@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>eclipse</groupId>
   <artifactId>maven-eclipse-plugin-test-project-3</artifactId>
   <version>88.0</version>
   <name>Maven</name>
-
   <description>
-    Tests creating just one sourceroot when test sourceroot and
-    main sourceroot are the same, and tests the same for 
-    two resourceroots for the same directory but with different
-    include/excludes.
+    Tests creating just one sourceroot when test sourceroot and main sourceroot are the same, and tests the same for two
+    resourceroots for the same directory but with different include/excludes.
   </description>
-
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,7 +17,6 @@
       <version>2.0</version>
     </dependency>
   </dependencies>
-
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
     <testSourceDirectory>src/main/java</testSourceDirectory>
@@ -47,6 +42,11 @@
         </excludes>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
-
 </project>

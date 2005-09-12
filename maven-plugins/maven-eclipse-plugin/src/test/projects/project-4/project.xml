@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>eclipse</groupId>
   <artifactId>maven-eclipse-plugin-test-project-4</artifactId>
   <version>88.0</version>
   <name>Maven</name>
-
-  <description>
-    Tests creating eclipse files in a different location
-  </description>
-
+  <description>Tests creating eclipse files in a different location</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -18,7 +13,6 @@
       <version>2.0</version>
     </dependency>
   </dependencies>
-
   <build>
     <testOutputDirectory>target/test-classes-dir</testOutputDirectory>
     <resources>

@@ -16,15 +16,6 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.StringUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,6 +23,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -61,12 +63,20 @@ public class EclipsePluginTest
     public void testProject4()
         throws Exception
     {
-        testProject( "project-4",  getTestFile( "target/project-4-test/" ) );
+        testProject( "project-4", getTestFile( "target/project-4-test/" ) );
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+    public void testProject5()
+        throws Exception
+    {
+        testProject( "project-5", null );
+    }
+
+    public void testProject6()
+        throws Exception
+    {
+        testProject( "project-6", null );
+    }
 
     private void testProject( String projectName, File outputDir )
         throws Exception
@@ -79,12 +89,16 @@ public class EclipsePluginTest
 
         File repo = getTestFile( "src/test/repository" );
 
-        ArtifactRepositoryLayout localRepositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+        ArtifactRepositoryLayout localRepositoryLayout = (ArtifactRepositoryLayout) lookup(
+                                                                                            ArtifactRepositoryLayout.ROLE,
+                                                                                            "legacy" );
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + repo.getAbsolutePath(),
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local",
+                                                                            "file://" + repo.getAbsolutePath(),
                                                                             localRepositoryLayout );
 
-        MavenProject project = builder.buildWithDependencies( new File( basedir, "project.xml" ), localRepository, null );
+        MavenProject project = builder
+            .buildWithDependencies( new File( basedir, "project.xml" ), localRepository, null );
 
         File projectOutputDir = basedir;
 
@@ -99,26 +113,56 @@ public class EclipsePluginTest
             projectOutputDir = new File( outputDir, project.getArtifactId() );
         }
 
-        System.err.println("basedir: " + basedir+"\noutputdir: " + outputDir+"\nprojectOutputDir: " + projectOutputDir );
+        // Shouldn't PlexusTestCase at least offer a predefined log instance?
+        //  if ( log.isDebugEnabled() )
+        //  {
+        //    log.debug( "basedir: " + basedir + "\noutputdir: " + outputDir + "\nprojectOutputDir: " + projectOutputDir );
+        //  }
 
         plugin.setOutputDir( outputDir );
-
 
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            artifact.setFile(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
+            artifact.setFile( new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) ) );
         }
 
         plugin.setProject( project );
 
         plugin.setLocalRepository( localRepository );
 
+        plugin.setArtifactFactory( (ArtifactFactory) lookup( ArtifactFactory.ROLE ) );
+        plugin.setArtifactResolver( (ArtifactResolver) lookup( ArtifactResolver.ROLE ) );
+        plugin.setRemoteArtifactRepositories( new ArrayList( 0 ) );
+
+        List projectNatures = new ArrayList();
+        projectNatures.add( "org.eclipse.jdt.core.javanature" );
+        plugin.setProjectnatures( projectNatures );
+
+        List buildcommands = new ArrayList();
+        buildcommands.add( "org.eclipse.jdt.core.javabuilder" );
+        plugin.setBuildcommands( buildcommands );
+
+        plugin.setClasspathContainers( new ArrayList() );
+
+        // @todo how to test injected parameters?
+
         plugin.execute();
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( projectOutputDir, ".project" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( projectOutputDir,
+                                                                                                  ".project" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( projectOutputDir, ".classpath" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( projectOutputDir,
+                                                                                                    ".classpath" ) );
+
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "wtpmodules" ), new File( projectOutputDir,
+                                                                                                     ".wtpmodules" ) );
+
+        if ( new File( basedir, "settings" ).exists() )
+        {
+            assertFileEquals( localRepository.getBasedir(), new File( basedir, "settings" ),
+                              new File( basedir, ".settings/org.eclipse.jdt.core.prefs" ) );
+        }
     }
 
     private void assertFileEquals( String mavenRepo, File expectedFile, File actualFile )
@@ -137,14 +181,21 @@ public class EclipsePluginTest
 
             expected = StringUtils.replace( expected, "${basedir}", basedir.replace( '\\', '/' ) );
 
-            if ( actualLines.size() < i )
+            if ( actualLines.size() <= i )
             {
-                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: " + expectedLines.size() );
+                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: "
+                    + expectedLines.size() );
             }
 
             String actual = actualLines.get( i ).toString();
 
-            assertEquals( "Checking line #" + (i + 1), expected, actual );
+            if ( expected.startsWith( "#" ) && actual.startsWith( "#" ) )
+            {
+                //ignore comments, for settings file
+                continue;
+            }
+
+            assertEquals( "Checking line #" + ( i + 1 ), expected, actual );
         }
 
         assertTrue( "Unequal number of lines.", expectedLines.size() == actualLines.size() );
@@ -159,7 +210,7 @@ public class EclipsePluginTest
 
         String line;
 
-        while ( (line = reader.readLine()) != null )
+        while ( ( line = reader.readLine() ) != null )
         {
             lines.add( line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
         }
