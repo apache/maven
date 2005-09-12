@@ -276,8 +276,8 @@ public class DoxiaMojo
                 if ( generatedSiteFile.exists() )
                 {
                     InputStream siteDescriptor = getSiteDescriptor( reports, locale );
-                    siteRenderer.render( generatedSiteFile, localeOutputDirectory, siteDescriptor, template,
-                                         attributes, locale );
+                    siteRenderer.render( generatedSiteFile, localeOutputDirectory, siteDescriptor, template, attributes,
+                                         locale );
                 }
 
                 // Generate static site
@@ -339,15 +339,16 @@ public class DoxiaMojo
                     }
                     catch ( Exception e )
                     {
-                        throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
+                        throw new MojoExecutionException( "An error is occurred in project reports page generation.",
+                                                          e );
                     }
                 }
 
                 // Try to generate the index.html
                 if ( duplicate.get( "index" ) != null )
                 {
-                    getLog().info( "Ignoring the index file generation for the \"" + getDisplayLanguage( locale )
-                                       + "\" version." );
+                    getLog().info( "Ignoring the index file generation for the \"" + getDisplayLanguage( locale ) +
+                        "\" version." );
                 }
                 else
                 {
@@ -362,8 +363,8 @@ public class DoxiaMojo
 
                     if ( duplicate.get( reportFileName ) != null )
                     {
-                        getLog().info( "Override the generated file \"" + reportFileName + "\" for the \""
-                                           + getDisplayLanguage( locale ) + "\" version." );
+                        getLog().info( "Override the generated file \"" + reportFileName + "\" for the \"" +
+                            getDisplayLanguage( locale ) + "\" version." );
                     }
                 }
 
@@ -397,21 +398,26 @@ public class DoxiaMojo
                     MavenProject parentProject = project.getParent();
                     if ( parentProject != null )
                     {
-/* Not working: 1) parentProject.getBasedir() returns the current basedir for some reason, so it copies inside itself
-which loops forever, and 2) this might be better working as a top-level aggregation rather than pushing from the
-subprojects...
                         // TODO Handle user plugin configuration
-                        File parentSiteDir = new File( parentProject.getBasedir(),
-                                                       parentProject.getBuild().getDirectory() + File.separator +
-                                                           "site" + File.separator + project.getArtifactId() );
-
-                        if ( !parentSiteDir.exists() )
+/* TODO: Not working, and would be better working as a top-level aggregation rather than pushing from the subprojects...
+                        File basedir = parentProject.getBasedir();
+                        if ( basedir != null )
                         {
-                            parentSiteDir.mkdirs();
-                        }
+                            String path = parentProject.getBuild().getDirectory() + "/site/" + project.getArtifactId();
+                            File parentSiteDir = new File( basedir, path );
 
-                        File siteDir = new File( outputDirectory );
-                        FileUtils.copyDirectoryStructure( siteDir, parentSiteDir );
+                            if ( !parentSiteDir.exists() )
+                            {
+                                parentSiteDir.mkdirs();
+                            }
+
+                            File siteDir = new File( outputDirectory );
+                            FileUtils.copyDirectoryStructure( siteDir, parentSiteDir );
+                        }
+                        else
+                        {
+                            getLog().info( "Not using parent as it was not located on the filesystem" );
+                        }
 */
                     }
                 }
@@ -447,8 +453,8 @@ subprojects...
             }
             else
             {
-                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for "
-                    + report.getName( defaultLocale ) + " mojo isn't valid." );
+                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
+                    report.getName( defaultLocale ) + " mojo isn't valid." );
             }
         }
     }
@@ -535,7 +541,8 @@ subprojects...
         return buffer.toString();
     }
 
-    private void writeReportSubMenu( List reports, StringBuffer buffer, Locale locale, String key, String indexFilename )
+    private void writeReportSubMenu( List reports, StringBuffer buffer, Locale locale, String key,
+                                     String indexFilename )
     {
         if ( reports.size() > 0 )
         {
@@ -802,9 +809,9 @@ subprojects...
                     outputFile.getParentFile().mkdirs();
                 }
 
-                siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ),
-                                                                       outputEncoding ), template, attributes, sink,
-                                               locale );
+                siteRenderer.generateDocument(
+                    new OutputStreamWriter( new FileOutputStream( outputFile ), outputEncoding ), template, attributes,
+                    sink, locale );
             }
         }
     }
@@ -982,8 +989,8 @@ subprojects...
 
                 if ( is == null )
                 {
-                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE
-                        + " template." );
+                    throw new IOException(
+                        "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE + " template." );
                 }
 
                 File outputFile = new File( outputDir, line );
@@ -1017,7 +1024,7 @@ subprojects...
         {
             DirectoryScanner scanner = new DirectoryScanner();
 
-            String[] includedResources = { "**/**" };
+            String[] includedResources = {"**/**"};
 
             scanner.setIncludes( includedResources );
 
@@ -1066,7 +1073,8 @@ subprojects...
 
         if ( project.getModel().getReports() != null )
         {
-            getLog().error( "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+            getLog().error(
+                "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
 
         List reports = new ArrayList();
@@ -1184,10 +1192,11 @@ subprojects...
                 {
                     if ( sb == null )
                     {
-                        sb = new StringBuffer( "Some files are duplicates in the site directory or in the generated-site directory. " );
+                        sb = new StringBuffer(
+                            "Some files are duplicates in the site directory or in the generated-site directory. " );
                         sb.append( "\n" );
-                        sb.append( "Review the following files for the \"" + getDisplayLanguage( locale )
-                            + "\" version:" );
+                        sb.append(
+                            "Review the following files for the \"" + getDisplayLanguage( locale ) + "\" version:" );
                     }
 
                     sb.append( "\n" );
