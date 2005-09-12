@@ -234,9 +234,13 @@ public class RepositoryMetadata
                 {
                     insideVersioning = false;
                 }
-                else if ( insideSnapshot && "snapshot".equals( rawName ) )
+                else if ( insideSnapshot )
                 {
-                    if ( "buildNumber".equals( rawName ) )
+                    if ( "snapshot".equals( rawName ) )
+                    {
+                        insideSnapshot = false;
+                    }
+                    else if ( "buildNumber".equals( rawName ) )
                     {
                         try
                         {
@@ -255,15 +259,17 @@ public class RepositoryMetadata
                     {
                         metadata.setLocalCopy( Boolean.valueOf( getBodyText() ).booleanValue() );
                     }
-                    insideSnapshot = false;
                 }
-                else if ( insideVersions && "versions".equals( rawName ) )
+                else if ( insideVersions )
                 {
-                    if ( "version".equals( rawName ) )
+                    if ( "versions".equals( rawName ) )
+                    {
+                        insideVersions = false;
+                    }
+                    else if ( "version".equals( rawName ) )
                     {
                         metadata.addVersion( getBodyText() );
                     }
-                    insideVersions = false;
                 }
                 else if ( "latest".equals( rawName ) )
                 {
