@@ -95,11 +95,11 @@ public class DefaultRepositoryMetadataManager
                     {
                         metadata.storeInLocalRepository( localRepository, repository );
                     }
-                    cachedMetadata.add( metadata.getKey() );
                 }
                 loadMetadata( metadata, repository, localRepository );
             }
         }
+        cachedMetadata.add( metadata.getKey() );
     }
 
     private void loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
