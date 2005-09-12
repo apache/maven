@@ -983,6 +983,7 @@ public class PrepareReleaseMojo
         modelToFix.setGroupId( correctModel.getGroupId() );
         modelToFix.setPackaging( correctModel.getPackaging() );
         modelToFix.setModules( cloneModules( correctModel.getModules() ) );
+        modelToFix.setDistributionManagement( correctModel.getDistributionManagement() );
     }
 
     private static List cloneModules( List modules )
