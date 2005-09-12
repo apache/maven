@@ -183,6 +183,8 @@ it0063: Test the use of a system scoped dependency to tools.jar.
 it0064: Test the use of a mojo that uses setters instead of private fields
         for the population of configuration values.
 
+it0065: Test that the basedir of the parent is set correctly.
+
 -------------------------------------------------------------------------------
 
 - generated sources

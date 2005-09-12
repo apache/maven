@@ -1,0 +1,28 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.it</groupId>
+    <artifactId>maven-core-it0065</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>maven-core-it0065-subproject</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.it</groupId>
+        <artifactId>maven-it0065-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-basedir</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</model>
