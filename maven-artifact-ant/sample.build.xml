@@ -29,11 +29,11 @@
   </target>
 
   <target name="test-no-deps" depends="initTaskDefs">
-     <artifact:dependencies filesetId="runtime.fileset">
-     </artifact:dependencies> 
-     <copy todir="target/test-no-deps" verbose="true">
-       <fileset refid="runtime.fileset" />
-     </copy>
+    <artifact:dependencies filesetId="runtime.fileset">
+    </artifact:dependencies>
+    <copy todir="target/test-no-deps" verbose="true">
+      <fileset refid="runtime.fileset"/>
+    </copy>
   </target>
 
   <target name="test-bad-dep" depends="initTaskDefs">
@@ -61,7 +61,7 @@
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2">
         <exclusion groupId="junit" artifactId="junit"/>
       </dependency>
-      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-4-SNAPSHOT"/>
+      <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
       <dependency groupId="org.apache.maven" artifactId="maven-core-it-support-old-location" version="1.1"/>
       <localRepository refid="local.repository"/>
       <remoteRepository url="http://snapshots.maven.codehaus.org/maven2">
@@ -135,7 +135,7 @@
 
     <artifact:dependencies pathId="dependency.classpath">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
-      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-4-SNAPSHOT"/>
+      <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
 
@@ -154,7 +154,7 @@
 
     <artifact:dependencies pathId="dependency.classpath.scm">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
-      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-4-SNAPSHOT"/>
+      <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
       <localRepository refid="local.repository.scm"/>
       <remoteRepository refid="deploy.repository"/>
     </artifact:dependencies>
