@@ -167,7 +167,7 @@ public class RepositoryMetadata
 
     public String constructVersion( String baseVersion )
     {
-        if ( snapshotTimestamp != null )
+        if ( snapshotTimestamp != null && !localCopy )
         {
             baseVersion = StringUtils.replace( baseVersion, "SNAPSHOT", snapshotTimestamp + "-" + snapshotBuildNumber );
         }
@@ -200,7 +200,14 @@ public class RepositoryMetadata
                 {
                     if ( "buildNumber".equals( rawName ) )
                     {
-                        metadata.setSnapshotBuildNumber( Integer.valueOf( getBodyText() ).intValue() );
+                        try
+                        {
+                            metadata.setSnapshotBuildNumber( Integer.valueOf( getBodyText() ).intValue() );
+                        }
+                        catch ( NumberFormatException e )
+                        {
+                            // Ignore
+                        }
                     }
                     else if ( "timestamp".equals( rawName ) )
                     {

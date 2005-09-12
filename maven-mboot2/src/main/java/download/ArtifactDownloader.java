@@ -171,7 +171,8 @@ public class ArtifactDownloader
                     {
                         log( "Using metadata: " + file );
 
-                        RepositoryMetadata metadata = RepositoryMetadata.read( file );
+                        RepositoryMetadata metadata;
+                        metadata = RepositoryMetadata.read( file );
 
                         if ( version.equals( metadata.getVersion() ) )
                         {
