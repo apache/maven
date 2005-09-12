@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * TODO: describe
+ * I/O for repository metadata.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
@@ -53,6 +53,8 @@ public class RepositoryMetadata
     private List versions = new ArrayList();
 
     private String latestVersion;
+
+    private boolean localCopy;
 
     public String getSnapshotTimestamp()
     {
@@ -139,6 +141,16 @@ public class RepositoryMetadata
         versions.add( version );
     }
 
+    public boolean isLocalCopy()
+    {
+        return localCopy;
+    }
+
+    public void setLocalCopy( boolean localCopy )
+    {
+        this.localCopy = localCopy;
+    }
+
     public static RepositoryMetadata read( File file )
         throws IOException, ParserConfigurationException, SAXException
     {
@@ -193,6 +205,10 @@ public class RepositoryMetadata
                     else if ( "timestamp".equals( rawName ) )
                     {
                         metadata.setSnapshotTimestamp( getBodyText() );
+                    }
+                    else if ( "localCopy".equals( rawName ) )
+                    {
+                        metadata.setLocalCopy( Boolean.valueOf( getBodyText() ).booleanValue() );
                     }
                 }
                 else if ( insideVersions )
@@ -301,6 +317,7 @@ public class RepositoryMetadata
                 writeLine( w, "    ", "latest", metadata.getLatestVersion() );
                 writeLine( w, "    ", "release", metadata.getReleaseVersion() );
                 w.println( "    <snapshot>" );
+                writeLine( w, "      ", "localCopy", String.valueOf( metadata.isLocalCopy() ) );
                 writeLine( w, "      ", "buildNumber", String.valueOf( metadata.getSnapshotBuildNumber() ) );
                 writeLine( w, "      ", "timestamp", metadata.getSnapshotTimestamp() );
                 w.println( "    </snapshot>" );

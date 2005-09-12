@@ -819,6 +819,11 @@ public class MBoot
         metadata.setReleaseVersion( version );
         file = localRepository.getMetadataFile( groupId, artifactId, null, type, "maven-metadata-local.xml" );
         metadata.write( file );
+
+        metadata = new RepositoryMetadata();
+        metadata.setLocalCopy( true );
+        file = localRepository.getMetadataFile( groupId, artifactId, version, type, "maven-metadata-local.xml" );
+        metadata.write( file );
     }
 
     private void runTests( String basedir, String classes, String testClasses, ModelReader reader,

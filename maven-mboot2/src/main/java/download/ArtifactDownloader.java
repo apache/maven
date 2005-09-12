@@ -75,14 +75,14 @@ public class ArtifactDownloader
                 // not exists so create it if missing.
                 File directory = destinationFile.getParentFile();
 
-                if ( directory.exists() == false )
+                if ( !directory.exists() )
                 {
                     directory.mkdirs();
                 }
 
                 boolean snapshot = isSnapshot( dep );
 
-                if ( dep.getGroupId().equals( "org.apache.maven" ) && snapshot )
+                if ( "org.apache.maven".equals( dep.getGroupId() ) && snapshot )
                 {
                     //skip our own
                     continue;
@@ -143,7 +143,8 @@ public class ArtifactDownloader
                     File remoteFile = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
                                                                        dep.getVersion(), dep.getType(), filename );
                     String metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
-                                                                      dep.getVersion(), dep.getType(), "maven-metadata.xml" );
+                                                                      dep.getVersion(), dep.getType(),
+                                                                      "maven-metadata.xml" );
                     String metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
                     log( "Downloading " + metaUrl );
                     try
