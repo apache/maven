@@ -76,6 +76,7 @@ public class DefaultArtifactDeployer
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                 repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
             }
+            artifact.getMetadataList().clear();
         }
         catch ( TransferFailedException e )
         {

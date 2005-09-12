@@ -75,6 +75,7 @@ public class DefaultArtifactInstaller
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                 repositoryMetadataManager.install( metadata, localRepository );
             }
+            artifact.getMetadataList().clear();
         }
         catch ( IOException e )
         {
