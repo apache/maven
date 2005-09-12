@@ -518,7 +518,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, repositories, profileManager );
+            project = processProjectLogic( pomLocation, project, repositories, profileManager, projectDir );
         }
         catch ( ModelInterpolationException e )
         {
@@ -544,7 +544,7 @@ public class DefaultMavenProjectBuilder
      * and projects are not cached or reused
      */
     private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories,
-                                              ProfileManager profileMgr )
+                                              ProfileManager profileMgr, File projectDir )
         throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
@@ -571,17 +571,9 @@ public class DefaultMavenProjectBuilder
         // We don't need all the project methods that are added over those in the model, but we do need basedir
         Map context = new HashMap( System.getProperties() );
 
-        // FIXME: why is project.file not filled in here? MavenProject.getBasedir() defaults
-        // to the current directory which causes all sorts of problems; might be better off
-        // setting that to null and just filling in the project file name and removing this.
-
-        if ( pomLocation != null && new File( pomLocation ).getParent() != null )
+        if ( projectDir != null )
         {
-            context.put( "basedir", new File( pomLocation ).getParent() );
-        }
-        else
-        {
-            context.put( "basedir", project.getBasedir() );
+            context.put( "basedir", projectDir.getAbsolutePath() );
         }
 
         model = modelInterpolator.interpolate( model, context );
@@ -717,7 +709,7 @@ public class DefaultMavenProjectBuilder
             model = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
 
             // the only way this will have a value is if we find the parent on disk...
-            File parentProjectDir = null;
+            File parentDescriptor = null;
 
             String parentRelativePath = parentModel.getRelativePath();
 
@@ -725,7 +717,7 @@ public class DefaultMavenProjectBuilder
             // <relativePath/>
             if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
             {
-                File parentDescriptor = new File( projectDir, parentRelativePath );
+                parentDescriptor = new File( projectDir, parentRelativePath );
 
                 try
                 {
@@ -743,15 +735,15 @@ public class DefaultMavenProjectBuilder
                     Model candidateParent = readModel( parentDescriptor );
 
                     // this works because parent-version is still required...
+                    boolean versionMatches = parentModel.getVersion().equals( candidateParent.getVersion() );
+                    if ( !versionMatches && candidateParent.getParent() != null )
+                    {
+                        versionMatches = parentModel.getVersion().equals( candidateParent.getParent().getVersion() );
+                    }
                     if ( parentModel.getGroupId().equals( candidateParent.getGroupId() ) &&
-                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) && (
-                        parentModel.getVersion().equals( candidateParent.getVersion() ) || (
-                            candidateParent.getParent() != null &&
-                                parentModel.getVersion().equals( candidateParent.getParent().getVersion() ) ) ) )
+                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) && versionMatches )
                     {
                         model = candidateParent;
-
-                        parentProjectDir = parentDescriptor.getParentFile();
 
                         getLogger().debug( "Using parent-POM from the project hierarchy at: \'" +
                             parentModel.getRelativePath() + "\' for project: " + project.getId() );
@@ -790,8 +782,14 @@ public class DefaultMavenProjectBuilder
                 model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository );
             }
 
+            File parentProjectDir = null;
+            if ( parentDescriptor != null )
+            {
+                parentProjectDir = parentDescriptor.getParentFile();
+            }
             MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories );
+            parent.setFile( parentDescriptor );
 
             project.setParent( parent );
 
@@ -1098,11 +1096,12 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project.setFile( new File( ".", "pom.xml" ) );
+            // TODO: remove - confirm this was a correct decision
+//            project.setFile( new File( ".", "pom.xml" ) );
 
             List remoteRepositories = buildArtifactRepositories( superModel );
 
-            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null );
+            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null, null );
 
             return project;
         }
