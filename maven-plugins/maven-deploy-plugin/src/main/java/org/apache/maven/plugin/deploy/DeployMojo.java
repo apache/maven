@@ -57,11 +57,11 @@ public class DeployMojo
     private String packaging;
 
     /**
-     * @parameter expression="${project.file.parentFile}"
+     * @parameter expression="${project.file}"
      * @required
      * @readonly
      */
-    private File parentDir;
+    private File pomFile;
 
     /**
      * @parameter expression="${project.build.directory}"
@@ -120,10 +120,9 @@ public class DeployMojo
 
         // Deploy the POM
         boolean isPomArtifact = "pom".equals( packaging );
-        File pom = new File( parentDir, "pom.xml" );
         if ( !isPomArtifact )
         {
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
+            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pomFile );
             artifact.addMetadata( metadata );
         }
 
@@ -136,7 +135,7 @@ public class DeployMojo
         {
             if ( isPomArtifact )
             {
-                deployer.deploy( pom, artifact, deploymentRepository, localRepository );
+                deployer.deploy( pomFile, artifact, deploymentRepository, localRepository );
             }
             else
             {

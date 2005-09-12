@@ -45,11 +45,11 @@ public class InstallMojo
     protected String packaging;
 
     /**
-     * @parameter expression="${basedir}"
+     * @parameter expression="${project.file}"
      * @required
      * @readonly
      */
-    private File basedir;
+    private File pomFile;
 
     /**
      * @parameter expression="${project.build.directory}"
@@ -89,10 +89,9 @@ public class InstallMojo
         // TODO: push into transformation
         boolean isPomArtifact = "pom".equals( packaging );
 
-        File pom = new File( basedir, "pom.xml" );
         if ( !isPomArtifact )
         {
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
+            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pomFile );
             artifact.addMetadata( metadata );
         }
 
@@ -105,7 +104,7 @@ public class InstallMojo
         {
             if ( isPomArtifact )
             {
-                installer.install( pom, artifact, localRepository );
+                installer.install( pomFile, artifact, localRepository );
             }
             else
             {

@@ -185,6 +185,8 @@ it0064: Test the use of a mojo that uses setters instead of private fields
 
 it0065: Test that the basedir of the parent is set correctly.
 
+it0066: Test that nonstandard POM files will be installed correctly.
+
 -------------------------------------------------------------------------------
 
 - generated sources
