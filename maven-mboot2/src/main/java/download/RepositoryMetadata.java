@@ -196,53 +196,13 @@ public class RepositoryMetadata
         {
             if ( insideVersioning )
             {
-                if ( insideSnapshot )
+                if ( "snapshot".equals( rawName ) )
                 {
-                    if ( "buildNumber".equals( rawName ) )
-                    {
-                        try
-                        {
-                            metadata.setSnapshotBuildNumber( Integer.valueOf( getBodyText() ).intValue() );
-                        }
-                        catch ( NumberFormatException e )
-                        {
-                            // Ignore
-                        }
-                    }
-                    else if ( "timestamp".equals( rawName ) )
-                    {
-                        metadata.setSnapshotTimestamp( getBodyText() );
-                    }
-                    else if ( "localCopy".equals( rawName ) )
-                    {
-                        metadata.setLocalCopy( Boolean.valueOf( getBodyText() ).booleanValue() );
-                    }
+                    insideSnapshot = true;
                 }
-                else if ( insideVersions )
+                else if ( "versions".equals( rawName ) )
                 {
-                    if ( "version".equals( rawName ) )
-                    {
-                        metadata.addVersion( getBodyText() );
-                    }
-                }
-                else
-                {
-                    if ( "snapshot".equals( rawName ) )
-                    {
-                        insideSnapshot = true;
-                    }
-                    else if ( "versions".equals( rawName ) )
-                    {
-                        insideVersions = true;
-                    }
-                    else if ( "latest".equals( rawName ) )
-                    {
-                        metadata.setLatestVersion( getBodyText() );
-                    }
-                    else if ( "release".equals( rawName ) )
-                    {
-                        metadata.setReleaseVersion( getBodyText() );
-                    }
+                    insideVersions = true;
                 }
             }
             else
@@ -251,18 +211,6 @@ public class RepositoryMetadata
                 if ( "versioning".equals( rawName ) )
                 {
                     insideVersioning = true;
-                }
-                else if ( "groupId".equals( rawName ) )
-                {
-                    metadata.setGroupId( getBodyText() );
-                }
-                else if ( "artifactId".equals( rawName ) )
-                {
-                    metadata.setArtifactId( getBodyText() );
-                }
-                else if ( "version".equals( rawName ) )
-                {
-                    metadata.setVersion( getBodyText() );
                 }
             }
         }
@@ -286,14 +234,57 @@ public class RepositoryMetadata
                 {
                     insideVersioning = false;
                 }
-                if ( "snapshot".equals( rawName ) )
+                else if ( insideSnapshot && "snapshot".equals( rawName ) )
                 {
+                    if ( "buildNumber".equals( rawName ) )
+                    {
+                        try
+                        {
+                            metadata.setSnapshotBuildNumber( Integer.valueOf( getBodyText() ).intValue() );
+                        }
+                        catch ( NumberFormatException e )
+                        {
+                            // Ignore
+                        }
+                    }
+                    else if ( "timestamp".equals( rawName ) )
+                    {
+                        metadata.setSnapshotTimestamp( getBodyText() );
+                    }
+                    else if ( "localCopy".equals( rawName ) )
+                    {
+                        metadata.setLocalCopy( Boolean.valueOf( getBodyText() ).booleanValue() );
+                    }
                     insideSnapshot = false;
                 }
-                if ( "versions".equals( rawName ) )
+                else if ( insideVersions && "versions".equals( rawName ) )
                 {
+                    if ( "version".equals( rawName ) )
+                    {
+                        metadata.addVersion( getBodyText() );
+                    }
                     insideVersions = false;
                 }
+                else if ( "latest".equals( rawName ) )
+                {
+                    metadata.setLatestVersion( getBodyText() );
+                }
+                else if ( "release".equals( rawName ) )
+                {
+                    metadata.setReleaseVersion( getBodyText() );
+                }
+            }
+            else if ( "groupId".equals( rawName ) )
+            {
+                metadata.setGroupId( getBodyText() );
+            }
+            else if ( "artifactId".equals( rawName ) )
+            {
+                metadata.setArtifactId( getBodyText() );
+            }
+            else if ( "version".equals( rawName ) )
+            {
+                metadata.setVersion( getBodyText() );
             }
             bodyText = new StringBuffer();
         }
