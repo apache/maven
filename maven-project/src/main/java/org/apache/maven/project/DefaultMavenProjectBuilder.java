@@ -342,7 +342,7 @@ public class DefaultMavenProjectBuilder
                 }
 
                 // TODO: configurable actions dependant on status
-                if ( !artifact.isSnapshot() && status.compareTo( ArtifactStatus.VERIFIED ) < 0 )
+                if ( !artifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
                 {
                     // use default policy (enabled, daily update, warn on bad checksum)
                     ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
@@ -575,11 +575,11 @@ public class DefaultMavenProjectBuilder
 
         if ( pomLocation != null && new File( pomLocation ).getParent() != null )
         {
-        	context.put( "basedir", new File( pomLocation ).getParent() );
+            context.put( "basedir", new File( pomLocation ).getParent() );
         }
         else
         {
-        	context.put( "basedir", project.getBasedir() );
+            context.put( "basedir", project.getBasedir() );
         }
 
         model = modelInterpolator.interpolate( model, context );
