@@ -140,6 +140,11 @@
                                     s.setBuildNumber( snapshot.getBuildNumber() );
                                     changed = true;
                                 }
+                                if ( s.isLocalCopy() )
+                                {
+                                    s.setLocalCopy( false );
+                                    changed = true;
+                                }
                             }
                         }
                     }

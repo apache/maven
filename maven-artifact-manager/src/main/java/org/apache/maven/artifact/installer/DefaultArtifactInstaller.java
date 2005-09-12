@@ -75,7 +75,9 @@ public class DefaultArtifactInstaller
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                 repositoryMetadataManager.install( metadata, localRepository );
             }
-            artifact.getMetadataList().clear();
+            // TODO: would like to flush this, but the plugin metadata is added in advance, not as an install/deploy transformation
+            // This would avoid the need to merge and clear out the state during deployment
+//            artifact.getMetadataList().clear();
         }
         catch ( IOException e )
         {
