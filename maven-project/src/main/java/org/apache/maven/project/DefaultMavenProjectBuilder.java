@@ -346,6 +346,8 @@ public class DefaultMavenProjectBuilder
                 {
                     // use default policy (enabled, daily update, warn on bad checksum)
                     ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
+                    // TODO: re-enable [MNG-798/865]
+                    policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
 
                     if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
                     {
