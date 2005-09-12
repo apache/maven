@@ -272,7 +272,9 @@ public class DefaultMavenProjectBuilder
         Model model = readModel( projectDescriptor );
 
         // Always cache files in the source tree over those in the repository
-        modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
+        MavenProject p = new MavenProject( model );
+        p.setFile( projectDescriptor );
+        modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), p );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
                                       buildArtifactRepositories( getSuperModel() ),
@@ -319,8 +321,10 @@ public class DefaultMavenProjectBuilder
                                            ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Model model = getCachedModel( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-        if ( model == null )
+        MavenProject project = getCachedProject( artifact.getGroupId(), artifact.getArtifactId(),
+                                                 artifact.getVersion() );
+        Model model;
+        if ( project == null )
         {
             // TODO: can't assume artifact is a POM
             try
@@ -419,6 +423,10 @@ public class DefaultMavenProjectBuilder
                 }
 */
             }
+        }
+        else
+        {
+            model = project.getModel();
         }
 
         return model;
@@ -549,10 +557,12 @@ public class DefaultMavenProjectBuilder
     {
         Model model = project.getModel();
         String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
-        Model cachedModel = (Model) modelCache.get( key );
-        if ( cachedModel == null )
+        if ( !modelCache.containsKey( key ) )
         {
-            modelCache.put( key, model );
+            // clone the model because the profile injection below will modify this instance
+            MavenProject p = new MavenProject( ModelUtils.cloneModel( model ) );
+            p.setFile( project.getFile() );
+            modelCache.put( key, project );
         }
 
         List activeProfiles = project.getActiveProfiles();
@@ -706,10 +716,20 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException( "Missing version element from parent element" );
             }
 
-            model = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
-
             // the only way this will have a value is if we find the parent on disk...
             File parentDescriptor = null;
+
+            MavenProject p = getCachedProject( parentModel.getGroupId(), parentModel.getArtifactId(),
+                                               parentModel.getVersion() );
+            if ( p != null )
+            {
+                model = p.getModel();
+                parentDescriptor = p.getFile();
+            }
+            else
+            {
+                model = null;
+            }
 
             String parentRelativePath = parentModel.getRelativePath();
 
@@ -935,9 +955,9 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model getCachedModel( String groupId, String artifactId, String version )
+    private MavenProject getCachedProject( String groupId, String artifactId, String version )
     {
-        return (Model) modelCache.get( createCacheKey( groupId, artifactId, version ) );
+        return (MavenProject) modelCache.get( createCacheKey( groupId, artifactId, version ) );
     }
 
     private static String createCacheKey( String groupId, String artifactId, String version )
