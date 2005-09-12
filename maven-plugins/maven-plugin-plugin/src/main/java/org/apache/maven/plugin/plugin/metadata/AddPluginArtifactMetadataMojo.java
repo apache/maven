@@ -40,7 +40,6 @@ public class AddPluginArtifactMetadataMojo
     {
         Artifact projectArtifact = project.getArtifact();
 
-        // TODO: clean up
         Versioning versioning = new Versioning();
         versioning.setLatest( projectArtifact.getVersion() );
         ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( projectArtifact, versioning );

@@ -17,7 +17,6 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
@@ -75,16 +74,14 @@ public class SnapshotTransformation
         {
             int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
 
-            // TODO: Better way to create this - should have to construct Versioning
             Snapshot snapshot = new Snapshot();
             snapshot.setTimestamp( getDeploymentTimestamp() );
             snapshot.setBuildNumber( buildNumber + 1 );
 
-            ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
+            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
-            Versioning versioning = new Versioning();
-            versioning.setSnapshot( snapshot );
-            artifact.setResolvedVersion( constructVersion( versioning, artifact.getBaseVersion() ) );
+            artifact.setResolvedVersion(
+                constructVersion( metadata.getMetadata().getVersioning(), artifact.getBaseVersion() ) );
 
             artifact.addMetadata( metadata );
         }
@@ -127,7 +124,6 @@ public class SnapshotTransformation
                                                   ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: can we improve on this?
         RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );

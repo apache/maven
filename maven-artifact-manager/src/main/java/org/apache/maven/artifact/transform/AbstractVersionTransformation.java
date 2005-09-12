@@ -61,7 +61,6 @@ public abstract class AbstractVersionTransformation
     protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: can we improve on this?
         RepositoryMetadata metadata;
         if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
         {
