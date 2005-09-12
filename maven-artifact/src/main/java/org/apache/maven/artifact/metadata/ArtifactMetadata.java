@@ -25,19 +25,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @version $Id$
  * @todo merge with artifactmetadatasource
  * @todo retrieval exception not appropriate for store
- * @todo not happy about the store/retrieve methods - they use "this"
  */
 public interface ArtifactMetadata
 {
-    /**
-     * Store the metadata in the local repository.
-     *
-     * @param localRepository the local repository
-     * @param remoteRepository the remote repository it came from
-     */
-    void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException;
-
     /**
      * Whether this metadata should be stored alongside the artifact.
      */
@@ -77,6 +67,17 @@ public interface ArtifactMetadata
      * Merge a new metadata set into this piece of metadata.
      *
      * @param metadata the new metadata
+     * @todo this should only be needed on the repository metadata
      */
     void merge( ArtifactMetadata metadata );
+
+    /**
+     * Store the metadata in the local repository.
+     *
+     * @param localRepository the local repository
+     * @param remoteRepository the remote repository it came from
+     * @todo this should only be needed on the repository metadata
+     */
+    void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException;
 }

@@ -10,6 +10,16 @@
       <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
     </component>
 
+    <component>
+      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+      <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
     <!--
      |
      | Transformations
@@ -152,4 +162,10 @@
       </requirement>
     </requirements>
   </component>
+
+  <component>
+    <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+    <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+  </component>
+
 </component-set>

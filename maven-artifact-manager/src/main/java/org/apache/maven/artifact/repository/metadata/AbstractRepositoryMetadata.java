@@ -39,7 +39,7 @@ import java.io.Writer;
  * @version $Id$
  */
 public abstract class AbstractRepositoryMetadata
-    implements ArtifactMetadata
+    implements RepositoryMetadata
 {
     private Metadata metadata;
 
@@ -162,7 +162,12 @@ public abstract class AbstractRepositoryMetadata
         return versioning;
     }
 
-    protected Metadata getMetadata()
+    public void setMetadata( Metadata metadata )
+    {
+        this.metadata = metadata;
+    }
+
+    public Metadata getMetadata()
     {
         return metadata;
     }

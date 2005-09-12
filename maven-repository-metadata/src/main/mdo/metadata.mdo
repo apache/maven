@@ -121,6 +121,13 @@
                                 v.setSnapshot( snapshot );
                                 changed = true;
                             }
+                            else if ( snapshot.isLocalCopy() )
+                            {
+                                s.setLocalCopy( true );
+                                s.setTimestamp( null );
+                                s.setBuildNumber( 0 );
+                                changed = true;
+                            }
                             else
                             {
                                 if ( snapshot.getTimestamp() != null && !snapshot.getTimestamp().equals( s.getTimestamp() ) )
@@ -128,7 +135,7 @@
                                     s.setTimestamp( snapshot.getTimestamp() );
                                     changed = true;
                                 }
-                                if ( s.getBuildNumber() != snapshot.getBuildNumber() )
+                                if ( snapshot.getBuildNumber() > 0 && s.getBuildNumber() != snapshot.getBuildNumber() )
                                 {
                                     s.setBuildNumber( snapshot.getBuildNumber() );
                                     changed = true;
@@ -200,6 +207,13 @@
           <version>1.0.0</version>
           <description>The incremental build number</description>
           <type>int</type>
+        </field>
+        <field>
+          <name>localCopy</name>
+          <version>1.0.0</version>
+          <description>Whether to use a local copy instead (with filename that includes the base version)</description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
         </field>
       </fields>
     </class>

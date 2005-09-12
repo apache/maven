@@ -16,6 +16,8 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -93,4 +95,8 @@ public class GroupRepositoryMetadata
         return false;
     }
 
+    public void setRepository( ArtifactRepository remoteRepository )
+    {
+        // intentionally blank
+    }
 }

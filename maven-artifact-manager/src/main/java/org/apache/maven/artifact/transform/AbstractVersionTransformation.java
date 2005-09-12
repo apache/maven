@@ -18,27 +18,21 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +62,7 @@ public abstract class AbstractVersionTransformation
         throws ArtifactMetadataRetrievalException
     {
         // TODO: can we improve on this?
-        ArtifactMetadata metadata;
+        RepositoryMetadata metadata;
         if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
         {
             metadata = new ArtifactRepositoryMetadata( artifact );
@@ -80,49 +74,11 @@ public abstract class AbstractVersionTransformation
 
         repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
 
-/*
-        // TODO: can this go directly into the manager? At least share with DefaultPluginMappingManager
-        // TODO: use this, cache the output, select from that list instead of the next set
-        Versioning versioning = new Versioning();
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
-            mergeVersioning( versioning, loadVersioningInformation( metadata, repository, localRepository ) );
-        }
-        mergeVersioning( versioning, loadVersioningInformation( metadata, localRepository, localRepository ) );
-
-        String version = selectVersion( versioning, artifact.getVersion() );
-*/
-        Versioning versioning = null;
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
-            versioning = loadVersioningInformation( metadata, repository, localRepository, artifact );
-            if ( versioning != null )
-            {
-                artifact.setRepository( repository );
-                // TODO: merge instead (see above)
-                break;
-            }
-        }
-        Versioning v = loadVersioningInformation( metadata, localRepository, localRepository, artifact );
-        if ( v != null )
-        {
-            versioning = v;
-            // TODO: figure out way to avoid duplicated message
-            if ( getLogger().isDebugEnabled() /*&& !alreadyResolved*/ )
-            {
-                // Locally installed file is newer, don't use the resolved version
-                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
-            }
-        }
-
+        Metadata repoMetadata = metadata.getMetadata();
         String version = null;
-        if ( versioning != null )
+        if ( repoMetadata != null && repoMetadata.getVersioning() != null )
         {
-            version = constructVersion( versioning, artifact.getBaseVersion() );
+            version = constructVersion( repoMetadata.getVersioning(), artifact.getBaseVersion() );
         }
 
         if ( version == null )
@@ -135,9 +91,10 @@ public abstract class AbstractVersionTransformation
         }
 
         // TODO: also do this logging for other metadata?
+        // TODO: figure out way to avoid duplicated message
         if ( getLogger().isDebugEnabled() )
         {
-            if ( version != null && !version.equals( artifact.getBaseVersion() ) )
+            if ( !version.equals( artifact.getBaseVersion() ) )
             {
                 String message = artifact.getArtifactId() + ": resolved to version " + version;
                 if ( artifact.getRepository() != null )
@@ -150,39 +107,16 @@ public abstract class AbstractVersionTransformation
                 }
                 getLogger().debug( message );
             }
+            else
+            {
+                // Locally installed file is newer, don't use the resolved version
+                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
+            }
         }
         return version;
     }
 
     protected abstract String constructVersion( Versioning versioning, String baseVersion );
-
-/* TODO
-    private void mergeVersioning( Versioning dest, Versioning source )
-    {
-        // TODO: currently, it is first wins. We should probably compare the versions, or check timestamping?
-        // This could also let us choose the newer of the locally installed version and the remotely built version
-        if ( dest.getLatest() == null )
-        {
-            dest.setLatest( source.getLatest() );
-        }
-        if ( dest.getRelease() == null )
-        {
-            dest.setRelease( source.getRelease() );
-        }
-        if ( dest.getSnapshot() == null )
-        {
-            dest.setSnapshot( source.getSnapshot() );
-        }
-        for ( Iterator i = source.getVersions().iterator(); i.hasNext(); )
-        {
-            String version = (String) i.next();
-            if ( !dest.getVersions().contains( version ) )
-            {
-                dest.getVersions().add( version );
-            }
-        }
-    }
-*/
 
     /**
      * @todo remove in beta-2 - used for legacy handling
@@ -311,57 +245,5 @@ public abstract class AbstractVersionTransformation
     {
         // No type - one per POM
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
-    }
-
-    protected Versioning loadVersioningInformation( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                                    ArtifactRepository localRepository, Artifact artifact )
-        throws ArtifactMetadataRetrievalException
-    {
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
-
-        Versioning versioning = null;
-        if ( metadataFile.exists() )
-        {
-            Metadata metadata = readMetadata( metadataFile );
-            versioning = metadata.getVersioning();
-        }
-        return versioning;
-    }
-
-    /**
-     * @todo share with DefaultPluginMappingManager.
-     */
-    private static Metadata readMetadata( File mappingFile )
-        throws ArtifactMetadataRetrievalException
-    {
-        Metadata result;
-
-        Reader fileReader = null;
-        try
-        {
-            fileReader = new FileReader( mappingFile );
-
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read( fileReader );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot parse version information from: " + mappingFile, e );
-        }
-        finally
-        {
-            IOUtil.close( fileReader );
-        }
-        return result;
     }
 }

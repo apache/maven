@@ -24,10 +24,10 @@ import java.util.List;
 
 public interface RepositoryMetadataManager
 {
-    void resolve( ArtifactMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
+    void resolve( RepositoryMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException;
 
-    void resolveAlways( ArtifactMetadata metadata, ArtifactRepository localRepository,
+    void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
                         ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 

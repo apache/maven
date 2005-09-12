@@ -25,8 +25,8 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
-import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -276,40 +276,16 @@ public class MavenMetadataSource
                                            List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
         repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
 
-        // TODO: this has been ripped from AbstractVersionTransformation - stop duplication
-        Versioning versioning = null;
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
-            versioning = loadVersioningInformation( metadata, repository, localRepository, artifact );
-            if ( versioning != null )
-            {
-                artifact.setRepository( repository );
-                // TODO: merge instead (see above)
-                break;
-            }
-        }
-        Versioning v = loadVersioningInformation( metadata, localRepository, localRepository, artifact );
-        if ( v != null )
-        {
-            versioning = v;
-            // TODO: figure out way to avoid duplicated message
-            if ( getLogger().isDebugEnabled() /*&& !alreadyResolved*/ )
-            {
-                // Locally installed file is newer, don't use the resolved version
-                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
-            }
-        }
-
         List versions;
-        if ( versioning != null )
+        Metadata repoMetadata = metadata.getMetadata();
+        if ( repoMetadata != null )
         {
-            versions = new ArrayList( versioning.getVersions().size() );
-            for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            List metadataVersions = repoMetadata.getVersioning().getVersions();
+            versions = new ArrayList( metadataVersions.size() );
+            for ( Iterator i = metadataVersions.iterator(); i.hasNext(); )
             {
                 String version = (String) i.next();
                 versions.add( new DefaultArtifactVersion( version ) );
@@ -323,20 +299,19 @@ public class MavenMetadataSource
         return versions;
     }
 
-    private Versioning loadVersioningInformation( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                                    ArtifactRepository localRepository, Artifact artifact )
+    private Metadata loadMetadata( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
+                                   ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         File metadataFile = new File( localRepository.getBasedir(),
                                       localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
-        Versioning versioning = null;
+        Metadata metadata = null;
         if ( metadataFile.exists() )
         {
-            Metadata metadata = readMetadata( metadataFile );
-            versioning = metadata.getVersioning();
+            metadata = readMetadata( metadataFile );
         }
-        return versioning;
+        return metadata;
     }
 
     /**

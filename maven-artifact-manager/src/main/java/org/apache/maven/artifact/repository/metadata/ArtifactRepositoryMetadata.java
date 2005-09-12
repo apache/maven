@@ -17,6 +17,7 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Metadata for the artifact directory of the repository.
@@ -78,4 +79,8 @@ public class ArtifactRepositoryMetadata
         return false;
     }
 
+    public void setRepository( ArtifactRepository remoteRepository )
+    {
+        artifact.setRepository( remoteRepository );
+    }
 }

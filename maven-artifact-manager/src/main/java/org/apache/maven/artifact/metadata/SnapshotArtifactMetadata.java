@@ -175,4 +175,8 @@ public class SnapshotArtifactMetadata
         return artifact.getBaseVersion();
     }
 
+    public void setRepository( ArtifactRepository remoteRepository )
+    {
+        artifact.setRepository( remoteRepository );
+    }
 }

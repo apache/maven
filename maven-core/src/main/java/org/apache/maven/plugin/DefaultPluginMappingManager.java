@@ -16,23 +16,15 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -97,32 +89,14 @@ public class DefaultPluginMappingManager
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        ArtifactMetadata metadata = new GroupRepositoryMetadata( groupId );
+        RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
-        // TODO: can this go directly into the manager?
-        for ( Iterator i = pluginRepositories.iterator(); i.hasNext(); )
+        Metadata repoMetadata = metadata.getMetadata();
+        if ( repoMetadata != null )
         {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
-            loadRepositoryPluginMappings( metadata, repository, localRepository );
-        }
-        loadRepositoryPluginMappings( metadata, localRepository, localRepository );
-    }
-
-    private void loadRepositoryPluginMappings( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
-                                               ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
-
-        if ( metadataFile.exists() )
-        {
-            Metadata pluginMap = readMetadata( metadataFile );
-
-            for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
+            for ( Iterator pluginIterator = repoMetadata.getPlugins().iterator(); pluginIterator.hasNext(); )
             {
                 Plugin mapping = (Plugin) pluginIterator.next();
 
@@ -139,38 +113,5 @@ public class DefaultPluginMappingManager
                 pluginDefinitionsByPrefix.put( prefix, plugin );
             }
         }
-    }
-
-    private static Metadata readMetadata( File mappingFile )
-        throws ArtifactMetadataRetrievalException
-    {
-        Metadata result;
-
-        Reader fileReader = null;
-        try
-        {
-            fileReader = new FileReader( mappingFile );
-
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read( fileReader );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read plugin mappings from: " + mappingFile, e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read plugin mappings from: " + mappingFile, e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot parse plugin mappings from: " + mappingFile, e );
-        }
-        finally
-        {
-            IOUtil.close( fileReader );
-        }
-        return result;
     }
 }

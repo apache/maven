@@ -17,6 +17,7 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Metadata for the artifact version directory of the repository.
@@ -74,5 +75,10 @@ public class SnapshotArtifactRepositoryMetadata
     public boolean isSnapshot()
     {
         return artifact.isSnapshot();
+    }
+
+    public void setRepository( ArtifactRepository remoteRepository )
+    {
+        artifact.setRepository( remoteRepository );
     }
 }

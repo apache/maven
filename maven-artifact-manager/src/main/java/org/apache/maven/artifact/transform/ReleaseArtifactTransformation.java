@@ -88,7 +88,7 @@ public class ReleaseArtifactTransformation
         return new ReleaseArtifactMetadata( artifact );
     }
 
-    protected String constructVersion( Versioning versioning, String bS )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
         return versioning.getRelease();
     }

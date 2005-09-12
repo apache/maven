@@ -23,6 +23,8 @@ import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -58,10 +60,9 @@ public class SnapshotTransformation
     {
         if ( artifact.isSnapshot() )
         {
-            // TODO: Better way to create this - should have to construct Versioning
-            ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+            metadata.getMetadata().getVersioning().getSnapshot().setLocalCopy( true );
 
-            // TODO: should merge with other repository metadata sitting on the same level?
             artifact.addMetadata( metadata );
         }
     }
@@ -109,7 +110,11 @@ public class SnapshotTransformation
         Snapshot snapshot = versioning.getSnapshot();
         if ( snapshot != null )
         {
-            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
+            if ( snapshot.isLocalCopy() )
+            {
+                version = baseVersion;
+            }
+            else if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
                 version = StringUtils.replace( baseVersion, "SNAPSHOT", newVersion );
@@ -123,14 +128,21 @@ public class SnapshotTransformation
         throws ArtifactMetadataRetrievalException
     {
         // TODO: can we improve on this?
-        ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+        RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
         repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
 
-        Versioning versioning = loadVersioningInformation( metadata, remoteRepository, localRepository, artifact );
         int buildNumber = 0;
-        if ( versioning == null )
+        Metadata repoMetadata = metadata.getMetadata();
+        if ( repoMetadata != null )
+        {
+            if ( repoMetadata.getVersioning() != null && repoMetadata.getVersioning().getSnapshot() != null )
+            {
+                buildNumber = repoMetadata.getVersioning().getSnapshot().getBuildNumber();
+            }
+        }
+        else
         {
             try
             {
@@ -146,10 +158,6 @@ public class SnapshotTransformation
                 // safe to ignore, use default snapshot data
                 getLogger().debug( "Unable to find legacy metadata - ignoring" );
             }
-        }
-        else if ( versioning.getSnapshot() != null )
-        {
-            buildNumber = versioning.getSnapshot().getBuildNumber();
         }
         return buildNumber;
     }
