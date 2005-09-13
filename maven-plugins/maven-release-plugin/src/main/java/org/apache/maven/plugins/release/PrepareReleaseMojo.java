@@ -974,16 +974,55 @@ public class PrepareReleaseMojo
 
     private void fixNullValueInModel( Model modelToFix, Model correctModel )
     {
-        modelToFix.setModelVersion( correctModel.getModelVersion() );
-        modelToFix.setName( correctModel.getName() );
-        modelToFix.setParent( cloneParent( correctModel.getParent() ) );
-        modelToFix.setVersion( correctModel.getVersion() );
-        modelToFix.setArtifactId( correctModel.getArtifactId() );
-        modelToFix.setProperties( new Properties( correctModel.getProperties() ) );
-        modelToFix.setGroupId( correctModel.getGroupId() );
-        modelToFix.setPackaging( correctModel.getPackaging() );
-        modelToFix.setModules( cloneModules( correctModel.getModules() ) );
-        modelToFix.setDistributionManagement( correctModel.getDistributionManagement() );
+        if ( modelToFix.getModelVersion() != null )
+        {
+            modelToFix.setModelVersion( correctModel.getModelVersion() );
+        }
+
+        if ( modelToFix.getName() != null )
+        {
+            modelToFix.setName( correctModel.getName() );
+        }
+
+        if ( modelToFix.getParent() != null )
+        {
+            modelToFix.setParent( cloneParent( correctModel.getParent() ) );
+        }
+
+        if ( modelToFix.getVersion() != null )
+        {
+            modelToFix.setVersion( correctModel.getVersion() );
+        }
+
+        if ( modelToFix.getArtifactId() != null )
+        {
+            modelToFix.setArtifactId( correctModel.getArtifactId() );
+        }
+
+        if ( modelToFix.getProperties() != null && modelToFix.getProperties().isEmpty() )
+        {
+            modelToFix.setProperties( new Properties( correctModel.getProperties() ) );
+        }
+
+        if ( modelToFix.getGroupId() != null )
+        {
+            modelToFix.setGroupId( correctModel.getGroupId() );
+        }
+
+        if ( modelToFix.getPackaging() != null )
+        {
+            modelToFix.setPackaging( correctModel.getPackaging() );
+        }
+
+        if ( modelToFix.getModules() != null && !modelToFix.getModules().isEmpty() )
+        {
+            modelToFix.setModules( cloneModules( correctModel.getModules() ) );
+        }
+
+        if ( modelToFix.getDistributionManagement() != null )
+        {
+            modelToFix.setDistributionManagement( correctModel.getDistributionManagement() );
+        }
     }
 
     private static List cloneModules( List modules )
