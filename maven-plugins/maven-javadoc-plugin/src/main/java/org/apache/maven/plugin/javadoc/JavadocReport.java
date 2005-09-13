@@ -74,9 +74,6 @@ public class JavadocReport
     /** Default bottom */
     private static final String DEFAULT_BOTTOM = "Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved.";
 
-    /** Default bottom */
-    private static final String DEFAULT_DESTDIR = "${project.build.directory}/site/apidocs";
-
     /** Default doctitle */
     private static final String DEFAULT_DOCTITLE = "${windowtitle}";
 
@@ -93,10 +90,13 @@ public class JavadocReport
     // ----------------------------------------------------------------------
 
     /**
-     * @parameter expression="${project.build.directory}/site"
+     * Specifies the destination directory where javadoc saves the generated HTML files. 
+     * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#d">d</a>.
+     * 
+     * @parameter expression="${destDir}" alias="destDir" default-value="${project.build.directory}/javadoc/"
      * @required
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     /**
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
@@ -290,14 +290,6 @@ public class JavadocReport
      * @parameter expression="${charset}" default-value="ISO-8859-1"
      */
     private String charset = "ISO-8859-1";
-
-    /**
-     * Specifies the destination directory where javadoc saves the generated HTML files. 
-     * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#d">d</a>.
-     * 
-     * @parameter expression="${destDir}" default-value="${project.build.directory}/site/apidocs"
-     */
-    private String destDir;
 
     /**
      * Enables deep copying of "doc-files" directories.
@@ -563,7 +555,7 @@ public class JavadocReport
      */
     protected String getOutputDirectory()
     {
-        return outputDirectory;
+        return outputDirectory.getAbsoluteFile().toString();
     }
 
     /**
@@ -642,7 +634,16 @@ public class JavadocReport
                 }
             }
 
-            File javadocDirectory = new File( getProject().getBuild().getDirectory() + "/javadoc" );
+            File javadocDirectory = getReportOutputDirectory();
+            
+            if ( ! javadocDirectory.equals( getOutputDirectory() ) )
+            {
+            	// we're in site-embedded report mode, so Doxia has set the
+            	// reportOutputDirectory to the basedir of the site.
+            	// Append 'apidocs'.
+            	javadocDirectory = new File( javadocDirectory, "apidocs" );
+            }
+            
             if ( fileList != null && fileList.length != 0 )
             {
                 StringBuffer files = new StringBuffer();
@@ -761,12 +762,7 @@ public class JavadocReport
                     }
                     bottom += ". All Rights Reserved.";
                 }
-                if ( destDir.equals( DEFAULT_DESTDIR ) )
-                {
-                    File outputDir = new File( getReportOutputDirectory().getAbsolutePath() + "/apidocs" );
-                    outputDir.mkdirs();
-                    destDir = outputDir.getAbsolutePath();
-                }
+                
                 if ( StringUtils.isEmpty( stylesheetfile ) )
                 {
                     stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
@@ -785,7 +781,7 @@ public class JavadocReport
                 addArgIfNotEmpty( arguments, "-bottom", bottom );
                 addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
                 addArgIfNotEmpty( arguments, "-charset", charset );
-                addArgIfNotEmpty( arguments, "-d", destDir );
+                addArgIfNotEmpty( arguments, "-d", javadocDirectory.toString() );
                 addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
                 addArgIfNotEmpty( arguments, "-docencoding", docencoding );
                 addArgIfNotEmpty( arguments, "-doctitle", doctitle );
