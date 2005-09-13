@@ -43,17 +43,15 @@
           <model>src/main/mdo/verifications.mdo</model>
           <version>1.0.0</version>
         </configuration>
-        <goals>
-          <goal>
-            <id>xpp3-reader</id>
-          </goal>
-          <goal>
-            <id>xpp3-writer</id>
-          </goal>
-          <goal>
-            <id>java</id>
-          </goal>
-        </goals>
+        <executions>
+          <execution>
+            <goals>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

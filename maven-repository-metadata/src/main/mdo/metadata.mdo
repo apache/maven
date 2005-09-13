@@ -57,12 +57,12 @@
             {
                 boolean changed = false;
 
-                for ( Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+                for ( java.util.Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
                 {
                     Plugin plugin = (Plugin) i.next();
                     boolean found = false;
 
-                    for ( Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
+                    for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
                     {
                         Plugin preExisting = (Plugin) it.next();
 
@@ -102,7 +102,7 @@
                             changed = true;
                             v.setLatest( versioning.getLatest() );
                         }
-                        for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+                        for ( java.util.Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
                         {
                             String version = (String) i.next();
                             if ( !v.getVersions().contains( version ) )
