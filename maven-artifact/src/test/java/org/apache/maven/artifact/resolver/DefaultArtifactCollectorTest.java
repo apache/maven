@@ -123,7 +123,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, c.artifact} ), res.getArtifacts() );
     }
 
-    public void testResolveNearest()
+    public void testResolveNearestNewestIsNearest()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -136,6 +136,21 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
                       res.getArtifacts() );
         assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testResolveNearestOldestIsNearest()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "2.0" );
+
+        b.addDependency( "c", "3.0" );
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
+                      res.getArtifacts() );
+        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
     public void testResolveNearestWithRanges()

@@ -185,8 +185,6 @@ public class VersionRange
 
     public VersionRange restrict( VersionRange restriction )
     {
-        ArtifactVersion version = max( recommendedVersion, restriction.getRecommendedVersion() );
-
         List r1 = this.restrictions;
         List r2 = restriction.restrictions;
         List restrictions;
@@ -199,23 +197,32 @@ public class VersionRange
             restrictions = intersection( r1, r2 );
         }
 
-        if ( version != null && restrictions.size() > 0 )
+        ArtifactVersion version = null;
+        if ( restrictions.size() > 0 )
         {
             boolean found = false;
             for ( Iterator i = restrictions.iterator(); i.hasNext() && !found; )
             {
                 Restriction r = (Restriction) i.next();
 
-                if ( r.containsVersion( version ) )
+                if ( recommendedVersion != null && r.containsVersion( recommendedVersion ) )
                 {
+                    // if we find the original, use that
+                    version = recommendedVersion;
                     found = true;
                 }
+                else if ( version == null && restriction.getRecommendedVersion() != null &&
+                    r.containsVersion( restriction.getRecommendedVersion() ) )
+                {
+                    // use this if we can, but prefer the original if possible
+                    version = restriction.getRecommendedVersion();
+                }
             }
-
-            if ( !found )
-            {
-                version = null;
-            }
+        }
+        else
+        {
+            // no range, so the recommended version is valid
+            version = recommendedVersion;
         }
 
         return new VersionRange( version, restrictions );
@@ -504,7 +511,7 @@ public class VersionRange
         return matched;
     }
 
-    private boolean containsVersion( ArtifactVersion version )
+    public boolean containsVersion( ArtifactVersion version )
     {
         boolean matched = false;
         for ( Iterator i = restrictions.iterator(); i.hasNext() && !matched; )

@@ -137,9 +137,10 @@ public class DefaultArtifactCollector
             }
             else
             {
-                VersionRange newRange = previousRange.restrict( currentRange );
-                previous.getArtifact().setVersionRange( newRange );
-                node.getArtifact().setVersionRange( newRange );
+                // TODO: shouldn't need to double up on this work, only done for simplicity of handling recommended
+                // version but the restriction is identical
+                previous.getArtifact().setVersionRange( previousRange.restrict( currentRange ) );
+                node.getArtifact().setVersionRange( currentRange.restrict( previousRange ) );
             }
 
             // previous one is more dominant
