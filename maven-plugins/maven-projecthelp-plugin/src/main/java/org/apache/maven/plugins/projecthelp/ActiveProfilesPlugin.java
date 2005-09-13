@@ -73,4 +73,14 @@ public class ActiveProfilesPlugin extends AbstractMojo
         
     }
 
+    protected final List getProfiles()
+    {
+        return profiles;
+    }
+
+    protected final void setProfiles( List profiles )
+    {
+        this.profiles = profiles;
+    }
+
 }

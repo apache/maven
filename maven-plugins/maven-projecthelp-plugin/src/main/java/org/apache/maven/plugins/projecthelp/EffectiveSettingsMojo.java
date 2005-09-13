@@ -115,4 +115,24 @@ public class EffectiveSettingsMojo
         }
     }
 
+    protected final String getOutput()
+    {
+        return output;
+    }
+
+    protected final void setOutput( String output )
+    {
+        this.output = output;
+    }
+
+    protected final Settings getSettings()
+    {
+        return settings;
+    }
+
+    protected final void setSettings( Settings settings )
+    {
+        this.settings = settings;
+    }
+
 }

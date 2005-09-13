@@ -113,4 +113,24 @@ public class EffectivePomPlugin
         }
     }
 
+    protected final String getOutput()
+    {
+        return output;
+    }
+
+    protected final void setOutput( String output )
+    {
+        this.output = output;
+    }
+
+    protected final Model getPom()
+    {
+        return pom;
+    }
+
+    protected final void setPom( Model pom )
+    {
+        this.pom = pom;
+    }
+
 }
