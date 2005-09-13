@@ -10,11 +10,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 /*
@@ -37,34 +35,15 @@ public class DefaultProfileManager implements ProfileManager
 {
     private PlexusContainer container;
 
-    private Set activatedIds = new HashSet();
-    private Set deactivatedIds = new HashSet();
-    private Set defaultIds = new HashSet();
+    private List activatedIds = new ArrayList();
+    private List deactivatedIds = new ArrayList();
+    private List defaultIds = new ArrayList();
     
     private Map profilesById = new HashMap();
     
     public DefaultProfileManager( PlexusContainer container )
     {
         this.container = container;
-    }
-    
-    public DefaultProfileManager( ProfileManager globals, PlexusContainer container )
-    {
-        this.container = container;
-        
-        this.activatedIds.addAll( globals.getActivatedIds() );
-        this.deactivatedIds.addAll( globals.getDeactivatedIds() );
-        this.profilesById.putAll( globals.getProfilesById() );
-    }
-    
-    public Set getActivatedIds()
-    {
-        return activatedIds;
-    }
-    
-    public Set getDeactivatedIds()
-    {
-        return deactivatedIds;
     }
     
     public Map getProfilesById()
@@ -102,9 +81,12 @@ public class DefaultProfileManager implements ProfileManager
      */
     public void explicitlyActivate( String profileId )
     {
-        container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly activated." );
-        
-        activatedIds.add( profileId );
+        if ( !activatedIds.contains( profileId ) )
+        {
+            container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly activated." );
+
+            activatedIds.add( profileId );
+        }
     }
     
     /* (non-Javadoc)
@@ -125,9 +107,12 @@ public class DefaultProfileManager implements ProfileManager
      */
     public void explicitlyDeactivate( String profileId )
     {
-        container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly deactivated." );
-        
-        deactivatedIds.add( profileId );
+        if ( !deactivatedIds.contains( profileId ) )
+        {
+            container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly deactivated." );
+
+            deactivatedIds.add( profileId );
+        }
     }
     
     /* (non-Javadoc)
@@ -234,7 +219,25 @@ public class DefaultProfileManager implements ProfileManager
 
     public void activateAsDefault( String profileId )
     {
-        defaultIds.add( profileId );
+        if ( !defaultIds.contains( profileId ) )
+        {
+            defaultIds.add( profileId );
+        }
+    }
+
+    public List getExplicitlyActivatedIds()
+    {
+        return activatedIds;
+    }
+
+    public List getExplicitlyDeactivatedIds()
+    {
+        return deactivatedIds;
+    }
+
+    public List getIdsActivatedByDefault()
+    {
+        return defaultIds;
     }
     
 }

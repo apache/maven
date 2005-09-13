@@ -5,7 +5,6 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface ProfileManager
 {
@@ -27,10 +26,12 @@ public interface ProfileManager
 
     void addProfiles( List profiles );
 
-    public Set getActivatedIds();
+    Map getProfilesById();
     
-    public Set getDeactivatedIds();
+    List getExplicitlyActivatedIds();
     
-    public Map getProfilesById();
+    List getExplicitlyDeactivatedIds();
+    
+    List getIdsActivatedByDefault();
     
 }

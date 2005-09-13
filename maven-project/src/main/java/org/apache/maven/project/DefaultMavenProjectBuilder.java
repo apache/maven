@@ -433,7 +433,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List parentSearchRepositories, File projectDir, ProfileManager profileManager )
+                                List parentSearchRepositories, File projectDir, ProfileManager externalProfileManager )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -461,9 +461,9 @@ public class DefaultMavenProjectBuilder
         List activeExternalProfiles;
         try
         {
-            if ( profileManager != null )
+            if ( externalProfileManager != null )
             {
-                activeExternalProfiles = profileManager.getActiveProfiles();
+                activeExternalProfiles = externalProfileManager.getActiveProfiles();
             }
             else
             {
@@ -494,7 +494,7 @@ public class DefaultMavenProjectBuilder
         Model originalModel = ModelUtils.cloneModel( model );
 
         MavenProject project = assembleLineage( model, lineage, localRepository, projectDir, parentSearchRepositories,
-                                                aggregatedRemoteWagonRepositories );
+                                                aggregatedRemoteWagonRepositories, externalProfileManager );
 
         project.setOriginalModel( originalModel );
 
@@ -526,7 +526,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, repositories, profileManager, projectDir );
+            project = processProjectLogic( pomLocation, project, repositories, externalProfileManager, projectDir );
         }
         catch ( ModelInterpolationException e )
         {
@@ -658,7 +658,7 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject assembleLineage( Model model, LinkedList lineage, ArtifactRepository localRepository,
                                           File projectDir, List parentSearchRepositories,
-                                          Set aggregatedRemoteWagonRepositories )
+                                          Set aggregatedRemoteWagonRepositories, ProfileManager externalProfileManager )
         throws ProjectBuildingException
     {
         if ( !model.getRepositories().isEmpty() )
@@ -677,6 +677,12 @@ public class DefaultMavenProjectBuilder
         }
 
         ProfileManager profileManager = new DefaultProfileManager( container );
+        
+        if ( externalProfileManager != null )
+        {
+            profileManager.explicitlyActivate( externalProfileManager.getExplicitlyActivatedIds() );
+            profileManager.explicitlyDeactivate( externalProfileManager.getExplicitlyDeactivatedIds() );
+        }
 
         List activeProfiles;
 
@@ -813,7 +819,8 @@ public class DefaultMavenProjectBuilder
                 parentProjectDir = parentDescriptor.getParentFile();
             }
             MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
-                                                   parentSearchRepositories, aggregatedRemoteWagonRepositories );
+                                                   parentSearchRepositories, aggregatedRemoteWagonRepositories,
+                                                   externalProfileManager );
             parent.setFile( parentDescriptor );
 
             project.setParent( parent );
