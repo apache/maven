@@ -29,7 +29,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.Requirement;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.codehaus.modello.StringUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;

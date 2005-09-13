@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <model>
   <id>settings</id>
   <name>Settings</name>
@@ -212,12 +214,12 @@
     {
         if(activeProxy == null)
         {
-            List proxies = getProxies();
+            java.util.List proxies = getProxies();
             if ( proxies != null && !proxies.isEmpty() )
             {
                 if ( proxies.size() > 1 )
                 {
-                    for ( Iterator it = proxies.iterator(); it.hasNext(); )
+                    for ( java.util.Iterator it = proxies.iterator(); it.hasNext(); )
                     {
                         Proxy proxy = (Proxy) it.next();
                         if ( proxy.isActive() )
@@ -242,10 +244,10 @@
     {
         Server match = null;
 
-        List servers = getServers();
+        java.util.List servers = getServers();
         if ( servers != null && serverId != null )
         {
-            for ( Iterator it = servers.iterator(); it.hasNext(); )
+            for ( java.util.Iterator it = servers.iterator(); it.hasNext(); )
             {
                 Server server = (Server) it.next();
                 if ( serverId.equals( server.getId() ) )
@@ -263,10 +265,10 @@
     {
         Mirror match = null;
 
-        List mirrors = getMirrors();
+        java.util.List mirrors = getMirrors();
         if ( mirrors != null && repositoryId != null )
         {
-            for ( Iterator it = mirrors.iterator(); it.hasNext(); )
+            for ( java.util.Iterator it = mirrors.iterator(); it.hasNext(); )
             {
                 Mirror mirror = (Mirror) it.next();
                 if ( repositoryId.equals( mirror.getMirrorOf() ) )
@@ -280,22 +282,22 @@
         return match;
     }
     
-    private Map profileMap;
+    private java.util.Map profileMap;
     
     public void flushProfileMap()
     {
         this.profileMap = null;
     }
     
-    public Map getProfilesAsMap()
+    public java.util.Map getProfilesAsMap()
     {
         if ( profileMap == null )
         {
-            profileMap = new HashMap();
+            profileMap = new java.util.HashMap();
             
             if ( getProfiles() != null )
             {
-                for ( Iterator it = getProfiles().iterator(); it.hasNext(); )
+                for ( java.util.Iterator it = getProfiles().iterator(); it.hasNext(); )
                 {
                     Profile profile = (Profile) it.next();
                     

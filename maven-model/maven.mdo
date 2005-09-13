@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <!--
  |
  | o add specification element to a field, this would be more a technical description of
@@ -742,21 +744,21 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    Map pluginMap;
+    java.util.Map pluginMap;
     
     public void flushPluginMap()
     {
         this.pluginMap = null;
     }
 
-    public Map getPluginsAsMap()
+    public java.util.Map getPluginsAsMap()
     {
         if ( pluginMap == null )
         {
-            pluginMap = new HashMap();
+            pluginMap = new java.util.HashMap();
             if ( plugins != null )
             {
-                for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                for ( java.util.Iterator it = plugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
                     pluginMap.put( plugin.getKey(), plugin );
@@ -1334,12 +1336,12 @@
                     return getJar();
                 }
 
-				String artifact;
+                String artifact;
 
                 if ("ejb-client".equals(getType())) {
-                	artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
+                  artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
                 } else {
-                	artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
+                  artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
                 }
 
                 return artifact;
@@ -1759,6 +1761,28 @@
           <defaultValue>../pom.xml</defaultValue>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+            public String getId()
+            {
+                StringBuffer id = new StringBuffer();
+
+                id.append( getGroupId() );
+                id.append( ":" );
+                id.append( getArtifactId() );
+                id.append( ":" );
+              //  id.append( getPackaging() );
+                id.append( ":" );
+                id.append( getVersion() );
+
+                return id.toString();
+            }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+
     </class>
     <class>
       <name>Repository</name>
@@ -2343,21 +2367,21 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    private Map executionMap = null;
+    private java.util.Map executionMap = null;
     
     public void flushExecutionMap()
     {
         this.executionMap = null;
     }
 
-    public Map getExecutionsAsMap()
+    public java.util.Map getExecutionsAsMap()
     {
         if ( executionMap == null )
         {
-            executionMap = new HashMap();
+            executionMap = new java.util.HashMap();
             if ( getExecutions() != null )
             {
-                for ( Iterator i = getExecutions().iterator(); i.hasNext(); )
+                for ( java.util.Iterator i = getExecutions().iterator(); i.hasNext(); )
                 {
                     PluginExecution exec = (PluginExecution) i.next();
                     
@@ -2385,7 +2409,7 @@
     }
 
     /** @deprecated */
-    private Map goalMap = null;
+    private java.util.Map goalMap = null;
     /** @deprecated */
     public void flushGoalMap()
     {
@@ -2393,14 +2417,14 @@
     }
 
     /** @deprecated */
-    public Map getGoalsAsMap()
+    public java.util.Map getGoalsAsMap()
     {
         if ( goalMap == null )
         {
-            goalMap = new HashMap();
+            goalMap = new java.util.HashMap();
             if ( goals != null )
             {
-                for ( Iterator i = goals.iterator(); i.hasNext(); )
+                for ( java.util.Iterator i = goals.iterator(); i.hasNext(); )
                 {
                     Goal g = (Goal) i.next();
                     goalMap.put( g.getId(), g );
@@ -2512,21 +2536,21 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    Map reportPluginMap;
+    java.util.Map reportPluginMap;
     
     public void flushReportPluginMap()
     {
         this.reportPluginMap = null;
     }
 
-    public Map getReportPluginsAsMap()
+    public java.util.Map getReportPluginsAsMap()
     {
         if ( reportPluginMap == null )
         {
-            reportPluginMap = new HashMap();
+            reportPluginMap = new java.util.HashMap();
             if ( getPlugins() != null )
             {
-                for ( Iterator it = getPlugins().iterator(); it.hasNext(); )
+                for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
                 {
                     ReportPlugin reportPlugin = (ReportPlugin) it.next();
                     reportPluginMap.put( reportPlugin.getKey(), reportPlugin );
@@ -2742,21 +2766,21 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    private Map reportSetMap = null;
+    private java.util.Map reportSetMap = null;
     
     public void flushReportSetMap()
     {
         this.reportSetMap = null;
     }
 
-    public Map getReportSetsAsMap()
+    public java.util.Map getReportSetsAsMap()
     {
         if ( reportSetMap == null )
         {
-            reportSetMap = new HashMap();
+            reportSetMap = new java.util.HashMap();
             if ( getReportSets() != null )
             {
-                for ( Iterator i = getReportSets().iterator(); i.hasNext(); )
+                for ( java.util.Iterator i = getReportSets().iterator(); i.hasNext(); )
                 {
                     ReportSet reportSet = (ReportSet) i.next();
                     reportSetMap.put( reportSet.getId(), reportSet );

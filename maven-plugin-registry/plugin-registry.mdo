@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <model>
   <id>plugin-registry</id>
   <name>PluginRegistry</name>
@@ -97,15 +99,15 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
-    private Map pluginsByKey;
+    private java.util.Map pluginsByKey;
     
-    public Map getPluginsByKey()
+    public java.util.Map getPluginsByKey()
     {
         if ( pluginsByKey == null )
         {
-            pluginsByKey = new HashMap();
+            pluginsByKey = new java.util.HashMap();
             
-            for ( Iterator it = getPlugins().iterator(); it.hasNext(); )
+            for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
             

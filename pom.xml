@@ -172,6 +172,11 @@
         <artifactId>plexus-utils</artifactId>
         <version>1.0.2-SNAPSHOT</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <version>1.0-alpha-5-SNAPSHOT</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <modules>
