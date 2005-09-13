@@ -233,7 +233,8 @@ public class PluginParameterExpressionEvaluator
                 logger.error( "Got expression '" + expression + "' that was not recognised" );
             }
         }
-        else
+        
+        if ( value == null )
         {
             // Check properties that have been injected via profiles before we default over to
             // system properties.
