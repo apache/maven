@@ -188,6 +188,7 @@ public class DefaultArtifactVersion
             {
                 // qualifier is the whole version, including "-"
                 qualifier = version;
+                buildNumber = null;
             }
         }
         else
