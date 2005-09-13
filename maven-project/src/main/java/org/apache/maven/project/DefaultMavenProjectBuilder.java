@@ -562,7 +562,7 @@ public class DefaultMavenProjectBuilder
             // clone the model because the profile injection below will modify this instance
             MavenProject p = new MavenProject( ModelUtils.cloneModel( model ) );
             p.setFile( project.getFile() );
-            modelCache.put( key, project );
+            modelCache.put( key, p );
         }
 
         List activeProfiles = project.getActiveProfiles();
