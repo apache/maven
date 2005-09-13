@@ -154,7 +154,7 @@ public class DefaultProfileInjector
 
                 if ( profilePlugin != null )
                 {
-                    mergedPlugin = profilePlugin;
+                    mergedPlugin = modelPlugin;
 
                     injectPluginDefinition( profilePlugin, modelPlugin );
                 }
