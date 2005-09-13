@@ -80,10 +80,6 @@ public class ArtifactRepositoryMetadata
 
     public void setRepository( ArtifactRepository remoteRepository )
     {
-        // TODO: this is the first wins policy - really, shouldn't call if not
-        if ( artifact.getRepository() == null )
-        {
-            artifact.setRepository( remoteRepository );
-        }
+        artifact.setRepository( remoteRepository );
     }
 }

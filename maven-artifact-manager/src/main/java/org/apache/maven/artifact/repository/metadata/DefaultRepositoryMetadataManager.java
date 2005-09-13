@@ -112,11 +112,13 @@ public class DefaultRepositoryMetadataManager
         if ( metadataFile.exists() )
         {
             Metadata metadata = readMetadata( metadataFile );
-            repoMetadata.setRepository( remoteRepository );
 
             if ( repoMetadata.getMetadata() != null )
             {
-                metadata.merge( repoMetadata.getMetadata() );
+                if ( metadata.merge( repoMetadata.getMetadata() ) )
+                {
+                    repoMetadata.setRepository( remoteRepository );
+                }
             }
             repoMetadata.setMetadata( metadata );
         }
