@@ -754,14 +754,17 @@ public class DefaultMavenProjectBuilder
                 {
                     Model candidateParent = readModel( parentDescriptor );
 
-                    // this works because parent-version is still required...
-                    boolean versionMatches = parentModel.getVersion().equals( candidateParent.getVersion() );
-                    if ( !versionMatches && candidateParent.getParent() != null )
-                    {
-                        versionMatches = parentModel.getVersion().equals( candidateParent.getParent().getVersion() );
-                    }
-                    if ( parentModel.getGroupId().equals( candidateParent.getGroupId() ) &&
-                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) && versionMatches )
+                    String candidateParentGroupId = candidateParent.getGroupId();
+                    if ( candidateParentGroupId == null && candidateParent.getParent() != null )
+                        candidateParentGroupId = candidateParent.getParent().getGroupId();
+
+                    String candidateParentVersion = candidateParent.getVersion();
+                    if ( candidateParentVersion == null && candidateParent.getParent() != null )
+                        candidateParentVersion = candidateParent.getParent().getVersion();
+
+                    if ( parentModel.getGroupId().equals( candidateParentGroupId ) &&
+                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) &&
+                        parentModel.getVersion().equals( candidateParentVersion ) )
                     {
                         model = candidateParent;
 
@@ -770,9 +773,11 @@ public class DefaultMavenProjectBuilder
                     }
                     else
                     {
-                        getLogger().debug( "Invalid parent-POM referenced by relative path: \'" +
-                            parentModel.getRelativePath() + "\'. It did not match parent specification in " +
-                            project.getId() );
+                        getLogger().debug( "Invalid parent-POM referenced by relative path '" +
+                            parentModel.getRelativePath() + "' in parent specification in " + project.getId() + ":" +
+                            "\n  Specified: " + parentModel.getId() +
+                            "\n  Found:     " + candidateParent.getId()
+                        );
                     }
                 }
             }
