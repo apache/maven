@@ -1050,6 +1050,34 @@
           <type>String</type>
           <description>The mechanism used to deliver notifications.</description>
         </field>
+        <field>
+          <name>sendOnError</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>Send notification on error.</description>
+        </field>
+        <field>
+          <name>sendOnFailure</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>Send notification on failure.</description>
+        </field>
+        <field>
+          <name>sendOnSuccess</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>Send notification on success.</description>
+        </field>
+        <field>
+          <name>sendOnWarning</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>Send notification on warning.</description>
+        </field>
         <!-- TODO: Remove it after continuum alpha-3 release -->
         <field>
           <name>address</name>
