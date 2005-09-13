@@ -37,17 +37,51 @@ public class SystemPropertyProfileActivator
 
         if ( property != null )
         {
-            String sysValue = System.getProperty( property.getName() );
+            String name = property.getName();
+            boolean reverseName = false;
+            
+            if ( name.startsWith("!") )
+            {
+                reverseName = true;
+                name = name.substring( 1 );
+            }
+            
+            String sysValue = System.getProperty( name );
 
             String propValue = property.getValue();
             if ( StringUtils.isNotEmpty( propValue ) )
             {
+                boolean reverseValue = false;
+                if ( propValue.startsWith( "!" ) )
+                {
+                    reverseValue = true;
+                    propValue = propValue.substring( 1 );
+                }
+                
                 // we have a value, so it has to match the system value...
-                return propValue.equals( sysValue );
+                boolean result = propValue.equals( sysValue );
+                
+                if ( reverseValue )
+                {
+                    return !result;
+                }
+                else
+                {
+                    return result;
+                }
             }
             else
             {
-                return StringUtils.isNotEmpty( sysValue );
+                boolean result = StringUtils.isNotEmpty( sysValue );
+                
+                if ( reverseName )
+                {
+                    return !result;
+                }
+                else
+                {
+                    return result;
+                }
             }
         }
 

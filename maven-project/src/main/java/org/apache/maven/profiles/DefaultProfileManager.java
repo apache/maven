@@ -1,5 +1,6 @@
 package org.apache.maven.profiles;
 
+import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
@@ -38,6 +39,7 @@ public class DefaultProfileManager implements ProfileManager
 
     private Set activatedIds = new HashSet();
     private Set deactivatedIds = new HashSet();
+    private Set defaultIds = new HashSet();
     
     private Map profilesById = new HashMap();
     
@@ -86,6 +88,13 @@ public class DefaultProfileManager implements ProfileManager
         }
         
         profilesById.put( profile.getId(), profile );
+        
+        Activation activation = profile.getActivation();
+        
+        if ( activation != null && activation.isActiveByDefault() )
+        {
+            activateAsDefault( profileId );
+        }
     }
     
     /* (non-Javadoc)
@@ -158,6 +167,18 @@ public class DefaultProfileManager implements ProfileManager
             }
         }
         
+        if ( active.isEmpty() )
+        {
+            for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
+            {
+                String profileId = (String) it.next();
+                
+                Profile profile = (Profile) profilesById.get( profileId );
+                
+                active.add( profile );
+            }
+        }
+        
         return active;
     }
     
@@ -209,6 +230,11 @@ public class DefaultProfileManager implements ProfileManager
             
             addProfile( profile );
         }
+    }
+
+    public void activateAsDefault( String profileId )
+    {
+        defaultIds.add( profileId );
     }
     
 }

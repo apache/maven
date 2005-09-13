@@ -861,11 +861,20 @@ public class DefaultMavenProjectBuilder
 
                 if ( root != null )
                 {
+                    List active = root.getActiveProfiles();
+                    
+                    if( active != null && !active.isEmpty() )
+                    {
+                        profileManager.explicitlyActivate( root.getActiveProfiles() );
+                    }
+                    
                     for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
                     {
                         org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
 
-                        profileManager.addProfile( ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile ) );
+                        Profile converted = ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile );
+                        
+                        profileManager.addProfile( converted );
                     }
                 }
             }

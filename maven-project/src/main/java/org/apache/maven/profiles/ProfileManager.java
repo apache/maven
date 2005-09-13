@@ -19,6 +19,8 @@ public interface ProfileManager
     void explicitlyDeactivate( String profileId );
 
     void explicitlyDeactivate( List profileIds );
+    
+    void activateAsDefault( String profileId );
 
     List getActiveProfiles()
         throws ProfileActivationException;

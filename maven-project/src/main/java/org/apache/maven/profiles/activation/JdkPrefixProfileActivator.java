@@ -30,9 +30,26 @@ public class JdkPrefixProfileActivator
         Activation activation = profile.getActivation();
 
         String jdk = activation.getJdk();
+        
+        boolean reverse = false;
+        
+        if ( jdk.startsWith( "!" ) )
+        {
+            reverse = true;
+            jdk = jdk.substring( 1 );
+        }
 
         // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
-        return JDK_VERSION.startsWith( jdk );
+        boolean result = JDK_VERSION.startsWith( jdk );
+        
+        if ( reverse )
+        {
+            return !result;
+        }
+        else
+        {
+            return result;
+        }
     }
 
     protected boolean canDetectActivation( Profile profile )

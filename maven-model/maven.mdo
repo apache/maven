@@ -2611,6 +2611,12 @@
       ]]></description>
       <fields>
         <field>
+          <name>activeByDefault</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>Flag specifying whether this profile is active as a default.</description>
+        </field>
+        <field>
           <name>jdk</name>
           <version>4.0.0</version>
           <type>String</type>

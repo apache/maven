@@ -147,6 +147,8 @@ public final class SettingsUtils
         {
             org.apache.maven.model.Activation activation = new org.apache.maven.model.Activation();
 
+            activation.setActiveByDefault( settingsActivation.isActiveByDefault() );
+            
             activation.setJdk( settingsActivation.getJdk() );
 
             ActivationProperty settingsProp = settingsActivation.getProperty();

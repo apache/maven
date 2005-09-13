@@ -44,6 +44,8 @@ public class ProfilesConversionUtils
         if ( profileActivation != null )
         {
             Activation activation = new Activation();
+            
+            activation.setActiveByDefault( profileActivation.isActiveByDefault() );
 
             activation.setJdk( profileActivation.getJdk() );
             
