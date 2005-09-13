@@ -1257,7 +1257,7 @@
             calculate the various classpaths used for testing, etc. and for 
             determining which artifacts to include in a distribution of this
             project. For more information, see 
-            <a href="http://maven.apache.org/maven2/dependencies.html">Dependency Mechanism</a>.]]>
+            <a href="http://maven.apache.org/maven2/dependencies-mechanism.html">Dependency Mechanism</a>.]]>
           </description>
           <type>String</type>
           <!-- This default has to be enforced at the maven-artifact layer, to allow 
