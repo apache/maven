@@ -141,14 +141,14 @@ public class PrepareReleaseMojo
     private String tag;
 
     /**
-     * @parameter expression="${tagBase}"
+     * @parameter expression="${tagBase}" default-value="../tags"
      */
-    private String tagBase = "../tags";
+    private String tagBase;
 
     /**
-     * @parameter expression="${resume}"
+     * @parameter expression="${resume}" default-value="true"
      */
-    private boolean resume = false;
+    private boolean resume;
 
     private String userTag;
 
@@ -829,11 +829,13 @@ public class PrepareReleaseMojo
                 fixNullValueInModel( releaseModel, project.getModel() );
 
                 // Remove parent
+/* TODO: put this back after it is properly resolved again
                 if ( releaseModel.getParent() != null )
                 {
                     releaseModel.setParent( null );
                 }
 
+*/
                 Set artifacts = releaseProject.getArtifacts();
 
                 if ( artifacts != null )
