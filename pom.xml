@@ -165,12 +165,12 @@
       <dependency>
         <groupId>plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.modello</groupId>
@@ -180,7 +180,6 @@
     </dependencies>
   </dependencyManagement>
   <modules>
-    <!-- module>maven-archetype</module -->
     <module>maven-archiver</module>
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
@@ -192,12 +191,10 @@
     <module>maven-plugin-api</module>
     <module>maven-plugin-descriptor</module>
     <module>maven-plugin-registry</module>
-    <!-- module>maven-plugins</module -->
     <module>maven-plugin-tools</module>
     <module>maven-profile</module>
     <module>maven-project</module>
     <module>maven-reporting</module>
-    <!-- module>maven-reports</module -->
     <module>maven-script</module>
     <module>maven-settings</module>
   </modules>

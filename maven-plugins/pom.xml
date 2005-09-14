@@ -137,17 +137,12 @@
       <dependency>
         <groupId>plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-4</version>
+        <version>1.0.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
