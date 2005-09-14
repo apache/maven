@@ -11,11 +11,13 @@
   <inceptionYear>2004</inceptionYear>
   <dependencies>
     <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <dependency>
       <groupId>forehead</groupId>
       <artifactId>forehead</artifactId>
       <version>1.0-beta-5</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 </model>
