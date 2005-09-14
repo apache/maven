@@ -44,18 +44,18 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 
 /**
- * Generates documentation for the Java code in the project using the standard 
+ * Generates documentation for the Java code in the project using the standard
  * <a href="http://java.sun.com/j2se/javadoc/">Javadoc Tool</a> tool.
- * 
+ *
  * @goal javadoc
  * @requiresDependencyResolution compile
  * @phase generate-sources
- * 
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * 
+ *
  * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
- * 
+ *
  * @see <a href="http://java.sun.com/j2se/javadoc/">Javadoc Tool</a>
  * @see <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#options">Javadoc Options </a>
  */
@@ -90,9 +90,9 @@ public class JavadocReport
     // ----------------------------------------------------------------------
 
     /**
-     * Specifies the destination directory where javadoc saves the generated HTML files. 
+     * Specifies the destination directory where javadoc saves the generated HTML files.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#d">d</a>.
-     * 
+     *
      * @parameter expression="${destDir}" alias="destDir" default-value="${project.build.directory}/javadoc/"
      * @required
      */
@@ -116,7 +116,7 @@ public class JavadocReport
     // @see http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#options
     /**
      * Set an additional parameter on the command line.
-     * 
+     *
      * @parameter expression="${additionalparam}"
      */
     private String additionalparam;
@@ -124,7 +124,7 @@ public class JavadocReport
     /**
      * Uses the sentence break iterator to determine the end of the first sentence.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#breakiterator">breakiterator</a>.
-     * 
+     *
      * @parameter expression="${breakiterator}" default-value="false"
      */
     private boolean breakiterator = false;
@@ -132,7 +132,7 @@ public class JavadocReport
     /**
      * Specifies the class file that starts the doclet used in generating the documentation.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#doclet">doclet</a>.
-     * 
+     *
      * @parameter expression="${doclet}"
      */
     private String doclet;
@@ -140,7 +140,7 @@ public class JavadocReport
     /**
      * Specifies the path to the doclet starting class file (specified with the -doclet option) and any jar files it depends on.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docletpath">docletpath</a>.
-     * 
+     *
      * @parameter expression="${docletPath}"
      */
     private String docletPath;
@@ -148,7 +148,7 @@ public class JavadocReport
     /**
      * Specifies the encoding name of the source files.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#encoding">encoding</a>.
-     * 
+     *
      * @parameter expression="${encoding}"
      */
     private String encoding;
@@ -156,7 +156,7 @@ public class JavadocReport
     /**
      * Unconditionally excludes the specified packages and their subpackages from the list formed by -subpackages.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#exclude">exclude</a>.
-     * 
+     *
      * @parameter expression="${excludePackageNames}"
      */
     private String excludePackageNames;
@@ -164,7 +164,7 @@ public class JavadocReport
     /**
      * Specifies the directories where extension classes reside.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#extdirs">extdirs</a>.
-     * 
+     *
      * @parameter expression="${extdirs}"
      */
     private String extdirs;
@@ -172,23 +172,23 @@ public class JavadocReport
     /**
      * Specifies the locale that javadoc uses when generating documentation.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#locale">locale</a>.
-     * 
+     *
      * @parameter expression="${locale}"
      */
     private String locale;
 
     /**
-     * Specifies the maximum Java heap size to be used when launching the javadoc executable. 
+     * Specifies the maximum Java heap size to be used when launching the javadoc executable.
      * Some JVMs refer to this property as the -Xmx parameter. Example: '512' or '512m'.
-     * 
+     *
      * @parameter expression="${maxmemory}"
      */
     private String maxmemory;
 
     /**
-     * Specifies the minimum Java heap size to be used when launching the javadoc executable. 
+     * Specifies the minimum Java heap size to be used when launching the javadoc executable.
      * Some JVMs refer to this property as the -Xms parameter. Example: '128' or '128m'.
-     * 
+     *
      * @parameter expression="${minmemory}"
      */
     private String minmemory;
@@ -196,7 +196,7 @@ public class JavadocReport
     /**
      * This option created documentation with the appearance and functionality of documentation generated by Javadoc 1.1.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#1.1">1.1</a>.
-     * 
+     *
      * @parameter expression="${old}" default-value="false"
      */
     private boolean old = false;
@@ -204,7 +204,7 @@ public class JavadocReport
     /**
      * Specifies that javadoc should retrieve the text for the overview documentation from the "source" file specified by path/filename and place it on the Overview page (overview-summary.html).
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#overview">overview</a>.
-     * 
+     *
      * @parameter expression="${overview}"
      */
     private String overview;
@@ -212,7 +212,7 @@ public class JavadocReport
     /**
      * Shows only protected and public classes and members.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#package">package</a>.
-     * 
+     *
      * @parameter expression="${package}" default-value="true"
      */
     private boolean showPackage = true;
@@ -228,7 +228,7 @@ public class JavadocReport
     /**
      * Shows all classes and members.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#private">private</a>
-     * 
+     *
      * @parameter expression="${private}" default-value="false"
      */
     private boolean showPrivate = false;
@@ -236,7 +236,7 @@ public class JavadocReport
     /**
      * Shows only public classes and members.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#public">public</a>.
-     * 
+     *
      * @parameter expression="${public}" default-value="false"
      */
     private boolean public_ = false;
@@ -244,7 +244,7 @@ public class JavadocReport
     /**
      * Shuts off non-error and non-warning messages, leaving only the warnings and errors appear, making them easier to view.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#quiet">quiet</a>.
-     * 
+     *
      * @parameter expression="${quiet}" default-value="false"
      */
     private boolean quiet = false;
@@ -252,7 +252,7 @@ public class JavadocReport
     /**
      * Necessary to enable javadoc to handle assertions present in J2SE v 1.4 source code.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#source">source</a>.
-     * 
+     *
      * @parameter expression="${source}"
      */
     private String source;
@@ -260,7 +260,7 @@ public class JavadocReport
     /**
      * Provides more detailed messages while javadoc is running.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#verbose">verbose</a>.
-     * 
+     *
      * @parameter expression="${verbose}" default-value="false"
      */
     private boolean verbose = false;
@@ -270,7 +270,7 @@ public class JavadocReport
     /**
      * Specifies whether or not the author text is included in the generated Javadocs.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#author">author</a>.
-     * 
+     *
      * @parameter expression="${author}" default-value="true"
      */
     private boolean author = true;
@@ -278,7 +278,7 @@ public class JavadocReport
     /**
      * Specifies the text to be placed at the bottom of each output file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#bottom">bottom</a>.
-     * 
+     *
      * @parameter expression="${bottom}" default-value="Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved."
      */
     private String bottom;
@@ -286,7 +286,7 @@ public class JavadocReport
     /**
      * Specifies the HTML character set for this document.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#charset">charset</a>.
-     * 
+     *
      * @parameter expression="${charset}" default-value="ISO-8859-1"
      */
     private String charset = "ISO-8859-1";
@@ -294,7 +294,7 @@ public class JavadocReport
     /**
      * Enables deep copying of "doc-files" directories.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docfilessubdirs">docfilessubdirs</a>.
-     * 
+     *
      * @parameter expression="${docfilessubdirs}" default-value="false"
      */
     private boolean docfilessubdirs = false;
@@ -302,23 +302,23 @@ public class JavadocReport
     /**
      * Specifies the encoding of the generated HTML files.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docencoding">docencoding</a>.
-     * 
+     *
      * @parameter expression="${docencoding}"
      */
     private String docencoding;
 
     /**
-     * Specifies the title to be placed near the top of the overview summary file. 
+     * Specifies the title to be placed near the top of the overview summary file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#doctitle">doctitle</a>.
-     * 
+     *
      * @parameter expression="${doctitle}" default-value="${project.name} ${project.version} API"
      */
     private String doctitle;
 
     /**
-     * Excludes any "doc-files" subdirectories with the given names. 
+     * Excludes any "doc-files" subdirectories with the given names.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#excludedocfilessubdir">excludedocfilessubdir</a>.
-     * 
+     *
      * @parameter expression="${excludedocfilessubdir}"
      */
     private String excludedocfilessubdir;
@@ -326,7 +326,7 @@ public class JavadocReport
     /**
      * Specifies the footer text to be placed at the bottom of each output file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#footer">footer</a>.
-     * 
+     *
      * @parameter expression="${footer}"
      */
     private String footer;
@@ -335,7 +335,7 @@ public class JavadocReport
      * Separates packages on the overview page into whatever groups you specify, one group per table.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#group">group</a>.
      * It is a comma separated String.
-     * 
+     *
      * @parameter expression="${group}"
      */
     private String group;
@@ -343,7 +343,7 @@ public class JavadocReport
     /**
      * Specifies the header text to be placed at the top of each output file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#header">header</a>.
-     * 
+     *
      * @parameter expression="${header}"
      */
     private String header;
@@ -351,7 +351,7 @@ public class JavadocReport
     /**
      * Specifies the path of an alternate help file path\filename that the HELP link in the top and bottom navigation bars link to.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#helpfile">helpfile</a>.
-     * 
+     *
      * @parameter expression="${helpfile}"
      */
     private String helpfile;
@@ -360,7 +360,7 @@ public class JavadocReport
      * Creates links to existing javadoc-generated documentation of external referenced classes.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#link">link</a>.
      * It is a comma separated String.
-     * 
+     *
      * @parameter expression="${link}"
      */
     private String link;
@@ -369,7 +369,7 @@ public class JavadocReport
      * This option is a variation of -link; they both create links to javadoc-generated documentation for external referenced classes.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#linkoffline">linkoffline</a>.
      * It is a comma separated String.
-     * 
+     *
      * @parameter expression="${linkoffline}"
      */
     private String linkoffline;
@@ -377,7 +377,7 @@ public class JavadocReport
     /**
      * Creates an HTML version of each source file (with line numbers) and adds links to them from the standard HTML documentation.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#linksource">linksource</a>.
-     * 
+     *
      * @parameter expression="${linksource}" default-value="false"
      */
     private boolean linksource = false;
@@ -385,7 +385,7 @@ public class JavadocReport
     /**
      * Suppress the entire comment body, including the main description and all tags, generating only declarations.
      * Ssee <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nocomment">nocomment</a>.
-     * 
+     *
      * @parameter expression="${nocomment}" default-value="false"
      */
     private boolean nocomment = false;
@@ -393,7 +393,7 @@ public class JavadocReport
     /**
      * Prevents the generation of any deprecated API at all in the documentation.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nodeprecated">nodeprecated</a>.
-     * 
+     *
      * @parameter expression="${nodeprecated}" default-value="false"
      */
     private boolean nodeprecated = false;
@@ -401,7 +401,7 @@ public class JavadocReport
     /**
      * Prevents the generation of the file containing the list of deprecated APIs (deprecated-list.html) and the link in the navigation bar to that page.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nodeprecatedlist">nodeprecatedlist</a>.
-     * 
+     *
      * @parameter expression="${nodeprecatedlist}" default-value="false"
      */
     private boolean nodeprecatedlist = false;
@@ -409,7 +409,7 @@ public class JavadocReport
     /**
      * Omits the HELP link in the navigation bars at the top and bottom of each page of output.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nohelp">nohelp</a>.
-     * 
+     *
      * @parameter expression="${nohelp}" default-value="false"
      */
     private boolean nohelp = false;
@@ -417,7 +417,7 @@ public class JavadocReport
     /**
      * Omits the index from the generated docs.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#noindex">noindex</a>.
-     * 
+     *
      * @parameter expression="${noindex}" default-value="false"
      */
     private boolean noindex = false;
@@ -425,7 +425,7 @@ public class JavadocReport
     /**
      * Omits the index from the generated docs. The default value is 'false'.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nonavbar">nonavbar</a>.
-     * 
+     *
      * @parameter expression="${nonavbar}" default-value="false"
      */
     private boolean nonavbar = false;
@@ -433,7 +433,7 @@ public class JavadocReport
     /**
      * Omits qualifying package name from ahead of class names in output.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#noqualifier">noqualifier</a>.
-     * 
+     *
      * @parameter expression="${noqualifier}"
      */
     private String noqualifier;
@@ -441,15 +441,15 @@ public class JavadocReport
     /**
      * Omits from the generated docs the "Since" sections associated with the since tags.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nosince">nosince</a>.
-     * 
+     *
      * @parameter expression="${nosince}" default-value="false"
      */
     private boolean nosince = false;
 
     /**
-     * Omits the class/interface hierarchy pages from the generated docs. 
+     * Omits the class/interface hierarchy pages from the generated docs.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#notree">notree</a>.
-     * 
+     *
      * @parameter expression="${notree}" default-value="false"
      */
     private boolean notree = false;
@@ -457,16 +457,16 @@ public class JavadocReport
     /**
      * Generates compile-time warnings for missing serial tags.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#serialwarn">serialwarn</a>
-     * 
+     *
      * @parameter expression="${serialwarn}" default-value="false"
      */
     private boolean serialwarn = false;
 
     /**
-     * Splits the index file into multiple files, alphabetically, one file per letter, plus a file for any index entries that 
-     * start with non-alphabetical characters. 
+     * Splits the index file into multiple files, alphabetically, one file per letter, plus a file for any index entries that
+     * start with non-alphabetical characters.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#splitindex">splitindex</a>.
-     * 
+     *
      * @parameter expression="${splitindex}" default-value="false"
      */
     private boolean splitindex = false;
@@ -474,7 +474,7 @@ public class JavadocReport
     /**
      * Specifies the path of an alternate HTML stylesheet file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#stylesheetfile">stylesheetfile</a>.
-     * 
+     *
      * @parameter expression="${stylesheetfile}"
      */
     private String stylesheetfile;
@@ -483,7 +483,7 @@ public class JavadocReport
      * Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tag">tag</a>.
      * It is a comma separated String.
-     * 
+     *
      * @parameter expression="${tag}"
      */
     private String tag;
@@ -491,7 +491,7 @@ public class JavadocReport
     /**
      * Specifies the class file that starts the taglet used in generating the documentation for that tag.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#taglet">taglet</a>.
-     * 
+     *
      * @parameter expression="${taglet}"
      */
     private String taglet;
@@ -499,7 +499,7 @@ public class JavadocReport
     /**
      * Specifies the search paths for finding taglet class files (.class).
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tagletpath">tagletpath</a>.
-     * 
+     *
      * @parameter expression="${tagletpath}"
      */
     private String tagletpath;
@@ -507,7 +507,7 @@ public class JavadocReport
     /**
      * Includes one "Use" page for each documented class and package.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#use">use</a>.
-     * 
+     *
      * @parameter expression="${use}" default-value="true"
      */
     private boolean use = true;
@@ -515,16 +515,16 @@ public class JavadocReport
     /**
      * Includes the version text in the generated docs.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#version">version</a>.
-     * 
+     *
      * @parameter expression="${version}" default-value="true"
      */
     private boolean version = true;
 
     /**
-     * Specifies the title to be placed in the HTML title tag. 
+     * Specifies the title to be placed in the HTML title tag.
      * The default is '${project.name} ${project.version} API'.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#windowtitle">windowtitle</a>.
-     * 
+     *
      * @parameter expression="${windowtitle}" default-value="${project.name} ${project.version} API"
      */
     private String windowtitle;
@@ -614,6 +614,7 @@ public class JavadocReport
             for ( Iterator i = getProject().getCompileClasspathElements().iterator(); i.hasNext(); )
             {
                 classpath.append( (String) i.next() );
+
                 if ( i.hasNext() )
                 {
                     classpath.append( PATH_SEPARATOR );
@@ -635,15 +636,15 @@ public class JavadocReport
             }
 
             File javadocDirectory = getReportOutputDirectory();
-            
-            if ( ! javadocDirectory.equals( getOutputDirectory() ) )
+
+            if ( !javadocDirectory.equals( getOutputDirectory() ) )
             {
-            	// we're in site-embedded report mode, so Doxia has set the
-            	// reportOutputDirectory to the basedir of the site.
-            	// Append 'apidocs'.
-            	javadocDirectory = new File( javadocDirectory, "apidocs" );
+                // we're in site-embedded report mode, so Doxia has set the
+                // reportOutputDirectory to the basedir of the site.
+                // Append 'apidocs'.
+                javadocDirectory = new File( javadocDirectory, "apidocs" );
             }
-            
+
             if ( fileList != null && fileList.length != 0 )
             {
                 StringBuffer files = new StringBuffer();
@@ -711,7 +712,8 @@ public class JavadocReport
                 }
                 else
                 {
-                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) && ( minmemory.toLowerCase().endsWith( "m" ) ) )
+                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) )
+                        && ( minmemory.toLowerCase().endsWith( "m" ) ) )
                     {
                         addArgIf( arguments, true, "-J-Xms" + minmemory );
                     }
@@ -752,7 +754,8 @@ public class JavadocReport
                 {
                     bottom = "Copyright &copy; " + year + " ";
 
-                    if ( ( model.getOrganization() != null ) && ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
+                    if ( ( model.getOrganization() != null )
+                        && ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
                     {
                         bottom += model.getOrganization().getName();
                     }
@@ -762,14 +765,15 @@ public class JavadocReport
                     }
                     bottom += ". All Rights Reserved.";
                 }
-                
+
                 if ( StringUtils.isEmpty( stylesheetfile ) )
                 {
                     stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
                 }
                 if ( windowtitle.equals( DEFAULT_WINDOW_TITLE ) )
                 {
-                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " " + model.getVersion() + " API";
+                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " "
+                        + model.getVersion() + " API";
                 }
                 if ( doctitle.equals( DEFAULT_DOCTITLE ) )
                 {
@@ -814,6 +818,12 @@ public class JavadocReport
                 addArgIfNotEmpty( arguments, "-windowtitle", windowtitle );
             }
 
+            for ( Iterator it = arguments.iterator(); it.hasNext(); )
+            {
+                String current = (String) it.next();
+                cmd.createArgument().setValue( current );
+            }
+
             cmd.createArgument().setValue( "@files" );
 
             getLog().info( Commandline.toString( cmd.getCommandline() ) );
@@ -842,7 +852,7 @@ public class JavadocReport
 
     /**
      * Get the path of Javadoc tool depending the OS.
-     * 
+     *
      * @return the path of the Javadoc tool
      */
     private String getJavadocPath()
@@ -858,7 +868,7 @@ public class JavadocReport
         }
         else
         {
-            javadocExe = new File( SystemUtils .getJavaHome() + "/../bin", javadocCommand );
+            javadocExe = new File( SystemUtils.getJavaHome() + "/../bin", javadocCommand );
         }
 
         getLog().debug( "Javadoc executable=[" + javadocExe.getAbsolutePath() + "]" );
@@ -869,7 +879,7 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * conditionally based on the given flag.
-     * 
+     *
      * @param arguments
      * @param b the flag which controls if the argument is added or not.
      * @param value the argument value to be added.
@@ -885,10 +895,10 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
-     * 
+     *
      * @see #addArgIf(java.util.List,boolean,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
-     * 
+     *
      * @param b the flag which controls if the argument is added or not.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
@@ -910,9 +920,9 @@ public class JavadocReport
      * if the the value is not null or empty.
      * <p>
      * Moreover, the value could be comma separated.
-     * 
+     *
      * @see #addArgIfNotEmpty(java.util.List,String,String,boolean)
-     * 
+     *
      * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
@@ -927,7 +937,7 @@ public class JavadocReport
      * if the the value is not null or empty.
      * <p>
      * Moreover, the value could be comma separated.
-     * 
+     *
      * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
@@ -939,7 +949,7 @@ public class JavadocReport
         {
             arguments.add( key );
 
-            StringTokenizer token = new StringTokenizer( value, ",", false );
+            StringTokenizer token = new StringTokenizer( value, "," );
             while ( token.hasMoreTokens() )
             {
                 String current = token.nextToken().trim();
@@ -960,9 +970,9 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
-     * 
+     *
      * @see #addArgIfNotEmpty(List, String, String, float, boolean)
-     * 
+     *
      * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
@@ -976,16 +986,17 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
-     * 
+     *
      * @see #addArgIfNotEmpty(java.util.List,String,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
-     * 
+     *
      * @param key the argument name.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      * @param repeatKey repeat or not the key in the command line
      */
-    private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion, boolean repeatKey )
+    private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion,
+                                  boolean repeatKey )
     {
         if ( SystemUtils.isJavaVersionAtLeast( requiredJavaVersion ) )
         {
@@ -1000,7 +1011,7 @@ public class JavadocReport
     /**
      * Returns an input stream for reading the specified resource from the
      * current class loader.
-     * 
+     *
      * @param resource the resource
      * @return InputStream An input stream for reading the resource, or <tt>null</tt>
      *            if the resource could not be found
@@ -1013,11 +1024,11 @@ public class JavadocReport
     }
 
     /**
-     * Convenience method that copy the <code>DEFAULT_STYLESHEET_NAME</code> file from the current class 
+     * Convenience method that copy the <code>DEFAULT_STYLESHEET_NAME</code> file from the current class
      * loader to the output directory.
-     * 
+     *
      * @see #DEFAULT_CSS_NAME
-     * 
+     *
      * @param outputDirectory the output directory
      * @throws Exception if any
      */
