@@ -1,0 +1,18 @@
+<settings>
+  <localRepository>file:../target/local-repo</localRepository>
+  <usePluginRegistry>false</usePluginRegistry>
+  <profiles>
+    <profile>
+      <id>test-settings</id>
+      <repositories>
+        <repository>
+          <id>test</id>
+          <url>file:../target/test-repo</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>test-settings</activeProfile>
+  </activeProfiles>
+</settings>

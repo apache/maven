@@ -1,0 +1,1 @@
+rm ${artifact:org.codehaus.modello:modello-core:1.0-alpha-3:jar}

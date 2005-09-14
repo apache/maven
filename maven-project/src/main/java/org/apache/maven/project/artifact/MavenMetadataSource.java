@@ -76,6 +76,9 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     private RepositoryMetadataManager repositoryMetadataManager;
+    
+    // lazily instantiated and cached.
+    private MavenProject superProject;
 
     /**
      * Retrieve the metadata for the project from the repository.
@@ -177,7 +180,13 @@ public class MavenMetadataSource
             {
                 // if the project is null, we encountered an invalid model (read: m1 POM)
                 // we'll just return an empty resolution group.
-                result = new ResolutionGroup( pomArtifact, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+                // or used the inherited scope (should that be passed to the buildFromRepository method above?)
+                Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
+                                                         artifact.getDependencyFilter() );
+                
+                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
+                
+                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
             }
             else
             {
@@ -195,6 +204,56 @@ public class MavenMetadataSource
         {
             throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
+        catch ( ProjectBuildingException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+        }
+    }
+
+    private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
+        throws ProjectBuildingException
+    {
+        if ( superProject == null )
+        {
+            superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
+        }
+
+        List repositories = new ArrayList();
+
+        repositories.addAll( remoteRepositories );
+
+        // ensure that these are defined
+        for ( Iterator it = superProject.getRemoteArtifactRepositories().iterator(); it.hasNext(); )
+        {
+            ArtifactRepository superRepo = (ArtifactRepository) it.next();
+
+            for ( Iterator aggregatedIterator = repositories.iterator(); aggregatedIterator.hasNext(); )
+            {
+                ArtifactRepository repo = (ArtifactRepository) aggregatedIterator.next();
+
+                // if the repository exists in the list and was introduced by another POM's super-pom, 
+                // remove it...the repository definitions from the super-POM should only be at the end of
+                // the list.
+                // if the repository has been redefined, leave it.
+                if ( repo.getId().equals( superRepo.getId() ) && repo.getUrl().equals( superRepo.getUrl() ) )
+                {
+                    aggregatedIterator.remove();
+                }
+            }
+        }
+
+        // this list should contain the super-POM repositories, so we don't have to explicitly add them back.
+        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        {
+            ArtifactRepository repository = (ArtifactRepository) it.next();
+
+            if ( !repositories.contains( repository ) )
+            {
+                repositories.add( repository );
+            }
+        }
+
+        return repositories;
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,

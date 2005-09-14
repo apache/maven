@@ -427,7 +427,13 @@ public class MavenCli
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
 
-        String url = "file://" + settings.getLocalRepository();
+        String url = settings.getLocalRepository();
+        
+        if ( !url.startsWith( "file:" ) )
+        {
+            url = "file://" + url;
+        }
+        
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;

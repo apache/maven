@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it2001</groupId>
+  <artifactId>it2001-c</artifactId>
+  <version>1.0</version>
+
+  <distributionManagement>
+    <repository>
+      <id>test</id>
+      <url>file:../target/test-repo</url>
+    </repository>
+  </distributionManagement>
+</project>

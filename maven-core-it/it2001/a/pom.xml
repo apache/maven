@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it2001</groupId>
+  <artifactId>it2001-a</artifactId>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.it2001</groupId>
+      <artifactId>it2001-b</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>test</id>
+      <url>file:../target/test-repo</url>
+    </repository>
+  </repositories>
+</project>
