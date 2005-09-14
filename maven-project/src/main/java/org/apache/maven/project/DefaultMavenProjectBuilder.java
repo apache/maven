@@ -321,17 +321,33 @@ public class DefaultMavenProjectBuilder
                                            ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        MavenProject project = getCachedProject( artifact.getGroupId(), artifact.getArtifactId(),
-                                                 artifact.getVersion() );
+        Artifact projectArtifact;
+        
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            projectArtifact = artifact;
+        }
+        else
+        {
+            getLogger().warn(
+                              "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType()
+                                  + "; constructing POM artifact instead." );
+            
+            projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                     artifact.getVersion(), artifact.getScope() );
+        }
+        
+        MavenProject project = getCachedProject( projectArtifact.getGroupId(), projectArtifact.getArtifactId(),
+                                                 projectArtifact.getVersion() );
         Model model;
         if ( project == null )
         {
             // TODO: can't assume artifact is a POM
             try
             {
-                artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+                artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
-                File file = artifact.getFile();
+                File file = projectArtifact.getFile();
                 model = readModel( file );
 
                 String downloadUrl = null;
@@ -346,7 +362,7 @@ public class DefaultMavenProjectBuilder
                 }
 
                 // TODO: configurable actions dependant on status
-                if ( !artifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
+                if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
                 {
                     // use default policy (enabled, daily update, warn on bad checksum)
                     ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
@@ -356,11 +372,11 @@ public class DefaultMavenProjectBuilder
                     if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
                     {
                         getLogger().info(
-                            artifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
+                            projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
                         try
                         {
-                            artifact.setResolved( false );
-                            artifactResolver.resolveAlways( artifact, remoteArtifactRepositories, localRepository );
+                            projectArtifact.setResolved( false );
+                            artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories, localRepository );
                         }
                         catch ( ArtifactResolutionException e )
                         {
@@ -374,11 +390,11 @@ public class DefaultMavenProjectBuilder
                 // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
                 if ( downloadUrl != null )
                 {
-                    artifact.setDownloadUrl( downloadUrl );
+                    projectArtifact.setDownloadUrl( downloadUrl );
                 }
                 else
                 {
-                    artifact.setDownloadUrl( model.getUrl() );
+                    projectArtifact.setDownloadUrl( model.getUrl() );
                 }
 
             }
@@ -388,15 +404,15 @@ public class DefaultMavenProjectBuilder
                 // only not found should have the below behaviour
 //                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
 
-                getLogger().warn( "\n  ***** Using defaults for missing POM " + artifact.getId() + " *****\n" );
+                getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact.getId() + " *****\n" );
 
                 model = new Model();
                 model.setModelVersion( "4.0.0" );
-                model.setArtifactId( artifact.getArtifactId() );
-                model.setGroupId( artifact.getGroupId() );
-                model.setVersion( artifact.getVersion() );
+                model.setArtifactId( projectArtifact.getArtifactId() );
+                model.setGroupId( projectArtifact.getGroupId() );
+                model.setVersion( projectArtifact.getVersion() );
                 // TODO: not correct in some instances
-                model.setPackaging( artifact.getType() );
+                model.setPackaging( projectArtifact.getType() );
 
                 model.setDistributionManagement( new DistributionManagement() );
                 model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );

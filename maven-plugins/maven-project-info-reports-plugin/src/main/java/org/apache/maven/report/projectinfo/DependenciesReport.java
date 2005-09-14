@@ -335,8 +335,15 @@ public class DependenciesReport
         private MavenProject getMavenProjectFromRepository( Artifact artifact, ArtifactRepository localRepository )
             throws ProjectBuildingException
         {
+            Artifact projectArtifact = artifact;
+            
+            if ( !"pom".equals( artifact.getType() ) )
+            {
+                projectArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
+            }
+            
             // TODO: we should use the MavenMetadataSource instead
-            return mavenProjectBuilder.buildFromRepository( artifact, project.getRepositories(), localRepository );
+            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(), localRepository );
         }
     }
 
