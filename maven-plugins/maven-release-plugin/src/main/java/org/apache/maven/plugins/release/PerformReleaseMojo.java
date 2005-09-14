@@ -101,6 +101,8 @@ public class PerformReleaseMojo
         cl.createArgument().setLine( "-DperformRelease=true" );
 
         cl.createArgument().setLine( "--no-plugin-updates" );
+        
+        cl.createArgument().setLine( "--batch-mode" );
 
         StreamConsumer consumer = new DefaultConsumer();
 
