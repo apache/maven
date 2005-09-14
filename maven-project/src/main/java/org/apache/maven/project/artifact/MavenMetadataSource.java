@@ -181,12 +181,7 @@ public class MavenMetadataSource
                 // if the project is null, we encountered an invalid model (read: m1 POM)
                 // we'll just return an empty resolution group.
                 // or used the inherited scope (should that be passed to the buildFromRepository method above?)
-                Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
-                                                         artifact.getDependencyFilter() );
-                
-                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
-                
-                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
+                result = new ResolutionGroup( pomArtifact, Collections.EMPTY_SET, Collections.EMPTY_LIST );
             }
             else
             {
@@ -195,7 +190,9 @@ public class MavenMetadataSource
                 Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
                                                          artifact.getDependencyFilter() );
 
-                result = new ResolutionGroup( pomArtifact, artifacts, project.getRemoteArtifactRepositories() );
+                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
+                
+                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
             }
 
             return result;

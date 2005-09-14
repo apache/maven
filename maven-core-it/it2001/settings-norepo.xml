@@ -1,0 +1,4 @@
+<settings>
+  <localRepository>file:../target/local-repo</localRepository>
+  <usePluginRegistry>false</usePluginRegistry>
+</settings>
