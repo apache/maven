@@ -10,7 +10,7 @@
       <artifactId>jdk-tools</artifactId>
       <version>1.4.2</version>
       <scope>system</scope>
-      <systemPath>${java.home}/../lib/tools.jar</systemPath>
+      <systemPath>${toolsJarPath}</systemPath>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -19,4 +19,30 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>default-tools.jar</id>
+      <activation>
+        <property>
+          <name>java.vendor</name>
+          <value>Sun Microsystems Inc.</value>
+        </property>
+      </activation>
+      <properties>
+        <toolsJarPath>${java.home}/../lib/tools.jar</toolsJarPath>
+      </properties>
+    </profile>
+    <profile>
+      <id>osx-tools.jar</id>
+      <activation>
+        <property>
+          <name>java.vendor</name>
+          <value>Apple Computer, Inc.</value>
+        </property>
+      </activation>
+      <properties>
+        <toolsJarPath>${java.home}/../Classes/classes.jar</toolsJarPath>
+      </properties>
+    </profile>
+  </profiles>
 </model>
