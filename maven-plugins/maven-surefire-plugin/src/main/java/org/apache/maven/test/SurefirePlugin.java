@@ -20,13 +20,11 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -106,14 +104,6 @@ public class SurefirePlugin
      * @parameter
      */
     private List excludes;
-
-    /**
-     * The project whose project files to create.
-     *
-     * @parameter expression="${project}"
-     * @required
-     */
-    private MavenProject project;
 
     /**
      * @parameter expression="${localRepository}"
