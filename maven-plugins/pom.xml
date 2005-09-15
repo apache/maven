@@ -93,14 +93,14 @@
   </organization>
   <distributionManagement>
     <snapshotRepository>
-      <id>central-plugins-snapshots</id>
+      <id>snapshots</id>
       <name>Maven Central Plugins Development Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2/plugins</url>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
     </snapshotRepository>
     <repository>
-      <id>central-plugins</id>
+      <id>repo1</id>
       <name>Maven Central Plugins Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2/plugins</url>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
     <site>
       <id>website</id>
@@ -121,7 +121,7 @@
     <pluginRepository>
       <id>snapshots</id>
       <name>Maven Central Plugins Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -177,6 +177,6 @@
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/maven-plugins/</url>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-plugins/</url>
   </scm>
 </project>
