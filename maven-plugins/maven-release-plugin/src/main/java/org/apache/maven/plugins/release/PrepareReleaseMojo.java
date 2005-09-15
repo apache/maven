@@ -827,8 +827,8 @@ public class PrepareReleaseMojo
 
                 MavenProject releaseProject = new MavenProject( project );
                 Model releaseModel = releaseProject.getOriginalModel();
-                fixNullValueInModel( releaseModel, project.getModel() );
-
+                fixNullValueInModel( releaseModel, project.getOriginalModel() );
+                
                 // Remove parent
 /* TODO: put this back after it is properly resolved again
                 if ( releaseModel.getParent() != null )
