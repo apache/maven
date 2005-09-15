@@ -86,7 +86,7 @@ public class ProjectVersionResolver
     {
         String projectVersion = project.getOriginalModel().getVersion();
 
-        if ( projectVersion.endsWith( "SNAPSHOT" ) )
+        if ( ArtifactUtils.isSnapshot( projectVersion ) )
         {
             String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
             throw new MojoExecutionException( "The project " + projectId + " is a snapshot (" + projectVersion +
@@ -103,17 +103,25 @@ public class ProjectVersionResolver
         // releaseVersion = 1.0.4
         // snapshotVersion = 1.0.5-SNAPSHOT
 
+        String staticVersionPart = null;
         String nextVersionString = null;
-        if ( projectVersion.indexOf( "-" ) > 0 )
+        
+        int dashIdx = projectVersion.lastIndexOf( "-" );
+        int dotIdx = projectVersion.lastIndexOf( "." );
+        
+        if ( dashIdx > 0 )
         {
-            nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "-" ) + 1 );
+            staticVersionPart = projectVersion.substring( 0, dashIdx + 1 );
+            nextVersionString = projectVersion.substring( dashIdx + 1 );
         }
-        else if ( projectVersion.indexOf( "." ) > 0 )
+        else if ( dotIdx > 0 )
         {
-            nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "." ) + 1 );
+            staticVersionPart = projectVersion.substring( 0, dotIdx + 1 );
+            nextVersionString = projectVersion.substring( dotIdx + 1 );
         }
         else
         {
+            staticVersionPart = "";
             nextVersionString = projectVersion;
         }
 
@@ -121,8 +129,7 @@ public class ProjectVersionResolver
         {
             nextVersionString = Integer.toString( Integer.parseInt( nextVersionString ) + 1 );
 
-            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString +
-                SNAPSHOT_CLASSIFIER;
+            projectVersion = staticVersionPart + nextVersionString + SNAPSHOT_CLASSIFIER;
         }
         catch ( NumberFormatException e )
         {

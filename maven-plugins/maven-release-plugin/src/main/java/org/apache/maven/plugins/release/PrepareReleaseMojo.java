@@ -239,8 +239,7 @@ public class PrepareReleaseMojo
                 }
             }
 
-            //TODO reinstate.
-//            removeReleasePoms();
+            removeReleasePoms();
 
             checkInNextSnapshot();
 
