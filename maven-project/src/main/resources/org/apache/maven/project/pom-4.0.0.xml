@@ -19,7 +19,7 @@
     <pluginRepository>
       <id>central-plugins</id>
       <name>Maven Plugin Repository</name>
-      <url>http://repo1.maven.org/maven2/plugins</url>
+      <url>http://repo1.maven.org/maven2</url>
       <layout>default</layout>
       <snapshots>
         <enabled>false</enabled>

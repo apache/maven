@@ -154,7 +154,7 @@
     <pluginRepository>
       <id>snapshots</id>
       <name>Maven Central Plugins Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -205,4 +205,16 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
+
