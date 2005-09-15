@@ -483,20 +483,17 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        Properties systemProperties = new Properties();
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
             for ( int i = 0; i < defStrs.length; ++i )
             {
-                setCliProperty( defStrs[i], systemProperties );
+                setCliProperty( defStrs[i] );
             }
         }
-
-        System.setProperties( systemProperties );
     }
 
-    private static void setCliProperty( String property, Properties systemProperties )
+    private static void setCliProperty( String property )
     {
         String name;
 
@@ -517,7 +514,7 @@ public class MavenCli
             value = property.substring( i + 1 ).trim();
         }
 
-        systemProperties.setProperty( name, value );
+        System.setProperty( name, value );
     }
 
     // ----------------------------------------------------------------------
