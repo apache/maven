@@ -14,7 +14,7 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>central-plugins</id>
+      <id>central</id>
       <name>Empty Repository</name>
       <url>file:/tmp/emptyRepo</url>
     </pluginRepository>
