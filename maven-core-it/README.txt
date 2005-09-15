@@ -150,9 +150,6 @@ it0053: Test that attached artifacts have the same buildnumber and timestamp
         as the main artifact. This will not correctly verify until we have
         some way to pattern-match the buildnumber/timestamp...
 
-it0054: Test that locally defined repositories override those from the super
-        POM. This is from MNG-479.
-
 it0055: Test that source includes/excludes with in the compiler plugin config.
         This will test excludes and testExcludes...
 
