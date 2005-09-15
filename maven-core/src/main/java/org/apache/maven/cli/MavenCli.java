@@ -61,11 +61,13 @@ import java.util.StringTokenizer;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @noinspection UseOfSystemOutOrSystemErr,ACCESS_STATIC_VIA_INSTANCE
  */
 public class MavenCli
 {
-    public static File userDir = new File( System.getProperty( "user.dir" ) );
-
+    /**
+     * @noinspection ConfusingMainMethod
+     */
     public static int main( String[] args, ClassWorld classWorld )
     {
         // ----------------------------------------------------------------------
@@ -95,22 +97,6 @@ public class MavenCli
 
             return 1;
         }
-
-        // ----------------------------------------------------------------------
-        //
-        // 1) maven user configuration directory ( ~/.m2 )
-        // 2) maven home
-        // 3) local repository
-        //
-        // ----------------------------------------------------------------------
-
-        //        File userConfigurationDirectory = getUserConfigurationDirectory();
-
-        //        Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
 
         initializeSystemProperties( commandLine );
 
@@ -157,9 +143,9 @@ public class MavenCli
             showFatalError( "Unable to start the embedded plexus container", e, showErrors );
             return 1;
         }
-        
+
         String userSettingsPath = null;
-        
+
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS );
@@ -169,18 +155,19 @@ public class MavenCli
         try
         {
             MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
-            
+
             if ( userSettingsPath != null )
             {
                 File userSettingsFile = new File( userSettingsPath );
-                
+
                 if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
                 {
                     settings = settingsBuilder.buildSettings( userSettingsFile );
                 }
                 else
                 {
-                    System.out.println("WARNING: Alternate user settings file: " + userSettingsPath + " is invalid. Using default path." );
+                    System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
+                        " is invalid. Using default path." );
                 }
             }
 
@@ -245,26 +232,26 @@ public class MavenCli
             {
                 loggerManager.setThreshold( Logger.LEVEL_DEBUG );
             }
-            
+
             ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer() );
-            
+
             if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
             {
                 String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
-                
+
                 StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
-                
-                while( profileTokens.hasMoreTokens() )
+
+                while ( profileTokens.hasMoreTokens() )
                 {
                     String profileAction = profileTokens.nextToken().trim();
-                    
+
                     if ( profileAction.startsWith( "-" ) )
                     {
                         profileManager.explicitlyDeactivate( profileAction.substring( 1 ) );
                     }
                     else if ( profileAction.startsWith( "+" ) )
                     {
-                        profileManager.explicitlyActivate(profileAction.substring( 1 ) );
+                        profileManager.explicitlyActivate( profileAction.substring( 1 ) );
                     }
                     else
                     {
@@ -275,7 +262,7 @@ public class MavenCli
             }
 
             request = createRequest( embedder, commandLine, settings, eventDispatcher, loggerManager, profileManager );
-            
+
             setProjectFileOptions( commandLine, request );
 
             maven = createMavenInstance( embedder, settings.isInteractiveMode() );
@@ -296,7 +283,6 @@ public class MavenCli
                 catch ( ComponentLifecycleException e )
                 {
                     showFatalError( "Error releasing logging manager", e, showErrors );
-                    return 1;
                 }
             }
         }
@@ -310,7 +296,7 @@ public class MavenCli
             return 1;
         }
 
-        MavenExecutionResponse response = null;
+        MavenExecutionResponse response;
         try
         {
             response = maven.execute( request );
@@ -346,15 +332,16 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( Embedder embedder, CommandLine commandLine,
-                                                        Settings settings, EventDispatcher eventDispatcher,
-                                                        LoggerManager loggerManager, ProfileManager profileManager )
+    private static MavenExecutionRequest createRequest( Embedder embedder, CommandLine commandLine, Settings settings,
+                                                        EventDispatcher eventDispatcher, LoggerManager loggerManager,
+                                                        ProfileManager profileManager )
         throws ComponentLookupException
     {
-        MavenExecutionRequest request = null;
+        MavenExecutionRequest request;
 
         ArtifactRepository localRepository = createLocalRepository( embedder, settings, commandLine );
 
+        File userDir = new File( System.getProperty( "user.dir" ) );
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                     commandLine.getArgList(), userDir.getPath(), profileManager );
 
@@ -369,7 +356,7 @@ public class MavenCli
         {
             request.setRecursive( false );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
         {
             request.setFailureBehavior( ReactorManager.FAIL_FAST );
@@ -382,7 +369,7 @@ public class MavenCli
         {
             request.setFailureBehavior( ReactorManager.FAIL_NEVER );
         }
-        
+
         return request;
     }
 
@@ -428,12 +415,12 @@ public class MavenCli
             ArtifactRepositoryFactory.ROLE );
 
         String url = settings.getLocalRepository();
-        
+
         if ( !url.startsWith( "file:" ) )
         {
             url = "file://" + url;
         }
-        
+
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;
@@ -496,21 +483,24 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
+        Properties systemProperties = new Properties();
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
             for ( int i = 0; i < defStrs.length; ++i )
             {
-                setCliProperty( defStrs[i] );
+                setCliProperty( defStrs[i], systemProperties );
             }
         }
+
+        System.setProperties( systemProperties );
     }
 
-    private static void setCliProperty( String property )
+    private static void setCliProperty( String property, Properties systemProperties )
     {
-        String name = null;
+        String name;
 
-        String value = null;
+        String value;
 
         int i = property.indexOf( "=" );
 
@@ -527,7 +517,7 @@ public class MavenCli
             value = property.substring( i + 1 ).trim();
         }
 
-        System.setProperty( name, value );
+        systemProperties.setProperty( name, value );
     }
 
     // ----------------------------------------------------------------------
@@ -537,7 +527,7 @@ public class MavenCli
     static class CLIManager
     {
         public static final char ALTERNATE_POM_FILE = 'f';
-        
+
         public static final char BATCH_MODE = 'B';
 
         public static final char SET_SYSTEM_PROPERTY = 'D';
@@ -554,7 +544,7 @@ public class MavenCli
 
         public static final char VERSION = 'v';
 
-        private Options options = null;
+        private Options options;
 
         public static final char NON_RECURSIVE = 'N';
 
@@ -589,9 +579,10 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            
-            options.addOption( OptionBuilder.withLongOpt( "file").hasArg().withDescription( "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
-            
+
+            options.addOption( OptionBuilder.withLongOpt( "file" ).hasArg().withDescription(
+                "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
+
             options.addOption(
                 OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create(
                     SET_SYSTEM_PROPERTY ) );
@@ -641,16 +632,19 @@ public class MavenCli
             options.addOption(
                 OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create(
                     CHECKSUM_WARNING_POLICY ) );
-            
+
             options.addOption( OptionBuilder.withLongOpt( "settings" )
                 .withDescription( "Alternate path for the user settings file" ).hasArg()
                 .create( ALTERNATE_USER_SETTINGS ) );
-            
-            options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription( "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
-            
-            options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
-            
-            options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription(
+                "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription(
+                "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription(
+                "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
         }
 
         public CommandLine parse( String[] args )
