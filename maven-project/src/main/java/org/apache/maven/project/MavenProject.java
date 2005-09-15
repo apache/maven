@@ -156,6 +156,9 @@ public class MavenProject
             this.artifacts = Collections.unmodifiableSet( project.artifacts );
         }
         this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
+        this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
+        this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
+        
         this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
         this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
         this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
@@ -972,7 +975,7 @@ public class MavenProject
         this.artifacts = artifacts;
 
         // flush the calculated artifactMap
-        artifactMap = null;
+        this.artifactMap = null;
     }
 
     public Set getArtifacts()
@@ -993,6 +996,8 @@ public class MavenProject
     public void setPluginArtifacts( Set pluginArtifacts )
     {
         this.pluginArtifacts = pluginArtifacts;
+        
+        this.pluginArtifactMap = null;
     }
 
     public Set getPluginArtifacts()
@@ -1013,6 +1018,8 @@ public class MavenProject
     public void setReportArtifacts( Set reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
+        
+        this.reportArtifactMap = null;
     }
 
     public Set getReportArtifacts()
@@ -1033,6 +1040,8 @@ public class MavenProject
     public void setExtensionArtifacts( Set extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
+        
+        this.extensionArtifactMap = null;
     }
 
     public Set getExtensionArtifacts()

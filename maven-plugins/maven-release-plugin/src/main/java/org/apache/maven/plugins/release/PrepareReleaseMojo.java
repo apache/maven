@@ -86,6 +86,7 @@ public class PrepareReleaseMojo
 
     /**
      * @parameter expression="${settings.interactiveMode}"
+     * @required
      * @readonly
      */
     private boolean interactive;
@@ -240,7 +241,7 @@ public class PrepareReleaseMojo
                 }
             }
 
-            removeReleasePoms();
+//            removeReleasePoms();
 
             checkInNextSnapshot();
 
@@ -890,12 +891,18 @@ public class PrepareReleaseMojo
                 {
                     //Rewrite report version
                     Map reportArtifacts = releaseProject.getReportArtifactMap();
+                    
+                    getLog().info( "Using report-artifact map with " + reportArtifacts.size() + " entries." );
 
                     for ( Iterator i = reports.iterator(); i.hasNext(); )
                     {
                         ReportPlugin plugin = (ReportPlugin) i.next();
 
-                        Artifact artifact = (Artifact) reportArtifacts.get( plugin.getKey() );
+                        String pluginKey = plugin.getKey();
+                        
+                        getLog().info( "Looking up report artifact for: \'" + pluginKey + "\'" );
+                        
+                        Artifact artifact = (Artifact) reportArtifacts.get( pluginKey );
 
                         String version = resolveVersion( artifact, "report", releaseProject );
 
@@ -1054,6 +1061,7 @@ public class PrepareReleaseMojo
     private String resolveVersion( Artifact artifact, String artifactUsage, MavenProject project )
         throws MojoExecutionException
     {
+        getLog().info( "Resolving version for: " + artifact );
         String resolvedVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
                                                                           artifact.getArtifactId() );
 

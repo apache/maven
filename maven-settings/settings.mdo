@@ -203,6 +203,11 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
+    public Boolean getInteractiveMode()
+    {
+        return Boolean.valueOf( isInteractiveMode() );
+    }
+          
     private Proxy activeProxy;
     
     public void flushActiveProxy()

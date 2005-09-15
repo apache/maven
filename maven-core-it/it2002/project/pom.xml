@@ -1,0 +1,64 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it2002</groupId>
+  <artifactId>project</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0.2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>snapshots</id>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>test</id>
+      <url>file:../target/test-repo</url>
+    </repository>
+    <snapshotRepository>
+      <id>test-snaps</id>
+      <url>file:../target/test-repo</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <scm>
+    <connection>scm:svn:file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</connection>
+    <developerConnection>scm:svn:file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</developerConnection>
+    <url>file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</url>
+    <tag>p1</tag>
+  </scm>
+
+  <properties>
+    <tagBase>file://${project.file.parentFile.parentFile}/target/svnroot/project/tags</tagBase>
+  </properties>
+
+  <!-- build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0-beta-1-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build -->
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
