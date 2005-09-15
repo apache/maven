@@ -82,6 +82,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -322,21 +323,20 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Artifact projectArtifact;
-        
+
         if ( "pom".equals( artifact.getType() ) )
         {
             projectArtifact = artifact;
         }
         else
         {
-            getLogger().warn(
-                              "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType()
-                                  + "; constructing POM artifact instead." );
-            
+            getLogger().warn( "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType() +
+                "; constructing POM artifact instead." );
+
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                                      artifact.getVersion(), artifact.getScope() );
         }
-        
+
         MavenProject project = getCachedProject( projectArtifact.getGroupId(), projectArtifact.getArtifactId(),
                                                  projectArtifact.getVersion() );
         Model model;
@@ -376,7 +376,8 @@ public class DefaultMavenProjectBuilder
                         try
                         {
                             projectArtifact.setResolved( false );
-                            artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories, localRepository );
+                            artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories,
+                                                            localRepository );
                         }
                         catch ( ArtifactResolutionException e )
                         {
@@ -472,7 +473,8 @@ public class DefaultMavenProjectBuilder
         // TODO: the aRWR can get out of sync with project.model.repositories. We should do all the processing of
         // profiles, etc on the models then recreate the aggregated sets at the end from the project repositories (they
         // must still be created along the way so that parent poms can be discovered, however)
-        Set aggregatedRemoteWagonRepositories = new HashSet();
+        // Use a TreeSet to ensure ordering is retained
+        Set aggregatedRemoteWagonRepositories = new LinkedHashSet();
 
         List activeExternalProfiles;
         try
@@ -693,7 +695,7 @@ public class DefaultMavenProjectBuilder
         }
 
         ProfileManager profileManager = new DefaultProfileManager( container );
-        
+
         if ( externalProfileManager != null )
         {
             profileManager.explicitlyActivate( externalProfileManager.getExplicitlyActivatedIds() );
@@ -778,11 +780,15 @@ public class DefaultMavenProjectBuilder
 
                     String candidateParentGroupId = candidateParent.getGroupId();
                     if ( candidateParentGroupId == null && candidateParent.getParent() != null )
+                    {
                         candidateParentGroupId = candidateParent.getParent().getGroupId();
+                    }
 
                     String candidateParentVersion = candidateParent.getVersion();
                     if ( candidateParentVersion == null && candidateParent.getParent() != null )
+                    {
                         candidateParentVersion = candidateParent.getParent().getVersion();
+                    }
 
                     if ( parentModel.getGroupId().equals( candidateParentGroupId ) &&
                         parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) &&
@@ -797,9 +803,7 @@ public class DefaultMavenProjectBuilder
                     {
                         getLogger().debug( "Invalid parent-POM referenced by relative path '" +
                             parentModel.getRelativePath() + "' in parent specification in " + project.getId() + ":" +
-                            "\n  Specified: " + parentModel.getId() +
-                            "\n  Found:     " + candidateParent.getId()
-                        );
+                            "\n  Specified: " + parentModel.getId() + "\n  Found:     " + candidateParent.getId() );
                     }
                 }
             }
@@ -890,18 +894,18 @@ public class DefaultMavenProjectBuilder
                 if ( root != null )
                 {
                     List active = root.getActiveProfiles();
-                    
-                    if( active != null && !active.isEmpty() )
+
+                    if ( active != null && !active.isEmpty() )
                     {
                         profileManager.explicitlyActivate( root.getActiveProfiles() );
                     }
-                    
+
                     for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
                     {
                         org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
 
                         Profile converted = ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile );
-                        
+
                         profileManager.addProfile( converted );
                     }
                 }
