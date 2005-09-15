@@ -71,8 +71,6 @@ import java.util.Set;
 public class PrepareReleaseMojo
     extends AbstractReleaseMojo
 {
-    private static final String SNAPSHOT = "-SNAPSHOT";
-
     private static final String RELEASE_POM = "release-pom.xml";
 
     private static final String POM = "pom.xml";
@@ -241,6 +239,7 @@ public class PrepareReleaseMojo
                 }
             }
 
+            //TODO reinstate.
 //            removeReleasePoms();
 
             checkInNextSnapshot();
@@ -458,11 +457,6 @@ public class PrepareReleaseMojo
         return scmRewriter;
     }
 
-    private boolean isSnapshot( String version )
-    {
-        return version.endsWith( SNAPSHOT );
-    }
-
     private void checkForLocalModifications()
         throws MojoExecutionException
     {
@@ -544,7 +538,7 @@ public class PrepareReleaseMojo
 
             String parentVersion = null;
 
-            if ( isSnapshot( parentProject.getVersion() ) )
+            if ( ArtifactUtils.isSnapshot( parentProject.getVersion() ) )
             {
                 parentVersion = getVersionResolver().getResolvedVersion( parentProject.getGroupId(),
                                                                          parentProject.getArtifactId() );
@@ -554,7 +548,7 @@ public class PrepareReleaseMojo
                     parentVersion = parentProject.getVersion();
                 }
 
-                if ( isSnapshot( parentVersion ) )
+                if ( ArtifactUtils.isSnapshot( parentVersion ) )
                 {
                     throw new MojoExecutionException( "Can't release project due to non released parent (" +
                         parentProject.getGroupId() + ":" + parentProject.getArtifactId() + parentVersion + "." );
@@ -580,7 +574,7 @@ public class PrepareReleaseMojo
                 artifactVersion = artifact.getVersion();
             }
 
-            if ( isSnapshot( artifactVersion ) )
+            if ( ArtifactUtils.isSnapshot( artifactVersion ) )
             {
                 snapshotDependencies.add( artifact );
             }
@@ -600,7 +594,7 @@ public class PrepareReleaseMojo
                 artifactVersion = artifact.getVersion();
             }
 
-            if ( isSnapshot( artifactVersion ) )
+            if ( ArtifactUtils.isSnapshot( artifactVersion ) )
             {
                 snapshotDependencies.add( artifact );
             }
@@ -633,7 +627,7 @@ public class PrepareReleaseMojo
     private void transformPomToReleaseVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !isSnapshot( project.getVersion() ) )
+        if ( !ArtifactUtils.isSnapshot( project.getVersion() ) )
         {
             throw new MojoExecutionException( "The project " + project.getGroupId() + ":" + project.getArtifactId() +
                 " isn't a snapshot (" + project.getVersion() + ")." );
@@ -646,7 +640,7 @@ public class PrepareReleaseMojo
         {
             Artifact parentArtifact = project.getParentArtifact();
 
-            if ( isSnapshot( parentArtifact.getBaseVersion() ) )
+            if ( ArtifactUtils.isSnapshot( parentArtifact.getBaseVersion() ) )
             {
                 String version = resolveVersion( parentArtifact, "parent", project );
 

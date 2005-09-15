@@ -28,6 +28,11 @@ public final class ArtifactUtils
     {
     }
 
+    public static boolean isSnapshot( String version )
+    {
+        return version != null && Artifact.VERSION_FILE_PATTERN.matcher( version ).matches();
+    }
+    
     public static String versionlessKey( Artifact artifact )
     {
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
