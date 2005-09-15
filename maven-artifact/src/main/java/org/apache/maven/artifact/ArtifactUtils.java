@@ -30,7 +30,7 @@ public final class ArtifactUtils
 
     public static boolean isSnapshot( String version )
     {
-        return version != null && Artifact.VERSION_FILE_PATTERN.matcher( version ).matches();
+        return version != null && ( version.toUpperCase().endsWith( "SNAPSHOT" ) || Artifact.VERSION_FILE_PATTERN.matcher( version ).matches() );
     }
     
     public static String versionlessKey( Artifact artifact )
