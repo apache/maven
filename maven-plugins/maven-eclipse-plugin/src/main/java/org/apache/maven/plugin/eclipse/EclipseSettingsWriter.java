@@ -41,7 +41,7 @@ public class EclipseSettingsWriter
         this.log = log;
     }
 
-    protected void write( File projectBaseDir, File outputDir, MavenProject project, MavenProject executedProject )
+    protected void write( File projectBaseDir, File outputDir, MavenProject project )
         throws EclipsePluginException
     {
 

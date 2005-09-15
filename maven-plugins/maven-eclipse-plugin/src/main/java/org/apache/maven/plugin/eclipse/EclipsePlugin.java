@@ -16,22 +16,16 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
@@ -46,12 +40,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class EclipsePlugin
     extends AbstractMojo
 {
-
-    /**
-     * Separator used for natures, builders, etc. (can't use space since conclasspath entries can contain spaces).
-     */
-    private static final String LIST_SEPARATOR = ","; //$NON-NLS-1$
-
     /**
      * The project whose project files to create.
      * @parameter expression="${project}"
@@ -151,6 +139,13 @@ public class EclipsePlugin
     private List classpathContainers;
 
     /**
+     * Disables the downloading of source attachments.
+     * 
+     * @parameter expression="${eclipse.downloadSources}"
+     */
+    private boolean downloadSources = true;
+
+    /**
      * Eclipse workspace directory.
      * @parameter expression="${eclipse.workspace}"
      */
@@ -243,9 +238,14 @@ public class EclipsePlugin
     public void execute()
         throws MojoExecutionException
     {
-
-        assertNotEmpty( project.getGroupId(), "groupId" ); //$NON-NLS-1$
-        assertNotEmpty( project.getArtifactId(), "artifactId" ); //$NON-NLS-1$
+        if ( executedProject == null )
+        {
+            // backwards compat with alpha-2 only
+            executedProject = project;
+        }
+    	
+        assertNotEmpty( executedProject.getGroupId(), "groupId" ); //$NON-NLS-1$
+        assertNotEmpty( executedProject.getArtifactId(), "artifactId" ); //$NON-NLS-1$
 
         // defaults
         // @todo how set List values in @default-value??
@@ -254,23 +254,25 @@ public class EclipsePlugin
             projectnatures = new ArrayList();
             projectnatures.add( "org.eclipse.jdt.core.javanature" );
         }
+
         if ( buildcommands == null )
         {
             buildcommands = new ArrayList();
             buildcommands.add( "org.eclipse.jdt.core.javabuilder" );
         }
+
         if ( classpathContainers == null )
         {
             classpathContainers = new ArrayList();
         }
         // end defaults
 
-        if ( project.getFile() == null || !project.getFile().exists() )
+        if ( executedProject.getFile() == null || !executedProject.getFile().exists() )
         {
             throw new MojoExecutionException( Messages.getString( "EclipsePlugin.missingpom" ) ); //$NON-NLS-1$
         }
 
-        if ( "pom".equals( project.getPackaging() ) ) //$NON-NLS-1$
+        if ( "pom".equals( executedProject.getPackaging() ) && outputDir == null ) //$NON-NLS-1$
         {
             getLog().info( Messages.getString( "EclipsePlugin.pompackaging" ) ); //$NON-NLS-1$
             return;
@@ -278,27 +280,21 @@ public class EclipsePlugin
 
         if ( outputDir == null )
         {
-            outputDir = project.getFile().getParentFile();
+            outputDir = executedProject.getFile().getParentFile();
         }
-        else if ( !outputDir.equals( project.getFile().getParentFile() ) )
+        else if ( !outputDir.equals( executedProject.getFile().getParentFile() ) )
         {
             if ( !outputDir.isDirectory() )
             {
                 throw new MojoExecutionException( Messages.getString( "EclipsePlugin.notadir", outputDir ) ); //$NON-NLS-1$
             }
 
-            outputDir = new File( outputDir, project.getArtifactId() );
+            outputDir = new File( outputDir, executedProject.getArtifactId() );
 
             if ( !outputDir.isDirectory() && !outputDir.mkdir() )
             {
                 throw new MojoExecutionException( Messages.getString( "EclipsePlugin.cantcreatedir", outputDir ) ); //$NON-NLS-1$
             }
-        }
-
-        if ( executedProject == null )
-        {
-            // backwards compat with alpha-2 only
-            executedProject = project;
         }
 
         // ready to start
@@ -309,25 +305,25 @@ public class EclipsePlugin
     public void write()
         throws EclipsePluginException
     {
-
-        File projectBaseDir = project.getFile().getParentFile();
+        File projectBaseDir = executedProject.getFile().getParentFile();
 
         // build the list of referenced ARTIFACTS produced by reactor projects
-        List reactorArtifacts = resolveReactorArtifacts();
+        List reactorArtifacts = EclipseUtils.resolveReactorArtifacts( project, reactorProjects );
 
         // build a list of UNIQUE source dirs (both src and resources) to be used in classpath and wtpmodules
-        EclipseSourceDir[] sourceDirs = buildDirectoryList( project, outputDir );
+        EclipseSourceDir[] sourceDirs = EclipseUtils.buildDirectoryList( executedProject, outputDir, getLog() );
 
+        // use project since that one has all artifacts resolved.
         new EclipseClasspathWriter( getLog() ).write( projectBaseDir, outputDir, project, reactorArtifacts, sourceDirs,
                                                       classpathContainers, localRepository, artifactResolver,
-                                                      artifactFactory, remoteArtifactRepositories );
+                                                      artifactFactory, remoteArtifactRepositories, downloadSources );
 
         new EclipseProjectWriter( getLog() ).write( projectBaseDir, outputDir, project, executedProject,
                                                     reactorArtifacts, projectnatures, buildcommands );
 
-        new EclipseSettingsWriter( getLog() ).write( projectBaseDir, outputDir, project, executedProject );
+        new EclipseSettingsWriter( getLog() ).write( projectBaseDir, outputDir, executedProject );
 
-        new EclipseWtpmodulesWriter( getLog() ).write( outputDir, project, reactorArtifacts, sourceDirs,
+        new EclipseWtpmodulesWriter( getLog() ).write( outputDir, executedProject, reactorArtifacts, sourceDirs,
                                                        localRepository );
 
         getLog().info( Messages.getString( "EclipsePlugin.wrote", //$NON-NLS-1$
@@ -342,166 +338,4 @@ public class EclipsePlugin
             throw new EclipsePluginException( Messages.getString( "EclipsePlugin.missingelement", elementName ) ); //$NON-NLS-1$
         }
     }
-
-    private EclipseSourceDir[] buildDirectoryList( MavenProject project, File basedir )
-    {
-        File projectBaseDir = project.getFile().getParentFile();
-
-        // avoid duplicated entries
-        Set directories = new TreeSet();
-
-        extractSourceDirs( directories, executedProject.getCompileSourceRoots(), basedir, projectBaseDir, false, null );
-
-        extractResourceDirs( directories, project.getBuild().getResources(), project, basedir, projectBaseDir, false,
-                             null );
-
-        extractSourceDirs( directories, executedProject.getTestCompileSourceRoots(), basedir, projectBaseDir, true,
-                           EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild()
-                               .getTestOutputDirectory(), false ) );
-
-        extractResourceDirs( directories, project.getBuild().getTestResources(), project, basedir, projectBaseDir,
-                             true, EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild()
-                                 .getTestOutputDirectory(), false ) );
-
-        return (EclipseSourceDir[]) directories.toArray( new EclipseSourceDir[directories.size()] );
-    }
-
-    private void extractSourceDirs( Set directories, List sourceRoots, File basedir, File projectBaseDir, boolean test,
-                                   String output )
-    {
-        for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
-        {
-            String sourceRoot = (String) it.next();
-
-            if ( new File( sourceRoot ).isDirectory() )
-            {
-                sourceRoot = EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, sourceRoot, !projectBaseDir
-                    .equals( basedir ) );
-
-                directories.add( new EclipseSourceDir( sourceRoot, output, test, null, null ) );
-            }
-        }
-    }
-
-    private void extractResourceDirs( Set directories, List resources, MavenProject project, File basedir,
-                                     File projectBaseDir, boolean test, String output )
-    {
-        for ( Iterator it = resources.iterator(); it.hasNext(); )
-        {
-
-            Resource resource = (Resource) it.next();
-            String includePattern = null;
-            String excludePattern = null;
-
-            if ( resource.getIncludes().size() != 0 )
-            {
-                // @todo includePattern = ?
-                getLog().warn( Messages.getString( "EclipsePlugin.includenotsupported" ) ); //$NON-NLS-1$
-            }
-
-            if ( resource.getExcludes().size() != 0 )
-            {
-                // @todo excludePattern = ?
-                getLog().warn( Messages.getString( "EclipsePlugin.excludenotsupported" ) ); //$NON-NLS-1$
-            }
-
-            //          Example of setting include/exclude patterns for future reference.
-            //
-            //          TODO: figure out how to merge if the same dir is specified twice
-            //          with different in/exclude patterns. We can't write them now,
-            //                      since only the the first one would be included.
-            //
-            //          if ( resource.getIncludes().size() != 0 )
-            //          {
-            //              writer.addAttribute(
-            //                      "including", StringUtils.join( resource.getIncludes().iterator(), "|" )
-            //                      );
-            //          }
-            //
-            //          if ( resource.getExcludes().size() != 0 )
-            //          {
-            //              writer.addAttribute(
-            //                      "excluding", StringUtils.join( resource.getExcludes().iterator(), "|" )
-            //              );
-            //          }
-
-            if ( !StringUtils.isEmpty( resource.getTargetPath() ) )
-            {
-                output = resource.getTargetPath();
-            }
-
-            File resourceDirectory = new File( resource.getDirectory() );
-
-            if ( !resourceDirectory.exists() || !resourceDirectory.isDirectory() )
-            {
-                continue;
-            }
-
-            String resourceDir = resource.getDirectory();
-            resourceDir = EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, resourceDir, !projectBaseDir
-                .equals( basedir ) );
-
-            if ( output != null )
-            {
-                output = EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, output, false );
-            }
-
-            directories.add( new EclipseSourceDir( resourceDir, output, test, includePattern, excludePattern ) );
-        }
-    }
-
-    /**
-     * Returns the list of referenced artifacts produced by reactor projects.
-     * @return List of Artifacts
-     */
-    private List resolveReactorArtifacts()
-    {
-        List referencedProjects = new ArrayList();
-
-        Set artifacts = project.getArtifacts();
-
-        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
-        {
-            Artifact artifact = (Artifact) it.next();
-
-            MavenProject refProject = findReactorProject( reactorProjects, artifact );
-
-            if ( refProject != null )
-            {
-                referencedProjects.add( artifact );
-            }
-        }
-
-        return referencedProjects;
-    }
-
-    /**
-     * Utility method that locates a project producing the given artifact.
-     *
-     * @param reactorProjects a list of projects to search.
-     * @param artifact the artifact a project should produce.
-     * @return null or the first project found producing the artifact.
-     */
-    private static MavenProject findReactorProject( List reactorProjects, Artifact artifact )
-    {
-        if ( reactorProjects == null )
-        {
-            return null; // we're a single project
-        }
-
-        for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
-        {
-            MavenProject project = (MavenProject) it.next();
-
-            if ( project.getGroupId().equals( artifact.getGroupId() )
-                && project.getArtifactId().equals( artifact.getArtifactId() )
-                && project.getVersion().equals( artifact.getVersion() ) )
-            {
-                return project;
-            }
-        }
-
-        return null;
-    }
-
 }

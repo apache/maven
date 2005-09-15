@@ -57,7 +57,7 @@ public class EclipseClasspathWriter
     protected void write( File projectBaseDir, File basedir, MavenProject project, List referencedReactorArtifacts,
                          EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
                          ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
-                         List remoteArtifactRepositories )
+                         List remoteArtifactRepositories, boolean downloadSources )
         throws EclipsePluginException
     {
 
@@ -128,7 +128,7 @@ public class EclipseClasspathWriter
         {
             Artifact artifact = (Artifact) it.next();
             addDependency( writer, artifact, referencedReactorArtifacts, localRepository, artifactResolver,
-                           artifactFactory, remoteArtifactRepositories );
+                           artifactFactory, remoteArtifactRepositories, downloadSources );
         }
 
         // ----------------------------------------------------------------------
@@ -150,7 +150,8 @@ public class EclipseClasspathWriter
 
     private void addDependency( XMLWriter writer, Artifact artifact, List referencedReactorArtifacts,
                                ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                               ArtifactFactory artifactFactory, List remoteArtifactRepositories )
+                               ArtifactFactory artifactFactory, List remoteArtifactRepositories,
+                               boolean downloadSources )
     {
 
         String path;
@@ -173,51 +174,33 @@ public class EclipseClasspathWriter
             }
 
             String fullPath = artifactPath.getPath();
+
             File localRepositoryFile = new File( localRepository.getBasedir() );
 
             path = "M2_REPO/" //$NON-NLS-1$
                 + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, fullPath, false );
 
-            // source artifact: use the "sources" classifier added by the source plugin
-            Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact
-                .getArtifactId(), artifact.getVersion(), "java-source", "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
-
-            try
+            if ( downloadSources )
             {
-                if ( log.isDebugEnabled() )
+            	Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories,
+                                                                  localRepository, artifactResolver, artifactFactory );
+            	
+                if ( !sourceArtifact.isResolved() )
                 {
-                    log.debug( Messages.getString( "EclipseClasspathWriter.lookingforsources", //$NON-NLS-1$
-                                                   sourceArtifact.getArtifactId() ) );
+                    log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
+                                                  sourceArtifact.getArtifactId() ) );
                 }
-                artifactResolver.resolve( sourceArtifact, remoteArtifactRepositories, localRepository );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                // ignore, the jar has not been found
-                if ( log.isDebugEnabled() )
-                {
-                    log.debug( e.getMessage(), e );
-                }
-            }
-
-            File sourceArtifactFile = sourceArtifact.getFile();
-
-            if ( !sourceArtifact.isResolved() )
-            {
-                log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
-                                              sourceArtifact.getArtifactId() ) );
-            }
-            else
-            {
-                if ( log.isDebugEnabled() )
+                else
                 {
                     log.debug( Messages.getString( "EclipseClasspathWriter.sourcesavailable", //$NON-NLS-1$
                                                    new Object[] {
                                                        sourceArtifact.getArtifactId(),
-                                                       sourceArtifactFile.getPath() } ) );
+                                                       sourceArtifact.getFile().getAbsolutePath() } ) );
+
+                    sourcepath = "M2_REPO/" //$NON-NLS-1$
+                        + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifact.getFile().getAbsolutePath(), false );
                 }
-                sourcepath = "M2_REPO/" //$NON-NLS-1$
-                    + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifactFile.getPath(), false );
+
             }
 
             kind = "var"; //$NON-NLS-1$
@@ -236,5 +219,31 @@ public class EclipseClasspathWriter
 
     }
 
+    
+    private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, ArtifactResolver artifactResolver,
+                                       ArtifactFactory artifactFactory )
+    {
+        // source artifact: use the "sources" classifier added by the source plugin
+        Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact
+            .getArtifactId(), artifact.getVersion(), "java-source", "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
+
+        try
+        {
+            log.debug( Messages.getString( "EclipseClasspathWriter.lookingforsources", //$NON-NLS-1$
+                                               sourceArtifact.getArtifactId() ) );
+
+            artifactResolver.resolve( sourceArtifact, remoteArtifactRepositories, localRepository );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            // ignore, the jar has not been found
+            if ( log.isDebugEnabled() )
+            {
+                log.debug( "Cannot resolve source artifact", e );
+            }
+        }
+        
+        return sourceArtifact;
+    }
 }
 
