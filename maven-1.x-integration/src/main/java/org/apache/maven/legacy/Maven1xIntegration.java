@@ -31,14 +31,8 @@ public interface Maven1xIntegration
     // Execution
     // ----------------------------------------------------------------------
 
-    void execute( File project, List goals );
-
-    // ----------------------------------------------------------------------
-    // Reactor execution
-    // ----------------------------------------------------------------------
-
-    // TODO: perhaps?
-    // ExecutionResponse executeReactor( String goal, String includes, String excludes );
+    void execute( File project, List args, List goals )
+        throws Maven1xIntegrationException;
 
     // ----------------------------------------------------------------------
     // Maven home

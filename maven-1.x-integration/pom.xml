@@ -1,5 +1,5 @@
 <model xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -12,12 +12,18 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>forehead</groupId>
-      <artifactId>forehead</artifactId>
-      <version>1.0-beta-5</version>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
     </dependency>
+    <!--
+        <dependency>
+          <groupId>forehead</groupId>
+          <artifactId>forehead</artifactId>
+          <version>1.0-beta-5</version>
+        </dependency>
+    -->
   </dependencies>
 </model>
