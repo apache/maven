@@ -54,25 +54,21 @@ public class DefaultRepositoryMetadataManager
     public void resolve( RepositoryMetadata metadata, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: currently this is first wins, but really we should take the latest by comparing either the
-        // snapshot timestamp, or some other timestamp later encoded into the metadata.
-        loadMetadata( metadata, localRepository, localRepository );
-
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        boolean alreadyResolved = alreadyResolved( metadata );
+        if ( !alreadyResolved )
         {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
-            ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
-                : repository.getReleases();
-
-            if ( !policy.isEnabled() )
+            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
-                getLogger().debug( "Skipping disabled repository " + repository.getId() );
-            }
-            else
-            {
-                boolean alreadyResolved = alreadyResolved( metadata );
-                if ( !alreadyResolved )
+                ArtifactRepository repository = (ArtifactRepository) i.next();
+
+                ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
+                    : repository.getReleases();
+
+                if ( !policy.isEnabled() )
+                {
+                    getLogger().debug( "Skipping disabled repository " + repository.getId() );
+                }
+                else
                 {
                     File file = new File( localRepository.getBasedir(),
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
@@ -96,10 +92,27 @@ public class DefaultRepositoryMetadataManager
                         metadata.storeInLocalRepository( localRepository, repository );
                     }
                 }
+            }
+            cachedMetadata.add( metadata.getKey() );
+        }
+        // TODO: currently this is first wins, but really we should take the latest by comparing either the
+        // snapshot timestamp, or some other timestamp later encoded into the metadata.
+        // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
+        //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
+        loadMetadata( metadata, localRepository, localRepository );
+
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        {
+            ArtifactRepository repository = (ArtifactRepository) i.next();
+
+            ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
+                : repository.getReleases();
+
+            if ( policy.isEnabled() )
+            {
                 loadMetadata( metadata, repository, localRepository );
             }
         }
-        cachedMetadata.add( metadata.getKey() );
     }
 
     private void loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
@@ -115,7 +128,7 @@ public class DefaultRepositoryMetadataManager
 
             if ( repoMetadata.getMetadata() != null )
             {
-                if ( metadata.merge( repoMetadata.getMetadata() ) )
+                if ( !metadata.merge( repoMetadata.getMetadata() ) )
                 {
                     repoMetadata.setRepository( remoteRepository );
                 }
