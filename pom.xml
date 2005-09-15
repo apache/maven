@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
   <artifactId>maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven Project</name>
-  <version>2.0-beta-1-SNAPSHOT</version>
+  <version>2.0-beta-1</version>
   <description>Maven components parent</description>
   <url>http://maven.apache.org/maven2/</url>
   <issueManagement>
@@ -16,7 +15,6 @@
     <system>continuum</system>
     <notifiers>
       <notifier>
-        <type>mail</type>
         <configuration>
           <address>dev@maven.apache.org</address>
         </configuration>
@@ -49,7 +47,7 @@
         <role>Architect</role>
         <role>Release Manager</role>
       </roles>
-      <timezone>-5</timezone>      
+      <timezone>-5</timezone>
     </developer>
     <developer>
       <id>brett</id>
@@ -83,7 +81,7 @@
         <role>PMC Member</role>
       </roles>
       <timezone>-5</timezone>
-    </developer>    
+    </developer>
     <developer>
       <id>kenney</id>
       <name>Kenney Westerhof</name>
@@ -93,7 +91,7 @@
         <role>Java Developer</role>
       </roles>
       <timezone>+1</timezone>
-    </developer>    
+    </developer>
     <developer>
       <id>trygvis</id>
       <name>Trygve Laugstol</name>
@@ -104,62 +102,82 @@
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
-    </developer>    
+    </developer>
   </developers>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-1/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-1/</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0-beta-1/</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
-  <distributionManagement>
-    <repository>
-      <id>repo1</id>
-      <name>Maven Central Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <name>Maven Central Development Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
-    </snapshotRepository>
-    <site>
-      <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>
-    </site>
-  </distributionManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
+    <module>maven-archiver</module>
+    <module>maven-artifact</module>
+    <module>maven-artifact-manager</module>
+    <module>maven-artifact-ant</module>
+    <module>maven-artifact-test</module>
+    <module>maven-core</module>
+    <module>maven-model</module>
+    <module>maven-monitor</module>
+    <module>maven-plugin-api</module>
+    <module>maven-plugin-descriptor</module>
+    <module>maven-plugin-registry</module>
+    <module>maven-plugin-tools</module>
+    <module>maven-profile</module>
+    <module>maven-project</module>
+    <module>maven-reporting</module>
+    <module>maven-repository-metadata</module>
+    <module>maven-script</module>
+    <module>maven-settings</module>
+  </modules>
   <repositories>
     <repository>
-      <id>snapshots</id>
-      <name>Maven Central Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
       <releases>
         <enabled>false</enabled>
       </releases>
+      <id>snapshots</id>
+      <name>Maven Central Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
     </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
-      <id>snapshots</id>
-      <name>Maven Central Plugins Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
       <releases>
         <enabled>false</enabled>
       </releases>
+      <id>snapshots</id>
+      <name>Maven Central Plugins Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
   </pluginRepositories>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -179,42 +197,20 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <modules>
-    <module>maven-archiver</module>
-    <module>maven-artifact</module>
-    <module>maven-artifact-manager</module>
-    <module>maven-artifact-ant</module>
-    <module>maven-artifact-test</module>
-    <module>maven-core</module>
-    <module>maven-model</module>
-    <module>maven-monitor</module>
-    <module>maven-plugin-api</module>
-    <module>maven-plugin-descriptor</module>
-    <module>maven-plugin-registry</module>
-    <module>maven-plugin-tools</module>
-    <module>maven-profile</module>
-    <module>maven-project</module>
-    <module>maven-reporting</module>
-    <module>maven-script</module>
-    <module>maven-settings</module>
-  </modules>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <name>Maven Central Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>Maven Central Development Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
+    </snapshotRepository>
+    <site>
+      <id>website</id>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>
+    </site>
+  </distributionManagement>
 </project>
-
