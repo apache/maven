@@ -20,6 +20,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Target;
 
@@ -45,6 +46,8 @@ public abstract class AbstractAntMojo
             DefaultLogger antLogger = new DefaultLogger();
             antLogger.setOutputPrintStream( System.out );
             antLogger.setErrorPrintStream( System.err );
+            antLogger.setMessageOutputLevel( Project.MSG_INFO );
+
             antTasks.getProject().addBuildListener( antLogger );
             antTasks.getProject().setBaseDir( mavenProject.getBasedir() );
 
