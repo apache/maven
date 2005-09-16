@@ -1,20 +1,20 @@
  ------
-Release Notes - Maven 2.0 Alpha 3
+Release Notes - Maven 2.0 Beta 1
  ------
 Brett Porter
  ------
-23 June 2005
+16 September 2005
  ------
 
-  The Apache Maven team are proud to announce the third alpha release of Maven 2.0.
+  The Apache Maven team are proud to announce the beta release of Maven 2.0.
 
   Download it from {{http://maven.apache.org/maven2/download.html}}
 
   Maven is a software project management and comprehension tool. Based on the concept of a project object model
   (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
 
-  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11021} 83 bug fixes and enhancements}}>>
-  since the previous release on 13 May.
+  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11040} 206 bug fixes and enhancements}}>>
+  since the previous release on 26 June.
 
   Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
   basis to take it into the future.  While it can be considered quite stable, and future versions are now expected to
@@ -23,25 +23,37 @@ Brett Porter
 
   The main new features in this release are:
 
-    * Improved dependency management
+    * Further improved dependency management: full support for dependency ranges
 
-    * Build profiles for environment specific settings and dependencies
+    * Reactor project aggregation support and summary
 
-    * Finalised build lifecycle
+    * File system discovery of POMs and artifacts to reduce build time and use of local and remote repositories
 
-    * Proper handling of derived dependency type such as sources, javadocs and ejb clients
+    * Repository metadata support
 
-    * Beanshell plugin support
+    * System scope dependency support
 
-    * Improved reporting support, including internationalisation.
+    * Eclipse compiler support, ability to fork compiler
 
-    * Improvements to the Ant tasks
+    * Ability to automatically bundle sources and javadoc with deployments
 
-    * Better plugin management, with the ability to select specific versions for use
+    * Maven 1.x repository support
 
-    * Various plugin improvements
+    * Allow use of setters in mojos for field population
 
-  This release is very near to being feature complete, and the next release will be a feature complete beta-1.
+    * Ability to separate snapshot repository
+
+    * Ability to set minimum Maven version requirement for projects and plugins 
+
+    * Build extension support
+
+    * Bugfixes and enhancements
+
+  This release is considered stable with a feature set comparable to Maven 1.0. Further betas and the final are expected
+  to be backwards compatible, with a primary goal of bugfixes, usability improvements, and documentation.
+
+  A large number of plugins will be released in the coming week to match the primary Maven 1.0 plugin set.
+  See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix} for more information.
 
   We hope you enjoy using Maven! If you have any questions, please consult:
 
