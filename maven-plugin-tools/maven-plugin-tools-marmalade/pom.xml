@@ -23,6 +23,13 @@
       <groupId>marmalade</groupId>
       <artifactId>marmalade-core</artifactId>
       <version>1.0-alpha-4</version>
+      <!-- Uses an old, incompatible version (unfortunately it is the nearest definition) -->
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
