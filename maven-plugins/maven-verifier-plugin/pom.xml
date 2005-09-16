@@ -8,7 +8,7 @@
   <artifactId>maven-verifier-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Verifier Plugin</name>
-  <version>1.0-beta-1</version>
+  <version>1.0-beta-2-SNAPSHOT</version>
   <developers>
     <developer>
       <id>vmassol</id>
@@ -26,6 +26,7 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <version>RELEASE</version>
         <executions>
           <execution>
             <goals>
