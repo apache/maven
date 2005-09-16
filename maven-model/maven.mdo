@@ -212,13 +212,13 @@
           <type>String</type>
         </field>
         <field>
-          <name>prerequesites</name>
+          <name>prerequisites</name>
           <version>4.0.0</version>
           <description>
-            Describes the prerequesites in the build environment for this project.
+            Describes the prerequisites in the build environment for this project.
           </description>
           <association>
-            <type>Prerequesites</type>
+            <type>Prerequisites</type>
           </association>
         </field>
         <field>
@@ -2899,15 +2899,15 @@
       </codeSegments>
     </class>
     <class>
-      <name>Prerequesites</name>
+      <name>Prerequisites</name>
       <version>4.0.0</version>
-      <description>Describes the prerequesites a project can have</description>
+      <description>Describes the prerequisites a project can have</description>
       <fields>
         <field>
           <name>maven</name>
           <version>4.0.0</version>
           <type>String</type>
-          <defaultValue>2.0-beta-1-SNAPSHOT</defaultValue>
+          <defaultValue>2.0-beta</defaultValue>
           <description>The minimum version of Maven required</description>
           <required>false</required>
         </field>
