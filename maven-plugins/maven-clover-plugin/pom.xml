@@ -9,7 +9,7 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Clover Plugin</name>
   <description>Maven plugin for Clover</description>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-alpha-1-SNAPSHOT</version>
   <inceptionYear>2005</inceptionYear>
   <developers>
     <developer>
