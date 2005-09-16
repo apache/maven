@@ -279,7 +279,7 @@ public class DependenciesReport
                         throw new IllegalArgumentException( "Can't find a valid Maven project in the repository for the artifact ["
                                                                 + artifact.getGroupId() + ":"
                                                                 + artifact.getArtifactId() + ":"
-                                                                + artifact.getVersion() + "]." );
+                                                                + artifact.getVersion() + "].", e );
                     }
                     tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
                         artifactProject.getDescription(),

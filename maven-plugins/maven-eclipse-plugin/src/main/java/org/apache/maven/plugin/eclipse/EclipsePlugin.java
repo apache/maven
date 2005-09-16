@@ -143,7 +143,7 @@ public class EclipsePlugin
      * 
      * @parameter expression="${eclipse.downloadSources}"
      */
-    private boolean downloadSources = true;
+    private boolean downloadSources = false;
 
     /**
      * Eclipse workspace directory.

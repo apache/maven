@@ -314,7 +314,10 @@ public class WarMojo
         {
             generateExplodedWebapp();
 
-            if ( !"exploded".equals( mode ) )
+            // TODO: make a separate 'exploded' Mojo. For now,
+            // disable not making an artifact so the install phase
+            // doesn't fail.
+            // if ( !"exploded".equals( mode ) )
             {
                 //generate war file
                 getLog().info( "Generating war " + warFile.getAbsolutePath() );
