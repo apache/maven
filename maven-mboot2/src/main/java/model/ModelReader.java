@@ -100,6 +100,10 @@ public class ModelReader
 
     private boolean insideSnapshots;
 
+    private boolean insideExclusion;
+
+    private Exclusion currentExclusion;
+
     public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
     {
         this.downloader = downloader;
@@ -222,9 +226,9 @@ public class ModelReader
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way (marmalade, and currently m2)
             ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false );
 
-            addDependencies( p.getDependencies(), parentDependencies, null );
+            addDependencies( p.getDependencies(), parentDependencies, null, Collections.EMPTY_SET );
 
-            addDependencies( p.getManagedDependencies(), managedDependencies, null );
+            addDependencies( p.getManagedDependencies(), managedDependencies, null, Collections.EMPTY_SET );
 
             resources.addAll( p.getResources() );
 
@@ -242,6 +246,11 @@ public class ModelReader
             {
                 dependencies.put( currentDependency.getConflictId(), currentDependency );
             }
+        }
+        else if ( rawName.equals( "exclusion" ) )
+        {
+            currentDependency.addExclusion( currentExclusion );
+            insideExclusion = false;
         }
         else if ( rawName.equals( "dependencyManagement" ) )
         {
@@ -282,7 +291,18 @@ public class ModelReader
         }
         else if ( insideDependency )
         {
-            if ( rawName.equals( "id" ) )
+            if ( insideExclusion )
+            {
+                if ( rawName.equals( "groupId" ) )
+                {
+                    currentExclusion.setGroupId( getBodyText() );
+                }
+                else if ( rawName.equals( "artifactId" ) )
+                {
+                    currentExclusion.setArtifactId( getBodyText() );
+                }
+            }
+            else if ( rawName.equals( "id" ) )
             {
                 currentDependency.setId( getBodyText() );
             }
@@ -309,6 +329,12 @@ public class ModelReader
             else if ( rawName.equals( "scope" ) )
             {
                 currentDependency.setScope( getBodyText() );
+            }
+            else if ( rawName.equals( "exclusion" ) )
+            {
+                insideExclusion = true;
+
+                currentExclusion = new Exclusion();
             }
         }
         else if ( insideResource )
@@ -401,8 +427,9 @@ public class ModelReader
                 Dependency managedDependency = (Dependency) managedDependencies.get( dependency.getConflictId() );
                 if ( managedDependency == null )
                 {
-                    throw new NullPointerException( "[" + groupId + ":" + artifactId +":" + packaging + ":" + version + "] " +
-                            "Dependency " + dependency.getConflictId() + " is missing a version, and nothing is found in dependencyManagement. ");
+                    throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" + version +
+                        "] " + "Dependency " + dependency.getConflictId() +
+                        " is missing a version, and nothing is found in dependencyManagement. " );
                 }
                 dependency.setVersion( managedDependency.getVersion() );
             }
@@ -413,12 +440,13 @@ public class ModelReader
                                              dependency.getVersion(), dependency.getType(),
                                              resolveTransitiveDependencies );
 
-                addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope() );
+                addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(),
+                                 dependency.getExclusions() );
             }
         }
     }
 
-    private void addDependencies( Collection dependencies, Map target, String inheritedScope )
+    private void addDependencies( Collection dependencies, Map target, String inheritedScope, Set excluded )
     {
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
@@ -430,7 +458,7 @@ public class ModelReader
                 d.setScope( Dependency.SCOPE_TEST );
             }
 
-            if ( !hasDependency( d, target ) )
+            if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) )
             {
                 target.put( d.getConflictId(), d );
             }

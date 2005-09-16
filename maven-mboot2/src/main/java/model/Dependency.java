@@ -1,5 +1,8 @@
 package model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -46,6 +49,8 @@ public class Dependency
     public static final String SCOPE_COMPILE = "compile";
 
     public static final String SCOPE_RUNTIME = "runtime";
+
+    private Set exclusions = new HashSet();
 
     public Dependency()
     {
@@ -273,5 +278,15 @@ public class Dependency
             resolvedVersion = getVersion();
         }
         return resolvedVersion;
+    }
+
+    public void addExclusion( Exclusion currentExclusion )
+    {
+        exclusions.add( currentExclusion.getConflictId() );
+    }
+
+    public Set getExclusions()
+    {
+        return exclusions;
     }
 }
