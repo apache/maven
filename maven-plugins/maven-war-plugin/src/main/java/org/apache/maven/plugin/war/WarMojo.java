@@ -54,7 +54,7 @@ public class WarMojo
      * The mode to use. Possible values are: war (default), inplace
      * and exploded.
      *
-     * @parameter
+     * @parameter expression="${mode}"
      */
     private String mode = "war";
 
@@ -317,7 +317,7 @@ public class WarMojo
             // TODO: make a separate 'exploded' Mojo. For now,
             // disable not making an artifact so the install phase
             // doesn't fail.
-            // if ( !"exploded".equals( mode ) )
+            if ( !"exploded".equals( mode ) )
             {
                 //generate war file
                 getLog().info( "Generating war " + warFile.getAbsolutePath() );
@@ -338,6 +338,10 @@ public class WarMojo
                 archiver.createArchive( project, archive );
 
                 project.getArtifact().setFile( warFile );
+            }
+            else
+            {
+                getLog().warn( "Exploded mode will be deprecated in the next release. It is not compatible with install/deploy goals" );
             }
         }
     }
