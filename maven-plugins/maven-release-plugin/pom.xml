@@ -1,33 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project>
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
     <version>2.0-beta-1</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-release-plugin</artifactId>
-  <version>2.0-beta-1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Maven Release plugin</name>
+  <version>2.0-beta-1</version>
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>2.0-beta-1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0-beta-1</version>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-api</artifactId>
+      <version>1.0-alpha-2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.scm</groupId>
-      <artifactId>maven-scm-api</artifactId>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-input-handler</artifactId>
       <version>1.0-alpha-2</version>
     </dependency>
     <dependency>
@@ -36,9 +30,14 @@
       <version>1.0-alpha-2</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.scm</groupId>
-      <artifactId>maven-scm-provider-cvs</artifactId>
-      <version>1.0-alpha-2</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0-beta-1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
@@ -46,8 +45,8 @@
       <version>1.0-alpha-2</version>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-input-handler</artifactId>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-cvs</artifactId>
       <version>1.0-alpha-2</version>
     </dependency>
   </dependencies>
