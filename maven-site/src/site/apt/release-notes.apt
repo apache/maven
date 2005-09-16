@@ -51,7 +51,7 @@ Brett Porter
   to be backwards compatible, with a primary goal of bugfixes, usability improvements, and documentation.
 
   A large number of plugins will be released in the coming week to match the primary Maven 1.0 plugin set.
-  See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix} for more information.
+  See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix}} for more information.
 
   We hope you enjoy using Maven! If you have any questions, please consult:
 
