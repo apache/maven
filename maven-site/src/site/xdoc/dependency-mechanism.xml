@@ -2,7 +2,7 @@
   <properties>
     <title>Dependency Mechanism</title>
     <author email="brett@apache.org">Brett Porter</author>
-    <author email="trygvis@apache.org">Trygve Laugstol </author>
+    <author email="trygvis@apache.org">Trygve Laugstol</author>
   </properties>
   <body>
     <section name="Dependency Mechanism">
@@ -57,11 +57,6 @@
             of the build. This is described in more detail below.
           </li>
         </ul>
-        <p>
-          More features are planned, such as different mediation techniques and conflict management as well as
-          reporting,
-          in later alpha versions of Maven 2.0.
-        </p>
       </subsection>
       <subsection name="Dependency Scope">
         <a name="dependency_scope"/>
@@ -270,7 +265,8 @@
         </p>
         <p>
           The reference information about the dependency management tags is available from the
-          <a href="maven-model/maven.html#class_DependencyManagement">project descriptor reference</a>.
+          <a href="maven-model/maven.html#class_DependencyManagement">project descriptor reference</a>
+          .
         </p>
       </subsection>
     </section>

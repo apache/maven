@@ -19,7 +19,8 @@
           Maven has also grown into a project that is building other products to help in the software development
           lifecycle<!--,
           such as the <a href="http://maven.apache.org/continuum">Continuum</a> continuous integration server -->.
-          <a href="http://maven.apache.org/project/index.html">More information about the Maven Project</a>.
+          <a href="http://maven.apache.org/project/index.html">More information about the Maven Project</a>
+          .
         </p>
       </answer>
     </faq>
@@ -41,7 +42,8 @@
           <li>Extensible, with the ability to easily write plugins in Java or other scripting languages</li>
           <li>Instant access to new features with little or no extra configuration</li>
           <li>
-            <a href="ant-tasks.html">Ant tasks</a>for dependency management and deployment outside of Maven
+            <a href="ant-tasks.html">Ant tasks</a>
+            for dependency management and deployment outside of Maven
           </li>
         </ul>
         <p>
@@ -61,7 +63,8 @@
       <answer>
         <p>
           You've seen
-          <a href="#what-is-maven">above</a>the goals that Maven aims to achieve, however there have also
+          <a href="#what-is-maven">above</a>
+          the goals that Maven aims to achieve, however there have also
           been questions about why Maven 2.0 is rewritten from the successful Maven 1.0. In summary, the main goals of
           the new Maven 2.0 architecture are:
         </p>
@@ -93,7 +96,8 @@
         </p>
         <p>
           For more information on whether this release of Maven 2.0 should be used in your environment, please consult
-          <a href="maven1.html#m1-or-m2">this topic</a>.
+          <a href="maven1.html#m1-or-m2">this topic</a>
+          .
         </p>
       </answer>
     </faq>
@@ -117,7 +121,8 @@
         </p>
         <p>
           For more information, consult the
-          <a href="roadmap.html">Road Map</a>.
+          <a href="roadmap.html">Road Map</a>
+          .
         </p>
       </answer>
     </faq>
@@ -135,11 +140,13 @@
         </p>
         <p>
           For instructions on checking out and building Maven 2.0, see
-          <a href="/maven2/developers/building.html">Building Maven 2.0</a>.
+          <a href="/maven2/developers/building.html">Building Maven 2.0</a>
+          .
         </p>
         <p>
           For more information, please see
-          <a href="http://maven.apache.org/contributing/help.html">How to Help</a>.
+          <a href="http://maven.apache.org/contributing/help.html">How to Help</a>
+          .
         </p>
       </answer>
     </faq>
@@ -148,7 +155,7 @@
       <question>What plugin languages will Maven 2.0 support? What about [insert language here]?</question>
       <answer>
         <p>
-          As of the current alpha-3 release, Maven supports pure Java, Beanshell and Marmalade. Java is the preferred
+          As of the current release, Maven supports pure Java, Beanshell and Marmalade. Java is the preferred
           language for it's familiarity and speed, while Marmalade is preferred for porting Maven 1.x plugins, and
           writing
           plugins based on Ant tasks.
@@ -182,18 +189,25 @@
       <answer>
         <p>
           Help for both Maven 1.0 and Maven 2.0 can be obtained by subscribing and posting to the
-          <a href="http://maven.apache.org/mail-lists.html">Maven Users List</a>. If you are posting about Maven 2.0,
+          <a href="http://maven.apache.org/mail-lists.html">Maven Users List</a>
+          . If you are posting about Maven 2.0,
           please make that clear in your email.
         </p>
         <p>
           You can also join us on IRC at
-          <code>irc.codehaus.org</code>on
-          <code>#maven</code>. This is available both
+          <code>irc.codehaus.org</code>
+          on
+          <code>#maven</code>
+          . This is available both
           over
-          <a href="irc://irc.codehaus.org/#maven">IRC</a>and
-          <a href="http://irc.codehaus.org/">HTTP</a>for those behind firewalls (enter
-          <code>#maven</code>in the
-          <i>Channel</i>box).
+          <a href="irc://irc.codehaus.org/#maven">IRC</a>
+          and
+          <a href="http://irc.codehaus.org/">HTTP</a>
+          for those behind firewalls (enter
+          <code>#maven</code>
+          in the
+          <i>Channel</i>
+          box).
         </p>
         <p>
           Please remember that it is a preview release, so please be patient with features that are not yet implemented,

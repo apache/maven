@@ -12,8 +12,9 @@
           <a href="download.html">
             <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download"/>
             Download
-          </a> Maven 2.0 Alpha 3
-          <small>(1.2Mb)</small>
+          </a>
+          Maven 2.0 Beta 1
+          <small>(1.1Mb)</small>
           <br/>
         </p>
         <ul>
@@ -37,7 +38,7 @@
       </p>
       <p>
         Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
-        basis to take it into the future. It is currently available as a Technology Preview.
+        basis to take it into the future. It is currently available for beta testing.
       </p>
       <ul>
         <li>
@@ -47,7 +48,8 @@
         </li>
         <li>
           <i>What are the
-            <a href="about.html#features">features of Maven 2.0</a>?
+            <a href="about.html#features">features of Maven 2.0</a>
+            ?
           </i>
         </li>
         <li>
@@ -57,22 +59,26 @@
         </li>
         <li>
           <i>What does
-            <a href="about.html#tech-preview">Technology Preview</a> mean?
+            <a href="about.html#tech-preview">beta testing</a>
+            mean?
           </i>
         </li>
         <li>
           <i>How often will Maven 2.0 be
-            <a href="about.html#release-schedule">released</a>?
+            <a href="about.html#release-schedule">released</a>
+            ?
           </i>
         </li>
         <li>
           <i>Can I
-            <a href="about.html#get-involved">get involved</a>?
+            <a href="about.html#get-involved">get involved</a>
+            ?
           </i>
         </li>
         <li>
           <i>Where do I
-            <a href="about.html#get-help">get help</a> with Maven 2.0?
+            <a href="about.html#get-help">get help</a>
+            with Maven 2.0?
           </i>
         </li>
       </ul>
@@ -96,12 +102,14 @@
         </li>
         <li>
           <i>
-            <a href="maven1.html#m1-future">What will happen</a> to Maven 1.0?
+            <a href="maven1.html#m1-future">What will happen</a>
+            to Maven 1.0?
           </i>
         </li>
         <li>
           <i>Will my
-            <a href="maven1.html#m1-plugins">Maven 1.0 plugins</a> be supported?
+            <a href="maven1.html#m1-plugins">Maven 1.0 plugins</a>
+            be supported?
           </i>
         </li>
       </ul>
@@ -146,8 +154,10 @@
         </li>
       </ul>
       <p>
-        <b>More coming soon - </b> we will continue to flesh out the documentation, so stay tuned, and join the
-        <a href="/mail-lists.html">user's mailing list</a> if you have any questions.
+        <b>More coming soon -</b>
+        we will continue to flesh out the documentation, so stay tuned, and join the
+        <a href="/mail-lists.html">user's mailing list</a>
+        if you have any questions.
       </p>
       <subsection name="Developing Maven 2">
         <p>
@@ -159,21 +169,26 @@
         <ul>
           <li>
             <i>How can I
-              <a href="about.html#get-involved">get involved</a>?
+              <a href="about.html#get-involved">get involved</a>
+              ?
             </i>
           </li>
           <li>
             <i>What
-              <a href="docs-required.html">documentation is needed</a>?
+              <a href="docs-required.html">documentation is needed</a>
+              ?
             </i>
           </li>
           <li>
             <i>How do I
-              <a href="/developers/building.html">build Maven 2.0</a>?
+              <a href="/developers/building.html">build Maven 2.0</a>
+              ?
             </i>
           </li>
           <li>
-            <i>Draft <a href="http://docs.codehaus.org/display/MAVEN/Home">design documents</a> are in
+            <i>Draft
+              <a href="http://docs.codehaus.org/display/MAVEN/Home">design documents</a>
+              are in
               Confluence, until they are implemented and added to the developers section.
             </i>
           </li>

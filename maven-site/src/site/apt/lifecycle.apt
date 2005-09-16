@@ -8,8 +8,6 @@
 
 Build Lifecycle
 
-  <<PLEASE NOTE:>> this documentation is current only as of alpha-3.
-
 * Build Lifecycle Basics
 
   Maven 2.0 is based around the central concept of a build lifecycle. What this means is that the process for building
@@ -165,8 +163,7 @@ m2 clean:clean install
 
 * Build Lifecycle Phase Reference
 
-  The following phases are all the ones available as of the Maven 2.0 alpha-3 release. They are executed in the order
-  given, up to the point of the one specified.
+  The following phases are executed in the order given, up to the point of the one specified.
 
 *-------------------------------+--------------------------------------------------------------------------------------+
 | <<<validate>>>                | validate the project is correct and all necessary information is available.
