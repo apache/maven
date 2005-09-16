@@ -17,9 +17,7 @@ Brett Porter
   since the previous release on 26 June.
 
   Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
-  basis to take it into the future.  While it can be considered quite stable, and future versions are now expected to
-  retain a high amount of backwards compatibility, this is still a technology preview, and not yet complete or
-  considered ready for a production environment.
+  basis to take it into the future.
 
   The main new features in this release are:
 
@@ -43,7 +41,7 @@ Brett Porter
 
     * Ability to separate snapshot repository
 
-    * Ability to set minimum Maven version requirement for projects and plugins 
+    * Ability to set minimum Maven version requirement for projects and plugins
 
     * Build extension support
 
