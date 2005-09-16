@@ -203,33 +203,35 @@
           <source><![CDATA[
 <project>
   ...
-  <dependencies>
-    <dependency>
-      <groupId>group-a</groupId>
-      <artifactId>artifact-a</artifactId>
-      <version>1.0</version>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+          <groupId>group-a</groupId>
+        <artifactId>artifact-a</artifactId>
+        <version>1.0</version>
       <exclusions>
-        <exclusion>
-          <groupId>group-c</groupId>
-          <artifactId>excluded-artifact</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>group-c</groupId>
-      <artifactId>artifact-b</artifactId>
-      <version>1.0</version>
-      <type>war</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>group-a</groupId>
-      <artifactId>artifact-b</artifactId>
-      <version>1.0</version>
-      <type>bar</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+          <exclusion>
+            <groupId>group-c</groupId>
+            <artifactId>excluded-artifact</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>group-c</groupId>
+        <artifactId>artifact-b</artifactId>
+        <version>1.0</version>
+        <type>war</type>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>group-a</groupId>
+        <artifactId>artifact-b</artifactId>
+        <version>1.0</version>
+        <type>bar</type>
+        <scope>runtime</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>]]></source>
           And then the two child poms would become much simpler:
         </p>
