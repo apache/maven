@@ -9,27 +9,18 @@
         This document discusses the release plans and current roadmap for Maven 2.0.
       </p>
       <p>
-        We are working to a 4-5 week release cycle, meaning that there will be at least one release per month.
-      </p>
-      <p>
-        The first releases such as the technology preview will be designated "alpha" releases, indicating that
-        they are not yet feature complete and there are outstanding bugs. Following that, "beta" releases will be
-        made available where introduction of new features will be restricted and the focus on improving usability and
-        stability. Finally, one or more release candidates will be distributed for testing that are genuinely believed
-        to be final, with the expectation that a final release would be available shortly afterwards.
-      </p>
-      <p>
-        We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
+        Note that we will continue with the successful technique from Maven 1.0 of making plugins available on a
+        separate
         release schedule so that new features can be obtained as they are ready and tested.
       </p>
       <subsection name="Maven 2.0 beta 1">
         <p>
-          <i>Expected Release:</i>
-          mid-August 2005
+          <i>Released:</i>
+          16th September 2005
         </p>
         <p>
           <i>Aims and features:</i>
-          This will be feature complete and stable. There are expected to be
+          This is feature complete and stable. There are expected to be
           bug fixes and cosmetic changes, but no new major features after this release.
         </p>
         <ul>
@@ -43,7 +34,21 @@
       <subsection name="Maven 2.0 beta 2">
         <p>
           <i>Expected Release:</i>
-          late-August 2005
+          late-September 2005
+        </p>
+        <p>
+          <i>Aims and features:</i>
+          Completion of all major work on the core engine.
+        </p>
+        <ul>
+          <li>Bugfixes</li>
+          <li>Cosmetic enhancements</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0 beta 3">
+        <p>
+          <i>Expected Release:</i>
+          early-October 2005
         </p>
         <p>
           <i>Aims and features:</i>
@@ -58,7 +63,7 @@
       <subsection name="Maven 2.0 Final">
         <p>
           <i>Expected Release:</i>
-          September 2005, following a release candidate
+          October 2005, following a release candidate
         </p>
         <p>
           <i>Aims and features:</i>
@@ -81,8 +86,7 @@
       <subsection name="Maven 2.1">
         <p>
           <i>Aims and features:</i>
-          Features to be added after the July freeze on Maven 2.0 will be slated for a 2.1
-          release later in 2005.
+          Features to be added after the freeze on Maven 2.0 will be slated for a 2.1 release in 2006.
         </p>
       </subsection>
     </section>

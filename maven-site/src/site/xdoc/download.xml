@@ -91,11 +91,6 @@
         <a href="http://maven.apache.org/license.html">Apache License, version 2.0</a>
         .
       </p>
-      <p>
-        The Ant tasks contain the JCraft Jsch library for deployment via SSH. For more information, see their
-        <a href="http://www.jcraft.com/jsch/LICENSE.txt">License and Copyright notice</a>
-        .
-      </p>
       <a name="requirements"/>
       <subsection name="System Requirements">
         <table>

@@ -83,15 +83,19 @@
     </faq>
 
     <faq id="tech-review">
-      <question>What does Technology Preview mean?</question>
+      <question>What does beta release mean?</question>
       <answer>
         <p>
-          While Maven 2.0 is quite useful as is, it does not yet have all of the features of it's predecessor, and has
-          some limitations that may impede it's use on a day-to-day basis in your projects.
+          Maven 2.0 is now in beta testing. We believe it is equally functional to Maven 1.0, however there are still
+          some bugs and usabilities issues including documentation to be resolved.
         </p>
         <p>
-          This release is being made available so that people who are interested in the future of Maven can take a
-          sneak peek, while those interested in becoming early adopters can get involved in the development and
+          While some minor features may be added, the key goal is to retain backwards compatibility so this will be
+          limited.
+        </p>
+        <p>
+          This release is being made available so that people who are interested in using Maven 2 when it is released
+          can test and provide feedback, and those interested can get involved in the development and
           direction of the project.
         </p>
         <p>
@@ -106,11 +110,11 @@
       <question>How often will Maven 2.0 be released?</question>
       <answer>
         <p>
-          We are working to a 4-5 week release cycle, meaning that there will be at least one release per month.
+          We are working to a fortnightly release cycle until the final release.
         </p>
         <p>
-          The first releases such as the technology preview will be designated "alpha" releases, indicating that
-          they are not yet feature complete and there are outstanding bugs. Following that, "beta" releases will be
+          The first releases such as the technology preview were designated "alpha" releases, indicating that
+          they were not yet feature complete and there were outstanding bugs. Following that, "beta" releases are being
           made available where introduction of new features will be restricted and the focus on improving usability and
           stability. Finally, one or more release candidates will be distributed for testing that are genuinely believed
           to be final, with the expectation that a final release would be available shortly afterwards.
@@ -208,10 +212,6 @@
           in the
           <i>Channel</i>
           box).
-        </p>
-        <p>
-          Please remember that it is a preview release, so please be patient with features that are not yet implemented,
-          and be prepared to do some research and to help out yourself wherever possible.
         </p>
       </answer>
     </faq>

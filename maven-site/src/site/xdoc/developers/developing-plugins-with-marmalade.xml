@@ -27,10 +27,11 @@
   <body>
     <section name="Developing Plugins with Marmalade">
       <p>
-         NOTE: Compare this tutorial to
+        NOTE: Compare this tutorial to
         <a href="http://maven.apache.org/using/developing-plugins.html">Developing
-         Plugins</a> from the Maven 1.0 website. Marmalade is meant to be quite similar to Jelly in its 
-         syntax, so this process should be very familiar to Maven 1.0 plugin developers.
+          Plugins</a>
+        from the Maven 1.0 website. Marmalade is meant to be quite similar to Jelly in its
+        syntax, so this process should be very familiar to Maven 1.0 plugin developers.
       </p>
       <!-- TODO
             <p>
@@ -41,9 +42,8 @@
 
       <subsection name="Graduating from Jelly: Plugins in Marmalade">
         <p>
-          Beginning in Maven 2.0, plugins can be implemented in various languages. While our initial
-          technology preview will only offer support for these Marmalade and Java, we will eventually add
-          support for additional languages, possibly including Beanshell/Janino, Javascript, and more.
+          Beginning in Maven 2.0, plugins can be implemented in various languages, including Marmalade, Java and
+          Beanshell.
         </p>
 
         <p>
@@ -67,7 +67,7 @@
         </p>
 
         <p>
-          For those Maven 1.x users who have implemented their own plugins using Jelly, Marmalade can be 
+          For those Maven 1.x users who have implemented their own plugins using Jelly, Marmalade can be
           an extremely powerful language for porting to Maven 2.0.
         </p>
 
@@ -88,25 +88,29 @@
               <ul>
                 <li>One or more implementations of MarmaladeTag</li>
                 <li>An implementation of
-                  <code>MarmaladeTagLibrary</code>, the constructor of which registers
-                    each MarmaladeTag implementation to a tag name (for use in scripts)
+                  <code>MarmaladeTagLibrary</code>
+                  , the constructor of which registers
+                  each MarmaladeTag implementation to a tag name (for use in scripts)
                 </li>
               </ul>
             </li>
             <li>
               [Required] A
-              <code>pom.xml</code> for building the plugin, which contains a script source directory
+              <code>pom.xml</code>
+              for building the plugin, which contains a script source directory
               resembling
               <code><![CDATA[<scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>]]></code>
             </li>
-            <li>[Optional] Plugin resources to be used from within the plugin's scripts (available on the classpath)</li>
+            <li>[Optional] Plugin resources to be used from within the plugin's scripts (available on the
+              classpath)</li>
             <li>[Optional] Other Java sources, which can be accessed from the plugin's scripts</li>
           </ul>
         </p>
 
         <p>
           Each
-          <code>.mmld</code> script file must provide the same basic structural elements, which define it
+          <code>.mmld</code>
+          script file must provide the same basic structural elements, which define it
           as a Maven 2.0 plugin, and provide essential metadata. This metadata is used to:
           <ul>
             <li>Inject project and environmental information into the plugin (parameters)</li>
@@ -156,7 +160,8 @@
         </p>
         <p>
           In a new directory, create a
-          <code>pom.xml</code> file like so:
+          <code>pom.xml</code>
+          file like so:
         </p>
         <source><![CDATA[<project> 
   <modelVersion>4.0.0</modelVersion>
@@ -206,7 +211,8 @@
           Since this is in fact a Hello World plugin, your script will simply output
           <code>Hello, World</code>
           to the screen. Create a script in
-          <code>src/main/scripts/hello.mmld</code> with the following contents:
+          <code>src/main/scripts/hello.mmld</code>
+          with the following contents:
         </p>
         <source><![CDATA[
 <mojo xmlns="marmalade:mojo">
@@ -238,11 +244,12 @@
       <subsection name="Using Plugin Parameters">
         <p>
           While you can always reference the POM information in a script using mojo parameters with expressions
-          that reference project elements, a plugin will often need to create new parameters so that it can be customised.
+          that reference project elements, a plugin will often need to create new parameters so that it can be
+          customised.
         </p>
 
         <p>
-          The creation of these parameters simply involves defining them in the metadata section of the script, 
+          The creation of these parameters simply involves defining them in the metadata section of the script,
           and optionally providing a default value for use in the event the user doesn't need to customize the plugin.
         </p>
         <p>
@@ -270,14 +277,17 @@
         ]]></source>
         <p>
           Note the additional element in this parameter declaration:
-          <code>default</code> specified a default
+          <code>default</code>
+          specified a default
           salutation in case the user doesn't need or want to customize the plugin.
         </p>
         <p>
           Now, to make use of the new parameter. Inside the
-          <code><![CDATA[<c:out/>]]></code> action, simply
+          <code><![CDATA[<c:out/>]]></code>
+          action, simply
           write out the customizable salutation instead of the stock phrase
-          <code>Hello</code>:
+          <code>Hello</code>
+          :
         </p>
         <source><![CDATA[
 <c:out xmlns:c="marmalade:core">${salutation}, World.</c:out>
@@ -286,9 +296,9 @@
           Install the new plugin and run it, to verify your changes:
         </p>
         <source>m2 install
-m2 hello:hello</source>
+          m2 hello:hello</source>
         <p>
-          Notice that the output still has the same old salutation (which is the default value of the parameter). 
+          Notice that the output still has the same old salutation (which is the default value of the parameter).
           Now, to customize it:
         </p>
         <source>m2 -Dsalutation=Hiya hello:hello</source>

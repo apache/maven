@@ -11,48 +11,66 @@
         </p>
         <ul>
           <li>
-            <i>Faster and smaller</i> - The Maven core no longer uses Ant, Jelly or Xerces making it much smaller, has
+            <i>Faster and smaller</i>
+            - The Maven core no longer uses Ant, Jelly or Xerces making it much smaller, has
             fewer dependencies and is perfect for embedding in other tools.
           </li>
           <li>
-            <i>Defined build lifecycle</i> - No more
-            <code>prereqs</code>,
-            <code>preGoals</code> and
-            <code>postGoals</code>.
+            <i>Defined build lifecycle</i>
+            - No more
+            <code>prereqs</code>
+            ,
+            <code>preGoals</code>
+            and
+            <code>postGoals</code>
+            .
             The build is a series of well defined phases. This also means that the normal goal names are not used -
-            <code>compile</code>,
-            <code>test</code> and
-            <code>install</code> work for any project type.
+            <code>compile</code>
+            ,
+            <code>test</code>
+            and
+            <code>install</code>
+            work for any project type.
           </li>
           <li>
-            <i>Built-in multiple project handling</i> - Use the same goals on a set of projects, and aggregate the
+            <i>Built-in multiple project handling</i>
+            - Use the same goals on a set of projects, and aggregate the
             results.
           </li>
           <li>
             <i>Improved
-              <code>SNAPSHOT</code> handling
-            </i> - Snapshots are now checked for updates only once per day by
+              <code>SNAPSHOT</code>
+              handling
+            </i>
+            - Snapshots are now checked for updates only once per day by
             default - though can be configured to be once per build, on a particular interval, or never. A command line
             option can force a check - making it more like updating from an SCM.
           </li>
           <li>
-            <i>No more properties files</i> - All plugins are now configured from the POM (which is now called
-            <code>pom.xml</code>).
+            <i>No more properties files</i>
+            - All plugins are now configured from the POM (which is now called
+            <code>pom.xml</code>
+            ).
           </li>
           <li>
             <i>No more
               <code>maven.xml</code>
-            </i> - Plugins are now easier to build and integrate, and are the only way
-            to script your builds. (Note that additions may later be made to the POM to allow simple things that scripting
+            </i>
+            - Plugins are now easier to build and integrate, and are the only way
+            to script your builds. (Note that additions may later be made to the POM to allow simple things that
+            scripting
             was used for, such as goal aliasing).
           </li>
           <li>
-            <i>No more Jelly</i> - Plugins are primarily written in Java, though there are providers for other scripting languages.
-            This release includes support for Marmalade, a scripting framework that supports an XML syntax similar to Jelly
+            <i>No more Jelly</i>
+            - Plugins are primarily written in Java, though there are providers for other scripting languages.
+            This release includes support for Marmalade, a scripting framework that supports an XML syntax similar to
+            Jelly
             which can be used to integrate Ant tasks and has a Jelly compatibility layer.
           </li>
           <li>
-            <i>Improved repository layout</i> - Maven 2.0 supports both the existing layout, and an improved repository
+            <i>Improved repository layout</i>
+            - Maven 2.0 supports both the existing layout, and an improved repository
             layout that has deeper, partitioned structure making it easier to browse.
           </li>
         </ul>
@@ -65,19 +83,22 @@
           The answer depends very much on on your circumstances, and in particular whether you are new to Maven or not.
         </p>
         <p>
-          The simple answer is that we hope you'll try Maven 2.0, and use it if it works for you. However, it is a preview
-          release, so you can expect some features to be missing at this point and there may be unexpected bugs.
-          We'd hate for your first experience with Maven 2.0 to be a bad one - so if you are embarking on a big, complicated
+          The simple answer is that we hope you'll try Maven 2.0, and use it if it works for you. However, it is a beta
+          release, so you can expect some unexpected bugs.
+          We'd hate for your first experience with Maven 2.0 to be a bad one - so if you are embarking on a big,
+          complicated
           or mission critical project - we still recommend Maven 1.0.2 as the latest stable release.
         </p>
         <p>
-          If you are already using Maven 1.0 - feel free to try out Maven 2.0, but it may be better to remain on an existing
+          If you are already using Maven 1.0 - feel free to try out Maven 2.0, but it may be better to remain on an
+          existing
           version that is working for you until you need the new features and it covers all of your needs.
         </p>
         <p>
           If you do use Maven 1.0, and would like to upgrade in the future, you should carefully consider following some
           of the
-          <a href="http://maven.apache.org/using/bestpractices.html">Best Practices</a> listed. These will make
+          <a href="http://maven.apache.org/using/bestpractices.html">Best Practices</a>
+          listed. These will make
           your project a lot easier to migrate in the future.
         </p>
         <p>
@@ -85,14 +106,16 @@
         </p>
         <ul>
           <li>
-            <i>Error handling</i> - there are occasions where Maven 2.0 will drop out with a long stack trace
+            <i>Error handling</i>
+            - there are occasions where Maven 2.0 will drop out with a long stack trace
             when an error has occurred. If a specific trace is not providing enough information to find out what went
             wrong, please post the message to JIRA.
           </li>
           <li>
-            <i>Availability of other plugins</i> - While most of the core Maven 1.x plugins have been converted,
-              there are still some not available, or not with the same level of features or documentation. In
-              addition, several 3rd party plugins may not be available. Maven 2.0 cannot execute Maven 1.0 plugins.
+            <i>Availability of other plugins</i>
+            - While most of the core Maven 1.x plugins have been converted,
+            there are still some not available, or not with the same level of features or documentation. In
+            addition, several 3rd party plugins may not be available. Maven 2.0 cannot execute Maven 1.0 plugins.
           </li>
         </ul>
       </answer>
@@ -125,29 +148,35 @@
       </answer>
     </faq>
     <faq id="m1-maven-xml">
-      <question>How do I write custom scripts without a <code>maven.xml</code> file?</question>
+      <question>How do I write custom scripts without a
+        <code>maven.xml</code>
+        file?
+      </question>
       <answer>
-        <p>Taken from <a href="http://mail-archives.apache.org/mod_mbox/maven-users/200504.mbox/%3c1113788711.5625.30.camel@172.16.1.36%3e">this post to the Maven User's List</a>:
+        <p>Taken from
+          <a href="http://mail-archives.apache.org/mod_mbox/maven-users/200504.mbox/%3c1113788711.5625.30.camel@172.16.1.36%3e">
+            this post to the Maven User's List</a>
+          :
         </p>
         <blockquote>
-Everything in m2 is a plugin so for doing any sort of custom work like
-that you will need to make a plugin. This 1) greatly reduces the
-complexity within m2 because we only deal with proper plugins. The
-maven.xml file in m1 was a psuedo plugin essentially and greatly
-complicated the internals and 2) it promotes the sharing of your work
-right from the get go. To start with you'll probably write a plugin that
-is only applicable to your specific requirements, or your team's work,
-but you'll see people asking for some functionality and you'll go "hey,
-I have something like that!" and hopefully people who have concrete
-solutions will generalize their solutions so they can be shared with
-others. That's what we're trying to encourage.
+          Everything in m2 is a plugin so for doing any sort of custom work like
+          that you will need to make a plugin. This 1) greatly reduces the
+          complexity within m2 because we only deal with proper plugins. The
+          maven.xml file in m1 was a psuedo plugin essentially and greatly
+          complicated the internals and 2) it promotes the sharing of your work
+          right from the get go. To start with you'll probably write a plugin that
+          is only applicable to your specific requirements, or your team's work,
+          but you'll see people asking for some functionality and you'll go "hey,
+          I have something like that!" and hopefully people who have concrete
+          solutions will generalize their solutions so they can be shared with
+          others. That's what we're trying to encourage.
         </blockquote>
         <blockquote>
-We estimate that there's a lot of work bound up in project's maven.xml
-that is not being shared and we'd like to try and change that. We plan
-to make it dead simple to share plugins and hopefully people can use
-other project's plugins as a start for a plugin that they may need
-themselves.
+          We estimate that there's a lot of work bound up in project's maven.xml
+          that is not being shared and we'd like to try and change that. We plan
+          to make it dead simple to share plugins and hopefully people can use
+          other project's plugins as a start for a plugin that they may need
+          themselves.
         </blockquote>
       </answer>
     </faq>
