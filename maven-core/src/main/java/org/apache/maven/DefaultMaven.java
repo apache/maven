@@ -136,7 +136,7 @@ public class DefaultMaven
             List files = getProjectFiles( request );
 
             List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), globalProfileManager );
+                                             request.getSettings(), globalProfileManager );
 
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
@@ -193,7 +193,8 @@ public class DefaultMaven
                     // TODO: yuck! Revisit when cleaning up the exception handling from the top down
                     Throwable exception = response.getException();
 
-                    if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && ( exception instanceof ReactorException ) )
+                    if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) &&
+                        ( exception instanceof ReactorException ) )
                     {
                         logFailure( response, exception, null );
 
@@ -311,7 +312,8 @@ public class DefaultMaven
         getLogger().info( messageBuffer.toString() );
     }
 
-    private MavenExecutionResponse dispatchErrorResponse( EventDispatcher dispatcher, String event, String baseDirectory, Exception e )
+    private MavenExecutionResponse dispatchErrorResponse( EventDispatcher dispatcher, String event,
+                                                          String baseDirectory, Exception e )
     {
         dispatcher.dispatchError( event, baseDirectory, e );
 
@@ -325,8 +327,9 @@ public class DefaultMaven
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                 ProfileManager globalProfileManager )
-        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException, ProfileActivationException
+                                  ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException,
+        ProfileActivationException
     {
         List projects = new ArrayList( files.size() );
 
@@ -341,9 +344,9 @@ public class DefaultMaven
 
             MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
 
-            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
-                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequesites().getMaven() );
+                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
                     throw new ProjectBuildingException( "Unable to build project '" + project.getFile() +
@@ -366,7 +369,8 @@ public class DefaultMaven
                     moduleFiles.add( new File( basedir, name + "/pom.xml" ) );
                 }
 
-                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings, globalProfileManager );
+                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings,
+                                                          globalProfileManager );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -377,7 +381,7 @@ public class DefaultMaven
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
-                                   ProfileManager globalProfileManager )
+                                    ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
         if ( pom.exists() )
@@ -426,8 +430,7 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm )
     {
         return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), rpm, request.getGoals(),
-                                 request.getBaseDirectory() );
+                                 request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory() );
     }
 
     /**

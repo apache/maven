@@ -231,10 +231,10 @@ public class DefaultPluginManager
             MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
                                                                             localRepository );
             // if we don't have the required Maven version, then ignore an update
-            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
                 DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                    project.getPrerequesites().getMaven() );
+                    project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
                 {
                     throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),

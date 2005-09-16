@@ -39,7 +39,7 @@ import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Prerequesites;
+import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
@@ -158,7 +158,7 @@ public class MavenProject
         this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
         this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
         this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
-        
+
         this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
         this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
         this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
@@ -798,9 +798,9 @@ public class MavenProject
         return model.getUrl();
     }
 
-    public Prerequesites getPrerequesites()
+    public Prerequisites getPrerequisites()
     {
-        return model.getPrerequesites();
+        return model.getPrerequisites();
     }
 
     public void setIssueManagement( IssueManagement issueManagement )
@@ -996,7 +996,7 @@ public class MavenProject
     public void setPluginArtifacts( Set pluginArtifacts )
     {
         this.pluginArtifacts = pluginArtifacts;
-        
+
         this.pluginArtifactMap = null;
     }
 
@@ -1018,7 +1018,7 @@ public class MavenProject
     public void setReportArtifacts( Set reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
-        
+
         this.reportArtifactMap = null;
     }
 
@@ -1040,7 +1040,7 @@ public class MavenProject
     public void setExtensionArtifacts( Set extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
-        
+
         this.extensionArtifactMap = null;
     }
 
