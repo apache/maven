@@ -204,9 +204,9 @@ public class SurefirePlugin
         }
 
 
-        surefireBooter.addClassPathUrl( classesDirectory.getPath() );
-
         surefireBooter.addClassPathUrl( testClassesDirectory.getPath() );
+
+        surefireBooter.addClassPathUrl( classesDirectory.getPath() );
 
         for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
