@@ -22,7 +22,7 @@
     <pluginRepository>
       <id>plugin-snapshots</id>
       <name>Plugin Snapshots</name>
-      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
   </pluginRepositories>
 </project>
