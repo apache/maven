@@ -5,10 +5,17 @@
     <version>2.0-beta-1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-plugin-api</artifactId>
-  <name>Maven Plugin API</name>
+  <artifactId>maven-plugin-tools</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven Plugin Tools Base POM</name>
   <version>2.0-beta-1</version>
+  <modules>
+    <module>maven-plugin-tools-api</module>
+    <module>maven-plugin-tools-java</module>
+    <module>maven-plugin-tools-marmalade</module>
+    <module>maven-plugin-tools-beanshell</module>
+    <module>maven-plugin-tools-pluggy</module>
+  </modules>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

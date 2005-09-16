@@ -5,10 +5,14 @@
     <version>2.0-beta-1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-plugin-api</artifactId>
-  <name>Maven Plugin API</name>
+  <artifactId>maven-script</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven Script Support Root</name>
   <version>2.0-beta-1</version>
+  <modules>
+    <module>maven-script-marmalade</module>
+    <module>maven-script-beanshell</module>
+  </modules>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

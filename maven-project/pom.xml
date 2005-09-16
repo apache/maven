@@ -1,43 +1,21 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project>
   <parent>
-    <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>2.0-beta-1-SNAPSHOT</version>
+    <groupId>org.apache.maven</groupId>
+    <version>2.0-beta-1</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-project</artifactId>
   <name>Maven Project Builder</name>
-  <description>
-    This library is used to not only read Maven project object model files, but to assemble inheritence
-    and to retrieve remote models as required.
-  </description>
+  <version>2.0-beta-1</version>
+  <description>This library is used to not only read Maven project object model files, but to assemble inheritence
+    and to retrieve remote models as required.</description>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
-    </dependency>
-    <!-- TODO: temporary - refactor code to avoid this. It is for metadata retrieval in MavenMetadataSource -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-profile</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
-    </dependency>
-    <!-- TODO: reduce to utils -->
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <artifactId>maven-artifact-test</artifactId>
+      <version>2.0-beta-1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
@@ -45,9 +23,27 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-test</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
-      <scope>test</scope>
+      <artifactId>maven-profile</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
     </dependency>
   </dependencies>
 </project>

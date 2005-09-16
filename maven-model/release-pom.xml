@@ -6,39 +6,45 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven-plugin-registry</artifactId>
-  <name>Maven Plugin Registry Model</name>
+  <artifactId>maven-model</artifactId>
+  <name>Maven Model</name>
   <version>2.0-beta-1</version>
+  <description>Maven Model</description>
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-4</version>
+        <version>RELEASE</version>
         <executions>
           <execution>
             <goals>
               <goal>xpp3-writer</goal>
               <goal>java</goal>
               <goal>xpp3-reader</goal>
+              <goal>xsd</goal>
             </goals>
-            <configuration>
-              <version>1.0.0</version>
-              <model>plugin-registry.mdo</model>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <version>4.0.0</version>
+          <model>maven.mdo</model>
+        </configuration>
       </plugin>
     </plugins>
   </build>
   <dependencies>
     <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0.3</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

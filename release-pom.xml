@@ -124,6 +124,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
+        <version>RELEASE</version>
         <configuration>
           <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
         </configuration>

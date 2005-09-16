@@ -20,9 +20,16 @@
   </developers>
   <dependencies>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
       <version>1.0-alpha-4</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
