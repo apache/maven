@@ -8,7 +8,7 @@
   <artifactId>maven-clover-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Clover Plugin</name>
-  <version>2.0-alpha-1</version>
+  <version>2.0-alpha-2-SNAPSHOT</version>
   <description>Maven plugin for Clover</description>
   <inceptionYear>2005</inceptionYear>
   <developers>
