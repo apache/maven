@@ -103,12 +103,17 @@ public class PerformReleaseMojo
         cl.createArgument().setLine( "--no-plugin-updates" );
 
         cl.createArgument().setLine( "--batch-mode" );
-
+        
         StreamConsumer consumer = new DefaultConsumer();
 
         try
         {
-            CommandLineUtils.executeCommandLine( cl, consumer, consumer );
+            int result = CommandLineUtils.executeCommandLine( cl, consumer, consumer );
+            
+            if ( result != 0 )
+            {
+                throw new MojoExecutionException("Result of m2 execution is: \'" + result + "\'. Release failed." );
+            }
         }
         catch ( CommandLineException e )
         {

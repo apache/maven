@@ -101,7 +101,7 @@ public class DefaultProfileInjector
 
             List profileResources = profileBuild.getResources();
             
-            if ( profileResources != null )
+            if ( profileResources != null && !profileResources.isEmpty() )
             {
                 modelBuild.setResources( profileResources );
             }

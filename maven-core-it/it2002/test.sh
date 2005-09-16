@@ -7,8 +7,6 @@ mkdir target
 
 svnadmin create --fs-type fsfs target/svnroot
 
-rm -Rf `find project -type d -name .svn`
-
 dir=`readlink -f ${PWD}`
 
 svn import project file://${dir}/target/svnroot/project/trunk -m "import."
@@ -22,6 +20,9 @@ rm -Rf target
 
 #. ~/shell-switches/m2-debug-on
 #echo "Enabling debugging options. Please attach the debugger."
+
+export MAVEN_OPTS=
 m2 -e release:prepare
 
+m2 -e release:perform
 
