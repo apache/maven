@@ -180,7 +180,6 @@
     <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-plugins/</url>
   </scm>
 <!-- Omitted as it causes a cycle unnecessarily in beta-1
->>>>>>> .merge-right.r289416
   <build>
     <pluginManagement>
       <plugins>
