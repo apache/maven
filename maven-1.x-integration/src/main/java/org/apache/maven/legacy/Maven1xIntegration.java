@@ -31,7 +31,7 @@ public interface Maven1xIntegration
     // Execution
     // ----------------------------------------------------------------------
 
-    void execute( File project, List args, List goals )
+    void execute( File project, List goals )
         throws Maven1xIntegrationException;
 
     // ----------------------------------------------------------------------
