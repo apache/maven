@@ -30,18 +30,18 @@ import java.util.List;
 /**
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
  *
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @version $Id$
  * @goal eclipse
  * @requiresDependencyResolution test
  * @execute phase="generate-sources"
- *
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public class EclipsePlugin
     extends AbstractMojo
 {
     /**
      * The project whose project files to create.
+     *
      * @parameter expression="${project}"
      * @required
      */
@@ -49,12 +49,14 @@ public class EclipsePlugin
 
     /**
      * The currently executed project (can be a reactor project).
+     *
      * @parameter expression="${executedProject}"
      */
     private MavenProject executedProject;
 
     /**
      * Local maven repository.
+     *
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -63,6 +65,7 @@ public class EclipsePlugin
 
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
+     *
      * @parameter expression="${reactorProjects}"
      * @required
      * @readonly
@@ -71,6 +74,7 @@ public class EclipsePlugin
 
     /**
      * Artifact resolver, needed to download source jars for inclusion in classpath.
+     *
      * @parameter expression="${component.org.apache.maven.artifact.resolver.ArtifactResolver}"
      * @required
      * @readonly
@@ -80,6 +84,7 @@ public class EclipsePlugin
 
     /**
      * Artifact factory, needed to download source jars for inclusion in classpath.
+     *
      * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
      * @required
      * @readonly
@@ -89,6 +94,7 @@ public class EclipsePlugin
 
     /**
      * Remote repositories which will be searched for source attachments.
+     *
      * @parameter expression="${project.remoteArtifactRepositories}"
      * @required
      * @readonly
@@ -104,6 +110,7 @@ public class EclipsePlugin
      *      &lt;java.lang.String>org.eclipse.wst.common.modulecore.ModuleCoreNature&lt;/java.lang.String>
      *    &lt;/projectnatures>
      * </pre>
+     *
      * @parameter
      * @todo default-value="<java.lang.String>org.eclipse.jdt.core.javanature</java.lang.String>"
      */
@@ -119,6 +126,7 @@ public class EclipsePlugin
      *      &lt;java.lang.String>org.eclipse.wst.common.modulecore.ComponentStructuralBuilderDependencyResolver&lt;/java.lang.String>
      *    &lt;/buildcommands>
      * </pre>
+     *
      * @parameter
      * @todo default-value="org.eclipse.jdt.core.javabuilder"
      */
@@ -133,6 +141,7 @@ public class EclipsePlugin
      *      &lt;java.lang.String>org.eclipse.jst.j2ee.internal.web.container/artifact&lt;/java.lang.String>
      *    &lt;/classpathContainers>
      * </pre>
+     *
      * @parameter
      * @todo default-value=empty list
      */
@@ -140,19 +149,21 @@ public class EclipsePlugin
 
     /**
      * Disables the downloading of source attachments.
-     * 
+     *
      * @parameter expression="${eclipse.downloadSources}"
      */
     private boolean downloadSources = false;
 
     /**
      * Eclipse workspace directory.
+     *
      * @parameter expression="${eclipse.workspace}"
      */
     private File outputDir;
 
     /**
      * Setter for <code>project</code>. Needed for tests.
+     *
      * @param project The MavenProject to set.
      */
     protected void setProject( MavenProject project )
@@ -162,6 +173,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>localRepository</code>. Needed for tests.
+     *
      * @param localRepository The ArtifactRepository to set.
      */
     protected void setLocalRepository( ArtifactRepository localRepository )
@@ -171,6 +183,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>artifactFactory</code>. Needed for tests.
+     *
      * @param artifactFactory The artifactFactory to set.
      */
     protected void setArtifactFactory( ArtifactFactory artifactFactory )
@@ -180,6 +193,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>artifactResolver</code>. Needed for tests.
+     *
      * @param artifactResolver The artifactResolver to set.
      */
     protected void setArtifactResolver( ArtifactResolver artifactResolver )
@@ -189,6 +203,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>remoteArtifactRepositories</code>. Needed for tests.
+     *
      * @param remoteArtifactRepositories The remoteArtifactRepositories to set.
      */
     protected void setRemoteArtifactRepositories( List remoteArtifactRepositories )
@@ -198,6 +213,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>buildcommands</code>. Needed for tests.
+     *
      * @param buildcommands The buildcommands to set.
      */
     protected void setBuildcommands( List buildcommands )
@@ -207,6 +223,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>classpathContainers</code>. Needed for tests.
+     *
      * @param classpathContainers The classpathContainers to set.
      */
     protected void setClasspathContainers( List classpathContainers )
@@ -216,6 +233,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>projectnatures</code>. Needed for tests.
+     *
      * @param projectnatures The projectnatures to set.
      */
     protected void setProjectnatures( List projectnatures )
@@ -225,6 +243,7 @@ public class EclipsePlugin
 
     /**
      * Setter for <code>outputDir</code>. Needed for tests.
+     *
      * @param outputDir The outputDir to set.
      */
     public void setOutputDir( File outputDir )
@@ -243,7 +262,7 @@ public class EclipsePlugin
             // backwards compat with alpha-2 only
             executedProject = project;
         }
-    	
+
         assertNotEmpty( executedProject.getGroupId(), "groupId" ); //$NON-NLS-1$
         assertNotEmpty( executedProject.getArtifactId(), "artifactId" ); //$NON-NLS-1$
 
@@ -286,14 +305,16 @@ public class EclipsePlugin
         {
             if ( !outputDir.isDirectory() )
             {
-                throw new MojoExecutionException( Messages.getString( "EclipsePlugin.notadir", outputDir ) ); //$NON-NLS-1$
+                throw new MojoExecutionException(
+                    Messages.getString( "EclipsePlugin.notadir", outputDir ) ); //$NON-NLS-1$
             }
 
             outputDir = new File( outputDir, executedProject.getArtifactId() );
 
             if ( !outputDir.isDirectory() && !outputDir.mkdir() )
             {
-                throw new MojoExecutionException( Messages.getString( "EclipsePlugin.cantcreatedir", outputDir ) ); //$NON-NLS-1$
+                throw new MojoExecutionException(
+                    Messages.getString( "EclipsePlugin.cantcreatedir", outputDir ) ); //$NON-NLS-1$
             }
         }
 
@@ -327,7 +348,7 @@ public class EclipsePlugin
                                                        localRepository );
 
         getLog().info( Messages.getString( "EclipsePlugin.wrote", //$NON-NLS-1$
-                                           new Object[] { project.getArtifactId(), outputDir.getAbsolutePath() } ) );
+                                           new Object[]{project.getArtifactId(), outputDir.getAbsolutePath()} ) );
     }
 
     private void assertNotEmpty( String string, String elementName )
@@ -335,7 +356,13 @@ public class EclipsePlugin
     {
         if ( string == null )
         {
-            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.missingelement", elementName ) ); //$NON-NLS-1$
+            throw new EclipsePluginException(
+                Messages.getString( "EclipsePlugin.missingelement", elementName ) ); //$NON-NLS-1$
         }
+    }
+
+    public void setDownloadSources( boolean downloadSources )
+    {
+        this.downloadSources = downloadSources;
     }
 }

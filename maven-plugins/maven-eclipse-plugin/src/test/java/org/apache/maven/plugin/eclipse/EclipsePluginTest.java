@@ -16,14 +16,6 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,6 +26,14 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -90,11 +90,9 @@ public class EclipsePluginTest
         File repo = getTestFile( "src/test/repository" );
 
         ArtifactRepositoryLayout localRepositoryLayout = (ArtifactRepositoryLayout) lookup(
-                                                                                            ArtifactRepositoryLayout.ROLE,
-                                                                                            "legacy" );
+            ArtifactRepositoryLayout.ROLE, "legacy" );
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local",
-                                                                            "file://" + repo.getAbsolutePath(),
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + repo.getAbsolutePath(),
                                                                             localRepositoryLayout );
 
         MavenProject project = builder
@@ -145,18 +143,20 @@ public class EclipsePluginTest
 
         plugin.setClasspathContainers( new ArrayList() );
 
+        plugin.setDownloadSources( true );
+
         // @todo how to test injected parameters?
 
         plugin.execute();
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( projectOutputDir,
-                                                                                                  ".project" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ),
+                          new File( projectOutputDir, ".project" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( projectOutputDir,
-                                                                                                    ".classpath" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ),
+                          new File( projectOutputDir, ".classpath" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "wtpmodules" ), new File( projectOutputDir,
-                                                                                                     ".wtpmodules" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "wtpmodules" ),
+                          new File( projectOutputDir, ".wtpmodules" ) );
 
         if ( new File( basedir, "settings" ).exists() )
         {
@@ -183,8 +183,8 @@ public class EclipsePluginTest
 
             if ( actualLines.size() <= i )
             {
-                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: "
-                    + expectedLines.size() );
+                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: " +
+                    expectedLines.size() );
             }
 
             String actual = actualLines.get( i ).toString();
@@ -212,7 +212,8 @@ public class EclipsePluginTest
 
         while ( ( line = reader.readLine() ) != null )
         {
-            lines.add( line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
+            lines.add(
+                line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
         }
 
         return lines;
