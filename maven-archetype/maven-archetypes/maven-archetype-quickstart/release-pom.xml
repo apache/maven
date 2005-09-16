@@ -7,4 +7,12 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-archetype-quickstart</artifactId>
   <version>1.0-alpha-3</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
