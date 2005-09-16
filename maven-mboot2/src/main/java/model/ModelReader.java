@@ -179,6 +179,12 @@ public class ModelReader
         {
             insideReleases = true;
         }
+        else if ( rawName.equals( "exclusion" ) && insideDependency )
+        {
+            insideExclusion = true;
+
+            currentExclusion = new Exclusion();
+        }
         depth++;
     }
 
@@ -329,12 +335,6 @@ public class ModelReader
             else if ( rawName.equals( "scope" ) )
             {
                 currentDependency.setScope( getBodyText() );
-            }
-            else if ( rawName.equals( "exclusion" ) )
-            {
-                insideExclusion = true;
-
-                currentExclusion = new Exclusion();
             }
         }
         else if ( insideResource )
