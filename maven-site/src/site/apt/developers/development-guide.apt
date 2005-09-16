@@ -53,7 +53,7 @@ Developing Maven 2
 * Creating and submitting a patch
 
  When you have either completed an issue or just want some feedback on the work you have done, create a patch
- and attache the patch to the issue in question. We have a couple of guidelines when creating patches:
+ and attach the patch to the issue in question. We have a couple of guidelines when creating patches:
 
  * Always create the patch from the root of the maven project, i.e. where the pom.xml file is.
 
@@ -132,7 +132,7 @@ target
 
  * Plexus
 
- Plexus is a full-fledged container supporting different cinds of component lifecycles. It's native lifecycle
+ Plexus is a full-fledged container supporting different kinds of component lifecycles. It's native lifecycle
  is like any other modern IoC container, using field injection of both requirements and configuration. All
  core Maven 2 functionality are Plexus components.
 
