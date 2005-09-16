@@ -179,16 +179,19 @@
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-plugins/</url>
   </scm>
-<!--
+<!-- Omitted as it causes a cycle unnecessarily in beta-1
+>>>>>>> .merge-right.r289416
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 -->
 </project>
