@@ -1,4 +1,7 @@
 <project name="foo" default="foo" xmlns:artifact="urn:maven-artifact-ant">
+<!--
+<project name="foo" default="foo" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+-->
   <!--
     You either need to run the the 'initTaskDefs' task below and
     define the artifact namespace like above (choose anything you
@@ -18,8 +21,8 @@
   -->
 
   <target name="initTaskDefs">
+    <!-- don't forget to update the version! -->
     <path id="maven.classpath">
-      <!-- don't forget to set the value! -->
       <pathelement location="target/maven-artifact-ant-2.0-beta-1-SNAPSHOT-dep.jar"/>
     </path>
 
@@ -104,6 +107,7 @@
       <pom refid="maven.project"/>
     </artifact:install>
 
+    <echo>Note: only works on snapshots!</echo>
     <artifact:deploy file="${outJar}">
       <remoteSnapshotRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
