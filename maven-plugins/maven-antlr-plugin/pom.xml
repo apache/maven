@@ -7,7 +7,7 @@
     <version>2.0-beta-1</version>
   </parent>
   <artifactId>maven-antlr-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>2.0-beta-1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Maven ANTLR Plugin</name>
   <inceptionYear>2001</inceptionYear>
