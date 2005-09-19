@@ -1,8 +1,5 @@
 package org.apache.maven.tools.repoclean;
 
-import java.io.File;
-import java.net.URL;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -18,6 +15,9 @@ import java.net.URL;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.io.File;
+import java.net.URL;
 
 public final class TestSupport
 {
@@ -74,9 +74,9 @@ public final class TestSupport
     public static File getResource( String relativePath )
     {
         ClassLoader cloader = TestSupport.class.getClassLoader();
-        
+
         URL resource = cloader.getResource( relativePath );
-        
+
         return new File( resource.getPath() ).getAbsoluteFile();
     }
 

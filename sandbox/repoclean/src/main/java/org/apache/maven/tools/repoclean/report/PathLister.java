@@ -1,12 +1,5 @@
 package org.apache.maven.tools.repoclean.report;
 
-import org.codehaus.plexus.util.IOUtil;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -22,6 +15,13 @@ import java.io.Writer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.codehaus.plexus.util.IOUtil;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 public class PathLister
 {

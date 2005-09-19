@@ -1,12 +1,5 @@
 package org.apache.maven.tools.repoclean.transaction;
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -22,6 +15,13 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class RewriteTransaction
 {
@@ -48,8 +48,8 @@ public class RewriteTransaction
             File file = (File) it.next();
             if ( file.exists() && !file.delete() )
             {
-                throw new RollbackException( "[rollback] Cannot delete file: " + file
-                    + "\nPart of transaction for artifact: {" + artifact.getId() + "}." );
+                throw new RollbackException( "[rollback] Cannot delete file: " + file +
+                    "\nPart of transaction for artifact: {" + artifact.getId() + "}." );
             }
         }
     }

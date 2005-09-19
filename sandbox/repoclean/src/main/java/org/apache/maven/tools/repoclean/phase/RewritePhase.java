@@ -267,7 +267,8 @@ public class RewritePhase
 
                 transaction.addFile( targetPom );
 
-                bridgedTargetPom = new File( targetBase, bridgingLayout.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
+                bridgedTargetPom = new File( targetBase,
+                                             bridgingLayout.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
 
                 transaction.addFile( bridgedTargetPom );
 

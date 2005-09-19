@@ -1,6 +1,4 @@
-package org.apache.maven.tools.repoclean.transaction;
-
-/*
+package org.apache.maven.tools.repoclean.transaction;/*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

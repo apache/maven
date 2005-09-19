@@ -1,13 +1,5 @@
 package org.apache.maven.tools.repoclean.translate;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.tools.repoclean.report.DummyReporter;
-import org.apache.maven.tools.repoclean.report.Reporter;
-import org.codehaus.plexus.PlexusTestCase;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -23,6 +15,14 @@ import org.codehaus.plexus.PlexusTestCase;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.tools.repoclean.report.DummyReporter;
+import org.apache.maven.tools.repoclean.report.Reporter;
+import org.codehaus.plexus.PlexusTestCase;
 
 public class PomV3ToV4TranslatorTest
     extends PlexusTestCase
