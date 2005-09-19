@@ -1,0 +1,13 @@
++dev = Dev environment
++qa = QA environment
++test = Test environment
++prod = Production Environment
+
+*tas.editor.stamp
+{
+  dev = devValue
+  qa = qaValue
+  test = testValue
+  prod = prodValue
+}
+
