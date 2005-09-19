@@ -23,6 +23,7 @@ import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
 import org.apache.maven.tools.repoclean.phase.DiscoveryPhase;
 import org.apache.maven.tools.repoclean.phase.RewritePhase;
 import org.apache.maven.tools.repoclean.report.FileReporter;
+import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -78,7 +79,7 @@ public class RepositoryCleaner
         {
             Logger logger = getLogger();
 
-            FileReporter repoReporter = null;
+            Reporter repoReporter = null;
             try
             {
                 repoReporter = new FileReporter( reportsBase, "repository.report.txt",

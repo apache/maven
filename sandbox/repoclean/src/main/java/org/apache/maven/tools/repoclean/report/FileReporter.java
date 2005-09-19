@@ -21,39 +21,21 @@ import org.codehaus.plexus.util.IOUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author jdcasey
  */
 public class FileReporter
-    implements Reporter
+    extends AbstractReporter
 {
-
-    private static final String WARN_LEVEL = "[WARNING] ";
-
-    private static final String ERROR_LEVEL = "[ERROR] ";
-
     private File reportsFile;
-
-    private List messages = new ArrayList();
-
-    private boolean hasError = false;
-
-    private boolean hasWarning = false;
 
     private Writer writer;
 
-    private final boolean warningsEnabled;
-
     public FileReporter( File reportsBase, String reportPath, boolean warningsEnabled )
     {
-        this.warningsEnabled = warningsEnabled;
+        super( warningsEnabled );
 
         this.reportsFile = new File( reportsBase, reportPath );
 
@@ -87,7 +69,7 @@ public class FileReporter
         IOUtil.close( writer );
     }
 
-    private void write( Object message )
+    protected void write( String message )
         throws ReportWriteException
     {
         try
@@ -97,14 +79,7 @@ public class FileReporter
                 open();
             }
 
-            if ( message instanceof List )
-            {
-                writer.write( format( (List) message ).toString() );
-            }
-            else
-            {
-                writer.write( String.valueOf( message ) );
-            }
+            writer.write( message );
 
             writer.write( '\n' );
 
@@ -113,99 +88,6 @@ public class FileReporter
         catch ( IOException e )
         {
             throw new ReportWriteException( "Cannot write message: " + message + " due to an I/O error.", e );
-        }
-    }
-
-    public boolean hasWarning()
-    {
-        return hasWarning;
-    }
-
-    public boolean hasError()
-    {
-        return hasError;
-    }
-
-    public void warn( String message )
-        throws ReportWriteException
-    {
-        if ( warningsEnabled )
-        {
-            hasWarning = true;
-            String source = getSourceLine();
-            write( new AppendingList( 3 ).append( WARN_LEVEL ).append( source ).append( message ) );
-        }
-    }
-
-    public void error( String message, Throwable error )
-        throws ReportWriteException
-    {
-        hasError = true;
-        String source = getSourceLine();
-        write( new AppendingList( 4 ).append( ERROR_LEVEL ).append( source ).append( message ).append( error ) );
-    }
-
-    public void error( String message )
-        throws ReportWriteException
-    {
-        hasError = true;
-        String source = getSourceLine();
-        write( new AppendingList( 3 ).append( ERROR_LEVEL ).append( source ).append( message ) );
-    }
-
-    private String getSourceLine()
-    {
-        NullPointerException npe = new NullPointerException();
-
-        StackTraceElement element = npe.getStackTrace()[2];
-
-        return " Reported from: (" + element.getClassName() + "." + element.getMethodName() + "(..):" +
-            element.getLineNumber() + ")\n";
-    }
-
-    private CharSequence format( List messageParts )
-    {
-        StringBuffer buffer = new StringBuffer();
-        for ( Iterator it = messageParts.iterator(); it.hasNext(); )
-        {
-            Object part = it.next();
-            if ( part instanceof Throwable )
-            {
-                part = formatThrowable( (Throwable) part );
-            }
-
-            buffer.append( part );
-        }
-
-        return buffer;
-    }
-
-    private String formatThrowable( Throwable throwable )
-    {
-        StringWriter sWriter = new StringWriter();
-        PrintWriter pWriter = new PrintWriter( sWriter );
-
-        throwable.printStackTrace( pWriter );
-
-        return sWriter.toString();
-    }
-
-    private static class AppendingList
-        extends ArrayList
-    {
-        public AppendingList()
-        {
-        }
-
-        public AppendingList( int size )
-        {
-            super( size );
-        }
-
-        public AppendingList append( Object item )
-        {
-            super.add( item );
-            return this;
         }
     }
 
