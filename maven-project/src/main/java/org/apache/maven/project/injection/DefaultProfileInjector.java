@@ -28,17 +28,17 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 /**
- * Inject profile data into a Model, using the profile as the dominant data source, and 
+ * Inject profile data into a Model, using the profile as the dominant data source, and
  * persisting results of the injection in the Model.
- * 
- * This will look similar to the ModelUtils/DefaultModelInheritanceAssembler code, but 
+ *
+ * This will look similar to the ModelUtils/DefaultModelInheritanceAssembler code, but
  * they are distinct. In model inheritance, the child provides data dominance AND persists
  * the results of the merge...sort of a 'merge-out' system.
- * 
+ *
  * In this system, the profile is dominant, but the model receives the merge result...sort
  * of a 'merge-in' system. The two pieces of code look like they could be combined with a
  * set of flags to determine which direction to merge 'to', but there are enough differences
- * in the code to justify the extra code involved with separating them, in order to simplify 
+ * in the code to justify the extra code involved with separating them, in order to simplify
  * the logic.
  */
 public class DefaultProfileInjector
@@ -60,13 +60,13 @@ public class DefaultProfileInjector
         injectDependencyManagement( profile, model );
 
         injectDistributionManagement( profile, model );
-        
+
         injectBuild( profile, model );
-        
+
         Properties props = new Properties();
         props.putAll( model.getProperties() );
         props.putAll( profile.getProperties() );
-        
+
         model.setProperties( props );
     }
 
@@ -74,7 +74,7 @@ public class DefaultProfileInjector
     {
         BuildBase profileBuild = profile.getBuild();
         Build modelBuild = model.getBuild();
-        
+
         // if the parent build is null, obviously we cannot inherit from it...
         if ( profileBuild != null )
         {
@@ -83,7 +83,7 @@ public class DefaultProfileInjector
                 modelBuild = new Build();
                 model.setBuild( modelBuild );
             }
-            
+
             if ( profileBuild.getDirectory() != null )
             {
                 modelBuild.setDirectory( profileBuild.getDirectory() );
@@ -100,19 +100,19 @@ public class DefaultProfileInjector
             }
 
             List profileResources = profileBuild.getResources();
-            
+
             if ( profileResources != null && !profileResources.isEmpty() )
             {
                 modelBuild.setResources( profileResources );
             }
 
             List profileTestResources = profileBuild.getTestResources();
-            
-            if ( profileTestResources != null )
+
+            if ( profileTestResources != null && !profileTestResources.isEmpty() )
             {
                 modelBuild.setTestResources( profileTestResources );
             }
-            
+
             injectPlugins( profileBuild, modelBuild );
 
             // Plugin management :: aggregate
@@ -133,7 +133,7 @@ public class DefaultProfileInjector
     private void injectPlugins( PluginContainer profileContainer, PluginContainer modelContainer )
     {
         List modelPlugins = modelContainer.getPlugins();
-        
+
         if ( modelPlugins == null )
         {
             modelContainer.setPlugins( profileContainer.getPlugins() );
@@ -221,35 +221,35 @@ public class DefaultProfileInjector
                 if ( profileExecution != null )
                 {
                     injectConfigurationContainer( profileExecution, modelExecution );
-                    
+
                     if ( profileExecution.getPhase() != null )
                     {
                         modelExecution.setPhase( profileExecution.getPhase() );
                     }
-                    
+
                     List profileGoals = profileExecution.getGoals();
                     List modelGoals = modelExecution.getGoals();
-                    
+
                     List goals = new ArrayList();
-                    
+
                     if ( modelGoals != null && !modelGoals.isEmpty() )
                     {
                         goals.addAll( modelGoals );
                     }
-                    
+
                     if ( profileGoals != null )
                     {
                         for ( Iterator goalIterator = profileGoals.iterator(); goalIterator.hasNext(); )
                         {
                             String goal = (String) goalIterator.next();
-                            
+
                             if ( !goals.contains( goal ) )
                             {
                                 goals.add( goal );
                             }
                         }
                     }
-                    
+
                     modelExecution.setGoals( goals );
                 }
 
@@ -276,7 +276,7 @@ public class DefaultProfileInjector
     }
 
     private void injectConfigurationContainer( ConfigurationContainer profileContainer,
-                                              ConfigurationContainer modelContainer )
+                                               ConfigurationContainer modelContainer )
     {
         Xpp3Dom configuration = (Xpp3Dom) profileContainer.getConfiguration();
         Xpp3Dom parentConfiguration = (Xpp3Dom) modelContainer.getConfiguration();
