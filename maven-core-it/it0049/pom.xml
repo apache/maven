@@ -20,7 +20,7 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>plugin-snapshots</id>
+      <id>snapshots</id>
       <name>Plugin Snapshots</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
