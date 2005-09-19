@@ -152,7 +152,7 @@ public abstract class AbstractVersionTransformation
 
                 if ( !policy.isEnabled() )
                 {
-                    getLogger().debug( "resolveMetaData: " + artifact.getId() + ": Skipping disabled repository " +
+                    getLogger().debug( "Legacy metadata: " + artifact.getId() + ": Skipping disabled repository " +
                         repository.getId() + " (" + repository.getUrl() + ")" );
                 }
                 else
@@ -185,7 +185,12 @@ public abstract class AbstractVersionTransformation
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
-                            getLogger().debug( "resolveMetaData: Artifact version metadata for: " + artifact.getId() +
+                            getLogger().debug( "Legacy metadata for: " + artifact.getId() +
+                                " could not be found on repository: " + repository.getId(), e );
+                        }
+                        catch ( ArtifactMetadataRetrievalException e )
+                        {
+                            getLogger().warn( "Legacy metadata for: " + artifact.getId() +
                                 " could not be found on repository: " + repository.getId(), e );
                         }
                     }
@@ -219,14 +224,6 @@ public abstract class AbstractVersionTransformation
         return localMetadata != null ? localMetadata.constructVersion() : null;
     }
 
-    /**
-     * Select the version to use based on a merged versioning element.
-     *
-     * @param versioning the versioning element
-     * @param defaultVersion the version to select if none is selected from versioning
-     * @return the version selected
-     */
-//    protected abstract String selectVersion( Versioning versioning, String defaultVersion );
     protected abstract LegacyArtifactMetadata createLegacyMetadata( Artifact artifact );
 
     /**
