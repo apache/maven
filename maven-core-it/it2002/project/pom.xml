@@ -3,24 +3,18 @@
   <groupId>org.apache.maven.it2002</groupId>
   <artifactId>project</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <modules>
+    <module>subproject</module>
+    <module>subproject2</module>
+  </modules>
 
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <version>1.0-alpha-6</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>2.0-beta-1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0-beta-1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -56,20 +50,21 @@
     <tagBase>file://${project.file.parentFile.parentFile}/target/svnroot/project/tags</tagBase>
   </properties>
 
-  <!-- build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.0-beta-1-SNAPSHOT</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0-beta-1</version>
       </plugin>
     </plugins>
-  </build -->
+  </build>
 
   <reporting>
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.0-alpha-1</version>
       </plugin>
     </plugins>
   </reporting>

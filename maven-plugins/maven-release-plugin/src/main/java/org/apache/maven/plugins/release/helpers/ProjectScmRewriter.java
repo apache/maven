@@ -37,12 +37,6 @@ public class ProjectScmRewriter
     {
         String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-        if ( project.getScm() == null )
-        {
-            throw new MojoExecutionException(
-                "Project: " + projectId + " does not have a SCM section! Cannot proceed with release." );
-        }
-
         Model model = project.getOriginalModel();
 
         Scm scm = model.getScm();
@@ -75,8 +69,18 @@ public class ProjectScmRewriter
             if ( scmConnection != null && scmConnection.startsWith( "scm:svn" ) )
             {
                 scm.setConnection( convertSvnConnectionString( scmConnection, tag ) );
-                scm.setDeveloperConnection( convertSvnConnectionString( scm.getDeveloperConnection(), tag ) );
-                scm.setUrl( convertSvnConnectionString( scm.getUrl(), tag ) );
+                
+                String devConnection = scm.getDeveloperConnection();
+                if ( devConnection != null )
+                {
+                    scm.setDeveloperConnection( convertSvnConnectionString( devConnection, tag ) );
+                }
+                
+                String url = scm.getUrl();
+                if ( url != null )
+                {
+                    scm.setUrl( convertSvnConnectionString( url, tag ) );
+                }
             }
         }
     }

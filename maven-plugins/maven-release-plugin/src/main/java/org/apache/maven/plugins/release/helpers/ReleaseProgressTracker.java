@@ -198,25 +198,56 @@ public class ReleaseProgressTracker
 
     public void addOriginalScmInfo( String projectId, Scm scm )
     {
-        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".connection", scm.getConnection() );
-        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".developerConnection",
-                                       scm.getDeveloperConnection() );
-        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".url", scm.getUrl() );
-        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".tag", scm.getTag() );
+        String connection = scm.getConnection();
+        if ( connection != null )
+        {
+            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".connection", connection );
+        }
+        
+        String devConnection = scm.getDeveloperConnection();
+        if ( devConnection != null )
+        {
+            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".developerConnection",
+                                           devConnection );
+        }
+        
+        String url = scm.getUrl();
+        if ( url != null )
+        {
+            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".url", url );
+        }
+        
+        String tag = scm.getTag();
+        if ( tag != null )
+        {
+            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".tag", tag );
+        }
     }
 
     public void restoreScmInfo( String projectId, Scm scm )
     {
         String connection = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".connection" );
-        if ( connection == null )
+        if ( connection != null )
         {
-            throw new IllegalArgumentException(
-                "Project \'" + projectId + "\' has not had its SCM info cached. Cannot restore uncached SCM info." );
+            scm.setConnection( connection );
         }
-        scm.setConnection( connection );
-        scm.setDeveloperConnection(
-            releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".developerConnection" ) );
-        scm.setUrl( releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".url" ) );
-        scm.setTag( releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".tag" ) );
+        
+        String devConnection = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".connection" );
+        if ( devConnection != null )
+        {
+            scm.setDeveloperConnection( devConnection );
+        }
+        
+        String url = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".url" );
+        if ( url != null )
+        {
+            scm.setUrl( url );
+        }
+        
+        String tag = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".tag" );
+        if ( tag != null )
+        {
+            scm.setTag( tag );
+        }
     }
 }
