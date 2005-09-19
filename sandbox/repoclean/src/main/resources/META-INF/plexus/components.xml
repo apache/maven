@@ -44,6 +44,9 @@
         <requirement>
           <role>org.apache.maven.tools.repoclean.digest.DigestVerifier</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.digest.Digestor</role>
+        </requirement>
       </requirements>
     </component>
     <!--

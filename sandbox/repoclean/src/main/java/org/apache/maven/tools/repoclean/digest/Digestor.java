@@ -33,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Digestor
 {
-
     public static final String ROLE = Digestor.class.getName();
 
     public static final String MD5 = "MD5";
@@ -58,6 +57,25 @@ public class Digestor
         {
             throw new DigestException( "Cannot write digest to file: \'" + digestFile + "\'", e );
         }
+    }
+
+    public File getDigestFile( File artifactFile, String algorithm )
+        throws NoSuchAlgorithmException
+    {
+        String extension;
+        if ( SHA.equals( algorithm ) )
+        {
+            extension = "sha1";
+        }
+        else if ( MD5.equals( algorithm ) )
+        {
+            extension = "md5";
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException( "Unknown algorithm " + algorithm );
+        }
+        return new File( artifactFile.getParentFile(), artifactFile.getName() + "." + extension );
     }
 
     public boolean verifyArtifactDigest( File artifactFile, File digestFile, String algorithm )

@@ -22,13 +22,16 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.tools.repoclean.RepositoryCleanerConfiguration;
 import org.apache.maven.tools.repoclean.digest.DigestException;
 import org.apache.maven.tools.repoclean.digest.DigestVerifier;
+import org.apache.maven.tools.repoclean.digest.Digestor;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
@@ -60,6 +63,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -69,6 +73,8 @@ public class RewritePhase
     implements Contextualizable
 {
     private DigestVerifier digestVerifier;
+
+    private Digestor artifactDigestor;
 
     private ArtifactRepositoryLayout bridgingLayout;
 
@@ -219,14 +225,43 @@ public class RewritePhase
         File metadataSource = new File( sourceBase, sourceRepo.pathOfRemoteRepositoryMetadata( metadata ) );
         File metadataTarget = new File( targetBase, targetRepo.pathOfRemoteRepositoryMetadata( metadata ) );
 
-        mergeMetadata( metadataSource, metadataTarget, transaction, artifactReporter, reportOnly );
+        Metadata sourceMetadata = readMetadata( metadataSource, artifact );
+        if ( sourceMetadata.getVersioning() == null )
+        {
+            sourceMetadata.setVersioning( new Versioning() );
+        }
+        if ( !sourceMetadata.getVersioning().getVersions().contains( artifact.getBaseVersion() ) )
+        {
+            sourceMetadata.getVersioning().addVersion( artifact.getBaseVersion() );
+        }
+        mergeMetadata( sourceMetadata, metadataTarget, reportOnly );
 
         metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
         metadataSource = new File( sourceBase, sourceRepo.pathOfRemoteRepositoryMetadata( metadata ) );
         metadataTarget = new File( targetBase, targetRepo.pathOfRemoteRepositoryMetadata( metadata ) );
 
-        mergeMetadata( metadataSource, metadataTarget, transaction, artifactReporter, reportOnly );
+        sourceMetadata = readMetadata( metadataSource, artifact );
+        if ( artifact.isSnapshot() )
+        {
+            if ( sourceMetadata.getVersioning() == null )
+            {
+                sourceMetadata.setVersioning( new Versioning() );
+            }
+            if ( sourceMetadata.getVersioning().getSnapshot() == null )
+            {
+                sourceMetadata.getVersioning().setSnapshot( new Snapshot() );
+            }
+
+            int i = artifact.getVersion().indexOf( '-' );
+            if ( i >= 0 )
+            {
+                Snapshot snapshot = sourceMetadata.getVersioning().getSnapshot();
+                snapshot.setTimestamp( artifact.getVersion().substring( 0, i ) );
+                snapshot.setBuildNumber( Integer.valueOf( artifact.getVersion().substring( i + 1 ) ).intValue() );
+            }
+        }
+        mergeMetadata( sourceMetadata, metadataTarget, reportOnly );
 
         // The rest is for POM metadata - translation and bridging of locations in the target repo may be required.
         ArtifactMetadata pom = new ProjectArtifactMetadata( artifact, null );
@@ -326,74 +361,90 @@ public class RewritePhase
         }
     }
 
-    private void mergeMetadata( File source, File target, RewriteTransaction transaction, Reporter artifactReporter,
-                                boolean reportOnly )
-        throws IOException, DigestException, ReportWriteException, XmlPullParserException
+    private void mergeMetadata( Metadata sourceMetadata, File target, boolean reportOnly )
+        throws IOException, DigestException, XmlPullParserException, NoSuchAlgorithmException
     {
-        if ( source.exists() )
+        if ( target.exists() )
         {
-            if ( !target.exists() )
+            Metadata targetMetadata = null;
+
+            Reader reader = null;
+
+            try
             {
-                copyMetadata( source, target, transaction, artifactReporter, reportOnly );
-            }
-            else
-            {
+                reader = new FileReader( target );
+
                 MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
-                Metadata sourceMetadata = null;
+                targetMetadata = mappingReader.read( reader );
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
 
-                Reader reader = null;
+            boolean changed = targetMetadata.merge( sourceMetadata );
 
+            if ( changed )
+            {
+                Writer writer = null;
                 try
                 {
-                    reader = new FileReader( source );
+                    target.getParentFile().mkdirs();
+                    writer = new FileWriter( target );
 
-                    sourceMetadata = mappingReader.read( reader );
+                    MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
+
+                    mappingWriter.write( writer, targetMetadata );
+
+                    if ( !reportOnly )
+                    {
+                        File digestFile = artifactDigestor.getDigestFile( target, Digestor.MD5 );
+                        artifactDigestor.createArtifactDigest( target, digestFile, Digestor.MD5 );
+                        digestFile = artifactDigestor.getDigestFile( target, Digestor.SHA );
+                        artifactDigestor.createArtifactDigest( target, digestFile, Digestor.SHA );
+                    }
                 }
                 finally
                 {
-                    IOUtil.close( reader );
-                    reader = null;
+                    IOUtil.close( writer );
                 }
-
-                Metadata targetMetadata = null;
-
-                try
-                {
-                    reader = new FileReader( target );
-
-                    targetMetadata = mappingReader.read( reader );
-                }
-                finally
-                {
-                    IOUtil.close( reader );
-                }
-
-                boolean changed = false;
-
-                changed |= targetMetadata.merge( sourceMetadata );
-
-                if ( changed )
-                {
-                    Writer writer = null;
-                    try
-                    {
-                        target.getParentFile().mkdirs();
-                        writer = new FileWriter( target );
-
-                        MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                        mappingWriter.write( writer, targetMetadata );
-                    }
-                    finally
-                    {
-                        IOUtil.close( writer );
-                    }
-                }
-
-                digestVerifier.verifyDigest( source, target, transaction, artifactReporter, reportOnly );
             }
         }
+    }
+
+    private Metadata readMetadata( File source, Artifact artifact )
+        throws IOException, XmlPullParserException
+    {
+        Metadata sourceMetadata = null;
+
+        if ( source.exists() )
+        {
+            Reader reader = null;
+
+            try
+            {
+                reader = new FileReader( source );
+
+                MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+                sourceMetadata = mappingReader.read( reader );
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+        }
+
+        if ( sourceMetadata == null )
+        {
+            sourceMetadata = new Metadata();
+
+            sourceMetadata.setGroupId( artifact.getGroupId() );
+            sourceMetadata.setArtifactId( artifact.getArtifactId() );
+            sourceMetadata.setVersion( artifact.getBaseVersion() );
+        }
+        return sourceMetadata;
     }
 
     private void copyMetadata( File source, File target, RewriteTransaction transaction, Reporter artifactReporter,

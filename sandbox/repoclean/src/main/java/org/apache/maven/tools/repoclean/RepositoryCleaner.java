@@ -73,8 +73,7 @@ public class RepositoryCleaner
 
         File targetRepositoryBase = normalizeTargetRepositoryBase( configuration.getTargetRepositoryPath() );
 
-        // do not proceed if we cannot produce reports, or if the repository is
-        // invalid.
+        // do not proceed if we cannot produce reports, or if the repository is invalid.
         if ( reportsBase != null && sourceRepositoryBase != null && targetRepositoryBase != null )
         {
             Logger logger = getLogger();
@@ -96,15 +95,13 @@ public class RepositoryCleaner
                     try
                     {
                         sourceLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                    configuration
-                                                                                        .getSourceRepositoryLayout() );
+                                                                                    configuration.getSourceRepositoryLayout() );
 
                         ArtifactRepository sourceRepo = new DefaultArtifactRepository( "source", "file://" +
                             sourceRepositoryBase.getAbsolutePath(), sourceLayout );
 
                         targetLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                    configuration
-                                                                                        .getTargetRepositoryLayout() );
+                                                                                    configuration.getTargetRepositoryLayout() );
 
                         ArtifactRepository targetRepo = new DefaultArtifactRepository( "target", "file://" +
                             targetRepositoryBase.getAbsolutePath(), targetLayout );
@@ -113,8 +110,6 @@ public class RepositoryCleaner
                         {
                             logger.debug( "Rewriting POMs and artifact files." );
                         }
-
-                        //                        List originalArtifacts = new ArrayList( artifacts );
 
                         List rewritten = rewritePhase.execute( artifacts, sourceRepo, targetRepo, configuration,
                                                                reportsBase, repoReporter );
