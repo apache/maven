@@ -84,7 +84,7 @@ public class DoxiaMojo
     /**
      * Patterns which should be excluded by default.
      */
-    // TODO Push me in AbstractMojo class and remove me from AbstractMavenReport class
+    // TODO Push me into a shared area (plexus-utils?)
     private static final String[] DEFAULT_EXCLUDES = new String[]{
         // Miscellaneous typical temporary files
         "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
@@ -100,6 +100,9 @@ public class DoxiaMojo
 
         // Subversion
         "**/.svn", "**/.svn/**",
+
+        // Arch/Bazaar
+        "**/.arch-ids", "**/.arch-ids/**",
 
         // Mac
         "**/.DS_Store"};
@@ -484,10 +487,9 @@ public class DoxiaMojo
             {
                 if ( !Arrays.asList( Locale.getAvailableLocales() ).contains( locale ) )
                 {
-                    getLog().warn( "The locale parsed defined by '" + locale
-                                       + "' is not available in this Java Virtual Machine ("
-                                       + System.getProperty( "java.version" ) + " from "
-                                       + System.getProperty( "java.vendor" ) + ") - IGNORING" );
+                    getLog().warn( "The locale parsed defined by '" + locale +
+                        "' is not available in this Java Virtual Machine (" + System.getProperty( "java.version" ) +
+                        " from " + System.getProperty( "java.vendor" ) + ") - IGNORING" );
                     continue;
                 }
 
@@ -1151,7 +1153,7 @@ public class DoxiaMojo
                 continue;
             }
 
-            if ( currentFile.lastIndexOf( "." ) == -1 )
+            if ( currentFile.lastIndexOf( "." ) == -1 || currentFile.startsWith( "." ) )
             {
                 // ignore files without extension
                 continue;
@@ -1249,9 +1251,9 @@ public class DoxiaMojo
      * <p>If localeCode = <code>default</code>, return the current value of the default locale for this instance
      * of the Java Virtual Machine.</p>
      *
-     * @see <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Locale.html">java.util.Locale#getDefault()</a>
      * @param localeCode the locale code string.
      * @return a java.util.Locale object instancied or null if errors occurred
+     * @see <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Locale.html">java.util.Locale#getDefault()</a>
      */
     private Locale codeToLocale( final String localeCode )
     {
