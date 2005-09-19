@@ -28,4 +28,16 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>env-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>test</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
+
 </project>
