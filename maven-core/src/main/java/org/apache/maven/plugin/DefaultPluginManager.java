@@ -352,8 +352,13 @@ public class DefaultPluginManager
 
         dispatcher.dispatchStart( event, goalExecId );
 
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+
         try
         {
+            Thread.currentThread().setContextClassLoader(
+                mojoDescriptor.getPluginDescriptor().getClassRealm().getClassLoader() );
+
             plugin.execute();
 
             dispatcher.dispatchEnd( event, goalExecId );
@@ -366,6 +371,9 @@ public class DefaultPluginManager
         }
         finally
         {
+
+            Thread.currentThread().setContextClassLoader( oldClassLoader );
+
             try
             {
                 PlexusContainer pluginContainer = getPluginContainer( mojoDescriptor.getPluginDescriptor() );

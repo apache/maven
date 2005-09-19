@@ -302,4 +302,10 @@ public class PluginDescriptor
     {
         this.classRealm = classRealm;
     }
+
+    public ClassRealm getClassRealm()
+    {
+        return classRealm;
+    }
+
 }
