@@ -46,6 +46,11 @@ public class ProjectArtifactMetadata
 {
     private final File file;
 
+    public ProjectArtifactMetadata( Artifact artifact )
+    {
+        this( artifact, null );
+    }
+
     public ProjectArtifactMetadata( Artifact artifact, File file )
     {
         super( artifact );
