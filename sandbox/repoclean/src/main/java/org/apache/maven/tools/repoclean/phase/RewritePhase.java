@@ -18,12 +18,15 @@ package org.apache.maven.tools.repoclean.phase;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
-import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.tools.repoclean.RepositoryCleanerConfiguration;
-import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
 import org.apache.maven.tools.repoclean.digest.DigestException;
 import org.apache.maven.tools.repoclean.digest.DigestVerifier;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
@@ -40,6 +43,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -51,7 +55,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -208,27 +214,25 @@ public class RewritePhase
                                   Reporter artifactReporter, boolean reportOnly )
         throws Exception
     {
-        // SNAPSHOT metadata
-        ArtifactMetadata snapshot = new SnapshotArtifactMetadata( artifact );
+        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact );
 
-        File snapshotSource = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( snapshot ) );
-        File snapshotTarget = new File( targetBase, targetRepo.pathOfArtifactMetadata( snapshot ) );
+        File metadataSource = new File( sourceBase, sourceRepo.pathOfRemoteRepositoryMetadata( metadata ) );
+        File metadataTarget = new File( targetBase, targetRepo.pathOfRemoteRepositoryMetadata( metadata ) );
 
-        freshenSupplementalMetadata( snapshotSource, snapshotTarget, transaction, artifactReporter, reportOnly );
+        mergeMetadata( metadataSource, metadataTarget, transaction, artifactReporter, reportOnly );
 
-        // RELEASE metadata
-        ArtifactMetadata release = new ReleaseArtifactMetadata( artifact );
+        metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
-        File releaseSource = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( release ) );
-        File releaseTarget = new File( targetBase, targetRepo.pathOfArtifactMetadata( release ) );
+        metadataSource = new File( sourceBase, sourceRepo.pathOfRemoteRepositoryMetadata( metadata ) );
+        metadataTarget = new File( targetBase, targetRepo.pathOfRemoteRepositoryMetadata( metadata ) );
 
-        freshenSupplementalMetadata( releaseSource, releaseTarget, transaction, artifactReporter, reportOnly );
+        mergeMetadata( metadataSource, metadataTarget, transaction, artifactReporter, reportOnly );
 
         // The rest is for POM metadata - translation and bridging of locations in the target repo may be required.
-        ArtifactMetadata pom = new ProjectMetadata( artifact );
+        ArtifactMetadata pom = new ProjectArtifactMetadata( artifact, null );
 
-        File sourcePom = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( pom ) );
-        File targetPom = new File( targetBase, targetRepo.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
+        File sourcePom = new File( sourceBase, sourceRepo.pathOfRemoteRepositoryMetadata( pom ) );
+        File targetPom = new File( targetBase, targetRepo.pathOfRemoteRepositoryMetadata( pom ).replace( '+', '-' ) );
 
         String pomContents = null;
 
@@ -242,7 +246,7 @@ public class RewritePhase
             {
                 shouldRewritePom = false;
 
-                freshenSupplementalMetadata( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
+                copyMetadata( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
             }
         }
         else if ( targetPom.exists() )
@@ -268,7 +272,7 @@ public class RewritePhase
                 transaction.addFile( targetPom );
 
                 bridgedTargetPom = new File( targetBase,
-                                             bridgingLayout.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
+                                             bridgingLayout.pathOfRemoteRepositoryMetadata( pom ).replace( '+', '-' ) );
 
                 transaction.addFile( bridgedTargetPom );
 
@@ -322,8 +326,78 @@ public class RewritePhase
         }
     }
 
-    private void freshenSupplementalMetadata( File source, File target, RewriteTransaction transaction,
-                                              Reporter artifactReporter, boolean reportOnly )
+    private void mergeMetadata( File source, File target, RewriteTransaction transaction, Reporter artifactReporter,
+                                boolean reportOnly )
+        throws IOException, DigestException, ReportWriteException, XmlPullParserException
+    {
+        if ( source.exists() )
+        {
+            if ( !target.exists() )
+            {
+                copyMetadata( source, target, transaction, artifactReporter, reportOnly );
+            }
+            else
+            {
+                MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+                Metadata sourceMetadata = null;
+
+                Reader reader = null;
+
+                try
+                {
+                    reader = new FileReader( source );
+
+                    sourceMetadata = mappingReader.read( reader );
+                }
+                finally
+                {
+                    IOUtil.close( reader );
+                    reader = null;
+                }
+
+                Metadata targetMetadata = null;
+
+                try
+                {
+                    reader = new FileReader( target );
+
+                    targetMetadata = mappingReader.read( reader );
+                }
+                finally
+                {
+                    IOUtil.close( reader );
+                }
+
+                boolean changed = false;
+
+                changed |= targetMetadata.merge( sourceMetadata );
+
+                if ( changed )
+                {
+                    Writer writer = null;
+                    try
+                    {
+                        target.getParentFile().mkdirs();
+                        writer = new FileWriter( target );
+
+                        MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
+
+                        mappingWriter.write( writer, targetMetadata );
+                    }
+                    finally
+                    {
+                        IOUtil.close( writer );
+                    }
+                }
+
+                digestVerifier.verifyDigest( source, target, transaction, artifactReporter, reportOnly );
+            }
+        }
+    }
+
+    private void copyMetadata( File source, File target, RewriteTransaction transaction, Reporter artifactReporter,
+                               boolean reportOnly )
         throws IOException, DigestException, ReportWriteException
     {
         if ( source.exists() )
@@ -428,7 +502,7 @@ public class RewritePhase
             return false;
         }
 
-        freshenSupplementalMetadata( targetPom, bridgedTargetPom, transaction, reporter, reportOnly );
+        copyMetadata( targetPom, bridgedTargetPom, transaction, reporter, reportOnly );
 
         return true;
     }
