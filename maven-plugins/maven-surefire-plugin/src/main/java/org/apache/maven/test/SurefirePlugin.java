@@ -37,7 +37,7 @@ import java.util.StringTokenizer;
  * @requiresDependencyResolution test
  * @goal test
  * @phase test
- * @description Run tests using surefire
+ * @description Run tests using Surefire
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable
  */
@@ -45,36 +45,46 @@ public class SurefirePlugin
     extends AbstractMojo
 {
     /**
-     *  Set this to 'true' to bypass unit tests entirely. Its use is NOT RECOMMENDED, but quite convenient on occasion.
+     * Set this to 'true' to bypass unit tests entirely. Its use is NOT RECOMMENDED, but quite convenient on occasion.
      *
      * @parameter expression="${maven.test.skip}"
      */
     private boolean skip;
 
     /**
+     * Set this to true to ignore a failure during testing. Its use is NOT RECOMMENDED, but quite convenient on occasion.
+     *
      * @parameter expression="${maven.test.failure.ignore}"
      */
     private boolean testFailureIgnore;
 
     /**
+     * The base directory of the project being tested. This can be obtained in your unit test by System.getProperty("basedir").
+     *
      * @parameter expression="${basedir}"
      * @required
      */
     private String basedir;
 
     /**
+     * The directory containing generated classes of the project being tested.
+     *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
     private File classesDirectory;
 
     /**
+     * The directory containing generated test classes of the project being tested.
+     *
      * @parameter expression="${project.build.testOutputDirectory}"
      * @required
      */
     private File testClassesDirectory;
 
     /**
+     * The classpath elements of the project being tested.
+     *
      * @parameter expression="${project.testClasspathElements}"
      * @required
      * @readonly
@@ -96,16 +106,22 @@ public class SurefirePlugin
     private String test;
 
     /**
+     * List of patterns (separated by commas) used to specify the tests that should be included in testing.
+     *
      * @parameter
      */
     private List includes;
 
     /**
+     * List of patterns (separated by commas) used to specify the tests that should be excluded in testing.
+     *
      * @parameter
      */
     private List excludes;
 
     /**
+     * ArtifactRepository of the localRepository. To obtain the directory of localRepository in unit tests use System.setProperty( "localRepository").
+     *
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -120,6 +136,8 @@ public class SurefirePlugin
     private Properties systemProperties;
 
     /**
+     * List of of Plugin Artifacts.
+     *
      * @parameter expression="${plugin.artifacts}"
      */
     private List pluginArtifacts;
@@ -222,6 +240,9 @@ public class SurefirePlugin
         surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
 
         surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
+
+        surefireBooter.addReport( "org.codehaus.surefire.report.XMLReporter");
+
 
         boolean success;
         try
