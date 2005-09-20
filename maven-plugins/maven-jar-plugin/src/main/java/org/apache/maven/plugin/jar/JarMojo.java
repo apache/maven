@@ -25,6 +25,8 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 
 /**
+ * Build a JAR from the current project.
+ *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  * @goal jar
@@ -34,27 +36,33 @@ import java.io.File;
 public class JarMojo
     extends AbstractMojo
 {
-    
+
     private static final String[] DEFAULT_EXCLUDES = new String[]{"**/package.html"};
 
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
     /**
-     * @todo Change type to File
-     * 
+	 * Directory containing the generated JAR.
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
+     *
+     * @todo Change type to File
      */
     private String basedir;
 
     /**
+	 * Name of the generated JAR.
+	 *
      * @parameter alias="jarName" expression="${project.build.finalName}"
      * @required
      */
     private String finalName;
 
     /**
+	 * Directory containing the classes.
+	 *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
@@ -62,6 +70,8 @@ public class JarMojo
     private String outputDirectory;
 
     /**
+	 * The maven project.
+	 *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -69,11 +79,15 @@ public class JarMojo
     private MavenProject project;
 
     /**
+     * The maven archiver to use.
+     *
      * @parameter
      */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
+	 * Generates the JAR.
+     *
      * @todo Add license files in META-INF directory.
      */
     public void execute()
@@ -107,5 +121,4 @@ public class JarMojo
             throw new MojoExecutionException( "Error assembling JAR", e );
         }
     }
-
 }

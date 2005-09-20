@@ -1,0 +1,20 @@
+ ------
+ Maven 2 JAR Plugin
+ ------
+
+Maven 2 JAR Plugin
+
+ Builds your project into a jar
+ 
+*How to Use
+
+  If the packaging of your project is set to 'jar', this plugin is executed
+  whenever it passes the "package" phase. Have it executed
+  using the command below from your project:
+
+-------------------
+  m2 package
+-------------------
+
+  From your project's target directory you'll able to see the generated jar file.
+
