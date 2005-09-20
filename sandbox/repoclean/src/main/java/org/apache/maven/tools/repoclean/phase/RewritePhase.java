@@ -456,9 +456,10 @@ public class RewritePhase
                                boolean reportOnly )
         throws IOException, DigestException, ReportWriteException
     {
-        if ( source.exists() )
+        if ( source.exists() && !source.getCanonicalFile().equals( target.getCanonicalFile() ) )
         {
             File targetParent = target.getParentFile();
+
             if ( !targetParent.exists() )
             {
                 targetParent.mkdirs();
@@ -515,6 +516,11 @@ public class RewritePhase
         throws IOException
     {
         File artifactSource = artifact.getFile();
+
+        if ( artifactSource.getCanonicalFile().equals( artifactTarget.getCanonicalFile() ) )
+        {
+            return;
+        }
 
         InputStream inStream = null;
         OutputStream outStream = null;

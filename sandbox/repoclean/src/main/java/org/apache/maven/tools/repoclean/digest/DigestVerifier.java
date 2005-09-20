@@ -83,7 +83,15 @@ public class DigestVerifier
                 {
                     try
                     {
-                        FileUtils.copyFile( digestSourceFile, digestTargetFile );
+                        if ( digestTargetFile == null )
+                        {
+                            reporter.error( "No target digest file for path [" + artifactSource +
+                                "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'." );
+                        }
+                        else if ( !digestSourceFile.getCanonicalFile().equals( digestTargetFile.getCanonicalFile() ) )
+                        {
+                            FileUtils.copyFile( digestSourceFile, digestTargetFile );
+                        }
                     }
                     catch ( IOException e )
                     {

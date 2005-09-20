@@ -70,7 +70,7 @@ public class DefaultArtifactDiscoverer
         Artifact result;
 
         List pathParts = new ArrayList();
-        StringTokenizer st = new StringTokenizer( path, "/" );
+        StringTokenizer st = new StringTokenizer( path, "/\\" );
         while ( st.hasMoreTokens() )
         {
             pathParts.add( st.nextToken() );
@@ -80,7 +80,7 @@ public class DefaultArtifactDiscoverer
 
         if ( pathParts.size() < 4 )
         {
-            reporter.error( "Not enough parts (4) in path " + path );
+            reporter.error( "Not enough parts (" + pathParts.size() + "/4) in path " + path );
             return null;
         }
 
