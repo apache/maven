@@ -253,7 +253,7 @@ public class PrepareReleaseMojo
                 }
             }
 
-//            removeReleasePoms();
+            removeReleasePoms();
 
             checkInNextSnapshot();
 
