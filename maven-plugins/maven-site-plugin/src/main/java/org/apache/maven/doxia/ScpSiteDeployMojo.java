@@ -1,7 +1,20 @@
-/*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
- */
 package org.apache.maven.doxia;
+
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.model.DistributionManagement;
@@ -23,13 +36,13 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-
 /**
  * Deploys website using scp protocol.
  * First website files are packaged into zip archive,
  * then archive is transfred to remote host, nextly it is un-archived.
  * This method of deployment should normally be much faster
  * then making file by file copy.
+ *
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
  * @version $Id$
  * @goal deploy
@@ -41,13 +54,7 @@ public class ScpSiteDeployMojo
      * @parameter alias="siteDirectory" expression="${project.build.directory}/site"
      * @required
      */
-    private String inputDirectory;
-
-    /**
-     * @parameter expression="${project.build.directory}"
-     * @required
-     */
-    private String workingDirectory;
+    private File inputDirectory;
 
     /**
      * @parameter
@@ -71,61 +78,67 @@ public class ScpSiteDeployMojo
     public void execute()
         throws MojoExecutionException
     {
-        File baseDir = new File( inputDirectory );
+        if ( !inputDirectory.exists() )
+        {
+            throw new MojoExecutionException( "The site does not exist, please run site:site first" );
+        }
 
         File zipFile;
 
         try
         {
-            zipFile = File.createTempFile( "site", ".zip", new File( workingDirectory ) );
+            zipFile = File.createTempFile( "site", ".zip" );
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Cannot create site archive!", e );
         }
 
+        DistributionManagement distributionManagement = project.getDistributionManagement();
+
+        if ( distributionManagement == null )
+        {
+            throw new MojoExecutionException( "Missing distribution management information in the project" );
+        }
+
+        Site site = distributionManagement.getSite();
+
+        if ( site == null )
+        {
+            throw new MojoExecutionException(
+                "Missing site information in the distribution management element in the project.." );
+        }
+
+        String url = site.getUrl();
+
+        String id = site.getId();
+
+        if ( url == null )
+        {
+            throw new MojoExecutionException( "The URL to the site is missing in the project descriptor." );
+        }
+
+        Repository repository = new Repository( id, url );
+
+        if ( !"scp".equals( repository.getProtocol() ) )
+        {
+            throw new MojoExecutionException(
+                "The deploy mojo currently only supports site deployment using the 'scp' protocol." );
+        }
+
         SshCommandExecutor commandExecutor = null;
+
         try
         {
-            DistributionManagement distributionManagement = project.getDistributionManagement();
-
-            if ( distributionManagement == null )
-            {
-                throw new MojoExecutionException( "Missing distribution management information in the project" );
-            }
-
-            Site site = distributionManagement.getSite();
-
-            if ( site == null )
-            {
-                throw new MojoExecutionException( "Missing site information in the distribution management element in the project.." );
-            }
-
-            String url = site.getUrl();
-
-            String id = site.getId();
-
-            if ( url == null )
-            {
-                throw new MojoExecutionException( "The URL to the site is missing in the project descriptor." );
-            }
-
-            Repository repository = new Repository( id, url );
-
-            if ( !"scp".equals( repository.getProtocol() ) )
-            {
-                throw new MojoExecutionException( "The deploy mojo currently only supports site deployment using the 'scp' protocol." );
-            }
-
             commandExecutor = (SshCommandExecutor) wagonManager.getWagon( "scp" );
 
             commandExecutor.connect( repository, wagonManager.getAuthenticationInfo( id ) );
 
             String basedir = repository.getBasedir();
 
-            List files = FileUtils.getFileNames( baseDir, "**/**", "", false );
+            List files = FileUtils.getFileNames( inputDirectory, "**/**", "", false );
 
-            createZip( files, zipFile, baseDir );
+            createZip( files, zipFile, inputDirectory );
 
             Debug debug = new Debug();
 
@@ -171,7 +184,6 @@ public class ScpSiteDeployMojo
 
             if ( !zipFile.delete() )
             {
-
                 zipFile.deleteOnExit();
             }
         }
