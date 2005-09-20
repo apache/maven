@@ -17,6 +17,7 @@ package org.apache.maven.tools.repoclean.discover;
  */
 
 import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 
 import java.io.File;
@@ -35,6 +36,6 @@ public interface ArtifactDiscoverer
 
     List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
                             PathLister excludeLister, PathLister kickoutLister, boolean includeSnapshots )
-        throws Exception;
+        throws ReportWriteException;
 
 }

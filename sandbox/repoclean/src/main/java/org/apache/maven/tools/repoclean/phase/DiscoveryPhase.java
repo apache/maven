@@ -19,6 +19,7 @@ package org.apache.maven.tools.repoclean.phase;
 import org.apache.maven.tools.repoclean.RepositoryCleanerConfiguration;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
 import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -54,8 +55,8 @@ public class DiscoveryPhase
 
         try
         {
-            artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE, configuration
-                .getSourceRepositoryLayout() );
+            artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE,
+                                                                        configuration.getSourceRepositoryLayout() );
 
             if ( logger.isDebugEnabled() )
             {
@@ -74,7 +75,7 @@ public class DiscoveryPhase
                                                                   configuration.getBlacklistedPatterns(), excludeLister,
                                                                   kickoutLister, configuration.isConvertSnapshots() );
             }
-            catch ( Exception e )
+            catch ( ReportWriteException e )
             {
                 repoReporter.error( "Error discovering artifacts in source repository.", e );
 

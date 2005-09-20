@@ -19,6 +19,7 @@ package org.apache.maven.tools.repoclean.discover;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class DefaultArtifactDiscoverer
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
                                    PathLister excludeLister, PathLister kickoutLister, boolean convertSnapshots )
-        throws Exception
+        throws ReportWriteException
     {
         List artifacts = new ArrayList();
 
@@ -49,7 +50,7 @@ public class DefaultArtifactDiscoverer
         {
             String path = artifactPaths[i];
 
-            Artifact artifact = buildArtifact( path );
+            Artifact artifact = buildArtifact( path, reporter );
 
             if ( artifact != null )
             {
@@ -63,8 +64,8 @@ public class DefaultArtifactDiscoverer
         return artifacts;
     }
 
-    private Artifact buildArtifact( String path )
-        throws Exception
+    private Artifact buildArtifact( String path, Reporter reporter )
+        throws ReportWriteException
     {
         Artifact result;
 
@@ -77,7 +78,11 @@ public class DefaultArtifactDiscoverer
 
         Collections.reverse( pathParts );
 
-        int currentPart = 0;
+        if ( pathParts.size() < 4 )
+        {
+            reporter.error( "Not enough parts (4) in path " + path );
+            return null;
+        }
 
         //discard the actual artifact filename.
         pathParts.remove( 0 );
