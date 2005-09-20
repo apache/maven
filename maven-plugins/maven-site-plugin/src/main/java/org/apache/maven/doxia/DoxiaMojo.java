@@ -36,7 +36,6 @@ import org.codehaus.plexus.siterenderer.sink.SiteRendererSink;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -52,6 +51,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -201,14 +201,6 @@ public class DoxiaMojo
      */
     private MavenSession session;
 
-    private List projectInfos = new ArrayList();
-
-    private List projectReports = new ArrayList();
-
-    private Locale defaultLocale = Locale.ENGLISH;
-
-    private List localesList = new ArrayList();
-
     /**
      * @see org.apache.maven.plugin.Mojo#execute()
      */
@@ -256,30 +248,39 @@ public class DoxiaMojo
 
         try
         {
-            categorizeReports( reports );
+            List localesList = initLocalesList();
+            if ( localesList.isEmpty() )
+            {
+                localesList = Collections.singletonList( Locale.ENGLISH );
+            }
 
-            initLocalesList();
-
+            // Default is first in the list
+            Locale defaultLocale = (Locale) localesList.get( 0 );
             Locale.setDefault( defaultLocale );
+
+            List projectInfos = new ArrayList();
+            List projectReports = new ArrayList();
+            categorizeReports( reports, defaultLocale, projectInfos, projectReports );
 
             for ( Iterator iterator = localesList.iterator(); iterator.hasNext(); )
             {
                 Locale locale = (Locale) iterator.next();
 
-                File localeOutputDirectory = getOuputDirectory( locale );
+                String siteDescriptor = getSiteDescriptor( reports, locale, projectInfos, projectReports );
+
+                File outputDirectory = getOutputDirectory( locale, defaultLocale );
 
                 // Safety
-                if ( !localeOutputDirectory.exists() )
+                if ( !outputDirectory.exists() )
                 {
-                    localeOutputDirectory.mkdirs();
+                    outputDirectory.mkdirs();
                 }
 
                 // Handle the GeneratedSite Directory
                 File generatedSiteFile = new File( generatedSiteDirectory );
                 if ( generatedSiteFile.exists() )
                 {
-                    InputStream siteDescriptor = getSiteDescriptor( reports, locale );
-                    siteRenderer.render( generatedSiteFile, localeOutputDirectory, siteDescriptor, template, attributes,
+                    siteRenderer.render( generatedSiteFile, outputDirectory, siteDescriptor, template, attributes,
                                          locale );
                 }
 
@@ -311,52 +312,30 @@ public class DoxiaMojo
                 //Generate reports
                 if ( reports != null )
                 {
-                    try
-                    {
-                        generateReportsPages( reports, locale, localeOutputDirectory );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new MojoExecutionException( "An error is occurred in reports pages generation.", e );
-                    }
+                    generateReportsPages( reports, locale, outputDirectory, defaultLocale, siteDescriptor );
                 }
 
                 //Generate overview pages
                 if ( projectInfos.size() > 0 )
                 {
-                    try
-                    {
-                        generateProjectInfoPage( getSiteDescriptor( reports, locale ), locale );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new MojoExecutionException( "An error is occurred in project info page generation.", e );
-                    }
+                    generateProjectInfoPage( siteDescriptor, locale, projectInfos, outputDirectory );
                 }
 
                 if ( projectReports.size() > 0 )
                 {
-                    try
-                    {
-                        generateProjectReportsPage( getSiteDescriptor( reports, locale ), locale );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new MojoExecutionException( "An error is occurred in project reports page generation.",
-                                                          e );
-                    }
+                    generateProjectReportsPage( siteDescriptor, locale, projectReports, outputDirectory );
                 }
 
                 // Try to generate the index.html
+                String displayLanguage = locale.getDisplayLanguage( Locale.ENGLISH );
                 if ( duplicate.get( "index" ) != null )
                 {
-                    getLog().info( "Ignoring the index file generation for the \"" + getDisplayLanguage( locale ) +
-                        "\" version." );
+                    getLog().info( "Ignoring the index file generation for the " + displayLanguage + " version." );
                 }
                 else
                 {
-                    getLog().info( "Generate an index file for the \"" + getDisplayLanguage( locale ) + "\" version." );
-                    generateIndexPage( getSiteDescriptor( reports, locale ), locale );
+                    getLog().info( "Generate an index file for the " + displayLanguage + " version." );
+                    generateIndexPage( siteDescriptor, locale, outputDirectory );
                 }
 
                 // Log if a user override a report file
@@ -366,13 +345,12 @@ public class DoxiaMojo
 
                     if ( duplicate.get( reportFileName ) != null )
                     {
-                        getLog().info( "Override the generated file \"" + reportFileName + "\" for the \"" +
-                            getDisplayLanguage( locale ) + "\" version." );
+                        getLog().info( "Override the generated file \"" + reportFileName + "\" for the " +
+                            displayLanguage + " version." );
                     }
                 }
 
-                siteRenderer.render( siteDirectoryFile, localeOutputDirectory, getSiteDescriptor( reports, locale ),
-                                     template, attributes, locale );
+                siteRenderer.render( siteDirectoryFile, outputDirectory, siteDescriptor, template, attributes, locale );
 
                 File cssDirectory = new File( siteDirectory, "css" );
                 File imagesDirectory = new File( siteDirectory, "images" );
@@ -382,17 +360,17 @@ public class DoxiaMojo
                 {
                     getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
 
-                    copyDirectory( cssDirectory, new File( localeOutputDirectory, "css" ) );
+                    copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
 
-                    copyDirectory( imagesDirectory, new File( localeOutputDirectory, "images" ) );
+                    copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
                 }
 
-                copyResources( localeOutputDirectory );
+                copyResources( outputDirectory );
 
                 // Copy site resources
                 if ( resourcesDirectory != null && resourcesDirectory.exists() )
                 {
-                    copyDirectory( resourcesDirectory, localeOutputDirectory );
+                    copyDirectory( resourcesDirectory, outputDirectory );
                 }
 
                 // Copy the generated site in parent site if needed to provide module links
@@ -434,13 +412,13 @@ public class DoxiaMojo
         {
             throw new MojoExecutionException( "Error during page generation", e );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             throw new MojoExecutionException( "Error during site generation", e );
         }
     }
 
-    private void categorizeReports( List reports )
+    private void categorizeReports( List reports, Locale defaultLocale, List projectInfos, List projectReports )
         throws MojoExecutionException
     {
         for ( Iterator i = reports.iterator(); i.hasNext(); )
@@ -467,18 +445,15 @@ public class DoxiaMojo
      * <p>If <code>locales</code> variable is available, the first valid token will be the <code>defaultLocale</code>
      * for this instance of the Java Virtual Machine.</p>
      */
-    private void initLocalesList()
+    private List initLocalesList()
     {
         if ( locales == null )
         {
-            localesList.add( defaultLocale );
-
-            return;
+            return Collections.EMPTY_LIST;
         }
-
         String[] localesArray = StringUtils.split( locales, "," );
 
-        boolean defaultLocaleWasSet = false;
+        List localesList = new ArrayList();
         for ( int i = 0; i < localesArray.length; i++ )
         {
             Locale locale = codeToLocale( localesArray[i] );
@@ -513,17 +488,12 @@ public class DoxiaMojo
                 }
 
                 localesList.add( locale );
-
-                if ( !defaultLocaleWasSet )
-                {
-                    defaultLocale = locale;
-                    defaultLocaleWasSet = true;
-                }
             }
         }
+        return localesList;
     }
 
-    private String getReportsMenu( Locale locale )
+    private String getReportsMenu( Locale locale, List projectInfos, List projectReports )
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"" );
@@ -627,10 +597,9 @@ public class DoxiaMojo
      * @param reports a list of reports
      * @param locale the current locale
      * @return the inpustream
-     * @throws MojoExecutionException is any
-     * @todo should only be needed once
+     * @throws org.apache.maven.plugin.MojoExecutionException is any
      */
-    private InputStream getSiteDescriptor( List reports, Locale locale )
+    private String getSiteDescriptor( List reports, Locale locale, List projectInfos, List projectReports )
         throws MojoExecutionException
     {
         File siteDescriptor = new File( siteDirectory, "site_" + locale.getLanguage() + ".xml" );
@@ -668,7 +637,7 @@ public class DoxiaMojo
 
         if ( reports != null )
         {
-            props.put( "reports", getReportsMenu( locale ) );
+            props.put( "reports", getReportsMenu( locale, projectInfos, projectReports ) );
         }
 
         if ( project.getParent() != null )
@@ -708,7 +677,7 @@ public class DoxiaMojo
 
         siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
 
-        return new StringInputStream( siteDescriptorContent );
+        return siteDescriptorContent;
     }
 
     /**
@@ -716,10 +685,10 @@ public class DoxiaMojo
      *
      * @param siteDescriptor
      * @param locale
-     * @throws Exception
+     * @param outputDirectory
      */
-    private void generateIndexPage( InputStream siteDescriptor, Locale locale )
-        throws Exception
+    private void generateIndexPage( String siteDescriptor, Locale locale, File outputDirectory )
+        throws RendererException, IOException
     {
         String outputFileName = "index.html";
 
@@ -757,7 +726,7 @@ public class DoxiaMojo
 
         sink.close();
 
-        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+        File outputFile = new File( outputDirectory, outputFileName );
 
         siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ), outputEncoding ),
                                        template, attributes, sink, locale );
@@ -771,10 +740,10 @@ public class DoxiaMojo
      * @param reports
      * @param locale
      * @param localeOutputDirectory
-     * @throws Exception
      */
-    private void generateReportsPages( List reports, Locale locale, File localeOutputDirectory )
-        throws Exception
+    private void generateReportsPages( List reports, Locale locale, File localeOutputDirectory, Locale defaultLocale,
+                                       String siteDescriptor )
+        throws RendererException, IOException, MavenReportException
     {
         for ( Iterator j = reports.iterator(); j.hasNext(); )
         {
@@ -798,7 +767,7 @@ public class DoxiaMojo
             String outputFileName = reportFileName + ".html";
 
             SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                             getSiteDescriptor( reports, locale ) );
+                                                             siteDescriptor );
 
             report.generate( sink, locale );
 
@@ -818,8 +787,9 @@ public class DoxiaMojo
         }
     }
 
-    private void generateProjectInfoPage( InputStream siteDescriptor, Locale locale )
-        throws Exception
+    private void generateProjectInfoPage( String siteDescriptor, Locale locale, List projectInfos,
+                                          File outputDirectory )
+        throws RendererException, IOException
     {
         String outputFileName = "project-info.html";
 
@@ -892,14 +862,15 @@ public class DoxiaMojo
 
         sink.close();
 
-        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+        File outputFile = new File( outputDirectory, outputFileName );
 
         siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ), outputEncoding ),
                                        template, attributes, sink, locale );
     }
 
-    private void generateProjectReportsPage( InputStream siteDescriptor, Locale locale )
-        throws Exception
+    private void generateProjectReportsPage( String siteDescriptor, Locale locale, List projectReports,
+                                             File outputDirectory )
+        throws RendererException, IOException
     {
         String outputFileName = "maven-reports.html";
 
@@ -968,14 +939,14 @@ public class DoxiaMojo
 
         sink.body_();
 
-        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+        File outputFile = new File( outputDirectory, outputFileName );
 
         siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ), outputEncoding ),
                                        template, attributes, sink, locale );
     }
 
     private void copyResources( File outputDir )
-        throws Exception
+        throws IOException
     {
         InputStream resourceList = getStream( RESOURCE_DIR + "/resources.txt" );
 
@@ -983,9 +954,9 @@ public class DoxiaMojo
         {
             LineNumberReader reader = new LineNumberReader( new InputStreamReader( resourceList ) );
 
-            String line;
+            String line = reader.readLine();
 
-            while ( ( line = reader.readLine() ) != null )
+            while ( line != null )
             {
                 InputStream is = getStream( RESOURCE_DIR + "/" + line );
 
@@ -1009,12 +980,13 @@ public class DoxiaMojo
                 IOUtil.close( is );
 
                 IOUtil.close( w );
+
+                line = reader.readLine();
             }
         }
     }
 
     private InputStream getStream( String name )
-        throws Exception
     {
         return DoxiaMojo.class.getClassLoader().getResourceAsStream( name );
     }
@@ -1051,13 +1023,8 @@ public class DoxiaMojo
         }
     }
 
-    private File getOuputDirectory( Locale locale )
+    private File getOutputDirectory( Locale locale, Locale defaultLocale )
     {
-        if ( localesList.size() == 1 )
-        {
-            return new File( outputDirectory );
-        }
-
         if ( locale.getLanguage().equals( defaultLocale.getLanguage() ) )
         {
             return new File( outputDirectory );
@@ -1197,8 +1164,9 @@ public class DoxiaMojo
                         sb = new StringBuffer(
                             "Some files are duplicates in the site directory or in the generated-site directory. " );
                         sb.append( "\n" );
-                        sb.append(
-                            "Review the following files for the \"" + getDisplayLanguage( locale ) + "\" version:" );
+                        sb.append( "Review the following files for the \"" );
+                        sb.append( locale.getDisplayLanguage( Locale.ENGLISH ) );
+                        sb.append( "\" version:" );
                     }
 
                     sb.append( "\n" );
@@ -1230,22 +1198,6 @@ public class DoxiaMojo
     }
 
     /**
-     * Return the <code>display language</code> for the given locale or "Default"
-     *
-     * @param locale
-     * @return the display language in English or "Default" if the locale is the same of the default locale
-     */
-    private String getDisplayLanguage( Locale locale )
-    {
-        if ( !locale.getLanguage().equals( defaultLocale.getLanguage() ) )
-        {
-            return locale.getDisplayLanguage( Locale.ENGLISH );
-        }
-
-        return "Default";
-    }
-
-    /**
      * Converts a locale code like "en", "en_US" or "en_US_win" to a <code>java.util.Locale</code>
      * object.
      * <p>If localeCode = <code>default</code>, return the current value of the default locale for this instance
@@ -1255,14 +1207,14 @@ public class DoxiaMojo
      * @return a java.util.Locale object instancied or null if errors occurred
      * @see <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Locale.html">java.util.Locale#getDefault()</a>
      */
-    private Locale codeToLocale( final String localeCode )
+    private Locale codeToLocale( String localeCode )
     {
         if ( localeCode == null )
         {
             return null;
         }
 
-        if ( localeCode.equalsIgnoreCase( "default" ) )
+        if ( "default".equalsIgnoreCase( localeCode ) )
         {
             return Locale.getDefault();
         }
