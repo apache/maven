@@ -22,6 +22,11 @@ if [ "$1" == "profile" ]; then
   shift
 fi
 
+if [ "$1" == "debug" ]; then
+  JAVA_OPTS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+  shift
+fi
+
 if [ -z "$JAVA_HOME" ]; then
   JAVA_HOME=/usr/local/java
 fi
