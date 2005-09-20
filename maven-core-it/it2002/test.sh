@@ -18,11 +18,7 @@ cd project.checkout
 
 rm -Rf target
 
-#. ~/shell-switches/m2-debug-on
-#echo "Enabling debugging options. Please attach the debugger."
+m2 -e release:prepare -Denv=test
 
-export MAVEN_OPTS=
-m2 -e release:prepare
-
-m2 -e release:perform
+m2 -e release:perform -Denv=test
 

@@ -16,9 +16,11 @@ package org.apache.maven.plugins.release;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
 import org.apache.maven.plugins.release.helpers.ScmHelper;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -26,6 +28,8 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Perform a release from SCM
@@ -55,7 +59,14 @@ public class PerformReleaseMojo
      * @required
      */
     protected String workingDirectory;
-
+    
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    protected MavenProject project;
+    
     private ReleaseProgressTracker releaseProgress;
 
     protected void executeTask()
@@ -103,6 +114,26 @@ public class PerformReleaseMojo
         cl.createArgument().setLine( "--no-plugin-updates" );
 
         cl.createArgument().setLine( "--batch-mode" );
+        
+        List profiles = project.getActiveProfiles();
+        
+        if ( profiles != null && !profiles.isEmpty() )
+        {
+            StringBuffer buffer = new StringBuffer();
+            
+            buffer.append( "-P " );
+            
+            for ( Iterator it = profiles.iterator(); it.hasNext(); )
+            {
+                Profile profile = (Profile) it.next();
+                
+                buffer.append( profile.getId() ).append( "," );
+            }
+            
+            buffer.setLength( buffer.length() - 1 );
+            
+            cl.createArgument().setLine( buffer.toString() );
+        }
         
         StreamConsumer consumer = new DefaultConsumer();
 

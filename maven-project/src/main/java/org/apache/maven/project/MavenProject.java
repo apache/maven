@@ -1129,6 +1129,7 @@ public class MavenProject
         if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
         {
             build.addPlugin( plugin );
+            build.flushPluginMap();
         }
     }
 

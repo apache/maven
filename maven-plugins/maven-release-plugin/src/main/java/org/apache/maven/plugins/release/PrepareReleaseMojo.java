@@ -836,6 +836,12 @@ public class PrepareReleaseMojo
                 Model releaseModel = releaseProject.getModel();
                 fixNullValueInModel( releaseModel, project.getModel() );
                 
+                // the release POM should reflect bits of these which were injected at build time...
+                // we don't need these polluting the POM.
+                releaseModel.setProfiles( Collections.EMPTY_LIST );
+                releaseModel.setDependencyManagement( null );
+                releaseModel.getBuild().setPluginManagement( null );
+                
                 String projectVersion = releaseModel.getVersion();
                 if ( ArtifactUtils.isSnapshot( projectVersion ) )
                 {

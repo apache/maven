@@ -53,9 +53,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0-beta-1</version>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
@@ -64,9 +63,40 @@
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.0-alpha-1</version>
+        <version>2.0-beta-1</version>
       </plugin>
     </plugins>
   </reporting>
+
+  <profiles>
+    <profile>
+      <id>env-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>test</value>
+        </property>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
+          <version>2.0-beta-1</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact-manager</artifactId>
+          <version>2.0-beta-1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <directory>alt-target</directory>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

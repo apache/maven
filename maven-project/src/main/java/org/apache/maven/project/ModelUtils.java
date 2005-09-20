@@ -19,7 +19,6 @@ package org.apache.maven.project;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.ActivationProperty;
-import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -56,7 +55,7 @@ import java.util.TreeMap;
 public final class ModelUtils
 {
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
-                                         boolean handleAsInheritance )
+                                        boolean handleAsInheritance )
     {
         if ( childContainer == null || parentContainer == null )
         {
@@ -78,8 +77,8 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || parentInherited == null
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     Plugin assembledPlugin = parentPlugin;
@@ -140,8 +139,8 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || parentInherited == null
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
@@ -259,7 +258,7 @@ public final class ModelUtils
     }
 
     public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
-                                                     boolean handleAsInheritance )
+                                                    boolean handleAsInheritance )
     {
         if ( child == null || parent == null )
         {
@@ -486,9 +485,9 @@ public final class ModelUtils
         newModel.setGroupId( model.getGroupId() );
         newModel.setPackaging( model.getPackaging() );
         newModel.setModules( cloneModules( model.getModules() ) );
-        
+
         newModel.setProfiles( cloneProfiles( model.getProfiles() ) );
-        
+
         assembler.copyModel( newModel, model );
 
         return newModel;
@@ -500,103 +499,104 @@ public final class ModelUtils
         {
             return profiles;
         }
-        
+
         List newProfiles = new ArrayList( profiles.size() );
-        
+
         for ( Iterator it = profiles.iterator(); it.hasNext(); )
         {
             Profile profile = (Profile) it.next();
-            
+
             Profile newProfile = new Profile();
-            
-            newProfile.setId(profile.getId());
-            
+
+            newProfile.setId( profile.getId() );
+
             newProfile.setActivation( cloneProfileActivation( profile.getActivation() ) );
-            
+
             newProfile.setBuild( cloneProfileBuild( profile.getBuild() ) );
-            
+
             newProfile.setDependencies( cloneProfileDependencies( profile.getDependencies() ) );
-            
+
             DependencyManagement dm = profile.getDependencyManagement();
-            
+
             if ( dm != null )
             {
                 DependencyManagement newDM = new DependencyManagement();
-                
+
                 newDM.setDependencies( cloneProfileDependencies( dm.getDependencies() ) );
-                
+
                 newProfile.setDependencyManagement( newDM );
             }
-            
-            newProfile.setDistributionManagement( cloneProfileDistributionManagement( profile.getDistributionManagement() ) );
-            
+
+            newProfile.setDistributionManagement( cloneProfileDistributionManagement( profile
+                .getDistributionManagement() ) );
+
             List modules = profile.getModules();
-            
+
             if ( modules != null && !modules.isEmpty() )
             {
                 newProfile.setModules( new ArrayList( modules ) );
             }
-            
+
             newProfile.setPluginRepositories( cloneProfileRepositories( profile.getPluginRepositories() ) );
-            
+
             Properties props = profile.getProperties();
-            
+
             if ( props != null )
             {
                 newProfile.setProperties( new Properties( props ) );
             }
-            
+
             newProfile.setReporting( cloneProfileReporting( profile.getReporting() ) );
-            
+
             newProfile.setReports( profile.getReports() );
-            
+
             newProfile.setRepositories( cloneProfileRepositories( profile.getRepositories() ) );
-            
-            newProfile.setSource(profile.getSource() );
-            
+
+            newProfile.setSource( profile.getSource() );
+
             newProfiles.add( newProfile );
         }
-        
+
         return newProfiles;
     }
 
     private static Reporting cloneProfileReporting( Reporting reporting )
     {
         Reporting newR = null;
-        
+
         if ( reporting != null )
         {
             newR = new Reporting();
-            
-            newR.setOutputDirectory(reporting.getOutputDirectory());
-            
+
+            newR.setOutputDirectory( reporting.getOutputDirectory() );
+
             List newP = null;
-            
+
             List plugins = reporting.getPlugins();
-            
+
             if ( plugins != null )
             {
                 newP = new ArrayList( plugins.size() );
-                
+
                 for ( Iterator it = plugins.iterator(); it.hasNext(); )
                 {
                     ReportPlugin plugin = (ReportPlugin) it.next();
-                    
+
                     ReportPlugin newPlugin = new ReportPlugin();
-                    
-                    newPlugin.setArtifactId(plugin.getArtifactId());
-                    newPlugin.setGroupId(plugin.getGroupId());
-                    newPlugin.setVersion(plugin.getVersion());
-                    newPlugin.setInherited(plugin.getInherited());
+
+                    newPlugin.setArtifactId( plugin.getArtifactId() );
+                    newPlugin.setGroupId( plugin.getGroupId() );
+                    newPlugin.setVersion( plugin.getVersion() );
+                    newPlugin.setInherited( plugin.getInherited() );
                     newPlugin.setReportSets( cloneReportSets( plugin.getReportSets() ) );
-                    
+
                     // TODO: Implement deep-copy of configuration.
-                    newPlugin.setConfiguration(plugin.getConfiguration());
-                    
+                    newPlugin.setConfiguration( plugin.getConfiguration() );
+
                     newP.add( newPlugin );
                 }
-                
-                newR.setPlugins(newP);
+
+                newR.setPlugins( newP );
             }
         }
 
@@ -606,178 +606,178 @@ public final class ModelUtils
     private static List cloneReportSets( List sets )
     {
         List newSets = null;
-        
+
         if ( sets != null )
         {
             newSets = new ArrayList( sets.size() );
-            
+
             for ( Iterator it = sets.iterator(); it.hasNext(); )
             {
                 ReportSet set = (ReportSet) it.next();
-                
+
                 ReportSet newSet = new ReportSet();
-                
+
                 // TODO: Deep-copy config.
-                newSet.setConfiguration(set.getConfiguration());
-                
-                newSet.setId(set.getId());
-                newSet.setInherited(set.getInherited());
-                
-                newSet.setReports(new ArrayList( set.getReports() ));
-                
+                newSet.setConfiguration( set.getConfiguration() );
+
+                newSet.setId( set.getId() );
+                newSet.setInherited( set.getInherited() );
+
+                newSet.setReports( new ArrayList( set.getReports() ) );
+
                 newSets.add( newSet );
             }
         }
-        
+
         return newSets;
     }
 
     private static List cloneProfileRepositories( List repos )
     {
         List newRepos = null;
-        
+
         if ( repos != null )
         {
             newRepos = new ArrayList( repos.size() );
-            
+
             for ( Iterator it = repos.iterator(); it.hasNext(); )
             {
                 Repository repo = (Repository) it.next();
-                
+
                 Repository newRepo = new Repository();
-                
-                newRepo.setChecksumPolicy(repo.getChecksumPolicy());
-                newRepo.setId(repo.getId());
-                newRepo.setLayout(repo.getLayout());
-                newRepo.setName(repo.getName());
-                newRepo.setSnapshotPolicy(repo.getSnapshotPolicy());
-                
+
+                newRepo.setChecksumPolicy( repo.getChecksumPolicy() );
+                newRepo.setId( repo.getId() );
+                newRepo.setLayout( repo.getLayout() );
+                newRepo.setName( repo.getName() );
+                newRepo.setSnapshotPolicy( repo.getSnapshotPolicy() );
+
                 RepositoryPolicy releasePolicy = repo.getReleases();
-                
+
                 if ( releasePolicy != null )
                 {
                     RepositoryPolicy newPolicy = new RepositoryPolicy();
-                    newPolicy.setEnabled(releasePolicy.isEnabled());
-                    newPolicy.setChecksumPolicy(releasePolicy.getChecksumPolicy());
-                    newPolicy.setUpdatePolicy(releasePolicy.getUpdatePolicy());
-                    
-                    newRepo.setReleases(newPolicy);
+                    newPolicy.setEnabled( releasePolicy.isEnabled() );
+                    newPolicy.setChecksumPolicy( releasePolicy.getChecksumPolicy() );
+                    newPolicy.setUpdatePolicy( releasePolicy.getUpdatePolicy() );
+
+                    newRepo.setReleases( newPolicy );
                 }
-                
+
                 RepositoryPolicy snapPolicy = repo.getSnapshots();
-                
+
                 if ( snapPolicy != null )
                 {
                     RepositoryPolicy newPolicy = new RepositoryPolicy();
-                    newPolicy.setEnabled(snapPolicy.isEnabled());
-                    newPolicy.setChecksumPolicy(snapPolicy.getChecksumPolicy());
-                    newPolicy.setUpdatePolicy(snapPolicy.getUpdatePolicy());
-                    
-                    newRepo.setSnapshots(newPolicy);
+                    newPolicy.setEnabled( snapPolicy.isEnabled() );
+                    newPolicy.setChecksumPolicy( snapPolicy.getChecksumPolicy() );
+                    newPolicy.setUpdatePolicy( snapPolicy.getUpdatePolicy() );
+
+                    newRepo.setSnapshots( newPolicy );
                 }
-                
-                newRepo.setUrl(repo.getUrl());
-                
+
+                newRepo.setUrl( repo.getUrl() );
+
                 newRepos.add( newRepo );
             }
         }
-        
+
         return newRepos;
     }
 
     private static DistributionManagement cloneProfileDistributionManagement( DistributionManagement dm )
     {
         DistributionManagement newDM = null;
-        
+
         if ( dm != null )
         {
             newDM = new DistributionManagement();
-            
-            newDM.setDownloadUrl(dm.getDownloadUrl() );
-            newDM.setStatus(dm.getStatus());
-            
+
+            newDM.setDownloadUrl( dm.getDownloadUrl() );
+            newDM.setStatus( dm.getStatus() );
+
             Relocation relocation = dm.getRelocation();
-            
+
             if ( relocation != null )
             {
                 Relocation newR = new Relocation();
-                
-                newR.setArtifactId(relocation.getArtifactId());
-                newR.setGroupId(relocation.getGroupId());
-                newR.setMessage(relocation.getMessage());
-                newR.setVersion(relocation.getVersion());
-                
-                newDM.setRelocation(newR);
+
+                newR.setArtifactId( relocation.getArtifactId() );
+                newR.setGroupId( relocation.getGroupId() );
+                newR.setMessage( relocation.getMessage() );
+                newR.setVersion( relocation.getVersion() );
+
+                newDM.setRelocation( newR );
             }
-            
+
             RepositoryBase repo = dm.getRepository();
-            
+
             if ( repo != null )
             {
                 RepositoryBase newRepo = new RepositoryBase();
-                
-                newRepo.setId(repo.getId());
-                newRepo.setLayout(repo.getLayout());
-                newRepo.setName(repo.getName());
-                newRepo.setUrl(repo.getUrl());
-                
-                newDM.setRepository(newRepo);
+
+                newRepo.setId( repo.getId() );
+                newRepo.setLayout( repo.getLayout() );
+                newRepo.setName( repo.getName() );
+                newRepo.setUrl( repo.getUrl() );
+
+                newDM.setRepository( newRepo );
             }
-            
+
             Site site = dm.getSite();
-            
+
             if ( site != null )
             {
                 Site newSite = new Site();
-                
-                newSite.setId(site.getId());
-                newSite.setName(site.getName());
-                newSite.setUrl(site.getUrl());
-                
-                newDM.setSite(newSite);
+
+                newSite.setId( site.getId() );
+                newSite.setName( site.getName() );
+                newSite.setUrl( site.getUrl() );
+
+                newDM.setSite( newSite );
             }
-            
+
             RepositoryBase sRepo = dm.getSnapshotRepository();
-            
+
             if ( sRepo != null )
             {
                 RepositoryBase newRepo = new RepositoryBase();
-                
-                newRepo.setId(sRepo.getId());
-                newRepo.setLayout(sRepo.getLayout());
-                newRepo.setName(sRepo.getName());
-                newRepo.setUrl(sRepo.getUrl());
-                
-                newDM.setSnapshotRepository(newRepo);
+
+                newRepo.setId( sRepo.getId() );
+                newRepo.setLayout( sRepo.getLayout() );
+                newRepo.setName( sRepo.getName() );
+                newRepo.setUrl( sRepo.getUrl() );
+
+                newDM.setSnapshotRepository( newRepo );
             }
         }
-        
+
         return newDM;
     }
 
     private static List cloneProfileDependencies( List dependencies )
     {
         List newDependencies = null;
-        
+
         if ( dependencies != null )
         {
             newDependencies = new ArrayList( dependencies.size() );
-            
+
             for ( Iterator it = dependencies.iterator(); it.hasNext(); )
             {
                 Dependency dep = (Dependency) it.next();
-                
+
                 Dependency newDep = new Dependency();
-                
-                newDep.setArtifactId(dep.getArtifactId());
-                newDep.setClassifier(dep.getClassifier());
+
+                newDep.setArtifactId( dep.getArtifactId() );
+                newDep.setClassifier( dep.getClassifier() );
                 newDep.setExclusions( cloneDependencyExclusions( dep.getExclusions() ) );
-                newDep.setGroupId(dep.getGroupId());
-                newDep.setScope(dep.getScope());
-                newDep.setSystemPath(dep.getSystemPath());
-                newDep.setType(dep.getType());
-                newDep.setVersion(dep.getVersion());
-                
+                newDep.setGroupId( dep.getGroupId() );
+                newDep.setScope( dep.getScope() );
+                newDep.setSystemPath( dep.getSystemPath() );
+                newDep.setType( dep.getType() );
+                newDep.setVersion( dep.getVersion() );
+
                 newDependencies.add( newDep );
             }
         }
@@ -788,20 +788,20 @@ public final class ModelUtils
     private static List cloneDependencyExclusions( List ex )
     {
         List newEx = null;
-        
+
         if ( ex != null )
         {
             newEx = new ArrayList( ex.size() );
-            
+
             for ( Iterator it = ex.iterator(); it.hasNext(); )
             {
                 Exclusion exclusion = (Exclusion) it.next();
-                
+
                 Exclusion newExclusion = new Exclusion();
-                
-                newExclusion.setArtifactId(exclusion.getArtifactId() );
+
+                newExclusion.setArtifactId( exclusion.getArtifactId() );
                 newExclusion.setGroupId( exclusion.getGroupId() );
-                
+
                 newEx.add( newExclusion );
             }
         }
@@ -815,135 +815,135 @@ public final class ModelUtils
         if ( build != null )
         {
             newBuild = new BuildBase();
-            
-            newBuild.setDefaultGoal(build.getDefaultGoal());
-            newBuild.setDirectory(build.getDirectory());
-            newBuild.setFinalName(build.getFinalName());
-            
+
+            newBuild.setDefaultGoal( build.getDefaultGoal() );
+            newBuild.setDirectory( build.getDirectory() );
+            newBuild.setFinalName( build.getFinalName() );
+
             newBuild.setPluginManagement( cloneProfilePluginManagement( build.getPluginManagement() ) );
             newBuild.setPlugins( cloneProfilePlugins( build.getPlugins() ) );
             newBuild.setResources( cloneProfileResources( build.getResources() ) );
             newBuild.setTestResources( cloneProfileResources( build.getTestResources() ) );
         }
-        
+
         return newBuild;
     }
 
     private static List cloneProfileResources( List resources )
     {
         List newResources = null;
-        
+
         if ( resources != null )
         {
             newResources = new ArrayList( resources.size() );
-            
+
             for ( Iterator it = resources.iterator(); it.hasNext(); )
             {
                 Resource resource = (Resource) it.next();
-                
+
                 Resource newResource = new Resource();
-                
-                newResource.setDirectory(resource.getDirectory());
-                newResource.setExcludes(new ArrayList( resource.getExcludes()));
-                newResource.setFiltering(resource.isFiltering());
-                newResource.setIncludes(new ArrayList( resource.getIncludes()));
-                newResource.setTargetPath(resource.getTargetPath());
-                
+
+                newResource.setDirectory( resource.getDirectory() );
+                newResource.setExcludes( new ArrayList( resource.getExcludes() ) );
+                newResource.setFiltering( resource.isFiltering() );
+                newResource.setIncludes( new ArrayList( resource.getIncludes() ) );
+                newResource.setTargetPath( resource.getTargetPath() );
+
                 newResources.add( newResource );
             }
         }
-        
+
         return newResources;
     }
 
     private static PluginManagement cloneProfilePluginManagement( PluginManagement pluginManagement )
     {
         PluginManagement newPM = null;
-        
+
         if ( pluginManagement != null )
         {
             newPM = new PluginManagement();
-            
+
             List plugins = pluginManagement.getPlugins();
-            
+
             newPM.setPlugins( cloneProfilePlugins( plugins ) );
         }
-        
+
         return newPM;
     }
 
     private static List cloneProfilePlugins( List plugins )
     {
         List newPlugins = null;
-        
+
         if ( plugins != null )
         {
             newPlugins = new ArrayList( plugins.size() );
-            
+
             for ( Iterator it = plugins.iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
-                
+
                 Plugin newPlugin = new Plugin();
-                
-                newPlugin.setArtifactId(plugin.getArtifactId());
-                newPlugin.setExtensions(plugin.isExtensions());
-                newPlugin.setGroupId(plugin.getGroupId());
-                newPlugin.setInherited(plugin.getInherited());
-                newPlugin.setVersion(plugin.getVersion());
-                
+
+                newPlugin.setArtifactId( plugin.getArtifactId() );
+                newPlugin.setExtensions( plugin.isExtensions() );
+                newPlugin.setGroupId( plugin.getGroupId() );
+                newPlugin.setInherited( plugin.getInherited() );
+                newPlugin.setVersion( plugin.getVersion() );
+
                 // TODO: Deep-copy this!
-                newPlugin.setConfiguration(plugin.getConfiguration());
-                
+                newPlugin.setConfiguration( plugin.getConfiguration() );
+
                 List goals = plugin.getGoals();
                 if ( goals != null && !goals.isEmpty() )
                 {
                     List newGoals = new ArrayList( goals );
-                    
-                    newPlugin.setGoals(newGoals);
+
+                    newPlugin.setGoals( newGoals );
                 }
-                
-                newPlugin.setExecutions( cloneExecutions( plugin.getExecutions() ));
-                
+
+                newPlugin.setExecutions( cloneExecutions( plugin.getExecutions() ) );
+
                 newPlugins.add( newPlugin );
             }
         }
-        
+
         return newPlugins;
     }
 
     private static List cloneExecutions( List executions )
     {
         List newExecs = null;
-        
+
         if ( executions != null )
         {
             newExecs = new ArrayList( executions.size() );
-            
+
             for ( Iterator it = executions.iterator(); it.hasNext(); )
             {
                 PluginExecution exec = (PluginExecution) it.next();
-                
+
                 PluginExecution newExec = new PluginExecution();
-                
+
                 // TODO: Deep-copy configs.
-                newExec.setConfiguration(exec.getConfiguration());
-                
-                newExec.setId(exec.getId());
-                newExec.setInherited(exec.getInherited());
-                newExec.setPhase(exec.getPhase());
-                
+                newExec.setConfiguration( exec.getConfiguration() );
+
+                newExec.setId( exec.getId() );
+                newExec.setInherited( exec.getInherited() );
+                newExec.setPhase( exec.getPhase() );
+
                 List goals = exec.getGoals();
-                
+
                 if ( goals != null && !goals.isEmpty() )
                 {
                     newExec.setGoals( new ArrayList( goals ) );
                 }
-                
+
                 newExecs.add( newExec );
             }
         }
-        
+
         return newExecs;
     }
 
@@ -953,35 +953,35 @@ public final class ModelUtils
         if ( activation != null )
         {
             newActivation = new Activation();
-            
-            newActivation.setActiveByDefault(activation.isActiveByDefault());
-            
+
+            newActivation.setActiveByDefault( activation.isActiveByDefault() );
+
             ActivationFile af = activation.getFile();
-            
+
             if ( af != null )
             {
                 ActivationFile afNew = new ActivationFile();
-                afNew.setExists(af.getExists());
-                afNew.setMissing(af.getMissing());
-                
-                newActivation.setFile(afNew);
+                afNew.setExists( af.getExists() );
+                afNew.setMissing( af.getMissing() );
+
+                newActivation.setFile( afNew );
             }
-            
-            newActivation.setJdk(activation.getJdk());
-            
+
+            newActivation.setJdk( activation.getJdk() );
+
             ActivationProperty ap = activation.getProperty();
-            
+
             if ( ap != null )
             {
                 ActivationProperty newAp = new ActivationProperty();
-                
-                newAp.setName(ap.getName());
-                newAp.setValue(ap.getValue());
-                
-                newActivation.setProperty(newAp);
+
+                newAp.setName( ap.getName() );
+                newAp.setValue( ap.getValue() );
+
+                newActivation.setProperty( newAp );
             }
         }
-        
+
         return newActivation;
     }
 
