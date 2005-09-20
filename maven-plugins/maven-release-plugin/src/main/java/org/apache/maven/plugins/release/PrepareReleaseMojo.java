@@ -860,7 +860,7 @@ public class PrepareReleaseMojo
                     
                     if ( finalName.equals( releaseModel.getArtifactId() + "-" + snapshotVersion ) )
                     {
-                        releaseModel.getBuild().setFinalName( releaseModel.getArtifactId() + "-" + projectVersion );
+                        releaseModel.getBuild().setFinalName( null );
                     }
                     else if ( finalName.indexOf( "SNAPSHOT" ) > -1 )
                     {
