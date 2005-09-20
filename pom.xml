@@ -36,6 +36,13 @@
       <post>dev@maven.apache.org</post>
       <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
     </mailingList>
+    <mailingList>
+      <name>Apache Announce List</name>
+      <subscribe>announce-subscribe@apache.org</subscribe>
+      <unsubscribe>announce-unsubscribe@apache.org</unsubscribe>
+      <post>announce@apache.org</post>
+      <archive>mail-archives.apache.org/mod_mbox/www-announce/</archive>
+    </mailingList>
   </mailingLists>
   <developers>
     <developer>
