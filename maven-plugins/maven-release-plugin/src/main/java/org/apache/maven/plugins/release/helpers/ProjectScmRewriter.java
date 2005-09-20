@@ -23,6 +23,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ProjectScmRewriter
 {
     private ReleaseProgressTracker releaseProgress;
@@ -87,9 +90,23 @@ public class ProjectScmRewriter
 
     private String convertSvnConnectionString( String scmConnection, String tag )
     {
-        if ( scmConnection.indexOf( "/trunk" ) >= 0 )
+        int trunkBegin = scmConnection.indexOf( "/trunk" );
+        
+        if ( trunkBegin >= 0 )
         {
-            scmConnection = StringUtils.replace( scmConnection, "/trunk", "/tags/" + tag );
+            String tail = "";
+            
+            if ( scmConnection.length() > trunkBegin + "/trunk".length() )
+            {
+                tail = scmConnection.substring( trunkBegin + "/trunk".length() );
+                
+                if ( !tail.startsWith( "/" ) )
+                {
+                    tail += "/";
+                }
+            }
+            
+            scmConnection = scmConnection.substring( 0, trunkBegin ) + "/tags/" + tag + tail;
         }
         else
         {
