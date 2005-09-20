@@ -149,8 +149,7 @@ m2 site:site site:deploy
 
   The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
 
-  The file <<<pic1.jpg>>> will be available via a relative reference to the
-  <<<resources/images>>> directory from any page in your site.
+  The file <<<pic1.jpg>>> will be available via a relative reference to the <<<images>>> directory from any page in your site.
 
 * Configuring Reports
 
