@@ -92,10 +92,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-
-      <build>
-        <directory>alt-target</directory>
-      </build>
     </profile>
   </profiles>
 
