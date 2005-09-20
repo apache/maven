@@ -364,10 +364,11 @@ public class RewritePhase
     private void mergeMetadata( Metadata sourceMetadata, File target, boolean reportOnly )
         throws IOException, DigestException, XmlPullParserException, NoSuchAlgorithmException
     {
+        boolean changed = false;
+        Metadata targetMetadata = null;
+
         if ( target.exists() )
         {
-            Metadata targetMetadata = null;
-
             Reader reader = null;
 
             try
@@ -383,32 +384,36 @@ public class RewritePhase
                 IOUtil.close( reader );
             }
 
-            boolean changed = targetMetadata.merge( sourceMetadata );
-
-            if ( changed )
+            changed = targetMetadata.merge( sourceMetadata );
+        }
+        else
+        {
+            changed = true;
+            targetMetadata = sourceMetadata;
+        }
+        if ( changed )
+        {
+            Writer writer = null;
+            try
             {
-                Writer writer = null;
-                try
+                target.getParentFile().mkdirs();
+                writer = new FileWriter( target );
+
+                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
+
+                mappingWriter.write( writer, targetMetadata );
+
+                if ( !reportOnly )
                 {
-                    target.getParentFile().mkdirs();
-                    writer = new FileWriter( target );
-
-                    MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                    mappingWriter.write( writer, targetMetadata );
-
-                    if ( !reportOnly )
-                    {
-                        File digestFile = artifactDigestor.getDigestFile( target, Digestor.MD5 );
-                        artifactDigestor.createArtifactDigest( target, digestFile, Digestor.MD5 );
-                        digestFile = artifactDigestor.getDigestFile( target, Digestor.SHA );
-                        artifactDigestor.createArtifactDigest( target, digestFile, Digestor.SHA );
-                    }
+                    File digestFile = artifactDigestor.getDigestFile( target, Digestor.MD5 );
+                    artifactDigestor.createArtifactDigest( target, digestFile, Digestor.MD5 );
+                    digestFile = artifactDigestor.getDigestFile( target, Digestor.SHA );
+                    artifactDigestor.createArtifactDigest( target, digestFile, Digestor.SHA );
                 }
-                finally
-                {
-                    IOUtil.close( writer );
-                }
+            }
+            finally
+            {
+                IOUtil.close( writer );
             }
         }
     }
