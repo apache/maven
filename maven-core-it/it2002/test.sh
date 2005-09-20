@@ -9,16 +9,25 @@ svnadmin create --fs-type fsfs target/svnroot
 
 dir=`readlink -f ${PWD}`
 
-svn import project file://${dir}/target/svnroot/project/trunk -m "import."
-svn mkdir file://${dir}/target/svnroot/project/tags -m "Creating tags dir."
+if [ "$1" == "windows" ]; then
+  dir=`cygpath -m $dir`
+  echo setting dir to $dir
+fi
 
-svn co file://${dir}/target/svnroot/project/trunk project.checkout
+svn import project file://localhost/${dir}/target/svnroot/project/trunk -m "import."
+svn mkdir file://localhost/${dir}/target/svnroot/project/tags -m "Creating tags dir."
+
+svn co file://localhost/${dir}/target/svnroot/project/trunk project.checkout
 
 cd project.checkout
 
+cat pom.xml | sed "s#\${project.file.parentFile.parentFile}#$dir#g" >tmp
+mv tmp pom.xml
+svn ci -m 'update scm' pom.xml
+
 rm -Rf target
 
-m2 -e release:prepare -Denv=test
+m2 -e release:prepare -Denv=test -B -Dtag=test-tag
 
 m2 -e release:perform -Denv=test
 

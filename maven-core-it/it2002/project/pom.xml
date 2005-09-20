@@ -40,14 +40,14 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</connection>
-    <developerConnection>scm:svn:file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</developerConnection>
-    <url>file://${project.file.parentFile.parentFile}/target/svnroot/project/trunk</url>
+    <connection>scm:svn:file://localhost/${project.file.parentFile.parentFile}/target/svnroot/project/trunk</connection>
+    <developerConnection>scm:svn:file://localhost/${project.file.parentFile.parentFile}/target/svnroot/project/trunk</developerConnection>
+    <url>file://localhost/${project.file.parentFile.parentFile}/target/svnroot/project/trunk</url>
     <tag>p1</tag>
   </scm>
 
   <properties>
-    <tagBase>file://${project.file.parentFile.parentFile}/target/svnroot/project/tags</tagBase>
+    <tagBase>file://localhost/${project.file.parentFile.parentFile}/target/svnroot/project/tags</tagBase>
   </properties>
 
   <build>
