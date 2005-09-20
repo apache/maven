@@ -101,6 +101,10 @@
           <artifactId>maven-artifact</artifactId>
         </dependency>
       </dependencies>
+
+      <properties>
+        <testName>testValue</testName>
+      </properties>
     </profile>
   </profiles>
 

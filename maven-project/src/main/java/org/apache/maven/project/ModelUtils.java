@@ -543,7 +543,10 @@ public final class ModelUtils
 
             if ( props != null )
             {
-                newProfile.setProperties( new Properties( props ) );
+                Properties newProps = new Properties();
+                newProps.putAll( props );
+                
+                newProfile.setProperties( newProps );
             }
 
             newProfile.setReporting( cloneProfileReporting( profile.getReporting() ) );

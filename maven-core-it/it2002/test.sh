@@ -1,7 +1,6 @@
 #!/bin/bash
 
 rm -Rf target
-rm -Rf project.checkout
 
 mkdir target
 
@@ -17,9 +16,9 @@ fi
 svn import project file://localhost/${dir}/target/svnroot/project/trunk -m "import."
 svn mkdir file://localhost/${dir}/target/svnroot/project/tags -m "Creating tags dir."
 
-svn co file://localhost/${dir}/target/svnroot/project/trunk project.checkout
+svn co file://localhost/${dir}/target/svnroot/project/trunk target/project.checkout
 
-cd project.checkout
+cd target/project.checkout
 
 cat pom.xml | sed "s#\${project.file.parentFile.parentFile}#$dir#g" >tmp
 mv tmp pom.xml
