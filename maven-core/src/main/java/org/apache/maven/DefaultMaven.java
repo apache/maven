@@ -337,9 +337,12 @@ public class DefaultMaven
         {
             File file = (File) iterator.next();
 
+            boolean usingReleasePom = false;
+            
             if ( RELEASE_POMv4.equals( file.getName() ) )
             {
                 getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
+                usingReleasePom = true;
             }
 
             MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
@@ -366,7 +369,19 @@ public class DefaultMaven
                 for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
                     String name = (String) i.next();
-                    moduleFiles.add( new File( basedir, name + "/pom.xml" ) );
+                    
+                    File moduleFile;
+                    
+                    if ( usingReleasePom )
+                    {
+                        moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                    }
+                    else
+                    {
+                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                    }
+                    
+                    moduleFiles.add( moduleFile );
                 }
 
                 List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings,
