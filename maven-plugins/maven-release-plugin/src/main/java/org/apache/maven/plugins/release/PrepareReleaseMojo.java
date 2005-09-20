@@ -97,12 +97,12 @@ public class PrepareReleaseMojo
      * @component role="org.apache.maven.artifact.metadata.ArtifactMetadataSource"
      */
     private ArtifactMetadataSource artifactMetadataSource;
-    
+
     /**
      * @component role="org.apache.maven.plugin.version.PluginVersionManager"
      */
     private PluginVersionManager pluginVersionManager;
-    
+
     /**
      * @parameter expression="${component.org.codehaus.plexus.components.inputhandler.InputHandler}"
      * @required
@@ -116,7 +116,7 @@ public class PrepareReleaseMojo
      * @readonly
      */
     private ArtifactRepository localRepository;
-    
+
     /**
      * @parameter expression="${settings}"
      * @required
@@ -835,39 +835,43 @@ public class PrepareReleaseMojo
                 MavenProject releaseProject = new MavenProject( project );
                 Model releaseModel = releaseProject.getModel();
                 fixNullValueInModel( releaseModel, project.getModel() );
-                
+
                 // the release POM should reflect bits of these which were injected at build time...
                 // we don't need these polluting the POM.
                 releaseModel.setProfiles( Collections.EMPTY_LIST );
                 releaseModel.setDependencyManagement( null );
                 releaseModel.getBuild().setPluginManagement( null );
-                
+
                 String projectVersion = releaseModel.getVersion();
                 if ( ArtifactUtils.isSnapshot( projectVersion ) )
                 {
                     String snapshotVersion = projectVersion;
-                    
-                    projectVersion = getVersionResolver().getResolvedVersion( releaseModel.getGroupId(), releaseModel.getArtifactId() );
-                    
+
+                    projectVersion = getVersionResolver().getResolvedVersion( releaseModel.getGroupId(),
+                                                                              releaseModel.getArtifactId() );
+
                     if ( ArtifactUtils.isSnapshot( projectVersion ) )
                     {
-                        throw new MojoExecutionException( "MAJOR PROBLEM!!! Cannot find resolved version to be used in releasing project: " + releaseProject.getId() );
+                        throw new MojoExecutionException(
+                            "MAJOR PROBLEM!!! Cannot find resolved version to be used in releasing project: " +
+                                releaseProject.getId() );
                     }
-                    
+
                     releaseModel.setVersion( projectVersion );
-                    
+
                     String finalName = releaseModel.getBuild().getFinalName();
-                    
+
                     if ( finalName.equals( releaseModel.getArtifactId() + "-" + snapshotVersion ) )
                     {
                         releaseModel.getBuild().setFinalName( null );
                     }
                     else if ( finalName.indexOf( "SNAPSHOT" ) > -1 )
                     {
-                        throw new MojoExecutionException( "Cannot reliably adjust the finalName of project: " + releaseProject.getId() );
+                        throw new MojoExecutionException(
+                            "Cannot reliably adjust the finalName of project: " + releaseProject.getId() );
                     }
                 }
-                
+
                 releaseModel.setParent( null );
 
                 Set artifacts = releaseProject.getArtifacts();
@@ -880,23 +884,25 @@ public class PrepareReleaseMojo
                     for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
                     {
                         Artifact artifact = (Artifact) i.next();
-                        
+
                         Dependency newdep = new Dependency();
 
                         newdep.setArtifactId( artifact.getArtifactId() );
                         newdep.setGroupId( artifact.getGroupId() );
-                        
+
                         String version = artifact.getVersion();
                         if ( artifact.isSnapshot() )
                         {
-                            version = getVersionResolver().getResolvedVersion(artifact.getGroupId(), artifact.getArtifactId() );
-                            
+                            version = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
+                                                                               artifact.getArtifactId() );
+
                             if ( ArtifactUtils.isSnapshot( version ) )
                             {
-                                throw new MojoExecutionException( "Unresolved SNAPSHOT version of: " + artifact.getId() + ". Cannot proceed with release." );
+                                throw new MojoExecutionException( "Unresolved SNAPSHOT version of: " +
+                                    artifact.getId() + ". Cannot proceed with release." );
                             }
                         }
-                        
+
                         newdep.setVersion( version );
                         newdep.setType( artifact.getType() );
                         newdep.setScope( artifact.getScope() );
@@ -909,9 +915,8 @@ public class PrepareReleaseMojo
                 }
 
                 // Use original - don't want the lifecycle introduced ones
-                // TODO: but is it the right settings?
-                Build model = releaseProject.getModel().getBuild();
-                List plugins = model != null ? model.getPlugins() : null;
+                Build build = releaseProject.getOriginalModel().getBuild();
+                List plugins = build != null ? build.getPlugins() : null;
 
                 if ( plugins != null )
                 {
@@ -923,16 +928,21 @@ public class PrepareReleaseMojo
                         String version;
                         try
                         {
-                            version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, settings, localRepository );
+                            version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
+                                                                                 plugin.getArtifactId(), project,
+                                                                                 settings, localRepository );
                         }
                         catch ( PluginVersionResolutionException e )
                         {
                             throw new MojoExecutionException( "Cannot resolve version for plugin: " + plugin );
                         }
-                        
-                        if ( ArtifactUtils.isSnapshot(version))
+
+                        if ( ArtifactUtils.isSnapshot( version ) )
                         {
-                            throw new MojoExecutionException( "Resolved version of plugin is a snapshot. Please release this plugin before releasing this project.\n\nGroupId: " + plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() + "\nResolved Version: " + version + "\n\n" );
+                            throw new MojoExecutionException(
+                                "Resolved version of plugin is a snapshot. Please release this plugin before releasing this project.\n\nGroupId: " +
+                                    plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() +
+                                    "\nResolved Version: " + version + "\n\n" );
                         }
 
                         plugin.setVersion( version );
@@ -958,10 +968,13 @@ public class PrepareReleaseMojo
                         {
                             throw new MojoExecutionException( "Cannot resolve version for report plugin: " + plugin );
                         }
-                        
-                        if ( ArtifactUtils.isSnapshot(version))
+
+                        if ( ArtifactUtils.isSnapshot( version ) )
                         {
-                            throw new MojoExecutionException( "Resolved version of plugin is a snapshot. Please release this report plugin before releasing this project.\n\nGroupId: " + plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() + "\nResolved Version: " + version + "\n\n" );
+                            throw new MojoExecutionException(
+                                "Resolved version of plugin is a snapshot. Please release this report plugin before releasing this project.\n\nGroupId: " +
+                                    plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() +
+                                    "\nResolved Version: " + version + "\n\n" );
                         }
 
                         plugin.setVersion( version );
@@ -988,10 +1001,11 @@ public class PrepareReleaseMojo
                         ext.setVersion( version );
                     }
                 }
-                
+
                 try
                 {
-                    relativizeBuildPaths( model, project.getFile().getParentFile().getCanonicalPath() );
+                    relativizeBuildPaths( releaseProject.getModel().getBuild(),
+                                          project.getFile().getParentFile().getCanonicalPath() );
                 }
                 catch ( IOException e )
                 {
@@ -1051,50 +1065,50 @@ public class PrepareReleaseMojo
     private void relativizeBuildPaths( Build build, String canonicalBasedir )
     {
         int basePathLength = canonicalBasedir.length() + 1;
-        
+
         String directory = build.getDirectory();
         if ( directory.startsWith( canonicalBasedir ) )
         {
             build.setDirectory( directory.substring( basePathLength ) );
         }
-        
+
         String outDir = build.getOutputDirectory();
         if ( outDir.startsWith( canonicalBasedir ) )
         {
             build.setOutputDirectory( outDir.substring( basePathLength ) );
         }
-        
+
         String testOutDir = build.getTestOutputDirectory();
         if ( testOutDir.startsWith( canonicalBasedir ) )
         {
             build.setTestOutputDirectory( testOutDir.substring( basePathLength ) );
         }
-        
+
         String srcDir = build.getSourceDirectory();
         if ( srcDir.startsWith( canonicalBasedir ) )
         {
             build.setSourceDirectory( srcDir.substring( basePathLength ) );
         }
-        
+
         String scriptSrcDir = build.getScriptSourceDirectory();
         if ( scriptSrcDir.startsWith( canonicalBasedir ) )
         {
             build.setScriptSourceDirectory( scriptSrcDir.substring( basePathLength ) );
         }
-        
+
         String testSrcDir = build.getTestSourceDirectory();
         if ( testSrcDir.startsWith( canonicalBasedir ) )
         {
             build.setTestSourceDirectory( testSrcDir.substring( basePathLength ) );
         }
-        
+
         List resources = build.getResources();
         if ( resources != null )
         {
             for ( Iterator it = resources.iterator(); it.hasNext(); )
             {
                 Resource resource = (Resource) it.next();
-                
+
                 String dir = resource.getDirectory();
                 if ( dir.startsWith( canonicalBasedir ) )
                 {
@@ -1102,14 +1116,14 @@ public class PrepareReleaseMojo
                 }
             }
         }
-        
+
         List testResources = build.getTestResources();
         if ( testResources != null )
         {
             for ( Iterator it = testResources.iterator(); it.hasNext(); )
             {
                 Resource resource = (Resource) it.next();
-                
+
                 String dir = resource.getDirectory();
                 if ( dir.startsWith( canonicalBasedir ) )
                 {
