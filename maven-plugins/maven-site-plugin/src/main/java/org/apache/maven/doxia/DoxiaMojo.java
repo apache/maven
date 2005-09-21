@@ -95,7 +95,7 @@ public class DoxiaMojo
         "**/.DS_Store"};
 
     /**
-     * Directory that contains the reports in apt/fml format.
+     * Directory containing source for apt, fml and xdoc docs.
      *
      * @parameter expression="${basedir}/src/site"
      * @required
@@ -109,7 +109,7 @@ public class DoxiaMojo
     private File generatedSiteDirectory;
 
     /**
-     * Directory that contains the generated reports.
+     * Directory containing the generated project sites and report distributions.
      *
      * @parameter expression="${project.build.directory}/site"
      * @required
@@ -164,6 +164,8 @@ public class DoxiaMojo
     private String outputEncoding;
 
     /**
+     * Site Renderer
+     *
      * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
      * @required
      * @readonly
@@ -196,6 +198,10 @@ public class DoxiaMojo
     private List reports;
 
     /**
+     * Generate the project site
+     *
+     * throws MojoExecutionException if any
+     *
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute()
@@ -502,6 +508,14 @@ public class DoxiaMojo
         return localesList;
     }
 
+    /**
+     * Retrieve the reports menu
+     *
+     * @param locale the locale used
+     * @param projectInfos list of project infos
+     * @param projectReports list of project reports
+     * @return a XML for reports menu
+     */
     private String getReportsMenu( Locale locale, List projectInfos, List projectReports )
     {
         StringBuffer buffer = new StringBuffer();
@@ -522,6 +536,15 @@ public class DoxiaMojo
         return buffer.toString();
     }
 
+    /**
+     * Create a report sub menu
+     *
+     * @param reports list of reports specified in pom
+     * @param buffer string to be appended
+     * @param locale the locale used
+     * @param key
+     * @param indexFilename index page filename
+     */
     private void writeReportSubMenu( List reports, StringBuffer buffer, Locale locale, String key,
                                      String indexFilename )
     {
@@ -798,6 +821,14 @@ public class DoxiaMojo
         return generatedReportsFileName;
     }
 
+    /**
+     * Generates Project Info Page
+     *
+     * @param siteDescriptor site.xml
+     * @param locale the locale used
+     * @param projectInfos list of projectInfos
+     * @param outputDirectory directory that will contain the generated project info page
+     */
     private void generateProjectInfoPage( String siteDescriptor, Locale locale, List projectInfos,
                                           File outputDirectory )
         throws RendererException, IOException
@@ -879,6 +910,14 @@ public class DoxiaMojo
                                        template, attributes, sink, locale );
     }
 
+    /**
+     * Generates the Project Report Pages
+     *
+     * @param siteDescriptor site.xml
+     * @param locale the locale used
+     * @param projectReports list of project reports
+     * @param outputDirectory directory that will contain the generated project report pages
+     */
     private void generateProjectReportsPage( String siteDescriptor, Locale locale, List projectReports,
                                              File outputDirectory )
         throws RendererException, IOException
@@ -956,6 +995,12 @@ public class DoxiaMojo
                                        template, attributes, sink, locale );
     }
 
+    /**
+     * Copy Resources
+     *
+     * @param outputDir the output directory
+     * @throws IOException if any
+     */
     private void copyResources( File outputDir )
         throws IOException
     {
@@ -997,11 +1042,24 @@ public class DoxiaMojo
         }
     }
 
+    /**
+     * Get the resource as stream
+     *
+     * @param name
+     * @return the inputstream
+     */
     private InputStream getStream( String name )
     {
         return DoxiaMojo.class.getClassLoader().getResourceAsStream( name );
     }
 
+    /**
+     * Copy the directory
+     *
+     * @param source source file to be copied
+     * @param destination destination file
+     * @throws IOException if any
+     */
     private void copyDirectory( File source, File destination )
         throws IOException
     {
