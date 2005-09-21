@@ -482,6 +482,17 @@ public class DefaultLifecycleExecutor
                 List reports = getReports( project, mojoExecution, session );
 
                 mojoExecution.setReports( reports );
+
+                for ( Iterator j = mojoExecution.getForkedExecutions().iterator(); j.hasNext(); )
+                {
+                    MojoExecution forkedExecution = (MojoExecution) j.next();
+                    MojoDescriptor descriptor = forkedExecution.getMojoDescriptor();
+
+                    if ( descriptor.getExecutePhase() != null )
+                    {
+                        forkLifecycle( descriptor, session, project );
+                    }
+                }
             }
 
             try
@@ -583,6 +594,9 @@ public class DefaultLifecycleExecutor
     private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
     {
+        getLogger().info(
+            "Preparing " + mojoDescriptor.getPluginDescriptor().getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+
         String targetPhase = mojoDescriptor.getExecutePhase();
 
         // Create new lifecycle

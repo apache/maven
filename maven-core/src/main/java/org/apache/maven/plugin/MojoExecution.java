@@ -90,4 +90,9 @@ public class MojoExecution
     {
         return reports;
     }
+
+    public List getForkedExecutions()
+    {
+        return forkedExecutions;
+    }
 }
