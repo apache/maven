@@ -1,0 +1,93 @@
+ ------
+ Maven 2 Assembly Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 20, 2005
+
+Pre-defined Descriptor Files
+
+*bin.xml    descriptorId:bin
+
+------
+    <assembly>
+      <id>bin</id>
+      <formats>
+        <format>tar.gz</format>
+        <format>tar.bz2</format>
+        <format>zip</format>
+      </formats>
+      <fileSets>
+        <fileSet>
+          <includes>
+            <include>README*</include>
+            <include>LICENSE*</include>
+            <include>NOTICE*</include>
+          </includes>
+        </fileSet>
+        <fileSet>
+          <directory>target</directory>
+          <outputDirectory></outputDirectory>
+          <includes>
+            <include>*.jar</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </assembly>
+------
+
+*jar-with-dependencies.xml  descriptorId:jar-with-dependencies
+
+-----
+<assembly>
+  <id>jar-with-dependencies</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+</assembly>
+-----
+
+*src.xml   descriptorId:xml
+
+-----
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+        <include>pom.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src</directory>
+    </fileSet>
+  </fileSets>
+</assembly>
+-----
+
+
+ 
+

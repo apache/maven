@@ -1,0 +1,72 @@
+ ------
+ Maven 2 Assembly Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 20, 2005
+
+How to Use
+
+  These is a brief example on how to use the assembly:assembly goal and assembly:unpack goal.  
+  
+  To use the assembly:assembly goal, you must define the descriptor file that you are going to use or 
+  define the descriptorId from the predefined {{{descriptor.html}descriptor ids}}.  
+
+
+* How To use assembly:assembly using a customized descriptor file.  
+
+-----
+  m2 assembly:assembly -Dmaven.assembly.descriptor=path/to/descriptor.xml
+-----
+
+ 
+* How to use assembly:assembly using predefined descriptor ids.
+
+----
+
+  m2 assembly:assembly -Dmaven.assembly.descriptorId=bin      
+
+  or  m2 assembly:assembly -Dmaven.assembly.descriptorId=jar-with-dependencies
+
+  or  m2 assembly:assembly -Dmaven.assembly.descriptorId=src
+
+-----
+
+* How to configure assembly:assembly plugin in pom.xml
+
+ You can also configure this plugin inside your pom.xml.  To run use "m2 assembly:assembly".
+
+-------------------
+<project>
+   ...
+      <build>
+         ...
+        <plugins>
+            <plugin>
+                 <artifactId>maven-assembly-plugin</artifactId>
+                 <version>2.0-beta-1</version>
+                 <configuration>
+                   <descriptor>path/to/descriptor.xml</descriptor>
+                   <finalName>final_name</finalName>
+                   <outputDirectory>output/directory</outputDirectory>
+                   <workDirectory>target/assembly/work</workDirectory>
+                 </configuration>
+            </plugin>
+         </plugins>
+         ...
+      </build>
+   ...
+</project>
+-------------------
+
+* How to use assembly:unpack
+
+  After running this goal, all dependencies will be extracted at the specified "\<workDirectory\>".
+
+-----
+ m2 assembly:unpack
+-----
+
+  For full documentation, click {{{index.html}here}}.
+ 

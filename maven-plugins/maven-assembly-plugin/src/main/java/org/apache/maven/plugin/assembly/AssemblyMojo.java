@@ -71,23 +71,31 @@ public class AssemblyMojo
 {
 
     /**
+     * Predefined Assembly Descriptor Id's.  You can select bin, jar-with-dependencies, or src.
+     *
      * @parameter expression="${maven.assembly.descriptorId}"
      */
     protected String descriptorId;
 
     /**
+     * Assembly XML Descriptor file.  This must be the path to your customized descriptor file.
+     *
      * @parameter expression="${maven.assembly.descriptor}"
      */
     protected File descriptor;
 
     /**
+     * Base directory of the project.
+     *
      * @parameter expression="${basedir}"
      * @required
      * @readonly
      */
     private String basedir;
-    
+
     /**
+     * The Maven Project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -95,6 +103,8 @@ public class AssemblyMojo
     private MavenProject project;
 
     /**
+     * Maven ProjectHelper
+     *
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
      * @required
      * @readonly
@@ -102,13 +112,19 @@ public class AssemblyMojo
     private MavenProjectHelper projectHelper;
 
     /**
+     * Temporary directory that contain the files to be assembled.
+     *
      * @parameter expression="${project.build.directory}/archive-tmp"
      * @required
      * @readonly
      */
     private File tempRoot;
 
-
+    /**
+     * Create the binary distribution.
+     *
+     * @throws MojoExecutionException
+     */
     public void execute()
         throws MojoExecutionException
     {
@@ -123,11 +139,16 @@ public class AssemblyMojo
         }
     }
 
+    /**
+     * Create the binary distribution.
+     *
+     * @throws ArchiverException, IOException, MojoExecutionException, XmlPullParserException
+     */
     private void doExecute()
         throws ArchiverException, IOException, MojoExecutionException, XmlPullParserException
     {
         Reader r = null;
-    
+
         if ( descriptor != null )
         {
             r = new FileReader( descriptor );
@@ -146,35 +167,35 @@ public class AssemblyMojo
             // TODO: better exception
             throw new MojoExecutionException( "You must specify descriptor or descriptorId" );
         }
-    
+
         try
         {
             AssemblyXpp3Reader reader = new AssemblyXpp3Reader();
             Assembly assembly = reader.read( r );
-    
+
             // TODO: include dependencies marked for distribution under certain formats
             // TODO: how, might we plug this into an installer, such as NSIS?
             // TODO: allow file mode specifications?
-    
+
             String fullName = finalName + "-" + assembly.getId();
-    
+
             for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
             {
                 String format = (String) i.next();
-    
+
                 String filename = fullName + "." + format;
-    
+
                 // TODO: use component roles? Can we do that in a mojo?
                 Archiver archiver = createArchiver( format );
-    
+
                 processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
                 processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
-    
+
                 File destFile = new File( outputDirectory, filename );
                 archiver.setDestFile( destFile );
                 archiver.createArchive();
-                
-                projectHelper.attachArtifact(project, format, format + "-assembly", destFile );
+
+                projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
             }
         }
         finally
@@ -183,6 +204,14 @@ public class AssemblyMojo
         }
     }
 
+    /**
+     * Processes Dependency Sets
+     *
+     * @param archiver
+     * @param dependencySets
+     * @param includeBaseDirectory
+     * @throws ArchiverException, IOException, MojoExecutionException
+     */
     private void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
         throws ArchiverException, IOException, MojoExecutionException
     {
@@ -192,15 +221,13 @@ public class AssemblyMojo
             String output = dependencySet.getOutputDirectory();
             output = getOutputDirectory( output, includeBaseDirectory );
 
-            archiver.setDefaultDirectoryMode( Integer.parseInt( 
-                    dependencySet.getDirectoryMode(), 8 ) );
+            archiver.setDefaultDirectoryMode( Integer.parseInt( dependencySet.getDirectoryMode(), 8 ) );
 
-            archiver.setDefaultFileMode( Integer.parseInt( 
-                    dependencySet.getFileMode(), 8 ) );
+            archiver.setDefaultFileMode( Integer.parseInt( dependencySet.getFileMode(), 8 ) );
 
-            getLog().debug("DependencySet["+output+"]" +
-                " dir perms: " + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) +
-                " file perms: " + Integer.toString( archiver.getDefaultFileMode(), 8 ) );
+            getLog().debug( "DependencySet[" + output + "]" + " dir perms: " +
+                Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
+                Integer.toString( archiver.getDefaultFileMode(), 8 ) );
 
             AndArtifactFilter filter = new AndArtifactFilter();
             filter.add( new ScopeArtifactFilter( dependencySet.getScope() ) );
@@ -222,7 +249,7 @@ public class AssemblyMojo
                 if ( filter.include( artifact ) )
                 {
                     String name = artifact.getFile().getName();
-                    
+
                     if ( dependencySet.isUnpack() )
                     {
                         // TODO: something like zipfileset in plexus-archiver
@@ -254,10 +281,17 @@ public class AssemblyMojo
                     }
                 }
             }
-        } 
+        }
     }
 
-
+    /**
+     * Process Files that will be included in the distribution.
+     *
+     * @param archiver
+     * @param fileSets
+     * @param includeBaseDirecetory
+     * @throws ArchiverException
+     */
     private void processFileSets( Archiver archiver, List fileSets, boolean includeBaseDirecetory )
         throws ArchiverException
     {
@@ -268,24 +302,22 @@ public class AssemblyMojo
             String output = fileSet.getOutputDirectory();
 
             String lineEnding = getLineEndingCharacters( fileSet.getLineEnding() );
-            
+
             File tmpDir = null;
-                
+
             if ( lineEnding != null )
             {
                 tmpDir = FileUtils.createTempFile( "", "", tempRoot );
                 tmpDir.mkdirs();
             }
-            
-            archiver.setDefaultDirectoryMode( Integer.parseInt( 
-                    fileSet.getDirectoryMode(), 8 ) );
 
-            archiver.setDefaultFileMode( Integer.parseInt( 
-                    fileSet.getFileMode(), 8 ) );
-            
-            getLog().debug("FileSet["+output+"]" +
-                " dir perms: " + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) +
-                " file perms: " + Integer.toString( archiver.getDefaultFileMode(), 8 ) +
+            archiver.setDefaultDirectoryMode( Integer.parseInt( fileSet.getDirectoryMode(), 8 ) );
+
+            archiver.setDefaultFileMode( Integer.parseInt( fileSet.getFileMode(), 8 ) );
+
+            getLog().debug( "FileSet[" + output + "]" + " dir perms: " +
+                Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
+                Integer.toString( archiver.getDefaultFileMode(), 8 ) +
                 ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
 
             if ( directory == null )
@@ -304,7 +336,7 @@ public class AssemblyMojo
                 }
             }
             output = getOutputDirectory( output, includeBaseDirecetory );
-    
+
             String[] includes = (String[]) fileSet.getIncludes().toArray( EMPTY_STRING_ARRAY );
             if ( includes.length == 0 )
             {
@@ -315,10 +347,9 @@ public class AssemblyMojo
             List excludesList = fileSet.getExcludes();
             excludesList.addAll( getDefaultExcludes() );
             String[] excludes = (String[]) excludesList.toArray( EMPTY_STRING_ARRAY );
-    
-            
+
             File archiveBaseDir = new File( directory );
-            
+
             if ( lineEnding != null )
             {
                 copySetReplacingLineEndings( archiveBaseDir, tmpDir, includes, excludes, lineEnding );
@@ -330,16 +361,23 @@ public class AssemblyMojo
         }
     }
 
+    /**
+     * Evaluates Filename Mapping
+     *
+     * @param expression
+     * @param artifact
+     * @return expression
+     */
     private static String evaluateFileNameMapping( String expression, Artifact artifact )
         throws MojoExecutionException
     {
         // this matches the last ${...} string
         Pattern pat = Pattern.compile( "^(.*)\\$\\{([^\\}]+)\\}(.*)$" );
         Matcher mat = pat.matcher( expression );
-    
-        String left,right;
+
+        String left, right;
         Object middle;
-    
+
         if ( mat.matches() )
         {
             left = evaluateFileNameMapping( mat.group( 1 ), artifact );
@@ -347,12 +385,12 @@ public class AssemblyMojo
             {
                 middle = ReflectionValueExtractor.evaluate( "dep." + mat.group( 2 ), artifact );
             }
-            catch (Exception e)
+            catch ( Exception e )
             {
-                throw new MojoExecutionException("Cannot evaluate filenameMapping", e);
+                throw new MojoExecutionException( "Cannot evaluate filenameMapping", e );
             }
             right = mat.group( 3 );
-    
+
             if ( middle == null )
             {
                 // TODO: There should be a more generic way dealing with that. Having magic words is not good at all.
@@ -367,20 +405,31 @@ public class AssemblyMojo
                     middle = "${" + mat.group( 2 ) + "}";
                 }
             }
-    
+
             return left + middle + right;
         }
-    
+
         return expression;
     }
-    
+
+    /**
+     * Get the files to be excluded and put it into list.
+     *
+     * @return l List of filename patterns to be excluded.
+     */
     private static List getJarExcludes()
     {
         List l = new ArrayList( getDefaultExcludes() );
         l.add( "META-INF/**" );
         return l;
     }
-    
+
+    /**
+     * Get the Output Directory by parsing the String output directory.
+     *
+     * @param output The string representation of the output directory.
+     * @param includeBaseDirectory True if base directory is to be included in the assembled file.
+     */
     private String getOutputDirectory( String output, boolean includeBaseDirectory )
     {
         if ( output == null )
@@ -392,7 +441,7 @@ public class AssemblyMojo
             // TODO: shouldn't archiver do this?
             output += '/';
         }
-    
+
         if ( includeBaseDirectory )
         {
             if ( output.startsWith( "/" ) )
@@ -413,7 +462,14 @@ public class AssemblyMojo
         }
         return output;
     }
-    
+
+    /**
+     * Creates the necessary archiver to build the distribution file.
+     *
+     * @param format Archive format
+     * @return archiver  Archiver generated
+     * @throws ArchiverException
+     */
     private static Archiver createArchiver( String format )
         throws ArchiverException
     {
@@ -463,7 +519,12 @@ public class AssemblyMojo
         }
         return archiver;
     }
-    
+
+    /**
+     * Insert into the exclude list the default excludes file pattern.
+     *
+     * @return defaultExcludes List containing the default patterns of files to be excluded.
+     */
     public static List getDefaultExcludes()
     {
         List defaultExcludes = new ArrayList();
@@ -472,40 +533,40 @@ public class AssemblyMojo
         defaultExcludes.add( "**/.#*" );
         defaultExcludes.add( "**/%*%" );
         defaultExcludes.add( "**/._*" );
-    
+
         // CVS
         defaultExcludes.add( "**/CVS" );
         defaultExcludes.add( "**/CVS/**" );
         defaultExcludes.add( "**/.cvsignore" );
-    
+
         // SCCS
         defaultExcludes.add( "**/SCCS" );
         defaultExcludes.add( "**/SCCS/**" );
-    
+
         // Visual SourceSafe
         defaultExcludes.add( "**/vssver.scc" );
-    
+
         // Subversion
         defaultExcludes.add( "**/.svn" );
         defaultExcludes.add( "**/.svn/**" );
-    
+
         // Mac
         defaultExcludes.add( "**/.DS_Store" );
-    
+
         return defaultExcludes;
     }
-    
+
     private void copyReplacingLineEndings( File source, File dest, String lineEndings )
         throws IOException
     {
         getLog().debug( "Copying while replacing line endings: " + source + " to " + dest );
 
-        BufferedReader in = new BufferedReader( new FileReader ( source ) );
-        BufferedWriter out = new BufferedWriter ( new FileWriter( dest ) );
-        
+        BufferedReader in = new BufferedReader( new FileReader( source ) );
+        BufferedWriter out = new BufferedWriter( new FileWriter( dest ) );
+
         String line;
-        
-        while ( ( line = in.readLine()) != null )
+
+        while ( ( line = in.readLine() ) != null )
         {
             out.write( line );
             out.write( lineEndings );
@@ -514,8 +575,9 @@ public class AssemblyMojo
         out.close();
     }
 
-    
-    private void copySetReplacingLineEndings( File archiveBaseDir, File tmpDir, String[] includes, String[] excludes, String lineEnding )
+
+    private void copySetReplacingLineEndings( File archiveBaseDir, File tmpDir, String[] includes, String[] excludes,
+                                              String lineEnding )
         throws ArchiverException
     {
         DirectoryScanner scanner = new DirectoryScanner();
@@ -523,36 +585,34 @@ public class AssemblyMojo
         scanner.setIncludes( includes );
         scanner.setExcludes( excludes );
         scanner.scan();
-        
+
         String [] dirs = scanner.getIncludedDirectories();
-        
-        for ( int j = 0; j < dirs.length; j ++)
+
+        for ( int j = 0; j < dirs.length; j ++ )
         {
             new File( tempRoot, dirs[j] ).mkdirs();
         }
-    
+
         String [] files = scanner.getIncludedFiles();
-    
-        for ( int j = 0; j < files.length; j ++)
+
+        for ( int j = 0; j < files.length; j ++ )
         {
             File targetFile = new File( tmpDir, files[j] );
-    
+
             try
             {
                 targetFile.getParentFile().mkdirs();
 
                 copyReplacingLineEndings( new File( archiveBaseDir, files[j] ), targetFile, lineEnding );
             }
-            catch (IOException e)
+            catch ( IOException e )
             {
-                throw new ArchiverException("Error copying file '" +
-                    files[j] + "' to '" + targetFile + "'", e);
+                throw new ArchiverException( "Error copying file '" + files[j] + "' to '" + targetFile + "'", e );
             }
         }
 
-    }	
+    }
 
-    
     private static String getLineEndingCharacters( String lineEnding )
         throws ArchiverException
     {
@@ -572,13 +632,12 @@ public class AssemblyMojo
             }
             else
             {
-                throw new ArchiverException( "Illlegal lineEnding specified: '" +
-                    lineEnding + "'");
+                throw new ArchiverException( "Illlegal lineEnding specified: '" + lineEnding + "'" );
             }
         }
-        
+
         return lineEnding;
     }
 
-    
+
 }

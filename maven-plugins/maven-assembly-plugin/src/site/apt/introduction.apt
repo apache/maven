@@ -1,0 +1,23 @@
+ ------
+ Maven 2 Assembly Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 20, 2005
+
+Introduction
+
+ This plugin is the Maven2 version of Maven1's Distribution Plugin.  
+ 
+ This plugin provides the capability to create a binary distribution and source distribution.  
+ Currently it can create distribution format such as: zip format, tar.bz, tar.gz2, jar format.
+ The goal to do this is "assembly:assembly".
+
+ It also provides the capability to extract all project dependencies on certain working directory.  
+ The goal to do this is "assembly:unpack".
+
+ To learn how to use the plugin, click {{{howto.html}here}}.
+
+ 
+

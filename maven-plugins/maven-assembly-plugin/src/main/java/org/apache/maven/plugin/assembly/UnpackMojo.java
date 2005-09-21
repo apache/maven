@@ -1,10 +1,10 @@
 package org.apache.maven.plugin.assembly;
 
-import java.io.File;
-import java.util.Iterator;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+
+import java.io.File;
+import java.util.Iterator;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -33,27 +33,40 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class UnpackMojo
     extends AbstractUnpackingMojo
 {
+    /**
+     * Unpacks the archive file.
+     *
+     * @throws MojoExecutionException
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+        try
+        {
+            doExecute();
+        }
+        catch ( Exception e )
+        {
+            // TODO: don't catch exception
+            throw new MojoExecutionException( "Error unpacking", e );
+        }
+    }
 
-	public void execute() throws MojoExecutionException {
-	    try
-	    {
-	        doExecute();
-	    }
-	    catch ( Exception e )
-	    {
-	        // TODO: don't catch exception
-	        throw new MojoExecutionException( "Error unpacking", e );
-	    }
-	}
-
-	private void doExecute() throws Exception {
+    /**
+     * Unpacks the project dependencies.
+     *
+     * @throws Exception
+     */
+    private void doExecute()
+        throws Exception
+    {
 
         for ( Iterator j = dependencies.iterator(); j.hasNext(); )
         {
             Artifact artifact = (Artifact) j.next();
 
             String name = artifact.getFile().getName();
-            
+
             File tempLocation = new File( workDirectory, name.substring( 0, name.length() - 4 ) );
             boolean process = false;
             if ( !tempLocation.exists() )
@@ -68,9 +81,9 @@ public class UnpackMojo
 
             if ( process )
             {
-            	File file = artifact.getFile();
-            	unpack(file, tempLocation);
+                File file = artifact.getFile();
+                unpack( file, tempLocation );
             }
-        }            
-	}
+        }
+    }
 }
