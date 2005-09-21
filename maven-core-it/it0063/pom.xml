@@ -6,13 +6,6 @@
   <version>1.0</version>
   <dependencies>
     <dependency>
-      <groupId>jdk-tools</groupId>
-      <artifactId>jdk-tools</artifactId>
-      <version>1.4.2</version>
-      <scope>system</scope>
-      <systemPath>${toolsJarPath}</systemPath>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
@@ -21,6 +14,7 @@
   </dependencies>
   <profiles>
     <profile>
+      <!-- NOTE: This will not be activated on OS X, since classes.jar already has the tools in it. -->
       <id>default-tools.jar</id>
       <activation>
         <property>
@@ -28,21 +22,15 @@
           <value>Sun Microsystems Inc.</value>
         </property>
       </activation>
-      <properties>
-        <toolsJarPath>${java.home}/../lib/tools.jar</toolsJarPath>
-      </properties>
-    </profile>
-    <profile>
-      <id>osx-tools.jar</id>
-      <activation>
-        <property>
-          <name>java.vendor</name>
-          <value>Apple Computer, Inc.</value>
-        </property>
-      </activation>
-      <properties>
-        <toolsJarPath>${java.home}/../Classes/classes.jar</toolsJarPath>
-      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>sun.jdk</groupId>
+          <artifactId>tools</artifactId>
+          <version>1.4.2</version>
+          <scope>system</scope>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </model>
