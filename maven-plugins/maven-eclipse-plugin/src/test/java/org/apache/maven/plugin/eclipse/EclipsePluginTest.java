@@ -126,6 +126,7 @@ public class EclipsePluginTest
         }
 
         plugin.setProject( project );
+        plugin.setOutputDirectory( project.getBuild().getOutputDirectory() );
 
         plugin.setLocalRepository( localRepository );
 

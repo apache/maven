@@ -97,7 +97,7 @@ public class EclipseUtils
     
     
 
-    public static EclipseSourceDir[] buildDirectoryList( MavenProject project, File basedir, Log log )
+    public static EclipseSourceDir[] buildDirectoryList( MavenProject project, File basedir, Log log, String outputDirectory )
     {
         File projectBaseDir = project.getFile().getParentFile();
 
@@ -109,13 +109,16 @@ public class EclipseUtils
         EclipseUtils.extractResourceDirs( directories, project.getBuild().getResources(), project, basedir, projectBaseDir, false,
                              null, log );
 
+        // If using the standard output location, don't mix the test output into it.
+        String testOutput = outputDirectory.equals( project.getBuild().getOutputDirectory() ) ?  
+                EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild().getTestOutputDirectory(), false ) :
+                null;
+        
         EclipseUtils.extractSourceDirs( directories, project.getTestCompileSourceRoots(), basedir, projectBaseDir, true,
-                           EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild()
-                               .getTestOutputDirectory(), false ) );
+                testOutput );
 
         EclipseUtils.extractResourceDirs( directories, project.getBuild().getTestResources(), project, basedir, projectBaseDir,
-                             true, EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild()
-                                 .getTestOutputDirectory(), false ), log );
+                             true, testOutput, log );
 
         return (EclipseSourceDir[]) directories.toArray( new EclipseSourceDir[directories.size()] );
     }

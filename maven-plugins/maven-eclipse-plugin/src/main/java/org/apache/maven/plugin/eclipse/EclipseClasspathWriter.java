@@ -53,11 +53,12 @@ public class EclipseClasspathWriter
 
     /**
      * @todo the list of needed parameters is really long, maybe this should become a Plexus component
+     * @param outputDirectory TODO
      */
     protected void write( File projectBaseDir, File basedir, MavenProject project, List referencedReactorArtifacts,
                          EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
                          ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
-                         List remoteArtifactRepositories, boolean downloadSources )
+                         List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
         throws EclipsePluginException
     {
 
@@ -103,8 +104,8 @@ public class EclipseClasspathWriter
 
         writer.startElement( "classpathentry" ); //$NON-NLS-1$
         writer.addAttribute( "kind", "output" ); //$NON-NLS-1$ //$NON-NLS-2$
-        writer.addAttribute( "path", EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild() //$NON-NLS-1$
-            .getOutputDirectory(), false ) );
+        writer.addAttribute( "path", EclipseUtils.toRelativeAndFixSeparator( projectBaseDir,  //$NON-NLS-1$  
+            outputDirectory, false ) );
         writer.endElement();
 
         // ----------------------------------------------------------------------

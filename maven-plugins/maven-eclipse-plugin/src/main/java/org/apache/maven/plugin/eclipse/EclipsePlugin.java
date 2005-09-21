@@ -160,6 +160,13 @@ public class EclipsePlugin
      * @parameter expression="${eclipse.workspace}"
      */
     private File outputDir;
+    
+    /**
+     * The default output directory 
+     *
+     * @parameter expression="${project.build.outputDirectory}"
+     */
+    String outputDirectory;
 
     /**
      * Setter for <code>project</code>. Needed for tests.
@@ -257,6 +264,7 @@ public class EclipsePlugin
     public void execute()
         throws MojoExecutionException
     {
+        
         if ( executedProject == null )
         {
             // backwards compat with alpha-2 only
@@ -332,12 +340,12 @@ public class EclipsePlugin
         List reactorArtifacts = EclipseUtils.resolveReactorArtifacts( project, reactorProjects );
 
         // build a list of UNIQUE source dirs (both src and resources) to be used in classpath and wtpmodules
-        EclipseSourceDir[] sourceDirs = EclipseUtils.buildDirectoryList( executedProject, outputDir, getLog() );
+        EclipseSourceDir[] sourceDirs = EclipseUtils.buildDirectoryList( executedProject, outputDir, getLog(), outputDirectory );
 
         // use project since that one has all artifacts resolved.
         new EclipseClasspathWriter( getLog() ).write( projectBaseDir, outputDir, project, reactorArtifacts, sourceDirs,
                                                       classpathContainers, localRepository, artifactResolver,
-                                                      artifactFactory, remoteArtifactRepositories, downloadSources );
+                                                      artifactFactory, remoteArtifactRepositories, downloadSources, outputDirectory );
 
         new EclipseProjectWriter( getLog() ).write( projectBaseDir, outputDir, project, executedProject,
                                                     reactorArtifacts, projectnatures, buildcommands );
@@ -364,5 +372,9 @@ public class EclipsePlugin
     public void setDownloadSources( boolean downloadSources )
     {
         this.downloadSources = downloadSources;
+    }
+
+    public void setOutputDirectory(String outputDirectory) {
+        this.outputDirectory = outputDirectory;
     }
 }
