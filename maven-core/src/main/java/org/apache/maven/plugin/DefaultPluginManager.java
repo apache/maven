@@ -1168,7 +1168,11 @@ public class DefaultPluginManager
         // check this with yourkit as a hot spot.
         try
         {
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+            // Don't recreate if already created - for effeciency, and because clover plugin adds to it
+            if ( project.getDependencyArtifacts() == null )
+            {
+                project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+            }
         }
         catch ( InvalidVersionSpecificationException e )
         {
