@@ -33,6 +33,7 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
+import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -62,6 +63,8 @@ public class DefaultWagonManager
     private Map proxies = new HashMap();
 
     private Map authenticationInfoMap = new HashMap();
+
+    private Map serverPermissionsMap = new HashMap();
 
     private Map mirrors = new HashMap();
 
@@ -139,8 +142,21 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
-                           getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+            Repository artifactRepository = new Repository( repository.getId(), repository.getUrl() );
+
+            if ( serverPermissionsMap.containsKey( repository.getId() ) )
+            {
+                RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
+                getLogger().debug(
+                    "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
+                artifactRepository.setPermissions( perms );
+            }
+            else
+            {
+                getLogger().debug( "not adding permissions to wagon connection" );
+            }
+
+            wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             wagon.put( source, remotePath );
 
@@ -307,6 +323,7 @@ public class DefaultWagonManager
 
         try
         {
+
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
                            getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
@@ -591,6 +608,30 @@ public class DefaultWagonManager
         authInfo.setPassphrase( passphrase );
 
         authenticationInfoMap.put( repositoryId, authInfo );
+    }
+
+    public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
+    {
+
+        RepositoryPermissions permissions = new RepositoryPermissions();
+        boolean addPermissions = false;
+
+        if ( filePermissions != null )
+        {
+            permissions.setFileMode( filePermissions );
+            addPermissions = true;
+        }
+
+        if ( directoryPermissions != null )
+        {
+            permissions.setDirectoryMode( directoryPermissions );
+            addPermissions = true;
+        }
+
+        if ( addPermissions )
+        {
+            serverPermissionsMap.put( repositoryId, permissions );
+        }
     }
 
     public void addMirror( String id, String mirrorOf, String url )

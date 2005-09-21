@@ -17,7 +17,8 @@
     <class>
       <name>TrackableBase</name>
       <version>1.0.0</version>
-      <description>common base class that contains code to track the source for this instance (USER|GLOBAL)</description>
+      <description>common base class that contains code to track the source for this instance
+        (USER|GLOBAL)</description>
       <codeSegments>
         <codeSegment>
           <version>1.0.0</version>
@@ -90,7 +91,8 @@
         <field>
           <name>usePluginRegistry</name>
           <version>1.0.0</version>
-          <description><![CDATA[Whether Maven should use the plugin-registry.xml file to manage plugin versions.]]></description>
+          <description>
+            <![CDATA[Whether Maven should use the plugin-registry.xml file to manage plugin versions.]]></description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
@@ -107,7 +109,7 @@
           <version>1.0.0</version>
           <required>false</required>
           <description><![CDATA[Indicate whether maven should operate in offline mode full-time.]]>
-            </description>
+          </description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
@@ -158,8 +160,8 @@
         <field>
           <name>mirrors</name>
           <version>1.0.0</version>
-          <description> Configuration of download mirrors for repositories. 
-            </description>
+          <description>Configuration of download mirrors for repositories.
+          </description>
           <association>
             <type>Mirror</type>
             <multiplicity>*</multiplicity>
@@ -192,7 +194,8 @@
         <field>
           <name>pluginGroups</name>
           <version>1.0.0</version>
-          <description>List of groupIds to search for a plugin when that plugin groupId is not explicitly provided.</description>
+          <description>List of groupIds to search for a plugin when that plugin groupId is not explicitly
+            provided.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -372,7 +375,7 @@
           <required>false</required>
           <defaultValue>false</defaultValue>
           <description><![CDATA[Whether this proxy configuration is the active one.]]>
-            </description>
+          </description>
           <type>boolean</type>
         </field>
         <field>
@@ -426,7 +429,7 @@
           <name>username</name>
           <version>1.0.0</version>
           <description><![CDATA[The username used to authenticate.]]>
-            </description>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -441,7 +444,7 @@
           <name>privateKey</name>
           <version>1.0.0</version>
           <description><![CDATA[The private key location used to authenticate.]]>
-            </description>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -452,36 +455,52 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>filePermissions</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+          	The permissions for files when they are created.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>directoryPermissions</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+          	The permissions for directories when they are created.
+          ]]></description>
+          <type>String</type>
+        </field>
       </fields>
     </class>
     <class>
       <name>Mirror</name>
       <version>1.0.0</version>
       <superClass>IdentifiableBase</superClass>
-      <description> A download mirror for a given repository. </description>
+      <description>A download mirror for a given repository.</description>
       <fields>
         <field>
           <name>mirrorOf</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description> The server ID of the repository being mirrored, eg 
-            "central". This MUST NOT match the mirror id. </description>
+          <description>The server ID of the repository being mirrored, eg
+            "central". This MUST NOT match the mirror id.</description>
         </field>
         <field>
           <name>name</name>
           <required>false</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description> The optional name that describes the mirror. 
-            </description>
+          <description>The optional name that describes the mirror.
+          </description>
         </field>
         <field>
           <name>url</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description> The URL of the mirror repository. </description>
+          <description>The URL of the mirror repository.</description>
         </field>
         <!--
         <field>
@@ -524,7 +543,7 @@
         </field>
         <field>
           <name>properties</name>
-          <description>Extended configuration specific to this profile goes 
+          <description>Extended configuration specific to this profile goes
             here.</description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
@@ -536,7 +555,7 @@
           <name>repositories</name>
           <version>1.0.0</version>
           <description><![CDATA[The lists of the remote repositories]]>
-            </description>
+          </description>
           <association>
             <type>Repository</type>
             <multiplicity>*</multiplicity>

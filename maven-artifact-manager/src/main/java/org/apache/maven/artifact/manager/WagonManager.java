@@ -66,6 +66,8 @@ public interface WagonManager
 
     void setDownloadMonitor( TransferListener downloadMonitor );
 
+    void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
+
     ProxyInfo getProxy( String protocol );
 
     AuthenticationInfo getAuthenticationInfo( String id );

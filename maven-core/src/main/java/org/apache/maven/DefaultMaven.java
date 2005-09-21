@@ -338,7 +338,7 @@ public class DefaultMaven
             File file = (File) iterator.next();
 
             boolean usingReleasePom = false;
-            
+
             if ( RELEASE_POMv4.equals( file.getName() ) )
             {
                 getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
@@ -369,9 +369,9 @@ public class DefaultMaven
                 for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
                     String name = (String) i.next();
-                    
+
                     File moduleFile;
-                    
+
                     if ( usingReleasePom )
                     {
                         moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
@@ -380,7 +380,7 @@ public class DefaultMaven
                     {
                         moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                     }
-                    
+
                     moduleFiles.add( moduleFile );
                 }
 
@@ -475,6 +475,9 @@ public class DefaultMaven
 
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
                                                     server.getPrivateKey(), server.getPassphrase() );
+
+                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
+                                                server.getDirectoryPermissions() );
             }
 
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
