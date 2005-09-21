@@ -51,9 +51,9 @@ Installing the Ant Tasks
 -----
 <project ... xmlns:artifact="urn:maven-artifact-ant">
   ...
-  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="maven-artifact-ant">
+  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
     <classpath>
-      <pathelement location="lib/maven-artifact-ant-2.0-alpha-3.jar" />
+      <pathelement location="lib/maven-artifact-ant-2.0-beta-1.jar" />
     </classpath>
   </typedef>
   ...
