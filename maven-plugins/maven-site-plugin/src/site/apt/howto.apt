@@ -1,0 +1,52 @@
+ ------
+ Maven 2 Site Plugin
+ ------
+
+Maven 2 Site Plugin
+
+ Generate the project's site and report distributions.
+
+*How to Use
+
+  Using the site plugin is very easy, just execute the site goal from your project
+
+-------------------
+  m2 site:site
+-------------------
+  
+  and it would generate its default reports.
+
+  *jdepend
+
+  *checkstyle
+  
+  *surefire-report
+  
+  *javadoc
+  
+  *jxr (cross reference)
+  
+  *taglist
+  
+  *changelog
+
+
+*How to configure the default reports version
+
+  You can configure the reports version by adding arguments in the command line.
+
+-------------------
+
+  m2 site:site -DjdependVersion=2.0-beta-1 \
+	-DcheckstyleVersion=1.0 \
+	-DsurefireVersion=2.0 \
+	-DjavadocVersion=3.0 \
+
+-------------------
+
+  Note: The command is only a single line and the version value are just examples.
+
+
+*Deploying site & Site Descriptor
+
+  For more references of deploying the site and site descriptor here's a link {{{http://maven.apache.org/maven2/site.html}http://maven.apache.org/maven2/site.html}}.

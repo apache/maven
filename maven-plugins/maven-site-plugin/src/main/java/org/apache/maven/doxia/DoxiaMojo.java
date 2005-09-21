@@ -95,6 +95,8 @@ public class DoxiaMojo
         "**/.DS_Store"};
 
     /**
+     * Directory that contains the reports in apt/fml format.
+     *
      * @parameter expression="${basedir}/src/site"
      * @required
      */
@@ -107,23 +109,31 @@ public class DoxiaMojo
     private File generatedSiteDirectory;
 
     /**
+     * Directory that contains the generated reports.
+     *
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private File outputDirectory;
 
     /**
+     * Directory which contains the resources for the site.
+     *
      * @parameter expression="${basedir}/src/site/resources"
      * @required
      */
     private File resourcesDirectory;
 
     /**
+     * Directory containing the template page.
+     *
      * @parameter expression="${templateDirectory}"
      */
     private String templateDirectory;
 
     /**
+     * Default template page.
+     *
      * @parameter expression="${template}"
      */
     private String template = DEFAULT_TEMPLATE;
@@ -161,6 +171,8 @@ public class DoxiaMojo
     private Renderer siteRenderer;
 
     /**
+     * Internationalization.
+     *
      * @parameter expression="${component.org.codehaus.plexus.i18n.I18N}"
      * @required
      * @readonly
@@ -168,6 +180,8 @@ public class DoxiaMojo
     private I18N i18n;
 
     /**
+     * The maven project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -409,6 +423,12 @@ public class DoxiaMojo
         }
     }
 
+    /**
+     * Categorize reports by category name.
+     *
+     * @param reports list of reports
+     * @return the categorised reports
+     */
     private Map categorizeReports( List reports )
     {
         Map categories = new HashMap();
@@ -670,7 +690,7 @@ public class DoxiaMojo
     }
 
     /**
-     * Generated an index page.
+     * Generate an index page.
      *
      * @param siteDescriptor
      * @param locale
