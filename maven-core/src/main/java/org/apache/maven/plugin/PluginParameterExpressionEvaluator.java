@@ -62,15 +62,15 @@ public class PluginParameterExpressionEvaluator
 
     private final Logger logger;
 
-    private final MojoDescriptor mojoDescriptor;
+    private final MojoExecution mojoExecution;
 
     private final MavenProject project;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, MojoDescriptor mojoDescriptor,
-                                              PathTranslator pathTranslator, Logger logger, MavenProject project )
+    public PluginParameterExpressionEvaluator( MavenSession context, MojoExecution mojoExecution,
+                                               PathTranslator pathTranslator, Logger logger, MavenProject project )
     {
         this.context = context;
-        this.mojoDescriptor = mojoDescriptor;
+        this.mojoExecution = mojoExecution;
         this.pathTranslator = pathTranslator;
         this.logger = logger;
         this.project = project;
@@ -106,18 +106,20 @@ public class PluginParameterExpressionEvaluator
             return expression;
         }
 
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         if ( BANNED_EXPRESSIONS.containsKey( expression ) )
         {
-            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression
-                + "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'"
-                + BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
+            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression +
+                "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'" +
+                BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
         }
         else if ( DEPRECATED_EXPRESSIONS.containsKey( expression ) )
         {
-            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" + mojoDescriptor.getGoal()
-                + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) + "\' instead." );
+            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" +
+                mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
+                "\' instead." );
         }
-        
+
         if ( "localRepository".equals( expression ) )
         {
             value = context.getLocalRepository();
@@ -129,6 +131,10 @@ public class PluginParameterExpressionEvaluator
         else if ( "reactorProjects".equals( expression ) )
         {
             value = context.getSortedProjects();
+        }
+        else if ( "reports".equals( expression ) )
+        {
+            value = mojoExecution.getReports();
         }
         else if ( "project".equals( expression ) )
         {
@@ -233,7 +239,7 @@ public class PluginParameterExpressionEvaluator
                 logger.error( "Got expression '" + expression + "' that was not recognised" );
             }
         }
-        
+
         if ( value == null )
         {
             // Check properties that have been injected via profiles before we default over to

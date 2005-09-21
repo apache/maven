@@ -17,7 +17,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -36,7 +35,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -160,6 +158,13 @@ public class DefaultPluginManager
             plugin.setVersion( version );
         }
 
+        return verifyVersionedPlugin( plugin, project, localRepository );
+    }
+
+    private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project,
+                                                    ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, PluginManagerException, ArtifactResolutionException
+    {
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
         // and no ChildContainer exists. The check for that below fixes
@@ -327,7 +332,7 @@ public class DefaultPluginManager
                 dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
             }
 
-            plugin = getConfiguredMojo( mojoDescriptor, session, dom, project, false );
+            plugin = getConfiguredMojo( session, dom, project, false, mojoExecution );
         }
         catch ( PluginConfigurationException e )
         {
@@ -390,69 +395,55 @@ public class DefaultPluginManager
         }
     }
 
-    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session )
-        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
-        ArtifactResolutionException
+    public MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+        throws PluginManagerException
     {
-        Plugin forLookup = new Plugin();
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
+        Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(), descriptor.getArtifactId(),
+                                                      mojoExecution.getExecutionId() );
+        if ( mojoExecution.getConfiguration() != null )
+        {
+            dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
+        }
 
-        String groupId = reportPlugin.getGroupId();
-        String artifactId = reportPlugin.getArtifactId();
+        MavenReport reportMojo;
+        try
+        {
+            reportMojo = (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new PluginManagerException( "Error looking up report: ", e );
+        }
+        catch ( PluginConfigurationException e )
+        {
+            throw new PluginManagerException( "Error configuring report: ", e );
+        }
+        return reportMojo;
+    }
 
-        forLookup.setGroupId( groupId );
-        forLookup.setArtifactId( artifactId );
-
+    public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException
+    {
         String version = reportPlugin.getVersion();
 
-        Artifact existingPluginArtifact = (Artifact) project.getReportArtifactMap().get( reportPlugin.getKey() );
-
-        if ( existingPluginArtifact == null ||
-            !reportPlugin.getKey().equals( ArtifactUtils.versionlessKey( existingPluginArtifact ) ) || version == null )
+        if ( version == null )
         {
-            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, session.getSettings(),
-                                                                 session.getLocalRepository(), true );
+            version = pluginVersionManager.resolveReportPluginVersion( reportPlugin.getGroupId(),
+                                                                       reportPlugin.getArtifactId(), project,
+                                                                       session.getSettings(),
+                                                                       session.getLocalRepository() );
+            reportPlugin.setVersion( version );
         }
 
+        Plugin forLookup = new Plugin();
+
+        forLookup.setGroupId( reportPlugin.getGroupId() );
+        forLookup.setArtifactId( reportPlugin.getArtifactId() );
         forLookup.setVersion( version );
 
-        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, project, session
-            .getSettings(), session.getLocalRepository() );
-
-        List reports = new ArrayList();
-        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
-        {
-            MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
-
-            // TODO: check ID is correct for reports
-            // if the POM configured no reports, give all from plugin
-            if ( reportSet == null || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
-            {
-                try
-                {
-                    String id = null;
-                    if ( reportSet != null )
-                    {
-                        id = reportSet.getId();
-                    }
-                    MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, id );
-
-                    String executionId = mojoExecution.getExecutionId();
-                    Xpp3Dom dom = project.getReportConfiguration( reportPlugin.getGroupId(),
-                                                                  reportPlugin.getArtifactId(), executionId );
-
-                    Mojo reportMojo = getConfiguredMojo( mojoDescriptor, session, dom, project, true );
-                    if ( reportMojo != null )
-                    {
-                        reports.add( reportMojo );
-                    }
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new PluginManagerException( "Error looking up plugin: ", e );
-                }
-            }
-        }
-        return reports;
+        return verifyVersionedPlugin( forLookup, project, session.getLocalRepository() );
     }
 
     private PlexusContainer getPluginContainer( PluginDescriptor pluginDescriptor )
@@ -469,10 +460,12 @@ public class DefaultPluginManager
         return pluginContainer;
     }
 
-    private Mojo getConfiguredMojo( MojoDescriptor mojoDescriptor, MavenSession session, Xpp3Dom dom,
-                                    MavenProject project, boolean report )
+    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report,
+                                    MojoExecution mojoExecution )
         throws ComponentLookupException, PluginConfigurationException, PluginManagerException
     {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
@@ -511,7 +504,7 @@ public class DefaultPluginManager
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoDescriptor,
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution,
                                                                                           pathTranslator, getLogger(),
                                                                                           project );
 
@@ -1019,8 +1012,8 @@ public class DefaultPluginManager
                 configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE );
             }
 
-            configurator.configureComponent( plugin, configuration, expressionEvaluator, pluginContainer
-                .getContainerRealm() );
+            configurator.configureComponent( plugin, configuration, expressionEvaluator,
+                                             pluginContainer.getContainerRealm() );
         }
         catch ( ComponentConfigurationException e )
         {

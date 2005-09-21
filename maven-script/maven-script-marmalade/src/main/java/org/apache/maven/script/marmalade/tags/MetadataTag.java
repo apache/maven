@@ -63,6 +63,8 @@ public class MetadataTag
 
     private String lifecyclePhase;
 
+    private boolean requiresReports;
+
     protected boolean alwaysProcessChildren()
     {
         return false;
@@ -132,7 +134,8 @@ public class MetadataTag
         {
             throw new TagExecutionException( getTagInfo(), "One or more mojo parameters is invalid.", e );
         }
-        
+
+        descriptor.setRequiresReports( requiresReports );
         descriptor.setDependencyResolutionRequired( requiresDependencyResolution );
         descriptor.setProjectRequired( requiresProject );
         descriptor.setAggregator( aggregator );
@@ -201,12 +204,12 @@ public class MetadataTag
 
     public void setAggregator( boolean aggregator )
     {
-        this.aggregator  = aggregator;
+        this.aggregator = aggregator;
     }
 
     public void setInheritByDefault( boolean inheritByDefault )
     {
-        this.inheritByDefault  = inheritByDefault;
+        this.inheritByDefault = inheritByDefault;
     }
 
     public void setRequiresOnline( boolean requiresOnline )
@@ -229,4 +232,8 @@ public class MetadataTag
         this.lifecyclePhase = lifecyclePhase;
     }
 
+    public void setRequiresReports( boolean requiresReports )
+    {
+        this.requiresReports = requiresReports;
+    }
 }

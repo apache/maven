@@ -29,8 +29,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.Requirement;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,8 +68,7 @@ public class JavaMojoDescriptorExtractor
      * Would say there is a getProject() method and a setProject(Project) method. Here the field
      * name would not be the basis for the parameter's name. This mode of operation will allow the
      * mojos to be usable as beans and will be the promoted form of use.
-     *
-     **/
+     */
     public static final String PARAMETER_PROPERTY = "property";
 
     public static final String REQUIRED = "required";
@@ -89,6 +88,8 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
 
     public static final String GOAL_REQUIRES_PROJECT = "requiresProject";
+
+    public static final String GOAL_REQUIRES_REPORTS = "requiresReports";
 
     public static final String GOAL_IS_AGGREGATOR = "aggregator";
 
@@ -413,6 +414,11 @@ public class JavaMojoDescriptorExtractor
                 }
 
                 pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
+
+                if ( "${reports}".equals( pd.getExpression() ) )
+                {
+                    mojoDescriptor.setRequiresReports( true );
+                }
 
                 pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
             }

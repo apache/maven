@@ -19,6 +19,9 @@ package org.apache.maven.plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Describes a single mojo invocation.
  *
@@ -32,6 +35,10 @@ public class MojoExecution
     private final MojoDescriptor mojoDescriptor;
 
     private final Xpp3Dom configuration;
+
+    private List forkedExecutions = new ArrayList();
+
+    private List reports;
 
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
@@ -67,5 +74,20 @@ public class MojoExecution
     public Xpp3Dom getConfiguration()
     {
         return configuration;
+    }
+
+    public void addMojoExecution( MojoExecution execution )
+    {
+        forkedExecutions.add( execution );
+    }
+
+    public void setReports( List reports )
+    {
+        this.reports = reports;
+    }
+
+    public List getReports()
+    {
+        return reports;
     }
 }

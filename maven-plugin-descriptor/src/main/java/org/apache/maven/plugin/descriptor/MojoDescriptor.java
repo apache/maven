@@ -61,7 +61,7 @@ public class MojoDescriptor
     private String executeLifecycle;
 
     private String deprecated;
-    
+
     private boolean aggregator = false;
 
     // ----------------------------------------------------------------------
@@ -79,8 +79,10 @@ public class MojoDescriptor
     private PluginDescriptor pluginDescriptor;
 
     private boolean inheritedByDefault = true;
-    
+
     private boolean directInvocationOnly = false;
+
+    private boolean requiresReports = false;
 
     public MojoDescriptor()
     {
@@ -132,9 +134,9 @@ public class MojoDescriptor
     {
         if ( parameters != null && parameters.contains( parameter ) )
         {
-            throw new DuplicateParameterException( parameter.getName()
-                + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
-                + getImplementation() + ")" );
+            throw new DuplicateParameterException( parameter.getName() +
+                " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: " +
+                getImplementation() + ")" );
         }
         else
         {
@@ -393,12 +395,12 @@ public class MojoDescriptor
     {
         this.executeLifecycle = executeLifecycle;
     }
-    
+
     public void setAggregator( boolean aggregator )
     {
         this.aggregator = aggregator;
     }
-    
+
     public boolean isAggregator()
     {
         return aggregator;
@@ -412,5 +414,15 @@ public class MojoDescriptor
     public void setDirectInvocationOnly( boolean directInvocationOnly )
     {
         this.directInvocationOnly = directInvocationOnly;
+    }
+
+    public boolean isRequiresReports()
+    {
+        return requiresReports;
+    }
+
+    public void setRequiresReports( boolean requiresReports )
+    {
+        this.requiresReports = requiresReports;
     }
 }

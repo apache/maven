@@ -31,6 +31,8 @@ import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecution;
@@ -47,6 +49,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -474,6 +477,13 @@ public class DefaultLifecycleExecutor
                 forkLifecycle( mojoDescriptor, session, project );
             }
 
+            if ( mojoDescriptor.isRequiresReports() )
+            {
+                List reports = getReports( project, mojoExecution, session );
+
+                mojoExecution.setReports( reports );
+            }
+
             try
             {
                 pluginManager.executeMojo( project, mojoExecution, session );
@@ -483,6 +493,91 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
             }
         }
+    }
+
+    private List getReports( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+        throws ArtifactResolutionException, LifecycleExecutionException
+    {
+        List reportPlugins = project.getReportPlugins();
+
+        if ( project.getModel().getReports() != null )
+        {
+            getLogger().error(
+                "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+        }
+
+        List reports = new ArrayList();
+        if ( reportPlugins != null )
+        {
+            for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
+            {
+                ReportPlugin reportPlugin = (ReportPlugin) it.next();
+
+                List reportSets = reportPlugin.getReportSets();
+
+                try
+                {
+                    if ( reportSets == null || reportSets.isEmpty() )
+                    {
+                        reports.addAll( getReports( reportPlugin, null, project, session, mojoExecution ) );
+                    }
+                    else
+                    {
+                        for ( Iterator j = reportSets.iterator(); j.hasNext(); )
+                        {
+                            ReportSet reportSet = (ReportSet) j.next();
+
+                            reports.addAll( getReports( reportPlugin, reportSet, project, session, mojoExecution ) );
+                        }
+                    }
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException( "Error getting reports", e );
+                }
+                catch ( PluginVersionResolutionException e )
+                {
+                    throw new LifecycleExecutionException( "Error getting reports", e );
+                }
+            }
+        }
+        return reports;
+    }
+
+    private List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
+                             MojoExecution mojoExecution )
+        throws PluginManagerException, PluginVersionResolutionException, ArtifactResolutionException
+    {
+        PluginDescriptor pluginDescriptor = pluginManager.verifyReportPlugin( reportPlugin, project, session );
+
+        List reports = new ArrayList();
+        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
+        {
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
+
+            // TODO: check ID is correct for reports
+            // if the POM configured no reports, give all from plugin
+            if ( reportSet == null || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
+            {
+                String id = null;
+                if ( reportSet != null )
+                {
+                    id = reportSet.getId();
+                }
+
+                MojoExecution reportExecution = new MojoExecution( mojoDescriptor, id );
+
+                MavenReport reportMojo = pluginManager.getReport( project, reportExecution, session );
+
+                // Comes back null if it was a plugin, not a report - these are mojos in the reporting plugins that are not reports
+                if ( reportMojo != null )
+                {
+                    reports.add( reportMojo );
+                    mojoExecution.addMojoExecution( reportExecution );
+                }
+            }
+        }
+        return reports;
     }
 
     private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )

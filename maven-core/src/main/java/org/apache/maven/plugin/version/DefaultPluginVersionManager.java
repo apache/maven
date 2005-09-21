@@ -80,8 +80,15 @@ public class DefaultPluginVersionManager
         return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
     }
 
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                        ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project,
+                                              Settings settings, ArtifactRepository localRepository )
+        throws PluginVersionResolutionException
+    {
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
+    }
+
+    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                         ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.

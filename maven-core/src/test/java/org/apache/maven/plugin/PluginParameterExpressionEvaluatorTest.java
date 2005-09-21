@@ -69,8 +69,8 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
-    private static MavenSession createSession( PlexusContainer container,
-                                               ArtifactRepository repo ) throws CycleDetectedException
+    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
+        throws CycleDetectedException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
                                  new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, "." );
@@ -141,12 +141,14 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = createSession( container, repo );
-        
+
         MojoDescriptor mojo = new MojoDescriptor();
         mojo.setPluginDescriptor( pluginDescriptor );
         mojo.setGoal( "goal" );
 
-        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, mojo, null,
+        MojoExecution mojoExecution = new MojoExecution( mojo );
+
+        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, mojoExecution, null,
                                                                              container.getLogger(), project );
     }
 

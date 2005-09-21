@@ -30,19 +30,26 @@ import java.util.List;
 public class ParametersTag
     extends AbstractMarmaladeTag
 {
+    private boolean requiresReports = false;
 
     private List parameters = new ArrayList();
 
-    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    protected void doExecute( MarmaladeExecutionContext context )
+        throws MarmaladeExecutionException
     {
         processChildren( context );
 
         MetadataTag metadataTag = (MetadataTag) requireParent( MetadataTag.class );
         metadataTag.setParameters( parameters );
+        metadataTag.setRequiresReports( requiresReports );
     }
 
     public void addParameter( Parameter parameter )
     {
+        if ( "${reports}".equals( parameter.getExpression() ) )
+        {
+            requiresReports = true;
+        }
         this.parameters.add( parameter );
     }
 

@@ -16,16 +16,8 @@ package org.apache.maven.doxia;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -106,19 +98,19 @@ public class DoxiaMojo
      * @parameter expression="${basedir}/src/site"
      * @required
      */
-    private String siteDirectory;
+    private File siteDirectory;
 
     /**
      * @parameter alias="workingDirectory" expression="${project.build.directory}/generated-site"
      * @required
      */
-    private String generatedSiteDirectory;
+    private File generatedSiteDirectory;
 
     /**
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     /**
      * @parameter expression="${basedir}/src/site/resources"
@@ -127,17 +119,17 @@ public class DoxiaMojo
     private File resourcesDirectory;
 
     /**
-     * @parameter expression="${templateDirectory}
+     * @parameter expression="${templateDirectory}"
      */
     private String templateDirectory;
 
     /**
-     * @parameter expression="${template}
+     * @parameter expression="${template}"
      */
     private String template = DEFAULT_TEMPLATE;
 
     /**
-     * @parameter expression="${attributes}
+     * @parameter expression="${attributes}"
      */
     private Map attributes;
 
@@ -145,7 +137,7 @@ public class DoxiaMojo
      * A comma separated list of locales supported by Maven. The first valid token will be the default Locale
      * for this instance of the Java Virtual Machine.
      *
-     * @parameter expression="${locales}
+     * @parameter expression="${locales}"
      */
     private String locales;
 
@@ -183,18 +175,11 @@ public class DoxiaMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.plugin.PluginManager}"
+     * @parameter expression="${reports}"
      * @required
      * @readonly
      */
-    private PluginManager pluginManager;
-
-    /**
-     * @parameter expression="${session}"
-     * @required
-     * @readonly
-     */
-    private MavenSession session;
+    private List reports;
 
     /**
      * @see org.apache.maven.plugin.Mojo#execute()
@@ -239,6 +224,21 @@ public class DoxiaMojo
             attributes.put( "outputEncoding", outputEncoding );
         }
 
+        Map categories = categorizeReports( reports );
+
+        List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
+        List projectReports = (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS );
+
+        if ( projectInfos == null )
+        {
+            projectInfos = Collections.EMPTY_LIST;
+        }
+
+        if ( projectReports == null )
+        {
+            projectReports = Collections.EMPTY_LIST;
+        }
+
         try
         {
             List localesList = initLocalesList();
@@ -264,7 +264,7 @@ public class DoxiaMojo
                 }
 
                 // Generate static site
-                File siteDirectoryFile = new File( siteDirectory );
+                File siteDirectoryFile = siteDirectory;
                 if ( !locale.getLanguage().equals( defaultLocale.getLanguage() ) )
                 {
                     siteDirectoryFile = new File( siteDirectory, locale.getLanguage() );
@@ -278,11 +278,9 @@ public class DoxiaMojo
                 }
 
                 // Handle the GeneratedSite Directory
-                File generatedSiteFile = new File( generatedSiteDirectory );
-
-                if ( generatedSiteFile.exists() )
+                if ( generatedSiteDirectory.exists() )
                 {
-                    tryToFindDuplicates( generatedSiteFile, duplicate );
+                    tryToFindDuplicates( generatedSiteDirectory, duplicate );
                 }
 
                 // Exception if a file is duplicate
@@ -292,28 +290,11 @@ public class DoxiaMojo
                     throw new MavenReportException( msg );
                 }
 
-                List reports = getReports();
-
-                Map categories = categorizeReports( reports );
-
-                List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
-                List projectReports = (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS );
-
-                if ( projectInfos == null )
-                {
-                    projectInfos = Collections.EMPTY_LIST;
-                }
-
-                if ( projectReports == null )
-                {
-                    projectReports = Collections.EMPTY_LIST;
-                }
-
                 String siteDescriptor = getSiteDescriptor( reports, locale, projectInfos, projectReports );
 
-                if ( generatedSiteFile.exists() )
+                if ( generatedSiteDirectory.exists() )
                 {
-                    siteRenderer.render( generatedSiteFile, outputDirectory, siteDescriptor, template, attributes,
+                    siteRenderer.render( generatedSiteDirectory, outputDirectory, siteDescriptor, template, attributes,
                                          locale );
                 }
 
@@ -437,6 +418,7 @@ public class DoxiaMojo
             MavenReport report = (MavenReport) i.next();
 
             List category = (List) categories.get( report.getCategoryName() );
+
             if ( category == null )
             {
                 category = new ArrayList();
@@ -699,7 +681,7 @@ public class DoxiaMojo
     {
         String outputFileName = "index.html";
 
-        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
+        SiteRendererSink sink = siteRenderer.createSink( siteDirectory, outputFileName, siteDescriptor );
 
         String title = i18n.getString( "site-plugin", locale, "report.index.title" ).trim() + " " + project.getName();
 
@@ -775,8 +757,7 @@ public class DoxiaMojo
 
             String outputFileName = reportFileName + ".html";
 
-            SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                             siteDescriptor );
+            SiteRendererSink sink = siteRenderer.createSink( siteDirectory, outputFileName, siteDescriptor );
 
             report.generate( sink, locale );
 
@@ -803,7 +784,7 @@ public class DoxiaMojo
     {
         String outputFileName = "project-info.html";
 
-        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
+        SiteRendererSink sink = siteRenderer.createSink( siteDirectory, outputFileName, siteDescriptor );
 
         String title = i18n.getString( "site-plugin", locale, "report.information.title" );
 
@@ -884,7 +865,7 @@ public class DoxiaMojo
     {
         String outputFileName = "maven-reports.html";
 
-        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
+        SiteRendererSink sink = siteRenderer.createSink( siteDirectory, outputFileName, siteDescriptor );
 
         String title = i18n.getString( "site-plugin", locale, "report.project.title" );
 
@@ -1037,74 +1018,10 @@ public class DoxiaMojo
     {
         if ( locale.getLanguage().equals( defaultLocale.getLanguage() ) )
         {
-            return new File( outputDirectory );
+            return outputDirectory;
         }
 
         return new File( outputDirectory, locale.getLanguage() );
-    }
-
-    private List getReports()
-        throws MojoExecutionException
-    {
-        // TODO: not the best solution. Perhaps a mojo tag that causes the plugin manager to populate project reports instead?
-
-        List reportPlugins = project.getReportPlugins();
-
-        if ( project.getModel().getReports() != null )
-        {
-            getLog().error(
-                "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
-        }
-
-        List reports = new ArrayList();
-        if ( reportPlugins != null )
-        {
-            for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
-            {
-                ReportPlugin reportPlugin = (ReportPlugin) it.next();
-
-                try
-                {
-                    List reportSets = reportPlugin.getReportSets();
-
-                    List reportsList = new ArrayList();
-
-                    if ( reportSets == null || reportSets.isEmpty() )
-                    {
-                        reportsList = pluginManager.getReports( reportPlugin, null, project, session );
-
-                    }
-                    else
-                    {
-                        for ( Iterator j = reportSets.iterator(); j.hasNext(); )
-                        {
-                            ReportSet reportSet = (ReportSet) j.next();
-
-                            reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session );
-                        }
-                    }
-
-                    reports.addAll( reportsList );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new MojoExecutionException( "Error getting reports", e );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new MojoExecutionException( "Error getting reports", e );
-                }
-                catch ( PluginConfigurationException e )
-                {
-                    throw new MojoExecutionException( "Error getting reports", e );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new MojoExecutionException( "Cannot find report plugin", e );
-                }
-            }
-        }
-        return reports;
     }
 
     /**

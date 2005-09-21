@@ -140,6 +140,10 @@ extract( file, mojoDescriptor )
                 this.parameter = createParameter( text, method );
                 if ( parameter != null )
                 {
+                    if ( "${reports}".equals( parameter.getExpression() ) )
+                    {
+                        mojoDescriptor.setRequiresReports( true );
+                    }
                     mojoDescriptor.addParameter( parameter );
                 }
 

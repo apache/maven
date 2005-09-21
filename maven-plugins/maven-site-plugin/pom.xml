@@ -9,6 +9,9 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Site plugin</name>
   <version>2.0-beta-2-SNAPSHOT</version>
+  <prerequisites>
+    <maven>2.0-beta-2-SNAPSHOT</maven>
+  </prerequisites>
   <developers>
     <developer>
       <id>vsiveton</id>
@@ -23,19 +26,9 @@
   </developers>
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings</artifactId>
-      <version>2.0-beta-1</version>
-    </dependency>
-    <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-site-renderer</artifactId>
       <version>1.0-alpha-2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-      <version>2.0-beta-1</version>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
@@ -44,6 +37,11 @@
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
       <version>2.0-beta-1</version>
     </dependency>
     <dependency>

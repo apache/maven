@@ -37,10 +37,10 @@ public class PluginDescriptorBuilder
         pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
         pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
         pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
-        
+
         String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
-        
-        if( isolatedRealm != null )
+
+        if ( isolatedRealm != null )
         {
             pluginDescriptor.setIsolatedRealm( Boolean.valueOf( isolatedRealm ).booleanValue() );
         }
@@ -63,7 +63,7 @@ public class PluginDescriptorBuilder
             PlexusConfiguration component = mojoConfigurations[i];
 
             MojoDescriptor mojoDescriptor = buildComponentDescriptor( component, pluginDescriptor );
-            
+
             pluginDescriptor.addMojo( mojoDescriptor );
         }
 
@@ -174,6 +174,13 @@ public class PluginDescriptorBuilder
             mojo.setProjectRequired( Boolean.valueOf( requiresProject ).booleanValue() );
         }
 
+        String requiresReports = c.getChild( "requiresReports" ).getValue();
+
+        if ( requiresReports != null )
+        {
+            mojo.setRequiresReports( Boolean.valueOf( requiresReports ).booleanValue() );
+        }
+
         String aggregator = c.getChild( "aggregator" ).getValue();
 
         if ( aggregator != null )
@@ -194,7 +201,7 @@ public class PluginDescriptorBuilder
         {
             mojo.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
         }
-        
+
         // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------

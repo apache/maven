@@ -1,9 +1,5 @@
 package org.apache.maven.plugin.version;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -20,15 +16,20 @@ import org.apache.maven.settings.Settings;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
+
 public interface PluginVersionManager
 {
-
     String ROLE = PluginVersionManager.class.getName();
 
-    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings, ArtifactRepository localRepository )
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                 ArtifactRepository localRepository )
         throws PluginVersionResolutionException;
 
-    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings, ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+    String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                       ArtifactRepository localRepository )
         throws PluginVersionResolutionException;
 
 }
