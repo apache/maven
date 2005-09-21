@@ -89,6 +89,12 @@ public class DefaultRepositoryMetadataManager
                     }
                     else
                     {
+                        // NOTE: [jc; 21-sept-2005] won't this cause inconsistencies if the metadata wasn't found?
+                        // this will write out an essentially empty metadata file, which will result
+                        // in the loop below NOT merging anything (each successive pass is still empty),
+                        // which means that the last repository will be set as the artifact repo, rather
+                        // than leaving it null. This is the root cause of MNG-900, but I'm not sure how
+                        // to fix it.
                         metadata.storeInLocalRepository( localRepository, repository );
                     }
                 }
