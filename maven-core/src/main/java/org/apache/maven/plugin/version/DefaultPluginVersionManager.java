@@ -493,29 +493,31 @@ public class DefaultPluginVersionManager
 
         if ( resolveAsReportPlugin )
         {
-            for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext(); )
+            if ( project.getReportPlugins() != null )
             {
-                ReportPlugin plugin = (ReportPlugin) it.next();
-
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && version == null; )
                 {
-                    version = plugin.getVersion();
+                    ReportPlugin plugin = (ReportPlugin) it.next();
 
-                    break;
+                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                    {
+                        version = plugin.getVersion();
+                    }
                 }
             }
         }
         else
         {
-            for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
+            if ( project.getBuildPlugins() != null )
             {
-                Plugin plugin = (Plugin) it.next();
-
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && version == null; )
                 {
-                    version = plugin.getVersion();
+                    Plugin plugin = (Plugin) it.next();
 
-                    break;
+                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                    {
+                        version = plugin.getVersion();
+                    }
                 }
             }
         }

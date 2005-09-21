@@ -91,6 +91,8 @@ public class DefaultLifecycleExecutor
 
     private ArtifactHandlerManager artifactHandlerManager;
 
+    private List defaultReports;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -515,6 +517,53 @@ public class DefaultLifecycleExecutor
         {
             getLogger().error(
                 "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+        }
+
+        if ( project.getReporting() == null || !project.getReporting().isExcludeDefaults() )
+        {
+            if ( reportPlugins == null )
+            {
+                reportPlugins = new ArrayList();
+            }
+            else
+            {
+                reportPlugins = new ArrayList( reportPlugins );
+            }
+
+            for ( Iterator i = defaultReports.iterator(); i.hasNext(); )
+            {
+                String report = (String) i.next();
+
+                StringTokenizer tok = new StringTokenizer( report, ":" );
+                if ( tok.countTokens() != 2 )
+                {
+                    getLogger().warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId)" );
+                }
+                else
+                {
+                    String groupId = tok.nextToken();
+                    String artifactId = tok.nextToken();
+
+                    boolean found = false;
+                    for ( Iterator j = reportPlugins.iterator(); j.hasNext() && !found; )
+                    {
+                        ReportPlugin reportPlugin = (ReportPlugin) j.next();
+                        if ( reportPlugin.getGroupId().equals( groupId ) &&
+                            reportPlugin.getArtifactId().equals( artifactId ) )
+                        {
+                            found = true;
+                        }
+                    }
+
+                    if ( !found )
+                    {
+                        ReportPlugin reportPlugin = new ReportPlugin();
+                        reportPlugin.setGroupId( groupId );
+                        reportPlugin.setArtifactId( artifactId );
+                        reportPlugins.add( reportPlugin );
+                    }
+                }
+            }
         }
 
         List reports = new ArrayList();

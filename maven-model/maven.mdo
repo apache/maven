@@ -1298,7 +1298,8 @@
         <field>
           <name>systemPath</name>
           <version>4.0.0</version>
-          <description>FOR SYSTEM SCOPE ONLY. This specifies the path on the filesystem for this dependency.</description>
+          <description>FOR SYSTEM SCOPE ONLY. This specifies the path on the filesystem for this
+            dependency.</description>
           <type>String</type>
         </field>
         <field>
@@ -2545,6 +2546,13 @@
       <description>Section for management of reports and configuration</description>
       <fields>
         <field>
+          <name>excludeDefaults</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>If true, then the default reports are not included in the site generation</description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
           <name>outputDirectory</name>
           <version>4.0.0</version>
           <type>String</type>
@@ -2654,7 +2662,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class> 
+    <class>
       <name>Activation</name>
       <version>4.0.0</version>
       <description><![CDATA[
@@ -2693,7 +2701,7 @@
              Specifies that this profile will be activated based on existence of a file.
              ]]></description>
           <association>
-             <type>ActivationFile</type>
+            <type>ActivationFile</type>
           </association>
         </field>
       </fields>
