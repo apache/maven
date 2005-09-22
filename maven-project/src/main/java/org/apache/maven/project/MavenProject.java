@@ -1444,4 +1444,9 @@ public class MavenProject
     {
         return getBuild().getFilters();
     }
+
+    public Map getProjectReferences()
+    {
+        return projectReferences;
+    }
 }

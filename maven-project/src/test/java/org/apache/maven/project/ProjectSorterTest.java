@@ -43,7 +43,7 @@ public class ProjectSorterTest
         projects.add( project2 );
         project1.getDependencies().add( createDependency( project2 ) );
 
-        projects = ProjectSorter.getSortedProjects( projects );
+        projects = new ProjectSorter( projects ).getSortedProjects();
 
         assertEquals( project2, projects.get( 0 ) );
         assertEquals( project1, projects.get( 1 ) );
@@ -59,7 +59,7 @@ public class ProjectSorterTest
         projects.add( project2 );
         project1.getDependencies().add( createDependency( project2 ) );
 
-        projects = ProjectSorter.getSortedProjects( projects );
+        projects = new ProjectSorter( projects ).getSortedProjects();
 
         assertEquals( project2, projects.get( 0 ) );
         assertEquals( project1, projects.get( 1 ) );

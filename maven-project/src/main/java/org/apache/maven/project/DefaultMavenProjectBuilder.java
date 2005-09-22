@@ -664,6 +664,8 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setRemoteArtifactRepositories( remoteRepositories );
+
+        // TODO: these aren't taking active project artifacts into consideration in the reactor
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
         project.setReportArtifacts( createReportArtifacts( project.getReportPlugins() ) );
         project.setExtensionArtifacts( createExtensionArtifacts( project.getBuildExtensions() ) );
@@ -1045,6 +1047,7 @@ public class DefaultMavenProjectBuilder
         return pluginArtifacts;
     }
 
+    // TODO: share with createPluginArtifacts?
     protected Set createReportArtifacts( List reports )
         throws ProjectBuildingException
     {
@@ -1087,6 +1090,7 @@ public class DefaultMavenProjectBuilder
         return pluginArtifacts;
     }
 
+    // TODO: share with createPluginArtifacts?
     protected Set createExtensionArtifacts( List extensions )
         throws ProjectBuildingException
     {
@@ -1112,8 +1116,7 @@ public class DefaultMavenProjectBuilder
                 try
                 {
                     artifact = artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(),
-                                                                        VersionRange
-                                                                            .createFromVersionSpec( version ) );
+                                                                        VersionRange.createFromVersionSpec( version ) );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {

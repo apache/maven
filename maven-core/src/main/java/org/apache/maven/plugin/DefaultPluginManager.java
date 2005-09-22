@@ -48,6 +48,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -262,6 +263,18 @@ public class DefaultPluginManager
                               ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException
     {
+        // TODO: share with MMS? Not sure if it belongs here
+        if ( project.getProjectReferences() != null && !project.getProjectReferences().isEmpty() )
+        {
+            // TODO: use MavenProject getProjectReferenceId
+            String refId = plugin.getGroupId() + ":" + plugin.getArtifactId();
+            MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
+            if ( ref != null && ref.getArtifact() != null )
+            {
+                pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+            }
+        }
+
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
         PlexusContainer child = container.createChildContainer( plugin.getKey(),

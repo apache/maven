@@ -16,6 +16,7 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Plugin;
@@ -25,6 +26,8 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,10 +41,11 @@ import java.util.Map;
  */
 public class ProjectSorter
 {
-    private ProjectSorter()
-    {
-        // no touchy...
-    }
+    private final DAG dag;
+
+    private final List sortedProjects;
+
+    private MavenProject topLevelProject;
 
     /**
      * Sort a list of projects.
@@ -54,10 +58,10 @@ public class ProjectSorter
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public static List getSortedProjects( List projects )
+    public ProjectSorter( List projects )
         throws CycleDetectedException
     {
-        DAG dag = new DAG();
+        dag = new DAG();
 
         Map projectMap = new HashMap();
 
@@ -65,7 +69,7 @@ public class ProjectSorter
         {
             MavenProject project = (MavenProject) i.next();
 
-            String id = getId( project.getGroupId(), project.getArtifactId() );
+            String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
             dag.addVertex( id );
 
@@ -76,13 +80,14 @@ public class ProjectSorter
         {
             MavenProject project = (MavenProject) i.next();
 
-            String id = getId( project.getGroupId(), project.getArtifactId() );
+            String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
             for ( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
             {
                 Dependency dependency = (Dependency) j.next();
 
-                String dependencyId = getId( dependency.getGroupId(), dependency.getArtifactId() );
+                String dependencyId = ArtifactUtils.versionlessKey( dependency.getGroupId(),
+                                                                    dependency.getArtifactId() );
 
                 if ( dag.getVertex( dependencyId ) != null )
                 {
@@ -95,7 +100,7 @@ public class ProjectSorter
             MavenProject parent = project.getParent();
             if ( parent != null )
             {
-                String parentId = getId( parent.getGroupId(), parent.getArtifactId() );
+                String parentId = ArtifactUtils.versionlessKey( parent.getGroupId(), parent.getArtifactId() );
                 if ( dag.getVertex( parentId ) != null )
                 {
                     dag.addEdge( id, parentId );
@@ -108,9 +113,11 @@ public class ProjectSorter
                 for ( Iterator j = buildPlugins.iterator(); j.hasNext(); )
                 {
                     Plugin plugin = (Plugin) j.next();
-                    String pluginId = getId( plugin.getGroupId(), plugin.getArtifactId() );
+                    String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null )
                     {
+                        project.addProjectReference( (MavenProject) projectMap.get( pluginId ) );
+
                         dag.addEdge( id, pluginId );
                     }
                 }
@@ -122,9 +129,11 @@ public class ProjectSorter
                 for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
                 {
                     ReportPlugin plugin = (ReportPlugin) j.next();
-                    String pluginId = getId( plugin.getGroupId(), plugin.getArtifactId() );
+                    String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null )
                     {
+                        project.addProjectReference( (MavenProject) projectMap.get( pluginId ) );
+
                         dag.addEdge( id, pluginId );
                     }
                 }
@@ -133,9 +142,11 @@ public class ProjectSorter
             for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
             {
                 Extension extension = (Extension) j.next();
-                String extensionId = getId( extension.getGroupId(), extension.getArtifactId() );
+                String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
                 if ( dag.getVertex( extensionId ) != null )
                 {
+                    project.addProjectReference( (MavenProject) projectMap.get( extensionId ) );
+
                     dag.addEdge( id, extensionId );
                 }
             }
@@ -150,11 +161,66 @@ public class ProjectSorter
             sortedProjects.add( projectMap.get( id ) );
         }
 
+        this.sortedProjects = Collections.unmodifiableList( sortedProjects );
+    }
+
+    // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+    public MavenProject getTopLevelProject()
+    {
+        if ( topLevelProject == null )
+        {
+            List projectsByFile = new ArrayList( sortedProjects );
+
+            Collections.sort( projectsByFile, new ByProjectFileComparator() );
+
+            topLevelProject = (MavenProject) projectsByFile.get( 0 );
+        }
+
+        return topLevelProject;
+    }
+
+    public List getSortedProjects()
+    {
         return sortedProjects;
     }
 
-    private static String getId( String groupId, String artifactId )
+    public boolean hasMultipleProjects()
     {
-        return groupId + ":" + artifactId;
+        return sortedProjects.size() > 1;
     }
+
+    public List getDependents( String id )
+    {
+        return dag.getParentLabels( id );
+    }
+
+    private static class ByProjectFileComparator
+        implements Comparator
+    {
+
+        public int compare( Object first, Object second )
+        {
+            MavenProject p1 = (MavenProject) first;
+            MavenProject p2 = (MavenProject) second;
+
+            String p1Path = p1.getFile().getAbsolutePath();
+            String p2Path = p2.getFile().getAbsolutePath();
+
+            int comparison = p1Path.length() - p2Path.length();
+
+            if ( comparison > 0 )
+            {
+                return 1;
+            }
+            else if ( comparison < 0 )
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+
 }

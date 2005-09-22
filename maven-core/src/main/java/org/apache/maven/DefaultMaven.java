@@ -194,7 +194,7 @@ public class DefaultMaven
                     Throwable exception = response.getException();
 
                     if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) &&
-                        ( exception instanceof ReactorException ) )
+                        exception instanceof ReactorException )
                     {
                         logFailure( response, exception, null );
 
@@ -268,11 +268,9 @@ public class DefaultMaven
         getLogger().info( "Reactor Summary:" );
         line();
 
-        for ( Iterator it = rm.getProjectsSortedByDependency().iterator(); it.hasNext(); )
+        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
             MavenProject project = (MavenProject) it.next();
-
-            String id = project.getId();
 
             if ( rm.hasBuildFailure( project ) )
             {
