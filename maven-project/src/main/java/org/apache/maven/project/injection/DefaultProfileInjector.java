@@ -113,6 +113,18 @@ public class DefaultProfileInjector
                 modelBuild.setTestResources( profileTestResources );
             }
 
+            if ( profileBuild.getFilters() != null )
+            {
+                if ( modelBuild.getFilters() == null )
+                {
+                    modelBuild.setFilters( profileBuild.getFilters() );
+                }
+                else
+                {
+                    modelBuild.getFilters().addAll( profileBuild.getFilters() );
+                }
+            }
+
             injectPlugins( profileBuild, modelBuild );
 
             // Plugin management :: aggregate

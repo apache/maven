@@ -1440,4 +1440,8 @@ public class MavenProject
         return getModel().getProperties();
     }
 
+    public List getFilters()
+    {
+        return getBuild().getFilters();
+    }
 }

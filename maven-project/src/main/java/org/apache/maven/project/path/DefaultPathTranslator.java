@@ -22,6 +22,8 @@ import org.apache.maven.model.Resource;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DefaultPathTranslator
     implements PathTranslator
@@ -54,6 +56,18 @@ public class DefaultPathTranslator
                 Resource resource = (Resource) i.next();
 
                 resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
+            }
+
+            if ( build.getFilters() != null )
+            {
+                List filters = new ArrayList();
+                for ( Iterator i = build.getFilters().iterator(); i.hasNext(); )
+                {
+                    String filter = (String) i.next();
+
+                    filters.add( alignToBaseDirectory( filter, basedir ) );
+                }
+                build.setFilters( filters );
             }
 
             build.setOutputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) );

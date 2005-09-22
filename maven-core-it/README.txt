@@ -150,6 +150,8 @@ it0053: Test that attached artifacts have the same buildnumber and timestamp
         as the main artifact. This will not correctly verify until we have
         some way to pattern-match the buildnumber/timestamp...
 
+it0054: Test resource filtering.
+
 it0055: Test that source includes/excludes with in the compiler plugin config.
         This will test excludes and testExcludes...
 
@@ -191,7 +193,6 @@ it0067: Test activation of a profile from the command line.
 - generated sources
 - generated resources from sources
 - generated resources from generated sources
-- filtered resources
 - build that requires a plugin download
 - transitive dependencies
 - goal attainment not requiring depedency resolution

@@ -69,13 +69,15 @@ public class ResourcesMojo
      * Wheter to apply filters during transfer.
      *
      * @parameter
+     * @deprecated
      */
-    private boolean filtering = false;
+    private boolean filtering = true;
 
     /**
      * The name of the filter property file to use.
      *
      * @parameter expression="${basedir}/filter.properties"
+     * @deprecated use the filters section of the POM.
      */
     private File filterPropertiesFile;
 
@@ -91,6 +93,11 @@ public class ResourcesMojo
     private static final String[] EMPTY_STRING_ARRAY = {};
 
     private static final String[] DEFAULT_INCLUDES = {"**/**"};
+
+    /**
+     * @parameter expression="${project.build.filters}"
+     */
+    private List filters;
 
     public void execute()
         throws MojoExecutionException
@@ -173,13 +180,34 @@ public class ResourcesMojo
     {
         if ( filtering )
         {
-            try
+            if ( filters == null || filters.isEmpty() && filterPropertiesFile.exists() )
             {
-                filterProperties = PropertyUtils.loadPropertyFile( filterPropertiesFile, true, true );
+                // Deprecated - remove
+                try
+                {
+                    filterProperties = PropertyUtils.loadPropertyFile( filterPropertiesFile, true, true );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Error loading property file '" + filterPropertiesFile + "'", e );
+                }
             }
-            catch ( IOException e )
+            else
             {
-                throw new MojoExecutionException( "Error loading property file '" + filterPropertiesFile + "'", e );
+                filterProperties = new Properties();
+                for ( Iterator i = filters.iterator(); i.hasNext(); )
+                {
+                    String filtersfile = (String) i.next();
+                    try
+                    {
+                        Properties properties = PropertyUtils.loadPropertyFile( new File( filtersfile ), true, true );
+                        filterProperties.putAll( properties );
+                    }
+                    catch ( IOException e )
+                    {
+                        throw new MojoExecutionException( "Error loading property file '" + filtersfile + "'", e );
+                    }
+                }
             }
         }
     }

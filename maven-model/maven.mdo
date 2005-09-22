@@ -856,6 +856,17 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>filters</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+          The list of filter properties files that are used when filtering is enabled.
+          ]]></description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
     <class>
