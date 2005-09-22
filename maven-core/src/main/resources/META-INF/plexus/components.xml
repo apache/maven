@@ -171,9 +171,9 @@
         <!-- START SNIPPET: default-reports -->
         <defaultReports>
           <report implementation="java.lang.String">org.apache.maven.plugins:maven-project-info-reports-plugin</report>
+          <!-- TODO: currently in mojo - should they be defaults any more?
           <report implementation="java.lang.String">org.apache.maven.plugins:maven-checkstyle-plugin</report>
           <report implementation="java.lang.String">org.apache.maven.plugins:maven-javadoc-plugin</report>
-          <!-- TODO: currently in mojo - should they be defaults any more?
                     <report implementation="java.lang.String">org.apache.maven.plugins:maven-changelog-plugin</report>
                     <report implementation="java.lang.String">org.apache.maven.plugins:maven-surefire-report-plugin</report>
                     <report implementation="java.lang.String">org.apache.maven.plugins:maven-jdepend-plugin</report>
