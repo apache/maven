@@ -1,0 +1,42 @@
+ ------
+ Maven 2 Compiler Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 19, 2005
+
+How to Use
+
+  These example shows how to set the -source and -target argument of the Java Compiler.
+ 
+  It also shows how to exclude certain files on the items to be compiled.
+ 
+-------------------
+<project>
+   ...
+      <build>
+         ...
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <excludes>
+                        <exclude implementation="java.lang.String">**/*Point*.java</exclude>
+                    </excludes>
+                </configuration>
+             </plugin>
+         </plugins>
+         ...
+      </build>
+   ...
+</project>
+-------------------
+
+  There are other parameters that you can configure like fork, includes/include, debug, showWarnings etc.
+  
+  For full documentation, click {{{index.html}here}}.
+ 

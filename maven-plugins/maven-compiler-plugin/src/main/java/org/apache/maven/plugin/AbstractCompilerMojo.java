@@ -106,6 +106,8 @@ public abstract class AbstractCompilerMojo
     private int staleMillis;
 
     /**
+     * The compiler id of the compiler to use.
+     *
      * @parameter default-value="javac"
      */
     private String compilerId;
@@ -134,9 +136,9 @@ public abstract class AbstractCompilerMojo
     private String executable;
 
     /**
-     * Arguements to be passed to the compiler if fork is set to true.
+     * Arguments to be passed to the compiler if fork is set to true.
      * <p/>
-     * This is because the list of valid arguements passed to a Java compiler
+     * This is because the list of valid arguments passed to a Java compiler
      * varies based on the compiler version.
      *
      * @parameter
@@ -165,7 +167,7 @@ public abstract class AbstractCompilerMojo
     private File basedir;
 
     /**
-     * The directory to run the compiler from if fork is true.
+     * The target directory of the compiler if fork is true.
      *
      * @parameter expression="${project.build.directory}"
      * @required
@@ -174,6 +176,8 @@ public abstract class AbstractCompilerMojo
     private File buildDirectory;
 
     /**
+     * Plexus compiler manager.
+     *
      * @component
      */
     private CompilerManager compilerManager;
@@ -281,7 +285,7 @@ public abstract class AbstractCompilerMojo
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
             if ( compiler.getCompilerOutputStyle().equals( CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES ) &&
-                 !canUpdateTarget )
+                !canUpdateTarget )
             {
                 getLog().info( "RESCANNING!" );
                 // TODO: This second scan for source files is sub-optimal

@@ -21,11 +21,11 @@ import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -39,6 +39,8 @@ public class CompilerMojo
     extends AbstractCompilerMojo
 {
     /**
+     * The source directories containing the sources to be compiled.
+     *
      * @parameter expression="${project.compileSourceRoots}"
      * @required
      * @readonly
@@ -46,6 +48,8 @@ public class CompilerMojo
     private List compileSourceRoots;
 
     /**
+     * Project classpath.
+     *
      * @parameter expression="${project.compileClasspathElements}"
      * @required
      * @readonly
@@ -53,6 +57,8 @@ public class CompilerMojo
     private List classpathElements;
 
     /**
+     * The directory for compiled classes.
+     *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
@@ -60,6 +66,8 @@ public class CompilerMojo
     private File outputDirectory;
 
     /**
+     * Project artifacts.
+     *
      * @parameter expression="${project.artifact}"
      * @required
      * @readonly
@@ -69,12 +77,14 @@ public class CompilerMojo
 
     /**
      * A list of inclusion filters for the compiler.
+     *
      * @parameter
      */
     private Set includes = new HashSet();
 
     /**
      * A list of exclusion filters for the compiler.
+     *
      * @parameter
      */
     private Set excludes = new HashSet();

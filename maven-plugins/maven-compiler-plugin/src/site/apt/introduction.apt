@@ -1,0 +1,14 @@
+ ------
+ Maven 2 Compiler Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 19, 2005
+
+Introduction
+
+ This plugin is the Maven2 version of Maven1's Java Plugin.  
+ 
+ This plugin provides the basic Javac facilities. 
+

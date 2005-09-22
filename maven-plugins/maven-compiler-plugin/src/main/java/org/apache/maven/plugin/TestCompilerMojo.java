@@ -20,11 +20,11 @@ import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -38,6 +38,8 @@ public class TestCompilerMojo
     extends AbstractCompilerMojo
 {
     /**
+     * The source directories containing the test-source to be compiled.
+     *
      * @parameter expression="${project.testCompileSourceRoots}"
      * @required
      * @readonly
@@ -45,6 +47,8 @@ public class TestCompilerMojo
     private List compileSourceRoots;
 
     /**
+     * Project test classpath.
+     *
      * @parameter expression="${project.testClasspathElements}"
      * @required
      * @readonly
@@ -52,6 +56,8 @@ public class TestCompilerMojo
     private List classpathElements;
 
     /**
+     * The directory where compiled test classes go.
+     *
      * @parameter expression="${project.build.testOutputDirectory}"
      * @required
      * @readonly
@@ -60,12 +66,14 @@ public class TestCompilerMojo
 
     /**
      * A list of inclusion filters for the compiler.
+     *
      * @parameter
      */
     private Set testIncludes = new HashSet();
 
     /**
      * A list of exclusion filters for the compiler.
+     *
      * @parameter
      */
     private Set testExcludes = new HashSet();
