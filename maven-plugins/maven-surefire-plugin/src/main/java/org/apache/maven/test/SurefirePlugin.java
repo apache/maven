@@ -207,33 +207,49 @@ public class SurefirePlugin
         // ----------------------------------------------------------------------
 
         System.setProperty( "basedir", basedir );
+
         System.setProperty( "localRepository", localRepository.getBasedir() );
 
         // Add all system properties configured by the user
         if ( systemProperties != null )
         {
             Enumeration propertyKeys = systemProperties.propertyNames();
+
             while ( propertyKeys.hasMoreElements() )
             {
                 String key = (String) propertyKeys.nextElement();
+
                 System.setProperty( key, systemProperties.getProperty( key ) );
+
                 getLog().debug( "Setting system property [" + key + "]=[" + systemProperties.getProperty( key ) + "]" );
             }
         }
 
+        getLog().debug( "Test Classpath :" );
+
+        getLog.debug( testClassesDirectory.getPath() );
 
         surefireBooter.addClassPathUrl( testClassesDirectory.getPath() );
+
+        getLog.debug( classesDirectory.getPath() );
 
         surefireBooter.addClassPathUrl( classesDirectory.getPath() );
 
         for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
         {
-            surefireBooter.addClassPathUrl( (String) i.next() );
+            String classpathElement = (String) i.next();
+
+            getLog().debug( classpathElement );
+
+            surefireBooter.addClassPathUrl( classpathElement );
         }
 
         for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
+
+            getLog().debug( artifact.getFile().getAbsolutePath() );
+
             surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
         }
 
@@ -245,6 +261,7 @@ public class SurefirePlugin
 
 
         boolean success;
+
         try
         {
             success = surefireBooter.run();
@@ -273,6 +290,7 @@ public class SurefirePlugin
     protected String[] split( String str, String separator, int max )
     {
         StringTokenizer tok;
+
         if ( separator == null )
         {
             // Null separator means we're using StringTokenizer's default
@@ -285,15 +303,20 @@ public class SurefirePlugin
         }
 
         int listSize = tok.countTokens();
+
         if ( max > 0 && listSize > max )
         {
             listSize = max;
         }
 
         String[] list = new String[listSize];
+
         int i = 0;
+
         int lastTokenBegin;
+
         int lastTokenEnd = 0;
+
         while ( tok.hasMoreTokens() )
         {
             if ( max > 0 && i == listSize - 1 )
@@ -302,18 +325,24 @@ public class SurefirePlugin
                 // tokens left over in our input, the last list
                 // element gets all remaining text.
                 String endToken = tok.nextToken();
+
                 lastTokenBegin = str.indexOf( endToken, lastTokenEnd );
+
                 list[i] = str.substring( lastTokenBegin );
+
                 break;
             }
             else
             {
                 list[i] = tok.nextToken();
+
                 lastTokenBegin = str.indexOf( list[i], lastTokenEnd );
+
                 lastTokenEnd = lastTokenBegin + list[i].length();
             }
             i++;
         }
+
         return list;
     }
 }
