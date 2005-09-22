@@ -123,6 +123,11 @@ public class ReactorManager
         return sorter.getSortedProjects();
     }
 
+    public MavenProject getTopLevelProject()
+    {
+        return sorter.getTopLevelProject();
+    }
+
     private static class BuildFailure
     {
         private Exception cause;
