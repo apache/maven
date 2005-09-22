@@ -227,11 +227,11 @@ public class SurefirePlugin
 
         getLog().debug( "Test Classpath :" );
 
-        getLog.debug( testClassesDirectory.getPath() );
+        getLog().debug( testClassesDirectory.getPath() );
 
         surefireBooter.addClassPathUrl( testClassesDirectory.getPath() );
 
-        getLog.debug( classesDirectory.getPath() );
+        getLog().debug( classesDirectory.getPath() );
 
         surefireBooter.addClassPathUrl( classesDirectory.getPath() );
 
