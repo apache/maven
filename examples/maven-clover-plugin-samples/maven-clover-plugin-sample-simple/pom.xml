@@ -17,19 +17,13 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <!-- to be removed -->
-    <dependency>
-      <groupId>clover</groupId>
-      <artifactId>clover</artifactId>
-      <version>1.3.9</version>
-    </dependency>
   </dependencies>
   <reporting>
+    <excludeDefaults>true</excludeDefaults>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
       </plugin>
     </plugins>
   </reporting>
