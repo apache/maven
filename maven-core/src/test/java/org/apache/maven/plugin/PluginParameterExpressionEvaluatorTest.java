@@ -148,8 +148,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MojoExecution mojoExecution = new MojoExecution( mojo );
 
-        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, mojoExecution, null,
-                                                                             container.getLogger(), project );
+        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version )

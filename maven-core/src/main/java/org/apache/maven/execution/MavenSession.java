@@ -119,7 +119,7 @@ public class MavenSession
 
     public List getSortedProjects()
     {
-        return rpm.getProjectsSortedByDependency();
+        return rpm.getSortedProjects();
     }
 
     public String getExecutionRootDirectory()
