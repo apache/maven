@@ -684,6 +684,23 @@ public class DefaultLifecycleExecutor
                     {
                         String goal = (String) k.next();
                         MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
+
+                        if ( desc == null )
+                        {
+                            String message = "Required goal '" + goal + "' not found in plugin '" +
+                                mojoDescriptor.getPluginDescriptor().getGoalPrefix() + "'";
+                            int index = goal.indexOf( ':' );
+                            if ( index >= 0 )
+                            {
+                                String prefix = goal.substring( index + 1 );
+                                if ( prefix.equals( mojoDescriptor.getPluginDescriptor().getGoalPrefix() ) )
+                                {
+                                    message = message + " (goals should not be prefixed - try '" + prefix + "')";
+                                }
+                            }
+                            throw new LifecycleExecutionException( message );
+                        }
+
                         MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
                         addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
                                                 session.getSettings() );
