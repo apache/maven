@@ -191,7 +191,7 @@ public class SurefirePlugin
             // Have to wrap in an ArrayList as surefire expects an ArrayList instead of a List for some reason
             if ( includes == null || includes.size() == 0 )
             {
-                includes = new ArrayList( Arrays.asList( new String[] { "**/*Test.java", "**/*TestCase.java" } ) );
+                includes = new ArrayList( Arrays.asList( new String[] { "**/Test*.java", "**/*Test.java", "**/*TestCase.java" } ) );
             }
             if ( excludes == null || excludes.size() == 0 )
             {
