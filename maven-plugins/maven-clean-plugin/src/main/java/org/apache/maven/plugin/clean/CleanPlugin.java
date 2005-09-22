@@ -22,8 +22,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 
 /**
+ * Goal which cleans the build.
+
  * @goal clean
- * @description Goal which cleans the build
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$
  */
@@ -33,24 +34,45 @@ public class CleanPlugin
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
 
     /** 
-     * This is where compiled classes go.
+     * This is where build results go.
      * 
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
      */
-    private String outputDirectory;
+    private File directory;
 
-    // TODO: not in the descriptor previously
-//    private boolean failOnError;
+    /** 
+     * This is where compiled classes go.
+     * 
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     * @readonly
+     */
+    private File outputDirectory;
+
+    /** 
+     * This is where compiled test classes go.
+     * 
+     * @parameter expression="${project.build.testOutputDirectory}"
+     * @required
+     * @readonly
+     */
+    private File testOutputDirectory;
 
     public void execute()
         throws MojoExecutionException
     {
-        if ( outputDirectory != null )
-        {
-            File dir = new File( outputDirectory );
+        removeDirectory( directory );
+        removeDirectory( outputDirectory );
+        removeDirectory( testOutputDirectory );
+    }
 
+    private void removeDirectory( File dir )
+        throws MojoExecutionException
+    {
+        if ( dir != null )
+        {
             if ( dir.exists() && dir.isDirectory() )
             {
                 getLog().info( "Deleting directory " + dir.getAbsolutePath() );
