@@ -1,0 +1,36 @@
+ ------
+ Maven 2 Idea Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 21, 2005
+
+How to Use
+
+  You can directly use this plugin without configuring anything using the command "m2 idea:idea".   
+  
+  To configure what JDK name  you want to use, you must specify the parameter "jdkName" in the pom.xml  
+ 
+-------------------
+<project>
+   ...
+      <build>
+         ...
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <configuration>
+                    <jdkName>Put_jdkName_Here</jdkName>
+                </configuration>
+             </plugin>
+         </plugins>
+         ...
+      </build>
+   ...
+</project>
+-------------------
+
+  For full documentation, click {{{index.html}here}}.
+ 

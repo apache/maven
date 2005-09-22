@@ -38,6 +38,7 @@ import java.util.Iterator;
 
 /**
  * Goal for generating IDEA files from a POM.
+ * This plug-in provides the ability to generate IDEA project files (.ipr and .iws files) for IDEA
  *
  * @goal idea
  * @execute phase="generate-sources"
@@ -48,6 +49,8 @@ public class IdeaMojo
     extends AbstractMojo
 {
     /**
+     * The Maven Project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -55,6 +58,8 @@ public class IdeaMojo
     private MavenProject project;
 
     /**
+     * The Maven Project.
+     *
      * @parameter expression="${executedProject}"
      */
     private MavenProject executedProject;
@@ -83,6 +88,11 @@ public class IdeaMojo
         rewriteWorkspace();
     }
 
+    /**
+     * Create IDEA workspace (.iws) file.
+     *
+     * @throws MojoExecutionException
+     */
     private void rewriteWorkspace()
         throws MojoExecutionException
     {
@@ -107,6 +117,11 @@ public class IdeaMojo
         }
     }
 
+    /**
+     * Create IDEA (.ipr) project files.
+     *
+     * @throws MojoExecutionException
+     */
     private void rewriteProject()
         throws MojoExecutionException
     {
@@ -190,6 +205,11 @@ public class IdeaMojo
         }
     }
 
+    /**
+     * Create IDEA (.iml) project files.
+     *
+     * @throws MojoExecutionException
+     */
     private void rewriteModule()
         throws MojoExecutionException
     {
@@ -311,6 +331,11 @@ public class IdeaMojo
         }
     }
 
+    /**
+     * Adds the Web module to the (.iml) project file.
+     *
+     * @param module Xpp3Dom element
+     */
     private void addWebModule( Xpp3Dom module )
     {
         // TODO: this is bad - reproducing war plugin defaults, etc!
@@ -368,12 +393,25 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         element.setAttribute( "url", getModuleFileUrl( warSrc ) );
     }
 
+    /**
+     * Sets the name of the JDK to use.
+     *
+     * @param content Xpp3Dom element.
+     * @param jdkName Name of the JDK to use.
+     */
     private void setJdkName( Xpp3Dom content, String jdkName )
     {
         Xpp3Dom component = findComponent( content, "ProjectRootManager" );
         component.setAttribute( "project-jdk-name", jdkName );
     }
 
+    /**
+     * Adds a sourceFolder element to IDEA (.iml) project file
+     *
+     * @param content Xpp3Dom element
+     * @param directory Directory to set as url.
+     * @param isTest True if directory isTestSource.
+     */
     private void addSourceFolder( Xpp3Dom content, String directory, boolean isTest )
     {
         if ( !StringUtils.isEmpty( directory ) && new File( directory ).isDirectory() )
@@ -384,8 +422,15 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         }
     }
 
-    // TODO: to FileUtils
+    //  TODO: to FileUtils
 
+    /**
+     * Translate the absolutePath into its relative path.
+     *
+     * @param basedir The basedir of the project.
+     * @param absolutePath The absolute path that must be translated to relative path.
+     * @return relative  Relative path of the parameter absolute path.
+     */
     private static String toRelative( File basedir, String absolutePath )
     {
         String relative;
@@ -404,6 +449,12 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         return relative;
     }
 
+    /**
+     * Translate the relative path of the file into module path
+     *
+     * @param file File to translate to ModuleFileUrl
+     * @return moduleFileUrl Translated Module File URL
+     */
     private String getModuleFileUrl( String file )
     {
         return "file://$MODULE_DIR$/" + toRelative( project.getBasedir(), file );
@@ -411,6 +462,12 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
 
     // TODO: some xpath may actually be more appropriate here
 
+    /**
+     * Remove elements from content (Xpp3Dom).
+     *
+     * @param content Xpp3Dom element
+     * @param name Name of the element to be removed
+     */
     private void removeOldElements( Xpp3Dom content, String name )
     {
         Xpp3Dom[] children = content.getChildren();
@@ -424,6 +481,11 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         }
     }
 
+    /**
+     * Removes dependencies from Xpp3Dom component.
+     *
+     * @param component Xpp3Dom element
+     */
     private void removeOldDependencies( Xpp3Dom component )
     {
         Xpp3Dom[] children = component.getChildren();
@@ -437,6 +499,13 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         }
     }
 
+    /**
+     * Finds element from the module element.
+     *
+     * @param module Xpp3Dom element
+     * @param name Name attribute to find
+     * @return component  Returns the Xpp3Dom element found.
+     */
     private Xpp3Dom findComponent( Xpp3Dom module, String name )
     {
         Xpp3Dom[] components = module.getChildren( "component" );
@@ -453,6 +522,13 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         return component;
     }
 
+    /**
+     * Returns a an Xpp3Dom element (setting).
+     *
+     * @param component Xpp3Dom element
+     * @param name Setting attribute to find
+     * @return setting Xpp3Dom element
+     */
     private Xpp3Dom findSetting( Xpp3Dom component, String name )
     {
         Xpp3Dom[] settings = component.getChildren( "setting" );
@@ -469,6 +545,13 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         return setting;
     }
 
+    /**
+     * Creates an Xpp3Dom element.
+     *
+     * @param module Xpp3Dom element
+     * @param name Name of the element
+     * @return component Xpp3Dom element
+     */
     private static Xpp3Dom createElement( Xpp3Dom module, String name )
     {
         Xpp3Dom component = new Xpp3Dom( name );
@@ -476,6 +559,13 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         return component;
     }
 
+    /**
+     * Finds an element from Xpp3Dom component.
+     *
+     * @param component Xpp3Dom component
+     * @param name Name of the element to find.
+     * @return the element
+     */
     private Xpp3Dom findElement( Xpp3Dom component, String name )
     {
         Xpp3Dom element = component.getChild( name );
