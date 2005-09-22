@@ -226,15 +226,15 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( classesDirectory.getPath() );
 
+        for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
+        {
+            surefireBooter.addClassPathUrl( (String) i.next() );
+        }
+
         for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
             surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
-        }
-
-        for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
-        {
-            surefireBooter.addClassPathUrl( (String) i.next() );
         }
 
         surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
