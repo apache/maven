@@ -1,0 +1,37 @@
+ ------
+ Configuring Proxy Settings
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Configuring a Proxy
+
+ You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and password are only
+ required if your proxy requires basic authentication (note that later releases may support storing your passwords in
+ a secured keystore - in the mean time, please ensure your settings.xml file is secured with permissions
+ appropriate for your operating system).
+
+The nonProxyHosts setting accepts wild cards, and each host not to proxy is separated by the | character. This matches
+the JDK configuration equivalent.
+
++----+
+
+<settings>
+  .
+  .
+  <proxies>
+   <proxy>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>proxy.somewhere.com</host>
+      <port>8080</port>
+      <username>proxyuser</username>
+      <password>somepassword</password>
+      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+    </proxy>
+  </proxies>
+  .
+  .
+</settings>

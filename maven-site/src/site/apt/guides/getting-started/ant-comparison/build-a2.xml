@@ -1,0 +1,23 @@
+<project default="compile">
+  <target name="compile" description="o Compile the code" depends="get-deps">
+    <mkdir dir="${classesdir}"/>
+    <javac destdir="${classesdir}">
+      <src>
+        <pathelement location="src/main/java"/>
+      </src>
+    </javac>
+  </target>
+  <target name="test-compile" description="o Compile the code" depends="get-deps">
+    <mkdir dir="${test.classesdir}"/>
+    <javac destdir="${test.classesdir}">
+      <src>
+        <pathelement location="src/test/java"/>
+      </src>
+      <classpath>
+        <fileset dir="${libdir}">
+          <include name="/path/to/junit-3.8.1.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+</project>
