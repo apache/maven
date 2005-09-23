@@ -119,11 +119,7 @@
 
     #if ( ${project.organization} && ${project.organization.name} )
       ${project.organization.name}
-    #else
-      Apache Software Foundation
     #end
-  #else
-    2002-2005, Apache Software Foundation
   #end
 #end
 
