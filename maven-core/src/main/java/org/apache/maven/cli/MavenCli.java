@@ -413,7 +413,7 @@ public class MavenCli
 
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
-
+        
         String url = settings.getLocalRepository();
 
         if ( !url.startsWith( "file:" ) )
@@ -427,8 +427,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
         {
             settings.setOffline( true );
-
-            artifactRepositoryFactory.setGlobalEnable( false );
+            
             snapshotPolicySet = true;
         }
 

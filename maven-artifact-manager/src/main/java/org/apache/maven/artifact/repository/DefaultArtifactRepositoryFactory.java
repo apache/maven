@@ -29,8 +29,6 @@ public class DefaultArtifactRepositoryFactory
 
     private String globalChecksumPolicy;
 
-    private boolean globalEnable = true;
-
     public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout )
     {
@@ -64,13 +62,6 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        // TODO: needed, or can offline cover it?
-        if ( !globalEnable )
-        {
-            snapshots.setEnabled( false );
-            releases.setEnabled( false );
-        }
-
         return new DefaultArtifactRepository( id, url, repositoryLayout, snapshots, releases );
     }
 
@@ -84,8 +75,11 @@ public class DefaultArtifactRepositoryFactory
         this.globalChecksumPolicy = checksumPolicy;
     }
 
+    /**
+     * @deprecated. Not needed, use WagonManager.set/isOnline() instead.
+     */
     public void setGlobalEnable( boolean enable )
     {
-        this.globalEnable = enable;
+        // TODO: Remove this method from the API.
     }
 }

@@ -41,18 +41,24 @@ public class ArtifactResolutionException
 
     private List remoteRepositories;
 
+    private final String originalMessage;
+
+    private final String path;
+
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
                                         List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
         super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, path ),
                t );
-
+        
+        this.originalMessage = message;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.type = type;
         this.version = version;
         this.remoteRepositories = remoteRepositories;
         this.downloadUrl = downloadUrl;
+        this.path = constructArtifactPath( path );
     }
 
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
@@ -66,15 +72,45 @@ public class ArtifactResolutionException
     {
         super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, path ) );
 
+        this.originalMessage = message;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.type = type;
         this.version = version;
         this.remoteRepositories = remoteRepositories;
         this.downloadUrl = downloadUrl;
+        this.path = constructArtifactPath( path );
+    }
+    
+    public String getOriginalMessage()
+    {
+        return originalMessage;
     }
 
     private static final String LS = System.getProperty( "line.separator" );
+
+    private static String constructArtifactPath( List path )
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        if ( path != null )
+        {
+            sb.append( LS );
+            sb.append( "Path to dependency: " );
+            sb.append( LS );
+            int num = 1;
+            for ( Iterator i = path.iterator(); i.hasNext(); )
+            {
+                sb.append( "\t" );
+                sb.append( num++ );
+                sb.append( ") " );
+                sb.append( i.next() );
+                sb.append( LS );
+            }
+        }
+        
+        return sb.toString();
+    }
 
     private static String constructMessage( String message, String groupId, String artifactId, String version,
                                             String type, List remoteRepositories, String downloadUrl, List path )
@@ -106,22 +142,8 @@ public class ArtifactResolutionException
             }
         }
 
-        if ( path != null )
-        {
-            sb.append( LS );
-            sb.append( "Path to dependency: " );
-            sb.append( LS );
-            int num = 1;
-            for ( Iterator i = path.iterator(); i.hasNext(); )
-            {
-                sb.append( "\t" );
-                sb.append( num++ );
-                sb.append( ") " );
-                sb.append( i.next() );
-                sb.append( LS );
-            }
-            sb.append( LS );
-        }
+        sb.append( constructArtifactPath( path ) );
+        sb.append( LS );
 
         if ( downloadUrl != null && !type.equals( "pom" ) )
         {
@@ -168,6 +190,9 @@ public class ArtifactResolutionException
     public ArtifactResolutionException( String message, Throwable cause )
     {
         super( message, cause );
+        
+        this.originalMessage = message;
+        this.path = "";
     }
 
     public String getGroupId()
@@ -199,4 +224,10 @@ public class ArtifactResolutionException
     {
         return downloadUrl;
     }
+    
+    public String getArtifactPath()
+    {
+        return path;
+    }
+    
 }

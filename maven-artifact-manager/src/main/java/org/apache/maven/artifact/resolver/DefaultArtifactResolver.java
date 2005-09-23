@@ -113,6 +113,13 @@ public class DefaultArtifactResolver
                 File destination = artifact.getFile();
                 if ( !destination.exists() || force )
                 {
+                    if ( !wagonManager.isOnline() )
+                    {
+                        getLogger().debug( "System is offline. Cannot resolve artifact: " + artifact.getId() + "." );
+                        
+                        return;
+                    }
+                    
                     try
                     {
                         if ( artifact.getRepository() != null )

@@ -78,4 +78,6 @@ public interface ArtifactMetadata
      */
     void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
+    
+    String extendedToString();
 }

@@ -18,7 +18,6 @@ package org.apache.maven.usability;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.TransitiveArtifactResolutionException;
-import org.apache.maven.project.ProjectBuildingException;
 
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
@@ -26,45 +25,37 @@ public class ArtifactResolverDiagnoser
 
     public boolean canDiagnose( Throwable error )
     {
-        return error instanceof ArtifactResolutionException;
+        return DiagnosisUtils.containsInCausality( error, ArtifactResolutionException.class );
     }
 
     public String diagnose( Throwable error )
     {
-        Throwable root = DiagnosisUtils.getRootCause( error );
+        ArtifactResolutionException exception = (ArtifactResolutionException) DiagnosisUtils.getFromCausality( error, ArtifactResolutionException.class );
 
-        String message = null;
-
-        if ( root instanceof ProjectBuildingException )
+        StringBuffer message = new StringBuffer();
+        
+        message.append( "Failed to resolve artifact." );
+        message.append( "\n");
+        message.append( "\nGroupId: " ).append( exception.getGroupId() );
+        message.append( "\nArtifactId: " ).append( exception.getArtifactId() );
+        message.append( "\nVersion: " ).append( exception.getVersion() );
+        message.append( "\nType: " ).append( exception.getType() );
+        
+        if ( exception instanceof TransitiveArtifactResolutionException )
         {
-            StringBuffer messageBuffer = new StringBuffer();
-
-            if ( DiagnosisUtils.containsInCausality( error, TransitiveArtifactResolutionException.class ) )
-            {
-                messageBuffer.append(
-                    "Error while transitively resolving artifacts (transitive path trace currently unavailable):\n\n" );
-            }
-            else
-            {
-                messageBuffer.append( "Error while resolving artifacts:\n\n" );
-            }
-
-            messageBuffer.append( "Root Error:\n  " ).append( root.getMessage() );
-
-            message = messageBuffer.toString();
+            message.append( exception.getArtifactPath() );
         }
-        else
+        
+        message.append( DiagnosisUtils.getOfflineWarning() );
+
+        Throwable root = DiagnosisUtils.getRootCause( exception );
+        
+        if ( root != null )
         {
-            StringBuffer messageBuffer = new StringBuffer();
-
-            messageBuffer.append( "Main Error:\n  " ).append( error.getMessage() );
-
-            messageBuffer.append( "\n\nRoot error:\n  " ).append( root.getMessage() );
-
-            message = messageBuffer.toString();
+            message.append( "\n\nRoot Cause: " ).append( root.getMessage() ).append( "\n" );
         }
-
-        return message;
+        
+        return message.toString();
     }
 
 }

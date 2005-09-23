@@ -69,6 +69,8 @@ public class DefaultWagonManager
     private Map mirrors = new HashMap();
 
     private TransferListener downloadMonitor;
+    
+    private boolean online = true;
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
@@ -105,6 +107,8 @@ public class DefaultWagonManager
                                 TransferListener downloadMonitor )
         throws TransferFailedException
     {
+        failIfNotOnline();
+        
         String protocol = repository.getProtocol();
 
         Wagon wagon;
@@ -277,7 +281,9 @@ public class DefaultWagonManager
         throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
         // TODO: better excetpions - transfer failed is not enough?
-
+        
+        failIfNotOnline();
+        
         Wagon wagon;
 
         ArtifactRepository mirror = getMirror( repository.getId() );
@@ -451,6 +457,14 @@ public class DefaultWagonManager
             {
                 throw new TransferFailedException( "Error copying temporary file to the final destination: ", e );
             }
+        }
+    }
+
+    private void failIfNotOnline() throws TransferFailedException
+    {
+        if ( !isOnline() )
+        {
+            throw new TransferFailedException( "System is offline." );
         }
     }
 
@@ -639,5 +653,15 @@ public class DefaultWagonManager
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
         mirrors.put( mirrorOf, mirror );
+    }
+
+    public void setOnline( boolean online )
+    {
+        this.online = online;
+    }
+    
+    public boolean isOnline()
+    {
+        return online;
     }
 }

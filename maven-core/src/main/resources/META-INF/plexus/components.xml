@@ -103,6 +103,16 @@
     </component>
     <!--
      |
+     |PluginContainerDiagnoser
+     |
+     -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>PluginContainerDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.PluginContainerDiagnoser</implementation>
+    </component>
+    <!--
+     |
      |ArtifactResolverDiagnoser
      |
      -->

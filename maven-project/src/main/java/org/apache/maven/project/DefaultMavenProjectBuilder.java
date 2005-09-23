@@ -346,7 +346,7 @@ public class DefaultMavenProjectBuilder
             try
             {
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
-
+                
                 File file = projectArtifact.getFile();
                 model = readModel( file );
 

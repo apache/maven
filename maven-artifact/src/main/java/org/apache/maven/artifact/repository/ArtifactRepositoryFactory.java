@@ -35,5 +35,8 @@ public interface ArtifactRepositoryFactory
 
     void setGlobalChecksumPolicy( String checksumPolicy );
 
+    /**
+     * @deprecated. Not needed, use WagonManager.set/isOnline() instead.
+     */
     void setGlobalEnable( boolean enable );
 }

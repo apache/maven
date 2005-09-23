@@ -188,11 +188,6 @@ public class DefaultPluginManager
 
                 project.addPlugin( plugin );
             }
-            catch ( PlexusContainerException e )
-            {
-                throw new PluginManagerException(
-                    "Error occurred in the artifact container attempting to download plugin " + plugin.getKey(), e );
-            }
             catch ( ArtifactResolutionException e )
             {
                 String groupId = plugin.getGroupId();
@@ -261,7 +256,7 @@ public class DefaultPluginManager
 
     protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project,
                               ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException
+        throws ArtifactResolutionException, PluginManagerException
     {
         // TODO: share with MMS? Not sure if it belongs here
         if ( project.getProjectReferences() != null && !project.getProjectReferences().isEmpty() )
@@ -276,11 +271,24 @@ public class DefaultPluginManager
         }
 
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
+        
+        if ( !pluginArtifact.isResolved() )
+        {
+            throw new PluginContainerException( plugin, "Cannot resolve artifact for plugin." );
+        }
 
-        PlexusContainer child = container.createChildContainer( plugin.getKey(),
-                                                                Collections.singletonList( pluginArtifact.getFile() ),
-                                                                Collections.EMPTY_MAP,
-                                                                Collections.singletonList( pluginCollector ) );
+        PlexusContainer child;
+        try
+        {
+            child = container.createChildContainer( plugin.getKey(),
+                                                    Collections.singletonList( pluginArtifact.getFile() ),
+                                                    Collections.EMPTY_MAP,
+                                                    Collections.singletonList( pluginCollector ) );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new PluginContainerException( plugin, "Failed to create plugin container.", e );
+        }
 
         // this plugin's descriptor should have been discovered in the child creation, so we should be able to
         // circle around and set the artifacts and class realm

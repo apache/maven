@@ -154,6 +154,15 @@ public abstract class AbstractVersionTransformation
         boolean alreadyResolved = alreadyResolved( artifact );
         if ( !alreadyResolved )
         {
+            if ( !wagonManager.isOnline() )
+            {
+                LegacyArtifactMetadata metadata = createLegacyMetadata( artifact );
+                getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+                
+                return null;
+            }
+            
+            
             boolean checkedUpdates = false;
             for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {

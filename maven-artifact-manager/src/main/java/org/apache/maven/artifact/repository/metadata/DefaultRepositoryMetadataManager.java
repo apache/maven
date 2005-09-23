@@ -183,6 +183,12 @@ public class DefaultRepositoryMetadataManager
                                ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
+        if ( !wagonManager.isOnline() )
+        {
+            getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+            return;
+        }
+        
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
@@ -199,6 +205,12 @@ public class DefaultRepositoryMetadataManager
                                 String checksumPolicy )
         throws ArtifactMetadataRetrievalException
     {
+        if ( !wagonManager.isOnline() )
+        {
+            getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+            return;
+        }
+        
         try
         {
             wagonManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
@@ -228,6 +240,12 @@ public class DefaultRepositoryMetadataManager
                         ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
+        if ( !wagonManager.isOnline() )
+        {
+            getLogger().warn( "System is offline. Cannot deploy metadata:\n" + metadata.extendedToString() + "\n\n" );
+            return;
+        }
+        
         getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
 
         File file = new File( localRepository.getBasedir(),

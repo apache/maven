@@ -103,7 +103,31 @@ public class DefaultMaven
     {
         if ( request.getSettings().isOffline() )
         {
-            getLogger().info( "Maven is running in offline mode." );
+            getLogger().info( "\n\nNOTE: Maven is running in offline mode.\n\n" );
+            
+            WagonManager wagonManager = null;
+
+            try
+            {
+                wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+                
+                wagonManager.setOnline( false );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new ReactorException( "Cannot retrieve WagonManager in order to set offline mode.", e );
+            }
+            finally
+            {
+                try
+                {
+                    container.release( wagonManager );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().warn( "Cannot release WagonManager.", e );
+                }
+            }
         }
 
         try
@@ -239,6 +263,8 @@ public class DefaultMaven
             }
             catch ( LifecycleExecutionException e )
             {
+                logFatal( e );
+                
                 throw new ReactorException( "Error executing project within the reactor", e );
             }
 
@@ -504,6 +530,19 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
     // Reporting / Logging
     // ----------------------------------------------------------------------
+    
+    protected void logFatal( Throwable error )
+    {
+        line();
+
+        getLogger().error( "FATAL ERROR" );
+
+        line();
+
+        diagnoseError( error );
+        
+        line();
+    }
 
     protected void logError( MavenExecutionResponse r )
     {
@@ -513,8 +552,17 @@ public class DefaultMaven
 
         line();
 
-        Throwable error = r.getException();
+        diagnoseError( r.getException() );
+        
+        line();
 
+        stats( r.getStart(), r.getFinish() );
+
+        line();
+    }
+
+    private void diagnoseError( Throwable error )
+    {
         String message = null;
         if ( errorDiagnosers != null )
         {
@@ -538,13 +586,14 @@ public class DefaultMaven
 
         line();
 
-        getLogger().error( "Cause: ", r.getException() );
+        // TODO: needs to honour -e
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Trace:\n", error );
 
-        line();
+            line();
+        }
 
-        stats( r.getStart(), r.getFinish() );
-
-        line();
     }
 
     protected void logFailure( MavenExecutionResponse r, Throwable error, String longMessage )
