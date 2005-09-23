@@ -23,6 +23,10 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Target;
+import org.apache.tools.ant.types.Path;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
@@ -50,6 +54,17 @@ public abstract class AbstractAntMojo
 
             antTasks.getProject().addBuildListener( antLogger );
             antTasks.getProject().setBaseDir( mavenProject.getBasedir() );
+
+            Path p = new Path( antTasks.getProject() );
+            p.setPath( StringUtils.join( mavenProject.getCompileClasspathElements().iterator(), File.pathSeparator ) );
+            antTasks.getProject().addReference( "maven.dependency.classpath", p );
+            antTasks.getProject().addReference( "maven.compile.classpath", p );
+            p = new Path( antTasks.getProject() );
+            p.setPath( StringUtils.join( mavenProject.getRuntimeClasspathElements().iterator(), File.pathSeparator ) );
+            antTasks.getProject().addReference( "maven.runtime.classpath", p );
+            p = new Path( antTasks.getProject() );
+            p.setPath( StringUtils.join( mavenProject.getTestClasspathElements().iterator(), File.pathSeparator ) );
+            antTasks.getProject().addReference( "maven.test.classpath", p );
 
             getLog().info( "Executing tasks" );
 

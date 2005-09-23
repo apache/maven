@@ -38,7 +38,8 @@ import org.apache.tools.ant.Target;
  * @goal run
  * 
  * @description Runs the nested ant tasks
- *
+ * 
+ * @requiresDependencyResolution
  */
 public class AntRunMojo
     extends AbstractAntMojo
