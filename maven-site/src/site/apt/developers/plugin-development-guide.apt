@@ -53,8 +53,5 @@ Developing Maven 2.0 Plugins
 
 * Resources
 
-    [[1]] {{{developers/developing-plugins-with-marmalade.html}Developing plugins
-          with Marmalade}}
-          
-    [[2]] {{{developers/mojo-api-specification.html}Mojo API specification}}
+    [[1]] {{{developers/mojo-api-specification.html}Mojo API specification}}
           

@@ -223,7 +223,7 @@ m2 clean:clean install
 @phase generate-sources
 ----
 
-  <<Note:>> <Some plugin languages such as Marmalade have different ways of specifying mojo level declarations.
+  <<Note:>> <Some plugin languages have different ways of specifying mojo level declarations.
   Please refer to the specific plugin development documentation for more information.>
 
   Once this is specified, it will automatically be registered when the goal is listed in the project POM, as described

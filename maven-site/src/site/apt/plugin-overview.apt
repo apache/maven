@@ -58,7 +58,7 @@ Plugin Overview
 
   A Mojo is really just a goal in Maven 2, and plug-ins consist of 
   any number of goals (Mojos).  Mojos can be defined as annotated Java classes or
-  as a XML plugin script if a plugin is defined in Marmalade.  A Mojo specifies 
+  Beanshell script.  A Mojo specifies 
   metadata about a goal: a goal name, which phase of the lifecycle it fits into, 
   and the parameters it is expecting.
   
@@ -175,8 +175,8 @@ Plugin Overview
   isn't going to be the best choice for performance, and the development team
   thought it wise to adopt an approach which would allow plugin developers to
   choose from an array of plugin implementation choices.  The first choice in 
-  Maven 2 should be Java plugins, but if you are used to defining plugins in Jelly
-  you may also define a plugin using a scripting language known as Marmalade.
+  Maven 2 should be Java plugins, but you may also use one of the supported
+  scripting languages like Beanshell.
   
   To summarize, the development team saw some critical gaps in the API and 
   architecture of Maven 1.0 plug-ins, and the team decided that addressing
