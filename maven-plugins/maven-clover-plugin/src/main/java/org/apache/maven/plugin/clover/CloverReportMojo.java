@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
  *
  * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
  * @version $Id$
- * @goal report
+ * @goal clover
  * @execute phase="test" lifecycle="clover"
  */
 public class CloverReportMojo extends AbstractMavenReport
