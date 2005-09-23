@@ -1,16 +1,16 @@
- ---
- Ear Plugin: configuration examples
- ---
- Stéphane Nicoll
- ---
- 07-Sep-2005
- ---
+ ------
+ Maven 2 Ear Plugin: configuration examples
+ ------
+ Stephane Nicoll
+ <snicoll@apache.org>
+ ------
+ September 23, 2005
 
 Introduction
 
   The Ear plugin allows to generate automatically the descriptor deployment, e.g.
-  application.xml. This generation is already customized by basic configuration
-  items, see <<TODO: ADD A LINK HERE>>.
+  application.xml. This generation is already customized by the goal's parameters,
+  see {{{index.html}the goals description}}.  
 
   Ear modules might be further customized as follows:
 

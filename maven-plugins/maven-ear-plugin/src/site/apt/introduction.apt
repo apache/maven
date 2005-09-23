@@ -1,0 +1,17 @@
+ ------
+ Maven 2 Ear Plugin
+ ------
+ Stephane Nicoll
+ <snicoll@apache.org>
+ ------
+ September 23, 2005
+
+Introduction
+
+  This plugin generates J2EE Enterprise Archive (EAR) file. It can also generate the deployment
+  descriptor file (e.g. application.xml)
+
+  The full description of goals is available {{{index.html}here}}.
+
+
+
