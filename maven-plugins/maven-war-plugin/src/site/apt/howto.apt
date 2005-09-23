@@ -1,0 +1,35 @@
+ ------
+ Maven 2 War Plugin: configuration examples
+ ------
+ Stephane Nicoll
+ <snicoll@apache.org>
+ ------
+ September 23, 2005
+
+Introduction
+
+  The War plugin allows to package the web application in different mode:
+
+   * war (default): generates the war artifact
+
+   * inplace: package the web application in the source tree
+
+   * exploded (<<deprecated>>): package an exploded web application
+
+  The packaging's mode is to be set in the plugin's configuration. For instance,
+  to use the <inplace> mode configure your project as follows:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+           <mode>inplace</mode>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+

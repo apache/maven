@@ -1,0 +1,16 @@
+ ------
+ Maven 2 Ear Plugin
+ ------
+ Stephane Nicoll
+ <snicoll@apache.org>
+ ------
+ September 23, 2005
+
+Introduction
+
+  This plugin generates Web application archive (WAR) file.
+
+  The full description of goals is available {{{index.html}here}}.
+
+
+
