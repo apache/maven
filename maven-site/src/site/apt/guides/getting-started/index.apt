@@ -216,6 +216,19 @@ Compiling 1 source file to /tmp/my-app/target/classes
 
 ~~* How do I filter resources against my POM?
 
++-----+
+
+FYI - In beta-2, while the other technique is still supported, the
+recommended way is finally settled:
+
+<build>
+  <filters>
+    <filtersFile>...</filtersFile>
+  </filters>
+</build>
+
++-----+
+
 ~~* How do use resources with my tests?
 ~~  o EIDSL
 
@@ -245,3 +258,66 @@ Compiling 1 source file to /tmp/my-app/target/classes
 ~~* How do I internationalize my site?
 
 ~~http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix
+
++-----+
+
+multiple repositories
+
+<project>
+...
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+    <repository>
+      <id>my-repo</id>
+      <name>your custom repo</name>
+      <url>http://jarsm2.dyndns.dk</url>
+    </repository>
+  </repositories>
+...
+</project>
+
+==
+
+Project properties
+
+Actually, no. It's *like* the properties defined in profiles in syntax,
+but this is a properties section that is specified as a direct child of
+the <project> element. So:
+
+<project>
+~  ...
+~  <properties>
+~    <name>value</name>
+~  </properties>
+</project>
+
+==
+
+Profile inheritance the same as standard inheritence and resources sets are currently not
+inherited.
+
+DefaultModelInheritenceAssembler.
+
+Merged:
+- dependencies
+- developers and contributors
+- plugin lists (including reports)
+- plugin executions with matching ids
+- plugin configuration
+
+==
+
+System vars are accessed implicitly in m2...try:
+
+<configuration>
+~  <debug>${build.debug}</debug>
+~  <source>${build.jdk}</source>
+~  <target>${build.jdk}</target>
+</configuration>
+
+
++-----+
