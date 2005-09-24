@@ -30,8 +30,7 @@ import java.util.List;
  * An <tt>XmlWriter</tt> based implementation used to generate an
  * <tt>application.xml</tt> file
  *
- * @author Stephane Nicoll <stephane.nicoll@gmail.com>
- * @author $Author: sni $ (last edit)
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  */
 public final class ApplicationXmlWriter

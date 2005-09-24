@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * The {@link EarModule} implementation for a Web application module.
  *
- * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  */
 public class WebModule

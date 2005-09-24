@@ -28,7 +28,7 @@ import java.util.Iterator;
 /**
  * Builds J2EE Enteprise Archive (EAR) files.
  *
- * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  * @goal ear
  * @phase package

@@ -21,7 +21,7 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Builds an {@link EarModule} based on an <tt>Artifact</tt>.
  *
- * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  */
 public final class EarModuleFactory

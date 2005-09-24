@@ -22,7 +22,7 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 /**
  * The {@link EarModule} implementation for a J2EE client module.
  *
- * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  */
 public class JavaModule

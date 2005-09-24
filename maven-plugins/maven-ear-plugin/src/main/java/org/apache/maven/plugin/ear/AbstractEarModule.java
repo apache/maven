@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * A base implementation of an {@link EarModule}.
  *
- * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
+ * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
  * @version $Id$
  */
 public abstract class AbstractEarModule
