@@ -143,6 +143,8 @@ public class DefaultPluginManager
         // use for the mapping manager in here
         Settings settings = session.getSettings();
         List pluginGroups = settings.getPluginGroups();
+        if ( pluginMappingManager == null ) throw new NullPointerException( "pluginMappingManager was null" );
+        if ( project == null ) throw new NullPointerException( "project was null" );
         return pluginMappingManager.getByPrefix( prefix, pluginGroups, project.getPluginArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
