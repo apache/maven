@@ -31,7 +31,7 @@ import java.util.Set;
  * A base class for EAR-processing related tasks.
  *
  * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
- * @version $Id $
+ * @version $Id:  $
  */
 public abstract class AbstractEarMojo
     extends AbstractMojo

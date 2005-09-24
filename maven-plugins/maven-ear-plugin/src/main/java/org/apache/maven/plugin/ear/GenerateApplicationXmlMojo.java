@@ -26,7 +26,7 @@ import java.io.IOException;
  * A Mojo used to build the application.xml file.
  *
  * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
- * @version $Id $
+ * @version $Id: $
  * @goal generate-application-xml
  * @phase generate-resources
  * @requiresDependencyResolution test
