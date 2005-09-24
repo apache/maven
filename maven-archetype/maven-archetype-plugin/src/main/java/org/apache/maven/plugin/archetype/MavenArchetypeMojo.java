@@ -33,6 +33,9 @@ import java.util.Map;
  * Builds archetype containers.
  *
  * @goal create
+ * @description The archetype creation goal looks for an archetype with a given groupId, artifactId, and
+ * version and retrieves it from the remote repository. Once the archetype is retrieve it is process against
+ * a set of user parameters to create a working Maven project.
  * @requiresProject false
  */
 public class MavenArchetypeMojo
