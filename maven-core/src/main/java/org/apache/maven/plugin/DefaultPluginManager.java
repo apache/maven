@@ -141,8 +141,9 @@ public class DefaultPluginManager
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
-        return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
-                                                 project.getPluginArtifactRepositories(),
+        Settings settings = session.getSettings();
+        List pluginGroups = settings.getPluginGroups();
+        return pluginMappingManager.getByPrefix( prefix, pluginGroups, project.getPluginArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
 
@@ -271,7 +272,7 @@ public class DefaultPluginManager
         }
 
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
-        
+
         if ( !pluginArtifact.isResolved() )
         {
             throw new PluginContainerException( plugin, "Cannot resolve artifact for plugin." );
