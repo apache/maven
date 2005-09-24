@@ -134,6 +134,8 @@ public class MavenProject
 
     private Build buildOverlay;
 
+    private boolean executionRoot;
+
     public MavenProject( Model model )
     {
         this.model = model;
@@ -180,6 +182,8 @@ public class MavenProject
         {
             this.originalModel = ModelUtils.cloneModel( project.originalModel );
         }
+
+        this.executionRoot = project.executionRoot;
 
         // TODO: need to clone this too?
         this.artifact = project.artifact;
@@ -1448,5 +1452,15 @@ public class MavenProject
     public Map getProjectReferences()
     {
         return projectReferences;
+    }
+
+    public boolean isExecutionRoot()
+    {
+        return executionRoot;
+    }
+
+    public void setExecutionRoot( boolean executionRoot )
+    {
+        this.executionRoot = executionRoot;
     }
 }

@@ -104,13 +104,13 @@ public class DefaultMaven
         if ( request.getSettings().isOffline() )
         {
             getLogger().info( "\n\nNOTE: Maven is running in offline mode.\n\n" );
-            
+
             WagonManager wagonManager = null;
 
             try
             {
                 wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-                
+
                 wagonManager.setOnline( false );
             }
             catch ( ComponentLookupException e )
@@ -160,7 +160,7 @@ public class DefaultMaven
             List files = getProjectFiles( request );
 
             List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                             request.getSettings(), globalProfileManager );
+                                             request.getSettings(), globalProfileManager, !request.isReactorActive() );
 
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
@@ -264,7 +264,7 @@ public class DefaultMaven
             catch ( LifecycleExecutionException e )
             {
                 logFatal( e );
-                
+
                 throw new ReactorException( "Error executing project within the reactor", e );
             }
 
@@ -351,7 +351,7 @@ public class DefaultMaven
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                  ProfileManager globalProfileManager )
+                                  ProfileManager globalProfileManager, boolean isRoot )
         throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException,
         ProfileActivationException
     {
@@ -370,6 +370,11 @@ public class DefaultMaven
             }
 
             MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
+
+            if ( isRoot )
+            {
+                project.setExecutionRoot( true );
+            }
 
             if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
@@ -409,7 +414,7 @@ public class DefaultMaven
                 }
 
                 List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings,
-                                                          globalProfileManager );
+                                                          globalProfileManager, false );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -530,7 +535,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
     // Reporting / Logging
     // ----------------------------------------------------------------------
-    
+
     protected void logFatal( Throwable error )
     {
         line();
@@ -540,7 +545,7 @@ public class DefaultMaven
         line();
 
         diagnoseError( error );
-        
+
         line();
     }
 
@@ -553,7 +558,7 @@ public class DefaultMaven
         line();
 
         diagnoseError( r.getException() );
-        
+
         line();
 
         stats( r.getStart(), r.getFinish() );

@@ -169,11 +169,14 @@ public class ProjectSorter
     {
         if ( topLevelProject == null )
         {
-            List projectsByFile = new ArrayList( sortedProjects );
-
-            Collections.sort( projectsByFile, new ByProjectFileComparator() );
-
-            topLevelProject = (MavenProject) projectsByFile.get( 0 );
+            for ( Iterator i = sortedProjects.iterator(); i.hasNext() && topLevelProject == null; )
+            {
+                MavenProject project = (MavenProject) i.next();
+                if ( project.isExecutionRoot() )
+                {
+                    topLevelProject = project;
+                }
+            }
         }
 
         return topLevelProject;

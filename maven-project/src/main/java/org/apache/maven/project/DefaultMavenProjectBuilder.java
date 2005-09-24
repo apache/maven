@@ -346,7 +346,7 @@ public class DefaultMavenProjectBuilder
             try
             {
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
-                
+
                 File file = projectArtifact.getFile();
                 model = readModel( file );
 
@@ -1166,6 +1166,8 @@ public class DefaultMavenProjectBuilder
             List remoteRepositories = buildArtifactRepositories( superModel );
 
             project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null, null );
+
+            project.setExecutionRoot( true );
 
             return project;
         }
