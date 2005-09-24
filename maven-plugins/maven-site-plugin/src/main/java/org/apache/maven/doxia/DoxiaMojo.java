@@ -103,6 +103,8 @@ public class DoxiaMojo
     private File siteDirectory;
 
     /**
+     * Directory containing generated documentation.
+     *
      * @parameter alias="workingDirectory" expression="${project.build.directory}/generated-site"
      * @required
      */
@@ -312,12 +314,6 @@ public class DoxiaMojo
 
                 String siteDescriptor = getSiteDescriptor( reports, locale, projectInfos, projectReports );
 
-                if ( generatedSiteDirectory.exists() )
-                {
-                    siteRenderer.render( generatedSiteDirectory, outputDirectory, siteDescriptor, template, attributes,
-                                         locale );
-                }
-
                 //Generate reports
                 List generatedReportsFileName = Collections.EMPTY_LIST;
                 if ( reports != null )
@@ -412,6 +408,12 @@ public class DoxiaMojo
                         }
 */
                     }
+                }
+
+                if ( generatedSiteDirectory.exists() )
+                {
+                    siteRenderer.render( generatedSiteDirectory, outputDirectory, siteDescriptor, template, attributes,
+                                         locale );
                 }
             }
         }
