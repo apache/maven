@@ -172,8 +172,8 @@ public class DefaultLifecycleExecutor
         return response;
     }
 
-    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session, MavenProject project,
-                                      EventDispatcher dispatcher )
+    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
+                                      MavenProject rootProject, EventDispatcher dispatcher )
         throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException, LifecycleExecutionException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -182,11 +182,11 @@ public class DefaultLifecycleExecutor
 
             if ( segment.aggregate() )
             {
-                if ( !rm.isBlackListed( project ) )
+                if ( !rm.isBlackListed( rootProject ) )
                 {
                     line();
 
-                    getLogger().info( "Building " + project.getName() );
+                    getLogger().info( "Building " + rootProject.getName() );
 
                     getLogger().info( "  " + segment );
 
@@ -196,7 +196,7 @@ public class DefaultLifecycleExecutor
                     // Event monitoring.
                     String event = MavenEvents.PROJECT_EXECUTION;
 
-                    dispatcher.dispatchStart( event, project.getId() + " ( " + segment + " )" );
+                    dispatcher.dispatchStart( event, rootProject.getId() + " ( " + segment + " )" );
 
                     try
                     {
@@ -207,23 +207,23 @@ public class DefaultLifecycleExecutor
 
                             try
                             {
-                                executeGoal( task, session, project );
+                                executeGoal( task, session, rootProject );
                             }
                             catch ( MojoExecutionException e )
                             {
-                                handleExecutionFailure( rm, project, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task );
                             }
                             catch ( ArtifactResolutionException e )
                             {
-                                handleExecutionFailure( rm, project, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task );
                             }
                         }
 
-                        dispatcher.dispatchEnd( event, project.getId() + " ( " + segment + " )" );
+                        dispatcher.dispatchEnd( event, rootProject.getId() + " ( " + segment + " )" );
                     }
                     catch ( LifecycleExecutionException e )
                     {
-                        dispatcher.dispatchError( event, project.getId() + " ( " + segment + " )", e );
+                        dispatcher.dispatchError( event, rootProject.getId() + " ( " + segment + " )", e );
 
                         throw e;
                     }
@@ -232,7 +232,7 @@ public class DefaultLifecycleExecutor
                 {
                     line();
 
-                    getLogger().info( "SKIPPING " + project.getName() );
+                    getLogger().info( "SKIPPING " + rootProject.getName() );
 
                     getLogger().info( "  " + segment );
 
@@ -279,11 +279,11 @@ public class DefaultLifecycleExecutor
                                 }
                                 catch ( MojoExecutionException e )
                                 {
-                                    handleExecutionFailure( rm, project, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task );
                                 }
                                 catch ( ArtifactResolutionException e )
                                 {
-                                    handleExecutionFailure( rm, project, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task );
                                 }
                             }
 
@@ -349,68 +349,17 @@ public class DefaultLifecycleExecutor
     {
         List segments = new ArrayList();
 
-        TaskSegment currentSegment = null;
-        for ( Iterator it = tasks.iterator(); it.hasNext(); )
+        if ( project != null )
         {
-            String task = (String) it.next();
 
-            // if it's a phase, then we don't need to check whether it's an aggregator.
-            // simply add it to the current task partition.
-            if ( phases.contains( task ) )
+            TaskSegment currentSegment = null;
+            for ( Iterator it = tasks.iterator(); it.hasNext(); )
             {
-                if ( currentSegment != null && currentSegment.aggregate() )
-                {
-                    segments.add( currentSegment );
-                    currentSegment = null;
-                }
+                String task = (String) it.next();
 
-                if ( currentSegment == null )
-                {
-                    currentSegment = new TaskSegment();
-                }
-
-                currentSegment.add( task );
-            }
-            else
-            {
-                MojoDescriptor mojo = null;
-                try
-                {
-                    // definitely a CLI goal, can use prefix
-                    mojo = getMojoDescriptor( task, session, project, task, true );
-                }
-                catch ( LifecycleExecutionException e )
-                {
-                    getLogger().info(
-                        "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
-                    getLogger().debug( "", e );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    getLogger().info(
-                        "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
-                    getLogger().debug( "", e );
-                }
-
-                // if the mojo descriptor was found, determine aggregator status according to:
-                // 1. whether the mojo declares itself an aggregator
-                // 2. whether the mojo DOES NOT require a project to function (implicitly avoid reactor)
-                if ( mojo != null && ( mojo.isAggregator() || !mojo.isProjectRequired() ) )
-                {
-                    if ( currentSegment != null && !currentSegment.aggregate() )
-                    {
-                        segments.add( currentSegment );
-                        currentSegment = null;
-                    }
-
-                    if ( currentSegment == null )
-                    {
-                        currentSegment = new TaskSegment( true );
-                    }
-
-                    currentSegment.add( task );
-                }
-                else
+                // if it's a phase, then we don't need to check whether it's an aggregator.
+                // simply add it to the current task partition.
+                if ( phases.contains( task ) )
                 {
                     if ( currentSegment != null && currentSegment.aggregate() )
                     {
@@ -425,10 +374,73 @@ public class DefaultLifecycleExecutor
 
                     currentSegment.add( task );
                 }
+                else
+                {
+                    MojoDescriptor mojo = null;
+                    try
+                    {
+                        // definitely a CLI goal, can use prefix
+                        mojo = getMojoDescriptor( task, session, project, task, true );
+                    }
+                    catch ( LifecycleExecutionException e )
+                    {
+                        getLogger().info(
+                            "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
+                        getLogger().debug( "", e );
+                    }
+                    catch ( ArtifactResolutionException e )
+                    {
+                        getLogger().info(
+                            "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
+                        getLogger().debug( "", e );
+                    }
+
+                    // if the mojo descriptor was found, determine aggregator status according to:
+                    // 1. whether the mojo declares itself an aggregator
+                    // 2. whether the mojo DOES NOT require a project to function (implicitly avoid reactor)
+                    if ( mojo != null && ( mojo.isAggregator() || !mojo.isProjectRequired() ) )
+                    {
+                        if ( currentSegment != null && !currentSegment.aggregate() )
+                        {
+                            segments.add( currentSegment );
+                            currentSegment = null;
+                        }
+
+                        if ( currentSegment == null )
+                        {
+                            currentSegment = new TaskSegment( true );
+                        }
+
+                        currentSegment.add( task );
+                    }
+                    else
+                    {
+                        if ( currentSegment != null && currentSegment.aggregate() )
+                        {
+                            segments.add( currentSegment );
+                            currentSegment = null;
+                        }
+
+                        if ( currentSegment == null )
+                        {
+                            currentSegment = new TaskSegment();
+                        }
+
+                        currentSegment.add( task );
+                    }
+                }
+            }
+
+            segments.add( currentSegment );
+        }
+        else
+        {
+            TaskSegment segment = new TaskSegment( false );
+            for ( Iterator i = tasks.iterator(); i.hasNext(); )
+            {
+                segment.add( (String) i.next() );
             }
         }
-
-        segments.add( currentSegment );
 
         return segments;
     }

@@ -141,11 +141,8 @@ public class DefaultPluginManager
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
-        Settings settings = session.getSettings();
-        List pluginGroups = settings.getPluginGroups();
-        if ( pluginMappingManager == null ) throw new NullPointerException( "pluginMappingManager was null" );
-        if ( project == null ) throw new NullPointerException( "project was null" );
-        return pluginMappingManager.getByPrefix( prefix, pluginGroups, project.getPluginArtifactRepositories(),
+        return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
+                                                 project.getPluginArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
 
