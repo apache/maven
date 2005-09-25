@@ -1,0 +1,28 @@
+ ------
+ Maven 2 Ejb Plugin: configuration examples
+ ------
+ Stephane Nicoll
+ <snicoll@apache.org>
+ ------
+ September 25, 2005
+
+Introduction
+
+  The EJB plugin allows to package an EJB module. To generate the ejb-client
+  jar as well, you need to set the <generateClient> to true in the plugin's
+  configuration:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <configuration>
+           <generateClient>true</generateClient>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
