@@ -73,26 +73,6 @@ public class JavadocReport
 
     // Using for the plugin:xdoc goal. Best way?
 
-    /**
-     * Default bottom
-     */
-    private static final String DEFAULT_BOTTOM = "Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved.";
-
-    /**
-     * Default doctitle
-     */
-    private static final String DEFAULT_DOCTITLE = "${windowtitle}";
-
-    /**
-     * Default organization name
-     */
-    private static final String DEFAULT_ORGANIZATION_NAME = "The Apache Software Foundation";
-
-    /**
-     * Default window title
-     */
-    private static final String DEFAULT_WINDOW_TITLE = "${project.name} ${project.version} API";
-
     private static final String PATH_SEPARATOR = System.getProperty( "path.separator" );
 
     // ----------------------------------------------------------------------
@@ -289,7 +269,7 @@ public class JavadocReport
      * Specifies the text to be placed at the bottom of each output file.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#bottom">bottom</a>.
      *
-     * @parameter expression="${bottom}" default-value="Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved."
+     * @parameter expression="${bottom}" default-value="Copyright {inceptionYear}-{currentYear} ${project.organization.name}. All Rights Reserved."
      */
     private String bottom;
 
@@ -774,35 +754,19 @@ public class JavadocReport
             // javadoc arguments for default doclet
             if ( StringUtils.isEmpty( doclet ) )
             {
-                // Specify default values
-                if ( bottom.equals( DEFAULT_BOTTOM ) )
+                bottom = StringUtils.replace( bottom, "{currentYear}", year );
+                if ( project.getInceptionYear() != null )
                 {
-                    bottom = "Copyright &copy; " + year + " ";
-
-                    if ( ( model.getOrganization() != null ) &&
-                        ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
-                    {
-                        bottom += model.getOrganization().getName();
-                    }
-                    else
-                    {
-                        bottom += DEFAULT_ORGANIZATION_NAME;
-                    }
-                    bottom += ". All Rights Reserved.";
+                    bottom = StringUtils.replace( bottom, "{inceptionYear}", project.getInceptionYear() );
+                }
+                else
+                {
+                    bottom = StringUtils.replace( bottom, "{inceptionYear}-", "" );
                 }
 
                 if ( StringUtils.isEmpty( stylesheetfile ) )
                 {
                     stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
-                }
-                if ( windowtitle.equals( DEFAULT_WINDOW_TITLE ) )
-                {
-                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " " +
-                        model.getVersion() + " API";
-                }
-                if ( doctitle.equals( DEFAULT_DOCTITLE ) )
-                {
-                    doctitle = windowtitle;
                 }
                 // End Specify default values
 
