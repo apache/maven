@@ -1,0 +1,16 @@
+ ------
+ Maven 2 Surefire Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 19, 2005
+
+Introduction
+
+ This plugin runs the junit tests in an isolated classloader.  By default, this plugin will be executed in 
+ "test" phase of m2 lifecycle.  
+
+ This plugin generates 2 types of report, Text File Report and XML File Report.   Both files will be generated in the
+ ${basedir}/target/surefire-report.  For an HTML version of the report, please see the Maven Surefire Report Plugin. 
+
