@@ -198,7 +198,7 @@ public class EarMojo
         File customManifestFile = new File( manifestFile );
         if ( !customManifestFile.exists() )
         {
-            getLog().info( "Could not find manifest file: " + manifestFile );
+            getLog().info( "Could not find manifest file: " + manifestFile +" - Generating one");
         }
         else
         {
