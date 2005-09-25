@@ -48,7 +48,7 @@ public class RarMojo
     /**
      * Single directory for extra files to include in the RAR.
      *
-     * @parameter expression="${basedir}/src/rar"
+     * @parameter expression="${basedir}/src/main/rar"
      * @required
      */
     private String rarSourceDirectory;
@@ -56,7 +56,7 @@ public class RarMojo
     /**
      * The location of the ra.xml file to be used within the rar file.
      *
-     * @parameter expression="${basedir}/src/rar/META-INF/ra.xml"
+     * @parameter expression="${basedir}/src/main/rar/META-INF/ra.xml"
      */
     private String raXmlFile;
 
@@ -71,7 +71,7 @@ public class RarMojo
     /**
      * The location of the manifest file to be used within the rar file.
      *
-     * @parameter expression="${basedir}/src/rar/META-INF/MANIFEST.MF"
+     * @parameter expression="${basedir}/src/main/rar/META-INF/MANIFEST.MF"
      */
     private String manifestFile;
 
