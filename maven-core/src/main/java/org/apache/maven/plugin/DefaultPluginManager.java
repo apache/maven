@@ -310,6 +310,19 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        
+        // NOTE: I'm putting these checks in here, since this is the central point of access for 
+        // anything that wants to execute a mojo.
+        if( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+        {
+            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() + ". It requires a project, but the build is not using one." ); 
+        }
+        
+        if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
+        {
+            // TODO: Should we error out, or simply warn and skip??
+            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal() + " requires online mode for execution. Maven is currently offline." );
+        }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {

@@ -153,6 +153,7 @@ public class DefaultMaven
 
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
 
+        boolean foundProjects = true;
         try
         {
             loadSettingsProfiles( globalProfileManager, request.getSettings() );
@@ -169,6 +170,8 @@ public class DefaultMaven
             {
                 MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
                 projects.add( superProject );
+                
+                foundProjects = false;
             }
 
             rm = new ReactorManager( projects );
@@ -204,6 +207,8 @@ public class DefaultMaven
         try
         {
             MavenSession session = createSession( request, rm );
+            
+            session.setUsingPOMsFromFilesystem( foundProjects );
 
             try
             {

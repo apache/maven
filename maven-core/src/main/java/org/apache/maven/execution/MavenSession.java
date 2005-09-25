@@ -46,6 +46,8 @@ public class MavenSession
 
     private final String executionRootDir;
 
+    private boolean usingPOMsFromFilesystem;
+
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager rpm, List goals, String executionRootDir )
     {
@@ -125,5 +127,15 @@ public class MavenSession
     public String getExecutionRootDirectory()
     {
         return executionRootDir;
+    }
+
+    public void setUsingPOMsFromFilesystem( boolean usingPOMsFromFilesystem )
+    {
+        this.usingPOMsFromFilesystem = usingPOMsFromFilesystem;
+    }
+    
+    public boolean isUsingPOMsFromFilesystem()
+    {
+        return usingPOMsFromFilesystem;
     }
 }
