@@ -21,6 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.ProfileManager;
@@ -168,6 +169,12 @@ public class MavenEmbedder
         throws ProjectBuildingException
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
+    }
+
+    public MavenProject readProjectWithDependencies( File mavenProject )
+        throws ProjectBuildingException, ArtifactResolutionException
+    {
+        return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
     }
 
     // ----------------------------------------------------------------------

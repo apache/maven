@@ -3,8 +3,11 @@ package org.apache.maven.embedder;
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.artifact.Artifact;
 
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -54,9 +57,17 @@ public class MavenEmbedderTest
     protected void projectReadingTest()
         throws Exception
     {
-        MavenProject project = maven.readProject( getPomFile() );
+        MavenProject project = maven.readProjectWithDependencies( getPomFile() );
 
         assertEquals( "org.apache.maven", project.getGroupId() );
+
+        Set artifacts = project.getArtifacts();
+
+        assertEquals( 1, artifacts.size() );
+
+        Artifact artifact = (Artifact) artifacts.iterator().next();
+
+        System.out.println( "artifact.getFile().getAbsolutePath() = " + artifact.getFile().getAbsolutePath() );
     }
 
     // ----------------------------------------------------------------------

@@ -1,9 +1,4 @@
 <project>
-  <parent>
-    <artifactId>maven</artifactId>
-    <groupId>org.apache.maven</groupId>
-    <version>2.0-beta-2-SNAPSHOT</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
   <artifactId>maven-model</artifactId>
@@ -36,35 +31,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+      <version>1.0.2</version>
     </dependency>
   </dependencies>
-  <profiles>
-    <profile>
-      <id>all-models</id>
-      <build>
-        <finalName>${pom.artifactId}-${pom.version}-all</finalName>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.modello</groupId>
-            <artifactId>modello-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>v3</id>
-                <configuration>
-                  <version>3.0.0</version>
-                  <packageWithVersion>true</packageWithVersion>
-                </configuration>
-                <goals>
-                  <goal>xpp3-writer</goal>
-                  <goal>java</goal>
-                  <goal>xpp3-reader</goal>
-                  <goal>xsd</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
