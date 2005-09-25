@@ -47,12 +47,16 @@ public class DependenciesReport
     extends AbstractMavenReport
 {
     /**
+     * Report output directory.
+     * 
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * Doxia Site Renderer.
+     * 
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -60,6 +64,8 @@ public class DependenciesReport
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven Project.
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -67,6 +73,8 @@ public class DependenciesReport
     private MavenProject project;
 
     /**
+     * Maven ArtifactFactory.
+     * 
      * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
      * @required
      * @readonly
@@ -74,6 +82,8 @@ public class DependenciesReport
     private ArtifactFactory artifactFactory;
 
     /**
+     * Maven Project Builder.
+     * 
      * @parameter expression="${component.org.apache.maven.project.MavenProjectBuilder}"
      * @required
      * @readonly
@@ -81,6 +91,8 @@ public class DependenciesReport
     private MavenProjectBuilder mavenProjectBuilder;
 
     /**
+     * Local Repository.
+     * 
      * @parameter expression="${localRepository}"
      * @required
      * @readonly

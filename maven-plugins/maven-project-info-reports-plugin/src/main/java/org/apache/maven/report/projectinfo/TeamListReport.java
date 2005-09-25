@@ -45,12 +45,16 @@ public class TeamListReport
     extends AbstractMavenReport
 {
     /**
+     * Report output directory.
+     * 
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * Doxia Site Renderer.
+     * 
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -58,6 +62,8 @@ public class TeamListReport
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven Project.
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly

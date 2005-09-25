@@ -39,7 +39,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Generates the Project Source Configuration Management report.
+ * Generates the Project Source Code Management report.
  * 
  * @goal scm
  * 
@@ -50,12 +50,16 @@ public class ScmReport
     extends AbstractMavenReport
 {
     /**
+     * Report output directory.
+     * 
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * Doxia Site Renderer.
+     * 
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -63,6 +67,8 @@ public class ScmReport
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven Project.
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -70,6 +76,8 @@ public class ScmReport
     private MavenProject project;
 
     /**
+     * Maven SCM Manager.
+     * 
      * @parameter expression="${component.org.apache.maven.scm.manager.ScmManager}"
      * @required
      * @readonly

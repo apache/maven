@@ -49,12 +49,16 @@ public class CimReport
     // ----------------------------------------------------------------------
 
     /**
+     * Report output directory.  
+     * 
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * Doxia SiteRender.
+     * 
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -62,6 +66,8 @@ public class CimReport
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven Project.
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
