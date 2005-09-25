@@ -87,7 +87,10 @@ public class DefaultPluginVersionManager
         return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
     }
 
-    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+    /**
+     * @deprecated Make private, use resolveReportPluginVersion(..) or resolvePluginVersion(..) instead.
+     */
+    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                          ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException
     {

@@ -28,6 +28,13 @@ public interface PluginVersionManager
                                  ArtifactRepository localRepository )
         throws PluginVersionResolutionException;
 
+    /**
+     * @deprecated Use resolveReportPluginVersion(..) instead.
+     */
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                 ArtifactRepository localRepository, boolean processAsReport )
+        throws PluginVersionResolutionException;
+
     String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                        ArtifactRepository localRepository )
         throws PluginVersionResolutionException;

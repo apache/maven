@@ -961,8 +961,8 @@ public class PrepareReleaseMojo
                         String version;
                         try
                         {
-                            version = pluginVersionManager.resolveReportPluginVersion( plugin.getGroupId(), plugin
-                                .getArtifactId(), project, settings, localRepository );
+                            version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin
+                                .getArtifactId(), project, settings, localRepository, true );
                         }
                         catch ( PluginVersionResolutionException e )
                         {
