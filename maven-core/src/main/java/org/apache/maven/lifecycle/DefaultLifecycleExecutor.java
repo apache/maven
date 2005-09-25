@@ -440,6 +440,7 @@ public class DefaultLifecycleExecutor
             {
                 segment.add( (String) i.next() );
             }
+            segments.add( segment );
         }
 
         return segments;
