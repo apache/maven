@@ -118,8 +118,8 @@ public class ForkMojo
 
         if ( response.isExecutionFailure() )
         {
-            throw new MojoExecutionException(
-                "Integration test failed" );
+            getLog().error( "Integration test failed", response.getException() );
+            throw new MojoExecutionException( "Integration test failed" );
         }
     }
 
