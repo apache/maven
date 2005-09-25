@@ -1,0 +1,264 @@
+<!--
+  <mojoMetadata goal="myGoal" 
+        phase="compile"
+        requiresDependencyResolution="compile"
+        requiresProject="true"
+        requiresReports="true"
+        requiresOnline="true"
+        inheritByDefault="true"
+        requiresDirectInvocation="true"
+        aggregator="true">
+  
+    <execute phase="initialize" lifecycle="mine"/>
+    <components>
+      <component role="stuff" hint="more"/>
+    </components>
+    <parameters>
+      <parameter name="nom" 
+                 property="prop" 
+                 required="true" 
+                 readonly="true" 
+                 expression="${project}" 
+                 type="org.apache.maven.project.MavenProject"
+                 alias="otherProp">
+        <description>Test parameter</description>
+        <deprecated>Use something else</deprecated>
+      </parameter>
+    </parameters>
+    <description>
+      This is a test.
+    </description>
+    <deprecated>Use another mojo</deprecated>
+  </mojoMetadata>
+  -->
+<model>
+  <id>mojo-metadata</id>
+  <name>MojoMetadata</name>
+  <description><![CDATA[
+  	Mojo descriptor for embedding in scripts.
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.plugin.tools.model</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="mojoMetadata">
+      <name>MojoMetadata</name>
+      <version>1.0.0</version>
+      <description>Root element of the XML-based mojo descriptor definition.</description>
+      <fields>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>goal</name>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the goal used to invoke this mojo.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>phase</name>
+          <type>String</type>
+          <description>The phase to which this mojo should be bound by default.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>aggregator</name>
+          <type>boolean</type>
+          <description>Whether this mojo operates as an aggregator when the reactor is run. That is, only runs once.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>requiresDependencyResolution</name>
+          <type>String</type>
+          <description>The scope of dependencies that this mojo requires to have resolved.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>requiresProject</name>
+          <type>boolean</type>
+          <description>Whether this mojo requires a project instance in order to execute.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>requiresReports</name>
+          <type>boolean</type>
+          <description>Whether this mojo requires a reports section in the POM.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>requiresOnline</name>
+          <type>boolean</type>
+          <description>Whether this mojo requires online mode to operate normally.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>inheritByDefault</name>
+          <type>boolean</type>
+          <description>Whether this mojo's configuration should propagate down the POM inheritance chain by default.</description>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>requiresDirectInvocation</name>
+          <type>boolean</type>
+          <description>If true, this mojo can only be directly invoked (eg. specified directly on the command line).</description>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>execution</name>
+          <description>Information about a sub-execution of the Maven lifecycle which should be processed.</description>
+          <association>
+            <type>LifecycleExecution</type>
+          </association>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>components</name>
+          <description>List of plexus components required by this mojo.</description>
+          <association>
+            <type>Component</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>parameters</name>
+          <description>List of parameters used by this mojo.</description>
+          <association>
+            <type>Parameter</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0</version>
+          <description>The description for this parameter.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>deprecation</name>
+          <version>1.0.0</version>
+          <description>A deprecation message for this mojo parameter.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>LifecycleExecution</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+      	A sub-process execution of a lifecycle to satisfy the needs of a mojo.
+      ]]></description>
+      <fields>
+        <field xml.attribute="true">
+          <name>lifecycle</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the overlay to apply to the sub-lifecycle before executing it. If specified, this lifecycle overlay definition will be bundled with the plugin.</description>
+        </field>
+        <field xml.attribute="true">
+          <name>phase</name>
+          <version>1.0.0</version>
+          <description>The phase in the sub-lifecycle.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Component</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+      	A reference to a plexus component, assumed to be available to the plugin container.
+      ]]></description>
+      <fields>
+        <field xml.attribute="true">
+          <name>role</name>
+          <version>1.0.0</version>
+          <description>The component role to lookup.</description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>hint</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The role-hint to lookup.</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Parameter</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+      	A parameter used by a mojo, and configurable from the command line or POM configuration sections.
+      ]]></description>
+      <fields>
+        <field xml.attribute="true">
+          <name>name</name>
+          <version>1.0.0</version>
+          <description>The parameter name</description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>alias</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>An alternate name for the parameter.</description>
+        </field>
+        <field xml.attribute="true">
+          <name>property</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The JavaBeans property name to use to configure the mojo with this parameter.</description>
+        </field>
+        <field xml.attribute="true">
+          <name>required</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <description>Whether this parameter is required.</description>
+        </field>
+        <field xml.attribute="true">
+          <name>readonly</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <description><![CDATA[
+            Whether this parameter can be directly edited. If false, this param is either derived from another POM element, or refers to a runtime instance of the build system.
+          ]]></description>
+        </field>
+        <field xml.attribute="true">
+          <name>expression</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            An expression in the form ${instance.property} for extracting a value for this parameter, especially from
+            a runtime instance within the build system. (eg. ${project.build.directory} references 
+            project.getBuild().getDirectory())
+          ]]></description>
+        </field>
+        <field xml.attribute="true">
+          <name>type</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <description><![CDATA[
+            The java type for this parameter.
+          ]]></description>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0</version>
+          <description>The description for this parameter.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>deprecation</name>
+          <version>1.0.0</version>
+          <description>A deprecation message for this mojo parameter.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>
