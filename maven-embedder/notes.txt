@@ -1,0 +1,4 @@
+<eu> -- parse xml to in-memory model
+<eu> -- run m2 (embedded): including running for downloading dependencies, building, archetypes, etc.
+<eu> -- introspect available goals
+<eu> -- introspect available plugins (low priority)
