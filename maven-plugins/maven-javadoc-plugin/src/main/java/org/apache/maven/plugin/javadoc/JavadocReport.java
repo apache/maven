@@ -16,24 +16,13 @@ package org.apache.maven.plugin.javadoc;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.model.Model;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
@@ -43,44 +32,65 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.StringTokenizer;
+
 /**
  * Generates documentation for the Java code in the project using the standard
  * <a href="http://java.sun.com/j2se/javadoc/">Javadoc Tool</a> tool.
  *
+ * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
+ * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
  * @goal javadoc
  * @requiresDependencyResolution compile
  * @phase generate-sources
- *
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- *
- * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
- *
  * @see <a href="http://java.sun.com/j2se/javadoc/">Javadoc Tool</a>
  * @see <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#options">Javadoc Options </a>
  */
 public class JavadocReport
     extends AbstractMavenReport
 {
-    /** The current class directory */
+    /**
+     * The current class directory
+     */
     private static final String RESOURCE_DIR = ClassUtils.getPackageName( JavadocReport.class ).replace( '.', '/' );
 
-    /** Default location for css */
+    /**
+     * Default location for css
+     */
     private static final String DEFAULT_CSS_NAME = "stylesheet.css";
 
     private static final String RESOURCE_CSS_DIR = RESOURCE_DIR + "/css";
 
     // Using for the plugin:xdoc goal. Best way?
-    /** Default bottom */
+
+    /**
+     * Default bottom
+     */
     private static final String DEFAULT_BOTTOM = "Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved.";
 
-    /** Default doctitle */
+    /**
+     * Default doctitle
+     */
     private static final String DEFAULT_DOCTITLE = "${windowtitle}";
 
-    /** Default organization name */
+    /**
+     * Default organization name
+     */
     private static final String DEFAULT_ORGANIZATION_NAME = "The Apache Software Foundation";
 
-    /** Default window title */
+    /**
+     * Default window title
+     */
     private static final String DEFAULT_WINDOW_TITLE = "${project.name} ${project.version} API";
 
     private static final String PATH_SEPARATOR = System.getProperty( "path.separator" );
@@ -99,9 +109,7 @@ public class JavadocReport
     private File outputDirectory;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private SiteRenderer siteRenderer;
 
@@ -114,6 +122,7 @@ public class JavadocReport
 
     // JavaDoc Options
     // @see http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#options
+
     /**
      * Set an additional parameter on the command line.
      *
@@ -267,6 +276,7 @@ public class JavadocReport
 
     // Options Provided by the Standard Doclet
     // @see http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#standard
+
     /**
      * Specifies whether or not the author text is included in the generated Javadocs.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#author">author</a>.
@@ -620,19 +630,37 @@ public class JavadocReport
                     classpath.append( PATH_SEPARATOR );
                 }
             }
+            if ( classpath.length() > 0 )
+            {
+                classpath.insert( 0, "-classpath " );
+            }
 
             StringBuffer sourcePath = new StringBuffer();
-            String[] fileList = new String[1];
+            StringBuffer files = new StringBuffer();
             for ( Iterator i = getProject().getCompileSourceRoots().iterator(); i.hasNext(); )
             {
                 String sourceDirectory = (String) i.next();
-                fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[] { "java" } );
+                String[] fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[]{"java"} );
+                if ( fileList != null && fileList.length != 0 )
+                {
+                    for ( int j = 0; j < fileList.length; j++ )
+                    {
+                        files.append( fileList[j] );
+                        files.append( "\n" );
+                    }
+                }
+
                 sourcePath.append( sourceDirectory );
 
                 if ( i.hasNext() )
                 {
                     sourcePath.append( PATH_SEPARATOR );
                 }
+            }
+
+            if ( files.length() == 0 )
+            {
+                return;
             }
 
             File javadocDirectory = getReportOutputDirectory();
@@ -644,22 +672,11 @@ public class JavadocReport
                 // Append 'apidocs'.
                 javadocDirectory = new File( javadocDirectory, "apidocs" );
             }
+            javadocDirectory.mkdirs();
 
-            if ( fileList != null && fileList.length != 0 )
-            {
-                StringBuffer files = new StringBuffer();
-                for ( int i = 0; i < fileList.length; i++ )
-                {
-                    files.append( fileList[i] );
-                    files.append( "\n" );
-                }
-                javadocDirectory.mkdirs();
-                FileUtils.fileWrite( new File( javadocDirectory, "files" ).getAbsolutePath(), files.toString() );
-            }
-            else
-            {
-                return;
-            }
+            File file = new File( javadocDirectory, "files" );
+            file.deleteOnExit();
+            FileUtils.fileWrite( file.getAbsolutePath(), files.toString() );
 
             // Copy default style sheet
             copyDefaultStylesheet( javadocDirectory );
@@ -691,14 +708,15 @@ public class JavadocReport
                 }
                 else
                 {
-                    if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) )
-                        && ( maxmemory.toLowerCase().endsWith( "m" ) ) )
+                    if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) ) &&
+                        ( maxmemory.toLowerCase().endsWith( "m" ) ) )
                     {
                         addArgIf( arguments, true, "-J-Xmx" + maxmemory );
                     }
                     else
                     {
-                        getLog().error( "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
+                        getLog().error(
+                            "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
                     }
                 }
             }
@@ -712,14 +730,15 @@ public class JavadocReport
                 }
                 else
                 {
-                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) )
-                        && ( minmemory.toLowerCase().endsWith( "m" ) ) )
+                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) &&
+                        ( minmemory.toLowerCase().endsWith( "m" ) ) )
                     {
                         addArgIf( arguments, true, "-J-Xms" + minmemory );
                     }
                     else
                     {
-                        getLog().error( "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
+                        getLog().error(
+                            "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
                     }
                 }
             }
@@ -744,7 +763,13 @@ public class JavadocReport
             addArgIfNotEmpty( arguments, "-additionalparam", additionalparam );
 
             addArgIfNotEmpty( arguments, "-sourcePath", sourcePath.toString() );
-            addArgIfNotEmpty( arguments, "-classpath", classpath.toString() );
+            if ( classpath.length() > 0 )
+            {
+                file = new File( javadocDirectory, "classpath" );
+                file.deleteOnExit();
+                FileUtils.fileWrite( file.getAbsolutePath(), classpath.toString() );
+                cmd.createArgument().setValue( "@classpath" );
+            }
 
             // javadoc arguments for default doclet
             if ( StringUtils.isEmpty( doclet ) )
@@ -754,8 +779,8 @@ public class JavadocReport
                 {
                     bottom = "Copyright &copy; " + year + " ";
 
-                    if ( ( model.getOrganization() != null )
-                        && ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
+                    if ( ( model.getOrganization() != null ) &&
+                        ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
                     {
                         bottom += model.getOrganization().getName();
                     }
@@ -772,8 +797,8 @@ public class JavadocReport
                 }
                 if ( windowtitle.equals( DEFAULT_WINDOW_TITLE ) )
                 {
-                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " "
-                        + model.getVersion() + " API";
+                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " " +
+                        model.getVersion() + " API";
                 }
                 if ( doctitle.equals( DEFAULT_DOCTITLE ) )
                 {
@@ -896,12 +921,11 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      *
-     * @see #addArgIf(java.util.List,boolean,String)
-     * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
-     *
      * @param b the flag which controls if the argument is added or not.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
+     * @see #addArgIf(java.util.List,boolean,String)
+     * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
      */
     private void addArgIf( List arguments, boolean b, String value, float requiredJavaVersion )
     {
@@ -921,11 +945,10 @@ public class JavadocReport
      * <p>
      * Moreover, the value could be comma separated.
      *
-     * @see #addArgIfNotEmpty(java.util.List,String,String,boolean)
-     *
      * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
+     * @see #addArgIfNotEmpty(java.util.List,String,String,boolean)
      */
     private void addArgIfNotEmpty( List arguments, String key, String value )
     {
@@ -971,12 +994,11 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      *
-     * @see #addArgIfNotEmpty(List, String, String, float, boolean)
-     *
      * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
+     * @see #addArgIfNotEmpty(List, String, String, float, boolean)
      */
     private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion )
     {
@@ -987,16 +1009,15 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      *
-     * @see #addArgIfNotEmpty(java.util.List,String,String)
-     * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
-     *
      * @param key the argument name.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      * @param repeatKey repeat or not the key in the command line
+     * @see #addArgIfNotEmpty(java.util.List,String,String)
+     * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
      */
     private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion,
-                                  boolean repeatKey )
+                                   boolean repeatKey )
     {
         if ( SystemUtils.isJavaVersionAtLeast( requiredJavaVersion ) )
         {
@@ -1014,7 +1035,7 @@ public class JavadocReport
      *
      * @param resource the resource
      * @return InputStream An input stream for reading the resource, or <tt>null</tt>
-     *            if the resource could not be found
+     *         if the resource could not be found
      * @throws Exception if any
      */
     private static InputStream getStream( String resource )
@@ -1027,10 +1048,9 @@ public class JavadocReport
      * Convenience method that copy the <code>DEFAULT_STYLESHEET_NAME</code> file from the current class
      * loader to the output directory.
      *
-     * @see #DEFAULT_CSS_NAME
-     *
      * @param outputDirectory the output directory
      * @throws Exception if any
+     * @see #DEFAULT_CSS_NAME
      */
     private void copyDefaultStylesheet( File outputDirectory )
         throws Exception
