@@ -17,7 +17,6 @@
     </site>
   </distributionManagement>
   <reporting>
-    <excludeDefaults>true</excludeDefaults>
     <!-- TODO: disable dependencies -->
     <plugins>
       <plugin>

@@ -11,16 +11,16 @@ Releasing
  
    [[1]] Preparing the release.
    
-   [[2]] Performing the release.
+   [[1]] Performing the release.
  
 Preparing the release
 
  The <<<release:prepare>>> goal will:
 
    [[1]] Verify that there are no uncommitted changes in the checkout
-   [[2]] Prompt for a desired version and tag name
-   [[3]] Modify the pom.xml 
-   [[4]] Tag the entire source tree with the new tag name
+   [[1]] Prompt for a desired version and tag name
+   [[1]] Modify the pom.xml 
+   [[1]] Tag the entire source tree with the new tag name
 
 -----
 m2 release:prepare -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm/tags

@@ -12,8 +12,8 @@ Maven Getting Started Guide
  a cookbook with self-contained references and solutions for common usecases. For the first time user it is suggested that
  you step through the material in a sequential fashion, but for users more familiar with Maven the guide endeavours
  to provide a quick solution for the need at hand. It is assumed at this point that you have downloaded Maven and
- installed Maven on your local machine. If you have not done so please refer to the {{{../download.html}}Download and
- Installation} instructions.
+ installed Maven on your local machine. If you have not done so please refer to the 
+ {{{../download.html}}Download and Installation} instructions.
 
 * What is Maven?
 
@@ -27,8 +27,6 @@ Maven Getting Started Guide
  * Managing dependencies
 
  * Managing documentation
-
- * Managing releases
 
  * Managing releases
 
@@ -242,7 +240,7 @@ recommended way is finally settled:
 
 ~~* How do I deploy my jar in my remote repository?
 
-~~* How do I deploy my jar in IBiblio?
+~~* How do I deploy my jar in Ibiblio?
 
 ~~* How do I create documentation?
 ~~  o Explain the different formats APT/xdoc/docbook/FAQML
@@ -313,11 +311,12 @@ Merged:
 
 System vars are accessed implicitly in m2...try:
 
-<configuration>
-~  <debug>${build.debug}</debug>
-~  <source>${build.jdk}</source>
-~  <target>${build.jdk}</target>
-</configuration>
++-----+
 
+<configuration>
+  <debug>${build.debug}</debug>
+  <source>${build.jdk}</source>
+  <target>${build.jdk}</target>
+</configuration>
 
 +-----+
