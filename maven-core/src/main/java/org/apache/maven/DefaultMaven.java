@@ -170,7 +170,7 @@ public class DefaultMaven
             {
                 MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
                 projects.add( superProject );
-                
+
                 foundProjects = false;
             }
 
@@ -207,7 +207,7 @@ public class DefaultMaven
         try
         {
             MavenSession session = createSession( request, rm );
-            
+
             session.setUsingPOMsFromFilesystem( foundProjects );
 
             try
@@ -509,7 +509,7 @@ public class DefaultMaven
 
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
                                                     server.getPrivateKey(), server.getPassphrase() );
-
+                        
                 wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
                                                 server.getDirectoryPermissions() );
             }

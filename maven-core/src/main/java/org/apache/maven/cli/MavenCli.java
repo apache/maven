@@ -43,6 +43,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.RuntimeInfo;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -50,7 +51,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +65,8 @@ import java.util.StringTokenizer;
  */
 public class MavenCli
 {
+    private static Embedder embedder;
+
     /**
      * @noinspection ConfusingMainMethod
      */
@@ -132,7 +134,7 @@ public class MavenCli
         // bring the maven component to life for use.
         // ----------------------------------------------------------------------
 
-        Embedder embedder = new Embedder();
+        embedder = new Embedder();
 
         try
         {
@@ -141,93 +143,34 @@ public class MavenCli
         catch ( PlexusContainerException e )
         {
             showFatalError( "Unable to start the embedded plexus container", e, showErrors );
+
             return 1;
-        }
-
-        String userSettingsPath = null;
-
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
-        {
-            userSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS );
         }
 
         Settings settings = null;
+
         try
         {
-            MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
-
-            if ( userSettingsPath != null )
-            {
-                File userSettingsFile = new File( userSettingsPath );
-
-                if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
-                {
-                    settings = settingsBuilder.buildSettings( userSettingsFile );
-                }
-                else
-                {
-                    System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
-                        " is invalid. Using default path." );
-                }
-            }
-
-            if ( settings == null )
-            {
-                settings = settingsBuilder.buildSettings();
-            }
+            settings = buildSettings( commandLine );
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             showFatalError( "Unable to read settings.xml", e, showErrors );
+
             return 1;
-        }
-        catch ( XmlPullParserException e )
-        {
-            showFatalError( "Unable to read settings.xml", e, showErrors );
-            return 1;
-        }
-        catch ( ComponentLookupException e )
-        {
-            showFatalError( "Unable to read settings.xml", e, showErrors );
-            return 1;
-        }
-
-        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            settings.setInteractiveMode( false );
-        }
-
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
-            commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
-        {
-            settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.TRUE );
-        }
-        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
-        {
-            settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.FALSE );
-        }
-
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_LATEST_CHECK ) )
-        {
-            settings.getRuntimeInfo().setCheckLatestPluginVersion( Boolean.TRUE );
-        }
-        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_LATEST_CHECK ) )
-        {
-            settings.getRuntimeInfo().setCheckLatestPluginVersion( Boolean.FALSE );
-        }
-
-        if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
-        {
-            settings.setUsePluginRegistry( false );
         }
 
         Maven maven = null;
+
         MavenExecutionRequest request = null;
+
         LoggerManager loggerManager = null;
+
         try
         {
             // logger must be created first
             loggerManager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+
             if ( debug )
             {
                 loggerManager.setThreshold( Logger.LEVEL_DEBUG );
@@ -261,15 +204,16 @@ public class MavenCli
                 }
             }
 
-            request = createRequest( embedder, commandLine, settings, eventDispatcher, loggerManager, profileManager );
+            request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager );
 
             setProjectFileOptions( commandLine, request );
 
-            maven = createMavenInstance( embedder, settings.isInteractiveMode() );
+            maven = createMavenInstance( settings.isInteractiveMode() );
         }
         catch ( ComponentLookupException e )
         {
             showFatalError( "Unable to configure the Maven application", e, showErrors );
+
             return 1;
         }
         finally
@@ -317,6 +261,86 @@ public class MavenCli
         }
     }
 
+    private static Settings buildSettings( CommandLine commandLine )
+        throws Exception
+    {
+        String userSettingsPath = null;
+
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
+        {
+            userSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS );
+        }
+
+        Settings settings = null;
+
+        MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+
+        if ( userSettingsPath != null )
+        {
+            File userSettingsFile = new File( userSettingsPath );
+
+            if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
+            {
+                settings = settingsBuilder.buildSettings( userSettingsFile );
+            }
+            else
+            {
+                System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
+                    " is invalid. Using default path." );
+            }
+        }
+
+        if ( settings == null )
+        {
+            settings = settingsBuilder.buildSettings();
+        }
+
+        // why aren't these part of the runtime info? jvz.
+
+        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            settings.setInteractiveMode( false );
+        }
+
+        if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
+        {
+            settings.setUsePluginRegistry( false );
+        }
+
+        // Create settings runtime info
+
+        settings.setRuntimeInfo( createRuntimeInfo( commandLine, settings ) );
+
+        return settings;
+    }
+
+    private static RuntimeInfo createRuntimeInfo( CommandLine commandLine, Settings settings )
+    {
+        RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
+
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
+            commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
+        {
+            runtimeInfo.setPluginUpdateOverride( Boolean.TRUE );
+        }
+        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
+        {
+            runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
+        }
+
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_LATEST_CHECK ) )
+        {
+            runtimeInfo.setCheckLatestPluginVersion( Boolean.TRUE );
+        }
+        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_LATEST_CHECK ) )
+        {
+            runtimeInfo.setCheckLatestPluginVersion( Boolean.FALSE );
+        }
+
+        return runtimeInfo;
+    }
+
+
     private static void showFatalError( String message, Exception e, boolean show )
     {
         System.err.println( "FATAL ERROR: " + message );
@@ -332,8 +356,10 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( Embedder embedder, CommandLine commandLine, Settings settings,
-                                                        EventDispatcher eventDispatcher, LoggerManager loggerManager,
+    private static MavenExecutionRequest createRequest( CommandLine commandLine,
+                                                        Settings settings,
+                                                        EventDispatcher eventDispatcher,
+                                                        LoggerManager loggerManager,
                                                         ProfileManager profileManager )
         throws ComponentLookupException
     {
@@ -385,7 +411,7 @@ public class MavenCli
         }
     }
 
-    private static Maven createMavenInstance( Embedder embedder, boolean interactive )
+    private static Maven createMavenInstance( boolean interactive )
         throws ComponentLookupException
     {
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
@@ -413,7 +439,7 @@ public class MavenCli
 
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
-        
+
         String url = settings.getLocalRepository();
 
         if ( !url.startsWith( "file:" ) )
@@ -424,10 +450,11 @@ public class MavenCli
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;
+
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
         {
             settings.setOffline( true );
-            
+
             snapshotPolicySet = true;
         }
 
