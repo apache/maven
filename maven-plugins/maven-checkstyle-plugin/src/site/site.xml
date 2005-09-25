@@ -1,0 +1,21 @@
+<project name="Maven Checkstyle plugin">
+  <bannerLeft>
+    <name>Maven Checkstyle plugin</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+
+    <menu name="Checkstyle Quickstart">
+      <item name="Overview" href="howto.html"/>
+	  <item name="Sample Checkstyle Report" href="checkstyle.html"/>
+    </menu>
+    ${reports}
+  </body>
+</project>

@@ -1,0 +1,33 @@
+ ------
+ Maven 2 Checkstyle Plugin
+ ------
+
+Maven 2 Checkstyle Plugin
+
+  Checkstyle plugin generates report regarding the code style of the developer.
+
+*How to Generate Checkstyle Report
+
+  In your project pom.xml, add the checkstyle plugin in <reporting> section.
+
+-------------------
+  <project>
+      ...
+      <reporting>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-checkstyle-plugin</artifactId>
+                  <version>2.0-alpha-3-SNAPSHOT</version>
+              </plugin>
+          </plugins>
+      </reporting>
+      ...
+  </project>
+-------------------    
+
+  Execute the site plugin to generate the report distribution.
+
+-------------------
+  m2 site:site
+-------------------  
