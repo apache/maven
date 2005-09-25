@@ -1,4 +1,11 @@
-<eu> -- parse xml to in-memory model
-<eu> -- run m2 (embedded): including running for downloading dependencies, building, archetypes, etc.
-<eu> -- introspect available goals
-<eu> -- introspect available plugins (low priority)
+
+-- parse xml to in-memory model
+  Now MavenEmbedder.readProjectWithDependencies()
+  transitively resolve all dependencies and download them
+  if anything is missing. However we need a callback for 
+  progress indication.
+
+-- run m2 (embedded): including running building, archetypes, etc.
+
+-- introspect available plugins and their goals
+  
