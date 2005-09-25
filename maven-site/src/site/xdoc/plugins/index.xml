@@ -240,6 +240,16 @@
         </tr>
         <tr>
           <td>
+            <a href="maven-rar-plugin">
+              <code>rar</code>
+            </a>
+          </td>
+          <td>
+            Build a RAR from the current project.
+          </td>
+        </tr>
+        <tr>
+          <td>
             <a href="maven-release-plugin">
               <code>release</code>
             </a>
