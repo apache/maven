@@ -1,0 +1,3 @@
+target/maven-core-it0070-1.0.rar
+target/maven-core-it0070-1.0.rar!/META-INF/ra.xml
+target/maven-core-it0070-1.0.rar!/SomeResource.txt

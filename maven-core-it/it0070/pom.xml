@@ -1,0 +1,20 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it0070</artifactId>
+  <packaging>rar</packaging>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-rar-plugin</artifactId>
+        <configuration>
+            <includeJar>false</includeJar>
+            <raXmlFile>src/main/custom/ra.xml</raXmlFile>            
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

@@ -188,6 +188,8 @@ it0066: Test that nonstandard POM files will be installed correctly.
 
 it0067: Test activation of a profile from the command line.
 
+it0070: Test a RAR generation.
+
 -------------------------------------------------------------------------------
 
 - generated sources
