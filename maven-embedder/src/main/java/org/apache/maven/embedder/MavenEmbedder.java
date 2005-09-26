@@ -286,8 +286,7 @@ public class MavenEmbedder
 
         if ( response.isExecutionFailure() )
         {
-            throw new MojoExecutionException(
-                "Integration test failed" );
+            throw new MojoExecutionException( "Integration test failed" );
         }
     }
 
