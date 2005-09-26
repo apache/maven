@@ -19,6 +19,13 @@
           <finalName>maven-2.0-beta-1</finalName>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>RELEASE</version>
+        <configuration>
+          <descriptor>src/main/assembly/dep.xml</descriptor>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
