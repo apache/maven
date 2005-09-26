@@ -23,6 +23,7 @@ import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -53,12 +54,22 @@ public class CanonicalProjectBuilderTest
 
         // Plugin0 [plexus]
 
-        Plugin plugin = (Plugin) plugins.get( 0 );
-
-        assertEquals( "org.apache.maven.plugins", plugin.getGroupId() );
-
-        assertEquals( "maven-plexus-plugin", plugin.getArtifactId() );
-
+        String key = "org.apache.maven.plugins:maven-plexus-plugin";
+        
+        Plugin plugin = null;
+        for ( Iterator it = plugins.iterator(); it.hasNext(); )
+        {
+            Plugin check = (Plugin) it.next();
+            
+            if ( key.equals( check.getKey() ) )
+            {
+                plugin = check;
+                break;
+            }
+        }
+        
+        assertNotNull( plugin );
+        
         assertEquals( "1.0", plugin.getVersion() );
 
         Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
