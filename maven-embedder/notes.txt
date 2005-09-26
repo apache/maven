@@ -1,3 +1,6 @@
+When you create the assembly you must manually install it in your
+local repository for now in order the maven-embedder-it tests to
+work. jvz.
 
 -- parse xml to in-memory model
   Now MavenEmbedder.readProjectWithDependencies()
