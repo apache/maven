@@ -181,6 +181,7 @@ public class DefaultArtifactCollector
                     }
                     else
                     {
+                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, previous, node.getArtifact() );
                         previous.disable();
                     }
                 }
