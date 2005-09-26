@@ -24,10 +24,12 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -287,7 +289,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    public void testUnboundedRange()
+    public void testUnboundedRangeWhenVersionUnavailable()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -295,12 +297,48 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "c", "[2.0,]" );
         b.addDependency( "c", "[1.0,]" );
 
+        try
+        {
+            ArtifactResolutionResult res = collect( a );
+            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+            assertTrue( true );
+        }
+    }
+
+    public void testUnboundedRangeBelowLastRelease()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        createArtifact( "c", "1.5" );
+        ArtifactSpec c = createArtifact( "c", "2.0" );
+        createArtifact( "c", "1.1" );
+        a.addDependency( "c", "[1.0,)" );
+
         ArtifactResolutionResult res = collect( a );
 
-        ArtifactSpec c = createArtifact( "c", "RELEASE" );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "RELEASE", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, c.artifact} ), res.getArtifacts() );
+        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testUnboundedRangeAboveLastRelease()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        createArtifact( "c", "2.0" );
+        a.addDependency( "c", "[10.0,)" );
+
+        try
+        {
+            ArtifactResolutionResult res = collect( a );
+            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+            assertTrue( true );
+        }
     }
 
     public void testResolveManagedVersion()
@@ -533,7 +571,7 @@ public class DefaultArtifactCollectorTest
         {
             spec = new ArtifactSpec();
             spec.artifact = artifact;
-            source.artifacts.put( source.getKey( artifact ), spec );
+            source.addArtifact( spec );
         }
         return spec;
     }
@@ -583,6 +621,8 @@ public class DefaultArtifactCollectorTest
         implements ArtifactMetadataSource
     {
         private Map artifacts = new HashMap();
+
+        private Map versions = new HashMap();
 
         public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
                                          List remoteRepositories )
@@ -648,7 +688,29 @@ public class DefaultArtifactCollectorTest
                                                List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
-            throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            List artifactVersions = (List) versions.get( artifact.getDependencyConflictId() );
+            if ( artifactVersions == null )
+            {
+                artifactVersions = Collections.EMPTY_LIST;
+            }
+            return artifactVersions;
+        }
+
+        public void addArtifact( ArtifactSpec spec )
+        {
+            artifacts.put( getKey( spec.artifact ), spec );
+
+            String key = spec.artifact.getDependencyConflictId();
+            List artifactVersions = (List) versions.get( key );
+            if ( artifactVersions == null )
+            {
+                artifactVersions = new ArrayList();
+                versions.put( key, artifactVersions );
+            }
+            if ( spec.artifact.getVersion() != null )
+            {
+                artifactVersions.add( new DefaultArtifactVersion( spec.artifact.getVersion() ) );
+            }
         }
     }
 }

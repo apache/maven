@@ -428,7 +428,7 @@ public class VersionRange
     public boolean isSelectedVersionKnown()
         throws OverConstrainedVersionException
     {
-        boolean value;
+        boolean value = false;
         if ( recommendedVersion != null )
         {
             value = true;
@@ -443,12 +443,7 @@ public class VersionRange
             {
                 Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
 
-                if ( restriction.getUpperBound() == null )
-                {
-                    // RELEASE version, considered known
-                    value = true;
-                }
-                else
+                if ( restriction.getUpperBound() != null )
                 {
                     value = restriction.isUpperBoundInclusive();
                 }
