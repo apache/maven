@@ -2,10 +2,20 @@
 -- parse xml to in-memory model
   Now MavenEmbedder.readProjectWithDependencies()
   transitively resolve all dependencies and download them
-  if anything is missing. However we need a callback for 
-  progress indication.
+  if anything is missing. 
+  
+-- we need a callback for progress indication:
+   download, build, etc
 
 -- run m2 (embedded): including running building, archetypes, etc.
 
 -- introspect available plugins and their goals
   
+-- to generate source folders for eclipse project from m2 pom.xml
+   we need to run generate-sources phase, so all plugins
+   registered for this phase will be kicked of and will register
+   target folders for compilation.
+   Ideally it would be nice to ask these plugins for the target
+   folders, but Brett said it will be only in 2.1, so I guess
+   we'll have to actually run these plugins and generate code.
+
