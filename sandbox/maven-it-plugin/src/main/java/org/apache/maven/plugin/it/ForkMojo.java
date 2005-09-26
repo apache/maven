@@ -17,6 +17,7 @@ package org.apache.maven.plugin.it;
  */
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,11 +37,10 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 /**
  * @goal fork
- *
- * @execute phase="package"
  *
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  */
@@ -72,6 +72,15 @@ public class ForkMojo
      */
     private File integrationTestsDirectory;
 
+    /**
+     * @parameter
+     */
+    private String [] includes = new String[] { "*/pom.xml" };
+
+    /**
+     * @parameter
+     */
+    private String [] excludes = new String[0];
 
     public void execute()
         throws MojoExecutionException
@@ -168,6 +177,26 @@ public class ForkMojo
 
     private List listITPoms()
     {
+		DirectoryScanner scanner = new DirectoryScanner();
+
+		scanner.setBasedir( integrationTestsDirectory );
+
+		scanner.setIncludes( includes );
+
+		scanner.setExcludes( excludes );
+
+		scanner.scan();
+		
+		List poms = new ArrayList();
+
+		for ( int i = 0; i < scanner.getIncludedFiles().length; i++ )
+		{
+			poms.add( new File( integrationTestsDirectory, scanner.getIncludedFiles()[i] ) );
+		}
+
+		return poms;
+
+		/*
         List poms = new ArrayList();
 
         File [] children = integrationTestsDirectory.listFiles();
@@ -186,5 +215,6 @@ public class ForkMojo
         }
 
         return poms;
+		*/
     }
 }

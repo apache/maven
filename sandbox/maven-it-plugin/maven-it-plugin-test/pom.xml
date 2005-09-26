@@ -1,0 +1,52 @@
+<model
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-it-plugin-test</artifactId>
+  <version>1.0-alpha-1-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-it-plugin</artifactId>
+        <configuration>
+          <integrationTestsDirectory>${basedir}/../../../maven-core-it</integrationTestsDirectory>
+					<includes>
+						<include>it0*/pom.xml</include>
+					</includes>
+					<excludes>
+						<exclude>it007*/pom.xml</exclude>
+						<exclude>it008*/pom.xml</exclude>
+					</excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<echo>Packaging maven-it-plugin-test</echo>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+    </plugins>
+  </build>
+</model>
