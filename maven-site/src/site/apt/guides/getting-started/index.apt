@@ -339,4 +339,8 @@ You must use the @requiresDependencyResolution tag in your plugin.
 How to best setup a multi-module build and make versions easiest to manage
 
 
+==
+
+Integrate Jesse's archetype work.
+
 +-----+
