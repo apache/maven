@@ -17,7 +17,6 @@ package org.apache.maven.plugin.it;
  */
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,8 +35,8 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @goal fork
@@ -121,6 +120,8 @@ public class ForkMojo
             rm, goals, integrationTestsDirectory.toString()
         );
 
+        forkedSession.setUsingPOMsFromFilesystem( true );
+
         MavenExecutionResponse response = lifecycleExecutor.execute( forkedSession,
             rm, forkedSession.getEventDispatcher()
         );
@@ -177,26 +178,26 @@ public class ForkMojo
 
     private List listITPoms()
     {
-		DirectoryScanner scanner = new DirectoryScanner();
+        DirectoryScanner scanner = new DirectoryScanner();
 
-		scanner.setBasedir( integrationTestsDirectory );
+        scanner.setBasedir( integrationTestsDirectory );
 
-		scanner.setIncludes( includes );
+        scanner.setIncludes( includes );
 
-		scanner.setExcludes( excludes );
+        scanner.setExcludes( excludes );
 
-		scanner.scan();
-		
-		List poms = new ArrayList();
+        scanner.scan();
+        
+        List poms = new ArrayList();
 
-		for ( int i = 0; i < scanner.getIncludedFiles().length; i++ )
-		{
-			poms.add( new File( integrationTestsDirectory, scanner.getIncludedFiles()[i] ) );
-		}
+        for ( int i = 0; i < scanner.getIncludedFiles().length; i++ )
+        {
+            poms.add( new File( integrationTestsDirectory, scanner.getIncludedFiles()[i] ) );
+        }
 
-		return poms;
+        return poms;
 
-		/*
+        /*
         List poms = new ArrayList();
 
         File [] children = integrationTestsDirectory.listFiles();
@@ -215,6 +216,6 @@ public class ForkMojo
         }
 
         return poms;
-		*/
+        */
     }
 }
