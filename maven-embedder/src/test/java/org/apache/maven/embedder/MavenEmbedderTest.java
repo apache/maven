@@ -22,11 +22,7 @@ public class MavenEmbedderTest
         super.setUp();
 
         basedir = System.getProperty( "basedir" );
-    }
 
-    public void testMavenEmbedder()
-        throws Exception
-    {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         maven = new MavenEmbedder();
@@ -34,13 +30,37 @@ public class MavenEmbedderTest
         maven.setClassLoader( classLoader );
 
         maven.start();
+    }
 
+    protected void tearDown()
+        throws Exception
+    {
+        maven.stop();
+    }
+
+    public void testMavenEmbedder()
+        throws Exception
+    {
         modelReadingTest();
 
         projectReadingTest();
-
-        maven.stop();
     }
+
+    // ----------------------------------------------------------------------
+    // Goal/Phase execution tests
+    // ----------------------------------------------------------------------
+
+    public void testPhaseExecution()
+        throws Exception
+    {
+        File pomFile = new File( basedir, "src/test/embedder-test-project/pom.xml" );
+
+        MavenProject pom = maven.readProjectWithDependencies( pomFile );
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     protected void modelReadingTest()
         throws Exception
