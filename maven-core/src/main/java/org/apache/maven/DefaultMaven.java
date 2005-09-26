@@ -232,8 +232,15 @@ public class DefaultMaven
                             writeReactorSummary( rm );
                         }
                     }
+                    else if ( exception instanceof MojoFailureException )
+                    {
+                        MojoFailureException e = (MojoFailureException) exception;
+
+                        logFailure( response, e, e.getLongMessage() );
+                    }
                     else if ( exception instanceof MojoExecutionException )
                     {
+                        // TODO: replace by above
                         if ( exception.getCause() == null )
                         {
                             MojoExecutionException e = (MojoExecutionException) exception;
