@@ -33,8 +33,11 @@ import java.util.regex.Pattern;
 import java.util.Map;
 
 /**
+ * Use a regular expression search to find and resolve expressions within the POM.
+ * 
  * @author jdcasey Created on Feb 3, 2005
  * @version $Id$
+ * @todo Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
@@ -43,7 +46,14 @@ public class RegexBasedModelInterpolator
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.)?([^}]+)\\}" );
 
     /**
-     * Added: Feb 3, 2005 by jdcasey
+     * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve 
+     * POM expressions, then re-parse into the resolved Model instance.
+     * <br/>
+     * <b>NOTE:</b> This will result in a different instance of Model being returned!!!
+     * 
+     * @param model The inbound Model instance, to serialize and reference for expression resolution
+     * @param context The other context map to be used during resolution
+     * @return The resolved instance of the inbound Model. This is a different instance!
      */
     public Model interpolate( Model model, Map context )
         throws ModelInterpolationException
@@ -84,10 +94,8 @@ public class RegexBasedModelInterpolator
         return model;
     }
 
-    /**
-     * Added: Feb 3, 2005 by jdcasey
-     */
     private String interpolateInternal( String src, Model model, Map context )
+        throws ModelInterpolationException
     {
         String result = src;
         Matcher matcher = EXPRESSION_PATTERN.matcher( result );
@@ -98,16 +106,16 @@ public class RegexBasedModelInterpolator
 
             Object value = context.get( realExpr );
 
+            if ( value == null )
+            {
+                value = model.getProperties().getProperty( realExpr );
+            }
+            
             try
             {
                 if ( value == null )
                 {
                     value = ReflectionValueExtractor.evaluate( realExpr, model );
-                }
-                
-                if ( value == null )
-                {
-                    value = model.getProperties().getProperty( realExpr );
                 }
             }
             catch ( Exception e )
@@ -118,6 +126,12 @@ public class RegexBasedModelInterpolator
                     logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...",
                                   e );
                 }
+            }
+            
+            // if the expression refers to itself, skip it.
+            if ( wholeExpr.equals( value ) )
+            {
+                throw new ModelInterpolationException( wholeExpr, model.getId() + " references itself." );
             }
 
             if ( value != null )

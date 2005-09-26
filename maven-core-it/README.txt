@@ -190,6 +190,12 @@ it0067: Test activation of a profile from the command line.
 
 it0070: Test a RAR generation.
 
+it0071: Verifies that dotted property references work within plugin
+        configurations.
+
+it0072: Verifies that property references with dotted notation work within
+        POM interpolation.
+
 -------------------------------------------------------------------------------
 
 - generated sources
@@ -248,6 +254,12 @@ it1011: Tests the fail-at-end reactor behavior. First module fails, and second
 -------------------------------------------------------------------------------
 it1012: Test that the DefaultLifecycleExecutor will throw an exception when
         encountering an unknown packaging.
+
+
+
+-------------------------------------------------------------------------------
+it1015: Test that expressions that self-reference within the POM result in an
+        error during POM interpolation.
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------

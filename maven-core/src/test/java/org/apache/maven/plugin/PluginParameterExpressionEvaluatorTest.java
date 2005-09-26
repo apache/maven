@@ -38,6 +38,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -67,6 +68,71 @@ public class PluginParameterExpressionEvaluatorTest
         String actual = new File( value.toString() ).getCanonicalPath();
 
         assertEquals( expected, actual );
+    }
+
+    public void testPOMPropertyExtractionWithMissingProject_WithDotNotation()
+        throws Exception
+    {
+        String key = "m2.name";
+        String checkValue = "value";
+        
+        Properties properties = new Properties();
+        properties.setProperty( key, checkValue );
+        
+        Model model = new Model();
+        model.setProperties( properties );
+        
+        MavenProject project = new MavenProject( model );
+        
+        ExpressionEvaluator ee = createExpressionEvaluator( project, null );
+
+        Object value = ee.evaluate( "${" + key + "}" );
+
+        assertEquals( checkValue, value );
+    }
+
+    public void testBasedirExtractionWithMissingProject()
+        throws Exception
+    {
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+
+        Object value = ee.evaluate( "${basedir}" );
+
+        assertEquals( System.getProperty( "user.dir" ), value );
+    }
+
+    public void testValueExtractionFromSystemPropertiesWithMissingProject()
+        throws Exception
+    {
+        String sysprop = "PPEET_sysprop1";
+
+        if ( System.getProperty( sysprop ) == null )
+        {
+            System.setProperty( sysprop, "value" );
+        }
+
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+
+        Object value = ee.evaluate( "${" + sysprop + "}" );
+
+        assertEquals( "value", value );
+    }
+
+    public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation()
+        throws Exception
+    {
+        String sysprop = "PPEET.sysprop2";
+
+        if ( System.getProperty( sysprop ) == null )
+        {
+            System.setProperty( sysprop, "value" );
+        }
+
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+
+        Object value = ee.evaluate( "${" + sysprop + "}" );
+
+        assertEquals( "value", value );
     }
 
     private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )

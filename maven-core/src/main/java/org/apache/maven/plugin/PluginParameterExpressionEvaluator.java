@@ -65,6 +65,8 @@ public class PluginParameterExpressionEvaluator
     private final MojoExecution mojoExecution;
 
     private final MavenProject project;
+    
+    private final String basedir;
 
     public PluginParameterExpressionEvaluator( MavenSession context, MojoExecution mojoExecution,
                                                PathTranslator pathTranslator, Logger logger, MavenProject project )
@@ -74,6 +76,26 @@ public class PluginParameterExpressionEvaluator
         this.pathTranslator = pathTranslator;
         this.logger = logger;
         this.project = project;
+        
+        String basedir = null;
+        
+        if ( project != null )
+        {
+            File projectFile = project.getFile();
+            
+            // this should always be the case for non-super POM instances...
+            if ( projectFile != null )
+            {
+                basedir = projectFile.getParentFile().getAbsolutePath();
+            }
+        }
+
+        if ( basedir == null )
+        {
+            basedir = System.getProperty( "user.dir" );
+        }
+        
+        this.basedir = basedir;
     }
 
     public Object evaluate( String expr )
@@ -224,7 +246,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "basedir".equals( expression ) )
         {
-            value = project.getBasedir().getAbsolutePath();
+            value = basedir;
         }
         else if ( expression.startsWith( "basedir" ) )
         {
@@ -232,7 +254,7 @@ public class PluginParameterExpressionEvaluator
 
             if ( pathSeparator > 0 )
             {
-                value = project.getFile().getParentFile().getAbsolutePath() + expression.substring( pathSeparator );
+                value = basedir + expression.substring( pathSeparator );
             }
             else
             {
@@ -242,10 +264,8 @@ public class PluginParameterExpressionEvaluator
 
         if ( value == null )
         {
-            // Check properties that have been injected via profiles before we default over to
-            // system properties.
-
-            if ( project.getProperties() != null )
+            // Check POM-level properties before we default over to system properties.
+            if ( project != null && project.getProperties() != null )
             {
                 value = project.getProperties().getProperty( expression );
             }
