@@ -4,10 +4,13 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.util.List;
 import java.util.Set;
+import java.util.Collections;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -53,9 +56,19 @@ public class MavenEmbedderTest
     public void testPhaseExecution()
         throws Exception
     {
-        File pomFile = new File( basedir, "src/test/embedder-test-project/pom.xml" );
+        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
+
+        File targetDirectory = new File( basedir, "target/embedder-test-project" );
+
+        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
+
+        File pomFile = new File( targetDirectory, "pom.xml" );
 
         MavenProject pom = maven.readProjectWithDependencies( pomFile );
+
+        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
+
+        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, targetDirectory );
     }
 
     // ----------------------------------------------------------------------

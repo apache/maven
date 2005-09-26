@@ -278,9 +278,7 @@ public class MavenEmbedder
 
         rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
 
-        // The first project is blacklisted?
-
-        rm.blackList( (MavenProject) projects.get( 0 ) );
+        //rm.blackList( (MavenProject) projects.get( 0 ) );
 
         MavenSession session = new MavenSession( embedder.getContainer(),
                                                  settings,
@@ -289,6 +287,8 @@ public class MavenEmbedder
                                                  rm,
                                                  goals,
                                                  executionRootDirectory.getAbsolutePath() );
+
+        session.setUsingPOMsFromFilesystem( true );
 
         MavenExecutionResponse response = lifecycleExecutor.execute( session,
                                                                      rm,
@@ -383,6 +383,8 @@ public class MavenEmbedder
             mavenProjectBuilder = (MavenProjectBuilder) embedder.lookup( MavenProjectBuilder.ROLE );
 
             artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
+
+            lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
 
             // ----------------------------------------------------------------------
             // If an explicit local repository has not been set then we will use the
