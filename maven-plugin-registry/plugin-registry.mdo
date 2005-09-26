@@ -64,7 +64,7 @@
           <name>updateInterval</name>
           <version>1.0.0</version>
           <type>String</type>
-          <defaultValue>never</defaultValue>
+          <defaultValue>1d</defaultValue>
           <description><![CDATA[
             Specifies how often to check for plugin updates. Valid values are: never, always, interval:XXX.
             For the interval specification, XXX denotes a terse interval specification, such as 4h.
