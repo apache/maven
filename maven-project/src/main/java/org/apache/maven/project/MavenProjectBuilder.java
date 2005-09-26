@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
 import java.util.List;
@@ -43,8 +44,24 @@ public interface MavenProjectBuilder
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
+    // ----------------------------------------------------------------------
+    // These methods are used by the MavenEmbedder
+    // ----------------------------------------------------------------------
+
+    MavenProject buildWithDependencies( File project,
+                                        ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager,
+                                        TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException;
+
+    MavenProject buildWithDependencies( File project,
+                                        ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ArtifactResolutionException;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     /**
      * Build the artifact from the local repository, resolving it if necessary.

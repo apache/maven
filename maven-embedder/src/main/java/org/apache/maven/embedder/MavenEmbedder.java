@@ -32,6 +32,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.RuntimeInfo;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
@@ -169,6 +170,12 @@ public class MavenEmbedder
         throws ProjectBuildingException
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
+    }
+
+    public MavenProject readProjectWithDependencies( File mavenProject, TransferListener transferListener )
+        throws ProjectBuildingException, ArtifactResolutionException
+    {
+        return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager, transferListener );
     }
 
     public MavenProject readProjectWithDependencies( File mavenProject )

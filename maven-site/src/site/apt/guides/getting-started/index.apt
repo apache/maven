@@ -311,12 +311,27 @@ Merged:
 
 System vars are accessed implicitly in m2...try:
 
-+-----+
-
 <configuration>
   <debug>${build.debug}</debug>
   <source>${build.jdk}</source>
   <target>${build.jdk}</target>
 </configuration>
+
+==
+
+How to attach sources to a release?
+
+> How does the sources plugin realize that it is part of a snapshot
+> build, and therefore not generate a sources JAR?
+>
+> I didn't notice anything obvious in the source code for the Mojo at
+
+It only does so when the release profile (see the root POM) is activated.
+
+==
+
+How do I get the list of artifacts within my plugin?
+
+You must use the @requiresDependencyResolution tag in your plugin.
 
 +-----+

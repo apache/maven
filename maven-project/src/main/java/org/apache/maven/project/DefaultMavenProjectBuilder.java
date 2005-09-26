@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -55,6 +56,7 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -126,6 +128,14 @@ public class DefaultMavenProjectBuilder
 
     private ArtifactTransformationManager transformationManager;
 
+    // ----------------------------------------------------------------------
+    // I am making this available for use with a new method that takes a
+    // a monitor wagon monitor as a parameter so that tools can use the
+    // methods here and receive callbacks. MNG-1015
+    // ----------------------------------------------------------------------
+
+    private WagonManager wagonManager;
+
     private final Map modelCache = new HashMap();
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
@@ -141,11 +151,21 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
+    public MavenProject buildWithDependencies( File projectDescriptor,
+                                               ArtifactRepository localRepository,
+                                               ProfileManager profileManager )
+        throws ProjectBuildingException, ArtifactResolutionException
+    {
+        return buildWithDependencies( projectDescriptor, localRepository, profileManager, null );
+    }
+
     /**
      * @todo move to metadatasource itself?
      */
-    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
-                                               ProfileManager profileManager )
+    public MavenProject buildWithDependencies( File projectDescriptor,
+                                               ArtifactRepository localRepository,
+                                               ProfileManager profileManager,
+                                               TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, profileManager );
@@ -177,6 +197,12 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Error in dependency version", e );
         }
+
+        if ( transferListener != null )
+        {
+            wagonManager.setDownloadMonitor( transferListener );
+        }
+
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 projectArtifact, managedVersions,
                                                                                 localRepository,
@@ -184,6 +210,7 @@ public class DefaultMavenProjectBuilder
                                                                                 artifactMetadataSource );
 
         project.setArtifacts( result.getArtifacts() );
+
         return project;
     }
 
