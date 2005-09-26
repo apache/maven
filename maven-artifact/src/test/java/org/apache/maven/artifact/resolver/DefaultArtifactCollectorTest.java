@@ -153,6 +153,30 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    public void testResolveLocalNewestIsLocal()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        a.addDependency( "b", "2.0" );
+        ArtifactSpec b = createArtifact( "b", "3.0" );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check version", "3.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testResolveLocalOldestIsLocal()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        a.addDependency( "b", "3.0" );
+        ArtifactSpec b = createArtifact( "b", "2.0" );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+    }
+
     public void testResolveNearestWithRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
