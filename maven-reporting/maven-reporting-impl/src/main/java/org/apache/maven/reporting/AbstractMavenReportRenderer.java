@@ -190,9 +190,28 @@ public abstract class AbstractMavenReportRenderer
      */
     protected void tableCell( String text )
     {
+        tableCell( text, false );
+    }
+
+    /**
+     * Add a cell in a table.
+     * <p>If <code>asHtml</code> is true, add the text as Html</p>
+     *
+     * @param text
+     * @param asHtml
+     */
+    protected void tableCell( String text, boolean asHtml )
+    {
         sink.tableCell();
 
-        linkPatternedText( text );
+        if ( asHtml )
+        {
+            sink.rawText( text );
+        }
+        else
+        {
+            linkPatternedText( text );
+        }
 
         sink.tableCell_();
     }
@@ -224,7 +243,9 @@ public abstract class AbstractMavenReportRenderer
     protected void tableCaption( String caption )
     {
         sink.tableCaption();
+
         text( caption );
+
         sink.tableCaption_();
     }
 
@@ -422,7 +443,8 @@ public abstract class AbstractMavenReportRenderer
 
     /**
      * Return a valid href.
-     * <p>A valid href could start by <code>mailto:</code></p>.
+     * <p>A valid href could start by <code>mailto:</code>.</p>
+     * <p>For a relative path, the href should start by <code>./</code> to be valid.</p>
      *
      * @param href an href
      * @return a valid href or null if the href is not valid.
@@ -451,7 +473,7 @@ public abstract class AbstractMavenReportRenderer
             // TODO Waiting for new release of Validator
             // http://issues.apache.org/bugzilla/show_bug.cgi?id=30686
             String hrefTmp;
-            if ( !href.trim().endsWith( "/" ) )
+            if ( !href.endsWith( "/" ) )
             {
                 hrefTmp = href + "/index.html";
             }
@@ -463,6 +485,18 @@ public abstract class AbstractMavenReportRenderer
             if ( urlValidator.isValid( hrefTmp ) )
             {
                 return href;
+            }
+
+            if ( href.startsWith( "./" ) )
+            {
+                if ( href.length() > 2 )
+                {
+                    return href.substring(2, href.length() );
+                }
+                else
+                {
+                    return ".";
+                }
             }
 
             return null;
@@ -484,7 +518,7 @@ public abstract class AbstractMavenReportRenderer
         }
 
         // Map defined by key/value name/href
-        // If href == null, it means 
+        // If href == null, it means
         Map segments = new LinkedHashMap();
 
         // TODO Special case http://jira.codehaus.org/browse/MEV-40
