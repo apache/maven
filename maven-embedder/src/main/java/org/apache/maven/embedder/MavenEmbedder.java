@@ -33,6 +33,13 @@ import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.monitor.event.EventDispatcher;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
@@ -40,11 +47,15 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -68,6 +79,8 @@ public class MavenEmbedder
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private MavenSettingsBuilder settingsBuilder;
+
+    private LifecycleExecutor lifecycleExecutor;
 
     private MavenXpp3Reader modelReader;
 
@@ -246,6 +259,38 @@ public class MavenEmbedder
         return runtimeInfo;
     }
 
+    private void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+    {
+        List projects = new ArrayList();
+
+        projects.add( project );
+
+        ReactorManager rm = new ReactorManager( projects );
+
+        rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+
+        rm.blackList( project );
+
+        MavenSession session = new MavenSession( embedder.getContainer(),
+                                                 settings,
+                                                 localRepository,
+                                                 eventDispatcher,
+                                                 rm,
+                                                 goals,
+                                                 executionRootDirectory.getAbsolutePath() );
+
+        MavenExecutionResponse response = lifecycleExecutor.execute( session,
+                                                                     rm,
+                                                                     session.getEventDispatcher() );
+
+        if ( response.isExecutionFailure() )
+        {
+            throw new MojoExecutionException(
+                "Integration test failed" );
+        }
+    }
+
     // ----------------------------------------------------------------------
     //  Lifecycle
     // ----------------------------------------------------------------------
@@ -344,6 +389,8 @@ public class MavenEmbedder
             embedder.release( artifactRepositoryFactory );
 
             embedder.release( settingsBuilder );
+
+            embedder.release( lifecycleExecutor );
         }
         catch ( ComponentLifecycleException e )
         {

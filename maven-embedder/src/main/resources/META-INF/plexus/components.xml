@@ -119,7 +119,9 @@
 
     <component>
       <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+      <!--
       <role-hint>default</role-hint>
+      -->
       <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager</implementation>
       <requirements>
         <requirement>
