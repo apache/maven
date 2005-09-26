@@ -135,10 +135,7 @@
      -->
     <component>
       <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <implementation>org.apache.maven.artifact.ant.CustomWagonManager</implementation>
-      <!--
-            <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
-      -->
+      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
     </component>
 
     <!--
