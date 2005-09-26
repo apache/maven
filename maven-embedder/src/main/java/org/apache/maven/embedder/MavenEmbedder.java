@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -260,18 +261,26 @@ public class MavenEmbedder
         return runtimeInfo;
     }
 
+    // ----------------------------------------------------------------------
+    // Execution of phases/goals
+    // ----------------------------------------------------------------------
+
     public void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
-        List projects = new ArrayList();
+        execute( Collections.singletonList( project ), goals, eventDispatcher, executionRootDirectory );
+    }
 
-        projects.add( project );
-
+    public void execute( List projects, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+    {
         ReactorManager rm = new ReactorManager( projects );
 
         rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
 
-        rm.blackList( project );
+        // The first project is blacklisted?
+
+        rm.blackList( (MavenProject) projects.get( 0 ) );
 
         MavenSession session = new MavenSession( embedder.getContainer(),
                                                  settings,
@@ -291,7 +300,7 @@ public class MavenEmbedder
         }
     }
 
-   public List collectProjects( File basedir, String[] includes, String[] excludes )
+    public List collectProjects( File basedir, String[] includes, String[] excludes )
         throws MojoExecutionException
     {
         List projects = new ArrayList();
@@ -309,7 +318,7 @@ public class MavenEmbedder
                 projects.add( p );
 
             }
-            catch (ProjectBuildingException e)
+            catch ( ProjectBuildingException e )
             {
                 throw new MojoExecutionException( "Error loading " + pom, e );
             }
