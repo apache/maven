@@ -15,7 +15,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptor>src/assemble/bin.xml</descriptor>
-          <finalName>maven-2.0-beta-3-SNAPSHOT</finalName>
+          <finalName>maven-${version}</finalName>
         </configuration>
       </plugin>
     </plugins>
