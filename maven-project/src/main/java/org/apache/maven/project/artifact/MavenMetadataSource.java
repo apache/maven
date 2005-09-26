@@ -338,7 +338,7 @@ public class MavenMetadataSource
 
         List versions;
         Metadata repoMetadata = metadata.getMetadata();
-        if ( repoMetadata != null )
+        if ( repoMetadata != null && repoMetadata.getVersioning() != null )
         {
             List metadataVersions = repoMetadata.getVersioning().getVersions();
             versions = new ArrayList( metadataVersions.size() );
