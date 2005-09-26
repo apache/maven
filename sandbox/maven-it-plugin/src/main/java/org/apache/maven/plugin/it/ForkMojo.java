@@ -1,7 +1,7 @@
 package org.apache.maven.plugin.it;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.embedder.MavenEmbedder;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -84,6 +85,24 @@ public class ForkMojo
     public void execute()
         throws MojoExecutionException
     {
+        // ----------------------------------------------------------------------
+        // Here we will try to use the embedder
+        // ----------------------------------------------------------------------
+        //
+        // ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        //
+        // MavenEmbedder maven = new MavenEmbedder();
+        //
+        // maven.setClassLoader( classLoader );
+        //
+        // maven.start();
+        //
+        // List projects = maven.collectProjects( integrationTestsDirectory, includes, excludes );
+        //
+        // maven.execute( projects, Collections.singletonList( "package" ), eventDispatcher, integrationTestsDirectory );
+        //
+
+
         try
         {
             buildProjects();
