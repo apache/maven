@@ -48,14 +48,15 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -259,7 +260,7 @@ public class MavenEmbedder
         return runtimeInfo;
     }
 
-    private void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+    public void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
         List projects = new ArrayList();
@@ -288,6 +289,55 @@ public class MavenEmbedder
         {
             throw new MojoExecutionException( "Integration test failed" );
         }
+    }
+
+   public List collectProjects( File basedir, String[] includes, String[] excludes )
+        throws MojoExecutionException
+    {
+        List projects = new ArrayList();
+
+        List poms = getPomFiles( basedir, includes, excludes );
+
+        for ( Iterator i = poms.iterator(); i.hasNext(); )
+        {
+            File pom = (File) i.next();
+
+            try
+            {
+                MavenProject p = readProject( pom );
+
+                projects.add( p );
+
+            }
+            catch (ProjectBuildingException e)
+            {
+                throw new MojoExecutionException( "Error loading " + pom, e );
+            }
+        }
+
+        return projects;
+    }
+
+    private List getPomFiles( File basedir, String[] includes, String[] excludes )
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+
+        scanner.setBasedir( basedir );
+
+        scanner.setIncludes( includes );
+
+        scanner.setExcludes( excludes );
+
+        scanner.scan();
+
+        List poms = new ArrayList();
+
+        for ( int i = 0; i < scanner.getIncludedFiles().length; i++ )
+        {
+            poms.add( new File( basedir, scanner.getIncludedFiles()[i] ) );
+        }
+
+        return poms;
     }
 
     // ----------------------------------------------------------------------
