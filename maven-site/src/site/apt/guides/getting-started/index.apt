@@ -334,4 +334,9 @@ How do I get the list of artifacts within my plugin?
 
 You must use the @requiresDependencyResolution tag in your plugin.
 
+==
+
+How to best setup a multi-module build and make versions easiest to manage
+
+
 +-----+
