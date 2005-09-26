@@ -239,6 +239,19 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
+    public void testResolveLocalWithNewerVersionButLesserScope()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "commons-logging", "1.0" );
+        a.addDependency( "junit", "3.7" );
+        ArtifactSpec b = createArtifact( "junit", "3.8.1", Artifact.SCOPE_TEST );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
+        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, getArtifact( "junit", res.getArtifacts() ).getScope() );
+    }
+
     public void testResolveNearestWithRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -590,7 +603,7 @@ public class DefaultArtifactCollectorTest
         public ArtifactSpec addDependency( String id, String version )
             throws InvalidVersionSpecificationException
         {
-            return addDependency( id, version, null );
+            return addDependency( id, version, Artifact.SCOPE_COMPILE );
         }
 
         public ArtifactSpec addDependency( String id, String version, String scope )
