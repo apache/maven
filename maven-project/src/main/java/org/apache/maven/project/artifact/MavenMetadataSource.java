@@ -76,7 +76,7 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     private RepositoryMetadataManager repositoryMetadataManager;
-    
+
     // lazily instantiated and cached.
     private MavenProject superProject;
 
@@ -190,8 +190,9 @@ public class MavenMetadataSource
                 Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
                                                          artifact.getDependencyFilter() );
 
-                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
-                
+                List repositories = aggregateRepositoryLists( remoteRepositories,
+                                                              project.getRemoteArtifactRepositories() );
+
                 result = new ResolutionGroup( pomArtifact, artifacts, repositories );
             }
 
@@ -275,7 +276,7 @@ public class MavenMetadataSource
             VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
-                                                                          scope, inheritedScope );
+                                                                          scope, inheritedScope, d.isOptional() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
             {

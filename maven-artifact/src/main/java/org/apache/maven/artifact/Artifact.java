@@ -150,4 +150,6 @@ public interface Artifact
     List getAvailableVersions();
 
     void setAvailableVersions( List versions );
+
+    boolean isOptional();
 }

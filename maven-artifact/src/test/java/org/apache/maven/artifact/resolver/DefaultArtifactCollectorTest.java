@@ -70,11 +70,11 @@ public class DefaultArtifactCollectorTest
 
     // works, but we don't fail on cycles presently
     public void disabledtestCircularDependencyNotIncludingCurrentProject()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
-        b.addDependency( a );
+        b.addDependency( "a", "1.0" );
         try
         {
             collect( a );
@@ -88,7 +88,7 @@ public class DefaultArtifactCollectorTest
 
     // works, but we don't fail on cycles presently
     public void disabledtestCircularDependencyIncludingCurrentProject()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -105,7 +105,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveWithFilter()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -124,7 +124,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveNearestNewestIsNearest()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -139,7 +139,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveNearestOldestIsNearest()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -154,7 +154,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveNearestWithRanges()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -169,7 +169,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testCompatibleRanges()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -185,7 +185,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testIncompatibleRanges()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -204,7 +204,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testUnboundedRange()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
@@ -220,7 +220,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveManagedVersion()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         a.addDependency( "b", "3.0", Artifact.SCOPE_RUNTIME );
@@ -233,7 +233,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveCompileScopeOverTestScope()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_TEST );
@@ -249,7 +249,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveRuntimeScopeOverTestScope()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_TEST );
@@ -265,7 +265,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveCompileScopeOverRuntimeScope()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME );
@@ -281,7 +281,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveCompileScopeOverProvidedScope()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_PROVIDED );
@@ -297,7 +297,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testResolveRuntimeScopeOverProvidedScope()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_PROVIDED );
@@ -313,7 +313,7 @@ public class DefaultArtifactCollectorTest
     }
 
     public void testProvidedScopeNotTransitive()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0", Artifact.SCOPE_PROVIDED );
         ArtifactSpec b = createArtifact( "b", "1.0" );
@@ -323,8 +323,51 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
     }
 
+    public void testOptionalNotTransitive()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+        b.addDependency( "c", "3.0", true );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+    }
+
+    public void testOptionalIncludedAtRoot()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        createArtifact( "b", "1.0", true );
+
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+    }
+
+    public void disabledtestOptionalNotTransitiveButVersionIsInfluential()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+        b.addDependency( "c", "3.0", true );
+        ArtifactSpec d = a.addDependency( "d", "1.0" );
+        ArtifactSpec e = d.addDependency( "e", "1.0" );
+        e.addDependency( "c", "2.0" );
+
+        ArtifactSpec c = createArtifact( "c", "3.0" );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list",
+                      createSet( new Object[]{a.artifact, b.artifact, c.artifact, d.artifact, e.artifact} ),
+                      res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check version", "3.0", artifact.getVersion() );
+    }
+
     public void testTestScopeNotTransitive()
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0", Artifact.SCOPE_TEST );
         ArtifactSpec b = createArtifact( "b", "1.0" );
@@ -377,16 +420,37 @@ public class DefaultArtifactCollectorTest
     }
 
     private ArtifactSpec createArtifact( String id, String version )
+        throws InvalidVersionSpecificationException
     {
         return createArtifact( id, version, Artifact.SCOPE_COMPILE );
     }
 
-    private ArtifactSpec createArtifact( String id, String version, String scope )
+    private ArtifactSpec createArtifact( String id, String version, boolean optional )
+        throws InvalidVersionSpecificationException
     {
-        ArtifactSpec spec = new ArtifactSpec();
-        Artifact artifact = artifactFactory.createArtifact( GROUP_ID, id, version, scope, "jar" );
-        spec.artifact = artifact;
-        source.artifacts.put( source.getKey( artifact ), spec );
+        return createArtifact( id, version, Artifact.SCOPE_COMPILE, null, optional );
+    }
+
+    private ArtifactSpec createArtifact( String id, String version, String scope )
+        throws InvalidVersionSpecificationException
+    {
+        return createArtifact( id, version, scope, null, false );
+    }
+
+    private ArtifactSpec createArtifact( String id, String version, String scope, String inheritedScope,
+                                         boolean optional )
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange versionRange = VersionRange.createFromVersionSpec( version );
+        Artifact artifact = artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
+                                                                      inheritedScope, optional );
+        ArtifactSpec spec = null;
+        if ( artifact != null )
+        {
+            spec = new ArtifactSpec();
+            spec.artifact = artifact;
+            source.artifacts.put( source.getKey( artifact ), spec );
+        }
         return spec;
     }
 
@@ -402,20 +466,32 @@ public class DefaultArtifactCollectorTest
         private Set dependencies = new HashSet();
 
         public ArtifactSpec addDependency( String id, String version )
+            throws InvalidVersionSpecificationException
         {
             return addDependency( id, version, null );
         }
 
         public ArtifactSpec addDependency( String id, String version, String scope )
+            throws InvalidVersionSpecificationException
         {
-            ArtifactSpec dep = createArtifact( id, version, scope );
-            addDependency( dep );
+            return addDependency( id, version, scope, false );
+        }
+
+        private ArtifactSpec addDependency( String id, String version, String scope, boolean optional )
+            throws InvalidVersionSpecificationException
+        {
+            ArtifactSpec dep = createArtifact( id, version, scope, this.artifact.getScope(), optional );
+            if ( dep != null )
+            {
+                dependencies.add( dep.artifact );
+            }
             return dep;
         }
 
-        public void addDependency( ArtifactSpec dep )
+        public ArtifactSpec addDependency( String id, String version, boolean optional )
+            throws InvalidVersionSpecificationException
         {
-            dependencies.add( dep.artifact );
+            return addDependency( id, version, Artifact.SCOPE_COMPILE, optional );
         }
     }
 
@@ -459,11 +535,19 @@ public class DefaultArtifactCollectorTest
             {
                 Artifact d = (Artifact) i.next();
 
-                VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+                VersionRange versionRange;
+                if ( d.getVersionRange() != null )
+                {
+                    versionRange = d.getVersionRange();
+                }
+                else
+                {
+                    versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+                }
                 Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                               versionRange, d.getType(),
                                                                               d.getClassifier(), d.getScope(),
-                                                                              inheritedScope );
+                                                                              inheritedScope, d.isOptional() );
 
                 if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
                 {

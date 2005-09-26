@@ -52,13 +52,19 @@ public class DefaultArtifactFactory
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
                                               String classifier, String scope )
     {
-        return createArtifact( groupId, artifactId, versionRange, null, type, classifier, null );
+        return createArtifact( groupId, artifactId, versionRange, type, classifier, null, null );
     }
 
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
                                               String classifier, String scope, String inheritedScope )
     {
-        return createArtifact( groupId, artifactId, versionRange, scope, type, classifier, inheritedScope );
+        return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
+    }
+
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String classifier, String scope, String inheritedScope, boolean optional )
+    {
+        return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, optional );
     }
 
     public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
@@ -78,7 +84,7 @@ public class DefaultArtifactFactory
 
     public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
-        return createArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_RUNTIME, "maven-plugin", null, null );
+        return createArtifact( groupId, artifactId, versionRange, "maven-plugin", null, Artifact.SCOPE_RUNTIME, null );
     }
 
     public Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope )
@@ -88,7 +94,7 @@ public class DefaultArtifactFactory
 
     public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
-        return createArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_RUNTIME, "jar", null, null );
+        return createArtifact( groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null );
     }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
@@ -105,11 +111,17 @@ public class DefaultArtifactFactory
         {
             versionRange = VersionRange.createFromVersion( version );
         }
-        return createArtifact( groupId, artifactId, versionRange, scope, type, classifier, inheritedScope );
+        return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String scope,
-                                     String type, String classifier, String inheritedScope )
+    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                     String classifier, String scope, String inheritedScope )
+    {
+        return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, false );
+    }
+
+    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                     String classifier, String scope, String inheritedScope, boolean optional )
     {
         // TODO: can refactor - inherited scope calculation belongs in the collector, use scope handler
 
@@ -140,6 +152,7 @@ public class DefaultArtifactFactory
 
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
 
-        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler );
+        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
+                                    optional );
     }
 }

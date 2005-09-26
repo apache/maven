@@ -77,9 +77,13 @@ public class DefaultArtifactCollector
                 {
                     Artifact artifact = node.getArtifact();
 
-                    artifact.setDependencyTrail( node.getDependencyTrail() );
+                    // If it was optional, we don't add it or its children, just allow the update of the version and scope
+                    if ( !node.getArtifact().isOptional() )
+                    {
+                        artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                    set.add( node );
+                        set.add( node );
+                    }
                 }
             }
 
@@ -169,7 +173,8 @@ public class DefaultArtifactCollector
         for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
         {
             ResolutionNode child = (ResolutionNode) i.next();
-            if ( !child.isResolved() )
+            // We leave in optional ones, but don't pick up its dependencies
+            if ( !child.isResolved() && !child.getArtifact().isOptional() )
             {
                 Artifact artifact = child.getArtifact();
                 try

@@ -47,6 +47,9 @@ public interface ArtifactFactory
     Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
                                        String classifier, String scope, String inheritedScope );
 
+    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                       String classifier, String scope, String inheritedScope, boolean optional );
+
     Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging );
 
     Artifact createProjectArtifact( String groupId, String artifactId, String version );

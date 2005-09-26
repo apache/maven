@@ -75,23 +75,30 @@ public class ResolutionNode
     public void addDependencies( Set artifacts, List remoteRepositories, ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
-        children = new ArrayList( artifacts.size() );
-
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        if ( !artifacts.isEmpty() )
         {
-            Artifact a = (Artifact) i.next();
+            children = new ArrayList( artifacts.size() );
 
-            if ( filter == null || filter.include( a ) )
+            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
             {
-                if ( parents.contains( a.getDependencyConflictId() ) )
+                Artifact a = (Artifact) i.next();
+
+                if ( filter == null || filter.include( a ) )
                 {
-                    a.setDependencyTrail( getDependencyTrail() );
+                    if ( parents.contains( a.getDependencyConflictId() ) )
+                    {
+                        a.setDependencyTrail( getDependencyTrail() );
 
-                    throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
+                        throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
+                    }
+
+                    children.add( new ResolutionNode( a, remoteRepositories, this ) );
                 }
-
-                children.add( new ResolutionNode( a, remoteRepositories, this ) );
             }
+        }
+        else
+        {
+            children = Collections.EMPTY_LIST;
         }
     }
 

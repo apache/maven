@@ -1303,6 +1303,7 @@
           <type>String</type>
           <!-- This default has to be enforced at the maven-artifact layer, to allow 
            | injection of defaults from <dependencyManagement/>.
+           | TODO: how can we document it?
            |-->
           <!-- defaultValue>compile</defaultValue -->
         </field>
@@ -1324,6 +1325,17 @@
             <type>Exclusion</type>
             <multiplicity>*</multiplicity>
           </association>
+        </field>
+        <field>
+          <name>optional</name>
+          <version>4.0.0</version>
+          <description>
+            Indicates the dependency is optional for use of this library. While the version of the dependency will be
+            taken into account for dependency calculation if the library is used elsewhere, it will not be passed on
+            transitively.
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
         </field>
       </fields>
       <codeSegments>
