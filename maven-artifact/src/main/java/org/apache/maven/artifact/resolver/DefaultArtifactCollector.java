@@ -26,6 +26,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,17 +73,21 @@ public class DefaultArtifactCollector
 
             for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
             {
-                ResolutionNode node = (ResolutionNode) i.next();
-                if ( !node.equals( root ) )
+                List nodes = (List) i.next();
+                for ( Iterator j = nodes.iterator(); j.hasNext(); )
                 {
-                    Artifact artifact = node.getArtifact();
-
-                    // If it was optional, we don't add it or its children, just allow the update of the version and scope
-                    if ( !node.getArtifact().isOptional() )
+                    ResolutionNode node = (ResolutionNode) j.next();
+                    if ( !node.equals( root ) && node.isActive() )
                     {
-                        artifact.setDependencyTrail( node.getDependencyTrail() );
+                        Artifact artifact = node.getArtifact();
 
-                        set.add( node );
+                        // If it was optional, we don't add it or its children, just allow the update of the version and scope
+                        if ( !node.getArtifact().isOptional() )
+                        {
+                            artifact.setDependencyTrail( node.getDependencyTrail() );
+
+                            set.add( node );
+                        }
                     }
                 }
             }
@@ -122,130 +127,156 @@ public class DefaultArtifactCollector
             }
         }
 
-        ResolutionNode previous = (ResolutionNode) resolvedArtifacts.get( key );
-        if ( previous != null )
+        List previousNodes = (List) resolvedArtifacts.get( key );
+        if ( previousNodes != null )
         {
-            // TODO: use as conflict resolver(s), chain and introduce version mediation
-            VersionRange previousRange = previous.getArtifact().getVersionRange();
-            VersionRange currentRange = node.getArtifact().getVersionRange();
+            for ( Iterator i = previousNodes.iterator(); i.hasNext(); )
+            {
+                ResolutionNode previous = (ResolutionNode) i.next();
 
-            if ( previousRange == null )
-            {
-                // version was already resolved
-                node.getArtifact().setVersion( previous.getArtifact().getVersion() );
-            }
-            else if ( currentRange == null )
-            {
-                // version was already resolved
-                previous.getArtifact().setVersion( node.getArtifact().getVersion() );
-            }
-            else
-            {
-                // TODO: shouldn't need to double up on this work, only done for simplicity of handling recommended
-                // version but the restriction is identical
-                previous.getArtifact().setVersionRange( previousRange.restrict( currentRange ) );
-                node.getArtifact().setVersionRange( currentRange.restrict( previousRange ) );
-            }
+                if ( previous.isActive() )
+                {
+                    // Version mediation
+                    VersionRange previousRange = previous.getArtifact().getVersionRange();
+                    VersionRange currentRange = node.getArtifact().getVersionRange();
 
-            // previous one is more dominant
-            if ( previous.getDepth() <= node.getDepth() )
-            {
-                checkScopeUpdate( node, previous, listeners );
-            }
-            else
-            {
-                checkScopeUpdate( previous, node, listeners );
-            }
+                    // TODO: why do we force the version on it? what if they don't match?
+                    if ( previousRange == null )
+                    {
+                        // version was already resolved
+                        node.getArtifact().setVersion( previous.getArtifact().getVersion() );
+                    }
+                    else if ( currentRange == null )
+                    {
+                        // version was already resolved
+                        previous.getArtifact().setVersion( node.getArtifact().getVersion() );
+                    }
+                    else
+                    {
+                        // TODO: shouldn't need to double up on this work, only done for simplicity of handling recommended
+                        // version but the restriction is identical
+                        previous.getArtifact().setVersionRange( previousRange.restrict( currentRange ) );
+                        node.getArtifact().setVersionRange( currentRange.restrict( previousRange ) );
+                    }
 
-            if ( previous.getDepth() <= node.getDepth() )
-            {
-                fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, node, previous.getArtifact() );
-                return;
+                    // Conflict Resolution
+                    // TODO: use as conflict resolver(s), chain
+
+                    // TODO: should this be part of mediation?
+                    // previous one is more dominant
+                    if ( previous.getDepth() <= node.getDepth() )
+                    {
+                        checkScopeUpdate( node, previous, listeners );
+                    }
+                    else
+                    {
+                        checkScopeUpdate( previous, node, listeners );
+                    }
+
+                    if ( previous.getDepth() <= node.getDepth() )
+                    {
+                        // previous was nearer
+                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, node, previous.getArtifact() );
+                        node.disable();
+                    }
+                    else
+                    {
+                        previous.disable();
+                    }
+                }
             }
         }
-
-        resolvedArtifacts.put( key, node );
+        else
+        {
+            previousNodes = new ArrayList();
+            resolvedArtifacts.put( key, previousNodes );
+        }
+        previousNodes.add( node );
 
         fireEvent( ResolutionListener.INCLUDE_ARTIFACT, listeners, node );
 
-        fireEvent( ResolutionListener.PROCESS_CHILDREN, listeners, node );
-
-        for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
+        if ( node.isActive() )
         {
-            ResolutionNode child = (ResolutionNode) i.next();
-            // We leave in optional ones, but don't pick up its dependencies
-            if ( !child.isResolved() && !child.getArtifact().isOptional() )
+            fireEvent( ResolutionListener.PROCESS_CHILDREN, listeners, node );
+
+            for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
             {
-                Artifact artifact = child.getArtifact();
-                try
+                ResolutionNode child = (ResolutionNode) i.next();
+                // We leave in optional ones, but don't pick up its dependencies
+                if ( !child.isResolved() && !child.getArtifact().isOptional() )
                 {
-                    if ( artifact.getVersion() == null )
+                    Artifact artifact = child.getArtifact();
+                    try
                     {
-                        // set the recommended version
-                        VersionRange versionRange = artifact.getVersionRange();
-
-                        // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
-                        ArtifactVersion version;
-                        if ( !versionRange.isSelectedVersionKnown() )
+                        if ( artifact.getVersion() == null )
                         {
-                            List versions = artifact.getAvailableVersions();
-                            if ( versions == null )
+                            // set the recommended version
+                            VersionRange versionRange = artifact.getVersionRange();
+
+                            // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
+                            ArtifactVersion version;
+                            if ( !versionRange.isSelectedVersionKnown() )
                             {
-                                versions = source.retrieveAvailableVersions( artifact, localRepository,
-                                                                             remoteRepositories );
-                                artifact.setAvailableVersions( versions );
+                                List versions = artifact.getAvailableVersions();
+                                if ( versions == null )
+                                {
+                                    versions = source.retrieveAvailableVersions( artifact, localRepository,
+                                                                                 remoteRepositories );
+                                    artifact.setAvailableVersions( versions );
+                                }
+
+                                version = versionRange.matchVersion( versions );
+
+                                if ( version == null )
+                                {
+                                    if ( versions.isEmpty() )
+                                    {
+                                        throw new OverConstrainedVersionException(
+                                            "No versions are present in the repository for the artifact with a range " +
+                                                versionRange );
+                                    }
+                                    else
+                                    {
+                                        throw new OverConstrainedVersionException( "Couldn't find a version in " +
+                                            versions + " to match range " + versionRange );
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                version = versionRange.getSelectedVersion();
                             }
 
-                            version = versionRange.matchVersion( versions );
-
-                            if ( version == null )
-                            {
-                                if ( versions.isEmpty() )
-                                {
-                                    throw new OverConstrainedVersionException(
-                                        "No versions are present in the repository for the artifact with a range " +
-                                            versionRange );
-                                }
-                                else
-                                {
-                                    throw new OverConstrainedVersionException(
-                                        "Couldn't find a version in " + versions + " to match range " + versionRange );
-                                }
-                            }
-                        }
-                        else
-                        {
-                            version = versionRange.getSelectedVersion();
+                            artifact.selectVersion( version.toString() );
+                            fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                         }
 
-                        artifact.selectVersion( version.toString() );
-                        fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
+                        ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
+                        child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
+                    }
+                    catch ( CyclicDependencyException e )
+                    {
+                        // would like to throw this, but we have crappy stuff in the repo
+                        // no logger to use here either just now
+
+                        // TODO: should the remoteRepositories list be null here?!
+                        fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
+                                   new ResolutionNode( e.getArtifact(), null, child ) );
+                    }
+                    catch ( ArtifactMetadataRetrievalException e )
+                    {
+                        artifact.setDependencyTrail( node.getDependencyTrail() );
+                        throw new TransitiveArtifactResolutionException( e.getMessage(), artifact, remoteRepositories,
+                                                                         e );
                     }
 
-                    ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
-                    child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
+                    recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
+                             filter, listeners );
                 }
-                catch ( CyclicDependencyException e )
-                {
-                    // would like to throw this, but we have crappy stuff in the repo
-                    // no logger to use here either just now
-
-                    // TODO: should the remoteRepositories list be null here?!
-                    fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
-                               new ResolutionNode( e.getArtifact(), null, child ) );
-                }
-                catch ( ArtifactMetadataRetrievalException e )
-                {
-                    artifact.setDependencyTrail( node.getDependencyTrail() );
-                    throw new TransitiveArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                }
-
-                recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                         listeners );
             }
-        }
 
-        fireEvent( ResolutionListener.FINISH_PROCESSING_CHILDREN, listeners, node );
+            fireEvent( ResolutionListener.FINISH_PROCESSING_CHILDREN, listeners, node );
+        }
     }
 
     private void checkScopeUpdate( ResolutionNode node, ResolutionNode previous, List listeners )

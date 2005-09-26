@@ -42,6 +42,8 @@ public class ResolutionNode
 
     private final List remoteRepositories;
 
+    private boolean active = true;
+
     public ResolutionNode( Artifact artifact, List remoteRepositories )
     {
         this.artifact = artifact;
@@ -144,4 +146,35 @@ public class ResolutionNode
         return remoteRepositories;
     }
 
+    public boolean isActive()
+    {
+        return active;
+    }
+
+    public void enable()
+    {
+        this.active = true;
+        // TODO: if it was null, we really need to go find them now... or is this taken care of by the ordering?
+        if ( children != null )
+        {
+            for ( Iterator i = children.iterator(); i.hasNext(); )
+            {
+                ResolutionNode node = (ResolutionNode) i.next();
+                node.enable();
+            }
+        }
+    }
+
+    public void disable()
+    {
+        this.active = false;
+        if ( children != null )
+        {
+            for ( Iterator i = children.iterator(); i.hasNext(); )
+            {
+                ResolutionNode node = (ResolutionNode) i.next();
+                node.disable();
+            }
+        }
+    }
 }
