@@ -69,6 +69,10 @@ public class MavenEmbedderTest
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
         maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, targetDirectory );
+
+        File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
+
+        assertTrue( jar.exists() );
     }
 
     // ----------------------------------------------------------------------
