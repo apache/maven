@@ -271,4 +271,9 @@ public class ActiveProjectArtifact
     {
         artifact.setAvailableVersions( versions );
     }
+
+    public boolean isOptional()
+    {
+        return artifact.isOptional();
+    }
 }
