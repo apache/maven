@@ -29,6 +29,7 @@ import java.io.File;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @goal install-file
+ * @requiresProject false
  */
 public class InstallFileMojo
     extends AbstractInstallMojo
