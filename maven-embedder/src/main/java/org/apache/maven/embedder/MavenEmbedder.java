@@ -118,9 +118,18 @@ public class MavenEmbedder
 
     private String globalChecksumPolicy;
 
+    // ----------------------------------------------------------------------
+    // Accessors
+    // ----------------------------------------------------------------------
+
     public void setPluginUpdateOverride( boolean pluginUpdateOverride )
     {
         this.pluginUpdateOverride = pluginUpdateOverride;
+    }
+
+    public boolean isPluginUpdateOverride()
+    {
+        return pluginUpdateOverride;
     }
 
     public void setCheckLatestPluginVersion( boolean checkLatestPluginVersion )
@@ -128,9 +137,19 @@ public class MavenEmbedder
         this.checkLatestPluginVersion = checkLatestPluginVersion;
     }
 
+    public boolean isCheckLatestPluginVersion()
+    {
+        return checkLatestPluginVersion;
+    }
+
     public void setInteractiveMode( boolean interactiveMode )
     {
         this.interactiveMode = interactiveMode;
+    }
+
+    public boolean isInteractiveMode()
+    {
+        return interactiveMode;
     }
 
     public void setUsePluginRegistry( boolean usePluginRegistry )
@@ -138,9 +157,19 @@ public class MavenEmbedder
         this.usePluginRegistry = usePluginRegistry;
     }
 
+    public boolean isUsePluginRegistry()
+    {
+        return usePluginRegistry;
+    }
+
     public void setOffline( boolean offline )
     {
         this.offline = offline;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
     }
 
     public void setUpdateSnapshots( boolean updateSnapshots )
@@ -148,14 +177,20 @@ public class MavenEmbedder
         this.updateSnapshots = updateSnapshots;
     }
 
+    public boolean isUpdateSnapshots()
+    {
+        return updateSnapshots;
+    }
+
     public void setGlobalChecksumPolicy( String globalChecksumPolicy )
     {
         this.globalChecksumPolicy = globalChecksumPolicy;
     }
 
-    // ----------------------------------------------------------------------
-    // Accessors
-    // ----------------------------------------------------------------------
+    public String getGlobalChecksumPolicy()
+    {
+        return globalChecksumPolicy;
+    }
 
     /**
      * Set the classloader to use with the maven embedder.
@@ -167,10 +202,21 @@ public class MavenEmbedder
         this.classLoader = classLoader;
     }
 
+    public ClassLoader getClassLoader()
+    {
+        return classLoader;
+    }
+
     public void setLocalRepositoryDirectory( File localRepositoryDirectory )
     {
         this.localRepositoryDirectory = localRepositoryDirectory;
     }
+
+    public File getLocalRepositoryDirectory()
+    {
+        return localRepositoryDirectory;
+    }
+
     // ----------------------------------------------------------------------
     // Embedder Client Contract
     // ----------------------------------------------------------------------
