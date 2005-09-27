@@ -27,3 +27,5 @@ work. jvz.
      -- the short description (in Eclipse it can be used in Problems view)
      -- detailed description (can be used in annotation/editors markers)
 
+-- Need getters for MavenEmbedder properties. E.g. to retrieve default 
+   location of the local repository
