@@ -16,7 +16,8 @@
         <b>IMPORTANT:</b>
         Some plugins built for alpha-3 will not work with beta-2. If you are experiencing
         "plugin not found" or other messages, please try running the command with -U first to ensure you have the
-        latest version.
+        latest version. In particular, the site plugin required a change between beta-1 and beta-2 and must be
+        upgraded.
       </p>
       <ul>
         <li>
