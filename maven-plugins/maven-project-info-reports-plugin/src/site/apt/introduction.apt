@@ -1,0 +1,33 @@
+ ------
+ Maven 2 Project Info Reports Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 22, 2005
+
+Introduction
+
+ This is a plugin that generates reports information about the project.  The reports being generated are as follows:
+ 
+*---------------------------------+-------------------------------------------------------------------------------+
+|<<Report Name>>                  | <<Description>>                                                               |          
+|                                 |                                                                               |                    
+*---------------------------------+-------------------------------------------------------------------------------+
+|Dependencies Report              | Project Dependencies and Transitive Dependencies  Report                      |
+*---------------------------------+-------------------------------------------------------------------------------+
+|Mailing Lists                    | Project Mailing List                                                          |
+*---------------------------------+-------------------------------------------------------------------------------+
+|Continous Integration            | Continous Integration used by the Project (System Name, URL, Notifiers)       |
+*---------------------------------+-------------------------------------------------------------------------------+
+|Source Repository                | Source Code Manager used by the Project.  This report shows how to access     |
+|                                 | the source code (Anonymous access, Dev access, Web access, etc.)              |
+*---------------------------------+-------------------------------------------------------------------------------+
+|Issue Tracking                   | Issue Tracking System used by the Project. (URL)                              |
+*---------------------------------+-------------------------------------------------------------------------------+
+|Project Team                     | Project Team Members, Developers, and Contributors                            |
+*---------------------------------+-------------------------------------------------------------------------------+
+|License                          | License of the project                                                        |
+*---------------------------------+-------------------------------------------------------------------------------+
+ 
+

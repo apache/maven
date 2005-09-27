@@ -1,0 +1,101 @@
+ ------
+ Maven 2 Project Info Report Plugin 
+ ------
+ Johnny R. Ruiz III
+ <jruiz@exist.com>
+ ------
+ September 20, 2005
+
+How to Use
+
+ This plugin consists of several reports that you can run selectively, individually or even run all of them.  Please see below for instructions 
+ on how to configure your pom.xml to do this.  
+ 
+
+*Run All Reports
+
+ To include all Project Info Reports in your project, you must configure your pom.xml.  
+ Use "m2 site:site" to generate the configured reports.
+ 
+-------------------
+<project>
+   ...
+      <reporting>
+         ...
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+             </plugin>
+         </plugins>
+         ...
+      <reporting>
+   ...
+</project>
+-------------------
+
+*Run Selective Reports
+
+ To run the reports selectively, you can configure it to include only the reports that you prefer. 
+ Use "m2 site:site" to generate the selected reports.
+  
+-------------------
+  
+  <project>
+     ...
+        <reporting>
+           ...
+            <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-project-info-reports-plugin</artifactId>
+                  <reportSets>
+                     <reportSet>
+                        <reports>
+                           <report>dependencies</report>
+                           <report>project-team</report>
+                           <report>mailing-list</report>
+                           <report>cim</report>
+                           <report>issue-tracking</report>
+                           <report>license</report>
+                           <report>scm</report>
+                        </reports>
+                     </reportSet>
+                  </reportSets>
+              </plugin>
+            </plugins>
+           ...
+        <reporting>
+     ...
+  </project>
+-------------------
+
+*Run Individual Report
+
+ How to run the reports directly without configuring anything from the pom.xml?
+
+*---------------------------------+----------------------------------------------+
+|<<Report Name>>                  | <<Command Line>>                             |          
+|                                 |                                              |                    
+*---------------------------------+----------------------------------------------+
+|Dependencies Report              | m2 project-info-reports:dependencies         |
+*---------------------------------+----------------------------------------------+
+|Mailing Lists                    | m2 project-info-reports:mailing-list         |
+*---------------------------------+----------------------------------------------+
+|Continous Integration            | m2 project-info-reports:cim                  |
+*---------------------------------+----------------------------------------------+
+|Source Repository                | m2 project-info-reports:scm                  |
+*---------------------------------+----------------------------------------------+
+|Issue Tracking                   | m2 project-info-reports:issue-tracking       |
+*---------------------------------+----------------------------------------------+
+|Project Team                     | m2 project-info-reports:project-team         |
+*---------------------------------+----------------------------------------------+
+|License                          | m2 project-info-reports:license              |
+*---------------------------------+----------------------------------------------+
+  
+  
+  
+  For full documentation, click {{{index.html}here}}.
+ 
+
+

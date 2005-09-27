@@ -22,6 +22,12 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
+  <contributors>
+    <contributor>
+      <name>Johnny R. Ruiz III</name>
+      <email>jruiz@exist.com</email>
+    </contributor>
+  </contributors>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
