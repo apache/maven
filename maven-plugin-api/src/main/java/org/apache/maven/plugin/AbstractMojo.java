@@ -19,13 +19,16 @@ package org.apache.maven.plugin;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
+import java.util.Map;
+
 /**
  * @version $Id$
  */
 public abstract class AbstractMojo
-    implements Mojo
+    implements Mojo, ContextEnabled
 {
     private Log log;
+    private Map pluginContext;
 
     public void setLog( Log log )
     {
@@ -41,4 +44,15 @@ public abstract class AbstractMojo
 
         return log;
     }
+
+    public Map getPluginContext()
+    {
+        return pluginContext;
+    }
+
+    public void setPluginContext( Map pluginContext )
+    {
+        this.pluginContext = pluginContext;
+    }
+    
 }

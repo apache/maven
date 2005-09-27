@@ -503,7 +503,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
-
+        
         // if this is the first time this plugin has been used, the plugin's container will only
         // contain the plugin's artifact in isolation; we need to finish resolving the plugin's
         // dependencies, and add them to the container.
@@ -516,6 +516,27 @@ public class DefaultPluginManager
             return null;
         }
 
+        if ( plugin instanceof ContextEnabled )
+        {
+            Map pluginContext;
+            try
+            {
+                pluginContext = (Map) pluginContainer.getContext().get( ContextEnabled.PLUGIN_CONTEXT_SESSION_KEY );
+            }
+            catch ( ContextException e )
+            {
+                // this is thrown the first time for each plugin, since the map hasn't been initialized in the
+                // new plugin's container context.
+                getLogger().debug( "Initializing plugin context map for plugin: " + pluginDescriptor.getPluginLookupKey() );
+                
+                pluginContext = new HashMap();
+                
+                pluginContainer.getContext().put( ContextEnabled.PLUGIN_CONTEXT_SESSION_KEY, pluginContext );
+            }
+            
+            ( (ContextEnabled) plugin ).setPluginContext( pluginContext );
+        }
+        
         plugin.setLog( mojoLogger );
 
         XmlPlexusConfiguration pomConfiguration;
