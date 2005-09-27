@@ -36,3 +36,5 @@ work. jvz.
 
 -- Would be nice to centralize the use of maven.home. Possibly have the
    embedder take it in and set a system property of plexus context value.
+   There seems to be a tad of code duplicated in the plugin registry 
+   builder and the settings builder.
