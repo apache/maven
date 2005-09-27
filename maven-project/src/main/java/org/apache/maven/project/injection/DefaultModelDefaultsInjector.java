@@ -90,6 +90,22 @@ public class DefaultModelDefaultsInjector
         {
             dep.setVersion( def.getVersion() );
         }
+        
+        if ( dep.getClassifier() == null && def.getClassifier() != null )
+        {
+            dep.setClassifier( def.getClassifier() );
+        }
+        
+        if ( dep.getType() == null && def.getType() != null )
+        {
+            dep.setType( def.getType() );
+        }
+        
+        List exclusions = dep.getExclusions();
+        if ( exclusions == null || exclusions.isEmpty() )
+        {
+            dep.setExclusions( def.getExclusions() );
+        }
     }
 
 }

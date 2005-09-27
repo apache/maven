@@ -19,8 +19,10 @@ package org.apache.maven.project.injection;
 import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,6 +65,51 @@ public class DefaultModelDefaultsInjectorTest
 
         Dependency result = (Dependency) deps.get( 0 );
         assertEquals( def.getVersion(), result.getVersion() );
+    }
+
+    public void testShouldMergeDependencyExclusionsFromDefaultsToDependency()
+    {
+        Model model = new Model();
+
+        Dependency dep = new Dependency();
+        dep.setGroupId( "myGroup" );
+        dep.setArtifactId( "myArtifact" );
+
+        model.addDependency( dep );
+
+        Dependency def = new Dependency();
+        def.setGroupId( dep.getGroupId() );
+        def.setArtifactId( dep.getArtifactId() );
+        def.setVersion( "1.0.1" );
+        def.setScope( "scope" );
+        
+        Exclusion exc = new Exclusion();
+        exc.setArtifactId( "mydep" );
+        exc.setGroupId( "mygrp" );
+        
+        def.addExclusion( exc );
+        
+        DependencyManagement depMgmt = new DependencyManagement();
+
+        depMgmt.addDependency( def );
+
+        model.setDependencyManagement( depMgmt );
+
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+
+        List deps = model.getDependencies();
+        assertEquals( 1, deps.size() );
+
+        Dependency result = (Dependency) deps.get( 0 );
+        assertEquals( def.getVersion(), result.getVersion() );
+        
+        List resultExclusions = result.getExclusions();
+        assertNotNull( resultExclusions );
+        assertEquals( 1, resultExclusions.size() );
+        
+        Exclusion resultExclusion = (Exclusion) resultExclusions.get( 0 );
+        assertEquals( "mydep", resultExclusion.getArtifactId() );
+        assertEquals( "mygrp", resultExclusion.getGroupId() );
     }
 
     public void testShouldMergeDefaultUrlAndArtifactWhenDependencyDoesntSupplyVersion()
