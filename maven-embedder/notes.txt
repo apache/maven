@@ -33,3 +33,6 @@ work. jvz.
 -- How to deal with the plugin registry builder whose component descriptor
    container references like ${maven.home} and ${user.home}. These can be
    placed in the context for plexus.
+
+-- Would be nice to centralize the use of maven.home. Possibly have the
+   embedder take it in and set a system property of plexus context value.
