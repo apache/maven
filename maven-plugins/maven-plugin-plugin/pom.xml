@@ -10,6 +10,17 @@
   <name>Maven PLUGIN Plugin</name>
   <version>2.0-beta-3-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
+  <developers>
+    <developer>
+      <id>vsiveton</id>
+      <name>Vincent Siveton</name>
+      <email>vincent.siveton@gmail.com</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -35,7 +46,7 @@
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-impl</artifactId>
-      <version>2.0-beta-1</version>
+      <version>2.0-beta-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

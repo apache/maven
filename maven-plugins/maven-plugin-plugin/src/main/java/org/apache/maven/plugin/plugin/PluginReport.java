@@ -42,19 +42,24 @@ import java.util.ResourceBundle;
  * Generates the Plugin's documentation report.
  *
  * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
- * @version $Id: EarMojo.java 267433 2005-09-03 07:34:07Z brett $
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
+ * @version $Id $
  * @goal report
  */
 public class PluginReport
     extends AbstractMavenReport
 {
     /**
+     * Report output directory.
+     *
      * @parameter expression="${project.build.directory}/generated-site/xdoc"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * Doxia Site Renderer.
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -62,6 +67,8 @@ public class PluginReport
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven Project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -69,26 +76,40 @@ public class PluginReport
     private MavenProject project;
 
     /**
+     * Mojo scanner tools.
+     *
      * @parameter expression="${component.org.apache.maven.tools.plugin.scanner.MojoScanner}"
      * @required
      */
     protected MojoScanner mojoScanner;
 
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     */
     protected SiteRenderer getSiteRenderer()
     {
         return siteRenderer;
     }
 
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
+     */
     protected String getOutputDirectory()
     {
         return outputDirectory;
     }
 
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
+     */
     protected MavenProject getProject()
     {
         return project;
     }
 
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
+     */
     protected void executeReport( Locale locale )
         throws MavenReportException
     {
@@ -135,16 +156,25 @@ public class PluginReport
         }
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
+     */
     public String getDescription( Locale locale )
     {
         return getBundle( locale ).getString( "report.plugin.description" );
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
+     */
     public String getName( Locale locale )
     {
         return getBundle( locale ).getString( "report.plugin.name" );
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getOutputName()
+     */
     public String getOutputName()
     {
         return "plugin-info";
@@ -193,11 +223,17 @@ public class PluginReport
             this.locale = locale;
         }
 
+        /**
+         * @see org.apache.maven.reporting.MavenReportRenderer#getTitle()
+         */
         public String getTitle()
         {
             return getBundle( locale ).getString( "report.plugin.title" );
         }
 
+        /**
+         * @see org.apache.maven.reporting.AbstractMavenReportRenderer#renderBody()
+         */
         public void renderBody()
         {
             startSection( getTitle() );
@@ -216,7 +252,11 @@ public class PluginReport
                 MojoDescriptor mojo = (MojoDescriptor) i.next();
 
                 String goalName = mojo.getFullGoalName();
-                String goalDocumentationLink = mojo.getGoal() + "-mojo.html";
+                /*
+                 * Added ./ to define a relative path
+                 * @see AbstractMavenReportRenderer#getValidHref(java.lang.String)
+                 */
+                String goalDocumentationLink = "./" + mojo.getGoal() + "-mojo.html";
                 String description = mojo.getDescription();
                 if ( StringUtils.isEmpty( mojo.getDescription() ) )
                 {
@@ -224,7 +264,10 @@ public class PluginReport
 
                 }
 
-                tableRow( new String[]{createLinkPatternedText( goalName, goalDocumentationLink ), description} );
+                sink.tableRow();
+                tableCell( createLinkPatternedText( goalName, goalDocumentationLink ) );
+                tableCell( description, true );
+                sink.tableRow_();
             }
 
             endTable();
