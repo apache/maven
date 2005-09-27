@@ -41,3 +41,5 @@ work. jvz.
 
 -- What are all the settings that must be provided? Ones that can be set
    and what the default values would be if they aren't set.
+
+-- Need to make an input handler to IDE use soon.
