@@ -198,6 +198,9 @@ it0072: Verifies that property references with dotted notation work within
 
 it0073: Tests context passing between mojos in the same plugin.
 
+it0074: Test that plugin-level configuration instances are not nullified by
+        execution-level configuration instances.
+
 -------------------------------------------------------------------------------
 
 - generated sources
