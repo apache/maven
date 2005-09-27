@@ -196,6 +196,8 @@ it0071: Verifies that dotted property references work within plugin
 it0072: Verifies that property references with dotted notation work within
         POM interpolation.
 
+it0073: Tests context passing between mojos in the same plugin.
+
 -------------------------------------------------------------------------------
 
 - generated sources
