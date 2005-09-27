@@ -43,3 +43,7 @@ work. jvz.
    and what the default values would be if they aren't set.
 
 -- Need to make an input handler to IDE use soon.
+
+-- having to add all the component descriptors by hand and the maven
+   version metadata is a real drag. something needs to be added to
+   the assembly plugin.

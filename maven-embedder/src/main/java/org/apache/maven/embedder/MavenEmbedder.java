@@ -66,6 +66,8 @@ import java.util.Collections;
  */
 public class MavenEmbedder
 {
+    public static final String userHome = System.getProperty( "user.home" );
+
     // ----------------------------------------------------------------------
     // Embedder
     // ----------------------------------------------------------------------
@@ -117,6 +119,8 @@ public class MavenEmbedder
     private boolean updateSnapshots;
 
     private String globalChecksumPolicy;
+
+    private File mavenHome;
 
     // ----------------------------------------------------------------------
     // Accessors
@@ -215,6 +219,16 @@ public class MavenEmbedder
     public File getLocalRepositoryDirectory()
     {
         return localRepositoryDirectory;
+    }
+
+    public File getMavenHome()
+    {
+        return mavenHome;
+    }
+
+    public void setMavenHome( File mavenHome )
+    {
+        this.mavenHome = mavenHome;
     }
 
     // ----------------------------------------------------------------------
@@ -402,6 +416,25 @@ public class MavenEmbedder
     public void start()
         throws MavenEmbedderException
     {
+        // ----------------------------------------------------------------------
+        // Set the maven.home system property which is need by components like
+        // the plugin registry builder.
+        // ----------------------------------------------------------------------
+
+        // TODO: create a maven.home discovery method.
+
+        if ( mavenHome == null )
+        {
+            mavenHome = new File( userHome, "m2" );
+
+            if ( !mavenHome.exists() )
+            {
+                throw new IllegalStateException( "You have set a maven home, or the default of ~/m2 must exist on your system." );
+            }
+
+            System.setProperty( "maven.home", mavenHome.getAbsolutePath() );
+        }
+
         if ( classLoader == null )
         {
             throw new IllegalStateException( "A classloader must be specified using setClassLoader(ClassLoader)." );
