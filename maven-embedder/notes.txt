@@ -38,3 +38,6 @@ work. jvz.
    embedder take it in and set a system property of plexus context value.
    There seems to be a tad of code duplicated in the plugin registry 
    builder and the settings builder.
+
+-- What are all the settings that must be provided? Ones that can be set
+   and what the default values would be if they aren't set.
