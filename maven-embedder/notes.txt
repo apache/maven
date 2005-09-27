@@ -29,3 +29,7 @@ work. jvz.
 
 -- Need getters for MavenEmbedder properties. E.g. to retrieve default 
    location of the local repository
+
+-- How to deal with the plugin registry builder whose component descriptor
+   container references like ${maven.home} and ${user.home}. These can be
+   placed in the context for plexus.
