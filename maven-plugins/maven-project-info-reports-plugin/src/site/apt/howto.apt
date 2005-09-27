@@ -1,5 +1,5 @@
  ------
- Maven 2 Project Info Report Plugin 
+ Maven 2 Project Info Report Plugin
  ------
  Johnny R. Ruiz III
  <jruiz@exist.com>
@@ -8,15 +8,15 @@
 
 How to Use
 
- This plugin consists of several reports that you can run selectively, individually or even run all of them.  Please see below for instructions 
- on how to configure your pom.xml to do this.  
- 
+ This plugin consists of several reports that you can run selectively, individually or even run all of them.  Please see below for instructions
+ on how to configure your pom.xml to do this.
+
 
 *Run All Reports
 
- To include all Project Info Reports in your project, you must configure your pom.xml.  
+ To include all Project Info Reports in your project, you must configure your pom.xml.
  Use "m2 site:site" to generate the configured reports.
- 
+
 -------------------
 <project>
    ...
@@ -36,11 +36,11 @@ How to Use
 
 *Run Selective Reports
 
- To run the reports selectively, you can configure it to include only the reports that you prefer. 
+ To run the reports selectively, you can configure it to include only the reports that you prefer.
  Use "m2 site:site" to generate the selected reports.
-  
+
 -------------------
-  
+
   <project>
      ...
         <reporting>
@@ -75,8 +75,8 @@ How to Use
  How to run the reports directly without configuring anything from the pom.xml?
 
 *---------------------------------+----------------------------------------------+
-|<<Report Name>>                  | <<Command Line>>                             |          
-|                                 |                                              |                    
+|<<Report Name>>                  | <<Command Line>>                             |
+|                                 |                                              |
 *---------------------------------+----------------------------------------------+
 |Dependencies Report              | m2 project-info-reports:dependencies         |
 *---------------------------------+----------------------------------------------+
@@ -92,10 +92,10 @@ How to Use
 *---------------------------------+----------------------------------------------+
 |License                          | m2 project-info-reports:license              |
 *---------------------------------+----------------------------------------------+
-  
-  
-  
+
+
+
   For full documentation, click {{{index.html}here}}.
- 
+
 
 

@@ -1,5 +1,5 @@
  ------
- Maven 2 Project Info Reports Plugin 
+ Maven 2 Project Info Reports Plugin
  ------
  Johnny R. Ruiz III
  <jruiz@exist.com>
@@ -9,10 +9,10 @@
 Introduction
 
  This is a plugin that generates reports information about the project.  The reports being generated are as follows:
- 
+
 *---------------------------------+-------------------------------------------------------------------------------+
-|<<Report Name>>                  | <<Description>>                                                               |          
-|                                 |                                                                               |                    
+|<<Report Name>>                  | <<Description>>                                                               |
+|                                 |                                                                               |
 *---------------------------------+-------------------------------------------------------------------------------+
 |Dependencies Report              | Project Dependencies and Transitive Dependencies  Report                      |
 *---------------------------------+-------------------------------------------------------------------------------+
@@ -29,5 +29,5 @@ Introduction
 *---------------------------------+-------------------------------------------------------------------------------+
 |License                          | License of the project                                                        |
 *---------------------------------+-------------------------------------------------------------------------------+
- 
+
 
