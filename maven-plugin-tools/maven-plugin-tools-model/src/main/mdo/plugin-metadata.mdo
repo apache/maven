@@ -1,41 +1,45 @@
 <!--
-  <mojoMetadata goal="myGoal" 
-        phase="compile"
-        requiresDependencyResolution="compile"
-        requiresProject="true"
-        requiresReports="true"
-        requiresOnline="true"
-        inheritByDefault="true"
-        requiresDirectInvocation="true"
-        aggregator="true">
+  <pluginMetadata>
+    <mojos>
+      <mojo goal="myGoal" 
+            phase="compile"
+            requiresDependencyResolution="compile"
+            requiresProject="true"
+            requiresReports="true"
+            requiresOnline="true"
+            inheritByDefault="true"
+            requiresDirectInvocation="true"
+            aggregator="true">
   
-    <execute phase="initialize" lifecycle="mine"/>
-    <components>
-      <component role="stuff" hint="more"/>
-    </components>
-    <parameters>
-      <parameter name="nom" 
-                 property="prop" 
-                 required="true" 
-                 readonly="true" 
-                 expression="${project}" 
-                 type="org.apache.maven.project.MavenProject"
-                 alias="otherProp">
-        <description>Test parameter</description>
-        <deprecated>Use something else</deprecated>
-      </parameter>
-    </parameters>
-    <description>
-      This is a test.
-    </description>
-    <deprecated>Use another mojo</deprecated>
-  </mojoMetadata>
+        <execute phase="initialize" lifecycle="mine"/>
+        <components>
+          <component role="stuff" hint="more"/>
+        </components>
+        <parameters>
+          <parameter name="nom" 
+                     property="prop" 
+                     required="true" 
+                     readonly="true" 
+                     expression="${project}" 
+                     type="org.apache.maven.project.MavenProject"
+                     alias="otherProp">
+            <description>Test parameter</description>
+            <deprecated>Use something else</deprecated>
+          </parameter>
+        </parameters>
+        <description>
+          This is a test.
+        </description>
+        <deprecated>Use another mojo</deprecated>
+      </mojo>
+    </mojos>
+  </pluginMetadata>
   -->
 <model>
-  <id>mojo-metadata</id>
-  <name>MojoMetadata</name>
+  <id>plugin-metadata</id>
+  <name>PluginMetadata</name>
   <description><![CDATA[
-  	Mojo descriptor for embedding in scripts.
+  	Plugin descriptor metadata for using with script-based mojos.
   ]]></description>
   <defaults>
     <default>
@@ -44,10 +48,27 @@
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="mojoMetadata">
-      <name>MojoMetadata</name>
+    <class rootElement="true" xml.tagName="pluginMetadata">
+      <name>PluginMetadata</name>
       <version>1.0.0</version>
-      <description>Root element of the XML-based mojo descriptor definition.</description>
+      <description>Root element of a script-based mojo's plugin metadata bindings.</description>
+      <fields>
+        <field>
+          <name>mojos</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <description>The list of mojos contained in the accompanying script.</description>
+          <association>
+            <type>Mojo</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Mojo</name>
+      <version>1.0.0</version>
+      <description>Mojo descriptor definition.</description>
       <fields>
         <field xml.attribute="true">
           <version>1.0.0</version>
@@ -136,11 +157,17 @@
           <description>The description for this parameter.</description>
           <type>String</type>
         </field>
-        <field>
+        <field xml.tagName="deprecated">
           <name>deprecation</name>
           <version>1.0.0</version>
           <description>A deprecation message for this mojo parameter.</description>
           <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <version>1.0.0</version>
+          <name>call</name>
+          <type>String</type>
+          <description>The target/method within the script to call when this mojo executes.</description>
         </field>
       </fields>
     </class>
@@ -252,7 +279,7 @@
           <description>The description for this parameter.</description>
           <type>String</type>
         </field>
-        <field>
+        <field xml.tagName="deprecated">
           <name>deprecation</name>
           <version>1.0.0</version>
           <description>A deprecation message for this mojo parameter.</description>
