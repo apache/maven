@@ -4,7 +4,7 @@
     <author email="brett@apache.org">Brett Porter</author>
   </properties>
   <body>
-    <section name="Download Maven 2.0 Beta 1">
+    <section name="Download Maven 2.0 Beta 2">
       <p>
         Maven is distributed in several formats for your convenience.
       </p>
@@ -14,50 +14,50 @@
       </p>
       <p>
         <b>IMPORTANT:</b>
-        Some plugins built for alpha-3 will not work with beta-1. If you are experiencing
+        Some plugins built for alpha-3 will not work with beta-2. If you are experiencing
         "plugin not found" or other messages, please try running the command with -U first to ensure you have the
         latest version.
       </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-1-bin.tar.bz2">
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-2-bin.tar.bz2">
             <code>.tar.bz2</code>
             archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.tar.bz2.md5">checksum</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.tar.bz2.md5">checksum</a>
             )
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.tar.bz2.asc">PGP</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.tar.bz2.asc">PGP</a>
             )
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-1-bin.tar.gz">
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-2-bin.tar.gz">
             <code>.tar.gz</code>
             archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.tar.gz.md5">checksum</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.tar.gz.md5">checksum</a>
             )
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.tar.gz.asc">PGP</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.tar.gz.asc">PGP</a>
             )
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-1-bin.zip">
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-2-bin.zip">
             <code>.zip</code>
             archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.zip.md5">checksum</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.zip.md5">checksum</a>
             )
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-1-bin.zip.asc">PGP</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-beta-2-bin.zip.asc">PGP</a>
             )
           </span>
         </li>
@@ -72,16 +72,16 @@
       </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-beta-1-dep.jar">
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-beta-2-dep.jar">
             <code>.jar</code>
             archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-1-dep.jar.md5">checksum</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-2-dep.jar.md5">checksum</a>
             )
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-1-dep.jar.asc">PGP</a>
+            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-2-dep.jar.asc">PGP</a>
             )
           </span>
         </li>
@@ -126,10 +126,10 @@
         <ol>
           <li>
             Unzip
-            <code>maven-2.0-beta-1-bin.zip</code>
+            <code>maven-2.0-beta-2-bin.zip</code>
             to the directory you wish to install Maven 2.0. These instructions
             assume you chose
-            <code>C:\Program Files\Apache Software Foundation\maven-2.0-beta-1</code>
+            <code>C:\Program Files\Apache Software Foundation\maven-2.0-beta-2</code>
           </li>
           <li>
             Add the
@@ -139,7 +139,7 @@
             <code>PATH</code>
             variable in the user variables.
             eg.
-            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-beta-1\bin";%PATH%</code>
+            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-beta-2\bin";%PATH%</code>
           </li>
           <li>
             In the same dialog, make sure that
@@ -160,16 +160,16 @@
           <li>
             Extract the distribution archive to the directory you wish to install Maven 2.0. These instructions
             assume you chose
-            <code>/usr/local/maven-2.0-beta-1</code>
+            <code>/usr/local/maven-2.0-beta-2</code>
             . The directory
-            <code>maven-2.0-beta-1</code>
+            <code>maven-2.0-beta-2</code>
             will be created from the archive.
           </li>
           <li>
             Add the
             <code>bin</code>
             directory to your path, eg.
-            <code>export PATH=/usr/local/maven-2.0-beta-1/bin:$PATH</code>
+            <code>export PATH=/usr/local/maven-2.0-beta-2/bin:$PATH</code>
           </li>
           <li>
             Make sure that

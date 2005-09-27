@@ -1,56 +1,38 @@
  ------
-Release Notes - Maven 2.0 Beta 1
+Release Notes - Maven 2.0 Beta 2
  ------
 Brett Porter
  ------
-16 September 2005
+27 September 2005
  ------
 
-  The Apache Maven team are proud to announce the beta release of Maven 2.0.
+  The Apache Maven team are proud to announce the second beta release of Maven 2.0.
 
   Download it from {{http://maven.apache.org/maven2/download.html}}
 
   Maven is a software project management and comprehension tool. Based on the concept of a project object model
   (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
 
-  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11040} 206 bug fixes and enhancements}}>>
-  since the previous release on 26 June.
+  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11861} a number of bug fixes and enhancements}}>> since the previous release on 16 September.
 
-  Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
+  Maven 2.0 is a rewrite of the popular Maven application to achieve a number of new goals, and to provide a stable
   basis to take it into the future.
 
-  The main new features in this release are:
+  The main improvements in this release are:
 
-    * Further improved dependency management: full support for dependency ranges
+    * Bug fixes in the reporting API to allow the clover plugin to work in more scenarios
 
-    * Reactor project aggregation support and summary
+    * Bug fixes in the artifact collector for version ranges
 
-    * File system discovery of POMs and artifacts to reduce build time and use of local and remote repositories
-
-    * Repository metadata support
-
-    * System scope dependency support
-
-    * Eclipse compiler support, ability to fork compiler
-
-    * Ability to automatically bundle sources and javadoc with deployments
-
-    * Maven 1.x repository support
-
-    * Allow use of setters in mojos for field population
-
-    * Ability to separate snapshot repository
-
-    * Ability to set minimum Maven version requirement for projects and plugins
-
-    * Build extension support
-
-    * Bugfixes and enhancements
+    * Improvements to offline mode
 
   This release is considered stable with a feature set comparable to Maven 1.0. Further betas and the final are expected
   to be backwards compatible, with a primary goal of bugfixes, usability improvements, and documentation.
 
-  A large number of plugins will be released in the coming week to match the primary Maven 1.0 plugin set.
+  The current roadmap is to make weekly beta releases to encourage faster turnaround for issues found by the
+  community.
+
+  This core release is independent of the plugins available. Further releases of plugins will be made separately.
   See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix}} for more information.
 
   We hope you enjoy using Maven! If you have any questions, please consult:

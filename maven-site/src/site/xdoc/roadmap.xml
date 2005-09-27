@@ -13,28 +13,10 @@
         separate
         release schedule so that new features can be obtained as they are ready and tested.
       </p>
-      <subsection name="Maven 2.0 beta 1">
+      <subsection name="Maven 2.0 beta 3">
         <p>
           <i>Released:</i>
-          16th September 2005
-        </p>
-        <p>
-          <i>Aims and features:</i>
-          This is feature complete and stable. There are expected to be
-          bug fixes and cosmetic changes, but no new major features after this release.
-        </p>
-        <ul>
-          <li>Dependency version ranges</li>
-          <li>Reactor: aggregation support</li>
-          <li>Reactor: Filesystem POM discovery</li>
-          <li>Improved repository support</li>
-          <li>Bugfixes</li>
-        </ul>
-      </subsection>
-      <subsection name="Maven 2.0 beta 2">
-        <p>
-          <i>Expected Release:</i>
-          late-September 2005
+          4 October 2005
         </p>
         <p>
           <i>Aims and features:</i>
@@ -45,10 +27,10 @@
           <li>Cosmetic enhancements</li>
         </ul>
       </subsection>
-      <subsection name="Maven 2.0 beta 3">
+      <subsection name="Maven 2.0 beta 4">
         <p>
           <i>Expected Release:</i>
-          early-October 2005
+          11 October 2005
         </p>
         <p>
           <i>Aims and features:</i>
