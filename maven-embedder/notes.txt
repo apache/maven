@@ -22,3 +22,8 @@ work. jvz.
    folders, but Brett said it will be only in 2.1, so I guess
    we'll have to actually run these plugins and generate code.
 
+-- In order to nicely show all the errors and events in the IDE UI
+   We need to have two messages for EACH event/error:
+     -- the short description (in Eclipse it can be used in Problems view)
+     -- detailed description (can be used in annotation/editors markers)
+
