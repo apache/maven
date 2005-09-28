@@ -53,6 +53,8 @@ public interface Artifact
 
     String SCOPE_SYSTEM = "system";
 
+    String RELEASE_VERSION = "RELEASE";
+
     String getGroupId();
 
     String getArtifactId();

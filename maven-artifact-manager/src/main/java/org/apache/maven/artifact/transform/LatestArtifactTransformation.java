@@ -32,11 +32,14 @@ public class LatestArtifactTransformation
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
-            if ( version != null && !version.equals( artifact.getVersion() ) )
+            if ( Artifact.LATEST_VERSION.equals( version ) )
             {
-                artifact.setBaseVersion( version );
-                artifact.updateVersion( version, localRepository );
+                throw new ArtifactMetadataRetrievalException(
+                    "Unable to determine the latest version for artifact " + artifact );
             }
+
+            artifact.setBaseVersion( version );
+            artifact.updateVersion( version, localRepository );
         }
     }
 

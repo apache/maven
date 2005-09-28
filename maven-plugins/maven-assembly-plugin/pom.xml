@@ -25,7 +25,6 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>RELEASE</version>
         <executions>
           <execution>
             <goals>

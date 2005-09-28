@@ -22,7 +22,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
@@ -91,7 +90,7 @@ public class DefaultPluginVersionManager
      * @deprecated Make private, use resolveReportPluginVersion(..) or resolvePluginVersion(..) instead.
      */
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                         ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+                                        ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
@@ -127,8 +126,7 @@ public class DefaultPluginVersionManager
                     ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
                     updatedVersion = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                                         localRepository,
-                                                         ReleaseArtifactTransformation.RELEASE_VERSION );
+                                                         localRepository, Artifact.RELEASE_VERSION );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -188,7 +186,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
-                                          ReleaseArtifactTransformation.RELEASE_VERSION );
+                                          Artifact.RELEASE_VERSION );
 
             if ( version != null )
             {

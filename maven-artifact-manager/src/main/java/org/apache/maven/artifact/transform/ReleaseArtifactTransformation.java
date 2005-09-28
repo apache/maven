@@ -34,20 +34,21 @@ import java.util.List;
 public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public static final String RELEASE_VERSION = "RELEASE";
-
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( RELEASE_VERSION.equals( artifact.getVersion() ) )
+        if ( Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
 
-            if ( version != null && !version.equals( artifact.getVersion() ) )
+            if ( Artifact.RELEASE_VERSION.equals( version ) )
             {
-                artifact.setBaseVersion( version );
-                artifact.updateVersion( version, localRepository );
+                throw new ArtifactMetadataRetrievalException(
+                    "Unable to determine the release version for artifact " + artifact );
             }
+
+            artifact.setBaseVersion( version );
+            artifact.updateVersion( version, localRepository );
         }
     }
 
