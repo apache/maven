@@ -89,12 +89,6 @@ public class DefaultRepositoryMetadataManager
                     }
                     else
                     {
-                        // NOTE: [jc; 21-sept-2005] won't this cause inconsistencies if the metadata wasn't found?
-                        // this will write out an essentially empty metadata file, which will result
-                        // in the loop below NOT merging anything (each successive pass is still empty),
-                        // which means that the last repository will be set as the artifact repo, rather
-                        // than leaving it null. This is the root cause of MNG-900, but I'm not sure how
-                        // to fix it.
                         metadata.storeInLocalRepository( localRepository, repository );
                     }
                 }
@@ -105,7 +99,6 @@ public class DefaultRepositoryMetadataManager
         // snapshot timestamp, or some other timestamp later encoded into the metadata.
         // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
         //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
-        loadMetadata( metadata, localRepository, localRepository );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
@@ -119,6 +112,7 @@ public class DefaultRepositoryMetadataManager
                 loadMetadata( metadata, repository, localRepository );
             }
         }
+        loadMetadata( metadata, localRepository, localRepository );
     }
 
     private void loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
@@ -134,12 +128,15 @@ public class DefaultRepositoryMetadataManager
 
             if ( repoMetadata.getMetadata() != null )
             {
-                if ( !metadata.merge( repoMetadata.getMetadata() ) )
+                if ( repoMetadata.getMetadata().merge( metadata ) )
                 {
                     repoMetadata.setRepository( remoteRepository );
                 }
             }
-            repoMetadata.setMetadata( metadata );
+            else
+            {
+                repoMetadata.setMetadata( metadata );
+            }
         }
     }
 
@@ -188,7 +185,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
             return;
         }
-        
+
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
@@ -210,7 +207,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
             return;
         }
-        
+
         try
         {
             wagonManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
@@ -245,7 +242,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().warn( "System is offline. Cannot deploy metadata:\n" + metadata.extendedToString() + "\n\n" );
             return;
         }
-        
+
         getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
 
         File file = new File( localRepository.getBasedir(),

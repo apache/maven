@@ -53,109 +53,123 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
-            public boolean merge( Metadata sourceMetadata )
+    public boolean merge( Metadata sourceMetadata )
+    {
+        boolean changed = false;
+
+        for ( java.util.Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+            boolean found = false;
+
+            for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
             {
-                boolean changed = false;
+                Plugin preExisting = (Plugin) it.next();
 
-                for ( java.util.Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+                if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
                 {
-                    Plugin plugin = (Plugin) i.next();
-                    boolean found = false;
+                    found = true;
+                }
+            }
 
-                    for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
-                    {
-                        Plugin preExisting = (Plugin) it.next();
+            if ( !found )
+            {
+                Plugin mappedPlugin = new Plugin();
 
-                        if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
-                        {
-                            found = true;
-                        }
-                    }
+                mappedPlugin.setArtifactId( plugin.getArtifactId() );
 
-                    if ( !found )
-                    {
-                        Plugin mappedPlugin = new Plugin();
+                mappedPlugin.setPrefix( plugin.getPrefix() );
 
-                        mappedPlugin.setArtifactId( plugin.getArtifactId() );
+                addPlugin( mappedPlugin );
 
-                        mappedPlugin.setPrefix( plugin.getPrefix() );
+                changed = true;
+            }
+        }
 
-                        addPlugin( mappedPlugin );
+        Versioning versioning = sourceMetadata.getVersioning();
+        if ( versioning != null )
+        {
+            Versioning v = getVersioning();
+            if ( v == null )
+            {
+                v = new Versioning();
+                setVersioning( v );
+                changed = true;
+            }
 
-                        changed = true;
-                    }
+            for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            {
+                String version = (String) i.next();
+                if ( !v.getVersions().contains( version ) )
+                {
+                    changed = true;
+                    v.getVersions().add( version );
+                }
+            }
+
+            if ( versioning.getLastUpdated() == null || versioning.getLastUpdated().length() == 0 )
+            {
+                // this should only be for historical reasons - we assume local is newer
+                versioning.setLastUpdated( v.getLastUpdated() );
+            }
+
+            if ( v.getLastUpdated() == null || v.getLastUpdated().length() == 0 ||
+                 versioning.getLastUpdated().compareTo( v.getLastUpdated() ) > 0 )
+            {
+                v.setLastUpdated( versioning.getLastUpdated() );
+
+                if ( versioning.getRelease() != null )
+                {
+                    changed = true;
+                    v.setRelease( versioning.getRelease() );
+                }
+                if ( versioning.getLatest() != null )
+                {
+                    changed = true;
+                    v.setLatest( versioning.getLatest() );
                 }
 
-                Versioning versioning = sourceMetadata.getVersioning();
-                if ( versioning != null )
+                Snapshot s = v.getSnapshot();
+                Snapshot snapshot = versioning.getSnapshot();
+                if ( snapshot != null )
                 {
-                    Versioning v = getVersioning();
-                    if ( v != null )
+                    if ( s == null )
                     {
-                        if ( versioning.getRelease() != null )
-                        {
-                            changed = true;
-                            v.setRelease( versioning.getRelease() );
-                        }
-                        if ( versioning.getLatest() != null )
-                        {
-                            changed = true;
-                            v.setLatest( versioning.getLatest() );
-                        }
-                        for ( java.util.Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
-                        {
-                            String version = (String) i.next();
-                            if ( !v.getVersions().contains( version ) )
-                            {
-                                changed = true;
-                                v.getVersions().add( version );
-                            }
-                        }
+                        s = new Snapshot();
+                        v.setSnapshot( s );
+                        changed = true;
+                    }
 
-                        Snapshot s = v.getSnapshot();
-                        Snapshot snapshot = versioning.getSnapshot();
-                        if ( snapshot != null )
-                        {
-                            if ( s == null )
-                            {
-                                v.setSnapshot( snapshot );
-                                changed = true;
-                            }
-                            else if ( snapshot.isLocalCopy() )
-                            {
-                                s.setLocalCopy( true );
-                                s.setTimestamp( null );
-                                s.setBuildNumber( 0 );
-                                changed = true;
-                            }
-                            else
-                            {
-                                if ( snapshot.getTimestamp() != null && !snapshot.getTimestamp().equals( s.getTimestamp() ) )
-                                {
-                                    s.setTimestamp( snapshot.getTimestamp() );
-                                    changed = true;
-                                }
-                                if ( snapshot.getBuildNumber() > 0 && s.getBuildNumber() != snapshot.getBuildNumber() )
-                                {
-                                    s.setBuildNumber( snapshot.getBuildNumber() );
-                                    changed = true;
-                                }
-                                if ( s.isLocalCopy() )
-                                {
-                                    s.setLocalCopy( false );
-                                    changed = true;
-                                }
-                            }
-                        }
+                    if ( snapshot.isLocalCopy() )
+                    {
+                        s.setLocalCopy( true );
+                        s.setTimestamp( null );
+                        s.setBuildNumber( 0 );
+                        changed = true;
                     }
                     else
                     {
-                        setVersioning( versioning );
-                        changed = true;
+                        if ( snapshot.getTimestamp() != null && !snapshot.getTimestamp().equals( s.getTimestamp() ) )
+                        {
+                            s.setTimestamp( snapshot.getTimestamp() );
+                            changed = true;
+                        }
+                        if ( snapshot.getBuildNumber() > 0 && s.getBuildNumber() != snapshot.getBuildNumber() )
+                        {
+                            s.setBuildNumber( snapshot.getBuildNumber() );
+                            changed = true;
+                        }
+                        if ( s.isLocalCopy() )
+                        {
+                            s.setLocalCopy( false );
+                            changed = true;
+                        }
                     }
                 }
-                return changed;
             }
+        }
+        return changed;
+    }
           ]]></code>
         </codeSegment>
       </codeSegments>
@@ -194,7 +208,27 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>lastUpdated</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>When the metadata was last updated</description>
+        </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            public void updateTimestamp()
+            {
+            java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
+            java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
+            fmt.setTimeZone( timezone );
+            setLastUpdated( fmt.format( new java.util.Date() ) );
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Snapshot</name>

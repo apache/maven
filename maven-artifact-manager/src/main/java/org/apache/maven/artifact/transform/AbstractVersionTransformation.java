@@ -109,17 +109,9 @@ public abstract class AbstractVersionTransformation
             else
             {
                 // Locally installed file is newer, don't use the resolved version
-                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot");
+                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
             }
         }
-        
-        if ( version.equals( artifact.getBaseVersion() ) )
-        {
-            // odd: we hit here when: using legecy repo, not local, and no snapshot version meta data was availble
-            // but the repository was set to one of the remote repos (and it was the wrong one).
-            artifact.setRepository( null );
-        }
-        
         return version;
     }
 
@@ -157,12 +149,12 @@ public abstract class AbstractVersionTransformation
             if ( !wagonManager.isOnline() )
             {
                 LegacyArtifactMetadata metadata = createLegacyMetadata( artifact );
-                getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-                
+                getLogger().debug(
+                    "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+
                 return null;
             }
-            
-            
+
             boolean checkedUpdates = false;
             for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
@@ -178,8 +170,8 @@ public abstract class AbstractVersionTransformation
                 }
                 else
                 {
-                    boolean checkForUpdates = localMetadata == null
-                        || policy.checkOutOfDate( localMetadata.getLastModified() );
+                    boolean checkForUpdates = localMetadata == null ||
+                        policy.checkOutOfDate( localMetadata.getLastModified() );
 
                     if ( checkForUpdates )
                     {
@@ -207,7 +199,7 @@ public abstract class AbstractVersionTransformation
                         catch ( ResourceDoesNotExistException e )
                         {
                             getLogger().debug( "Legacy metadata for: " + artifact.getId() +
-                                " could not be found on repository: " + repository.getId(), e );
+                                " could not be found on repository: " + repository.getId() );
                         }
                         catch ( ArtifactMetadataRetrievalException e )
                         {
@@ -233,7 +225,8 @@ public abstract class AbstractVersionTransformation
             resolvedArtifactCache.add( getCacheKey( artifact ) );
         }
 
-        if ( localMetadata != null && artifact.getFile().exists() && !localMetadata.newerThanFile( artifact.getFile() ) )
+        if ( localMetadata != null && artifact.getFile().exists() &&
+            !localMetadata.newerThanFile( artifact.getFile() ) )
         {
             if ( getLogger().isDebugEnabled() && !alreadyResolved )
             {
@@ -242,7 +235,7 @@ public abstract class AbstractVersionTransformation
             }
             localMetadata = null;
         }
-        
+
         return localMetadata != null ? localMetadata.constructVersion() : null;
     }
 

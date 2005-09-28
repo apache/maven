@@ -73,6 +73,7 @@ public class ReleaseArtifactTransformation
     private ArtifactMetadata createMetadata( Artifact artifact )
     {
         Versioning versioning = new Versioning();
+        versioning.updateTimestamp();
         versioning.addVersion( artifact.getVersion() );
 
         if ( artifact.isRelease() )

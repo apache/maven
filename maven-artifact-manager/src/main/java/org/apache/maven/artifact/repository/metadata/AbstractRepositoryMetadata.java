@@ -159,6 +159,7 @@ public abstract class AbstractRepositoryMetadata
     {
         Versioning versioning = new Versioning();
         versioning.setSnapshot( snapshot );
+        versioning.updateTimestamp();
         return versioning;
     }
 
@@ -178,16 +179,16 @@ public abstract class AbstractRepositoryMetadata
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );
     }
-    
+
     public String extendedToString()
     {
         StringBuffer buffer = new StringBuffer();
-        
+
         buffer.append( "\nRepository Metadata\n--------------------------" );
         buffer.append( "\nGroupId: " ).append( getGroupId() );
         buffer.append( "\nArtifactId: " ).append( getArtifactId() );
-        buffer.append( "\nMetadata Type: " ).append(getClass().getName() );
-        
+        buffer.append( "\nMetadata Type: " ).append( getClass().getName() );
+
         return buffer.toString();
     }
 }

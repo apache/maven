@@ -42,6 +42,7 @@ public class AddPluginArtifactMetadataMojo
 
         Versioning versioning = new Versioning();
         versioning.setLatest( projectArtifact.getVersion() );
+        versioning.updateTimestamp();
         ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( projectArtifact, versioning );
         projectArtifact.addMetadata( metadata );
 

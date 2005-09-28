@@ -59,8 +59,9 @@ public class SnapshotTransformation
     {
         if ( artifact.isSnapshot() )
         {
-            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
-            metadata.getMetadata().getVersioning().getSnapshot().setLocalCopy( true );
+            Snapshot snapshot = new Snapshot();
+            snapshot.setLocalCopy( true );
+            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
             artifact.addMetadata( metadata );
         }
@@ -129,12 +130,13 @@ public class SnapshotTransformation
         if ( !wagonManager.isOnline() )
         {
             getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-            
-            getLogger().info( "System is offline. Assuming build number of 0 for " + metadata.getGroupId() + ":" + metadata.getArtifactId() + " snapshot." );
+
+            getLogger().info( "System is offline. Assuming build number of 0 for " + metadata.getGroupId() + ":" +
+                metadata.getArtifactId() + " snapshot." );
 
             return 0;
         }
-        
+
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
         repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
 

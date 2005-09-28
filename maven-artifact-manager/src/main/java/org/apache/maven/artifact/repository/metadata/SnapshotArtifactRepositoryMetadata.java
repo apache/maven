@@ -33,7 +33,8 @@ public class SnapshotArtifactRepositoryMetadata
 
     public SnapshotArtifactRepositoryMetadata( Artifact artifact )
     {
-        this( artifact, new Snapshot() );
+        super( createMetadata( artifact, null ) );
+        this.artifact = artifact;
     }
 
     public SnapshotArtifactRepositoryMetadata( Artifact artifact, Snapshot snapshot )
