@@ -1,0 +1,3 @@
+<settings>
+  <localRepository>file:target/local-repo</localRepository>
+</settings>

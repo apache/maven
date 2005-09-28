@@ -518,19 +518,63 @@ public class Verifier
             {
                 expectedFile = new File( basedir, line );
             }
-
-            if ( !expectedFile.exists() )
+            
+            if ( line.indexOf( '*' ) > -1 )
             {
-                if ( wanted )
+                File parent = expectedFile.getParentFile();
+                
+                if ( !parent.exists() )
                 {
-                    throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
+                    if ( wanted )
+                    {
+                        throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
+                    }
+                }
+                else
+                {
+                    String shortNamePattern = expectedFile.getName().replaceAll( "\\*", ".*" );
+
+                    String[] candidates = parent.list();
+                    
+                    boolean found = false;
+                    
+                    if ( candidates != null )
+                    {
+                        for ( int i = 0; i < candidates.length; i++ )
+                        {
+                            if ( candidates[i].matches( shortNamePattern ) )
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if ( !found && wanted )
+                    {
+                        throw new VerificationException( "Expected file pattern was not found: " + expectedFile.getPath() );
+                    }
+                    else if ( found && !wanted )
+                    {
+                        throw new VerificationException( "Unwanted file pattern was found: " + expectedFile.getPath() );
+                    }
                 }
             }
             else
             {
-                if ( !wanted )
+                if ( !expectedFile.exists() )
                 {
-                    throw new VerificationException( "Unwanted file was found: " + expectedFile.getPath() );
+                    if ( wanted )
+                    {
+                        throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
+                    }
+                }
+                else
+                {
+                    if ( !wanted )
+                    {
+                        throw new VerificationException( "Unwanted file was found: " + expectedFile.getPath() );
+                    }
                 }
             }
         }
@@ -540,7 +584,7 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
-    public void executeGoals( Properties properties, String filename )
+    public void executeGoals( Properties properties, Properties controlProperties, String filename )
         throws VerificationException
     {
         String mavenHome = System.getProperty( "maven.home" );
@@ -583,7 +627,10 @@ public class Verifier
             for ( Iterator it = cliOptions.iterator(); it.hasNext(); )
             {
                 String key = (String) it.next();
-                cli.createArgument().setLine( key );
+                
+                String resolvedArg = resolveCommandLineArg( key );
+                
+                cli.createArgument().setLine( resolvedArg );
             }
 
             cli.createArgument().setValue( "-e" );
@@ -598,9 +645,13 @@ public class Verifier
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
 
-            // Note: Make sure that the repo is surrounded by quotes as it can possibly have
-            // spaces in its path.
-            cli.createArgument().setLine( "-Dmaven.repo.local=" + "\"" + localRepo + "\"" );
+            boolean useMavenRepoLocal = Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+            if ( useMavenRepoLocal )
+            {
+                // Note: Make sure that the repo is surrounded by quotes as it can possibly have
+                // spaces in its path.
+                cli.createArgument().setLine( "-Dmaven.repo.local=" + "\"" + localRepo + "\"" );
+            }
 
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
             {
@@ -634,6 +685,15 @@ public class Verifier
 
             throw new VerificationException();
         }
+    }
+
+    private String resolveCommandLineArg( String key )
+    {
+        String result = key.replaceAll( "\\$\\{basedir\\}", basedir );
+        result = result.replaceAll( "\\\\", "\\" );
+        result = result.replaceAll( "\\/\\/", "\\/" );
+        
+        return result;
     }
 
     private void displayLogFile()
@@ -746,7 +806,7 @@ public class Verifier
                 boolean chokeOnErrorOutput = Boolean.valueOf(
                     controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
 
-                verifier.executeGoals( properties, "goals.txt" );
+                verifier.executeGoals( properties, controlProperties, "goals.txt" );
 
                 verifier.executeHook( "postbuild-hook.txt" );
 

@@ -291,5 +291,14 @@ it2001: Test that repositories are accumulated as the artifact resolution
         that transitive dependencies can be resolved from repositories defined
         in the top-level pom.xml. See MNG-757.
 
+
+it2002: Test the release plugin.
+
+it2003: Test that source artifacts share the same build number as the main
+        project artifact. This is only defined in the 2000 series because of
+        the exorbitant time it takes to execute (it uses a uniquely defined
+        local repository, to avoid pollution from existing artifacts in 
+        pattern matching of the results).
+
 -------------------------------------------------------------------------------
 
