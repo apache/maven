@@ -15,6 +15,7 @@ this.descriptionPattern = Pattern.compile( "(?s)\\r?\\n\\s*\\*" );
 this.typePattern = Pattern.compile( "type\\s*=\\s*\"(.*?)\"" );
 this.expressionPattern = Pattern.compile( "expression\\s*=\\s*\"(.*?)\"" );
 this.phasePattern = Pattern.compile( "phase\\s*=\\s*\"(.*?)\"" );
+this.goalPattern = Pattern.compile( "goal\\s*=\\s*\"(.*?)\"" );
 this.lifecyclePattern = Pattern.compile( "lifecycle\\s*=\\s*\"(.*?)\"" );
 this.rolePattern = Pattern.compile( "role\\s*=\\s*\"(.*?)\"" );
 this.roleHintPattern = Pattern.compile( "roleHint\\s*=\\s*\"(.*?)\"" );
@@ -182,15 +183,31 @@ extract( file, mojoDescriptor )
             {
                 mojoDescriptor.setExecutePhase( m.group( 1 ) );
             }
-            else
+
+            m = goalPattern.matcher( value );
+            if ( m.find() )
             {
-                throw new InvalidPluginDescriptorException( "@execute must have a phase" );
+                mojoDescriptor.setExecuteGoal( m.group( 1 ) );
+            }
+
+            if ( mojoDescriptor.getExecutePhase() == null || mojoDescriptor.getExecuteGoal() == null )
+            {
+                throw new InvalidPluginDescriptorException( "@execute must have a phase or goal" );
+            }
+
+            if ( mojoDescriptor.getExecutePhase() != null && mojoDescriptor.getExecuteGoal() != null )
+            {
+                throw new InvalidPluginDescriptorException( "@execute must have only one of a phase or goal" );
             }
 
             m = lifecyclePattern.matcher( value );
             if ( m.find() )
             {
                 mojoDescriptor.setExecuteLifecycle( m.group( 1 ) );
+                if ( mojoDescriptor.getExecuteGoal() != null )
+                {
+                    throw new InvalidPluginDescriptorException( "@execute lifecycle requires a phase instead of a goal" );
+                }
             }
         }
     }

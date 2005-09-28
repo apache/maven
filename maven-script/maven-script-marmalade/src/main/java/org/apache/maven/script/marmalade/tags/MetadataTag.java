@@ -59,6 +59,8 @@ public class MetadataTag
 
     private String executePhase;
 
+    private String executeGoal;
+
     private String executeLifecycle;
 
     private String lifecyclePhase;
@@ -119,6 +121,11 @@ public class MetadataTag
         if ( notEmpty( executePhase ) )
         {
             descriptor.setExecutePhase( executePhase );
+        }
+
+        if ( notEmpty( executeGoal ) )
+        {
+            descriptor.setExecutePhase( executeGoal );
         }
 
         if ( notEmpty( lifecyclePhase ) )
@@ -235,5 +242,10 @@ public class MetadataTag
     public void setRequiresReports( boolean requiresReports )
     {
         this.requiresReports = requiresReports;
+    }
+
+    public void setExecuteGoal( String executeGoal )
+    {
+        this.executeGoal = executeGoal;
     }
 }

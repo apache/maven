@@ -217,18 +217,30 @@ public class JavaMojoDescriptorExtractor
         if ( execute != null )
         {
             String executePhase = execute.getNamedParameter( "phase" );
+            String executeGoal = execute.getNamedParameter( "goal" );
 
-            if ( executePhase == null )
+            if ( executePhase == null && executeGoal == null )
             {
-                throw new InvalidPluginDescriptorException( "@execute tag requires a 'phase' parameter" );
+                throw new InvalidPluginDescriptorException( "@execute tag requires a 'phase' or 'goal' parameter" );
+            }
+            else if ( executePhase != null && executeGoal != null )
+            {
+                throw new InvalidPluginDescriptorException(
+                    "@execute tag can have only one of a 'phase' or 'goal' parameter" );
             }
             mojoDescriptor.setExecutePhase( executePhase );
+            mojoDescriptor.setExecuteGoal( executeGoal );
 
             String lifecycle = execute.getNamedParameter( "lifecycle" );
 
             if ( lifecycle != null )
             {
                 mojoDescriptor.setExecuteLifecycle( lifecycle );
+                if ( mojoDescriptor.getExecuteGoal() != null )
+                {
+                    throw new InvalidPluginDescriptorException(
+                        "@execute lifecycle requires a phase instead of a goal" );
+                }
             }
         }
 

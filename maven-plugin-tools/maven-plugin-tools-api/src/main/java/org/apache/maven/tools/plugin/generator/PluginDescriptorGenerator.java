@@ -177,6 +177,11 @@ public class PluginDescriptorGenerator
             element( w, "executePhase", mojoDescriptor.getExecutePhase() );
         }
 
+        if ( mojoDescriptor.getExecuteGoal() != null )
+        {
+            element( w, "executeGoal", mojoDescriptor.getExecuteGoal() );
+        }
+
         if ( mojoDescriptor.getExecuteLifecycle() != null )
         {
             element( w, "executeLifecycle", mojoDescriptor.getExecuteLifecycle() );

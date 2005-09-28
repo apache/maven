@@ -487,7 +487,7 @@ public class DefaultLifecycleExecutor
 
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-            if ( mojoDescriptor.getExecutePhase() != null )
+            if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
             {
                 forkLifecycle( mojoDescriptor, session, project );
             }
@@ -661,73 +661,83 @@ public class DefaultLifecycleExecutor
 
         String targetPhase = mojoDescriptor.getExecutePhase();
 
-        // Create new lifecycle
-        Map lifecycleMappings = constructLifecycleMappings( session, targetPhase, project );
-
-        String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
-        if ( executeLifecycle != null )
+        Map lifecycleMappings = null;
+        if ( targetPhase != null )
         {
-            Lifecycle lifecycleOverlay;
-            try
-            {
-                lifecycleOverlay = mojoDescriptor.getPluginDescriptor().getLifecycleMapping( executeLifecycle );
-            }
-            catch ( IOException e )
-            {
-                throw new LifecycleExecutionException( "Unable to read lifecycle mapping file", e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file", e );
-            }
+            // Create new lifecycle
+            lifecycleMappings = constructLifecycleMappings( session, targetPhase, project );
 
-            if ( lifecycleOverlay == null )
+            String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
+            if ( executeLifecycle != null )
             {
-                throw new LifecycleExecutionException( "Lifecycle '" + executeLifecycle + "' not found in plugin" );
-            }
-
-            for ( Iterator i = lifecycleOverlay.getPhases().iterator(); i.hasNext(); )
-            {
-                Phase phase = (Phase) i.next();
-                for ( Iterator j = phase.getExecutions().iterator(); j.hasNext(); )
+                Lifecycle lifecycleOverlay;
+                try
                 {
-                    Execution e = (Execution) j.next();
+                    lifecycleOverlay = mojoDescriptor.getPluginDescriptor().getLifecycleMapping( executeLifecycle );
+                }
+                catch ( IOException e )
+                {
+                    throw new LifecycleExecutionException( "Unable to read lifecycle mapping file", e );
+                }
+                catch ( XmlPullParserException e )
+                {
+                    throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file", e );
+                }
 
-                    for ( Iterator k = e.getGoals().iterator(); k.hasNext(); )
+                if ( lifecycleOverlay == null )
+                {
+                    throw new LifecycleExecutionException( "Lifecycle '" + executeLifecycle + "' not found in plugin" );
+                }
+
+                for ( Iterator i = lifecycleOverlay.getPhases().iterator(); i.hasNext(); )
+                {
+                    Phase phase = (Phase) i.next();
+                    for ( Iterator j = phase.getExecutions().iterator(); j.hasNext(); )
                     {
-                        String goal = (String) k.next();
-                        MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
+                        Execution e = (Execution) j.next();
 
-                        if ( desc == null )
+                        for ( Iterator k = e.getGoals().iterator(); k.hasNext(); )
                         {
-                            String message = "Required goal '" + goal + "' not found in plugin '" +
-                                mojoDescriptor.getPluginDescriptor().getGoalPrefix() + "'";
-                            int index = goal.indexOf( ':' );
-                            if ( index >= 0 )
-                            {
-                                String prefix = goal.substring( index + 1 );
-                                if ( prefix.equals( mojoDescriptor.getPluginDescriptor().getGoalPrefix() ) )
-                                {
-                                    message = message + " (goals should not be prefixed - try '" + prefix + "')";
-                                }
-                            }
-                            throw new LifecycleExecutionException( message );
-                        }
+                            String goal = (String) k.next();
+                            MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
 
-                        MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
-                        addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
-                                                session.getSettings() );
+                            if ( desc == null )
+                            {
+                                String message = "Required goal '" + goal + "' not found in plugin '" +
+                                    mojoDescriptor.getPluginDescriptor().getGoalPrefix() + "'";
+                                int index = goal.indexOf( ':' );
+                                if ( index >= 0 )
+                                {
+                                    String prefix = goal.substring( index + 1 );
+                                    if ( prefix.equals( mojoDescriptor.getPluginDescriptor().getGoalPrefix() ) )
+                                    {
+                                        message = message + " (goals should not be prefixed - try '" + prefix + "')";
+                                    }
+                                }
+                                throw new LifecycleExecutionException( message );
+                            }
+
+                            MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
+                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
+                                                    session.getSettings() );
+                        }
                     }
                 }
             }
+
+            removeFromLifecycle( mojoDescriptor, lifecycleMappings );
         }
 
-        removeFromLifecycle( mojoDescriptor, lifecycleMappings );
-
         MavenProject executionProject = new MavenProject( project );
-        executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject );
+        if ( targetPhase != null )
+        {
+            executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject );
+        }
+        else
+        {
+            executeStandaloneGoal( mojoDescriptor.getExecuteGoal(), session, executionProject );
+        }
         project.setExecutionProject( executionProject );
-
     }
 
     private void removeFromLifecycle( MojoDescriptor mojoDescriptor, Map lifecycleMappings )

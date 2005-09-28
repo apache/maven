@@ -58,6 +58,8 @@ public class MojoDescriptor
 
     private String executePhase;
 
+    private String executeGoal;
+
     private String executeLifecycle;
 
     private String deprecated;
@@ -424,5 +426,15 @@ public class MojoDescriptor
     public void setRequiresReports( boolean requiresReports )
     {
         this.requiresReports = requiresReports;
+    }
+
+    public void setExecuteGoal( String executeGoal )
+    {
+        this.executeGoal = executeGoal;
+    }
+
+    public String getExecuteGoal()
+    {
+        return executeGoal;
     }
 }

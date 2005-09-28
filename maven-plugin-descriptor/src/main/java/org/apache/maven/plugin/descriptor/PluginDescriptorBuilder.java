@@ -142,6 +142,13 @@ public class PluginDescriptorBuilder
             mojo.setExecutePhase( executePhase );
         }
 
+        String executeMojo = c.getChild( "executeGoal" ).getValue();
+
+        if ( executeMojo != null )
+        {
+            mojo.setExecuteGoal( executeMojo );
+        }
+
         String executeLifecycle = c.getChild( "executeLifecycle" ).getValue();
 
         if ( executeLifecycle != null )
