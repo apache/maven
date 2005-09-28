@@ -350,4 +350,17 @@ And how do I make archetypes for use in my organization?
 How to do a test release and deployment. Trying to work through this with
 raphael at the moment.
 
+==
+
+How to get started behind an NTLM proxy.
+
+==
+
+How maven's classloaders work
+
+==
+
+How artifact resolution works, this would be a long one more advanced in
+scope.
+
 +-----+
