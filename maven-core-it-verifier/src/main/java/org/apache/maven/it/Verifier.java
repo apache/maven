@@ -237,10 +237,6 @@ public class Verifier
                     int startIndex = newLine.indexOf( ' ' );
 
                     command = newLine.substring( 0, startIndex );
-                    if ( "rm".equals( command ) )
-                    {
-                        l.add( newLine.substring( 0, index ) + "SNAPSHOT.version.txt" );
-                    }
 
                     filespec = newLine.substring( startIndex + 1, endIndex );
                 }
