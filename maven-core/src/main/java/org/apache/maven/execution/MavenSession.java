@@ -18,6 +18,8 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -42,14 +44,14 @@ public class MavenSession
     // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
 
-    private ReactorManager rpm;
+    private ReactorManager reactorManager;
 
     private final String executionRootDir;
 
     private boolean usingPOMsFromFilesystem;
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager rpm, List goals, String executionRootDir )
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals, String executionRootDir )
     {
         this.container = container;
 
@@ -59,11 +61,16 @@ public class MavenSession
 
         this.eventDispatcher = eventDispatcher;
 
-        this.rpm = rpm;
+        this.reactorManager = reactorManager;
 
         this.goals = goals;
 
         this.executionRootDir = executionRootDir;
+    }
+    
+    public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    {
+        return reactorManager.getPluginContext( pluginDescriptor, project );
     }
 
     public PlexusContainer getContainer()
@@ -121,7 +128,7 @@ public class MavenSession
 
     public List getSortedProjects()
     {
-        return rpm.getSortedProjects();
+        return reactorManager.getSortedProjects();
     }
 
     public String getExecutionRootDirectory()

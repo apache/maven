@@ -17,6 +17,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -39,14 +40,37 @@ public class ReactorManager
 
     private Map buildFailuresByProject = new HashMap();
 
+    private Map pluginContextsByProjectAndPluginKey = new HashMap();
+
     private String failureBehavior = FAIL_FAST;
 
     private final ProjectSorter sorter;
-
+    
     public ReactorManager( List projects )
         throws CycleDetectedException
     {
         this.sorter = new ProjectSorter( projects );
+    }
+    
+    public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
+    {
+        Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
+        
+        if ( pluginContextsByKey == null )
+        {
+            pluginContextsByKey = new HashMap();
+            pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
+        }
+        
+        Map pluginContext = (Map) pluginContextsByKey.get( plugin.getPluginLookupKey() );
+        
+        if ( pluginContext == null )
+        {
+            pluginContext = new HashMap();
+            pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
+        }
+        
+        return pluginContext;
     }
 
     public void setFailureBehavior( String failureBehavior )

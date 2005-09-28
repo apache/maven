@@ -518,21 +518,7 @@ public class DefaultPluginManager
 
         if ( plugin instanceof ContextEnabled )
         {
-            Map pluginContext;
-            try
-            {
-                pluginContext = (Map) pluginContainer.getContext().get( ContextEnabled.PLUGIN_CONTEXT_SESSION_KEY );
-            }
-            catch ( ContextException e )
-            {
-                // this is thrown the first time for each plugin, since the map hasn't been initialized in the
-                // new plugin's container context.
-                getLogger().debug( "Initializing plugin context map for plugin: " + pluginDescriptor.getPluginLookupKey() );
-                
-                pluginContext = new HashMap();
-                
-                pluginContainer.getContext().put( ContextEnabled.PLUGIN_CONTEXT_SESSION_KEY, pluginContext );
-            }
+            Map pluginContext = session.getPluginContext( pluginDescriptor, project );
             
             ( (ContextEnabled) plugin ).setPluginContext( pluginContext );
         }
