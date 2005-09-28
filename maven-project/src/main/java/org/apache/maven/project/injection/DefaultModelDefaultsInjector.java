@@ -16,10 +16,12 @@ package org.apache.maven.project.injection;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.ModelUtils;
 
 import java.util.Iterator;
@@ -38,8 +40,40 @@ public class DefaultModelDefaultsInjector
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
         if ( model.getBuild() != null )
         {
-            ModelUtils.mergePluginLists( model.getBuild(), model.getBuild().getPluginManagement(), false );
+            injectPluginDefaults( model.getBuild(), model.getBuild().getPluginManagement() );
         }
+    }
+
+    private void injectPluginDefaults( Build build, PluginManagement pluginManagement )
+    {
+        if ( pluginManagement == null )
+        {
+            // nothing to inject.
+            return ;
+        }
+        
+        List buildPlugins = build.getPlugins();
+        
+        if ( buildPlugins != null && !buildPlugins.isEmpty() )
+        {
+            Map pmPlugins = pluginManagement.getPluginsAsMap();
+            
+            if ( pmPlugins != null && !pmPlugins.isEmpty() )
+            {
+                for ( Iterator it = buildPlugins.iterator(); it.hasNext(); )
+                {
+                    Plugin buildPlugin = (Plugin) it.next();
+                    
+                    Plugin pmPlugin = (Plugin) pmPlugins.get( buildPlugin.getKey() );
+                    
+                    if ( pmPlugin != null )
+                    {
+                        mergePluginWithDefaults( buildPlugin, pmPlugin );
+                    }
+                }
+            }
+        }
+        
     }
 
     public void mergePluginWithDefaults( Plugin plugin, Plugin def )

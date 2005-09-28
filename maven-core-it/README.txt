@@ -200,6 +200,10 @@ it0074: Test that plugin-level configuration instances are not nullified by
 it0075: Verify that direct invocation of a mojo from the command line still
         results in the processing of modules included via profiles.
 
+it0076: Test that plugins in pluginManagement aren't included in the build
+        unless they are referenced by groupId/artifactId within the plugins
+        section of a pom.
+
 -------------------------------------------------------------------------------
 
 - generated sources
