@@ -69,7 +69,7 @@ public class DefaultWagonManager
     private Map mirrors = new HashMap();
 
     private TransferListener downloadMonitor;
-    
+
     private boolean online = true;
 
     public Wagon getWagon( String protocol )
@@ -108,7 +108,7 @@ public class DefaultWagonManager
         throws TransferFailedException
     {
         failIfNotOnline();
-        
+
         String protocol = repository.getProtocol();
 
         Wagon wagon;
@@ -281,9 +281,9 @@ public class DefaultWagonManager
         throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
         // TODO: better excetpions - transfer failed is not enough?
-        
+
         failIfNotOnline();
-        
+
         Wagon wagon;
 
         ArtifactRepository mirror = getMirror( repository.getId() );
@@ -329,7 +329,6 @@ public class DefaultWagonManager
 
         try
         {
-
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
                            getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
@@ -460,7 +459,8 @@ public class DefaultWagonManager
         }
     }
 
-    private void failIfNotOnline() throws TransferFailedException
+    private void failIfNotOnline()
+        throws TransferFailedException
     {
         if ( !isOnline() )
         {
@@ -659,7 +659,7 @@ public class DefaultWagonManager
     {
         this.online = online;
     }
-    
+
     public boolean isOnline()
     {
         return online;

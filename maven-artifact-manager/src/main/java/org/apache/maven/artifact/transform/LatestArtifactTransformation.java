@@ -18,8 +18,6 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.LatestArtifactMetadata;
-import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 
@@ -53,11 +51,6 @@ public class LatestArtifactTransformation
         throws ArtifactMetadataRetrievalException
     {
         // metadata is added via addPluginArtifactMetadata
-    }
-
-    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
-    {
-        return new LatestArtifactMetadata( artifact );
     }
 
     protected String constructVersion( Versioning versioning, String baseVersion )

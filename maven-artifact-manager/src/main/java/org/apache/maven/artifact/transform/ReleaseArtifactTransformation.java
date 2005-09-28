@@ -19,8 +19,6 @@ package org.apache.maven.artifact.transform;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
-import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -82,11 +80,6 @@ public class ReleaseArtifactTransformation
         }
 
         return new ArtifactRepositoryMetadata( artifact, versioning );
-    }
-
-    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
-    {
-        return new ReleaseArtifactMetadata( artifact );
     }
 
     protected String constructVersion( Versioning versioning, String baseVersion )

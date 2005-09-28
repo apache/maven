@@ -18,20 +18,19 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
-import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -43,6 +42,10 @@ public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
     private String deploymentTimestamp;
+
+    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
+
+    private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
@@ -93,14 +96,9 @@ public class SnapshotTransformation
     {
         if ( deploymentTimestamp == null )
         {
-            deploymentTimestamp = SnapshotArtifactMetadata.getUtcDateFormatter().format( new Date() );
+            deploymentTimestamp = getUtcDateFormatter().format( new Date() );
         }
         return deploymentTimestamp;
-    }
-
-    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
-    {
-        return new SnapshotArtifactMetadata( artifact );
     }
 
     protected String constructVersion( Versioning versioning, String baseVersion )
@@ -150,24 +148,13 @@ public class SnapshotTransformation
                 buildNumber = repoMetadata.getVersioning().getSnapshot().getBuildNumber();
             }
         }
-        else
-        {
-            try
-            {
-                SnapshotArtifactMetadata snapshotMetadata = new SnapshotArtifactMetadata( artifact );
-                snapshotMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager,
-                                                               ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
-                getLogger().warn( "Using old-style versioning metadata from remote repo for " + artifact );
-
-                buildNumber = snapshotMetadata.getBuildNumber();
-            }
-            catch ( ResourceDoesNotExistException e1 )
-            {
-                // safe to ignore, use default snapshot data
-                getLogger().debug( "Unable to find legacy metadata - ignoring" );
-            }
-        }
         return buildNumber;
     }
 
+    public static DateFormat getUtcDateFormatter()
+    {
+        DateFormat utcDateFormatter = new SimpleDateFormat( UTC_TIMESTAMP_PATTERN );
+        utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
+        return utcDateFormatter;
+    }
 }
