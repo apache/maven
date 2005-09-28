@@ -109,14 +109,14 @@ public class DefaultRepositoryMetadataManager
 
             if ( policy.isEnabled() )
             {
-                loadMetadata( metadata, repository, localRepository );
+                loadMetadata( metadata, repository, localRepository, true );
             }
         }
-        loadMetadata( metadata, localRepository, localRepository );
+        loadMetadata( metadata, localRepository, localRepository, false );
     }
 
     private void loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
-                               ArtifactRepository localRepository )
+                               ArtifactRepository localRepository, boolean setRepository )
         throws ArtifactMetadataRetrievalException
     {
         File metadataFile = new File( localRepository.getBasedir(),
@@ -130,12 +130,19 @@ public class DefaultRepositoryMetadataManager
             {
                 if ( repoMetadata.getMetadata().merge( metadata ) )
                 {
-                    repoMetadata.setRepository( remoteRepository );
+                    if ( setRepository )
+                    {
+                        repoMetadata.setRepository( remoteRepository );
+                    }
                 }
             }
             else
             {
                 repoMetadata.setMetadata( metadata );
+                if ( setRepository )
+                {
+                    repoMetadata.setRepository( remoteRepository );
+                }
             }
         }
     }
