@@ -1,1 +1,2 @@
 core-it:fork
+core-it:fork-goal
