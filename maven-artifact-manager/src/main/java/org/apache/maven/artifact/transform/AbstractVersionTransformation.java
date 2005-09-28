@@ -62,13 +62,13 @@ public abstract class AbstractVersionTransformation
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata;
-        if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
+        if ( artifact.isSnapshot() )
         {
-            metadata = new ArtifactRepositoryMetadata( artifact );
+            metadata = new SnapshotArtifactRepositoryMetadata( artifact );
         }
         else
         {
-            metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+            metadata = new ArtifactRepositoryMetadata( artifact );
         }
 
         repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );

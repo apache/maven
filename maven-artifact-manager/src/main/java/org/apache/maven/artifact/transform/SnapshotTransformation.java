@@ -47,7 +47,8 @@ public class SnapshotTransformation
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( artifact.isSnapshot() )
+        // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
+        if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
             artifact.updateVersion( version, localRepository );
