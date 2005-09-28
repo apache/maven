@@ -269,8 +269,23 @@ m2 clean:clean install
   The phases to bind are listed in the configuration element, and each that is given can have one goal associated with
   that phase for that particular packaging.
 
-  Once this is included in the JAR and the plugin is added to the project, the packaging will also be available from
-  that project.
+  Once this is included in the JAR, the plugin needs to be added to the project to make the packaging available from
+  that project. In addition to listing the plugin, you must specify that it provides extensions:
+
+----
+...
+ <packaging>plexus-application</packaging>
+...
+ <plugin>
+   <groupId>org.codehaus.plexus</groupId>
+   <artifactId>plexus-maven-plugin</artifactId>
+   <extensions>true</extensions>
+ </plugin>
+...
+----
+
+  Setting the extensions flag is also necessary if you provide custom artifact type handlers (closely related to
+  providing a packaging).
 
 ** Forking a Parallel Lifecycle
 
