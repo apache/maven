@@ -47,3 +47,15 @@ work. jvz.
 -- having to add all the component descriptors by hand and the maven
    version metadata is a real drag. something needs to be added to
    the assembly plugin.
+
+-- maven.home
+
+this is a CLI notion and should not be required by the embedder but
+we still need to deal with notions of centralize configuration which
+are extremely important in the corporate environment.
+
+-- ~/.m2
+
+plugin registry and settings should be stored in the tool specific locations
+
+-- local repository will be shared and default to ~/.m2/repository

@@ -47,7 +47,7 @@ public class AddPluginArtifactMetadataMojo
         projectArtifact.addMetadata( metadata );
 
         GroupRepositoryMetadata groupMetadata = new GroupRepositoryMetadata( project.getGroupId() );
-        groupMetadata.addPluginMapping( getGoalPrefix(), project.getArtifactId() );
+        groupMetadata.addPluginMapping( getGoalPrefix(), project.getArtifactId(), project.getName() );
 
         projectArtifact.addMetadata( groupMetadata );
     }

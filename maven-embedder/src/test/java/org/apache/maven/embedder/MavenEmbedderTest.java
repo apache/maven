@@ -6,11 +6,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.Set;
 import java.util.Collections;
+import java.util.List;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -73,6 +75,26 @@ public class MavenEmbedderTest
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
         assertTrue( jar.exists() );
+    }
+
+    // ----------------------------------------------------------------------
+    // Test mock plugin metadata
+    // ----------------------------------------------------------------------
+
+    public void testMockPluginMetadata()
+        throws Exception
+    {
+        List plugins = maven.getAvailablePlugins();
+
+        SummaryPluginDescriptor spd = (SummaryPluginDescriptor) plugins.get( 0 );
+
+        assertNotNull( spd );
+
+        PluginDescriptor pd = maven.getPluginDescriptor( spd );
+
+        assertNotNull( pd );
+
+        assertEquals( "org.apache.maven.plugins", pd.getGroupId() );
     }
 
     // ----------------------------------------------------------------------

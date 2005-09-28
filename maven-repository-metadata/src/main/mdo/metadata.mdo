@@ -79,7 +79,9 @@
                 mappedPlugin.setArtifactId( plugin.getArtifactId() );
 
                 mappedPlugin.setPrefix( plugin.getPrefix() );
-
+                
+                mappedPlugin.setName( plugin.getName() );
+                
                 addPlugin( mappedPlugin );
 
                 changed = true;
@@ -262,6 +264,13 @@
       <description>Mapping information for a single plugin within this group</description>
       <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
       <fields>
+        <field>
+          <name>name</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>Display name for the plugin.</description>
+        </field>
         <field>
           <name>prefix</name>
           <type>String</type>

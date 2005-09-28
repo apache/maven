@@ -36,6 +36,8 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MavenExecutionResponse;
@@ -43,6 +45,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
@@ -54,6 +57,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,6 +94,8 @@ public class MavenEmbedder
     private MavenXpp3Reader modelReader;
 
     private ProfileManager profileManager;
+
+    private PluginDescriptorBuilder pluginDescriptorBuilder;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -235,11 +242,19 @@ public class MavenEmbedder
     // Embedder Client Contract
     // ----------------------------------------------------------------------
 
+    // ----------------------------------------------------------------------
+    // Model
+    // ----------------------------------------------------------------------
+
     public Model readModel( File model )
         throws XmlPullParserException, FileNotFoundException, IOException
     {
         return modelReader.read( new FileReader( model ) );
     }
+
+    // ----------------------------------------------------------------------
+    // Project
+    // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
@@ -257,6 +272,111 @@ public class MavenEmbedder
         throws ProjectBuildingException, ArtifactResolutionException
     {
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
+    }
+
+    public List collectProjects( File basedir, String[] includes, String[] excludes )
+        throws MojoExecutionException
+    {
+        List projects = new ArrayList();
+
+        List poms = getPomFiles( basedir, includes, excludes );
+
+        for ( Iterator i = poms.iterator(); i.hasNext(); )
+        {
+            File pom = (File) i.next();
+
+            try
+            {
+                MavenProject p = readProject( pom );
+
+                projects.add( p );
+
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new MojoExecutionException( "Error loading " + pom, e );
+            }
+        }
+
+        return projects;
+    }
+
+    // ----------------------------------------------------------------------
+    // Plugins
+    // ----------------------------------------------------------------------
+
+    public List getAvailablePlugins()
+    {
+        List plugins = new ArrayList();
+
+        plugins.add( makeMockPlugin( "org.apache.maven.plugins", "maven-jar-plugin", "Maven Jar Plug-in" ) );
+
+        plugins.add( makeMockPlugin( "org.apache.maven.plugins", "maven-compiler-plugin", "Maven Compiler Plug-in" ) );
+
+        return plugins;
+    }
+
+    public PluginDescriptor getPluginDescriptor( SummaryPluginDescriptor summaryPluginDescriptor )
+        throws MavenEmbedderException
+    {
+        PluginDescriptor pluginDescriptor;
+
+        try
+        {
+            InputStream is = classLoader.getResourceAsStream( "/plugins/" + summaryPluginDescriptor.getArtifactId() + ".xml" );
+
+            pluginDescriptor = pluginDescriptorBuilder.build( new InputStreamReader( is ) );
+        }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new MavenEmbedderException( "Error retrieving plugin descriptor.", e );
+        }
+
+        return pluginDescriptor;
+    }
+
+    private SummaryPluginDescriptor makeMockPlugin( String groupId, String artifactId, String name )
+    {
+        return new SummaryPluginDescriptor( groupId, artifactId, name );
+    }
+
+    // ----------------------------------------------------------------------
+    // Execution of phases/goals
+    // ----------------------------------------------------------------------
+
+    // TODO: should we allow the passing in of a settings object so that everything can be taken from the client env
+
+    public void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+    {
+        execute( Collections.singletonList( project ), goals, eventDispatcher, executionRootDirectory );
+    }
+
+    public void execute( List projects, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+    {
+        ReactorManager rm = new ReactorManager( projects );
+
+        rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+
+        MavenSession session = new MavenSession( embedder.getContainer(),
+                                                 settings,
+                                                 localRepository,
+                                                 eventDispatcher,
+                                                 rm,
+                                                 goals,
+                                                 executionRootDirectory.getAbsolutePath() );
+
+        session.setUsingPOMsFromFilesystem( true );
+
+        MavenExecutionResponse response = lifecycleExecutor.execute( session,
+                                                                     rm,
+                                                                     session.getEventDispatcher() );
+
+        if ( response.isExecutionFailure() )
+        {
+            throw new MojoExecutionException( "Integration test failed" );
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -321,72 +441,6 @@ public class MavenEmbedder
         return runtimeInfo;
     }
 
-    // ----------------------------------------------------------------------
-    // Execution of phases/goals
-    // ----------------------------------------------------------------------
-
-    public void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
-    {
-        execute( Collections.singletonList( project ), goals, eventDispatcher, executionRootDirectory );
-    }
-
-    public void execute( List projects, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
-    {
-        ReactorManager rm = new ReactorManager( projects );
-
-        rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
-
-        //rm.blackList( (MavenProject) projects.get( 0 ) );
-
-        MavenSession session = new MavenSession( embedder.getContainer(),
-                                                 settings,
-                                                 localRepository,
-                                                 eventDispatcher,
-                                                 rm,
-                                                 goals,
-                                                 executionRootDirectory.getAbsolutePath() );
-
-        session.setUsingPOMsFromFilesystem( true );
-
-        MavenExecutionResponse response = lifecycleExecutor.execute( session,
-                                                                     rm,
-                                                                     session.getEventDispatcher() );
-
-        if ( response.isExecutionFailure() )
-        {
-            throw new MojoExecutionException( "Integration test failed" );
-        }
-    }
-
-    public List collectProjects( File basedir, String[] includes, String[] excludes )
-        throws MojoExecutionException
-    {
-        List projects = new ArrayList();
-
-        List poms = getPomFiles( basedir, includes, excludes );
-
-        for ( Iterator i = poms.iterator(); i.hasNext(); )
-        {
-            File pom = (File) i.next();
-
-            try
-            {
-                MavenProject p = readProject( pom );
-
-                projects.add( p );
-
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new MojoExecutionException( "Error loading " + pom, e );
-            }
-        }
-
-        return projects;
-    }
-
     private List getPomFiles( File basedir, String[] includes, String[] excludes )
     {
         DirectoryScanner scanner = new DirectoryScanner();
@@ -429,7 +483,10 @@ public class MavenEmbedder
 
             if ( !mavenHome.exists() )
             {
-                throw new IllegalStateException( "You have set a maven home, or the default of ~/m2 must exist on your system." );
+                if ( !mavenHome.mkdirs() )
+                {
+                    throw new IllegalStateException( "A maven home directory does not exist and cannot be created." );
+                }
             }
 
             System.setProperty( "maven.home", mavenHome.getAbsolutePath() );
@@ -456,6 +513,8 @@ public class MavenEmbedder
             // ----------------------------------------------------------------------
 
             modelReader = new MavenXpp3Reader();
+
+            pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
             profileManager = new DefaultProfileManager( embedder.getContainer() );
 
