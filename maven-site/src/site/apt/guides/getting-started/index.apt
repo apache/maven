@@ -278,6 +278,11 @@ multiple repositories
 ...
 </project>
 
+if you specify repositories in profiles you must remember to activate that
+particular profile!
+
+and the use of mirrors
+
 ==
 
 Project properties
