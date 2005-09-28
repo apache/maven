@@ -354,6 +354,11 @@ raphael at the moment.
 
 How to get started behind an NTLM proxy.
 
+use the fat http client and add it as an extension to the POM. Do we
+support ntmlv2:
+
+http://www.mail-archive.com/httpclient-dev@jakarta.apache.org/msg01861.html
+
 ==
 
 How maven's classloaders work
