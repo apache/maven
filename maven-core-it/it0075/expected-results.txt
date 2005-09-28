@@ -1,0 +1,2 @@
+sub1/.classpath
+sub2/.classpath

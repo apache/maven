@@ -197,6 +197,9 @@ it0073: Tests context passing between mojos in the same plugin.
 it0074: Test that plugin-level configuration instances are not nullified by
         execution-level configuration instances.
 
+it0075: Verify that direct invocation of a mojo from the command line still
+        results in the processing of modules included via profiles.
+
 -------------------------------------------------------------------------------
 
 - generated sources

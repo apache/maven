@@ -1,0 +1,2 @@
+rm sub1/.classpath
+rm sub2/.classpath
