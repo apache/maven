@@ -361,6 +361,14 @@ http://www.mail-archive.com/httpclient-dev@jakarta.apache.org/msg01861.html
 
 ==
 
+Using extensions and why they are needed.
+
+==
+
+How to use Ant constructs from m2.
+
+==
+
 How maven's classloaders work
 
 ==
