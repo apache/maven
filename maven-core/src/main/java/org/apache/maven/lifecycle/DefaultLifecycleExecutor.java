@@ -656,8 +656,8 @@ public class DefaultLifecycleExecutor
     private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
     {
-        getLogger().info(
-            "Preparing " + mojoDescriptor.getPluginDescriptor().getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+        getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
 
         String targetPhase = mojoDescriptor.getExecutePhase();
 
@@ -673,7 +673,7 @@ public class DefaultLifecycleExecutor
                 Lifecycle lifecycleOverlay;
                 try
                 {
-                    lifecycleOverlay = mojoDescriptor.getPluginDescriptor().getLifecycleMapping( executeLifecycle );
+                    lifecycleOverlay = pluginDescriptor.getLifecycleMapping( executeLifecycle );
                 }
                 catch ( IOException e )
                 {
@@ -699,23 +699,7 @@ public class DefaultLifecycleExecutor
                         for ( Iterator k = e.getGoals().iterator(); k.hasNext(); )
                         {
                             String goal = (String) k.next();
-                            MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
-
-                            if ( desc == null )
-                            {
-                                String message = "Required goal '" + goal + "' not found in plugin '" +
-                                    mojoDescriptor.getPluginDescriptor().getGoalPrefix() + "'";
-                                int index = goal.indexOf( ':' );
-                                if ( index >= 0 )
-                                {
-                                    String prefix = goal.substring( index + 1 );
-                                    if ( prefix.equals( mojoDescriptor.getPluginDescriptor().getGoalPrefix() ) )
-                                    {
-                                        message = message + " (goals should not be prefixed - try '" + prefix + "')";
-                                    }
-                                }
-                                throw new LifecycleExecutionException( message );
-                            }
+                            MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
 
                             MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
                             addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
@@ -735,9 +719,34 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            executeStandaloneGoal( mojoDescriptor.getExecuteGoal(), session, executionProject );
+            String goal = mojoDescriptor.getExecuteGoal();
+            MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
+            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), session, executionProject );
         }
         project.setExecutionProject( executionProject );
+    }
+
+    private MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
+        throws LifecycleExecutionException
+    {
+        MojoDescriptor desc = pluginDescriptor.getMojo( goal );
+
+        if ( desc == null )
+        {
+            String message = "Required goal '" + goal + "' not found in plugin '" + pluginDescriptor.getGoalPrefix() +
+                "'";
+            int index = goal.indexOf( ':' );
+            if ( index >= 0 )
+            {
+                String prefix = goal.substring( index + 1 );
+                if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
+                {
+                    message = message + " (goals should not be prefixed - try '" + prefix + "')";
+                }
+            }
+            throw new LifecycleExecutionException( message );
+        }
+        return desc;
     }
 
     private void removeFromLifecycle( MojoDescriptor mojoDescriptor, Map lifecycleMappings )
