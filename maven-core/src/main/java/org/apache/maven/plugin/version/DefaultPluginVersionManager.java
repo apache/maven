@@ -561,6 +561,8 @@ public class DefaultPluginVersionManager
             plugin.setUseVersion( version );
 
             pluginRegistry.addPlugin( plugin );
+            
+            pluginRegistry.flushPluginsByKey();
         }
 
         writeUserRegistry( groupId, artifactId, pluginRegistry );
