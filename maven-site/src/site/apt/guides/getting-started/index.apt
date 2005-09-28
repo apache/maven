@@ -363,4 +363,15 @@ How maven's classloaders work
 How artifact resolution works, this would be a long one more advanced in
 scope.
 
+==
+
+Archetype generation problems:
+
+This looks like:
+http://jira.codehaus.org/browse/MNG-916
+
+Please check ~/.m2/plugin-registry.xml - if that has RELEASE as a
+version in there somewhere, remove it - that should correct the
+problem.
+
 +-----+
