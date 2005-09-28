@@ -1,1 +1,2 @@
-core-it:throw core-it:catch
+core-it:throw
+core-it:catch
