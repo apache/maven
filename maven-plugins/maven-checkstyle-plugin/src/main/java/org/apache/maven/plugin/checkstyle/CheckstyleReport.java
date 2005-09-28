@@ -16,25 +16,24 @@ package org.apache.maven.plugin.checkstyle;
  * limitations under the License.
  */
 
+import com.puppycrawl.tools.checkstyle.Checker;
+import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
+import com.puppycrawl.tools.checkstyle.DefaultLogger;
+import com.puppycrawl.tools.checkstyle.ModuleFactory;
+import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
+import com.puppycrawl.tools.checkstyle.PropertiesExpander;
+import com.puppycrawl.tools.checkstyle.XMLLogger;
+import com.puppycrawl.tools.checkstyle.api.AuditListener;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.api.Configuration;
+import com.puppycrawl.tools.checkstyle.api.FilterSet;
+import com.puppycrawl.tools.checkstyle.filters.SuppressionsLoader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-
-import com.puppycrawl.tools.checkstyle.api.AuditListener;
-import com.puppycrawl.tools.checkstyle.api.Configuration;
-import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
-import com.puppycrawl.tools.checkstyle.Checker;
-import com.puppycrawl.tools.checkstyle.DefaultLogger;
-import com.puppycrawl.tools.checkstyle.ModuleFactory;
-import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
-import com.puppycrawl.tools.checkstyle.PropertiesExpander;
-import com.puppycrawl.tools.checkstyle.XMLLogger;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.api.FilterSet;
-import com.puppycrawl.tools.checkstyle.filters.SuppressionsLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,11 +47,10 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
- * @goal checkstyle
- *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
+ * @goal checkstyle
  */
 public class CheckstyleReport
     extends AbstractMavenReport
@@ -60,10 +58,10 @@ public class CheckstyleReport
     /**
      * Specifies the directory where the report will be generated
      *
-     * @parameter expression="${project.build.directory}/site"
+     * @parameter default-value="${project.reporting.outputDirectory}"
      * @required
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     /**
      * Specifies the names filter of the source files to be used for checkstyle
@@ -82,8 +80,8 @@ public class CheckstyleReport
 
     /**
      * Specifies what predefined check set to use. Available sets are
-     *     "sun" (for the Sun coding conventions), "turbine", and "avalon".
-     *     Default is sun.
+     * "sun" (for the Sun coding conventions), "turbine", and "avalon".
+     * Default is sun.
      *
      * @parameter default-value="sun"
      */
@@ -105,7 +103,7 @@ public class CheckstyleReport
 
     /**
      * Specifies the location of the License file (a.k.a. the header file) that is used by Checkstyle
-     *     to verify that source code has the correct copyright.
+     * to verify that source code has the correct copyright.
      *
      * @parameter
      */
@@ -120,18 +118,18 @@ public class CheckstyleReport
 
     /**
      * If null, the checkstyle task will display violations on stdout. Otherwise, the text file will be
-     *     created with the violations. Note: This is in addition to the XML result file (containing
-     *     the violations in XML format which is always created.
+     * created with the violations. Note: This is in addition to the XML result file (containing
+     * the violations in XML format which is always created.
      *
      * @parameter
      */
-    private String useFile;
+    private File useFile;
 
     /**
      * Specifies the location of the supperssions XML file to use. The plugin defines a Checkstyle
-     *     property named <code>checkstyle.supperssions.file</code> with the value of this
-     *     property. This allows using the Checkstyle property your own custom checkstyle
-     *     configuration file when specifying a suppressions file.
+     * property named <code>checkstyle.supperssions.file</code> with the value of this
+     * property. This allows using the Checkstyle property your own custom checkstyle
+     * configuration file when specifying a suppressions file.
      *
      * @parameter
      */
@@ -139,7 +137,7 @@ public class CheckstyleReport
 
     /**
      * Specifies the path and filename to save the checkstyle output.  The format of the output file is
-     *     determined by the <code>outputFileFormat</code>
+     * determined by the <code>outputFileFormat</code>
      *
      * @parameter expression="${project.build.directory}/checkstyle-result.txt"
      */
@@ -147,7 +145,7 @@ public class CheckstyleReport
 
     /**
      * Specifies the format of the output to be used when writing to the output file. Valid values are
-     *     "plain" and "xml"
+     * "plain" and "xml"
      *
      * @parameter default-value="plain"
      */
@@ -210,7 +208,7 @@ public class CheckstyleReport
      */
     protected String getOutputDirectory()
     {
-        return outputDirectory;
+        return outputDirectory.getAbsolutePath();
     }
 
     /**
@@ -255,10 +253,14 @@ public class CheckstyleReport
             checker = new Checker();
 
             if ( moduleFactory != null )
+            {
                 checker.setModuleFactory( moduleFactory );
+            }
 
             if ( filterSet != null )
+            {
                 checker.addFilter( filterSet );
+            }
 
             checker.configure( config );
         }
@@ -274,11 +276,9 @@ public class CheckstyleReport
             checker.addListener( listener );
         }
 
-        if ( StringUtils.isNotEmpty( useFile ) )
+        if ( useFile != null )
         {
-            File outputFile = new File( useFile );
-
-            OutputStream out = getOutputStream( outputFile );
+            OutputStream out = getOutputStream( useFile );
 
             checker.addListener( new DefaultLogger( out, true ) );
         }
@@ -326,8 +326,8 @@ public class CheckstyleReport
             }
             else
             {
-                throw new MavenReportException( "Invalid output file format: (" + outputFileFormat
-                    + "). Must be 'plain' or 'xml'." );
+                throw new MavenReportException(
+                    "Invalid output file format: (" + outputFileFormat + "). Must be 'plain' or 'xml'." );
             }
         }
 
@@ -337,14 +337,14 @@ public class CheckstyleReport
     private OutputStream getOutputStream( File file )
         throws MavenReportException
     {
-        FileOutputStream out;
-
         try
         {
-            File parentFile = file.getParentFile();
+            File parentFile = file.getAbsoluteFile().getParentFile();
 
             if ( !parentFile.exists() )
+            {
                 parentFile.mkdirs();
+            }
 
             return new FileOutputStream( file );
         }
@@ -405,10 +405,14 @@ public class CheckstyleReport
             }
 
             if ( headerFile != null )
+            {
                 p.setProperty( "checkstyle.header.file", headerFile );
+            }
 
             if ( cacheFile != null )
+            {
                 p.setProperty( "checkstyle.cache.file", cacheFile );
+            }
         }
         catch ( IOException e )
         {
@@ -448,7 +452,9 @@ public class CheckstyleReport
         throws MavenReportException
     {
         if ( StringUtils.isEmpty( packageNamesFile ) )
+        {
             return null;
+        }
 
         try
         {
@@ -464,7 +470,9 @@ public class CheckstyleReport
         throws MavenReportException
     {
         if ( StringUtils.isEmpty( suppressionsFile ) )
+        {
             return null;
+        }
 
         try
         {
