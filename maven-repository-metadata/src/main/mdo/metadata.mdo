@@ -116,7 +116,7 @@
             }
 
             if ( v.getLastUpdated() == null || v.getLastUpdated().length() == 0 ||
-                 versioning.getLastUpdated().compareTo( v.getLastUpdated() ) > 0 )
+                 versioning.getLastUpdated().compareTo( v.getLastUpdated() ) >= 0 )
             {
                 v.setLastUpdated( versioning.getLastUpdated() );
 

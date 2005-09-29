@@ -101,21 +101,19 @@ public abstract class AbstractRepositoryMetadata
             }
         }
 
-        boolean changed = false;
+        boolean changed;
 
         // If file could not be found or was not valid, start from scratch
         if ( metadata == null )
         {
-            metadata = new Metadata();
-
-            metadata.setGroupId( getGroupId() );
-            metadata.setArtifactId( getArtifactId() );
-            metadata.setVersion( getBaseVersion() );
+            metadata = this.metadata;
 
             changed = true;
         }
-
-        changed |= metadata.merge( this.metadata );
+        else
+        {
+            changed = metadata.merge( this.metadata );
+        }
 
         if ( changed )
         {
