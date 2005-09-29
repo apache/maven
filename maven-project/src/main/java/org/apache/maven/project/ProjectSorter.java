@@ -27,7 +27,6 @@ import org.codehaus.plexus.util.dag.TopologicalSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,6 +96,7 @@ public class ProjectSorter
                 }
             }
 
+/* TODO: can this be removed?
             MavenProject parent = project.getParent();
             if ( parent != null )
             {
@@ -106,6 +106,7 @@ public class ProjectSorter
                     dag.addEdge( id, parentId );
                 }
             }
+*/
 
             List buildPlugins = project.getBuildPlugins();
             if ( buildPlugins != null )
@@ -196,34 +197,4 @@ public class ProjectSorter
     {
         return dag.getParentLabels( id );
     }
-
-    private static class ByProjectFileComparator
-        implements Comparator
-    {
-
-        public int compare( Object first, Object second )
-        {
-            MavenProject p1 = (MavenProject) first;
-            MavenProject p2 = (MavenProject) second;
-
-            String p1Path = p1.getFile().getAbsolutePath();
-            String p2Path = p2.getFile().getAbsolutePath();
-
-            int comparison = p1Path.length() - p2Path.length();
-
-            if ( comparison > 0 )
-            {
-                return 1;
-            }
-            else if ( comparison < 0 )
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
-
 }
