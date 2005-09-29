@@ -114,7 +114,7 @@ public class ProjectSorter
                 {
                     Plugin plugin = (Plugin) j.next();
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
-                    if ( dag.getVertex( pluginId ) != null )
+                    if ( dag.getVertex( pluginId ) != null && !pluginId.equals( id ) )
                     {
                         project.addProjectReference( (MavenProject) projectMap.get( pluginId ) );
 
