@@ -1,0 +1,69 @@
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-jar-plugin</artifactId>
+  <version>2.0-beta-2-SNAPSHOT</version>
+  <goalPrefix>jar</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>jar</goal>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>package</phase>
+      <implementation>org.apache.maven.plugin.jar.JarMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>archive</name>
+          <type>org.apache.maven.archiver.MavenArchiveConfiguration</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The maven archiver to use.</description>
+        </parameter>
+        <parameter>
+          <name>basedir</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>Directory containing the generated JAR.</description>
+        </parameter>
+        <parameter>
+          <name>finalName</name>
+          <alias>jarName</alias>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>Name of the generated JAR.</description>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>Directory containing the classes.</description>
+        </parameter>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The maven project.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <outputDirectory implementation="java.lang.String">${project.build.outputDirectory}</outputDirectory>
+        <project implementation="org.apache.maven.project.MavenProject">${project}</project>
+        <basedir implementation="java.lang.String">${project.build.directory}</basedir>
+        <finalName implementation="java.lang.String">${project.build.finalName}</finalName>
+      </configuration>
+    </mojo>
+  </mojos>
+  <dependencies/>
+</plugin>

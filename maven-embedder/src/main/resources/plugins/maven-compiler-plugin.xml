@@ -1,0 +1,369 @@
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-compiler-plugin</artifactId>
+  <version>2.0-beta-2-SNAPSHOT</version>
+  <goalPrefix>compiler</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>testCompile</goal>
+      <requiresDependencyResolution>test</requiresDependencyResolution>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>test-compile</phase>
+      <implementation>org.apache.maven.plugin.TestCompilerMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>basedir</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The directory to run the compiler from if fork is true.</description>
+        </parameter>
+        <parameter>
+          <name>buildDirectory</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The target directory of the compiler if fork is true.</description>
+        </parameter>
+        <parameter>
+          <name>classpathElements</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>Project test classpath.</description>
+        </parameter>
+        <parameter>
+          <name>compileSourceRoots</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The source directories containing the test-source to be compiled.</description>
+        </parameter>
+        <parameter>
+          <name>compilerArguments</name>
+          <type>java.util.LinkedHashMap</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Arguments to be passed to the compiler if fork is set to true. &lt;p/&gt; This is because the list of valid arguments passed to a Java compiler varies based on the compiler version.</description>
+        </parameter>
+        <parameter>
+          <name>compilerId</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The compiler id of the compiler to use.</description>
+        </parameter>
+        <parameter>
+          <name>compilerVersion</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Version of the compiler to use, ex. "1.3", "1.5"</description>
+        </parameter>
+        <parameter>
+          <name>debug</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether to include debugging information in the compiled class files. The default value is true.</description>
+        </parameter>
+        <parameter>
+          <name>encoding</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -encoding argument for the Java compiler</description>
+        </parameter>
+        <parameter>
+          <name>executable</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The executable of the compiler to use.</description>
+        </parameter>
+        <parameter>
+          <name>fork</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Runs the compiler in a separate process. &lt;p/&gt; If not set the compiler will default to a executable.</description>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The directory where compiled test classes go.</description>
+        </parameter>
+        <parameter>
+          <name>outputFileName</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Used to control the name of the output file when compiling a set of sources to a single file.</description>
+        </parameter>
+        <parameter>
+          <name>showDeprecation</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Output source locations where deprecated APIs are used</description>
+        </parameter>
+        <parameter>
+          <name>showWarnings</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Output warnings</description>
+        </parameter>
+        <parameter>
+          <name>source</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -source argument for the Java compiler</description>
+        </parameter>
+        <parameter>
+          <name>staleMillis</name>
+          <type>int</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The granularity in milliseconds of the last modification date for testing whether a source needs recompilation</description>
+        </parameter>
+        <parameter>
+          <name>target</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -target argument for the Java compiler</description>
+        </parameter>
+        <parameter>
+          <name>testExcludes</name>
+          <type>java.util.Set</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>A list of exclusion filters for the compiler.</description>
+        </parameter>
+        <parameter>
+          <name>testIncludes</name>
+          <type>java.util.Set</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>A list of inclusion filters for the compiler.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <fork implementation="boolean" default-value="false"/>
+        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
+        <outputDirectory implementation="java.io.File">${project.build.testOutputDirectory}</outputDirectory>
+        <buildDirectory implementation="java.io.File">${project.build.directory}</buildDirectory>
+        <compilerId implementation="java.lang.String" default-value="javac"/>
+        <classpathElements implementation="java.util.List">${project.testClasspathElements}</classpathElements>
+        <outputFileName implementation="java.lang.String">${project.build.finalName}</outputFileName>
+        <compileSourceRoots implementation="java.util.List">${project.testCompileSourceRoots}</compileSourceRoots>
+        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
+        <basedir implementation="java.io.File">${basedir}</basedir>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.compiler.manager.CompilerManager</role>
+          <field-name>compilerManager</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+    <mojo>
+      <goal>compile</goal>
+      <requiresDependencyResolution>compile</requiresDependencyResolution>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>compile</phase>
+      <implementation>org.apache.maven.plugin.CompilerMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>basedir</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The directory to run the compiler from if fork is true.</description>
+        </parameter>
+        <parameter>
+          <name>buildDirectory</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The target directory of the compiler if fork is true.</description>
+        </parameter>
+        <parameter>
+          <name>classpathElements</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>Project classpath.</description>
+        </parameter>
+        <parameter>
+          <name>compileSourceRoots</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The source directories containing the sources to be compiled.</description>
+        </parameter>
+        <parameter>
+          <name>compilerArguments</name>
+          <type>java.util.LinkedHashMap</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Arguments to be passed to the compiler if fork is set to true. &lt;p/&gt; This is because the list of valid arguments passed to a Java compiler varies based on the compiler version.</description>
+        </parameter>
+        <parameter>
+          <name>compilerId</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The compiler id of the compiler to use.</description>
+        </parameter>
+        <parameter>
+          <name>compilerVersion</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Version of the compiler to use, ex. "1.3", "1.5"</description>
+        </parameter>
+        <parameter>
+          <name>debug</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether to include debugging information in the compiled class files. The default value is true.</description>
+        </parameter>
+        <parameter>
+          <name>encoding</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -encoding argument for the Java compiler</description>
+        </parameter>
+        <parameter>
+          <name>excludes</name>
+          <type>java.util.Set</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>A list of exclusion filters for the compiler.</description>
+        </parameter>
+        <parameter>
+          <name>executable</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The executable of the compiler to use.</description>
+        </parameter>
+        <parameter>
+          <name>fork</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Runs the compiler in a separate process. &lt;p/&gt; If not set the compiler will default to a executable.</description>
+        </parameter>
+        <parameter>
+          <name>includes</name>
+          <type>java.util.Set</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>A list of inclusion filters for the compiler.</description>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The directory for compiled classes.</description>
+        </parameter>
+        <parameter>
+          <name>outputFileName</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Used to control the name of the output file when compiling a set of sources to a single file.</description>
+        </parameter>
+        <parameter>
+          <name>projectArtifact</name>
+          <type>org.apache.maven.artifact.Artifact</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>Project artifacts.</description>
+        </parameter>
+        <parameter>
+          <name>showDeprecation</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Output source locations where deprecated APIs are used</description>
+        </parameter>
+        <parameter>
+          <name>showWarnings</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Output warnings</description>
+        </parameter>
+        <parameter>
+          <name>source</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -source argument for the Java compiler</description>
+        </parameter>
+        <parameter>
+          <name>staleMillis</name>
+          <type>int</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The granularity in milliseconds of the last modification date for testing whether a source needs recompilation</description>
+        </parameter>
+        <parameter>
+          <name>target</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The -target argument for the Java compiler</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <fork implementation="boolean" default-value="false"/>
+        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
+        <outputDirectory implementation="java.io.File">${project.build.outputDirectory}</outputDirectory>
+        <projectArtifact implementation="org.apache.maven.artifact.Artifact">${project.artifact}</projectArtifact>
+        <buildDirectory implementation="java.io.File">${project.build.directory}</buildDirectory>
+        <compilerId implementation="java.lang.String" default-value="javac"/>
+        <classpathElements implementation="java.util.List">${project.compileClasspathElements}</classpathElements>
+        <outputFileName implementation="java.lang.String">${project.build.finalName}</outputFileName>
+        <compileSourceRoots implementation="java.util.List">${project.compileSourceRoots}</compileSourceRoots>
+        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
+        <basedir implementation="java.io.File">${basedir}</basedir>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.compiler.manager.CompilerManager</role>
+          <field-name>compilerManager</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+  </mojos>
+  <dependencies/>
+</plugin>
