@@ -51,7 +51,8 @@ public class MavenSession
     private boolean usingPOMsFromFilesystem;
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals, String executionRootDir )
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         String executionRootDir )
     {
         this.container = container;
 
@@ -67,7 +68,7 @@ public class MavenSession
 
         this.executionRootDir = executionRootDir;
     }
-    
+
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
         return reactorManager.getPluginContext( pluginDescriptor, project );
@@ -140,7 +141,7 @@ public class MavenSession
     {
         this.usingPOMsFromFilesystem = usingPOMsFromFilesystem;
     }
-    
+
     public boolean isUsingPOMsFromFilesystem()
     {
         return usingPOMsFromFilesystem;

@@ -110,7 +110,16 @@ public class DefaultLifecycleExecutor
     {
         MavenProject rootProject = rm.getTopLevelProject();
 
-        List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, rootProject );
+        List goals = session.getGoals();
+
+        if ( goals.isEmpty() && rootProject != null )
+        {
+            String goal = rootProject.getDefaultGoal();
+            if ( goal != null )
+            {
+                goals = Collections.singletonList( goal );
+            }
+        }
 
         MavenExecutionResponse response = new MavenExecutionResponse();
 
@@ -118,6 +127,13 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            if ( goals.isEmpty() )
+            {
+                throw new NoGoalsSpecifiedException( "You must specify at least one goal. Try 'install'" );
+            }
+
+            List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
+
             // TODO: probably don't want to do all this up front
             for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
             {
@@ -163,6 +179,10 @@ public class DefaultLifecycleExecutor
         catch ( InvalidVersionSpecificationException e )
         {
             throw new LifecycleExecutionException( "Unable to initialise extensions", e );
+        }
+        catch ( NoGoalsSpecifiedException e )
+        {
+            response.setException( e );
         }
         finally
         {

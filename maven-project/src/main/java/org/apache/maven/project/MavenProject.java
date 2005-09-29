@@ -1463,4 +1463,9 @@ public class MavenProject
     {
         this.executionRoot = executionRoot;
     }
+
+    public String getDefaultGoal()
+    {
+        return getBuild() != null ? getBuild().getDefaultGoal() : null;
+    }
 }

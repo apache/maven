@@ -42,8 +42,8 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.RuntimeInfo;
+import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -231,15 +231,6 @@ public class MavenCli
             }
         }
 
-        // TODO: this should be in default maven, and should accommodate default goals
-        if ( request.getGoals().isEmpty() )
-        {
-            System.err.println( "You must specify at least one goal. Try 'install'" );
-
-            cliManager.displayHelp();
-            return 1;
-        }
-
         MavenExecutionResponse response;
         try
         {
@@ -285,8 +276,8 @@ public class MavenCli
             }
             else
             {
-                System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
-                    " is invalid. Using default path." );
+                System.out.println(
+                    "WARNING: Alternate user settings file: " + userSettingsPath + " is invalid. Using default path." );
             }
         }
 
@@ -356,10 +347,8 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( CommandLine commandLine,
-                                                        Settings settings,
-                                                        EventDispatcher eventDispatcher,
-                                                        LoggerManager loggerManager,
+    private static MavenExecutionRequest createRequest( CommandLine commandLine, Settings settings,
+                                                        EventDispatcher eventDispatcher, LoggerManager loggerManager,
                                                         ProfileManager profileManager )
         throws ComponentLookupException
     {
