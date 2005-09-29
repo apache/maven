@@ -63,6 +63,11 @@ public class GroupRepositoryMetadata
         return null;
     }
 
+    public void addPluginMapping( String goalPrefix, String artifactId )
+    {
+        addPluginMapping( goalPrefix, artifactId, artifactId );    
+    }
+
     public void addPluginMapping( String goalPrefix, String artifactId, String name )
     {
         List plugins = getMetadata().getPlugins();
