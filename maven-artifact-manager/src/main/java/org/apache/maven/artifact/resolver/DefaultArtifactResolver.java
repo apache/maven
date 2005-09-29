@@ -27,8 +27,10 @@ import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -116,10 +118,10 @@ public class DefaultArtifactResolver
                     if ( !wagonManager.isOnline() )
                     {
                         getLogger().debug( "System is offline. Cannot resolve artifact: " + artifact.getId() + "." );
-                        
+
                         return;
                     }
-                    
+
                     try
                     {
                         if ( artifact.getRepository() != null )
@@ -146,6 +148,23 @@ public class DefaultArtifactResolver
                     catch ( TransferFailedException e )
                     {
                         throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    }
+
+                    if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+                    {
+                        String version = artifact.getVersion();
+                        artifact.selectVersion( artifact.getBaseVersion() );
+                        File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                        try
+                        {
+                            FileUtils.copyFile( destination, copy );
+                        }
+                        catch ( IOException e )
+                        {
+                            throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use",
+                                                                   artifact, remoteRepositories, e );
+                        }
+                        artifact.selectVersion( version );
                     }
                 }
                 else if ( destination.exists() )

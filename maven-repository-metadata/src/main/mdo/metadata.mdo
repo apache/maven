@@ -79,9 +79,9 @@
                 mappedPlugin.setArtifactId( plugin.getArtifactId() );
 
                 mappedPlugin.setPrefix( plugin.getPrefix() );
-                
+
                 mappedPlugin.setName( plugin.getName() );
-                
+
                 addPlugin( mappedPlugin );
 
                 changed = true;
@@ -142,30 +142,22 @@
                         changed = true;
                     }
 
-                    if ( snapshot.isLocalCopy() )
+                    // overwrite
+                    if ( s.getTimestamp() == null ? snapshot.getTimestamp() != null
+                        : !s.getTimestamp().equals( snapshot.getTimestamp() ) )
                     {
-                        s.setLocalCopy( true );
-                        s.setTimestamp( null );
-                        s.setBuildNumber( 0 );
+                        s.setTimestamp( snapshot.getTimestamp() );
                         changed = true;
                     }
-                    else
+                    if ( s.getBuildNumber() != snapshot.getBuildNumber() )
                     {
-                        if ( snapshot.getTimestamp() != null && !snapshot.getTimestamp().equals( s.getTimestamp() ) )
-                        {
-                            s.setTimestamp( snapshot.getTimestamp() );
-                            changed = true;
-                        }
-                        if ( snapshot.getBuildNumber() > 0 && s.getBuildNumber() != snapshot.getBuildNumber() )
-                        {
-                            s.setBuildNumber( snapshot.getBuildNumber() );
-                            changed = true;
-                        }
-                        if ( s.isLocalCopy() )
-                        {
-                            s.setLocalCopy( false );
-                            changed = true;
-                        }
+                        s.setBuildNumber( snapshot.getBuildNumber() );
+                        changed = true;
+                    }
+                    if ( s.isLocalCopy() != snapshot.isLocalCopy() )
+                    {
+                        s.setLocalCopy( snapshot.isLocalCopy() );
+                        changed = true;
                     }
                 }
             }

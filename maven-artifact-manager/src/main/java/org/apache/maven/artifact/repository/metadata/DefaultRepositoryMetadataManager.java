@@ -34,9 +34,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultRepositoryMetadataManager
@@ -100,6 +102,8 @@ public class DefaultRepositoryMetadataManager
         // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
         //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
 
+        Map previousMetadata = new HashMap();
+        ArtifactRepository selected = null;
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) i.next();
@@ -109,16 +113,68 @@ public class DefaultRepositoryMetadataManager
 
             if ( policy.isEnabled() )
             {
-                loadMetadata( metadata, repository, localRepository, true );
+                if ( loadMetadata( metadata, repository, localRepository, previousMetadata ) )
+                {
+                    metadata.setRepository( repository );
+                    selected = repository;
+                }
             }
         }
-        loadMetadata( metadata, localRepository, localRepository, false );
+        if ( loadMetadata( metadata, localRepository, localRepository, previousMetadata ) )
+        {
+            selected = localRepository;
+        }
+
+        // TODO: this could be a lot nicer... should really be in the snapshot transformation?
+        if ( metadata.isSnapshot() )
+        {
+            Metadata prevMetadata = metadata.getMetadata();
+
+            for ( Iterator i = previousMetadata.keySet().iterator(); i.hasNext(); )
+            {
+                ArtifactRepository repository = (ArtifactRepository) i.next();
+                Metadata m = (Metadata) previousMetadata.get( repository );
+                if ( repository.equals( selected ) )
+                {
+                    if ( m.getVersioning() == null )
+                    {
+                        m.setVersioning( new Versioning() );
+                    }
+
+                    if ( m.getVersioning().getSnapshot() == null )
+                    {
+                        m.getVersioning().setSnapshot( new Snapshot() );
+                    }
+
+                    if ( !m.getVersioning().getSnapshot().isLocalCopy() )
+                    {
+                        m.getVersioning().getSnapshot().setLocalCopy( true );
+                        metadata.setMetadata( m );
+                        metadata.storeInLocalRepository( localRepository, repository );
+                    }
+                }
+                else
+                {
+                    if ( m.getVersioning() != null && m.getVersioning().getSnapshot() != null &&
+                        m.getVersioning().getSnapshot().isLocalCopy() )
+                    {
+                        m.getVersioning().getSnapshot().setLocalCopy( false );
+                        metadata.setMetadata( m );
+                        metadata.storeInLocalRepository( localRepository, repository );
+                    }
+                }
+            }
+
+            metadata.setMetadata( prevMetadata );
+        }
     }
 
-    private void loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
-                               ArtifactRepository localRepository, boolean setRepository )
+    private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
+                                  ArtifactRepository localRepository, Map previousMetadata )
         throws ArtifactMetadataRetrievalException
     {
+        boolean setRepository = false;
+
         File metadataFile = new File( localRepository.getBasedir(),
                                       localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
@@ -126,25 +182,22 @@ public class DefaultRepositoryMetadataManager
         {
             Metadata metadata = readMetadata( metadataFile );
 
+            if ( repoMetadata.isSnapshot() && previousMetadata != null )
+            {
+                previousMetadata.put( remoteRepository, metadata );
+            }
+
             if ( repoMetadata.getMetadata() != null )
             {
-                if ( repoMetadata.getMetadata().merge( metadata ) )
-                {
-                    if ( setRepository )
-                    {
-                        repoMetadata.setRepository( remoteRepository );
-                    }
-                }
+                setRepository = repoMetadata.getMetadata().merge( metadata );
             }
             else
             {
                 repoMetadata.setMetadata( metadata );
-                if ( setRepository )
-                {
-                    repoMetadata.setRepository( remoteRepository );
-                }
+                setRepository = true;
             }
         }
+        return setRepository;
     }
 
     /**

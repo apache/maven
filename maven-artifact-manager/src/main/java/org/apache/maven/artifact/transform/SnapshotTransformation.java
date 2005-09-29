@@ -107,14 +107,14 @@ public class SnapshotTransformation
         Snapshot snapshot = versioning.getSnapshot();
         if ( snapshot != null )
         {
-            if ( snapshot.isLocalCopy() )
-            {
-                version = baseVersion;
-            }
-            else if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
+            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
                 version = StringUtils.replace( baseVersion, "SNAPSHOT", newVersion );
+            }
+            else
+            {
+                version = baseVersion;
             }
         }
         return version;
