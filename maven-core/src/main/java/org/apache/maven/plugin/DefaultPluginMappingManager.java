@@ -68,6 +68,10 @@ public class DefaultPluginMappingManager
         {
             pluginGroupIds.add( "org.apache.maven.plugins" );
         }
+        if ( !pluginGroupIds.contains( "org.codehaus.mojo" ) )
+        {
+            pluginGroupIds.add( "org.codehaus.mojo" );
+        }
 
         for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
         {
