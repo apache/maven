@@ -401,4 +401,31 @@ add the plugin to the project, <extensions>true</extensions>
 
 ==
 
+How snapshots works
+
+==
+
+How do i use the lifecycle provided by a plugin:
+
+make sure you turn on the extension option
+
+         <packaging>nbm</packaging>, <build><plugins><plugin><groupId/><artifactId/><extensions>true</extensions></plugin></plugins></build>
+
+==
+
+What expressions are available for use in the mojos?
+
+           <jason> maybe i can generate doco from @tags in the expression evaluator or something
+<jason> that's where it's localized right?
+<jdcasey> um, sort of
+<jdcasey> we have the roots there, but we're using the ReflectionValueExtractor from there
+<jdcasey> it can easily get pretty ugly
+<jason> i'll make a list of those
+<jdcasey> I'm thinking of making a mapping resource for expressions, for use in the error diagnoser...maybe we can reuse that?
+<jason> of the ones that are not referenced in the plugin expression evaluator where can i find them?
+<jason> sure
+<jason> a single place would be nice
+<jdcasey> they're (a) listed in the expression evaluator, (b) available as POM properties, (c) available as system properties, or (d) available reflectively from the api rooted in one of the four or five data objects
+<jdcasey> yup, I think we need that
+
 +-----+
