@@ -98,6 +98,22 @@ public class MavenEmbedderTest
     }
 
     // ----------------------------------------------------------------------
+    // Lifecycle phases
+    // ----------------------------------------------------------------------
+
+    public void testRetrievingLifecyclePhases()
+        throws Exception
+    {
+        List phases = maven.getLifecyclePhases();
+
+        assertEquals( "validate", (String) phases.get( 0 ) );
+
+        assertEquals( "initialize", (String) phases.get( 1 ) );
+
+        assertEquals( "generate-sources", (String) phases.get( 2 ) );
+    }
+
+    // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 

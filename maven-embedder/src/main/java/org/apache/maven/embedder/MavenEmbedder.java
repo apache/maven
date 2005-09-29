@@ -46,8 +46,10 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -126,8 +128,6 @@ public class MavenEmbedder
     private boolean updateSnapshots;
 
     private String globalChecksumPolicy;
-
-    private File mavenHome;
 
     // ----------------------------------------------------------------------
     // Accessors
@@ -226,16 +226,6 @@ public class MavenEmbedder
     public File getLocalRepositoryDirectory()
     {
         return localRepositoryDirectory;
-    }
-
-    public File getMavenHome()
-    {
-        return mavenHome;
-    }
-
-    public void setMavenHome( File mavenHome )
-    {
-        this.mavenHome = mavenHome;
     }
 
     // ----------------------------------------------------------------------
@@ -380,6 +370,36 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
+    // Lifecycle information
+    // ----------------------------------------------------------------------
+
+    public List getLifecyclePhases()
+        throws MavenEmbedderException
+    {
+        List phases = new ArrayList();
+
+        ComponentDescriptor descriptor = embedder.getContainer().getComponentDescriptor( LifecycleExecutor.ROLE );
+
+        PlexusConfiguration configuration = descriptor.getConfiguration();
+
+        PlexusConfiguration[] phasesConfigurations = configuration.getChild( "phases" ).getChildren( "phase" );
+
+        try
+        {
+            for ( int i = 0; i < phasesConfigurations.length; i++ )
+            {
+                phases.add( phasesConfigurations[i].getValue() );
+            }
+        }
+        catch ( PlexusConfigurationException e )
+        {
+             throw new MavenEmbedderException( "Cannot retrieve default lifecycle phasesConfigurations.", e );
+        }
+
+        return phases;
+    }
+
+    // ----------------------------------------------------------------------
     // Internal utility code
     // ----------------------------------------------------------------------
 
@@ -474,23 +494,6 @@ public class MavenEmbedder
         // Set the maven.home system property which is need by components like
         // the plugin registry builder.
         // ----------------------------------------------------------------------
-
-        // TODO: create a maven.home discovery method.
-
-        if ( mavenHome == null )
-        {
-            mavenHome = new File( userHome, "m2" );
-
-            if ( !mavenHome.exists() )
-            {
-                if ( !mavenHome.mkdirs() )
-                {
-                    throw new IllegalStateException( "A maven home directory does not exist and cannot be created." );
-                }
-            }
-
-            System.setProperty( "maven.home", mavenHome.getAbsolutePath() );
-        }
 
         if ( classLoader == null )
         {
