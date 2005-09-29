@@ -38,6 +38,14 @@ public class TestCompilerMojo
     extends AbstractCompilerMojo
 {
     /**
+     * Set this to 'true' to bypass unit tests entirely.
+     * Its use is NOT RECOMMENDED, but quite convenient on occasion.
+     *
+     * @parameter expression="${maven.test.skip}"
+     */
+    private boolean skip;
+
+    /**
      * The source directories containing the test-source to be compiled.
      *
      * @parameter expression="${project.testCompileSourceRoots}"
@@ -77,6 +85,20 @@ public class TestCompilerMojo
      * @parameter
      */
     private Set testExcludes = new HashSet();
+
+    public void execute()
+        throws MojoExecutionException
+    {
+        if ( skip )
+        {
+            getLog().info( "Not compiling test sources" );
+            return;
+        }
+        else
+        {
+            super.execute();
+        }
+    }
 
     protected List getCompileSourceRoots()
     {
