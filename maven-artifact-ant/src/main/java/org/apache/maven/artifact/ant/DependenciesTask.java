@@ -24,8 +24,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.TypeArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
@@ -62,6 +64,8 @@ public class DependenciesTask
     private String filesetId;
 
     private String useScope;
+
+    private String type;
 
     private boolean verbose;
 
@@ -145,7 +149,26 @@ public class DependenciesTask
             // TODO: managed dependencies
             Map managedDependencies = Collections.EMPTY_MAP;
 
-            ArtifactFilter filter = useScope != null ? new ScopeArtifactFilter( useScope ) : null;
+            ArtifactFilter filter = null;
+            if ( useScope != null )
+            {
+                filter = new ScopeArtifactFilter( useScope );
+            }
+            if ( type != null )
+            {
+                TypeArtifactFilter typeArtifactFilter = new TypeArtifactFilter( type );
+                if ( filter != null )
+                {
+                    AndArtifactFilter andFilter = new AndArtifactFilter();
+                    andFilter.add( filter );
+                    andFilter.add( typeArtifactFilter );
+                    filter = andFilter;
+                }
+                else
+                {
+                    filter = typeArtifactFilter;
+                }
+            }
 
             result = resolver.resolveTransitively( artifacts, pomArtifact, managedDependencies, localRepo,
                                                    remoteArtifactRepositories, metadataSource, filter, listeners );
@@ -181,12 +204,12 @@ public class DependenciesTask
             {
                 Artifact artifact = (Artifact) i.next();
                 String filename = localRepo.pathOf( artifact );
-    
+
                 FileList.FileName file = new FileList.FileName();
                 file.setName( filename );
-    
+
                 fileList.addConfiguredFile( file );
-    
+
                 fileSet.createInclude().setName( filename );
             }
         }
@@ -263,4 +286,11 @@ public class DependenciesTask
     {
         this.useScope = useScope;
     }
+
+    public void setType( String type )
+    {
+        this.type = type;
+    }
+
+
 }
