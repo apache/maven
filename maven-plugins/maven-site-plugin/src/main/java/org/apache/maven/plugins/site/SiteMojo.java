@@ -1,4 +1,4 @@
-package org.apache.maven.doxia;
+package org.apache.maven.plugins.site;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -61,10 +61,10 @@ import java.util.StringTokenizer;
  * @goal site
  * @requiresDependencyResolution test
  */
-public class DoxiaMojo
+public class SiteMojo
     extends AbstractMojo
 {
-    private static final String RESOURCE_DIR = "org/apache/maven/doxia";
+    private static final String RESOURCE_DIR = "org/apache/maven/plugins/site";
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
@@ -211,7 +211,7 @@ public class DoxiaMojo
     {
         if ( templateDirectory == null )
         {
-            siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );
+            siteRenderer.setTemplateClassLoader( SiteMojo.class.getClassLoader() );
         }
         else
         {
@@ -1052,7 +1052,7 @@ public class DoxiaMojo
      */
     private InputStream getStream( String name )
     {
-        return DoxiaMojo.class.getClassLoader().getResourceAsStream( name );
+        return SiteMojo.class.getClassLoader().getResourceAsStream( name );
     }
 
     /**

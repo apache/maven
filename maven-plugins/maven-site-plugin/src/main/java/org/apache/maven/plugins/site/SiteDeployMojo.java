@@ -1,4 +1,4 @@
-package org.apache.maven.doxia;
+package org.apache.maven.plugins.site;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -48,7 +48,7 @@ import java.util.zip.ZipOutputStream;
  * @version $Id$
  * @goal deploy
  */
-public class ScpSiteDeployMojo
+public class SiteDeployMojo
     extends AbstractMojo
 {
     /**
