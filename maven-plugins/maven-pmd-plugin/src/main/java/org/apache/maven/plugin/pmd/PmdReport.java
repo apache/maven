@@ -22,7 +22,9 @@ import net.sourceforge.pmd.Report;
 import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.RuleSet;
 import net.sourceforge.pmd.RuleSetFactory;
-
+import net.sourceforge.pmd.TargetJDK1_3;
+import net.sourceforge.pmd.TargetJDK1_4;
+import net.sourceforge.pmd.TargetJDK1_5;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -45,11 +47,10 @@ import java.util.ResourceBundle;
 /**
  * Implement the PMD report.
  *
- * @goal pmd
- *
- * @todo needs to support the multiple source roots
  * @author Brett Porter
  * @version $Id: PmdReport.java,v 1.3 2005/02/23 00:08:53 brett Exp $
+ * @goal pmd
+ * @todo needs to support the multiple source roots
  */
 public class PmdReport
     extends AbstractMavenReport
@@ -73,6 +74,11 @@ public class PmdReport
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * @parameter expression="${targetJdk}
+     */
+    private String targetJdk;
 
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
@@ -122,7 +128,7 @@ public class PmdReport
     {
         Sink sink = getSink();
 
-        PMD pmd = new PMD();
+        PMD pmd = getPMD();
         RuleContext ruleContext = new RuleContext();
         Report report = new Report();
         // TODO: use source roots instead
@@ -194,6 +200,34 @@ public class PmdReport
     }
 
     /**
+     * Constructs the PMD class, passing it an argument
+     * that configures the target JDK.
+     *
+     * @return the resulting PMD
+     */
+    public PMD getPMD()
+    {
+        PMD pmd;
+        if ( "1.5".equals( targetJdk ) )
+        {
+            pmd = new PMD( new TargetJDK1_5() );
+        }
+        else if ( "1.4".equals( targetJdk ) )
+        {
+            pmd = new PMD( new TargetJDK1_4() );
+        }
+        else if ( "1.3".equals( targetJdk ) )
+        {
+            pmd = new PMD( new TargetJDK1_3() );
+        }
+        else
+        {
+            pmd = new PMD();
+        }
+        return pmd;
+    }
+
+    /**
      * @see org.apache.maven.reporting.MavenReport#getOutputName()
      */
     public String getOutputName()
@@ -229,6 +263,6 @@ public class PmdReport
 
     private static ResourceBundle getBundle( Locale locale )
     {
-        return ResourceBundle.getBundle("pmd-report", locale, PmdReport.class.getClassLoader() );
+        return ResourceBundle.getBundle( "pmd-report", locale, PmdReport.class.getClassLoader() );
     }
 }
