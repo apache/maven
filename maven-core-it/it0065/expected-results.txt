@@ -1,2 +1,2 @@
 subproject/target/child-basedir
-target/parent-basedir
+parent-basedir

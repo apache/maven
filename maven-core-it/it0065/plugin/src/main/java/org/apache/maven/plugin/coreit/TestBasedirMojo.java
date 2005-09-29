@@ -39,7 +39,7 @@ public class TestBasedirMojo
     private String childBasedir;
 
     /**
-     * @parameter expression="${project.parent.basedir}/target/parent-basedir"
+     * @parameter expression="${project.parent.basedir}/parent-basedir"
      * @required
      */
     private String parentBasedir;
