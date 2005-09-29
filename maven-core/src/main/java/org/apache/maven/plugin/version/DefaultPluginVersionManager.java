@@ -582,6 +582,7 @@ public class DefaultPluginVersionManager
 
             try
             {
+                pluginRegistryFile.getParentFile().mkdirs();
                 fWriter = new FileWriter( pluginRegistryFile );
 
                 PluginRegistryXpp3Writer writer = new PluginRegistryXpp3Writer();
