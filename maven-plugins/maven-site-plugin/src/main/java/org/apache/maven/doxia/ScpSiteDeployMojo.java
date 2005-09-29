@@ -37,11 +37,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Deploys website using scp protocol.
- * First website files are packaged into zip archive,
+ * Deploys website using scp/file protocol.
+ * For scp protocol, website files are packaged into zip archive,
  * then archive is transfred to remote host, nextly it is un-archived.
  * This method of deployment should normally be much faster
- * then making file by file copy.
+ * then making file by file copy.  For file protocol, the files are copied
+ * directly to the destination directory.
  *
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
  * @version $Id$
@@ -120,12 +121,51 @@ public class ScpSiteDeployMojo
 
         Repository repository = new Repository( id, url );
 
-        if ( !"scp".equals( repository.getProtocol() ) )
+        String siteProtocol = repository.getProtocol();
+
+        if ( "scp".equals( siteProtocol ) )
+        {
+            scpDeploy( zipFile, id, repository );
+        }
+        else if ( "file".equals( siteProtocol ) )
+        {
+            File toDir = new File( repository.getBasedir() );
+            fileDeploy( toDir );
+        }
+        else
         {
             throw new MojoExecutionException(
-                "The deploy mojo currently only supports site deployment using the 'scp' protocol." );
+                "The deploy mojo currently only supports site deployment using the 'scp' and 'file' protocols." );
         }
+    }
 
+
+    /**
+     * @throws MojoExecutionException
+     */
+    private void fileDeploy( File toDir )
+        throws MojoExecutionException
+    {
+        try
+        {
+            FileUtils.copyDirectoryStructure( inputDirectory, toDir );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error transfering site!", e );
+        }
+    }
+
+
+    /**
+     * @param zipFile
+     * @param id
+     * @param repository
+     * @throws MojoExecutionException
+     */
+    private void scpDeploy( File zipFile, String id, Repository repository )
+        throws MojoExecutionException
+    {
         SshCommandExecutor commandExecutor = null;
 
         try
