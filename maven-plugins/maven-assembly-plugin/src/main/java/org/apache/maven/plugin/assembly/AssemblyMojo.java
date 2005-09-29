@@ -142,13 +142,11 @@ public class AssemblyMojo
 
     /**
      * Create the binary distribution.
-     *
-     * @throws ArchiverException, IOException, MojoExecutionException, XmlPullParserException
      */
     private void doExecute()
         throws ArchiverException, IOException, MojoExecutionException, XmlPullParserException
     {
-        Reader r = null;
+        Reader r;
 
         if ( descriptor != null )
         {
@@ -189,8 +187,8 @@ public class AssemblyMojo
                 // TODO: use component roles? Can we do that in a mojo?
                 Archiver archiver = createArchiver( format );
 
-                processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
                 processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
+                processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
 
                 File destFile = new File( outputDirectory, filename );
                 archiver.setDestFile( destFile );
@@ -211,7 +209,6 @@ public class AssemblyMojo
      * @param archiver
      * @param dependencySets
      * @param includeBaseDirectory
-     * @throws ArchiverException, IOException, MojoExecutionException
      */
     private void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
         throws ArchiverException, IOException, MojoExecutionException
@@ -273,7 +270,7 @@ public class AssemblyMojo
                             unpack( artifact.getFile(), tempLocation );
                         }
                         archiver.addDirectory( tempLocation, null,
-                                               (String[]) getJarExcludes().toArray( EMPTY_STRING_ARRAY ) );
+                                               (String[]) getDefaultExcludes().toArray( EMPTY_STRING_ARRAY ) );
                     }
                     else
                     {
@@ -376,7 +373,8 @@ public class AssemblyMojo
         Pattern pat = Pattern.compile( "^(.*)\\$\\{([^\\}]+)\\}(.*)$" );
         Matcher mat = pat.matcher( expression );
 
-        String left, right;
+        String left;
+        String right;
         Object middle;
 
         if ( mat.matches() )
@@ -396,7 +394,7 @@ public class AssemblyMojo
             {
                 // TODO: There should be a more generic way dealing with that. Having magic words is not good at all.
                 // probe for magic word
-                if ( mat.group( 2 ).trim().equals( "extension" ) )
+                if ( "extension".equals( mat.group( 2 ).trim() ) )
                 {
                     ArtifactHandler artifactHandler = artifact.getArtifactHandler();
                     middle = artifactHandler.getExtension();
@@ -411,18 +409,6 @@ public class AssemblyMojo
         }
 
         return expression;
-    }
-
-    /**
-     * Get the files to be excluded and put it into list.
-     *
-     * @return l List of filename patterns to be excluded.
-     */
-    private static List getJarExcludes()
-    {
-        List l = new ArrayList( getDefaultExcludes() );
-        l.add( "META-INF/**" );
-        return l;
     }
 
     /**
@@ -486,11 +472,11 @@ public class AssemblyMojo
                 TarArchiver.TarCompressionMethod tarCompressionMethod = new TarArchiver.TarCompressionMethod();
                 // TODO: this should accept gz and bz2 as well so we can skip over the switch
                 String compression = format.substring( index + 1 );
-                if ( compression.equals( "gz" ) )
+                if ( "gz".equals( compression ) )
                 {
                     tarCompressionMethod.setValue( "gzip" );
                 }
-                else if ( compression.equals( "bz2" ) )
+                else if ( "bz2".equals( compression ) )
                 {
                     tarCompressionMethod.setValue( "bzip2" );
                 }
@@ -619,15 +605,15 @@ public class AssemblyMojo
     {
         if ( lineEnding != null )
         {
-            if ( lineEnding.equals( "keep" ) )
+            if ( "keep".equals( lineEnding ) )
             {
                 lineEnding = null;
             }
-            else if ( lineEnding.equals( "dos" ) || lineEnding.equals( "crlf" ) )
+            else if ( "dos".equals( lineEnding ) || "crlf".equals( lineEnding ) )
             {
                 lineEnding = "\r\n";
             }
-            else if ( lineEnding.equals( "unix" ) || lineEnding.equals( "lf" ) )
+            else if ( "unix".equals( lineEnding ) || "lf".equals( lineEnding ) )
             {
                 lineEnding = "\n";
             }
