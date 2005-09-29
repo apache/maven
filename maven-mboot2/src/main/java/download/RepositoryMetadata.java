@@ -56,6 +56,8 @@ public class RepositoryMetadata
 
     private boolean localCopy;
 
+    private String lastUpdated;
+
     public String getSnapshotTimestamp()
     {
         return snapshotTimestamp;
@@ -167,11 +169,21 @@ public class RepositoryMetadata
 
     public String constructVersion( String baseVersion )
     {
-        if ( snapshotTimestamp != null && !localCopy )
+        if ( snapshotTimestamp != null )
         {
             baseVersion = StringUtils.replace( baseVersion, "SNAPSHOT", snapshotTimestamp + "-" + snapshotBuildNumber );
         }
         return baseVersion;
+    }
+
+    public void setLastUpdated( String lastUpdated )
+    {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getLastUpdated()
+    {
+        return lastUpdated;
     }
 
     static class Reader
@@ -279,6 +291,10 @@ public class RepositoryMetadata
                 {
                     metadata.setReleaseVersion( getBodyText() );
                 }
+                else if ( "lastUpdated".equals( rawName ) )
+                {
+                    metadata.setLastUpdated( getBodyText() );
+                }
             }
             else if ( "groupId".equals( rawName ) )
             {
@@ -320,6 +336,7 @@ public class RepositoryMetadata
                 w.println( "  <versioning>" );
                 writeLine( w, "    ", "latest", metadata.getLatestVersion() );
                 writeLine( w, "    ", "release", metadata.getReleaseVersion() );
+                writeLine( w, "    ", "lastUpdated", String.valueOf( metadata.getLastUpdated() ) );
                 w.println( "    <snapshot>" );
                 writeLine( w, "      ", "localCopy", String.valueOf( metadata.isLocalCopy() ) );
                 writeLine( w, "      ", "buildNumber", String.valueOf( metadata.getSnapshotBuildNumber() ) );

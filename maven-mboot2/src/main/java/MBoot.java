@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 public class MBoot
@@ -822,6 +825,7 @@ public class MBoot
 
         metadata = new RepositoryMetadata();
         metadata.setLocalCopy( true );
+        metadata.setLastUpdated( getCurrentUtcDate() );
         file = localRepository.getMetadataFile( groupId, artifactId, version, type, "maven-metadata-local.xml" );
         metadata.write( file );
     }
@@ -1001,6 +1005,13 @@ public class MBoot
 
             FileUtils.copyFile( source, dest );
         }
+    }
+
+    public String getCurrentUtcDate()
+    {
+        TimeZone timezone = TimeZone.getTimeZone( "UTC" );
+        DateFormat fmt = new SimpleDateFormat( "yyyyMMddHHmmss" );
+        return fmt.format( new Date() );
     }
 
     class SettingsReader

@@ -172,7 +172,10 @@ public class ArtifactDownloader
 
                         RepositoryMetadata metadata = RepositoryMetadata.read( file );
 
-                        version = metadata.constructVersion( version );
+                        if ( !file.equals( localFile ) )
+                        {
+                            version = metadata.constructVersion( version );
+                        }
                         log( "Resolved version: " + version );
                         dep.setResolvedVersion( version );
                         if ( !version.endsWith( "SNAPSHOT" ) )
