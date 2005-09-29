@@ -294,15 +294,21 @@ public class SiteMojo
 
                 // Try to find duplicate files
                 Map duplicate = new LinkedHashMap();
+                String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
+
                 if ( siteDirectoryFile.exists() )
                 {
-                    tryToFindDuplicates( siteDirectoryFile, duplicate );
+                    // TODO: avoid this hardcoding - the resources dir might be elsewhere. We should really test for duplicate targets, not guess at what source files will be html.
+                    // add the site's 'resources' directory to the default exclude list
+                    String actualExcludes = defaultExcludes + "," + "resources/**";
+
+                    tryToFindDuplicates( siteDirectoryFile, actualExcludes, duplicate );
                 }
 
                 // Handle the GeneratedSite Directory
                 if ( generatedSiteDirectory.exists() )
                 {
-                    tryToFindDuplicates( generatedSiteDirectory, duplicate );
+                    tryToFindDuplicates( generatedSiteDirectory, defaultExcludes, duplicate );
                 }
 
                 // Exception if a file is duplicate
@@ -1109,13 +1115,13 @@ public class SiteMojo
      * <p>The scan is case sensitive.</p>
      *
      * @param directory the directory to scan
+     * @param defaultExcludes files patterns to be exclude from the search
      * @param duplicate the map to update
      * @throws IOException if any
      */
-    private static void tryToFindDuplicates( File directory, Map duplicate )
+    private static void tryToFindDuplicates( File directory, String defaultExcludes, Map duplicate )
         throws IOException
     {
-        String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
         List siteFiles = FileUtils.getFileNames( directory, null, defaultExcludes, false );
         for ( Iterator it = siteFiles.iterator(); it.hasNext(); )
         {
