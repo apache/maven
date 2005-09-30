@@ -64,3 +64,6 @@ plugin registry and settings should be stored in the tool specific locations
 
 <eu> -- properties param on execute() method
 <eu> -- transfet listener and loggers, system out cleanup
+
+<eu> one more thing I need in embedder - writeModel() method
+

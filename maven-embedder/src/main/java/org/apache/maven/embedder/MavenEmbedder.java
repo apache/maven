@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.project.MavenProject;
@@ -61,6 +62,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -94,6 +96,8 @@ public class MavenEmbedder
     private LifecycleExecutor lifecycleExecutor;
 
     private MavenXpp3Reader modelReader;
+
+    private MavenXpp3Writer modelWriter;
 
     private ProfileManager profileManager;
 
@@ -240,6 +244,12 @@ public class MavenEmbedder
         throws XmlPullParserException, FileNotFoundException, IOException
     {
         return modelReader.read( new FileReader( model ) );
+    }
+
+    public void writeModel( Writer writer, Model model )
+        throws IOException
+    {
+        modelWriter.write( writer, model );
     }
 
     // ----------------------------------------------------------------------
@@ -516,6 +526,8 @@ public class MavenEmbedder
             // ----------------------------------------------------------------------
 
             modelReader = new MavenXpp3Reader();
+
+            modelWriter = new MavenXpp3Writer();
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
