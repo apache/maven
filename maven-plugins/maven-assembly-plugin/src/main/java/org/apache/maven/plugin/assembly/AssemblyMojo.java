@@ -66,6 +66,7 @@ import java.util.regex.Pattern;
  * @requiresDependencyResolution test
  * @requiresDirectInvocation
  * @execute phase="package"
+ * @aggregator 
  */
 public class AssemblyMojo
     extends AbstractUnpackingMojo
