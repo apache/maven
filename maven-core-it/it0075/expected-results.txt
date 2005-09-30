@@ -1,2 +1,2 @@
-sub1/.classpath
-sub2/.classpath
+!sub1/target/maven-core-it0075-sub1-1.0.jar
+!sub2/target/maven-core-it0075-sub2-1.0.jar

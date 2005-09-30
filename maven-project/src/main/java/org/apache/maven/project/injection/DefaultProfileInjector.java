@@ -298,22 +298,26 @@ public class DefaultProfileInjector
         modelContainer.setConfiguration( configuration );
     }
 
+    /**
+     * Append modules specified in the profile to the end of the list supplied by the model, if 
+     * they don't already exist.
+     */
     private void injectModules( Profile profile, Model model )
     {
         List modules = new ArrayList();
 
-        List profileModules = profile.getModules();
-
-        if ( profileModules != null && !profileModules.isEmpty() )
-        {
-            modules.addAll( profileModules );
-        }
-
         List modelModules = model.getModules();
 
-        if ( modelModules != null )
+        if ( modelModules != null && !modelModules.isEmpty() )
         {
-            for ( Iterator it = modelModules.iterator(); it.hasNext(); )
+            modules.addAll( modelModules );
+        }
+
+        List profileModules = profile.getModules();
+
+        if ( profileModules != null )
+        {
+            for ( Iterator it = profileModules.iterator(); it.hasNext(); )
             {
                 String module = (String) it.next();
 

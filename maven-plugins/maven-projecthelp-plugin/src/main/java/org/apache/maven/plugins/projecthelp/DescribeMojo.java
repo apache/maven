@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 /**
  * @goal describe
+ * @aggregator
  */
 public class DescribeMojo
     extends AbstractMojo
