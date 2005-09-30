@@ -49,6 +49,18 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>test-jar</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <classifier>test</classifier>
+        <extension>jar</extension>
+        <type>test-jar</type>
+        <packaging>jar</packaging>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>maven-plugin</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
