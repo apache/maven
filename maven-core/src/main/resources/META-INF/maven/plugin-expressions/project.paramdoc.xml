@@ -1,0 +1,139 @@
+<expressions>
+  <expression>
+    <syntax>project.distributionManagementArtifactRepository</syntax>
+    <origin><![CDATA[
+<distributionManagement>
+  <!-- use the following if you're not using a snapshot version. -->
+  <repository>
+    <id>repo</id>
+    <name>Repository Name</name>
+    <url>scp://host/path/to/repo</url>
+  </repository>
+  <!-- use the following if you ARE using a snapshot version. -->
+  <snapshotRepository>
+    <id>repo</id>
+    <name>Repository Name</name>
+    <url>scp://host/path/to/repo</url>
+  </snapshotRepository>
+</distributionManagement>
+    ]]></origin>
+    <usage>
+      This is the ArtifactRepository used to deploy artifacts built by this Maven.
+    </usage>
+  </expression>
+  <expression>
+    <syntax>project.artifact</syntax>
+    <origin><![CDATA[
+<groupId>project.group</groupId>
+<artifactId>project-artifact</artifactId>
+<version>0.0.0.0</version>
+<packaging>type</packaging>
+    ]]></origin>
+    <usage>
+      This is the Artifact instance created from the essential project attributes: 
+      groupId, artifactId, version, and packaging (with a default packaging of 'jar').
+    </usage>
+  </expression>
+  <expression>
+    <syntax>project.parent</syntax>
+    <origin><![CDATA[
+<parent>
+  <groupId>project.group</groupId>
+  <artifactId>project-artifact</artifactId>
+  <version>0.0.0.0</version>
+</parent>
+    ]]></origin>
+    <usage>
+      This is the MavenProject instance for the parent of the current POM.
+    </usage>
+  </expression>
+  <expression>
+    <syntax>project.file</syntax>
+    <usage>
+      This is the File instance that refers to the location of the current POM on disk.
+    </usage>
+  </expression>
+  <expression>
+    <syntax>project.artifacts</syntax>
+    <origin><![CDATA[
+<dependencies>
+  ...
+</dependencies>
+    ]]></origin>
+    <usage><![CDATA[
+      This is a set of Artifact instances resolved from the set of dependencies for
+      the current project.
+      
+      NOTE: This will likely contain much more than the direct dependencies of the 
+      current POM, since Maven uses transitive, or chained, dependency resolution.
+    ]]></usage>
+  </expression>
+  <expression>
+    <syntax>project.parentArtifact</syntax>
+    <origin><![CDATA[
+    <parent>
+      <groupId>project.group</groupId>
+      <artifactId>project-artifact</artifactId>
+      <version>0.0.0.0</version>
+    </parent>
+    ]]></origin>
+    <usage>
+      This is the Artifact instance for the parent of the current POM.
+    </usage>
+  </expression>
+  <expression>
+    <syntax>project.pluginArtifacts</syntax>
+    <origin><![CDATA[
+<build>
+  <plugins>
+    ...
+  </plugins>
+</build>
+    ]]></origin>
+    <usage><![CDATA[
+      This is the list of Artifact instances for plugins used in the current build
+      for this project.
+      
+      NOTE: This list may contain plugin Artifacts which are implied by the current POM's
+      packaging and the lifecycle phase being built.
+    ]]></usage>
+  </expression>
+  <expression>
+    <syntax>project.remoteArtifactRepositories</syntax>
+    <origin><![CDATA[
+<repositories>
+  ...
+</repositories>
+    ]]></origin>
+    <usage><![CDATA[
+      This is a list of ArtifactRepository instances used to resolve the Artifacts associated
+      with the current POM.
+      
+      NOTE: This list will contain entries for repositories specified by ancestor POMs, including
+      the default built-in super-POM, which is the parent of all POMs.
+    ]]></usage>
+  </expression>
+  <expression>
+    <syntax>project.pluginArtifactRepositories</syntax>
+    <origin><![CDATA[
+<pluginRepositories>
+  ...
+</pluginRepositories>
+    ]]></origin>
+    <usage><![CDATA[
+      This is a list of ArtifactRepository instances used to resolve the Artifacts associated
+      with plugins used in building the current POM.
+      
+      NOTE: This list will contain entries for repositories specified by ancestor POMs, including
+      the default built-in super-POM, which is the parent of all POMs.
+    ]]></usage>
+  </expression>
+  <expression>
+    <syntax>project.attachedArtifacts</syntax>
+    <usage><![CDATA[
+      This is a list of attachments to the main artifact produced by building the current POM.
+      Attachments are derived works, based on the main build process, such as an ejb-client jar,
+      project sources jar, etc.
+    ]]></usage>
+  </expression>
+</expressions>

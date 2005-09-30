@@ -16,12 +16,14 @@ package org.apache.maven.usability;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.TransitiveArtifactResolutionException;
 
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
 {
+    
+    private WagonManager wagonManager;
 
     public boolean canDiagnose( Throwable error )
     {
@@ -35,25 +37,22 @@ public class ArtifactResolverDiagnoser
         StringBuffer message = new StringBuffer();
         
         message.append( "Failed to resolve artifact." );
-        message.append( "\n");
-        message.append( "\nGroupId: " ).append( exception.getGroupId() );
-        message.append( "\nArtifactId: " ).append( exception.getArtifactId() );
-        message.append( "\nVersion: " ).append( exception.getVersion() );
-        message.append( "\nType: " ).append( exception.getType() );
+        message.append( "\n\n");
+        message.append( exception.getMessage() );
         
-        if ( exception instanceof TransitiveArtifactResolutionException )
+        if ( !wagonManager.isOnline() )
         {
-            message.append( exception.getArtifactPath() );
+            message.append( "\n" ).append( DiagnosisUtils.getOfflineWarning() );
         }
-        
-        message.append( DiagnosisUtils.getOfflineWarning() );
 
         Throwable root = DiagnosisUtils.getRootCause( exception );
         
         if ( root != null )
         {
-            message.append( "\n\nRoot Cause: " ).append( root.getMessage() ).append( "\n" );
+            message.append( "\nRoot Cause: " ).append( root.getMessage() );
         }
+        
+        message.append( "\n" );
         
         return message.toString();
     }

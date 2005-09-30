@@ -43,6 +43,7 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.apache.maven.usability.DiagnosisUtils;
 import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -104,7 +105,7 @@ public class DefaultMaven
     {
         if ( request.getSettings().isOffline() )
         {
-            getLogger().info( "\n\nNOTE: Maven is running in offline mode.\n\n" );
+            getLogger().info( DiagnosisUtils.getOfflineWarning() );
 
             WagonManager wagonManager = null;
 
@@ -560,6 +561,10 @@ public class DefaultMaven
         diagnoseError( error );
 
         line();
+
+        getLogger().error( "FATAL ERROR" );
+
+        line();
     }
 
     protected void logError( MavenExecutionResponse r )
@@ -571,6 +576,10 @@ public class DefaultMaven
         line();
 
         diagnoseError( r.getException() );
+
+        line();
+
+        getLogger().error( "BUILD ERROR" );
 
         line();
 
@@ -591,6 +600,9 @@ public class DefaultMaven
                 if ( diagnoser.canDiagnose( error ) )
                 {
                     message = diagnoser.diagnose( error );
+                    
+                    // first one wins.
+                    break;
                 }
             }
         }
@@ -632,6 +644,9 @@ public class DefaultMaven
                 if ( diagnoser.canDiagnose( error ) )
                 {
                     message = diagnoser.diagnose( error );
+                    
+                    // first one wins.
+                    break;
                 }
             }
         }
@@ -659,6 +674,10 @@ public class DefaultMaven
 
             line();
         }
+
+        getLogger().info( "BUILD FAILURE" );
+
+        line();
 
         stats( r.getStart(), r.getFinish() );
 

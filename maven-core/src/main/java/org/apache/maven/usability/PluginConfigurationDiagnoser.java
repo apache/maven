@@ -20,12 +20,18 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.usability.plugin.ExpressionDocumenter;
+import org.apache.maven.usability.plugin.ExpressionDocumentationException;
+import org.apache.maven.usability.plugin.ExpressionDocumentation;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -43,6 +49,9 @@ public class PluginConfigurationDiagnoser
 
         exprs.add( "localRepository" );
         exprs.add( "settings" );
+        exprs.add( "project" );
+        exprs.add( "session" );
+        exprs.add( "plugin" );
         exprs.add( "basedir" );
 
         UNMODIFIABLE_EXPRESSIONS = exprs;
@@ -50,25 +59,27 @@ public class PluginConfigurationDiagnoser
 
     public boolean canDiagnose( Throwable error )
     {
-        return error instanceof PluginConfigurationException;
+        return DiagnosisUtils.containsInCausality(error, PluginConfigurationException.class );
     }
 
     public String diagnose( Throwable error )
     {
-        if ( error instanceof PluginParameterException )
+        PluginConfigurationException pce = (PluginConfigurationException) DiagnosisUtils.getFromCausality(error, PluginConfigurationException.class );
+        
+        if ( pce instanceof PluginParameterException )
         {
-            PluginParameterException exception = (PluginParameterException) error;
+            PluginParameterException exception = (PluginParameterException) pce;
 
             return buildParameterDiagnosticMessage( exception );
         }
-        else if( DiagnosisUtils.containsInCausality(error, ComponentConfigurationException.class ) )
+        else if( DiagnosisUtils.containsInCausality(pce, ComponentConfigurationException.class ) )
         {
-            ComponentConfigurationException cce = (ComponentConfigurationException) DiagnosisUtils.getFromCausality( error, ComponentConfigurationException.class );
+            ComponentConfigurationException cce = (ComponentConfigurationException) DiagnosisUtils.getFromCausality( pce, ComponentConfigurationException.class );
             return buildInvalidPluginConfigurationDiagnosisMessage( cce );
         }
         else
         {
-            return error.getMessage();
+            return pce.getMessage();
         }
     }
 
@@ -101,7 +112,7 @@ public class PluginConfigurationDiagnoser
             messageBuffer.append( "\n[" ).append( idx++ ).append( "] " );
 
             decomposeParameterIntoUserInstructions( mojo, param, messageBuffer );
-
+            
             messageBuffer.append( "\n" );
         }
 
@@ -115,16 +126,13 @@ public class PluginConfigurationDiagnoser
 
         if ( param.isEditable() )
         {
-            messageBuffer.append( "specify configuration for <" + param.getName() + ">VALUE</" + param.getName() + ">" );
+            messageBuffer.append( "inside the definition for plugin: \'" + mojo.getPluginDescriptor().getArtifactId() + "\'specify the following:\n\n<configuration>\n  ...\n  <" + param.getName() + ">VALUE</" + param.getName() + ">\n</configuration>" );
 
             String alias = param.getAlias();
             if ( StringUtils.isNotEmpty( alias ) )
             {
-                messageBuffer.append( " (aliased as: <" + alias + ">VALUE</" + alias + ">)" );
+                messageBuffer.append( "\n\n-OR-\n\n<configuration>\n  ...\n  <" + alias + ">VALUE</" + alias + ">\n</configuration>\n" );
             }
-
-            messageBuffer.append( "\n    inside the <configuration/> section for " +
-                                  mojo.getPluginDescriptor().getArtifactId() );
         }
 
         if ( StringUtils.isEmpty( expression ) )
@@ -137,7 +145,7 @@ public class PluginConfigurationDiagnoser
 
             if ( param.isEditable() )
             {
-                expressionMessageBuffer.append( ", or\n    " );
+                expressionMessageBuffer.append( "\n\n-OR-\n\n" );
             }
 
             Matcher exprMatcher = Pattern.compile( "\\$\\{(.+)\\}" ).matcher( expression );
@@ -159,14 +167,9 @@ public class PluginConfigurationDiagnoser
 
                 String firstPart = expressionParts.nextToken();
 
-                if ( "project".equals( firstPart ) && expressionParts.hasMoreTokens() )
+                if ( expressionParts.hasMoreTokens() && ( "project".equals( firstPart ) || "settings".equals( firstPart ) ) )
                 {
-                    appendProjectSection( expressionParts, expressionMessageBuffer );
-                }
-                else if ( "reports".equals( firstPart ) )
-                {
-                    expressionMessageBuffer.append(
-                        "make sure the <reports/> section of the pom.xml contains valid report names\n" );
+                    addParameterConfigDocumentation( firstPart, exprMatcher.group( 0 ), subExpression, expressionMessageBuffer );
                 }
                 else if ( UNMODIFIABLE_EXPRESSIONS.contains( subExpression ) )
                 {
@@ -174,8 +177,7 @@ public class PluginConfigurationDiagnoser
                 }
                 else
                 {
-                    expressionMessageBuffer.append( "Please provide the system property: " ).append( subExpression ).append(
-                        "\n    (specified as \'-D" + subExpression + "=VALUE\' on the command line)\n" );
+                    expressionMessageBuffer.append( "on the command line, specify: \'-D" ).append( subExpression ).append("=VALUE\'" );
                 }
             }
 
@@ -204,52 +206,61 @@ public class PluginConfigurationDiagnoser
         }
     }
 
-    private void appendProjectSection( StringTokenizer expressionParts, StringBuffer messageBuffer )
+    private void addParameterConfigDocumentation( String firstPart, String wholeExpression, String subExpression, StringBuffer expressionMessageBuffer )
     {
-        messageBuffer.append( "check that the following section of the pom.xml is present and correct:\n\n" );
-
-        Stack nestedParts = new Stack();
-
-        String indentation = "      ";
-
-        messageBuffer.append( indentation ).append( "<project>\n" );
-
-        nestedParts.push( "project" );
-
-        indentation += "  ";
-
-        while ( expressionParts.hasMoreTokens() )
+        try
         {
-            String nextPart = expressionParts.nextToken();
+            Map expressionDoco = ExpressionDocumenter.load();
 
-            messageBuffer.append( indentation ).append( "<" ).append( nextPart );
+            ExpressionDocumentation info = (ExpressionDocumentation) expressionDoco.get( subExpression );
 
-            if ( expressionParts.hasMoreTokens() )
+            if ( info != null )
             {
-                messageBuffer.append( ">\n" );
+                expressionMessageBuffer.append( "check that the following section of " );
+                if ( "project".equals( firstPart ) )
+                {
+                    expressionMessageBuffer.append( "the pom.xml " );
+                }
+                else if ( "settings".equals( firstPart ) )
+                {
+                    expressionMessageBuffer.append( "your ~/.m2/settings.xml file " );
+                }
 
-                indentation += "  ";
-
-                nestedParts.push( nextPart );
+                expressionMessageBuffer.append( "is present and correct:\n\n" );
+                
+                String message = info.getOrigin();
+                
+                if ( message == null )
+                {
+                    message = info.getUsage();
+                }
+                
+                expressionMessageBuffer.append( message );
+                
+                String addendum = info.getAddendum();
+                
+                if ( addendum != null )
+                {
+                    expressionMessageBuffer.append("\n\n").append( addendum );
+                }
             }
             else
             {
-                messageBuffer.append( "/>\n" );
-
-                indentation = indentation.substring( 2 );
+                expressionMessageBuffer.append( "ensure that the expression: \'"
+                    + wholeExpression + "\' is satisfied" );
             }
+
         }
-
-        if ( !nestedParts.isEmpty() )
+        catch ( ExpressionDocumentationException e )
         {
-            while ( nestedParts.size() > 0 )
-            {
-                String prevPart = (String) nestedParts.pop();
+            expressionMessageBuffer.append( "\n\nERROR!! Failed to load expression documentation!" );
 
-                messageBuffer.append( indentation ).append( "</" ).append( prevPart ).append( ">\n" );
+            StringWriter sWriter = new StringWriter();
+            PrintWriter pWriter = new PrintWriter( sWriter );
 
-                indentation = indentation.substring( 2 );
-            }
+            e.printStackTrace( pWriter );
+
+            expressionMessageBuffer.append( "\n\nException:\n\n" ).append( sWriter.toString() );
         }
     }
 

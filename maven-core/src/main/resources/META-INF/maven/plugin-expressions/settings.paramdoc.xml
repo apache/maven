@@ -1,0 +1,27 @@
+<expressions>
+  <expression>
+    <syntax>settings.offline</syntax>
+    <origin><![CDATA[
+    <offline>true</offline>
+    ]]></origin>
+    <usage>
+      Flags the system as offline, to prevent accessing the network to resolve artifacts or execute plugins.
+    </usage>
+    <addendum><![CDATA[
+    NOTE: It's also possible to switch to offline mode on a per-build basis, using the '-o' command-line option.
+    ]]></addendum>
+  </expression>
+  <expression>
+    <syntax>settings.interactiveMode</syntax>
+    <origin><![CDATA[
+    <interactiveMode>true</interactiveMode>
+    ]]></origin>
+    <usage>
+      If false, flags the system to skip prompting the user for any information, or holding up the build
+      waiting for any input.
+    </usage>
+    <addendum><![CDATA[
+    NOTE: It's also possible to switch to batch (ie. non-interactive) mode using the '-B' command-line option.
+    ]]></addendum>
+  </expression>
+</expressions>

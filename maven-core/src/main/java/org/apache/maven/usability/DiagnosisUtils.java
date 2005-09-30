@@ -25,8 +25,8 @@ public final class DiagnosisUtils
     
     public static String getOfflineWarning()
     {
-        return "\nNOTE: If Maven is executing in offline mode, some artifacts may be missing from your" +
-                "\nlocal repository.\n";
+        return "\nNOTE: Maven is executing in offline mode. Any artifacts not already in your local\n" +
+                "repository will be inaccessible.\n";
     }
     
     public static boolean containsInCausality( Throwable error, Class test )

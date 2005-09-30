@@ -33,7 +33,7 @@ import java.util.List;
 public class PluginErrorDiagnoserTest
     extends TestCase
 {
-    
+
     private PluginConfigurationDiagnoser diagnoser = new PluginConfigurationDiagnoser();
 
     private PluginParameterException buildException( String prefix, String goal, List params )
@@ -54,16 +54,17 @@ public class PluginErrorDiagnoserTest
 
         return new PluginParameterException( mojoDescriptor, params );
     }
-    
+
     public void testShouldDiagnoseInvalidPluginConfiguration()
     {
         printMethodHeader();
 
-        ComponentConfigurationException cce = new ComponentConfigurationException( "Class \'org.apache.maven.plugin.jar.JarMojo\' does not contain a field named \'addClasspath\'" );
+        ComponentConfigurationException cce = new ComponentConfigurationException(
+                                                                                   "Class \'org.apache.maven.plugin.jar.JarMojo\' does not contain a field named \'addClasspath\'" );
         PluginConfigurationException pce = new PluginConfigurationException( "test", cce );
-        
+
         assertTrue( diagnoser.canDiagnose( pce ) );
-        
+
         String userMessage = diagnoser.diagnose( pce );
 
         System.out.println( userMessage );
@@ -220,6 +221,26 @@ public class PluginErrorDiagnoserTest
         assertNotNull( userMessage );
     }
 
+    public void testParamWithOneProjectAPIBasedExpression()
+        throws DuplicateParameterException
+    {
+        printMethodHeader();
+
+        Parameter param = new Parameter();
+        param.setName( "testName" );
+        param.setExpression( "${project.distributionManagementArtifactRepository}" );
+        param.setRequired( true );
+        param.setEditable( false );
+
+        PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
+
+        String userMessage = diagnoser.diagnose( error );
+
+        System.out.println( userMessage );
+
+        assertNotNull( userMessage );
+    }
+
     public void testNonEditableParamWithOneProjectBasedExpression()
         throws DuplicateParameterException
     {
@@ -244,9 +265,9 @@ public class PluginErrorDiagnoserTest
     {
         IllegalArgumentException marker = new IllegalArgumentException();
 
-        System.out.println( "---------------------------------------------------------------------\n" +
-                            "Visual output for " + marker.getStackTrace()[1].getMethodName() +
-                            ":\n---------------------------------------------------------------------" );
+        System.out.println( "---------------------------------------------------------------------\n"
+            + "Visual output for " + marker.getStackTrace()[1].getMethodName()
+            + ":\n---------------------------------------------------------------------" );
     }
 
 }

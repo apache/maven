@@ -16,7 +16,7 @@ package org.apache.maven.embedder;/*
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id:$
+ * @version $Id$
  */
 public class SummaryPluginDescriptor
 {

@@ -120,6 +120,11 @@
       <role>org.apache.maven.usability.ErrorDiagnoser</role>
       <role-hint>ArtifactResolverDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
     </component>
     <!--
      |
