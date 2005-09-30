@@ -61,3 +61,6 @@ plugin registry and settings should be stored in the tool specific locations
 -- local repository will be shared and default to ~/.m2/repository
 
 -- add a method that gives the standard lifecycle phases.
+
+<eu> -- properties param on execute() method
+<eu> -- transfet listener and loggers, system out cleanup
