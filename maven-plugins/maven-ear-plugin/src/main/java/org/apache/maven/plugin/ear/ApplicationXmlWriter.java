@@ -76,17 +76,17 @@ public final class ApplicationXmlWriter
             writer = initializeRootElementOneDotFour( w );
         }
 
-        if ( displayName != null )
-        {
-            writer.startElement( "display-name" );
-            writer.writeText( displayName );
-            writer.endElement();
-        }
-
         if ( description != null )
         {
             writer.startElement( "description" );
             writer.writeText( description );
+            writer.endElement();
+        }
+
+        if ( displayName != null )
+        {
+            writer.startElement( "display-name" );
+            writer.writeText( displayName );
             writer.endElement();
         }
 
