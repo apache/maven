@@ -31,7 +31,7 @@ public class Plugin
 
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
-        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, targetDirectory );
+        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, null, targetDirectory );
     }
     
     public static void main( String[] args )

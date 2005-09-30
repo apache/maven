@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -94,6 +95,8 @@ public class MavenEmbedder
     private MavenSettingsBuilder settingsBuilder;
 
     private LifecycleExecutor lifecycleExecutor;
+
+    private WagonManager wagonManager;
 
     private MavenXpp3Reader modelReader;
 
@@ -346,13 +349,24 @@ public class MavenEmbedder
 
     // TODO: should we allow the passing in of a settings object so that everything can be taken from the client env
 
-    public void execute( MavenProject project, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+    // TODO: transfer listener
+    // TODO: logger
+
+    public void execute( MavenProject project,
+                         List goals,
+                         EventDispatcher eventDispatcher,
+                         TransferListener transferListener,
+                         File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
-        execute( Collections.singletonList( project ), goals, eventDispatcher, executionRootDirectory );
+        execute( Collections.singletonList( project ), goals, eventDispatcher, transferListener, executionRootDirectory );
     }
 
-    public void execute( List projects, List goals, EventDispatcher eventDispatcher, File executionRootDirectory )
+    public void execute( List projects,
+                         List goals,
+                         EventDispatcher eventDispatcher,
+                         TransferListener transferListener,
+                         File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
         ReactorManager rm = new ReactorManager( projects );
@@ -368,6 +382,11 @@ public class MavenEmbedder
                                                  executionRootDirectory.getAbsolutePath() );
 
         session.setUsingPOMsFromFilesystem( true );
+
+        if ( transferListener != null )
+        {
+            wagonManager.setDownloadMonitor( transferListener );
+        }
 
         MavenExecutionResponse response = lifecycleExecutor.execute( session,
                                                                      rm,
@@ -538,6 +557,8 @@ public class MavenEmbedder
             artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
 
             lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
+
+            wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 
             // ----------------------------------------------------------------------
             // If an explicit local repository has not been set then we will use the

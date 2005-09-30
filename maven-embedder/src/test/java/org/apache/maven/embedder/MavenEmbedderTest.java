@@ -7,6 +7,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.cli.ConsoleDownloadMonitor;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -70,7 +71,7 @@ public class MavenEmbedderTest
 
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
-        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, targetDirectory );
+        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, new ConsoleDownloadMonitor(), targetDirectory );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
