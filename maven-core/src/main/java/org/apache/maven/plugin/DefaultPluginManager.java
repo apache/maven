@@ -131,7 +131,6 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
-        throws PluginManagerException
     {
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
@@ -310,18 +309,20 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        
+
         // NOTE: I'm putting these checks in here, since this is the central point of access for 
         // anything that wants to execute a mojo.
-        if( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+        if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() + ". It requires a project, but the build is not using one." ); 
+            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() +
+                ". It requires a project, but the build is not using one." );
         }
-        
+
         if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
-            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal() + " requires online mode for execution. Maven is currently offline." );
+            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal() +
+                " requires online mode for execution. Maven is currently offline." );
         }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -503,7 +504,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
-        
+
         // if this is the first time this plugin has been used, the plugin's container will only
         // contain the plugin's artifact in isolation; we need to finish resolving the plugin's
         // dependencies, and add them to the container.
@@ -519,10 +520,10 @@ public class DefaultPluginManager
         if ( plugin instanceof ContextEnabled )
         {
             Map pluginContext = session.getPluginContext( pluginDescriptor, project );
-            
+
             ( (ContextEnabled) plugin ).setPluginContext( pluginContext );
         }
-        
+
         plugin.setLog( mojoLogger );
 
         XmlPlexusConfiguration pomConfiguration;

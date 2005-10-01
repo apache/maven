@@ -44,8 +44,7 @@ public interface PluginManager
     MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws PluginManagerException;
 
-    PluginDescriptor getPluginDescriptorForPrefix( String prefix )
-        throws PluginManagerException;
+    PluginDescriptor getPluginDescriptorForPrefix( String prefix );
 
     Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
         throws PluginManagerException;

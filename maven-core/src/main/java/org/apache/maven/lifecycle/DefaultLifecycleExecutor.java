@@ -1144,14 +1144,14 @@ public class DefaultLifecycleExecutor
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
 
-        // TODO: Add "&& canUsePrefix" to this boolean expression, and remove deprecation warning in next release.
         if ( numTokens == 2 )
         {
             if ( !canUsePrefix )
             {
-                getLogger().warn(
-                    "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. Please use specification of the form groupId:artifactId[:version]:goal instead. (Offending mojo: \'" +
-                        task + "\', invoked via: \'" + invokedVia + "\')" );
+                String msg = "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. " +
+                    "Please use specification of the form groupId:artifactId[:version]:goal instead. " +
+                    "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
+                throw new LifecycleExecutionException( msg );
             }
 
             String prefix = tok.nextToken();
@@ -1159,16 +1159,9 @@ public class DefaultLifecycleExecutor
 
             // Steps for retrieving the plugin model instance:
             // 1. request directly from the plugin collector by prefix
-            try
-            {
-                pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException(
-                    "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin collector.", e );
-            }
+            pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
 
+            // 2. look in the repository via search groups
             if ( pluginDescriptor == null )
             {
                 try
@@ -1181,8 +1174,7 @@ public class DefaultLifecycleExecutor
                         "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin mappings metadata.", e );
                 }
             }
-
-            if ( pluginDescriptor != null )
+            else
             {
                 plugin = new Plugin();
 
@@ -1191,7 +1183,34 @@ public class DefaultLifecycleExecutor
                 plugin.setVersion( pluginDescriptor.getVersion() );
             }
 
-            // 2. default to o.a.m.plugins and maven-<prefix>-plugin
+            // 3. search plugins in the current POM
+            if ( plugin == null )
+            {
+                for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+                {
+                    Plugin buildPlugin = (Plugin) i.next();
+
+                    try
+                    {
+                        PluginDescriptor desc = pluginManager.verifyPlugin( buildPlugin, project, session.getSettings(),
+                                                                            session.getLocalRepository() );
+                        if ( prefix.equals( desc.getGoalPrefix() ) )
+                        {
+                            plugin = buildPlugin;
+                        }
+                    }
+                    catch ( PluginManagerException e )
+                    {
+                        throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+                    }
+                    catch ( PluginVersionResolutionException e )
+                    {
+                        throw new LifecycleExecutionException( "Error resolving plugin version", e );
+                    }
+                }
+            }
+
+            // 4. default to o.a.m.plugins and maven-<prefix>-plugin
             if ( plugin == null )
             {
                 plugin = new Plugin();
