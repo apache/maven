@@ -5,13 +5,11 @@
       <role-hint>coreit-packaging</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: plexus-application-lifecycle -->
         <phases>
-          <package>core-it:package</package>
-          <install>install:install</install>
-          <deploy>deploy:deploy</deploy>
+          <package>org.apache.maven.plugins:maven-core-it-plugin:package</package>
+          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </phases>
-        <!-- END SNIPPET: plexus-application-lifecycle -->
       </configuration>
     </component>
     <component>
