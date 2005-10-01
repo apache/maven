@@ -1,3 +1,10 @@
+o need to check in changes to plexus, maven-core, embedder
+o task segment still using the wrong logger
+
+x child container
+x mojos need to feed into the logging
+- surefire needs to feed into the logging
+
 When you create the assembly you must manually install it in your
 local repository for now in order the maven-embedder-it tests to
 work. jvz.
@@ -67,3 +74,12 @@ plugin registry and settings should be stored in the tool specific locations
 
 <eu> one more thing I need in embedder - writeModel() method
 
+
+<jdcasey> you know something else that would rock for the eclipse plugin? if
+F5 triggered a re-resolution of the poms, and recreation of the .classpath,
+etc.
+<jdcasey> that way, if the pom was upgraded to the next version-SNAPSHOT,
+you'd get it
+<jdcasey> :)
+<jdcasey> configurable on|off, of course
+<jdcasey> F5 is refresh, BTW

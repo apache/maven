@@ -1,8 +1,11 @@
+import org.apache.maven.cli.ConsoleDownloadMonitor;
 import org.apache.maven.embedder.*;
 import org.apache.maven.project.*;
 import org.apache.maven.monitor.event.*;
 import java.io.*;
 import java.util.*;
+import org.codehaus.plexus.logging.*;
+import org.codehaus.plexus.logging.console.*;
 
 public class Plugin
 {
@@ -14,6 +17,8 @@ public class Plugin
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         
         maven.setClassLoader( classLoader );
+
+        maven.setLogger( new MavenEmbedderConsoleLogger() );                
         
         maven.start();
         
@@ -29,9 +34,13 @@ public class Plugin
 
         MavenProject pom = maven.readProjectWithDependencies( pomFile );
 
-        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
-
-        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, null, targetDirectory );
+        EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
+        
+        System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<");        
+        
+        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), targetDirectory );
+        
+        System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<");        
     }
     
     public static void main( String[] args )

@@ -1,19 +1,21 @@
 package org.apache.maven.embedder;
 
 import junit.framework.TestCase;
-import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.cli.ConsoleDownloadMonitor;
+import org.apache.maven.model.Model;
+import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.util.Set;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -34,6 +36,8 @@ public class MavenEmbedderTest
         maven = new MavenEmbedder();
 
         maven.setClassLoader( classLoader );
+
+        maven.setLogger( new MavenEmbedderConsoleLogger() );
 
         maven.start();
     }
@@ -69,9 +73,9 @@ public class MavenEmbedderTest
 
         MavenProject pom = maven.readProjectWithDependencies( pomFile );
 
-        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
+        EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
 
-        maven.execute( pom, Collections.singletonList( "package" ), eventDispatcher, new ConsoleDownloadMonitor(), targetDirectory );
+        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), targetDirectory );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 

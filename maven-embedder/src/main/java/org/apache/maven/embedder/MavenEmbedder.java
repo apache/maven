@@ -44,6 +44,8 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.event.EventMonitor;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
@@ -106,6 +108,8 @@ public class MavenEmbedder
 
     private PluginDescriptorBuilder pluginDescriptorBuilder;
 
+    private EventDispatcher eventDispatcher;
+
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -117,6 +121,8 @@ public class MavenEmbedder
     private File localRepositoryDirectory;
 
     private ClassLoader classLoader;
+
+    private MavenEmbedderLogger logger;
 
     // ----------------------------------------------------------------------
     // User options
@@ -233,6 +239,16 @@ public class MavenEmbedder
     public File getLocalRepositoryDirectory()
     {
         return localRepositoryDirectory;
+    }
+
+    public MavenEmbedderLogger getLogger()
+    {
+        return logger;
+    }
+
+    public void setLogger( MavenEmbedderLogger logger )
+    {
+        this.logger = logger;
     }
 
     // ----------------------------------------------------------------------
@@ -354,22 +370,24 @@ public class MavenEmbedder
 
     public void execute( MavenProject project,
                          List goals,
-                         EventDispatcher eventDispatcher,
+                         EventMonitor eventMonitor,
                          TransferListener transferListener,
                          File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
-        execute( Collections.singletonList( project ), goals, eventDispatcher, transferListener, executionRootDirectory );
+        execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, executionRootDirectory );
     }
 
     public void execute( List projects,
                          List goals,
-                         EventDispatcher eventDispatcher,
+                         EventMonitor eventMonitor,
                          TransferListener transferListener,
                          File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
         ReactorManager rm = new ReactorManager( projects );
+
+        eventDispatcher.addEventMonitor( eventMonitor );
 
         rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
 
@@ -531,6 +549,13 @@ public class MavenEmbedder
 
         embedder = new Embedder();
 
+        if ( logger != null )
+        {
+            System.out.println( "logger = " + logger );
+
+            embedder.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
+        }
+
         try
         {
             ClassWorld classWorld = new ClassWorld();
@@ -549,6 +574,8 @@ public class MavenEmbedder
             modelWriter = new MavenXpp3Writer();
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
+
+            eventDispatcher = new DefaultEventDispatcher();
 
             profileManager = new DefaultProfileManager( embedder.getContainer() );
 
