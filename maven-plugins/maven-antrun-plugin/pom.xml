@@ -33,9 +33,5 @@
       <artifactId>ant</artifactId>
       <version>1.6.5</version>
     </dependency>
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-    </dependency>
   </dependencies>
 </project>
