@@ -27,6 +27,8 @@ svn ci -m 'update scm' pom.xml
 rm -Rf target
 
 m2 -e release:prepare -Denv=test -B -Dtag=test-tag
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 m2 -e release:perform -Denv=test
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
