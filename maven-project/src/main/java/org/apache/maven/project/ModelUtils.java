@@ -55,7 +55,7 @@ import java.util.TreeMap;
 public final class ModelUtils
 {
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
-                                        boolean handleAsInheritance )
+                                         boolean handleAsInheritance )
     {
         if ( childContainer == null || parentContainer == null )
         {
@@ -77,8 +77,8 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null
-                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || parentInherited == null ||
+                    Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     Plugin assembledPlugin = parentPlugin;
@@ -139,8 +139,8 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null
-                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || parentInherited == null ||
+                    Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
@@ -258,7 +258,7 @@ public final class ModelUtils
     }
 
     public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
-                                                    boolean handleAsInheritance )
+                                                     boolean handleAsInheritance )
     {
         if ( child == null || parent == null )
         {
@@ -471,7 +471,7 @@ public final class ModelUtils
         child.setConfiguration( childConfiguration );
     }
 
-    static Model cloneModel( Model model )
+    public static Model cloneModel( Model model )
     {
         // TODO: would be nice for the modello:java code to generate this as a copy constructor
         Model newModel = new Model();
@@ -545,7 +545,7 @@ public final class ModelUtils
             {
                 Properties newProps = new Properties();
                 newProps.putAll( props );
-                
+
                 newProfile.setProperties( newProps );
             }
 

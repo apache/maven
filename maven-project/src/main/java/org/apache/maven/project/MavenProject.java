@@ -160,6 +160,7 @@ public class MavenProject
         this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
         this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
         this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
+        this.parentArtifact = project.parentArtifact;
 
         this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
         this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );

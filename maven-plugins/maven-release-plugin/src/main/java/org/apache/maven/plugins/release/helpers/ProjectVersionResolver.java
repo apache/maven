@@ -1,10 +1,25 @@
 package org.apache.maven.plugins.release.helpers;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -14,7 +29,6 @@ import java.util.Map;
 
 public class ProjectVersionResolver
 {
-
     private static final String SNAPSHOT_CLASSIFIER = "-SNAPSHOT";
 
     private Map resolvedVersions = new HashMap();
@@ -32,11 +46,9 @@ public class ProjectVersionResolver
         this.interactive = interactive;
     }
 
-    public void resolveVersion( MavenProject project )
+    public void resolveVersion( Model model, String projectId )
         throws MojoExecutionException
     {
-        String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
-
         if ( resolvedVersions.containsKey( projectId ) )
         {
             throw new IllegalArgumentException(
@@ -44,7 +56,7 @@ public class ProjectVersionResolver
         }
 
         //Rewrite project version
-        String projectVersion = project.getVersion();
+        String projectVersion = model.getVersion();
 
         projectVersion = projectVersion.substring( 0, projectVersion.length() - SNAPSHOT_CLASSIFIER.length() );
 
@@ -67,8 +79,6 @@ public class ProjectVersionResolver
             }
         }
 
-        Model model = project.getOriginalModel();
-
         model.setVersion( projectVersion );
 
         resolvedVersions.put( projectId, projectVersion );
@@ -81,14 +91,13 @@ public class ProjectVersionResolver
         return (String) resolvedVersions.get( projectId );
     }
 
-    public void incrementVersion( MavenProject project )
+    public void incrementVersion( Model model, String projectId )
         throws MojoExecutionException
     {
-        String projectVersion = project.getOriginalModel().getVersion();
+        String projectVersion = model.getVersion();
 
         if ( ArtifactUtils.isSnapshot( projectVersion ) )
         {
-            String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
             throw new MojoExecutionException( "The project " + projectId + " is a snapshot (" + projectVersion +
                 "). It appears that the release version has not been committed." );
         }
@@ -105,10 +114,10 @@ public class ProjectVersionResolver
 
         String staticVersionPart = null;
         String nextVersionString = null;
-        
+
         int dashIdx = projectVersion.lastIndexOf( "-" );
         int dotIdx = projectVersion.lastIndexOf( "." );
-        
+
         if ( dashIdx > 0 )
         {
             staticVersionPart = projectVersion.substring( 0, dashIdx + 1 );
@@ -136,7 +145,6 @@ public class ProjectVersionResolver
             projectVersion = "";
         }
 
-        String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
         if ( interactive )
         {
             try
@@ -160,7 +168,7 @@ public class ProjectVersionResolver
             throw new MojoExecutionException( "Cannot determine incremented development version for: " + projectId );
         }
 
-        project.getOriginalModel().setVersion( projectVersion );
+        model.setVersion( projectVersion );
 
         resolvedVersions.put( projectId, projectVersion );
     }

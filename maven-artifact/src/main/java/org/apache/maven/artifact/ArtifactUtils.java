@@ -30,11 +30,11 @@ public final class ArtifactUtils
 
     public static boolean isSnapshot( String version )
     {
-        return version != null
-            && ( version.toUpperCase().endsWith( "SNAPSHOT" ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
+        return version != null &&
+            ( version.toUpperCase().endsWith( "SNAPSHOT" ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
                 .matches() );
     }
-    
+
     public static String versionlessKey( Artifact artifact )
     {
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
@@ -42,6 +42,14 @@ public final class ArtifactUtils
 
     public static String versionlessKey( String groupId, String artifactId )
     {
+        if ( groupId == null )
+        {
+            throw new NullPointerException( "groupId was null" );
+        }
+        if ( artifactId == null )
+        {
+            throw new NullPointerException( "artifactId was null" );
+        }
         return groupId + ":" + artifactId;
     }
 
@@ -60,7 +68,7 @@ public final class ArtifactUtils
     public static Map artifactMapByVersionlessId( Collection artifacts )
     {
         Map artifactMap = new HashMap();
-        
+
         if ( artifacts != null )
         {
             for ( Iterator it = artifacts.iterator(); it.hasNext(); )

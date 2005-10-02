@@ -205,7 +205,7 @@ public class ScmHelper
     }
 
     public void checkin( String message )
-        throws Exception
+        throws ScmException
     {
         ScmRepository repository = getScmRepository();
 

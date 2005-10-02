@@ -96,7 +96,7 @@ public class ProjectSorter
                 }
             }
 
-/* TODO: can this be removed?
+            // TODO: this MUST be fixed before beta-3, but it is required for a sane release plugin.
             MavenProject parent = project.getParent();
             if ( parent != null )
             {
@@ -106,7 +106,6 @@ public class ProjectSorter
                     dag.addEdge( id, parentId );
                 }
             }
-*/
 
             List buildPlugins = project.getBuildPlugins();
             if ( buildPlugins != null )

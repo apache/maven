@@ -20,11 +20,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ProjectScmRewriter
 {
@@ -35,13 +30,9 @@ public class ProjectScmRewriter
         this.releaseProgress = releaseProgress;
     }
 
-    public void rewriteScmInfo( MavenProject project, String tagLabel )
+    public void rewriteScmInfo( Model model, String projectId, String tagLabel )
         throws MojoExecutionException
     {
-        String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
-
-        Model model = project.getOriginalModel();
-
         Scm scm = model.getScm();
         // If SCM is null in original model, it is inherited, no mods needed
         if ( scm != null )
@@ -52,12 +43,12 @@ public class ProjectScmRewriter
         }
     }
 
-    public void restoreScmInfo( MavenProject project )
+    public void restoreScmInfo( Model model )
     {
-        Scm scm = project.getOriginalModel().getScm();
+        Scm scm = model.getScm();
         if ( scm != null )
         {
-            String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+            String projectId = ArtifactUtils.versionlessKey( model.getGroupId(), model.getArtifactId() );
 
             releaseProgress.restoreScmInfo( projectId, scm );
         }
@@ -72,13 +63,13 @@ public class ProjectScmRewriter
             if ( scmConnection != null && scmConnection.startsWith( "scm:svn" ) )
             {
                 scm.setConnection( convertSvnConnectionString( scmConnection, tag ) );
-                
+
                 String devConnection = scm.getDeveloperConnection();
                 if ( devConnection != null )
                 {
                     scm.setDeveloperConnection( convertSvnConnectionString( devConnection, tag ) );
                 }
-                
+
                 String url = scm.getUrl();
                 if ( url != null )
                 {
@@ -91,21 +82,21 @@ public class ProjectScmRewriter
     private String convertSvnConnectionString( String scmConnection, String tag )
     {
         int trunkBegin = scmConnection.indexOf( "/trunk" );
-        
+
         if ( trunkBegin >= 0 )
         {
             String tail = "";
-            
+
             if ( scmConnection.length() > trunkBegin + "/trunk".length() )
             {
                 tail = scmConnection.substring( trunkBegin + "/trunk".length() );
-                
+
                 if ( !tail.startsWith( "/" ) )
                 {
                     tail += "/";
                 }
             }
-            
+
             scmConnection = scmConnection.substring( 0, trunkBegin ) + "/tags/" + tag + tail;
         }
         else
