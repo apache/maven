@@ -17,48 +17,61 @@ package org.apache.maven.plugin.jar;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProjectHelper;
 
 import java.io.File;
 
 /**
- * Build a JAR from the current project.
+ * Build a JAR of the test classes for the current project.
  *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
- * @goal jar
+ * @goal test-jar
  * @phase package
  * @requiresProject
  */
-public class JarMojo
+public class TestJarMojo
     extends AbstractJarMojo
 {
     /**
-	 * Directory containing the classes.
-	 *
-     * @parameter expression="${project.build.outputDirectory}"
+     * Directory containing the test classes.
+     *
+     * @parameter expression="${project.build.testOutputDirectory}"
      * @required
      * @readonly
      */
-    private File outputDirectory;
+    private File testOutputDirectory;
 
     /**
-	 * Generates the JAR.
+     * @component role="org.apache.maven.project.MavenProjectHelper"
+     */
+    private MavenProjectHelper projectHelper;
+
+    protected String getClassifier()
+    {
+        return "tests";
+    }
+
+    /**
+     * Generates the JAR.
      *
      * @todo Add license files in META-INF directory.
      */
     public void execute()
         throws MojoExecutionException
     {
+        getLog().info( "Creating a jar containing the test classes for this project." );
+
         File jarFile = createArchive();
-        
-        getProject().getArtifact().setFile( jarFile );
+
+        projectHelper.attachArtifact( getProject(), "jar", "tests", jarFile );
     }
 
     /**
-     * Return the main classes directory, so it's used as the root of the jar.
+     * Return the test-classes directory, to serve as the root of the tests jar.
      */
     protected File getOutputDirectory()
     {
-        return outputDirectory;
+        return testOutputDirectory;
     }
 }

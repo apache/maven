@@ -1,0 +1,26 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.it</groupId>
+    <artifactId>maven-core-it0077</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>maven-it0077-sub2</artifactId>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.it</groupId>
+      <artifactId>maven-it0077-sub1</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.it</groupId>
+      <artifactId>maven-it0077-sub1</artifactId>
+      <type>test-jar</type>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</model>

@@ -1,0 +1,1 @@
+${artifact:org.apache.maven.it:maven-it0077-sub1:1.0:test-jar}

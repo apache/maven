@@ -308,6 +308,11 @@ public class Verifier
             ext = "jar";
             classifier = "it";
         }
+        if ( "test-jar".equals( a[3] ) )
+        {
+            ext = "jar";
+            classifier = "tests";
+        }
 
         String repositoryPath;
         if ( "legacy".equals( localRepoLayout ) )

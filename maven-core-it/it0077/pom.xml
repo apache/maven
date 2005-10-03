@@ -1,0 +1,28 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-core-it0077</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <modules>
+    <module>sub1</module>
+    <module>sub2</module>
+  </modules>
+
+  <repositories>
+    <repository>
+      <id>test</id>
+      <url>file:target/test-repo</url>
+    </repository>
+  </repositories>
+</model>

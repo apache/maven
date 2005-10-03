@@ -204,6 +204,8 @@ it0076: Test that plugins in pluginManagement aren't included in the build
         unless they are referenced by groupId/artifactId within the plugins
         section of a pom.
 
+it0077: Test test jar attachment.
+
 -------------------------------------------------------------------------------
 
 - generated sources

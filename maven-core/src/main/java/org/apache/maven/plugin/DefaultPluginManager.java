@@ -265,7 +265,11 @@ public class DefaultPluginManager
             MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
             if ( ref != null && ref.getArtifact() != null )
             {
-                pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                // TODO: if not matching, we should get the correct artifact from that project (attached)
+                if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
+                {
+                    pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                }
             }
         }
 
