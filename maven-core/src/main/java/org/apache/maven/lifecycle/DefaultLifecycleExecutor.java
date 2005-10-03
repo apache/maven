@@ -572,7 +572,7 @@ public class DefaultLifecycleExecutor
         if ( project.getModel().getReports() != null )
         {
             getLogger().error(
-                "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+                "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
 
         if ( project.getReporting() == null || !project.getReporting().isExcludeDefaults() )
@@ -1030,6 +1030,12 @@ public class DefaultLifecycleExecutor
             // use the plugin if inherit was true in a base class, or it is in the current POM, otherwise use the default inheritence setting
             if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
             {
+                if ( plugin.getGoals() != null )
+                {
+                    getLogger().error(
+                        "Plugin contains a <goals/> section: this is IGNORED - please use <executions/> instead." );
+                }
+
                 List executions = plugin.getExecutions();
 
                 if ( executions != null )
