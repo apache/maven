@@ -180,7 +180,6 @@
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-plugins/</url>
   </scm>
-<!-- TODO: reinstate one parent situation is sorted
   <build>
     <pluginManagement>
       <plugins>
@@ -201,5 +200,4 @@
       </plugin>
     </plugins>
   </reporting>
--->
 </project>

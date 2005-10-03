@@ -96,13 +96,17 @@ public class ProjectSorter
                 }
             }
 
-            // TODO: this MUST be fixed before beta-3, but it is required for a sane release plugin.
             MavenProject parent = project.getParent();
             if ( parent != null )
             {
                 String parentId = ArtifactUtils.versionlessKey( parent.getGroupId(), parent.getArtifactId() );
                 if ( dag.getVertex( parentId ) != null )
                 {
+                    // Parent is added as an edge, but must not cause a cycle - so we remove any other edges it has in conflict
+                    if ( dag.hasEdge( parentId, id ) )
+                    {
+                        dag.removeEdge( parentId, id );
+                    }
                     dag.addEdge( id, parentId );
                 }
             }
@@ -116,9 +120,7 @@ public class ProjectSorter
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null && !pluginId.equals( id ) )
                     {
-                        project.addProjectReference( (MavenProject) projectMap.get( pluginId ) );
-
-                        dag.addEdge( id, pluginId );
+                        addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
                 }
             }
@@ -132,9 +134,7 @@ public class ProjectSorter
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null && !pluginId.equals( id ) )
                     {
-                        project.addProjectReference( (MavenProject) projectMap.get( pluginId ) );
-
-                        dag.addEdge( id, pluginId );
+                        addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
                 }
             }
@@ -145,9 +145,7 @@ public class ProjectSorter
                 String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
                 if ( dag.getVertex( extensionId ) != null )
                 {
-                    project.addProjectReference( (MavenProject) projectMap.get( extensionId ) );
-
-                    dag.addEdge( id, extensionId );
+                    addEdgeWithParentCheck( projectMap, extensionId, project, id );
                 }
             }
         }
@@ -162,6 +160,21 @@ public class ProjectSorter
         }
 
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
+    }
+
+    private void addEdgeWithParentCheck( Map projectMap, String extensionId, MavenProject project, String id )
+        throws CycleDetectedException
+    {
+        MavenProject extProject = (MavenProject) projectMap.get( extensionId );
+        project.addProjectReference( extProject );
+
+        MavenProject extParent = extProject.getParent();
+        String parentId = ArtifactUtils.versionlessKey( extParent.getGroupId(), extParent.getArtifactId() );
+        // Don't add edge from parent to extension if a reverse edge already exists
+        if ( !dag.hasEdge( extensionId, id ) || !parentId.equals( id ) )
+        {
+            dag.addEdge( id, extensionId );
+        }
     }
 
     // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
