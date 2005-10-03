@@ -29,16 +29,6 @@ public class RemoteRepository
 
     private Authentication authentication;
 
-    /**
-     * @deprecated use &lt;snapshots/&gt; and &lt;updatePolicy&gt; instead.
-     */
-    private String snapshotPolicy;
-
-    /**
-     * @deprecated use &lt;snapshots/&gt; and &lt;checksumPolicy&gt; instead.
-     */
-    private String checksumPolicy;
-
     private Proxy proxy;
 
     private RepositoryPolicy snapshots;
@@ -65,16 +55,6 @@ public class RemoteRepository
         this.authentication = authentication;
     }
 
-    public void setSnapshotPolicy( String snapshotPolicy )
-    {
-        this.snapshotPolicy = snapshotPolicy;
-    }
-
-    public String getSnapshotPolicy()
-    {
-        return snapshotPolicy;
-    }
-
     public void addProxy( Proxy proxy )
     {
         this.proxy = proxy;
@@ -83,16 +63,6 @@ public class RemoteRepository
     public Proxy getProxy()
     {
         return proxy;
-    }
-
-    public String getChecksumPolicy()
-    {
-        return checksumPolicy;
-    }
-
-    public void setChecksumPolicy( String checksumPolicy )
-    {
-        this.checksumPolicy = checksumPolicy;
     }
 
     public RepositoryPolicy getSnapshots()

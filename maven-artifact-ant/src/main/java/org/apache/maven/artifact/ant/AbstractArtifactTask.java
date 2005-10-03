@@ -112,12 +112,8 @@ public abstract class AbstractArtifactTask
         {
             repositoryFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
 
-            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repository.getSnapshots(),
-                                                                                repository.getSnapshotPolicy(),
-                                                                                repository.getChecksumPolicy() );
-            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repository.getReleases(),
-                                                                               repository.getSnapshotPolicy(),
-                                                                               repository.getChecksumPolicy() );
+            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repository.getSnapshots() );
+            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repository.getReleases() );
 
             artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(),
                                                                              repositoryLayout, snapshots, releases );
@@ -137,13 +133,11 @@ public abstract class AbstractArtifactTask
         return artifactRepository;
     }
 
-    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy,
-                                                                           String defaultUpdatePolicy,
-                                                                           String defaultChecksumPolicy )
+    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
     {
         boolean enabled = true;
-        String updatePolicy = defaultUpdatePolicy;
-        String checksumPolicy = defaultChecksumPolicy;
+        String updatePolicy = null;
+        String checksumPolicy = null;
 
         if ( policy != null )
         {
