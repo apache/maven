@@ -76,14 +76,15 @@ public class EarMojo
      * @readonly
      */
     private String finalName;
-    
+
     /**
-     * Directory that resources are copied to during the build.
+     * The directory to get the resources from.
      *
-     * @parameter expression="${project.build.directory}/ear"
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
      */
     private File resourcesDir;
-    
+
     /**
      * The maven archiver to use.
      *
@@ -113,7 +114,7 @@ public class EarMojo
             {
                 EarModule module = (EarModule) iter.next();
                 getLog().info( "Copying artifact[" + module + "] to[" + module.getUri() + "]" );
-                File destinationFile = buildDestinationFile( getBuildDir(), module.getUri() );
+                File destinationFile = buildDestinationFile( getWorkDirectory(), module.getUri() );
 
                 File sourceFile = module.getArtifact().getFile();
 
@@ -137,8 +138,8 @@ public class EarMojo
             File earSourceDir = new File( earSourceDirectory );
             if ( earSourceDir.exists() )
             {
-                getLog().info( "Copy ear sources to " + getBuildDir().getAbsolutePath() );
-                FileUtils.copyDirectoryStructure( earSourceDir, getBuildDir() );
+                getLog().info( "Copy ear sources to " + getWorkDirectory().getAbsolutePath() );
+                FileUtils.copyDirectoryStructure( earSourceDir, getWorkDirectory() );
             }
         }
         catch ( IOException e )
@@ -151,8 +152,8 @@ public class EarMojo
         {
             if ( resourcesDir.exists() )
             {
-                getLog().info( "Copy ear resources to " + getBuildDir().getAbsolutePath() );
-                FileUtils.copyDirectoryStructure( resourcesDir, getBuildDir() );
+                getLog().info( "Copy ear resources to " + getWorkDirectory().getAbsolutePath() );
+                FileUtils.copyDirectoryStructure( resourcesDir, getWorkDirectory() );
             }
         }
         catch ( IOException e )
@@ -161,7 +162,7 @@ public class EarMojo
         }
 
         // Check if deployment descriptor is there
-        File ddFile = new File( getBuildDir(), APPLICATION_XML_URI );
+        File ddFile = new File( getWorkDirectory(), APPLICATION_XML_URI );
         if ( !ddFile.exists() )
         {
             throw new MojoExecutionException(
@@ -177,7 +178,7 @@ public class EarMojo
             // Include custom manifest if necessary
             includeCustomManifestFile();
 
-            archiver.getArchiver().addDirectory( getBuildDir() );
+            archiver.getArchiver().addDirectory( getWorkDirectory() );
             archiver.createArchive( getProject(), archive );
 
             project.getArtifact().setFile( earFile );
@@ -198,7 +199,7 @@ public class EarMojo
         File customManifestFile = new File( manifestFile );
         if ( !customManifestFile.exists() )
         {
-            getLog().info( "Could not find manifest file: " + manifestFile +" - Generating one");
+            getLog().info( "Could not find manifest file: " + manifestFile + " - Generating one" );
         }
         else
         {

@@ -61,13 +61,11 @@ public abstract class AbstractEarMojo
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
      * @required
      */
-    private String workDirectory;
+    private File workDirectory;
 
     private List earModules;
 
     private List allModules;
-
-    private File buildDir;
 
     public void execute()
         throws MojoExecutionException
@@ -138,21 +136,12 @@ public abstract class AbstractEarMojo
         return earModules;
     }
 
-    protected File getBuildDir()
-    {
-        if ( buildDir == null )
-        {
-            buildDir = new File( workDirectory );
-        }
-        return buildDir;
-    }
-
     protected MavenProject getProject()
     {
         return project;
     }
 
-    protected String getWorkDirectory()
+    protected File getWorkDirectory()
     {
         return workDirectory;
     }

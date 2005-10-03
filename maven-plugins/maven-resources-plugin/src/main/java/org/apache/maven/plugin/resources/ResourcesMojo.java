@@ -38,13 +38,14 @@ import java.util.List;
 import java.util.Properties;
 
 /**
+ * Copy application resources.
+ *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author Andreas Hoheneder
  * @version $Id$
  * @goal resources
  * @phase process-resources
- * @description copy application resources
  */
 public class ResourcesMojo
     extends AbstractMojo

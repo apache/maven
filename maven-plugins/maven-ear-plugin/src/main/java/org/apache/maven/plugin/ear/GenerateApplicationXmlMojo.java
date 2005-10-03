@@ -120,7 +120,7 @@ public class GenerateApplicationXmlMojo
             getLog().info( "Generating application.xml" );
             generateDeploymentDescriptor();
             FileUtils.copyFileToDirectory( new File( generatedDescriptorLocation, "application.xml" ),
-                                           new File( getBuildDir(), "META-INF" ) );
+                                           new File( getWorkDirectory(), "META-INF" ) );
         }
         catch ( IOException e )
         {
