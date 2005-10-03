@@ -1132,6 +1132,23 @@ public class MavenProject
 
         if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
         {
+            PluginManagement pm = build.getPluginManagement();
+            
+            if ( pm != null )
+            {
+                Map pmByKey = pm.getPluginsAsMap();
+                
+                String pluginKey = plugin.getKey();
+                
+                if ( pmByKey != null && pmByKey.containsKey( pluginKey ) )
+                {
+                    Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
+                    
+                    ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
+                }
+                
+            }
+            
             build.addPlugin( plugin );
             build.flushPluginMap();
         }

@@ -2470,6 +2470,14 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    public static final String DEFAULT_EXECUTION_ID = "default";
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>DependencyManagement</name>

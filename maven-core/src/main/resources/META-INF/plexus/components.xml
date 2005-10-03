@@ -153,9 +153,6 @@
           <role>org.apache.maven.extension.ExtensionManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
       </requirements>

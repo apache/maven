@@ -29,7 +29,6 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -47,7 +46,6 @@ import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -81,8 +79,6 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
-
-    private ModelDefaultsInjector modelDefaultsInjector;
 
     private PluginManager pluginManager;
 
@@ -1291,7 +1287,9 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        injectHandlerPluginConfiguration( project, plugin );
+        // this has been simplified from the old code that injected the plugin management stuff, since
+        // pluginManagement injection is now handled by the project method.
+        project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
         if ( mojoDescriptor == null )
@@ -1300,29 +1298,6 @@ public class DefaultLifecycleExecutor
         }
 
         return mojoDescriptor;
-    }
-
-    private void injectHandlerPluginConfiguration( MavenProject project, Plugin plugin )
-    {
-        String key = plugin.getKey();
-
-        Plugin buildPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
-
-        if ( buildPlugin == null )
-        {
-            PluginManagement pluginManagement = project.getPluginManagement();
-            if ( pluginManagement != null )
-            {
-                Plugin managedPlugin = (Plugin) pluginManagement.getPluginsAsMap().get( key );
-
-                if ( managedPlugin != null )
-                {
-                    modelDefaultsInjector.mergePluginWithDefaults( plugin, managedPlugin );
-                }
-            }
-
-            project.addPlugin( plugin );
-        }
     }
 
     protected void line()
