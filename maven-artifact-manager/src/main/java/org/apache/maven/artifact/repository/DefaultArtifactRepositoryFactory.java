@@ -76,7 +76,7 @@ public class DefaultArtifactRepositoryFactory
     }
 
     /**
-     * @deprecated. Not needed, use WagonManager.set/isOnline() instead.
+     * @deprecated Not needed, use WagonManager.set/isOnline() instead.
      */
     public void setGlobalEnable( boolean enable )
     {

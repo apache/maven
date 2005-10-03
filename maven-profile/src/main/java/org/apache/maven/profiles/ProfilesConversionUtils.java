@@ -17,8 +17,8 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.ActivationFile;
+import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 
@@ -44,11 +44,11 @@ public class ProfilesConversionUtils
         if ( profileActivation != null )
         {
             Activation activation = new Activation();
-            
+
             activation.setActiveByDefault( profileActivation.isActiveByDefault() );
 
             activation.setJdk( profileActivation.getJdk() );
-            
+
             org.apache.maven.profiles.ActivationProperty profileProp = profileActivation.getProperty();
 
             if ( profileProp != null )
@@ -60,7 +60,7 @@ public class ProfilesConversionUtils
 
                 activation.setProperty( prop );
             }
-            
+
             org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
 
             if ( profileFile != null )
@@ -72,7 +72,7 @@ public class ProfilesConversionUtils
 
                 activation.setFile( file );
             }
-            
+
             profile.setActivation( activation );
         }
         else
@@ -113,8 +113,6 @@ public class ProfilesConversionUtils
         repo.setId( profileXmlRepo.getId() );
         repo.setLayout( profileXmlRepo.getLayout() );
         repo.setName( profileXmlRepo.getName() );
-        repo.setSnapshotPolicy( profileXmlRepo.getSnapshotPolicy() );
-        repo.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );
         repo.setUrl( profileXmlRepo.getUrl() );
 
         if ( profileXmlRepo.getSnapshots() != null )

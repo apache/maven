@@ -148,7 +148,7 @@ public final class SettingsUtils
             org.apache.maven.model.Activation activation = new org.apache.maven.model.Activation();
 
             activation.setActiveByDefault( settingsActivation.isActiveByDefault() );
-            
+
             activation.setJdk( settingsActivation.getJdk() );
 
             ActivationProperty settingsProp = settingsActivation.getProperty();
@@ -194,8 +194,6 @@ public final class SettingsUtils
         repo.setId( settingsRepo.getId() );
         repo.setLayout( settingsRepo.getLayout() );
         repo.setName( settingsRepo.getName() );
-        repo.setSnapshotPolicy( settingsRepo.getSnapshotPolicy() );
-        repo.setChecksumPolicy( settingsRepo.getChecksumPolicy() );
         repo.setUrl( settingsRepo.getUrl() );
 
         if ( settingsRepo.getSnapshots() != null )

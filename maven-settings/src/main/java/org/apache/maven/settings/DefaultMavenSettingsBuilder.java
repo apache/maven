@@ -26,8 +26,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author jdcasey
@@ -52,7 +50,7 @@ public class DefaultMavenSettingsBuilder
     private File userSettingsFile;
 
     private File globalSettingsFile;
-    
+
     private Settings loadedSettings;
 
     // ----------------------------------------------------------------------
@@ -61,12 +59,14 @@ public class DefaultMavenSettingsBuilder
 
     public void initialize()
     {
-        userSettingsFile = getFile( userSettingsPath, "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        userSettingsFile = getFile( userSettingsPath, "user.home",
+                                    MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
 
         globalSettingsFile = getFile( globalSettingsPath, "maven.home",
                                       MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
-        getLogger().debug( "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
+        getLogger().debug(
+            "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
         getLogger().debug( "Building Maven user-level settings from: '" + userSettingsFile.getAbsolutePath() + "'" );
     }
 
@@ -110,7 +110,7 @@ public class DefaultMavenSettingsBuilder
     {
         return buildSettings( userSettingsFile );
     }
-    
+
     public Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException
     {
@@ -128,7 +128,7 @@ public class DefaultMavenSettingsBuilder
             SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
             setLocalRepository( userSettings );
-            
+
             loadedSettings = userSettings;
         }
 
@@ -144,30 +144,6 @@ public class DefaultMavenSettingsBuilder
         if ( localRepository == null || localRepository.length() < 1 )
         {
             localRepository = userSettings.getLocalRepository();
-        }
-
-        // this is a backward compatibility feature...
-        if ( localRepository == null || localRepository.length() < 1 )
-        {
-            List profiles = userSettings.getProfiles();
-
-            for ( Iterator it = profiles.iterator(); it.hasNext(); )
-            {
-                Profile profile = (Profile) it.next();
-
-                localRepository = profile.getLocalRepository();
-
-                if ( localRepository != null && localRepository.length() > 0 )
-                {
-                    getLogger().warn(
-                                      "DEPRECATED: Please specify the local repository as:\n\n<settings>"
-                                          + "\n    <localRepository>" + localRepository + "</localRepository>"
-                                          + "\n    ...\n</settings>\n" );
-
-                    // we've found it! so stop looking through the profiles...
-                    break;
-                }
-            }
         }
 
         // if all of the above are missing, default to ~/.m2/repository.
