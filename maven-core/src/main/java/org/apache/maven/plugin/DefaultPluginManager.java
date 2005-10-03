@@ -310,7 +310,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
+        throws ArtifactResolutionException, PluginManagerException, MojoExecutionException, MojoFailureException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -408,6 +408,12 @@ public class DefaultPluginManager
             dispatcher.dispatchEnd( event, goalExecId );
         }
         catch ( MojoExecutionException e )
+        {
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw e;
+        }
+        catch ( MojoFailureException e )
         {
             session.getEventDispatcher().dispatchError( event, goalExecId, e );
 

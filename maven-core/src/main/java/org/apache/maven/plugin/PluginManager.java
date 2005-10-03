@@ -39,7 +39,7 @@ public interface PluginManager
     String ROLE = PluginManager.class.getName();
 
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
+        throws MojoExecutionException, PluginManagerException, ArtifactResolutionException, MojoFailureException;
 
     MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws PluginManagerException;
