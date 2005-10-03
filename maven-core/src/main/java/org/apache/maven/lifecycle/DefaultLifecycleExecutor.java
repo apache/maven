@@ -1020,12 +1020,6 @@ public class DefaultLifecycleExecutor
     private void bindPluginToLifecycle( Plugin plugin, MavenSession session, Map phaseMap, MavenProject project )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
-        if ( plugin.getGoals() != null && !plugin.getGoals().isEmpty() )
-        {
-            getLogger().warn(
-                "DEPRECATED: goal definitions for plugin '" + plugin.getKey() + "' must be in an executions element" );
-        }
-
         PluginDescriptor pluginDescriptor;
         Settings settings = session.getSettings();
 

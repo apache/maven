@@ -2405,15 +2405,6 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <!-- TODO: this is deprecated -->
-        <field>
-          <name>goals</name>
-          <version>4.0.0</version>
-          <association>
-            <type>Goal</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -2458,32 +2449,6 @@
     public static String constructKey( String groupId, String artifactId )
     {
         return groupId + ":" + artifactId;
-    }
-
-    /** @deprecated */
-    private java.util.Map goalMap = null;
-    /** @deprecated */
-    public void flushGoalMap()
-    {
-        this.goalMap = null;
-    }
-
-    /** @deprecated */
-    public java.util.Map getGoalsAsMap()
-    {
-        if ( goalMap == null )
-        {
-            goalMap = new java.util.HashMap();
-            if ( goals != null )
-            {
-                for ( java.util.Iterator i = goals.iterator(); i.hasNext(); )
-                {
-                    Goal g = (Goal) i.next();
-                    goalMap.put( g.getId(), g );
-                }
-            }
-        }
-        return goalMap;
     }
           ]]></code>
         </codeSegment>

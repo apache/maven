@@ -828,14 +828,6 @@ public final class ModelUtils
                 // TODO: Deep-copy this!
                 newPlugin.setConfiguration( plugin.getConfiguration() );
 
-                List goals = plugin.getGoals();
-                if ( goals != null && !goals.isEmpty() )
-                {
-                    List newGoals = new ArrayList( goals );
-
-                    newPlugin.setGoals( newGoals );
-                }
-
                 newPlugin.setExecutions( cloneExecutions( plugin.getExecutions() ) );
 
                 newPlugins.add( newPlugin );
