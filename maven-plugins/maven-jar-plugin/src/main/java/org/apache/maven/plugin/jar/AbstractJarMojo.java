@@ -21,6 +21,7 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
@@ -56,6 +57,14 @@ public abstract class AbstractJarMojo
      * @required
      */
     private String finalName;
+
+    /**
+	 * The Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+     * @required
+     */
+    private JarArchiver jarArchiver;
 
     /**
 	 * The maven project.
@@ -113,6 +122,8 @@ public abstract class AbstractJarMojo
         File jarFile = new File( basedir, finalName + classifier + ".jar" );
 
         MavenArchiver archiver = new MavenArchiver();
+
+        archiver.setArchiver( jarArchiver );
 
         archiver.setOutputFile( jarFile );
 

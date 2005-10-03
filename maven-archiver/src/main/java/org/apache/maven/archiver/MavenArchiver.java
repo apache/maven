@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class MavenArchiver
 {
-    private JarArchiver archiver = new JarArchiver();
+    private JarArchiver archiver;
 
     private File archiveFile;
 
