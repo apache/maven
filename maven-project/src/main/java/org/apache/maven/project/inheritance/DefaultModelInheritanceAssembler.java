@@ -367,8 +367,18 @@ public class DefaultModelInheritanceAssembler
             }
 
             ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
-            ModelUtils.mergeResourceLists( childBuild.getResources(), parentBuild.getResources() );
-            ModelUtils.mergeResourceLists( childBuild.getTestResources(), parentBuild.getTestResources() );
+
+            List resources = childBuild.getResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setResources( parentBuild.getResources() );
+            }
+
+            resources = childBuild.getTestResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setTestResources( parentBuild.getTestResources() );
+            }
 
             // Plugins are aggregated if Plugin.inherit != false
             ModelUtils.mergePluginLists( childBuild, parentBuild, true );
