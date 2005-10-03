@@ -44,13 +44,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +64,6 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
  * @goal assembly
- * @description Assemble an application bundle or distribution from an assembly descriptor.
  * @requiresDependencyResolution test
  * @requiresDirectInvocation
  * @execute phase="package"
@@ -73,7 +72,6 @@ import java.util.regex.Pattern;
 public class AssemblyMojo
     extends AbstractUnpackingMojo
 {
-
     /**
      * Predefined Assembly Descriptor Id's.  You can select bin, jar-with-dependencies, or src.
      *
@@ -130,14 +128,57 @@ public class AssemblyMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        doExecute();
+        Assembly assembly = readAssembly();
+
+        // TODO: include dependencies marked for distribution under certain formats
+        // TODO: how, might we plug this into an installer, such as NSIS?
+        // TODO: allow file mode specifications?
+
+        String fullName = finalName + "-" + assembly.getId();
+
+        for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
+        {
+            String format = (String) i.next();
+
+            String filename = fullName + "." + format;
+
+            File destFile;
+            try
+            {
+                // TODO: use component roles? Can we do that in a mojo?
+                Archiver archiver = createArchiver( format );
+
+                destFile = createArchive( archiver, assembly, filename );
+            }
+            catch ( ArchiverException e )
+            {
+                throw new MojoExecutionException( "Error creating assembly", e );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error creating assembly", e );
+            }
+
+            projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
+        }
     }
 
-    /**
-     * Create the binary distribution.
-     */
-    private void doExecute()
-        throws MojoExecutionException, MojoFailureException
+    protected File createArchive( Archiver archiver, Assembly assembly, String filename )
+        throws ArchiverException, IOException, MojoExecutionException
+    {
+        File destFile;
+        processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
+        processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
+
+        destFile = new File( outputDirectory, filename );
+        archiver.setDestFile( destFile );
+        archiver.createArchive();
+
+        return destFile;
+    }
+
+    protected Assembly readAssembly()
+        throws MojoFailureException, MojoExecutionException
     {
         Reader r;
 
@@ -184,43 +225,7 @@ public class AssemblyMojo
         {
             IOUtil.close( r );
         }
-
-        // TODO: include dependencies marked for distribution under certain formats
-        // TODO: how, might we plug this into an installer, such as NSIS?
-        // TODO: allow file mode specifications?
-
-        String fullName = finalName + "-" + assembly.getId();
-
-        for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
-        {
-            String format = (String) i.next();
-
-            String filename = fullName + "." + format;
-
-            File destFile = null;
-            try
-            {
-                // TODO: use component roles? Can we do that in a mojo?
-                Archiver archiver = createArchiver( format );
-
-                processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
-                processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
-
-                destFile = new File( outputDirectory, filename );
-                archiver.setDestFile( destFile );
-                archiver.createArchive();
-            }
-            catch ( ArchiverException e )
-            {
-                throw new MojoExecutionException( "Error creating assembly", e );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Error creating assembly", e );
-            }
-
-            projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
-        }
+        return assembly;
     }
 
     /**
@@ -230,7 +235,7 @@ public class AssemblyMojo
      * @param dependencySets
      * @param includeBaseDirectory
      */
-    private void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
+    protected void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
         throws ArchiverException, IOException, MojoExecutionException
     {
         for ( Iterator i = dependencySets.iterator(); i.hasNext(); )
@@ -310,7 +315,7 @@ public class AssemblyMojo
      * @param includeBaseDirecetory
      * @throws ArchiverException
      */
-    private void processFileSets( Archiver archiver, List fileSets, boolean includeBaseDirecetory )
+    protected void processFileSets( Archiver archiver, List fileSets, boolean includeBaseDirecetory )
         throws ArchiverException
     {
         for ( Iterator i = fileSets.iterator(); i.hasNext(); )
