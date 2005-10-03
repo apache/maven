@@ -2516,22 +2516,6 @@
         </field>
       </fields>
     </class>
-    <!-- TODO: deprecated -->
-    <class>
-      <name>Goal</name>
-      <version>4.0.0</version>
-      <fields>
-        <field>
-          <name>id</name>
-          <version>4.0.0</version>
-          <type>String</type>
-        </field>
-        <field>
-          <name>configuration</name>
-          <type>DOM</type>
-        </field>
-      </fields>
-    </class>
     <class>
       <name>DependencyManagement</name>
       <version>4.0.0</version>

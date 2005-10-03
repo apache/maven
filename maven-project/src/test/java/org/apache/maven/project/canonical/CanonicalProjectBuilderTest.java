@@ -16,10 +16,10 @@ package org.apache.maven.project.canonical;
  * limitations under the License.
  */
 
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -55,21 +55,21 @@ public class CanonicalProjectBuilderTest
         // Plugin0 [plexus]
 
         String key = "org.apache.maven.plugins:maven-plexus-plugin";
-        
+
         Plugin plugin = null;
         for ( Iterator it = plugins.iterator(); it.hasNext(); )
         {
             Plugin check = (Plugin) it.next();
-            
+
             if ( key.equals( check.getKey() ) )
             {
                 plugin = check;
                 break;
             }
         }
-        
+
         assertNotNull( plugin );
-        
+
         assertEquals( "1.0", plugin.getVersion() );
 
         Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
@@ -85,13 +85,15 @@ public class CanonicalProjectBuilderTest
         // Goal specific configuration
         // ----------------------------------------------------------------------
 
-        List goals = plugin.getGoals();
+        List executions = plugin.getExecutions();
 
-        Goal g0 = (Goal) goals.get( 0 );
+        PluginExecution execution = (PluginExecution) executions.get( 0 );
 
-        assertEquals( "plexus:runtime", g0.getId() );
+        String g0 = (String) execution.getGoals().get( 0 );
 
-        configuration = (Xpp3Dom) g0.getConfiguration();
+        assertEquals( "plexus:runtime", g0 );
+
+        configuration = (Xpp3Dom) execution.getConfiguration();
 
         assertEquals( "ContinuumPro", configuration.getChild( "plexusApplicationName" ).getValue() );
 

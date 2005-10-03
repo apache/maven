@@ -26,7 +26,6 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -199,9 +198,6 @@ public final class ModelUtils
             child.setVersion( parent.getVersion() );
         }
 
-        // merge the lists of goals that are not attached to an <execution/>
-        mergeGoalContainerDefinitions( child, parent );
-
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
@@ -328,74 +324,6 @@ public final class ModelUtils
             child.flushReportSetMap();
         }
 
-    }
-
-    /**
-     * @param child
-     * @param parent
-     * @deprecated
-     */
-    private static void mergeGoalContainerDefinitions( Plugin child, Plugin parent )
-    {
-        List parentGoals = parent.getGoals();
-
-        // if the supplemental goals are non-existent, then nothing related to goals changes.
-        if ( parentGoals != null && !parentGoals.isEmpty() )
-        {
-            Map assembledGoals = new TreeMap();
-
-            Map childGoals = child.getGoalsAsMap();
-
-            if ( childGoals != null )
-            {
-                for ( Iterator it = parentGoals.iterator(); it.hasNext(); )
-                {
-                    Goal parentGoal = (Goal) it.next();
-
-                    Goal assembledGoal = parentGoal;
-
-                    Goal childGoal = (Goal) childGoals.get( parentGoal.getId() );
-
-                    if ( childGoal != null )
-                    {
-                        Xpp3Dom childGoalConfig = (Xpp3Dom) childGoal.getConfiguration();
-                        Xpp3Dom parentGoalConfig = (Xpp3Dom) parentGoal.getConfiguration();
-
-                        childGoalConfig = Xpp3Dom.mergeXpp3Dom( childGoalConfig, parentGoalConfig );
-
-                        childGoal.setConfiguration( childGoalConfig );
-
-                        assembledGoal = childGoal;
-                    }
-
-                    assembledGoals.put( assembledGoal.getId(), assembledGoal );
-                }
-
-                for ( Iterator it = childGoals.entrySet().iterator(); it.hasNext(); )
-                {
-                    Map.Entry entry = (Map.Entry) it.next();
-
-                    String key = (String) entry.getKey();
-                    Goal childGoal = (Goal) entry.getValue();
-
-                    if ( !assembledGoals.containsKey( key ) )
-                    {
-                        assembledGoals.put( key, childGoal );
-                    }
-                }
-
-                child.setGoals( new ArrayList( assembledGoals.values() ) );
-
-                child.flushGoalMap();
-            }
-        }
-
-        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
-        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
-
-        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
-
-        child.setConfiguration( childConfiguration );
     }
 
     private static void mergePluginExecutionDefinitions( PluginExecution child, PluginExecution parent )

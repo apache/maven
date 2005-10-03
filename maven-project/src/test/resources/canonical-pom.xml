@@ -16,14 +16,16 @@
           <plexusConfigurationPropertiesFile>src/conf/plexus.properties</plexusConfigurationPropertiesFile>
           <plexusApplicationName>Continuum</plexusApplicationName>
         </configuration>
-        <goals>
-          <goal>
-            <id>plexus:runtime</id>
+        <executions>
+          <execution>
+            <goals>
+              <goal>plexus:runtime</goal>
+            </goals>
             <configuration>
               <plexusApplicationName>ContinuumPro</plexusApplicationName>
             </configuration>
-          </goal>
-        </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

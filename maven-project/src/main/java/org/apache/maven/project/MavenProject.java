@@ -30,7 +30,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -1233,21 +1232,6 @@ public class MavenProject
                 if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
                     dom = (Xpp3Dom) plugin.getConfiguration();
-
-                    // TODO: this part is deprecated
-                    if ( goalId != null )
-                    {
-                        Goal goal = (Goal) plugin.getGoalsAsMap().get( goalId );
-                        if ( goal != null )
-                        {
-                            Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
-                            if ( goalConfiguration != null )
-                            {
-                                Xpp3Dom newDom = new Xpp3Dom( goalConfiguration );
-                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
-                            }
-                        }
-                    }
 
                     if ( executionId != null )
                     {

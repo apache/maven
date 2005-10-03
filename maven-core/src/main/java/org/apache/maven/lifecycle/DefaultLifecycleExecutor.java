@@ -27,7 +27,6 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.ExtensionManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Extension;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
@@ -1037,8 +1036,6 @@ public class DefaultLifecycleExecutor
             // use the plugin if inherit was true in a base class, or it is in the current POM, otherwise use the default inheritence setting
             if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
             {
-                bindGoalMapToLifecycle( pluginDescriptor, plugin.getGoalsAsMap(), phaseMap, settings );
-
                 List executions = plugin.getExecutions();
 
                 if ( executions != null )
@@ -1072,33 +1069,6 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Error resolving plugin version", e );
         }
         return pluginDescriptor;
-    }
-
-    /**
-     * @deprecated
-     */
-    private void bindGoalMapToLifecycle( PluginDescriptor pluginDescriptor, Map goalMap, Map phaseMap,
-                                         Settings settings )
-    {
-        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
-        {
-            MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
-
-            Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
-
-            if ( goal != null )
-            {
-                // We have to check to see that the inheritance rules have been applied before binding this mojo.
-                if ( mojoDescriptor.isInheritedByDefault() )
-                {
-                    if ( mojoDescriptor.getPhase() != null )
-                    {
-                        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-                        addToLifecycleMappings( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
-                    }
-                }
-            }
-        }
     }
 
     private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution,
