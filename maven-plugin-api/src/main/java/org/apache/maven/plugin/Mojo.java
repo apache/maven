@@ -27,7 +27,7 @@ public interface Mojo
     String ROLE = Mojo.class.getName();
 
     void execute()
-        throws MojoExecutionException;
+        throws MojoExecutionException, MojoFailureException;
 
     // TODO: not sure about this here, and may want a getLog on here as well/instead
     void setLog( Log log );
