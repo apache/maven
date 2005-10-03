@@ -8,6 +8,11 @@
       <src>
         <pathelement location="src/main/java"/>
       </src>
+      <classpath>
+        <fileset dir="${libdir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
     </javac>
   </target>
   <target name="test-compile">
@@ -18,7 +23,7 @@
       </src>
       <classpath>
         <fileset dir="${libdir}">
-          <include name="junit-3.8.1.jar"/>
+          <include name="*.jar"/>
         </fileset>
       </classpath>
     </javac>

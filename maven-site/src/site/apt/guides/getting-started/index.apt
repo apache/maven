@@ -202,7 +202,7 @@ Compiling 1 source file to /tmp/my-app/target/classes
  standard conventions the POM above is very small and you haven't explicity had to tell Maven where any of
  your sources are or where the output should go. By following the standard Maven conventions you can get
  a lot done with very little effort! Just as a comparison lets take a look at what you might have had to do
- in {{{http://ant.apache.org}Ant}} to accomplish the same {{{ant/build-a1.xml}thing}}.
+ in {{{http://ant.apache.org}Ant}} to accomplish the same {{{../../ant/build-a1.xml}thing}}.
 
  Now this is simply to compile a single application source and the Ant script shown is pretty much the same
  size as the POM shown above. But we'll see how much more we can do with just that simple POM above!

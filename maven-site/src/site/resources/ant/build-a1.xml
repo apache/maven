@@ -7,6 +7,11 @@
       <src>
         <pathelement location="src/main/java"/>
       </src>
+      <classpath>
+        <fileset dir="${libdir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
     </javac>
   </target>
 </project>
