@@ -1,30 +1,29 @@
 package org.apache.maven.usability.plugin;
 
+import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 public class ExpressionDocumenter
 {
 
-    private static final String[] EXPRESSION_ROOTS = { "project", "settings", "session", "plugin" };
+    private static final String[] EXPRESSION_ROOTS = { "project", "settings", "session", "plugin", "rootless" };
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
@@ -58,13 +57,9 @@ public class ExpressionDocumenter
                 {
                     throw new ExpressionDocumentationException( "Failed to read documentation for expression root: " + EXPRESSION_ROOTS[i], e );
                 }
-                catch ( ParserConfigurationException e )
+                catch ( XmlPullParserException e )
                 {
                     throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: " + EXPRESSION_ROOTS[i], e );
-                }
-                catch ( SAXException e )
-                {
-                    throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: " + EXPRESSION_ROOTS[i], e.getException() );
                 }
                 finally
                 {
@@ -101,20 +96,32 @@ public class ExpressionDocumenter
      * @throws IOException 
      * @throws ParserConfigurationException 
      * @throws SAXException 
+     * @throws XmlPullParserException 
      */
     private static Map parseExpressionDocumentation( InputStream docStream )
-        throws IOException, ParserConfigurationException, SAXException
+        throws IOException, XmlPullParserException
     {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser parser = factory.newSAXParser();
-
-        ExpressionInfoParser eiParser = new ExpressionInfoParser();
+        Reader reader = new BufferedReader( new InputStreamReader( docStream ) );
         
-        InputSource is = new InputSource( docStream );
-
-        parser.parse( new InputSource( docStream ), eiParser );
-
-        return eiParser.getExpressionInfoMappings();
+        ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
+        
+        ExpressionDocumentation documentation = paramdocReader.read( reader );
+        
+        List expressions = documentation.getExpressions();
+        
+        Map bySyntax = new HashMap();
+        
+        if ( expressions != null && !expressions.isEmpty() )
+        {
+            for ( Iterator it = expressions.iterator(); it.hasNext(); )
+            {
+                Expression expr = (Expression) it.next();
+                
+                bySyntax.put( expr.getSyntax(), expr );
+            }
+        }
+        
+        return bySyntax;
     }
 
     private static ClassLoader initializeDocLoader()
@@ -146,142 +153,6 @@ public class ExpressionDocumenter
         }
 
         return new URLClassLoader( new URL[] { docResource } );
-    }
-
-    private static final class ExpressionInfoParser
-        extends DefaultHandler
-    {
-
-        private static final String EXPRESSION = "expression";
-        
-        private static final String SYNTAX = "syntax";
-
-        private static final String ORIGIN = "origin";
-
-        private static final String USAGE = "usage";
-
-        private static final String BAN = "ban";
-
-        private static final String DEPRECATION = "deprecation";
-        
-        private static final String ADDENDUM = "addendum";
-
-        private Map expressionInfos = new HashMap();
-
-        private StringBuffer currentBuffer;
-
-        private StringBuffer currentExpressionName;
-
-        private StringBuffer currentUsage;
-
-        private StringBuffer currentOrigin;
-        
-        private StringBuffer currentAddendum;
-
-        private StringBuffer currentBan;
-
-        private StringBuffer currentDeprecation;
-
-        Map getExpressionInfoMappings()
-        {
-            return expressionInfos;
-        }
-
-        public void characters( char[] ch, int start, int length )
-            throws SAXException
-        {
-            if ( currentBuffer != null )
-            {
-                currentBuffer.append( ch, start, length );
-            }
-        }
-
-        public void endElement( String uri, String localName, String qName )
-            throws SAXException
-        {
-            if ( EXPRESSION.equals( qName ) )
-            {
-                String expression = currentExpressionName.toString().trim();
-
-                ExpressionDocumentation ei = new ExpressionDocumentation();
-                ei.setExpression( expression );
-
-                if ( currentUsage != null )
-                {
-                    ei.setUsage( currentUsage.toString().trim() );
-                }
-
-                if ( currentOrigin != null )
-                {
-                    ei.setOrigin( currentOrigin.toString().trim() );
-                }
-
-                if ( currentBan != null )
-                {
-                    ei.setBanMessage( currentBan.toString().trim() );
-                }
-
-                if ( currentDeprecation != null )
-                {
-                    ei.setDeprecationMessage( currentDeprecation.toString().trim() );
-                }
-                
-                if ( currentAddendum != null )
-                {
-                    ei.setAddendum( currentAddendum.toString().trim() );
-                }
-
-                expressionInfos.put( expression, ei );
-
-                reset();
-            }
-        }
-
-        private void reset()
-        {
-            currentExpressionName = null;
-            currentUsage = null;
-            currentOrigin = null;
-            currentBan = null;
-            currentDeprecation = null;
-            currentAddendum = null;
-            currentBuffer = null;
-        }
-
-        public void startElement( String uri, String localName, String qName, Attributes attributes )
-            throws SAXException
-        {
-            if ( SYNTAX.equals( qName ) )
-            {
-                currentExpressionName = new StringBuffer();
-                currentBuffer = currentExpressionName;
-            }
-            else if ( ORIGIN.equals( qName ) )
-            {
-                currentOrigin = new StringBuffer();
-                currentBuffer = currentOrigin;
-            }
-            else if ( USAGE.equals( qName ) )
-            {
-                currentUsage = new StringBuffer();
-                currentBuffer = currentUsage;
-            }
-            else if ( BAN.equals( qName ) )
-            {
-                currentBan = new StringBuffer();
-                currentBuffer = currentBan;
-            }
-            else if ( DEPRECATION.equals( qName ) )
-            {
-                currentDeprecation = new StringBuffer();
-                currentBuffer = currentDeprecation;
-            }
-            else if ( ADDENDUM.equals( qName ) )
-            {
-                currentAddendum = new StringBuffer();
-                currentBuffer = currentAddendum;
-            }
-        }
     }
 
 }

@@ -61,7 +61,12 @@ public class PluginErrorDiagnoserTest
 
         ComponentConfigurationException cce = new ComponentConfigurationException(
                                                                                    "Class \'org.apache.maven.plugin.jar.JarMojo\' does not contain a field named \'addClasspath\'" );
-        PluginConfigurationException pce = new PluginConfigurationException( "test", cce );
+        
+        PluginDescriptor pd = new PluginDescriptor();
+        pd.setGroupId("testGroup");
+        pd.setArtifactId("testArtifact");
+        
+        PluginConfigurationException pce = new PluginConfigurationException( pd, "test", cce );
 
         assertTrue( diagnoser.canDiagnose( pce ) );
 

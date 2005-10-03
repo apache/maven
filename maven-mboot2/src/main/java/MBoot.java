@@ -42,7 +42,7 @@ public class MBoot
         "maven-artifact", "maven-plugin-descriptor", "maven-repository-metadata", "maven-artifact-manager",
         "maven-artifact-test", "maven-script/maven-script-beanshell",
         "maven-profile", "maven-project", "maven-plugin-registry", "maven-reporting/maven-reporting-api",
-        "maven-reporting/maven-reporting-impl", "maven-core", "maven-archiver",
+        "maven-reporting/maven-reporting-impl", "maven-plugin-parameter-documenter", "maven-core", "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
         "maven-plugin-tools/maven-plugin-tools-beanshell", "maven-plugin-tools/maven-plugin-tools-pluggy",
         "maven-core-it-verifier"};
@@ -63,6 +63,7 @@ public class MBoot
         targetVersions.put( "maven-profile", "1.0.0" );
         targetVersions.put( "maven-plugin-registry", "1.0.0" );
         targetVersions.put( "maven-plugin-descriptor", "1.0.0" );
+        targetVersions.put( "maven-plugin-parameter-documenter", "1.0.0" );
         targetVersions.put( "maven-repository-metadata", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
@@ -73,6 +74,7 @@ public class MBoot
         modelFiles.put( "maven-profile", "profiles.mdo" );
         modelFiles.put( "maven-plugin-registry", "plugin-registry.mdo" );
         modelFiles.put( "maven-plugin-descriptor", "src/main/mdo/lifecycle.mdo" );
+        modelFiles.put( "maven-plugin-parameter-documenter", "src/main/mdo/paramdoc.mdo" );
         modelFiles.put( "maven-repository-metadata", "src/main/mdo/metadata.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );

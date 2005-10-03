@@ -30,7 +30,7 @@ public class PluginParameterException
 
     public PluginParameterException( MojoDescriptor mojo, List parameters )
     {
-        super( "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
+        super( mojo.getPluginDescriptor(), "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
 
         this.mojo = mojo;
 
@@ -39,7 +39,7 @@ public class PluginParameterException
 
     public PluginParameterException( MojoDescriptor mojo, List parameters, Throwable cause )
     {
-        super( "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
+        super( mojo.getPluginDescriptor(), "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
 
         this.mojo = mojo;
 

@@ -1,5 +1,7 @@
 package org.apache.maven.plugin;
 
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -23,18 +25,36 @@ package org.apache.maven.plugin;
 public class PluginConfigurationException
     extends Exception
 {
-    public PluginConfigurationException( String message )
+    private final PluginDescriptor pluginDescriptor;
+    private String originalMessage;
+
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String message )
     {
-        super( message );
+        super( "Error configuring: " + pluginDescriptor.getPluginLookupKey() + ". Reason: " + message );
+        this.pluginDescriptor = pluginDescriptor;
+        this.originalMessage = message;
     }
 
-    public PluginConfigurationException( Throwable cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, Throwable cause )
     {
-        super( cause );
+        super( "Error configuring: " + pluginDescriptor.getPluginLookupKey() + ".", cause );
+        this.pluginDescriptor = pluginDescriptor;
     }
 
-    public PluginConfigurationException( String message, Throwable cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String message, Throwable cause )
     {
-        super( message, cause );
+        super( "Error configuring: " + pluginDescriptor.getPluginLookupKey() + ". Reason: " + message, cause );
+        this.pluginDescriptor = pluginDescriptor;
+        this.originalMessage = message;
+    }
+    
+    public PluginDescriptor getPluginDescriptor()
+    {
+        return pluginDescriptor;
+    }
+    
+    public String getOriginalMessage()
+    {
+        return originalMessage;
     }
 }

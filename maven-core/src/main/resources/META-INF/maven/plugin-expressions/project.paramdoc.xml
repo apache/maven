@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paramdoc xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ../../../../../../../maven-plugin-parameter-documenter/target/generated-site/xsd/paramdoc-1.0.0.xsd ">
 <expressions>
   <expression>
     <syntax>project.distributionManagementArtifactRepository</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <distributionManagement>
   <!-- use the following if you're not using a snapshot version. -->
   <repository>
@@ -16,124 +19,135 @@
     <url>scp://host/path/to/repo</url>
   </snapshotRepository>
 </distributionManagement>
-    ]]></origin>
-    <usage>
-      This is the ArtifactRepository used to deploy artifacts built by this Maven.
-    </usage>
+    ]]></configuration>
+    <description> This is the ArtifactRepository used to deploy artifacts built by this
+      Maven.
+    </description>
   </expression>
   <expression>
     <syntax>project.artifact</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <groupId>project.group</groupId>
 <artifactId>project-artifact</artifactId>
 <version>0.0.0.0</version>
 <packaging>type</packaging>
-    ]]></origin>
-    <usage>
-      This is the Artifact instance created from the essential project attributes: 
-      groupId, artifactId, version, and packaging (with a default packaging of 'jar').
-    </usage>
+    ]]></configuration>
+    <description> This is the Artifact instance created from the essential project
+      attributes: groupId, artifactId, version, and packaging (with a default packaging of
+      'jar').
+    </description>
   </expression>
   <expression>
     <syntax>project.parent</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <parent>
   <groupId>project.group</groupId>
   <artifactId>project-artifact</artifactId>
   <version>0.0.0.0</version>
 </parent>
-    ]]></origin>
-    <usage>
-      This is the MavenProject instance for the parent of the current POM.
-    </usage>
+    ]]></configuration>
+    <description> This is the MavenProject instance for the parent of the current POM.
+    </description>
   </expression>
   <expression>
     <syntax>project.file</syntax>
-    <usage>
-      This is the File instance that refers to the location of the current POM on disk.
-    </usage>
+    <description> This is the File instance that refers to the location of the current POM on
+      disk.
+    </description>
   </expression>
   <expression>
     <syntax>project.artifacts</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <dependencies>
   ...
 </dependencies>
-    ]]></origin>
-    <usage><![CDATA[
+    ]]></configuration>
+    <description>
+      <![CDATA[
       This is a set of Artifact instances resolved from the set of dependencies for
       the current project.
       
       NOTE: This will likely contain much more than the direct dependencies of the 
       current POM, since Maven uses transitive, or chained, dependency resolution.
-    ]]></usage>
+    ]]></description>
   </expression>
   <expression>
     <syntax>project.parentArtifact</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
     <parent>
       <groupId>project.group</groupId>
       <artifactId>project-artifact</artifactId>
       <version>0.0.0.0</version>
     </parent>
-    ]]></origin>
-    <usage>
-      This is the Artifact instance for the parent of the current POM.
-    </usage>
+    ]]></configuration>
+    <description> This is the Artifact instance for the parent of the current POM.
+    </description>
   </expression>
   <expression>
     <syntax>project.pluginArtifacts</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <build>
   <plugins>
     ...
   </plugins>
 </build>
-    ]]></origin>
-    <usage><![CDATA[
+    ]]></configuration>
+    <description>
+      <![CDATA[
       This is the list of Artifact instances for plugins used in the current build
       for this project.
       
       NOTE: This list may contain plugin Artifacts which are implied by the current POM's
       packaging and the lifecycle phase being built.
-    ]]></usage>
+    ]]></description>
   </expression>
   <expression>
     <syntax>project.remoteArtifactRepositories</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <repositories>
   ...
 </repositories>
-    ]]></origin>
-    <usage><![CDATA[
+    ]]></configuration>
+    <description>
+      <![CDATA[
       This is a list of ArtifactRepository instances used to resolve the Artifacts associated
       with the current POM.
       
       NOTE: This list will contain entries for repositories specified by ancestor POMs, including
       the default built-in super-POM, which is the parent of all POMs.
-    ]]></usage>
+    ]]></description>
   </expression>
   <expression>
     <syntax>project.pluginArtifactRepositories</syntax>
-    <origin><![CDATA[
+    <configuration>
+      <![CDATA[
 <pluginRepositories>
   ...
 </pluginRepositories>
-    ]]></origin>
-    <usage><![CDATA[
+    ]]></configuration>
+    <description>
+      <![CDATA[
       This is a list of ArtifactRepository instances used to resolve the Artifacts associated
       with plugins used in building the current POM.
       
       NOTE: This list will contain entries for repositories specified by ancestor POMs, including
       the default built-in super-POM, which is the parent of all POMs.
-    ]]></usage>
+    ]]></description>
   </expression>
   <expression>
     <syntax>project.attachedArtifacts</syntax>
-    <usage><![CDATA[
+    <description>
+      <![CDATA[
       This is a list of attachments to the main artifact produced by building the current POM.
       Attachments are derived works, based on the main build process, such as an ejb-client jar,
       project sources jar, etc.
-    ]]></usage>
+    ]]></description>
   </expression>
 </expressions>
+</paramdoc>

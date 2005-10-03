@@ -1,0 +1,54 @@
+<project>
+  <parent>
+    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>2.0-beta-3-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>maven-plugin-parameter-documenter</artifactId>
+  <name>Maven Plugin Parameter Documenter API</name>
+  <version>2.0-beta-3-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
+    
+        <configuration>
+          <version>1.0.0</version>
+          <model>src/main/mdo/paramdoc.mdo</model>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+        
+        <executions>
+          <execution>
+            <id>base</id>
+            <goals>
+              <goal>xpp3-writer</goal>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>xsd</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+  </dependencies>
+</project>

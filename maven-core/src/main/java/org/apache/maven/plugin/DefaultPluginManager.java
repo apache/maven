@@ -624,15 +624,15 @@ public class DefaultPluginManager
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new PluginConfigurationException( "Cannot resolve plugin dependencies", e );
+                throw new PluginConfigurationException( pluginDescriptor, "Cannot resolve plugin dependencies", e );
             }
             catch ( PlexusContainerException e )
             {
-                throw new PluginConfigurationException( "Cannot start plugin container", e );
+                throw new PluginConfigurationException( pluginDescriptor, "Cannot start plugin container", e );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new PluginConfigurationException( "Cannot resolve plugin dependencies", e );
+                throw new PluginConfigurationException( pluginDescriptor, "Cannot resolve plugin dependencies", e );
             }
         }
     }
@@ -779,7 +779,7 @@ public class DefaultPluginManager
                 }
                 catch ( ExpressionEvaluationException e )
                 {
-                    throw new PluginConfigurationException( "Bad expression", e );
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), "Bad expression", e );
                 }
 
                 // only mark as invalid if there are no child nodes
@@ -832,7 +832,7 @@ public class DefaultPluginManager
                     errorMessage.append( key );
                     errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
-                    throw new PluginConfigurationException( errorMessage.toString() );
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), errorMessage.toString() );
                 }
 
                 String deprecated = parameter.getDeprecated();
@@ -1036,12 +1036,13 @@ public class DefaultPluginManager
         }
         catch ( ComponentConfigurationException e )
         {
-            throw new PluginConfigurationException( "Unable to parse the created DOM for plugin configuration", e );
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), "Unable to parse the created DOM for plugin configuration", e );
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginConfigurationException(
-                "Unable to retrieve component configurator for plugin configuration", e );
+            throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(),
+                                                    "Unable to retrieve component configurator for plugin configuration",
+                                                    e );
         }
         finally
         {
@@ -1152,6 +1153,7 @@ public class DefaultPluginManager
         artifacts.add( "maven-monitor" );
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
+        artifacts.add( "maven-plugin-parameter-documenter" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-profile" );

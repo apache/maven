@@ -1,27 +1,34 @@
-<expressions>
-  <expression>
-    <syntax>settings.offline</syntax>
-    <origin><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<paramdoc xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ../../../../../../../maven-plugin-parameter-documenter/target/generated-site/xsd/paramdoc-1.0.0.xsd ">
+  <expressions>
+    <expression>
+      <syntax>settings.offline</syntax>
+      <configuration>
+        <![CDATA[
     <offline>true</offline>
-    ]]></origin>
-    <usage>
+    ]]></configuration>
+      <description>
+        <![CDATA[
       Flags the system as offline, to prevent accessing the network to resolve artifacts or execute plugins.
-    </usage>
-    <addendum><![CDATA[
-    NOTE: It's also possible to switch to offline mode on a per-build basis, using the '-o' command-line option.
-    ]]></addendum>
-  </expression>
-  <expression>
-    <syntax>settings.interactiveMode</syntax>
-    <origin><![CDATA[
+
+      NOTE: It's also possible to switch to offline mode on a per-build basis, using the '-o' command-line option.
+    ]]></description>
+    </expression>
+    <expression>
+      <syntax>settings.interactiveMode</syntax>
+      <configuration>
+        <![CDATA[
     <interactiveMode>true</interactiveMode>
-    ]]></origin>
-    <usage>
+    ]]></configuration>
+      <description>
+        <![CDATA[
       If false, flags the system to skip prompting the user for any information, or holding up the build
       waiting for any input.
-    </usage>
-    <addendum><![CDATA[
-    NOTE: It's also possible to switch to batch (ie. non-interactive) mode using the '-B' command-line option.
-    ]]></addendum>
-  </expression>
-</expressions>
+
+      NOTE: It's also possible to switch to batch (ie. non-interactive) mode using the '-B' command-line option.
+    ]]></description>
+    </expression>
+  </expressions>
+</paramdoc>
