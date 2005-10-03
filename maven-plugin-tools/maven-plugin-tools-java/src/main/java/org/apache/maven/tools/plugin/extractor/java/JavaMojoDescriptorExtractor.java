@@ -205,13 +205,6 @@ public class JavaMojoDescriptorExtractor
         // Additional phase to execute first
         // ----------------------------------------------------------------------
 
-        DocletTag oldExecutePhase = findInClassHierarchy( javaClass, "executePhase" );
-        if ( oldExecutePhase != null )
-        {
-            getLogger().warn( "DEPRECATED: @executePhase is deprecated, please use @execute" );
-            mojoDescriptor.setExecutePhase( oldExecutePhase.getValue() );
-        }
-
         DocletTag execute = findInClassHierarchy( javaClass, EXECUTE );
 
         if ( execute != null )
