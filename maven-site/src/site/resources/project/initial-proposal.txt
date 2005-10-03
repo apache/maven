@@ -1,0 +1,98 @@
+----------------------------------------------------------
+R A T I O N A L E  A N D  E X P L A N A T I O N
+----------------------------------------------------------
+
+Over the last year Maven has been in heavy development, is nearly
+production quality and is rapidly being adopted as the next generation
+build tool for Java-based projects. Maven initially started as an
+attempt to get a grasp on the ever increasing number of problems
+encountered in trying to build, maintain and document the Jakarta
+Turbine projects.
+
+Ironically, the Turbine projects are still the most difficult to build
+with Maven but fortunately this is not the case for countless other
+projects that have adopted Maven which is evident by the sheer number
+of Java projects cropping up everywhere with the Maven/Tigris look and
+feel.  The db.apache.org project finally has a site which is generated
+by Maven and we would challenge anyone at Apache to find an easier
+more elegant solution for deploy maintaining and deploying a top-level
+Apache project.
+
+On the whole most projects that are now using Maven are finding the
+general overall burden of building, maintaining and deploy greatly
+lifted. We would now like to bring Maven to a wider audience and
+continue trying to unify and codify the Java development process which
+would be the primary goal of this project.
+
+What follows is a list of people who would make up the initial PMC and
+the projects that would initially seed maven.apache.org if this 
+proposal is accepted.
+
+----------------------------------------------------------
+P M C  M E M B E R S
+----------------------------------------------------------
+
+The following list of people would make up the PMC. All those listed
+have participated in the development of Maven heavily to this point in
+time and would like to commit to initializing maven.apache.org.
+
+Dion Gillard
+Pete Kazmier
+Bob McWhirter
+James Strachan
+Jason van Zyl
+
+----------------------------------------------------------
+S E E D  P R O J E C T S
+----------------------------------------------------------
+
+To start, we plan to place the following projects into
+maven.apache.org:
+
+Maven: 
+The core Maven application that can be found at
+http://maven.apache.org/
+
+Plugins:
+A project for all the Plugins that have formed around Maven. There are
+currently 50+ Plugins for Maven in the Apache repository and another
+30+ living in different places around the world. We would like to
+provide a place for Plugin developers to keep their work and have it
+be separate from the Maven core.
+
+Continuum:
+Continuous Integration tool for Java-based projects that use Maven as
+their primary build tool. This package will be released when Maven 1.0
+is released.
+
+SCM:
+A Source Control Management abstraction that is slated to be used with
+Continuum but will serve as a general SCM tool for integration into
+any Java project.
+
+Artifact Downloading Mechanism:
+This project has yet to be named but it is the engine inside Maven
+that provides the artifact comparison and downloading capabilities of
+Maven. It has been requested that this functionality be separated from
+the core of Maven so that it can be utilized by other project like
+Ant.
+
+----------------------------------------------------------
+
+If the board deems the project is not meant to be a top-level Apache
+project then we would humbly ask the Board to release Maven from
+Apache and allow us to use the "Maven" name and move the entire
+project to maven.org. We fully understand any decision that the Board
+makes but ask that we be allowed to continue on the path we feel is
+best for Maven. We really feel that Maven is ready to leave the fold
+of Turbine where it started and become a project in its own right. We
+would prefer to be at Apache, but would take the project out of the
+Apache realm if the Board would grant us permission to do so.
+
+-- 
+jvz.
+
+Jason van Zyl
+jvanzyl@apache.org
+
+http://tambora.zenplex.org
