@@ -1,18 +1,6 @@
-o need to check in changes to plexus, maven-core, embedder
-o task segment still using the wrong logger
-
-x child container
-x mojos need to feed into the logging
 - surefire needs to feed into the logging
+- maven/plexus archiver needs to be fixed
 
-When you create the assembly you must manually install it in your
-local repository for now in order the maven-embedder-it tests to
-work. jvz.
-
--- run m2 (embedded): including running building, archetypes, etc.
-
--- introspect available plugins and their goals
-  
 -- to generate source folders for eclipse project from m2 pom.xml
    we need to run generate-sources phase, so all plugins
    registered for this phase will be kicked of and will register
@@ -28,29 +16,3 @@ work. jvz.
 
 -- What are all the settings that must be provided? Ones that can be set
    and what the default values would be if they aren't set.
-
--- Need to make an input handler to IDE use soon.
-
--- having to add all the component descriptors by hand and the maven
-   version metadata is a real drag. something needs to be added to
-   the assembly plugin.
-
--- maven.home
-
-this is a CLI notion and should not be required by the embedder but
-we still need to deal with notions of centralize configuration which
-are extremely important in the corporate environment.
-
--- ~/.m2
-
-plugin registry and settings should be stored in the tool specific locations
-
--- local repository will be shared and default to ~/.m2/repository
-
-<jdcasey> you know something else that would rock for the eclipse plugin? if
-F5 triggered a re-resolution of the poms, and recreation of the .classpath, etc.
-<jdcasey> that way, if the pom was upgraded to the next version-SNAPSHOT,
-you'd get it
-<jdcasey> :)
-<jdcasey> configurable on|off, of course
-<jdcasey> F5 is refresh, BTW
