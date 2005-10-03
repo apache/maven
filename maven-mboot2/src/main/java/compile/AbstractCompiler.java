@@ -18,14 +18,6 @@ public abstract class AbstractCompiler
     implements Compiler
 {
     private static String PS = System.getProperty( "path.separator" );
-    
-    /**
-     * @deprecated Use getPathString(..) instead.
-     */
-    public String getClasspathString( List pathElements ) throws Exception
-    {
-        return getPathString( pathElements );
-    }
 
     public String getPathString( List pathElements )
         throws Exception
@@ -73,7 +65,7 @@ public abstract class AbstractCompiler
                 }
                 else
                 {
-                    scanner.setIncludes( new String[] { "**/*.java" } );
+                    scanner.setIncludes( new String[]{"**/*.java"} );
                 }
 
                 Set excludes = config.getExcludes();
