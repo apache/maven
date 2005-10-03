@@ -88,6 +88,18 @@ with the dependency management mechanism you have to try to screw up your jar ve
 
 there is a strong defined lifecycle that a software system goes thru from the initiation of a build to the end...and the users are allowed to mix and match their system to the lifecycle instead of cobble together their own lifecycle..  this has the additional benefit of allowing people to move from one project to another and speak using the same vocabulary in terms of software building
 
+henning
+1) (most important) quick project setup, no complicated build.xml
+   files, just a POM and go
+   
+2) all developers in a project use the same jar dependencies due to
+centralized POM.
+      
+3) getting a number of reports and metrics for a project "for free"
+      
+4) reduce the size of source distributions, because jars can be pulled
+from a central location
+         
 
 
 +-----+
