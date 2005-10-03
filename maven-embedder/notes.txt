@@ -9,14 +9,6 @@ When you create the assembly you must manually install it in your
 local repository for now in order the maven-embedder-it tests to
 work. jvz.
 
--- parse xml to in-memory model
-  Now MavenEmbedder.readProjectWithDependencies()
-  transitively resolve all dependencies and download them
-  if anything is missing. 
-  
--- we need a callback for progress indication:
-   download, build, etc
-
 -- run m2 (embedded): including running building, archetypes, etc.
 
 -- introspect available plugins and their goals
@@ -33,18 +25,6 @@ work. jvz.
    We need to have two messages for EACH event/error:
      -- the short description (in Eclipse it can be used in Problems view)
      -- detailed description (can be used in annotation/editors markers)
-
--- Need getters for MavenEmbedder properties. E.g. to retrieve default 
-   location of the local repository
-
--- How to deal with the plugin registry builder whose component descriptor
-   container references like ${maven.home} and ${user.home}. These can be
-   placed in the context for plexus.
-
--- Would be nice to centralize the use of maven.home. Possibly have the
-   embedder take it in and set a system property of plexus context value.
-   There seems to be a tad of code duplicated in the plugin registry 
-   builder and the settings builder.
 
 -- What are all the settings that must be provided? Ones that can be set
    and what the default values would be if they aren't set.
@@ -67,17 +47,8 @@ plugin registry and settings should be stored in the tool specific locations
 
 -- local repository will be shared and default to ~/.m2/repository
 
--- add a method that gives the standard lifecycle phases.
-
-<eu> -- properties param on execute() method
-<eu> -- transfet listener and loggers, system out cleanup
-
-<eu> one more thing I need in embedder - writeModel() method
-
-
 <jdcasey> you know something else that would rock for the eclipse plugin? if
-F5 triggered a re-resolution of the poms, and recreation of the .classpath,
-etc.
+F5 triggered a re-resolution of the poms, and recreation of the .classpath, etc.
 <jdcasey> that way, if the pom was upgraded to the next version-SNAPSHOT,
 you'd get it
 <jdcasey> :)
