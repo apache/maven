@@ -365,19 +365,6 @@ public class SiteMojo
 
                 siteRenderer.render( siteDirectoryFile, outputDirectory, siteDescriptor, template, attributes, locale );
 
-                File cssDirectory = new File( siteDirectory, "css" );
-                File imagesDirectory = new File( siteDirectory, "images" );
-
-                // special case for backwards compatibility
-                if ( cssDirectory.exists() || imagesDirectory.exists() )
-                {
-                    getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
-
-                    copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
-
-                    copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
-                }
-
                 copyResources( outputDirectory );
 
                 // Copy site resources
