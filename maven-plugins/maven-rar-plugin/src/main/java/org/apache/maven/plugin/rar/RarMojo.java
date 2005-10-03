@@ -112,8 +112,8 @@ public class RarMojo
     private MavenProject project;
 
     /**
-	 * The Jar archiver.
-	 *
+     * The Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
      * @required
      */

@@ -40,7 +40,7 @@ public abstract class AbstractJarMojo
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
     /**
-	 * Directory containing the generated JAR.
+     * Directory containing the generated JAR.
      *
      * @parameter expression="${project.build.directory}"
      * @required
@@ -51,24 +51,24 @@ public abstract class AbstractJarMojo
     private String basedir;
 
     /**
-	 * Name of the generated JAR.
-	 *
+     * Name of the generated JAR.
+     *
      * @parameter alias="jarName" expression="${project.build.finalName}"
      * @required
      */
     private String finalName;
 
     /**
-	 * The Jar archiver.
-	 *
+     * The Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
      * @required
      */
     private JarArchiver jarArchiver;
 
     /**
-	 * The maven project.
-	 *
+     * The maven project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -101,7 +101,7 @@ public abstract class AbstractJarMojo
     }
 
     /**
-	 * Generates the JAR.
+     * Generates the JAR.
      *
      * @todo Add license files in META-INF directory.
      */

@@ -87,8 +87,8 @@ public class EarMojo
     private File resourcesDir;
 
     /**
-	 * The Jar archiver.
-	 *
+     * The Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
      * @required
      */

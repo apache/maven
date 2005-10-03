@@ -89,16 +89,16 @@ public class EjbMojo
     private MavenProject project;
 
     /**
-	 * The Jar archiver.
-	 *
+     * The Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
      * @required
      */
     private JarArchiver jarArchiver;
 
     /**
-	 * The client Jar archiver.
-	 *
+     * The client Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
      * @required
      */

@@ -131,8 +131,8 @@ public class WarMojo
     private String warName;
 
     /**
-	 * The Jar archiver.
-	 *
+     * The Jar archiver.
+     *
      * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#war}"
      * @required
      */
