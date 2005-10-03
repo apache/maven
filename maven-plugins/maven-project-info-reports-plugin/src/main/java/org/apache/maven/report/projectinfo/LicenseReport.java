@@ -333,41 +333,41 @@ public class LicenseReport
     private static String replaceParts( String html, String baseURL, String serverURL, String tagPattern,
                                         String attributePattern )
     {
-        Pattern anchor = Pattern
-            .compile( "(<\\s*" + tagPattern + "\\s+[^>]*" + attributePattern + "\\s*=\\s*\")([^\"]*)\"([^>]*>)" );
+        Pattern anchor = Pattern.compile(
+            "(<\\s*" + tagPattern + "\\s+[^>]*" + attributePattern + "\\s*=\\s*\")([^\"]*)\"([^>]*>)" );
         StringBuffer sb = new StringBuffer( html );
 
         int indx = 0;
-        do
+        boolean done = false;
+        while ( !done )
         {
             Matcher mAnchor = anchor.matcher( sb );
-            mAnchor.region( indx, sb.length() );
-            if ( !mAnchor.find() )
+            if ( mAnchor.find( indx ) )
             {
-                System.err.println( "No more matches" );
-                break; // no more matches
-            }
+                indx = mAnchor.end( 3 );
 
-            indx = mAnchor.end( 3 );
-
-            if ( mAnchor.group( 2 ).startsWith( "#" ) )
-            {
-                // relative link - don't want to alter this one!
+                if ( mAnchor.group( 2 ).startsWith( "#" ) )
+                {
+                    // relative link - don't want to alter this one!
+                }
+                if ( mAnchor.group( 2 ).startsWith( "/" ) )
+                {
+                    // root link
+                    sb.insert( mAnchor.start( 2 ), serverURL );
+                    indx += serverURL.length();
+                }
+                else if ( mAnchor.group( 2 ).indexOf( ':' ) < 0 )
+                {
+                    // relative link
+                    sb.insert( mAnchor.start( 2 ), baseURL );
+                    indx += baseURL.length();
+                }
             }
-            if ( mAnchor.group( 2 ).startsWith( "/" ) )
+            else
             {
-                // root link
-                sb.insert( mAnchor.start( 2 ), serverURL );
-                indx += serverURL.length();
-            }
-            else if ( mAnchor.group( 2 ).indexOf( ':' ) < 0 )
-            {
-                // relative link
-                sb.insert( mAnchor.start( 2 ), baseURL );
-                indx += baseURL.length();
+                done = true;
             }
         }
-        while ( true );
 
         return sb.toString();
     }
