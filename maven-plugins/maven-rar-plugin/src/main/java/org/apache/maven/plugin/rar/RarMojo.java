@@ -22,6 +22,7 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -109,6 +110,14 @@ public class RarMojo
      * @description "the maven project to use"
      */
     private MavenProject project;
+
+    /**
+	 * The Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+     * @required
+     */
+    private JarArchiver jarArchiver;
 
     /**
      * The maven archiver to use.
@@ -206,6 +215,7 @@ public class RarMojo
         {
             File rarFile = new File( outputDirectory, finalName + ".rar" );
             MavenArchiver archiver = new MavenArchiver();
+            archiver.setArchiver( jarArchiver );
             archiver.setOutputFile( rarFile );
 
             // Include custom manifest if necessary

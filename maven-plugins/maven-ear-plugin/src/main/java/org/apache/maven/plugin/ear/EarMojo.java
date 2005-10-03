@@ -19,6 +19,7 @@ package org.apache.maven.plugin.ear;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -84,6 +85,14 @@ public class EarMojo
      * @required
      */
     private File resourcesDir;
+
+    /**
+	 * The Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+     * @required
+     */
+    private JarArchiver jarArchiver;
 
     /**
      * The maven archiver to use.
@@ -173,6 +182,7 @@ public class EarMojo
         {
             File earFile = new File( outputDirectory, finalName + ".ear" );
             MavenArchiver archiver = new MavenArchiver();
+            archiver.setArchiver( jarArchiver );
             archiver.setOutputFile( earFile );
 
             // Include custom manifest if necessary

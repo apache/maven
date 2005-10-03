@@ -131,6 +131,14 @@ public class WarMojo
     private String warName;
 
     /**
+	 * The Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#war}"
+     * @required
+     */
+    private WarArchiver warArchiver;
+
+    /**
      * The maven archive configuration to use.
      *
      * @parameter
@@ -322,8 +330,6 @@ public class WarMojo
                 getLog().info( "Generating war " + warFile.getAbsolutePath() );
 
                 MavenArchiver archiver = new MavenArchiver();
-
-                WarArchiver warArchiver = new WarArchiver();
 
                 archiver.setArchiver( warArchiver );
 

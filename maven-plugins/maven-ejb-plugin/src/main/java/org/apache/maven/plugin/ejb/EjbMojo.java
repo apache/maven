@@ -22,6 +22,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
@@ -88,6 +89,14 @@ public class EjbMojo
     private MavenProject project;
 
     /**
+	 * The Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+     * @required
+     */
+    private JarArchiver jarArchiver;
+
+    /**
      * The maven project's helper.
      *
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
@@ -116,6 +125,8 @@ public class EjbMojo
         File jarFile = new File( basedir, jarName + ".jar" );
 
         MavenArchiver archiver = new MavenArchiver();
+
+        archiver.setArchiver( jarArchiver );
 
         archiver.setOutputFile( jarFile );
 
