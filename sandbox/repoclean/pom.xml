@@ -8,9 +8,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0-alpha-7-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
@@ -21,11 +21,6 @@
       <groupId>plexus</groupId>
       <artifactId>plexus-mail-sender-simple</artifactId>
       <version>1.0-alpha-1</version>
-    </dependency>
-    <dependency>
-      <groupId>classworlds</groupId>
-      <artifactId>classworlds</artifactId>
-      <version>1.1-alpha-1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

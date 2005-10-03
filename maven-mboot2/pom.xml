@@ -27,7 +27,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <scope>runtime</scope>
     </dependency>

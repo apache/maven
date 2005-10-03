@@ -15,7 +15,7 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <scope>test</scope>
     </dependency>
