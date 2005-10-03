@@ -1,5 +1,21 @@
 package org.apache.maven.project.injection;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.ConfigurationContainer;
@@ -99,31 +115,9 @@ public class DefaultProfileInjector
                 modelBuild.setFinalName( profileBuild.getFinalName() );
             }
 
-            List profileResources = profileBuild.getResources();
-
-            if ( profileResources != null && !profileResources.isEmpty() )
-            {
-                modelBuild.setResources( profileResources );
-            }
-
-            List profileTestResources = profileBuild.getTestResources();
-
-            if ( profileTestResources != null && !profileTestResources.isEmpty() )
-            {
-                modelBuild.setTestResources( profileTestResources );
-            }
-
-            if ( profileBuild.getFilters() != null )
-            {
-                if ( modelBuild.getFilters() == null )
-                {
-                    modelBuild.setFilters( profileBuild.getFilters() );
-                }
-                else
-                {
-                    modelBuild.getFilters().addAll( profileBuild.getFilters() );
-                }
-            }
+            ModelUtils.mergeFilterLists( modelBuild.getFilters(), profileBuild.getFilters() );
+            ModelUtils.mergeResourceLists( modelBuild.getResources(), profileBuild.getResources() );
+            ModelUtils.mergeResourceLists( modelBuild.getTestResources(), profileBuild.getTestResources() );
 
             injectPlugins( profileBuild, modelBuild );
 
@@ -299,7 +293,7 @@ public class DefaultProfileInjector
     }
 
     /**
-     * Append modules specified in the profile to the end of the list supplied by the model, if 
+     * Append modules specified in the profile to the end of the list supplied by the model, if
      * they don't already exist.
      */
     private void injectModules( Profile profile, Model model )

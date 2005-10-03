@@ -19,11 +19,13 @@ package org.apache.maven.project;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.ActivationProperty;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -1034,5 +1036,41 @@ public final class ModelUtils
         }
 
         return repositories;
+    }
+
+    public static void mergeExtensionLists( Build childBuild, Build parentBuild )
+    {
+        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
+        {
+            Extension e = (Extension) i.next();
+            if ( !childBuild.getExtensions().contains( e ) )
+            {
+                childBuild.addExtension( e );
+            }
+        }
+    }
+
+    public static void mergeResourceLists( List childResources, List parentResources )
+    {
+        for ( Iterator i = parentResources.iterator(); i.hasNext(); )
+        {
+            Resource r = (Resource) i.next();
+            if ( !childResources.contains( r ) )
+            {
+                childResources.add( r );
+            }
+        }
+    }
+
+    public static void mergeFilterLists( List childFilters, List parentFilters )
+    {
+        for ( Iterator i = parentFilters.iterator(); i.hasNext(); )
+        {
+            String f = (String) i.next();
+            if ( !childFilters.contains( f ) )
+            {
+                childFilters.add( f );
+            }
+        }
     }
 }

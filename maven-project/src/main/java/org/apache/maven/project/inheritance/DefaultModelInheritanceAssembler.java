@@ -20,7 +20,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
@@ -173,11 +172,11 @@ public class DefaultModelInheritanceAssembler
         assembleDependencyManagementInheritance( child, parent );
 
         assembleDistributionManagementInheritance( child, parent );
-        
+
         Properties props = new Properties();
         props.putAll( parent.getProperties() );
         props.putAll( child.getProperties() );
-        
+
         child.setProperties( props );
     }
 
@@ -350,7 +349,7 @@ public class DefaultModelInheritanceAssembler
             }
 
             // Extensions are accumlated
-            mergeExtensionLists( childBuild, parentBuild );
+            ModelUtils.mergeExtensionLists( childBuild, parentBuild );
 
             if ( childBuild.getDirectory() == null )
             {
@@ -367,17 +366,9 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setFinalName( parentBuild.getFinalName() );
             }
 
-            List resources = childBuild.getResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setResources( parentBuild.getResources() );
-            }
-
-            resources = childBuild.getTestResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setTestResources( parentBuild.getTestResources() );
-            }
+            ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
+            ModelUtils.mergeResourceLists( childBuild.getResources(), parentBuild.getResources() );
+            ModelUtils.mergeResourceLists( childBuild.getTestResources(), parentBuild.getTestResources() );
 
             // Plugins are aggregated if Plugin.inherit != false
             ModelUtils.mergePluginLists( childBuild, parentBuild, true );
@@ -397,7 +388,6 @@ public class DefaultModelInheritanceAssembler
             }
         }
     }
-
 
     private void assembleScmInheritance( Model child, Model parent, boolean appendPaths )
     {
@@ -523,15 +513,4 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void mergeExtensionLists( Build childBuild, Build parentBuild )
-    {
-        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
-        {
-            Extension e = (Extension) i.next();
-            if ( !childBuild.getExtensions().contains( e ) )
-            {
-                childBuild.addExtension( e );
-            }
-        }
-    }
 }
