@@ -335,7 +335,7 @@ public class LicenseReport
     {
         Pattern anchor = Pattern
             .compile( "(<\\s*" + tagPattern + "\\s+[^>]*" + attributePattern + "\\s*=\\s*\")([^\"]*)\"([^>]*>)" );
-        StringBuilder sb = new StringBuilder( html );
+        StringBuffer sb = new StringBuffer( html );
 
         int indx = 0;
         do
