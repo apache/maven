@@ -21,6 +21,7 @@ import bsh.Interpreter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.component.factory.bsh.BshComponent;
 
 /**
@@ -46,7 +47,7 @@ public class BeanshellMojoAdapter
     }
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         try
         {
