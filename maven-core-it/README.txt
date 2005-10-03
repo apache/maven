@@ -184,6 +184,10 @@ it0066: Test that nonstandard POM files will be installed correctly.
 
 it0067: Test activation of a profile from the command line.
 
+it0068: Test repository accumulation.
+
+it0069: Test offline mode.
+
 it0070: Test a RAR generation.
 
 it0071: Verifies that dotted property references work within plugin
