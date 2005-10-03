@@ -1172,22 +1172,6 @@ public class MavenProject
         return model.getPluginRepositories();
     }
 
-    /**
-     * @deprecated use getProperties() instead
-     */
-    public Properties getProfileProperties()
-    {
-        return getProperties();
-    }
-
-    /**
-     * @deprecated should add properties to the model instead
-     */
-    public void addProfileProperties( Properties profileConfiguration )
-    {
-        getProperties().putAll( profileConfiguration );
-    }
-
     public void setActiveProfiles( List activeProfiles )
     {
         this.activeProfiles.addAll( activeProfiles );
