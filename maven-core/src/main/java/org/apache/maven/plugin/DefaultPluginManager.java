@@ -782,39 +782,6 @@ public class DefaultPluginManager
                     throw new PluginConfigurationException( "Bad expression", e );
                 }
 
-                if ( fieldValue == null && goal.getComponentConfigurator() == null )
-                {
-                    try
-                    {
-                        // TODO: would like to remove in beta-1 as configurator should always be given, but it is
-                        // currently causing problems with published plugins.
-                        Field field = findPluginField( plugin.getClass(), parameter.getName() );
-                        boolean accessible = field.isAccessible();
-                        if ( !accessible )
-                        {
-                            field.setAccessible( true );
-                        }
-                        fieldValue = field.get( plugin );
-                        if ( !accessible )
-                        {
-                            field.setAccessible( false );
-                        }
-                        if ( fieldValue != null )
-                        {
-                            getLogger().warn( "DEPRECATED: using default-value to set the default value of field '" +
-                                parameter.getName() + "'" );
-                        }
-                    }
-                    catch ( NoSuchFieldException e )
-                    {
-                        throw new PluginConfigurationException( "Unable to find field to check default value", e );
-                    }
-                    catch ( IllegalAccessException e )
-                    {
-                        throw new PluginConfigurationException( "Unable to read field to check default value", e );
-                    }
-                }
-
                 // only mark as invalid if there are no child nodes
                 if ( fieldValue == null && ( value == null || value.getChildCount() == 0 ) )
                 {
