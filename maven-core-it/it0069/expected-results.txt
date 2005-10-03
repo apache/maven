@@ -1,1 +1,1 @@
-target/classes/org/apache/maven/it0069/ProjectBasedThing.class
+target/classes/org/apache/maven/it0069/ClassworldBasedThing.class
