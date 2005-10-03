@@ -86,11 +86,8 @@ public class DefaultPluginVersionManager
         return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
     }
 
-    /**
-     * @deprecated Make private, use resolveReportPluginVersion(..) or resolvePluginVersion(..) instead.
-     */
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                        ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                         ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
@@ -561,7 +558,7 @@ public class DefaultPluginVersionManager
             plugin.setUseVersion( version );
 
             pluginRegistry.addPlugin( plugin );
-            
+
             pluginRegistry.flushPluginsByKey();
         }
 
