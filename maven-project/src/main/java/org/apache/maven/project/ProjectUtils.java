@@ -93,12 +93,8 @@ public final class ProjectUtils
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
 
-            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots(),
-                                                                                repo.getSnapshotPolicy(),
-                                                                                repo.getChecksumPolicy() );
-            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases(),
-                                                                               repo.getSnapshotPolicy(),
-                                                                               repo.getChecksumPolicy() );
+            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
+            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
             return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshots, releases );
         }
@@ -108,13 +104,11 @@ public final class ProjectUtils
         }
     }
 
-    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy,
-                                                                           String defaultUpdatePolicy,
-                                                                           String defaultChecksumPolicy )
+    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
     {
         boolean enabled = true;
-        String updatePolicy = defaultUpdatePolicy;
-        String checksumPolicy = defaultChecksumPolicy;
+        String updatePolicy = null;
+        String checksumPolicy = null;
 
         if ( policy != null )
         {

@@ -2211,24 +2211,6 @@
         Repository contains the information needed for establishing connections with remote repoistory
       </description>
       <fields>
-        <!-- TODO: deprecated -->
-        <field>
-          <name>snapshotPolicy</name>
-          <version>4.0.0</version>
-          <description>
-            The policy for downloading snapshots - can be "always", "daily" (default), "interval:XXX" (in minutes) or
-            "never" (repository is not checked, even if the snapshot is not present locally).
-          </description>
-          <type>String</type>
-        </field>
-        <!-- TODO: deprecated -->
-        <field>
-          <name>checksumPolicy</name>
-          <version>4.0.0</version>
-          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
-            "fail" or "warn"</description>
-          <type>String</type>
-        </field>
         <field>
           <name>releases</name>
           <version>4.0.0</version>

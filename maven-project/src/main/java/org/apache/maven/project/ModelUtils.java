@@ -579,11 +579,9 @@ public final class ModelUtils
 
                 Repository newRepo = new Repository();
 
-                newRepo.setChecksumPolicy( repo.getChecksumPolicy() );
                 newRepo.setId( repo.getId() );
                 newRepo.setLayout( repo.getLayout() );
                 newRepo.setName( repo.getName() );
-                newRepo.setSnapshotPolicy( repo.getSnapshotPolicy() );
 
                 RepositoryPolicy releasePolicy = repo.getReleases();
 

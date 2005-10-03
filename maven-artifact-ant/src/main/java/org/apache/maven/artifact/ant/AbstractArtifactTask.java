@@ -221,8 +221,6 @@ public abstract class AbstractArtifactTask
     {
         RemoteRepository r = createAntRemoteRepositoryBase( pomRepository );
 
-        r.setSnapshotPolicy( pomRepository.getSnapshotPolicy() );
-
         if ( pomRepository.getSnapshots() != null )
         {
             r.addSnapshots( convertRepositoryPolicy( pomRepository.getSnapshots() ) );
