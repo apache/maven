@@ -703,7 +703,7 @@ public class MavenProject
         String type = artifact.getType();
 
         // TODO: utilise type handler
-        return "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type );
+        return "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) || "test-jar".equals( type );
     }
 
     // ----------------------------------------------------------------------

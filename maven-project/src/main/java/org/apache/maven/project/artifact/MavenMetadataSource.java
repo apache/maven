@@ -318,7 +318,12 @@ public class MavenMetadataSource
                     MavenProject project = (MavenProject) projectReferences.get( refId );
                     if ( project != null && project.getArtifact() != null )
                     {
-                        artifact = new ActiveProjectArtifact( project, artifact );
+                        // TODO: if not matching, we should get the correct artifact from that project (attached)
+                        if ( project.getArtifact().getDependencyConflictId().equals(
+                            artifact.getDependencyConflictId() ) )
+                        {
+                            artifact = new ActiveProjectArtifact( project, artifact );
+                        }
                     }
                 }
 
