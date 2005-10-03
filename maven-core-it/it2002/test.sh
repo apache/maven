@@ -13,10 +13,10 @@ if [ "$1" == "windows" ]; then
   echo setting dir to $dir
 fi
 
-svn import project file://localhost/${dir}/target/svnroot/project/trunk -m "import."
-svn mkdir file://localhost/${dir}/target/svnroot/project/tags -m "Creating tags dir."
+svn import project file://localhost/${dir}/target/svnroot/trunk/project -m "import."
+svn mkdir file://localhost/${dir}/target/svnroot/tags -m "Creating tags dir."
 
-svn co file://localhost/${dir}/target/svnroot/project/trunk target/project.checkout
+svn co file://localhost/${dir}/target/svnroot/trunk/project target/project.checkout
 
 cd target/project.checkout
 

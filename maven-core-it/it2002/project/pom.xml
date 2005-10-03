@@ -57,6 +57,14 @@
         <artifactId>modello-maven-plugin</artifactId>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/conf</directory>
+      </resource>
+    </resources>
   </build>
 
   <reporting>
