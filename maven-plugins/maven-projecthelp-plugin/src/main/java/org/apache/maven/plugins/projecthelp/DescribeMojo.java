@@ -131,15 +131,7 @@ public class DescribeMojo
 
         if ( pluginPrefix != null )
         {
-            try
-            {
-                descriptor = pluginManager.getPluginDescriptorForPrefix( pluginPrefix );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new MojoExecutionException( "Error retrieving plugin descriptor for prefix: \'" + pluginPrefix
-                    + "\'.", e );
-            }
+            descriptor = pluginManager.getPluginDescriptorForPrefix( pluginPrefix );
         }
         else if ( groupId != null && artifactId != null )
         {
