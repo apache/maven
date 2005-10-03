@@ -19,11 +19,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-core-it-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <goals>
-          <goal>
-            <id>touch</id>
-          </goal>
-        </goals>
+        <executions>
+          <execution>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

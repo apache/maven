@@ -23,14 +23,17 @@
           <pluginItem>pluginItem</pluginItem>
           <goalItem>bad-item</goalItem>
         </configuration>
-        <goals>
-          <goal>
-            <id>touch</id>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>touch</goal>
+            </goals>
             <configuration>
               <goalItem>goalItem</goalItem>
             </configuration>
-          </goal>
-        </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

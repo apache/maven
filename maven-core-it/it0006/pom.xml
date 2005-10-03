@@ -8,11 +8,13 @@
     <plugins>
       <plugin>
         <artifactId>maven-verifier-plugin</artifactId>
-        <goals>
-          <goal>
-            <id>verify</id>
-          </goal>
-        </goals>        
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>        
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
