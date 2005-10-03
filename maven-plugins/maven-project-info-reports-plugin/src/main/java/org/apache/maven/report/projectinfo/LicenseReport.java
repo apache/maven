@@ -37,21 +37,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Generates the Project License report.
- * 
- * @goal license
- * 
+ *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal license
  */
 public class LicenseReport
     extends AbstractMavenReport
 {
     /**
      * Report output directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
@@ -59,7 +60,7 @@ public class LicenseReport
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -68,7 +69,7 @@ public class LicenseReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -215,8 +216,8 @@ public class LicenseReport
                     }
                     catch ( MalformedURLException e )
                     {
-                        throw new MissingResourceException( "The license url [" + url + "] seems to be invalid: "
-                            + e.getMessage(), null, null );
+                        throw new MissingResourceException(
+                            "The license url [" + url + "] seems to be invalid: " + e.getMessage(), null, null );
                     }
                 }
                 else
@@ -224,8 +225,8 @@ public class LicenseReport
                     File licenseFile = new File( project.getBasedir(), url );
                     if ( !licenseFile.exists() )
                     {
-                        throw new MissingResourceException( "Maven can't find the file " + licenseFile
-                            + " on the system.", null, null );
+                        throw new MissingResourceException(
+                            "Maven can't find the file " + licenseFile + " on the system.", null, null );
                     }
                     try
                     {
@@ -233,8 +234,8 @@ public class LicenseReport
                     }
                     catch ( MalformedURLException e )
                     {
-                        throw new MissingResourceException( "The license url [" + url + "] seems to be invalid: "
-                            + e.getMessage(), null, null );
+                        throw new MissingResourceException(
+                            "The license url [" + url + "] seems to be invalid: " + e.getMessage(), null, null );
                     }
                 }
 
@@ -262,8 +263,26 @@ public class LicenseReport
                     paragraph( comments );
                 }
 
-                verbatimText( licenseContent );
+                // TODO: we should check for a text/html mime type instead, and possibly use a html parser to do this a bit more cleanly/reliably.
+                String licenseContentLC = licenseContent.toLowerCase();
+                int bodyStart = licenseContentLC.indexOf( "<body" );
+                int bodyEnd = licenseContentLC.indexOf( "</body>" );
+                if ( ( licenseContentLC.startsWith( "<!doctype html" ) || licenseContentLC.startsWith( "<html>" ) ) &&
+                    bodyStart >= 0 && bodyEnd >= 0 )
+                {
+                    bodyStart = licenseContentLC.indexOf( ">", bodyStart ) + 1;
+                    String body = licenseContent.substring( bodyStart, bodyEnd );
 
+                    link( "[Original text]", licenseUrl.toExternalForm() );
+                    paragraph( "Copy of the license follows." );
+
+                    body = replaceRelativeLinks( body, baseURL( licenseUrl ).toExternalForm() );
+                    sink.rawText( body );
+                }
+                else
+                {
+                    verbatimText( licenseContent );
+                }
                 endSection();
             }
 
@@ -274,5 +293,82 @@ public class LicenseReport
     private static ResourceBundle getBundle( Locale locale )
     {
         return ResourceBundle.getBundle( "project-info-report", locale, LicenseReport.class.getClassLoader() );
+    }
+
+    private static URL baseURL( URL aUrl )
+    {
+        String urlTxt = aUrl.toExternalForm();
+        int lastSlash = urlTxt.lastIndexOf( '/' );
+        if ( lastSlash > -1 )
+        {
+            try
+            {
+                return new URL( urlTxt.substring( 0, lastSlash + 1 ) );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new AssertionError( e );
+            }
+        }
+        else
+        {
+            return aUrl;
+        }
+    }
+
+    private static String replaceRelativeLinks( String html, String baseURL )
+    {
+        if ( !baseURL.endsWith( "/" ) )
+        {
+            baseURL += "/";
+        }
+
+        String serverURL = baseURL.substring( 0, baseURL.indexOf( '/', baseURL.indexOf( "//" ) + 2 ) );
+
+        html = replaceParts( html, baseURL, serverURL, "[aA]", "[hH][rR][eE][fF]" );
+        html = replaceParts( html, baseURL, serverURL, "[iI][mM][gG]", "[sS][rR][cC]" );
+        return html;
+    }
+
+    private static String replaceParts( String html, String baseURL, String serverURL, String tagPattern,
+                                        String attributePattern )
+    {
+        Pattern anchor = Pattern
+            .compile( "(<\\s*" + tagPattern + "\\s+[^>]*" + attributePattern + "\\s*=\\s*\")([^\"]*)\"([^>]*>)" );
+        StringBuilder sb = new StringBuilder( html );
+
+        int indx = 0;
+        do
+        {
+            Matcher mAnchor = anchor.matcher( sb );
+            mAnchor.region( indx, sb.length() );
+            if ( !mAnchor.find() )
+            {
+                System.err.println( "No more matches" );
+                break; // no more matches
+            }
+
+            indx = mAnchor.end( 3 );
+
+            if ( mAnchor.group( 2 ).startsWith( "#" ) )
+            {
+                // relative link - don't want to alter this one!
+            }
+            if ( mAnchor.group( 2 ).startsWith( "/" ) )
+            {
+                // root link
+                sb.insert( mAnchor.start( 2 ), serverURL );
+                indx += serverURL.length();
+            }
+            else if ( mAnchor.group( 2 ).indexOf( ':' ) < 0 )
+            {
+                // relative link
+                sb.insert( mAnchor.start( 2 ), baseURL );
+                indx += baseURL.length();
+            }
+        }
+        while ( true );
+
+        return sb.toString();
     }
 }
