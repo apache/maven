@@ -55,28 +55,27 @@ if [ -z "$M2_HOME" ] ; then
 
   ## resolve links - $0 may be a link to maven's home
   PRG="$0"
-  saveddir=`pwd`
 
   # need this for relative symlinks
-  PRGDIR=`dirname "$PRG"`
-  cd "$PRGDIR"
-
   while [ -h "$PRG" ] ; do
     ls=`ls -ld "$PRG"`
     link=`expr "$ls" : '.*-> \(.*\)$'`
     if expr "$link" : '.*/.*' > /dev/null; then
-  PRG="$link"
+      PRG="$link"
     else
-  PRG="$PRGDIR/$link"
+      PRG="`dirname "$PRG"`/$link"
     fi
   done
 
-  M2_HOME="$PRGDIR/.."
+  saveddir=`pwd`
+
+  M2_HOME=`dirname "$PRG"`/..
 
   # make it fully qualified
   M2_HOME=`cd "$M2_HOME" && pwd`
 
   cd "$saveddir"
+  # echo Using m2 at $M2_HOME
 fi
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
