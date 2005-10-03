@@ -280,8 +280,19 @@ public class PluginDescriptorGenerator
                     // remove "component." plus expression delimiters
                     String role = expression.substring( "${component.".length(), expression.length() - 1 );
 
+                    String roleHint = null;
+
+                    int posRoleHintSeparator;
+
+                    if ( ( posRoleHintSeparator = role.indexOf( "#" ) ) > 0 )
+                    {
+                        roleHint = role.substring( posRoleHintSeparator + 1 );
+
+                        role = role.substring( 0, posRoleHintSeparator );
+                    }
+
                     // TODO: remove deprecated expression
-                    requirements.put( parameter.getName(), new Requirement( role ) );
+                    requirements.put( parameter.getName(), new Requirement( role, roleHint ) );
                 }
                 else if ( parameter.getRequirement() != null )
                 {
