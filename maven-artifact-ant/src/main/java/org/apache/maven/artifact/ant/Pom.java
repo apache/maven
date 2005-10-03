@@ -34,7 +34,6 @@ import org.apache.tools.ant.PropertyHelper;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
-import java.util.Collections;
 
 /**
  * A POM typedef.
@@ -114,7 +113,7 @@ public class Pom
             try
             {
                 // TODO: should the profiles be constructed and passed in here? From Ant, or perhaps settings?
-                mavenProject = builder.build( file, localRepository, Collections.EMPTY_LIST );
+                mavenProject = builder.build( file, localRepository, null );
             }
             catch ( ProjectBuildingException e )
             {

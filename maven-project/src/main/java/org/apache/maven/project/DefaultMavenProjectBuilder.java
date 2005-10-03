@@ -259,30 +259,6 @@ public class DefaultMavenProjectBuilder
         return map;
     }
 
-    /**
-     * @deprecated Use build( File, ArtifactRepository, ProfileManager)
-     */
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List activeExternalProfiles )
-        throws ProjectBuildingException
-    {
-        ProfileManager profileManager = new DefaultProfileManager( container );
-
-        if ( activeExternalProfiles != null )
-        {
-            for ( Iterator it = activeExternalProfiles.iterator(); it.hasNext(); )
-            {
-                Profile profile = (Profile) it.next();
-
-                // since it's already determined to be active, we'll explicitly set it as activated in the mgr.
-                profileManager.explicitlyActivate( profile.getId() );
-
-                profileManager.addProfile( profile );
-            }
-        }
-
-        return buildFromSourceFile( projectDescriptor, localRepository, profileManager );
-    }
-
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
                                ProfileManager profileManager )
         throws ProjectBuildingException

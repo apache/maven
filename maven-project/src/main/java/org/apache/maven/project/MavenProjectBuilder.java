@@ -35,12 +35,6 @@ public interface MavenProjectBuilder
 
     String STANDALONE_SUPERPOM_VERSION = "2.0";
 
-    /**
-     * @deprecated Use build( File, ArtifactRepository, ProfileManager)
-     */
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List activeExternalProfiles )
-        throws ProjectBuildingException;
-    
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
@@ -48,14 +42,11 @@ public interface MavenProjectBuilder
     // These methods are used by the MavenEmbedder
     // ----------------------------------------------------------------------
 
-    MavenProject buildWithDependencies( File project,
-                                        ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager,
-                                        TransferListener transferListener )
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager, TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException;
 
-    MavenProject buildWithDependencies( File project,
-                                        ArtifactRepository localRepository,
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException;
 
