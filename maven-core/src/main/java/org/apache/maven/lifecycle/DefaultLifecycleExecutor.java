@@ -37,10 +37,10 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
@@ -73,6 +73,7 @@ import java.util.StringTokenizer;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
  *          jdcasey Exp $
+ * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without much of the event handling)
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
@@ -150,7 +151,7 @@ public class DefaultLifecycleExecutor
                 artifactHandlerManager.addHandlers( handlers );
             }
 
-            executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
+            executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher, response );
 
             if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && rm.hasBuildFailures() )
             {
@@ -198,7 +199,8 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
-                                      MavenProject rootProject, EventDispatcher dispatcher )
+                                      MavenProject rootProject, EventDispatcher dispatcher,
+                                      MavenExecutionResponse response )
         throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException,
         LifecycleExecutionException, MojoFailureException
     {
@@ -233,7 +235,7 @@ public class DefaultLifecycleExecutor
 
                             try
                             {
-                                executeGoal( task, session, rootProject );
+                                executeGoal( task, session, rootProject, response );
                             }
                             catch ( MojoExecutionException e )
                             {
@@ -276,6 +278,8 @@ public class DefaultLifecycleExecutor
             {
                 List sortedProjects = session.getSortedProjects();
 
+                response.setExecutedMultipleProjects( true );
+
                 // iterate over projects, and execute on each...
                 for ( Iterator projectIterator = sortedProjects.iterator(); projectIterator.hasNext(); )
                 {
@@ -305,7 +309,7 @@ public class DefaultLifecycleExecutor
 
                                 try
                                 {
-                                    executeGoal( task, session, currentProject );
+                                    executeGoal( task, session, currentProject, response );
                                 }
                                 catch ( MojoExecutionException e )
                                 {
@@ -484,7 +488,7 @@ public class DefaultLifecycleExecutor
         return segments;
     }
 
-    private void executeGoal( String task, MavenSession session, MavenProject project )
+    private void executeGoal( String task, MavenSession session, MavenProject project, MavenExecutionResponse response )
         throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException,
         ArtifactResolutionException, MojoFailureException
     {
@@ -492,32 +496,33 @@ public class DefaultLifecycleExecutor
         {
             // we have a lifecycle phase, so lets bind all the necessary goals
             Map lifecycleMappings = constructLifecycleMappings( session, task, project );
-            executeGoalWithLifecycle( task, session, lifecycleMappings, project );
+            executeGoalWithLifecycle( task, session, lifecycleMappings, project, response );
         }
         else
         {
-            executeStandaloneGoal( task, session, project );
+            executeStandaloneGoal( task, session, project, response );
         }
     }
 
     private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings,
-                                           MavenProject project )
+                                           MavenProject project, MavenExecutionResponse response )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException
     {
         List goals = processGoalChain( task, lifecycleMappings );
 
-        executeGoals( goals, session, project );
+        executeGoals( goals, session, project, response );
     }
 
-    private void executeStandaloneGoal( String task, MavenSession session, MavenProject project )
+    private void executeStandaloneGoal( String task, MavenSession session, MavenProject project,
+                                        MavenExecutionResponse response )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException
     {
         // guaranteed to come from the CLI and not be part of a phase
         MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true );
-        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project );
+        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project, response );
     }
 
-    private void executeGoals( List goals, MavenSession session, MavenProject project )
+    private void executeGoals( List goals, MavenSession session, MavenProject project, MavenExecutionResponse response )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException, MojoFailureException
     {
         for ( Iterator i = goals.iterator(); i.hasNext(); )
@@ -528,7 +533,7 @@ public class DefaultLifecycleExecutor
 
             if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
             {
-                forkLifecycle( mojoDescriptor, session, project );
+                forkLifecycle( mojoDescriptor, session, project, response );
             }
 
             if ( mojoDescriptor.isRequiresReports() )
@@ -544,7 +549,7 @@ public class DefaultLifecycleExecutor
 
                     if ( descriptor.getExecutePhase() != null )
                     {
-                        forkLifecycle( descriptor, session, project );
+                        forkLifecycle( descriptor, session, project, response );
                     }
                 }
             }
@@ -692,11 +697,41 @@ public class DefaultLifecycleExecutor
         return reports;
     }
 
-    private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )
+    private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project,
+                                MavenExecutionResponse response )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException, MojoFailureException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+
+        if ( mojoDescriptor.isAggregator() )
+        {
+            response.setExecutedMultipleProjects( true );
+
+            for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
+            {
+                MavenProject reactorProject = (MavenProject) i.next();
+
+                line();
+
+                getLogger().info( "Building " + reactorProject.getName() );
+
+                line();
+
+                forkProjectLifecycle( mojoDescriptor, session, reactorProject, response );
+            }
+        }
+        else
+        {
+            forkProjectLifecycle( mojoDescriptor, session, project, response );
+        }
+    }
+
+    private void forkProjectLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project,
+                                       MavenExecutionResponse response )
+        throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException
+    {
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         String targetPhase = mojoDescriptor.getExecutePhase();
 
@@ -754,13 +789,13 @@ public class DefaultLifecycleExecutor
         MavenProject executionProject = new MavenProject( project );
         if ( targetPhase != null )
         {
-            executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject );
+            executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject, response );
         }
         else
         {
             String goal = mojoDescriptor.getExecuteGoal();
             MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
-            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), session, executionProject );
+            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), session, executionProject, response );
         }
         project.setExecutionProject( executionProject );
     }

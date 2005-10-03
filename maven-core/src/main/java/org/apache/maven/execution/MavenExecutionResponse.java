@@ -30,13 +30,15 @@ public class MavenExecutionResponse
 
     private Date finish;
 
+    private boolean executedMultipleProjects;
+
     // ----------------------------------------------------------------------
     // Execution failure
     // ----------------------------------------------------------------------
 
     public boolean isExecutionFailure()
     {
-        return ( exception != null );
+        return exception != null;
     }
 
     // ----------------------------------------------------------------------
@@ -75,5 +77,15 @@ public class MavenExecutionResponse
     public void setFinish( Date finish )
     {
         this.finish = finish;
+    }
+
+    public boolean executedMultipleProjects()
+    {
+        return executedMultipleProjects;
+    }
+
+    public void setExecutedMultipleProjects( boolean executedMultipleProjects )
+    {
+        this.executedMultipleProjects = executedMultipleProjects;
     }
 }

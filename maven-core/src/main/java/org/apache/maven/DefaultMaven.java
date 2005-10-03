@@ -229,7 +229,7 @@ public class DefaultMaven
                     {
                         logFailure( response, exception, null );
 
-                        if ( rm.hasMultipleProjects() )
+                        if ( rm.hasMultipleProjects() && response.executedMultipleProjects() )
                         {
                             writeReactorSummary( rm );
                         }
@@ -600,7 +600,7 @@ public class DefaultMaven
                 if ( diagnoser.canDiagnose( error ) )
                 {
                     message = diagnoser.diagnose( error );
-                    
+
                     // first one wins.
                     break;
                 }
@@ -644,7 +644,7 @@ public class DefaultMaven
                 if ( diagnoser.canDiagnose( error ) )
                 {
                     message = diagnoser.diagnose( error );
-                    
+
                     // first one wins.
                     break;
                 }
@@ -675,10 +675,6 @@ public class DefaultMaven
             line();
         }
 
-        getLogger().info( "BUILD FAILURE" );
-
-        line();
-
         stats( r.getStart(), r.getFinish() );
 
         line();
@@ -686,7 +682,7 @@ public class DefaultMaven
 
     protected void logSuccess( MavenExecutionResponse r, ReactorManager rm )
     {
-        if ( rm.hasMultipleProjects() )
+        if ( rm.hasMultipleProjects() && r.executedMultipleProjects() )
         {
             writeReactorSummary( rm );
         }
