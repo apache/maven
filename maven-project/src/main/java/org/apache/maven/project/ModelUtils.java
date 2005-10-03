@@ -198,6 +198,13 @@ public final class ModelUtils
             child.setVersion( parent.getVersion() );
         }
 
+        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+
+        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
+
+        child.setConfiguration( childConfiguration );
+
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
@@ -503,13 +510,11 @@ public final class ModelUtils
 
             newR.setOutputDirectory( reporting.getOutputDirectory() );
 
-            List newP = null;
-
             List plugins = reporting.getPlugins();
 
             if ( plugins != null )
             {
-                newP = new ArrayList( plugins.size() );
+                List newP = new ArrayList( plugins.size() );
 
                 for ( Iterator it = plugins.iterator(); it.hasNext(); )
                 {
