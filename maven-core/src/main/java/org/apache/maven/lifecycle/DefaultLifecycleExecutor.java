@@ -1172,7 +1172,7 @@ public class DefaultLifecycleExecutor
         {
             if ( !canUsePrefix )
             {
-                String msg = "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. " +
+                String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. " +
                     "Please use specification of the form groupId:artifactId[:version]:goal instead. " +
                     "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
                 throw new LifecycleExecutionException( msg );
