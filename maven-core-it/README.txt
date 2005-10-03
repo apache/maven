@@ -210,6 +210,10 @@ it0076: Test that plugins in pluginManagement aren't included in the build
 
 it0077: Test test jar attachment.
 
+it0078: Test that configuration for maven-compiler-plugin is injected from
+        PluginManagement section even when it's not explicitly defined in the
+        plugins section.
+
 -------------------------------------------------------------------------------
 
 - generated sources
