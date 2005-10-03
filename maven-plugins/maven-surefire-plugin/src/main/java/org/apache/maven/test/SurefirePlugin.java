@@ -141,6 +141,30 @@ public class SurefirePlugin
      * @parameter expression="${plugin.artifacts}"
      */
     private List pluginArtifacts;
+    
+    /**
+     * Option to print summary of test suites or just print the test cases that has errors.
+     * 
+     *  @parameter expression="${surefire.printSummary}"
+     *             default-value="true"
+     */
+    private boolean printSummary;
+    
+    /**
+     * Selects the formatting for the test report to be generated.  Can be set as brief, plain, or xml.
+     * 
+     * @parameter expression="${surefire.reportFormat}"
+     *            default-value="brief"       
+     */
+     private String reportFormat;
+     
+     /**
+      * Option to generate a file test report or just output the test report to the console.
+      * 
+      * @parameter expression="${surefire.useFile}"
+      *            default-value="true"
+      */
+     private boolean useFile;
 
     public void execute()
         throws MojoExecutionException
@@ -253,13 +277,8 @@ public class SurefirePlugin
             surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
         }
 
-        surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
-
-        surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
-
-        surefireBooter.addReport( "org.codehaus.surefire.report.XMLReporter");
-
-
+        addReporters(surefireBooter);
+        
         boolean success;
 
         try
@@ -344,5 +363,49 @@ public class SurefirePlugin
         }
 
         return list;
+    }
+    
+    /**
+     * <p> Adds Reporters that will generate reports with different formatting. 
+     * <p> The Reporter that will be added will be based on the value of the parameter 
+     *     useFile, reportFormat, and printSummary.
+     *     
+     * @param surefireBooter The surefire booter that will run tests.
+     */
+    private void addReporters(SurefireBooter surefireBooter)
+    {
+
+        if ( useFile )
+        {
+            if ( printSummary )
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
+            }
+            else
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.SummaryConsoleReporter" );
+            }
+
+            if ( reportFormat.equals( "brief" ) )
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.BriefFileReporter" );
+            }
+            else if ( reportFormat.equals( "plain" ) )
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
+            }
+        }
+        else
+        {
+            if ( reportFormat.equals( "brief" ) )
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.BriefConsoleReporter" );
+            }
+            else if ( reportFormat.equals( "plain" ) )
+            {
+                surefireBooter.addReport( "org.codehaus.surefire.report.DetailedConsoleReporter" );
+            }
+        }
+        surefireBooter.addReport( "org.codehaus.surefire.report.XMLReporter" );   
     }
 }
