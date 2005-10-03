@@ -37,12 +37,6 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
     }
 
-    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
-                                                  String type, String classifier )
-    {
-        return createArtifact( groupId, artifactId, version, scope, type, classifier, null );
-    }
-
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
                                                   String classifier )
     {
@@ -95,12 +89,6 @@ public class DefaultArtifactFactory
     public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
         return createArtifact( groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null );
-    }
-
-    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                                    String inheritedScope )
-    {
-        return createArtifact( groupId, artifactId, version, scope, type, null, inheritedScope );
     }
 
     private Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,

@@ -23,20 +23,8 @@ public interface ArtifactFactory
 {
     String ROLE = ArtifactFactory.class.getName();
 
-    /**
-     * @deprecated
-     */
-    Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                             String inheritedScope );
-
     // TODO: deprecate and chase down (probably used for copying only)
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
-
-    /**
-     * @deprecated
-     */
-    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope, String type,
-                                           String classifier );
 
     Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
                                            String classifier );
