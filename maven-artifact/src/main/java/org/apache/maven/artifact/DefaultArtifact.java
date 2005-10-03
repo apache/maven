@@ -215,12 +215,13 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getDependencyConflictId() + ( hasClassifier() ? ":" + getClassifier() : "" ) + ":" + getBaseVersion();
+        return getDependencyConflictId() + ":" + getBaseVersion();
     }
 
     public String getDependencyConflictId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType();
+        return getGroupId() + ":" + getArtifactId() + ":" + getType() +
+            ( hasClassifier() ? ":" + getClassifier() : "" );
     }
 
     public void addMetadata( ArtifactMetadata metadata )
@@ -252,7 +253,7 @@ public class DefaultArtifact
 
     public String toString()
     {
-        return getDependencyConflictId() + ( hasClassifier() ? ":" + getClassifier() : "" ) + ":" +
+        return getDependencyConflictId() + ":" +
             ( version != null || baseVersion != null ? getBaseVersion() : versionRange.toString() );
     }
 
