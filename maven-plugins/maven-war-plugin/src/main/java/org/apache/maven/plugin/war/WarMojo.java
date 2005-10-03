@@ -127,7 +127,6 @@ public class WarMojo
      *
      * @parameter expression="${project.build.finalName}"
      * @required
-     * @deprecated "Please use the finalName element of build instead"
      */
     private String warName;
 
