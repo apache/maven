@@ -66,7 +66,6 @@ public class EjbMojo
      *
      * @parameter expression="${project.build.finalName}"
      * @required
-     * @deprecated "Please use the finalName element of build instead"
      */
     private String jarName;
 
