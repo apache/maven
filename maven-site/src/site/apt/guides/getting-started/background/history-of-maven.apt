@@ -8,13 +8,13 @@
 
 History of Maven by Jason van Zyl
 
- Maven began its life in the {{{http://jakarta.apache.org}}Jakarta {{{ http://jakarta.apache.org/alexandria/legacy/}}Alexandria}
+ Maven began its life in the {{{http://jakarta.apache.org}Jakarta}} {{{ http://jakarta.apache.org/alexandria/legacy/}Alexandria}}
  project. The Alexandria project is now defunct but was the breeding ground for not only Maven, but for the
- {{{http://gump.apache.org}}Gump} and {{http://forrest.apache.org}}Forrest} projects as well. From the old
- {{{http://cvs.apache.org/viewcvs.cgi/jakarta-alexandria/proposal/maven/?hideattic=0}}CVS} archive
+ {{{http://gump.apache.org}Gump}} and {{http://forrest.apache.org}Forrest}} projects as well. From the old
+ {{{http://cvs.apache.org/viewcvs.cgi/jakarta-alexandria/proposal/maven/?hideattic=0}CVS}} archive
  you can see that as of the date of this document Maven was removed from Alexandria about 3 years, 7 months ago
  making Maven about 4 years old! Maven spent about 5 months as part of the Alexandria before moving on to its next home
- in the {{{http://jakarta.apache.org/turbine}}Turbine} project.
+ in the {{{http://jakarta.apache.org/turbine}Turbine}} project.
 
  Though Maven started in Alexandria the testbed for its use was the Turbine project. Turbine was in the process of
  decoupling its persistence layer, services layer and web layer into separate builds and I got very tired of having
@@ -43,6 +43,8 @@ you look at, the more general your framework will be.
 
  * <<A standard directory structure>> so you didn't have to go fishing around for libraries, sources and documentation
 
+ []
+
  So started using a model with a simple XML representation and picked what I thought were some decent standards for
  a directory structure and that's how it started. I was still using Ant under the covers but I had some standard targets
  that could be used in each of the Turbine builds and that made me happy.
@@ -52,7 +54,7 @@ you look at, the more general your framework will be.
  pretty much allowed any project to do whatever it wanted in terms of directory structure and use of JARs in CVS
  as Gump was not trying to standardize anything at the time but trying to continously integrate anything it could
  get its hands on. My goals were different and I wanted to make an
- {{{http://www.oreillynet.com/pub/a/network/2005/08/30/ruby-rails-david-heinemeier-hansson.html}}opinionated} piece
+ {{{http://www.oreillynet.com/pub/a/network/2005/08/30/ruby-rails-david-heinemeier-hansson.html}opinionated}} piece
  of software and I preferred the notion of convention over configuration. I wanted a project's infrastructure to
  look the same and work the same so I continued to pursue my own model for a project and decided to disagree with
  Gump's particular tact at project modelling which I thought was too flexible.

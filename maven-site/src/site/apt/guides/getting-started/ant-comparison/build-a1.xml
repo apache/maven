@@ -1,15 +1,12 @@
 <project default="compile">
-  <target name="compile" description="o Compile the code" depends="get-deps">
+  <property name="classesdir=" value="..."/>
+  <property name="libdir" value="..."/>
+  <target name="compile">
     <mkdir dir="${classesdir}"/>
     <javac destdir="${classesdir}">
       <src>
         <pathelement location="src/main/java"/>
       </src>
-      <classpath>
-        <fileset dir="${libdir}">
-          <include name="/path/to/junit-3.8.1.jar"/>
-        </fileset>
-      </classpath>
     </javac>
   </target>
 </project>

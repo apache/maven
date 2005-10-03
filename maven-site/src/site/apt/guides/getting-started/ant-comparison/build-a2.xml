@@ -1,5 +1,8 @@
 <project default="compile">
-  <target name="compile" description="o Compile the code" depends="get-deps">
+  <property name="classesdir=" value="..."/>
+  <property name="test.classesdir=" value="..."/>
+  <property name="libdir" value="..."/>
+  <target name="compile">
     <mkdir dir="${classesdir}"/>
     <javac destdir="${classesdir}">
       <src>
@@ -7,7 +10,7 @@
       </src>
     </javac>
   </target>
-  <target name="test-compile" description="o Compile the code" depends="get-deps">
+  <target name="test-compile">
     <mkdir dir="${test.classesdir}"/>
     <javac destdir="${test.classesdir}">
       <src>
@@ -15,7 +18,7 @@
       </src>
       <classpath>
         <fileset dir="${libdir}">
-          <include name="/path/to/junit-3.8.1.jar"/>
+          <include name="junit-3.8.1.jar"/>
         </fileset>
       </classpath>
     </javac>

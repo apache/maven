@@ -8,50 +8,63 @@
 
 Maven Getting Started Guide
 
- This guide is intended as a reference for those working with Maven for the first. It is also intended to serve as
- a cookbook with self-contained references and solutions for common usecases. For the first time user it is suggested that
- you step through the material in a sequential fashion, but for users more familiar with Maven the guide endeavours
+ This guide is intended as a reference for those working with Maven for the first time,  but is also intended to serve as
+ a cookbook with self-contained references and solutions for common usecases. It is recommended as a first time user
+ that you step through the material in a sequential fashion. For users more familiar with Maven the guide endeavours
  to provide a quick solution for the need at hand. It is assumed at this point that you have downloaded Maven and
  installed Maven on your local machine. If you have not done so please refer to the 
- {{{../download.html}}Download and Installation} instructions.
+ {{{../../download.html}Download and Installation}} instructions.
+
+ Ok, so you now have Maven installed and we're ready to go. Before we jump into our examples we'll very briefly go over
+ what Maven is and how it can help you with your daily work and collaborative efforts with team members. Maven will, of
+ course, work for small projects but Maven shines in helping teams operate more effectively by allowing team members
+ to focus on what the stakeholders of a project require. You can leave the build infrastructure to Maven!
 
 * What is Maven?
 
- At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt to apply patterns to
+ At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt <to apply patterns to
  a project's build infrastructure in order to promote comprehension and productivity by providing a clear path in the
- use of best practices. Maven is essentially a project management and comprehension tool and as such provides a way to
- help with:
+ use of best practices>. Maven is essentially a project management and comprehension tool and as such provides a way to
+ help with managing:
 
- * Managing builds
 
- * Managing dependencies
+ * Builds
 
- * Managing documentation
+ * Documentation
 
- * Managing releases
+ * Reporting
 
- If you want to know about the Maven itself you can check out {{{../philosophy-of-maven.html}}The Philosophy of Maven} and
- the {{{../history-of-maven.html}}The History of Maven}. Now we want to move on to why you, the user, can benefit from
+ * Dependencies
+
+ * SCMs
+
+ * Releases
+
+ * Distribution
+
+ []
+
+ If you want more background information on Maven you can check out {{{background/philosophy-of-maven.html}The Philosophy of Maven}} and
+ the {{{background/history-of-maven.html}The History of Maven}}. Now we want to move on to why you, the user, can benefit from
  using Maven.
 
 * How can Maven benefit my development process?
 
- Maven can benefit your build process by using standard conventions and practices to accelerate your development
- process while at the same time helping you achieve a higher rate of success. For a more detailed look at how
- Maven can help you with your development process please refer to {{{../benefits-of-using-maven.apt}}The Benefits of Using Maven}.
+ Maven can provide benefits for your build process by employing standard conventions and practices to accelerate your development
+ cycle while at the same time helping you achieve a higher rate of success. For a more detailed look at how
+ Maven can help you with your development process please refer to {{{benefits-of-using-maven.html}The Benefits of Using Maven}}.
+
+ Now that we have covered a little bit of the history and purpose of Maven let's get into some real examples to
+ get you up and running with Maven!
 
 * How do I make my first Maven project?
 
- We are going to jump head long into creating your first Maven project, but before doing that it is recommended that you
- understand what Maven's Project Object Model (POM) is all about. For this you can refer to the {{{../introduction-to-the-pom.html}}Introduction to the POM}.
- You can read this later if you want to jump right into seeing a working Maven build, but the POM is the primary unit of
- work in Maven and so understanding the POM can be highly useful!
-
+ We are going to jump head long into creating your first Maven project!
  To create our first Maven project we are going to use Maven's archetype mechanism. An archetype is defined as
  <an original pattern or model from which all other things of the same kind are made>. In Maven, an archetype is a template
  of a project which is combined with some user input to produce a working Maven project that has been tailored to the
- user's wishes. We are going to show you how the archetype mechanism works now, but if you would to know more about
- archetypes please refer to our {{{../introduction-to-archetypes}}Introduction to Archetypes}.
+ user's requirements. We are going to show you how the archetype mechanism works now, but if you would to know more about
+ archetypes please refer to our {{{introduction-to-archetypes.html}Introduction to Archetypes}}.
 
  On to creating your first project! In order to create the simplest of Maven projects execute the following from
  the command line:
@@ -62,7 +75,64 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 
 +-----+
 
- Once you have executed this command you will have a directory structure that looks like the following:
+ Once you have executed this command you will notice a few things have happened. First you will notice that
+ a file names <<<pom.xml>>> has been created which should look like this:
+
++-----+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Maven Quick Start Archetype</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+
++-----+
+
+ What is contained in the <<<pom.xml>>> is the Project Object Model (POM) for this project. The POM is the basic unit
+ of work in Maven. This is important to remember because Maven is inherently project-centric in that everything revolves
+ around the notion of a project. In short, the POM contains every important piece of information about your project and
+ is essentially one-stop-shopping for finding anything related to your project. Understanding the POM is important and
+ new users are encouraged to refer to the {{{introduction-to-the-pom.html}Introduction to the POM}}.
+
+  This is a very simple POM but still displays the key elements every POM contains so lets walk through each of them
+  to familiarize you with the POM essentials:
+
+  * <<project>>
+
+  * <<modelVersion>>
+
+  * <<groupId>>
+
+  * <<artifactId>>
+
+  * <<packaging>>
+
+  * <<version>>
+
+  * <<name>>
+
+  * <<url>>
+
+  []
+
+ For a complete reference of what elements are available for use in the POM please refer to our {{{../../maven-model/maven.html}POM Reference}}.
+ Now let's get back to the project at hand.
+
+ After the archetype generation of your first project you will also notice that the following directory structure
+ has been created:
 
 +-----+
 
@@ -85,59 +155,12 @@ my-app
 +-----+
 
  As you can see, the project created from the archetype has a POM, a source tree for you applications sources and
- a source tree for your tests. This is the standard layout for Maven projects where the application sources
+ a source tree for your test sources. This is the standard layout for Maven projects where the application sources
  reside in <<<${basedir}/src/main/java>>> and test sources reside in <<<${basedir}/src/test/java>>>.
 
  If you were to create a Maven project by hand this is the directory structure that we recommend using. This is a
  Maven convention and to learn more about it you can read our
- {{{../introduction-to-the-standard-directory-layout}}Introduction to the Standard Directory Layout}.
-
- So now that we have our first project let's take a look at the POM that was created for us by the archetype
- mechanism:
-
-+-----+
-
- <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.mycompany.app</groupId>
-  <artifactId>my-app</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Maven Quick Start Archetype</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-</project>
-
-+-----+
-
- This is a very simple POM but still displays the key elements every POM contains so lets walk through each of them
- to familiarize you with the POM essentials:
-
- * <<project>>
-
- * <<modelVersion>>
-
- * <<groupId>>
-
- * <<artifactId>>
-
- * <<packaging>>
-
- * <<version>>
-
- * <<name>>
-
- * <<url>>
-
- For a complete reference of what elements are available for use in the POM please refer to our {{{../../maven-model/maven.html}}POM Reference}.
+ {{{introduction-to-the-standard-directory-layout.html}Introduction to the Standard Directory Layout}}.
 
  Now that we have a POM, some application sources, and some test sources you are probably asking ...
 
@@ -148,6 +171,8 @@ my-app
 m2 compile
 
 +-----+
+
+ Explain why this is so easy ...
 
  Upon executing this command you should see output like the following:
 
@@ -177,30 +202,21 @@ Compiling 1 source file to /tmp/my-app/target/classes
  standard conventions the POM above is very small and you haven't explicity had to tell Maven where any of
  your sources are or where the output should go. By following the standard Maven conventions you can get
  a lot done with very little effort! Just as a comparison lets take a look at what you might have had to do
- in {{{http://ant.apache.org}}Ant} to accomplish the same thing:
+ in {{{http://ant.apache.org}Ant}} to accomplish the same {{{ant/build-a1.xml}thing}}.
 
-+----+
-
-<project default="compile">
-  <target name="compile" description="o Compile the code" depends="get-deps">
-    <mkdir dir="${classesdir}"/>
-    <javac destdir="${classesdir}">
-      <src>
-        <pathelement location="src/main/java"/>
-      </src>
-    </javac>
-  </target>
-</project>
-
-+----+
-
- Now this is simply to compile a single application source and the Ant script above is pretty much the same
+ Now this is simply to compile a single application source and the Ant script shown is pretty much the same
  size as the POM shown above. But we'll see how much more we can do with just that simple POM above!
 
-~~* How do I compile my test sources?
+* How do I compile my test sources?
 
 +----+
+
+m2 test-compile
+
 +----+
+
+ Upon executing this command you should see output like the following:
+
 
 ~~* How do I create a JAR?
 
