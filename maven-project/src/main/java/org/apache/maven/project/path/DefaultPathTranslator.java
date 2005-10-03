@@ -21,20 +21,18 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 public class DefaultPathTranslator
     implements PathTranslator
 {
     private String FILE_SEPARATOR = "/";
 
-    public void alignToBaseDirectory( Model model, File projectFile )
+    public void alignToBaseDirectory( Model model, File basedir )
     {
         Build build = model.getBuild();
-
-        File basedir = projectFile.getParentFile();
 
         if ( build != null )
         {
@@ -122,5 +120,60 @@ public class DefaultPathTranslator
 
         return false;
     }
+
+    public void unalignFromBaseDirectory( Model model, File basedir )
+    {
+        Build build = model.getBuild();
+
+        if ( build != null )
+        {
+            build.setDirectory( unalignFromBaseDirectory( build.getDirectory(), basedir ) );
+
+            build.setSourceDirectory( unalignFromBaseDirectory( build.getSourceDirectory(), basedir ) );
+
+            build.setTestSourceDirectory( unalignFromBaseDirectory( build.getTestSourceDirectory(), basedir ) );
+
+            for ( Iterator i = build.getResources().iterator(); i.hasNext(); )
+            {
+                Resource resource = (Resource) i.next();
+
+                resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
+            }
+
+            for ( Iterator i = build.getTestResources().iterator(); i.hasNext(); )
+            {
+                Resource resource = (Resource) i.next();
+
+                resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
+            }
+
+            if ( build.getFilters() != null )
+            {
+                List filters = new ArrayList();
+                for ( Iterator i = build.getFilters().iterator(); i.hasNext(); )
+                {
+                    String filter = (String) i.next();
+
+                    filters.add( unalignFromBaseDirectory( filter, basedir ) );
+                }
+                build.setFilters( filters );
+            }
+
+            build.setOutputDirectory( unalignFromBaseDirectory( build.getOutputDirectory(), basedir ) );
+
+            build.setTestOutputDirectory( unalignFromBaseDirectory( build.getTestOutputDirectory(), basedir ) );
+        }
+    }
+
+    public String unalignFromBaseDirectory( String directory, File basedir )
+    {
+        String path = basedir.getPath();
+        if ( directory.startsWith( path ) )
+        {
+            directory = directory.substring( path.length() + 1 ).replace( '\\', '/' );
+        }
+        return directory;
+    }
+
 }
 

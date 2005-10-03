@@ -31,7 +31,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.version.PluginVersionManager;
@@ -41,6 +40,8 @@ import org.apache.maven.plugins.release.helpers.ProjectVersionResolver;
 import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
 import org.apache.maven.plugins.release.helpers.ScmHelper;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ModelUtils;
+import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.settings.Settings;
@@ -164,6 +165,11 @@ public class PrepareReleaseMojo
      */
     private boolean resume;
 
+    /**
+     * @component
+     */
+    private PathTranslator pathTranslator;
+
     private String userTag;
 
     private ReleaseProgressTracker releaseProgress;
@@ -206,9 +212,7 @@ public class PrepareReleaseMojo
 
                     getVersionResolver().resolveVersion( project.getOriginalModel(), projectId );
 
-                    MavenProject clonedProject = new MavenProject( project );
-
-                    Model model = clonedProject.getOriginalModel();
+                    Model model = ModelUtils.cloneModel( project.getOriginalModel() );
 
                     transformPomToReleaseVersionPom( model, projectId, project.getFile(), project.getParentArtifact(),
                                                      project.getPluginArtifactRepositories() );
@@ -237,10 +241,7 @@ public class PrepareReleaseMojo
                 {
                     MavenProject project = (MavenProject) it.next();
 
-                    // TODO: use clone model instead... (requires beta-3)
-                    project = new MavenProject( project );
-
-                    Model model = project.getOriginalModel();
+                    Model model = ModelUtils.cloneModel( project.getOriginalModel() );
 
                     String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
                     getVersionResolver().incrementVersion( model, projectId );
@@ -1009,15 +1010,7 @@ public class PrepareReleaseMojo
                     }
                 }
 
-                try
-                {
-                    relativizeBuildPaths( releaseProject.getModel().getBuild(),
-                                          project.getFile().getParentFile().getCanonicalPath() );
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "Cannot relativize build paths for: " + project.getId(), e );
-                }
+                pathTranslator.unalignFromBaseDirectory( releaseProject.getModel(), project.getFile().getParentFile() );
 
                 File releasePomFile = new File( releaseProject.getFile().getParentFile(), RELEASE_POM );
 
@@ -1064,77 +1057,6 @@ public class PrepareReleaseMojo
                 catch ( IOException e )
                 {
                     getLog().warn( "Error writing checkpoint.", e );
-                }
-            }
-        }
-    }
-
-    private void relativizeBuildPaths( Build build, String canonicalBasedir )
-    {
-        int basePathLength = canonicalBasedir.length() + 1;
-
-        String directory = build.getDirectory();
-        if ( directory.startsWith( canonicalBasedir ) )
-        {
-            build.setDirectory( directory.substring( basePathLength ) );
-        }
-
-        String outDir = build.getOutputDirectory();
-        if ( outDir.startsWith( canonicalBasedir ) )
-        {
-            build.setOutputDirectory( outDir.substring( basePathLength ) );
-        }
-
-        String testOutDir = build.getTestOutputDirectory();
-        if ( testOutDir.startsWith( canonicalBasedir ) )
-        {
-            build.setTestOutputDirectory( testOutDir.substring( basePathLength ) );
-        }
-
-        String srcDir = build.getSourceDirectory();
-        if ( srcDir.startsWith( canonicalBasedir ) )
-        {
-            build.setSourceDirectory( srcDir.substring( basePathLength ) );
-        }
-
-        String scriptSrcDir = build.getScriptSourceDirectory();
-        if ( scriptSrcDir.startsWith( canonicalBasedir ) )
-        {
-            build.setScriptSourceDirectory( scriptSrcDir.substring( basePathLength ) );
-        }
-
-        String testSrcDir = build.getTestSourceDirectory();
-        if ( testSrcDir.startsWith( canonicalBasedir ) )
-        {
-            build.setTestSourceDirectory( testSrcDir.substring( basePathLength ) );
-        }
-
-        List resources = build.getResources();
-        if ( resources != null )
-        {
-            for ( Iterator it = resources.iterator(); it.hasNext(); )
-            {
-                Resource resource = (Resource) it.next();
-
-                String dir = resource.getDirectory();
-                if ( dir.startsWith( canonicalBasedir ) )
-                {
-                    resource.setDirectory( dir.substring( basePathLength ) );
-                }
-            }
-        }
-
-        List testResources = build.getTestResources();
-        if ( testResources != null )
-        {
-            for ( Iterator it = testResources.iterator(); it.hasNext(); )
-            {
-                Resource resource = (Resource) it.next();
-
-                String dir = resource.getDirectory();
-                if ( dir.startsWith( canonicalBasedir ) )
-                {
-                    resource.setDirectory( dir.substring( basePathLength ) );
                 }
             }
         }
