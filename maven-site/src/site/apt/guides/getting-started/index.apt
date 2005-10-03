@@ -166,13 +166,13 @@ my-app
 
 * How do I compile my application sources?
 
+ Execute the following command to compile your application sources:
+
 +-----+
 
 m2 compile
 
 +-----+
-
- Explain why this is so easy ...
 
  Upon executing this command you should see output like the following:
 
