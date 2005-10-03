@@ -35,7 +35,7 @@
       <question>How can I use Ant tasks in Maven 2?</question>
       <answer>
         <p>
-          There are 3 alternatives:
+          There are currently 2 alternatives:
         </p>
         <ul>
           <li>
@@ -43,10 +43,6 @@
             the Ant tasks using the
             <a href="http://ant.apache.org/manual/antexternal.html">instructions given in the Ant
               documentation</a>
-          </li>
-          <li>
-            You can write your plugin using Marmalade, and use the Ant tasks much like you would from Jelly in Maven
-            1.0.
           </li>
           <li>
             If you have very small amounts of Ant script specific to your project, you can use the

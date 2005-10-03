@@ -229,7 +229,7 @@ public class ModelReader
                 version = parentVersion;
             }
 
-            // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way (marmalade, and currently m2)
+            // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
             ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false );
 
             addDependencies( p.getDependencies(), parentDependencies, null, Collections.EMPTY_SET );

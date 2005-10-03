@@ -64,9 +64,6 @@
           <li>
             <i>No more Jelly</i>
             - Plugins are primarily written in Java, though there are providers for other scripting languages.
-            This release includes support for Marmalade, a scripting framework that supports an XML syntax similar to
-            Jelly
-            which can be used to integrate Ant tasks and has a Jelly compatibility layer.
           </li>
           <li>
             <i>Improved repository layout</i>
@@ -138,8 +135,7 @@
       <question>Will my Maven 1.0 plugins be supported?</question>
       <answer>
         <p>
-          Not directly. While Marmalade supports a Jelly compatibility layer - the different POM format and goal
-          architecture would prevent most plugins from working.
+          Not directly.
         </p>
         <p>
           We recommend building your Jelly plugins as thin wrappers around Java beans that do not use Maven 1.0 API's,

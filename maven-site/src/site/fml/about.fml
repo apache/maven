@@ -159,10 +159,8 @@
       <question>What plugin languages will Maven 2.0 support? What about [insert language here]?</question>
       <answer>
         <p>
-          As of the current release, Maven supports pure Java, Beanshell and Marmalade. Java is the preferred
-          language for it's familiarity and speed, while Marmalade is preferred for porting Maven 1.x plugins, and
-          writing
-          plugins based on Ant tasks.
+          As of the current release, Maven supports pure Java and Beanshell. Java is the preferred
+          language for it's familiarity and speed.
         </p>
         <p>
           We get asked a lot whether Maven 2.0 will support other languages, in particular Groovy.

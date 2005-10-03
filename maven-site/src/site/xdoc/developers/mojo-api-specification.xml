@@ -25,8 +25,7 @@
   <body>
     <section name="Introduction">
       <p>Starting with Maven 2.0, plugins can be written in Java or any of a
-        number of scripting languages (currently just marmalade - we are
-        working to implement others). Additionally, Maven tries to stay out of
+        number of scripting languages. Additionally, Maven tries to stay out of
         the way of the programmer with its new Mojo API. This opens up the
         opportunity for many Mojos to be reused outside of Maven, or bridged
         into Maven from external systems like Ant.</p>
@@ -413,7 +412,7 @@
             <td>No. Default:
               <code>java</code>
             </td>
-            <td>The implementation language for this Mojo (marmalade, java,
+            <td>The implementation language for this Mojo (java,
               beanshell, etc.).</td>
           </tr>
           <tr>
