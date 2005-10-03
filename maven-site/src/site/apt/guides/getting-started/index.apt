@@ -294,9 +294,11 @@ m2 package
 
 +----+
 
- If you again take a look at the POM for this project you will notice the <<<packaging>>> element is set to <<<jar>>>.
- This is how Maven knows to produce a JAR file from the above command. You can now take a look in the the
- <<<${basedir}/target>>> directory and you will see the generated JAR file.
+ If you take a look at the POM for this project you will notice the <<<packaging>>> element is set to <<<jar>>>.
+ This is how Maven knows to produce a JAR file from the above command and we'll talk more about this later.
+ You can now take a look in the the <<<${basedir}/target>>> directory and you will see the generated JAR file.
+
+
 
 +----+
 
@@ -525,5 +527,28 @@ What expressions are available for use in the mojos?
 <jason> a single place would be nice
 <jdcasey> they're (a) listed in the expression evaluator, (b) available as POM properties, (c) available as system properties, or (d) available reflectively from the api rooted in one of the four or five data objects
 <jdcasey> yup, I think we need that
+
+note from andy
+
+             Jason,
+
+Follow up to our irc chat about suggesting that windows m2 users move their
+repos to a location without embedded spaces. I think it would be helpful to
+people if we were to place a notification about this in a prominent place
+on the M2 site and in the getting started guide.  Parting of the marketing
+chat could be "Windows M2 Users Prepare for surefire and Java compiler
+forking by moving your M2 repository to a file system location that doesn't
+contain embedded spaces!"
+
+The default user.home on windows is c:\documents and settings\<username>\
+
+The repo location can be changed in the settings.xml file located at
+${user.home}/.m2/settings.xml
+
+I've pasted an example of a trivial modified settings.xml file below.
+
+<settings>
+   <localRepository>F:\m2-repository\repository</localRepository>
+</settings>
 
 +-----+

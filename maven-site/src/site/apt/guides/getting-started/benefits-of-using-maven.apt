@@ -91,15 +91,19 @@ there is a strong defined lifecycle that a software system goes thru from the in
 henning
 1) (most important) quick project setup, no complicated build.xml
    files, just a POM and go
-   
+
 2) all developers in a project use the same jar dependencies due to
 centralized POM.
-      
+
 3) getting a number of reports and metrics for a project "for free"
-      
+
 4) reduce the size of source distributions, because jars can be pulled
 from a central location
-         
 
+roberto castro
+  Hi Jason, the main benefits of using Maven in the company I work are: the fact Maven generates every artifact with its version in the artifact's name, it helps identify then even when configuring the artifacts dependencies; the other benefit is the Remote Repository, where all dependencies and artifacts of my sistems are deployed.
+Using the Remote Repository it is not necessary any more to save jar files in CVS, in orther to garantee that, during the compilation of a system, it will use the jar file saved in CVS.
+I think the generation of the system Web Site is another benefit of using Maven.
+        Regards,
 
 +-----+
