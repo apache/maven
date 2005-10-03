@@ -23,6 +23,7 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.assembly.model.Assembly;
 import org.apache.maven.plugins.assembly.model.DependencySet;
 import org.apache.maven.plugins.assembly.model.FileSet;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,16 +59,16 @@ import java.util.regex.Pattern;
 
 /**
  * Assemble an application bundle or distribution from an assembly descriptor.
- * 
- * @goal assembly
- * @description Assemble an application bundle or distribution from an assembly descriptor.
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
+ * @goal assembly
+ * @description Assemble an application bundle or distribution from an assembly descriptor.
  * @requiresDependencyResolution test
  * @requiresDirectInvocation
  * @execute phase="package"
- * @aggregator 
+ * @aggregator
  */
 public class AssemblyMojo
     extends AbstractUnpackingMojo
@@ -75,14 +77,14 @@ public class AssemblyMojo
     /**
      * Predefined Assembly Descriptor Id's.  You can select bin, jar-with-dependencies, or src.
      *
-     * @parameter expression="${maven.assembly.descriptorId}"
+     * @parameter expression="${descriptorId}"
      */
     protected String descriptorId;
 
     /**
      * Assembly XML Descriptor file.  This must be the path to your customized descriptor file.
      *
-     * @parameter expression="${maven.assembly.descriptor}"
+     * @parameter expression="${descriptor}"
      */
     protected File descriptor;
 
@@ -107,9 +109,7 @@ public class AssemblyMojo
     /**
      * Maven ProjectHelper
      *
-     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
-     * @required
-     * @readonly
+     * @component
      */
     private MavenProjectHelper projectHelper;
 
@@ -128,30 +128,29 @@ public class AssemblyMojo
      * @throws MojoExecutionException
      */
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
-        try
-        {
-            doExecute();
-        }
-        catch ( Exception e )
-        {
-            // TODO: don't catch exception
-            throw new MojoExecutionException( "Error creating assembly", e );
-        }
+        doExecute();
     }
 
     /**
      * Create the binary distribution.
      */
     private void doExecute()
-        throws ArchiverException, IOException, MojoExecutionException, XmlPullParserException
+        throws MojoExecutionException, MojoFailureException
     {
         Reader r;
 
         if ( descriptor != null )
         {
-            r = new FileReader( descriptor );
+            try
+            {
+                r = new FileReader( descriptor );
+            }
+            catch ( FileNotFoundException e )
+            {
+                throw new MojoFailureException( "Unable to find descriptor: " + e.getMessage() );
+            }
         }
         else if ( descriptorId != null )
         {
@@ -164,43 +163,63 @@ public class AssemblyMojo
         }
         else
         {
-            // TODO: better exception
-            throw new MojoExecutionException( "You must specify descriptor or descriptorId" );
+            throw new MojoFailureException( "You must specify descriptor or descriptorId" );
         }
 
+        Assembly assembly;
         try
         {
             AssemblyXpp3Reader reader = new AssemblyXpp3Reader();
-            Assembly assembly = reader.read( r );
+            assembly = reader.read( r );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error reading descriptor", e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new MojoExecutionException( "Error reading descriptor", e );
+        }
+        finally
+        {
+            IOUtil.close( r );
+        }
 
-            // TODO: include dependencies marked for distribution under certain formats
-            // TODO: how, might we plug this into an installer, such as NSIS?
-            // TODO: allow file mode specifications?
+        // TODO: include dependencies marked for distribution under certain formats
+        // TODO: how, might we plug this into an installer, such as NSIS?
+        // TODO: allow file mode specifications?
 
-            String fullName = finalName + "-" + assembly.getId();
+        String fullName = finalName + "-" + assembly.getId();
 
-            for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
+        for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
+        {
+            String format = (String) i.next();
+
+            String filename = fullName + "." + format;
+
+            File destFile = null;
+            try
             {
-                String format = (String) i.next();
-
-                String filename = fullName + "." + format;
-
                 // TODO: use component roles? Can we do that in a mojo?
                 Archiver archiver = createArchiver( format );
 
                 processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
                 processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
 
-                File destFile = new File( outputDirectory, filename );
+                destFile = new File( outputDirectory, filename );
                 archiver.setDestFile( destFile );
                 archiver.createArchive();
-
-                projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
             }
-        }
-        finally
-        {
-            IOUtil.close( r );
+            catch ( ArchiverException e )
+            {
+                throw new MojoExecutionException( "Error creating assembly", e );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error creating assembly", e );
+            }
+
+            projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
         }
     }
 
