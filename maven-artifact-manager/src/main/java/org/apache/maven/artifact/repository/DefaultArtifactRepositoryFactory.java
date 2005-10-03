@@ -74,12 +74,4 @@ public class DefaultArtifactRepositoryFactory
     {
         this.globalChecksumPolicy = checksumPolicy;
     }
-
-    /**
-     * @deprecated Not needed, use WagonManager.set/isOnline() instead.
-     */
-    public void setGlobalEnable( boolean enable )
-    {
-        // TODO: Remove this method from the API.
-    }
 }
