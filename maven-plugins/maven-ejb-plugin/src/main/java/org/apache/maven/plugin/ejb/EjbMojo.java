@@ -97,6 +97,14 @@ public class EjbMojo
     private JarArchiver jarArchiver;
 
     /**
+	 * The client Jar archiver.
+	 *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+     * @required
+     */
+    private JarArchiver clientJarArchiver;
+
+    /**
      * The maven project's helper.
      *
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
@@ -151,6 +159,8 @@ public class EjbMojo
                 File clientJarFile = new File( basedir, jarName + "-client.jar" );
 
                 MavenArchiver clientArchiver = new MavenArchiver();
+
+                clientArchiver.setArchiver( clientJarArchiver );
 
                 clientArchiver.setOutputFile( clientJarFile );
 
