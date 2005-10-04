@@ -89,6 +89,7 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
+  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -142,6 +143,9 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 
   * <<url>> This element indicates where the project's site can be found. This url is often used in Maven's
     generated documentation.
+
+  * <<description>> This elements provides a basic description of your project. This url is often used in
+    Maven's generated documentation.
 
   []
 
@@ -356,6 +360,18 @@ Results :
  far you'll notice it's already twice the size of the POM and we're just getting started! There is far more
  functionality available to you as a user of Maven without requiring any additions to our POM as it is currently. To
  get any more functionality out of our example Ant build file you must keep making error prone additions.
+
+ So what else can you get for free? There are a great number of Maven plug-ins that work out of the box with
+ even a simple POM like we have above. We'll mention one here specifically as it is one of the highly
+ prized features of Maven: without any work on your part this POM has enough information to generate
+ a web site for your project! You will most likely want to customize your Maven site but if you're pressed for
+ time all you need to do to provide basic information about your project is execution the following command:
+
++----+
+
+m2 site:site
+
++----+
 
 ~~* How do I package resources inside my JAR?
 ~~  o EIDSL
