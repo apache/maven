@@ -8,7 +8,7 @@
   <artifactId>maven-antrun-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven AntRun Plugin</name>
-  <version>1.0-rc1-SNAPSHOT</version>
+  <version>1.0-rc1</version>
   <description>Runs ant scripts embedded in the POM</description>
   <developers>
     <developer>
