@@ -16,6 +16,7 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
+import org.apache.maven.model.ActivationFile;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
@@ -161,6 +162,30 @@ public final class SettingsUtils
                 prop.setValue( settingsProp.getValue() );
 
                 activation.setProperty( prop );
+            }
+            
+            ActivationOS settingsOs = settingsActivation.getOs();
+            
+            if ( settingsOs != null )
+            {
+                org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
+
+                os.setArch( settingsOs.getArch() );
+                os.setFamily( settingsOs.getFamily() );
+                os.setName( settingsOs.getName() );
+                os.setVersion( settingsOs.getVersion() );
+            }
+            
+            org.apache.maven.settings.ActivationFile settingsFile = settingsActivation.getFile();
+
+            if ( settingsFile != null )
+            {
+                ActivationFile file = new ActivationFile();
+
+                file.setExists( settingsFile.getExists() );
+                file.setMissing( settingsFile.getMissing() );
+
+                activation.setFile( file );
             }
         }
 

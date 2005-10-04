@@ -61,6 +61,19 @@ public class ProfilesConversionUtils
                 activation.setProperty( prop );
             }
 
+            
+            ActivationOS profileOs = profileActivation.getOs();
+            
+            if ( profileOs != null )
+            {
+                org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
+
+                os.setArch( profileOs.getArch() );
+                os.setFamily( profileOs.getFamily() );
+                os.setName( profileOs.getName() );
+                os.setVersion( profileOs.getVersion() );
+            }
+            
             org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
 
             if ( profileFile != null )

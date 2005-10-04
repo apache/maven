@@ -14,6 +14,9 @@
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.0-alpha-3</version>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
         <executions>
           <execution>
             <goals>

@@ -94,7 +94,7 @@
           <description>
             <![CDATA[Whether Maven should use the plugin-registry.xml file to manage plugin versions.]]></description>
           <type>boolean</type>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </field>
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
@@ -593,6 +593,16 @@
           ]]></description>
         </field>
         <field>
+          <name>os</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            Specifies that this profile will be activated when matching OS attributes are detected.
+          ]]></description>
+          <association>
+            <type>ActivationOS</type>
+          </association>
+        </field>
+        <field>
           <name>property</name>
           <version>1.0.0</version>
           <description><![CDATA[
@@ -600,6 +610,16 @@
           ]]></description>
           <association>
             <type>ActivationProperty</type>
+          </association>
+        </field>
+        <field>
+          <name>file</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+             Specifies that this profile will be activated based on existence of a file.
+             ]]></description>
+          <association>
+            <type>ActivationFile</type>
           </association>
         </field>
       </fields>
@@ -760,6 +780,63 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>The value of the property to be used to activate a profile</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationOS</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        This is an activator which will detect an operating system's attributes in order to activate
+        its profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the OS to be used to activate a profile</description>
+        </field>
+        <field>
+          <name>family</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The general family of the OS to be used to activate a profile (e.g. 'windows')</description>
+        </field>
+        <field>
+          <name>arch</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The architecture of the OS to be used to activate a profile</description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The version of the OS to be used to activate a profile</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationFile</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        This is the file specification used to activate a profile. The missing value will be a the location
+        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test 
+        for the existence of the file and if it is there will run the profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>missing</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the file that should be missing to activate a profile</description>
+        </field>
+        <field>
+          <name>exists</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the file that should exist to activate a profile</description>
         </field>
       </fields>
     </class>
