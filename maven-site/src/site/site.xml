@@ -2,11 +2,11 @@
 <project name="Maven">
   <bannerLeft>
     <name>Maven</name>
-    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <src>http://maven.apache.org/maven2/images/apache-maven-project-2.png</src>
     <href>http://maven.apache.org/</href>
   </bannerLeft>
   <bannerRight>
-    <src>http://maven.apache.org/images/maven-small.gif</src>
+    <src>http://maven.apache.org/maven2/images/maven-logo-2.gif</src>
   </bannerRight>
   <body>
     <links>
