@@ -448,9 +448,56 @@ artifactId=my-app
 
 +----+
 
-~~* How do I filter resources against a properties file?
+ To use resources with your unit tests you follow the same pattern except the directory you place resources in
+ is ${basedir}/src/test/resources which are then availabe to you at the base of the classpath. So you would have a
+ project directory structure that would look like the following:
 
-~~* How do I filter resources against my POM?
++---+
+
+my-app
+|-- pom.xml
+`-- src
+    |-- main
+    |   |-- java
+    |   |   `-- com
+    |   |       `-- mycompany
+    |   |           `-- app
+    |   |               `-- App.java
+    |   `-- resources
+    |       `-- META-INF
+    |           |-- application.properties
+    |           `-- application.properties~
+    `-- test
+        |-- java
+        |   `-- com
+        |       `-- mycompany
+        |           `-- app
+        |               `-- AppTest.java
+        `-- resources
+            `-- test.properties
++---+
+
+ So in a unit test you could use a simple snippet of code like the following to access the resource required for
+ testing:
+
++----+
+
+...
+
+// Retrieve resource
+InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( "test.properties" );
+
+// Do something with the resource
+
+...
+
++----+
+
+* How do I filter resources against a properties file?
+
+* How do I filter resources against my POM?
+
++----+
 
 FYI - In beta-2, while the other technique is still supported, the
 recommended way is finally settled:
@@ -471,17 +518,12 @@ chatting with emm in irc and src/main/filters seems like a good place for filter
 
 ~~* How do I setup a proxy if I'm behind a firewall so I can get my external dependencies?
 
-~~* How do I install my JAR in my local repository?
-~~  o Explain the standard layout of the m2 repository
-
 ~~* How do I deploy my jar in my remote repository?
 
 ~~* How do I deploy my jar in Ibiblio?
 
 ~~* How do I create documentation?
 ~~  o Explain the different formats APT/xdoc/docbook/FAQML
-
-~~* How do I generate my site?
 
 ~~* How do I use plug-ins?
   o Explain that a plug-in consists of one or more mojos
