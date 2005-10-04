@@ -203,7 +203,7 @@ m2 compile
 [INFO] artifact org.apache.maven.plugins:maven-compiler-plugin: checking for updates from central
 [INFO] [resources:resources]
 [INFO] [compiler:compile]
-Compiling 1 source file to /tmp/my-app/target/classes
+Compiling 1 source file to <dir>/my-app/target/classes
 [INFO] ----------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ----------------------------------------------------------------------------
@@ -247,12 +247,12 @@ m2 test
 [INFO] ----------------------------------------------------------------------------
 [INFO] [resources:resources]
 [INFO] [compiler:compile]
-Compiling 1 source file to /home/jvanzyl/js/org.apache.maven/components/trunk/maven-site/my-app/target/classes
+Compiling 1 source file to <dir>/my-app/target/classes
 [INFO] [resources:testResources]
 [INFO] [compiler:testCompile]
-Compiling 1 source file to /home/jvanzyl/js/org.apache.maven/components/trunk/maven-site/my-app/target/test-classes
+Compiling 1 source file to <dir>/my-app/target/test-classes
 [INFO] [surefire:test]
-[INFO] Setting reports dir: /home/jvanzyl/js/org.apache.maven/components/trunk/maven-site/my-app/target/surefire-reports
+[INFO] Setting reports dir: <dir>/my-app/target/surefire-reports
 
 -------------------------------------------------------
  T E S T S
@@ -298,7 +298,8 @@ m2 package
  This is how Maven knows to produce a JAR file from the above command and we'll talk more about this later.
  You can now take a look in the the <<<${basedir}/target>>> directory and you will see the generated JAR file.
 
-
+ Now you'll want to install the artifact you've generated, the JAR file, in your local repository
+ (<<<~/.m2/repository>>> is the default value). To do so execute the following command:
 
 +----+
 
@@ -306,6 +307,43 @@ m2 install
 
 +----+
 
+ Upon executing this command you should see the following output:
+
++----+
+
+[INFO] ----------------------------------------------------------------------------
+[INFO] Building Maven Quick Start Archetype
+[INFO]    task-segment: [install]
+[INFO] ----------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] [compiler:compile]
+Compiling 1 source file to <dir>/my-app/target/classes
+[INFO] [resources:testResources]
+[INFO] [compiler:testCompile]
+Compiling 1 source file to <dir>/my-app/target/test-classes
+[INFO] [surefire:test]
+[INFO] Setting reports dir: <dir>/my-app/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+[surefire] Running com.mycompany.app.AppTest
+[surefire] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.001 sec
+
+Results :
+[surefire] Tests run: 1, Failures: 0, Errors: 0
+
+[INFO] [jar:jar]
+[INFO] Building jar: <dir>/my-app/target/my-app-1.0-SNAPSHOT.jar
+[INFO] [install:install]
+[INFO] Installing <dir>/my-app/target/my-app-1.0-SNAPSHOT.jar to <local-repository>/com/mycompany/app/my-app/1.0-SNAPSHOT/my-app-1.0-SNAPSHOT.jar
+[INFO] ----------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ----------------------------------------------------------------------------
+[INFO] Total time: 5 seconds
+[INFO] Finished at: Tue Oct 04 13:20:32 GMT-05:00 2005
+[INFO] Final Memory: 3M/8M
+[INFO] ----------------------------------------------------------------------------
 
 +----+
 
@@ -551,4 +589,10 @@ I've pasted an example of a trivial modified settings.xml file below.
    <localRepository>F:\m2-repository\repository</localRepository>
 </settings>
 
+==
+
+example of generating sources
+
 +-----+
+
+
