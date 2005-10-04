@@ -10,7 +10,6 @@
   <name>Maven Script Support Root</name>
   <version>2.0-beta-3-SNAPSHOT</version>
   <modules>
-    <module>maven-script-marmalade</module>
     <module>maven-script-beanshell</module>
   </modules>
 </project>

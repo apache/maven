@@ -12,7 +12,6 @@
   <modules>
     <module>maven-plugin-tools-api</module>
     <module>maven-plugin-tools-java</module>
-    <module>maven-plugin-tools-marmalade</module>
     <module>maven-plugin-tools-beanshell</module>
     <module>maven-plugin-tools-pluggy</module>
   </modules>
