@@ -49,6 +49,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -66,7 +67,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
@@ -85,7 +85,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Properties;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -304,6 +303,17 @@ public class DefaultPluginManager
         // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to
         // transitively resolve its dependencies, and add them to the plugin container...
         addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
+
+        try
+        {
+            Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null,
+                                                             project.getProjectReferences() );
+            addedPlugin.setIntroducedDependencyArtifacts( artifacts );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new PluginManagerException( "Unable to get one of the plugins additional dependencies", e );
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -506,10 +516,7 @@ public class DefaultPluginManager
         return pluginContainer;
     }
 
-    private Mojo getConfiguredMojo( MavenSession session,
-                                    Xpp3Dom dom,
-                                    MavenProject project,
-                                    boolean report,
+    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report,
                                     MojoExecution mojoExecution )
         throws ComponentLookupException, PluginConfigurationException, PluginManagerException
     {
@@ -592,7 +599,9 @@ public class DefaultPluginManager
                 ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
                                                                                    project.getPluginArtifactRepositories() );
 
-                Set dependencies = resolutionGroup.getArtifacts();
+                Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+
+                dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
@@ -1041,13 +1050,14 @@ public class DefaultPluginManager
         }
         catch ( ComponentConfigurationException e )
         {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), "Unable to parse the created DOM for plugin configuration", e );
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+                                                    "Unable to parse the created DOM for plugin configuration", e );
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(),
-                                                   "Unable to retrieve component configurator for plugin configuration",
-                                                   e );
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+                                                    "Unable to retrieve component configurator for plugin configuration",
+                                                    e );
         }
         finally
         {

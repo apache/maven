@@ -220,6 +220,8 @@ it0079: Test that source attachments have the same build number as the main
 it0080: Test that depending on a WAR doesn't also get its dependencies
         transitively.
 
+it0081: Test per-plugin dependencies.
+
 -------------------------------------------------------------------------------
 
 - generated sources

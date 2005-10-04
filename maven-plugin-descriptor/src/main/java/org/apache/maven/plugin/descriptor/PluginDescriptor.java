@@ -33,6 +33,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -63,6 +66,8 @@ public class PluginDescriptor
 
     // calculated on-demand.
     private Map artifactMap;
+
+    private Set introducedDependencyArtifacts;
 
     // ----------------------------------------------------------------------
     //
@@ -214,18 +219,18 @@ public class PluginDescriptor
     public void setArtifacts( List artifacts )
     {
         this.artifacts = artifacts;
-        
+
         // clear the calculated artifactMap
         artifactMap = null;
     }
-    
+
     public Map getArtifactMap()
     {
         if ( artifactMap == null )
         {
             artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
-        
+
         return artifactMap;
     }
 
@@ -308,4 +313,13 @@ public class PluginDescriptor
         return classRealm;
     }
 
+    public void setIntroducedDependencyArtifacts( Set introducedDependencyArtifacts )
+    {
+        this.introducedDependencyArtifacts = introducedDependencyArtifacts;
+    }
+
+    public Set getIntroducedDependencyArtifacts()
+    {
+        return introducedDependencyArtifacts != null ? introducedDependencyArtifacts : Collections.EMPTY_SET;
+    }
 }

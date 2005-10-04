@@ -2388,6 +2388,15 @@
           </association>
         </field>
         <field>
+          <name>dependencies</name>
+          <description>Additional dependencies that this project needs to introduce to the plugin</description>
+          <version>4.0.0</version>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>goals</name>
           <version>4.0.0</version>
           <description><![CDATA[
@@ -2543,7 +2552,7 @@
           <version>4.0.0</version>
           <code><![CDATA[
     java.util.Map reportPluginMap;
-    
+
     public void flushReportPluginMap()
     {
         this.reportPluginMap = null;
@@ -2575,7 +2584,7 @@
       <superClass>ModelBase</superClass>
       <version>4.0.0</version>
       <description><![CDATA[
-        Modifications to the build process which is keyed on some 
+        Modifications to the build process which is keyed on some
         sort of environmental parameter.
       ]]></description>
       <fields>
@@ -2613,17 +2622,17 @@
     // We don't want this to be parseable...it's sort of 'hidden'
     // default source for this profile is in the pom itself.
     private String source = "pom";
-    
+
     public void setSource( String source )
     {
         this.source = source;
     }
-    
+
     public String getSource()
     {
         return source;
     }
-    
+
     public String toString()
     {
         return "Profile {id: " + getId() + ", source: " + getSource() + "}";
@@ -2636,7 +2645,7 @@
       <name>Activation</name>
       <version>4.0.0</version>
       <description><![CDATA[
-        The conditions within the build runtime environment which will trigger 
+        The conditions within the build runtime environment which will trigger
         the automatic inclusion of the parent build profile.
       ]]></description>
       <fields>
@@ -2690,7 +2699,7 @@
       <name>ActivationProperty</name>
       <version>4.0.0</version>
       <description><![CDATA[
-        This is the property specification used to activate a profile. If the value field is empty, 
+        This is the property specification used to activate a profile. If the value field is empty,
         then the existence of the named property will activate the profile, otherwise it does a case-sensitive
         match against the property value as well.
       ]]></description>

@@ -1,0 +1,1 @@
+test-component-c/target/org.apache.maven.wagon.providers.ftp.FtpWagon
