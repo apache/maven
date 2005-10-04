@@ -21,13 +21,14 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
 /**
  * Base class for creating a jar from project classes.
- * 
+ *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  */
@@ -45,7 +46,6 @@ public abstract class AbstractJarMojo
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
-     *
      * @todo Change type to File
      */
     private String basedir;
@@ -81,24 +81,26 @@ public abstract class AbstractJarMojo
      * @parameter
      */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
-    
+
+    /**
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
+
     /**
      * Return the specific output directory to serve as the root for the archive.
      */
     protected abstract File getOutputDirectory();
-    
+
     protected final MavenProject getProject()
     {
         return project;
     }
-    
+
     /**
      * Overload this to produce a test-jar, for example.
      */
-    protected String getClassifier()
-    {
-        return "";
-    }
+    protected abstract String getClassifier();
 
     /**
      * Generates the JAR.
@@ -109,7 +111,7 @@ public abstract class AbstractJarMojo
         throws MojoExecutionException
     {
         String classifier = getClassifier();
-        
+
         if ( classifier == null )
         {
             classifier = "";
@@ -118,7 +120,7 @@ public abstract class AbstractJarMojo
         {
             classifier = "-" + classifier;
         }
-        
+
         File jarFile = new File( basedir, finalName + classifier + ".jar" );
 
         MavenArchiver archiver = new MavenArchiver();
@@ -140,13 +142,34 @@ public abstract class AbstractJarMojo
             }
 
             archiver.createArchive( project, archive );
-            
+
             return jarFile;
         }
         catch ( Exception e )
         {
             // TODO: improve error handling
             throw new MojoExecutionException( "Error assembling JAR", e );
+        }
+    }
+
+    /**
+     * Generates the JAR.
+     *
+     * @todo Add license files in META-INF directory.
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+        File jarFile = createArchive();
+
+        String classifier = getClassifier();
+        if ( classifier != null )
+        {
+            projectHelper.attachArtifact( getProject(), "jar", classifier, jarFile );
+        }
+        else
+        {
+            getProject().getArtifact().setFile( jarFile );
         }
     }
 }

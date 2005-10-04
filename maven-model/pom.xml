@@ -36,7 +36,6 @@
     <profile>
       <id>all-models</id>
       <build>
-        <finalName>${pom.artifactId}-${pom.version}-all</finalName>
         <plugins>
           <plugin>
             <groupId>org.codehaus.modello</groupId>
@@ -57,6 +56,20 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <configuration>
+                  <classifier>all</classifier>
+                </configuration>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+           </executions> 
+         </plugin>
         </plugins>
       </build>
     </profile>

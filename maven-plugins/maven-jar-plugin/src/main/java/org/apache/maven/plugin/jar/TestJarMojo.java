@@ -42,29 +42,9 @@ public class TestJarMojo
      */
     private File testOutputDirectory;
 
-    /**
-     * @component role="org.apache.maven.project.MavenProjectHelper"
-     */
-    private MavenProjectHelper projectHelper;
-
     protected String getClassifier()
     {
         return "tests";
-    }
-
-    /**
-     * Generates the JAR.
-     *
-     * @todo Add license files in META-INF directory.
-     */
-    public void execute()
-        throws MojoExecutionException
-    {
-        getLog().info( "Creating a jar containing the test classes for this project." );
-
-        File jarFile = createArchive();
-
-        projectHelper.attachArtifact( getProject(), "jar", "tests", jarFile );
     }
 
     /**

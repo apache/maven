@@ -42,16 +42,15 @@ public class JarMojo
     private File outputDirectory;
 
     /**
-	 * Generates the JAR.
+     * Classifier to add to the artifact generated. If given, the artifact will be an attachment instead.
      *
-     * @todo Add license files in META-INF directory.
+     * @parameter
      */
-    public void execute()
-        throws MojoExecutionException
+    private String classifier;
+
+    protected String getClassifier()
     {
-        File jarFile = createArchive();
-        
-        getProject().getArtifact().setFile( jarFile );
+        return classifier;
     }
 
     /**
