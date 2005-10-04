@@ -185,10 +185,14 @@ public class MavenMetadataSource
             }
             else
             {
-                // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
-                // or used the inherited scope (should that be passed to the buildFromRepository method above?)
-                Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
+                Set artifacts = Collections.EMPTY_SET;
+                if ( !artifact.getArtifactHandler().isIncludesDependencies() )
+                {
+                    // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
+                    // or used the inherited scope (should that be passed to the buildFromRepository method above?)
+                    artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
                                                          artifact.getDependencyFilter() );
+                }
 
                 List repositories = aggregateRepositoryLists( remoteRepositories,
                                                               project.getRemoteArtifactRepositories() );

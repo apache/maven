@@ -17,7 +17,7 @@ package org.apache.maven.artifact.handler;
  */
 
 /**
- * @author <a href="mailto:brett@apach.org">Brett Porter</a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: AbstractArtifactHandler.java 189871 2005-06-10 00:57:19Z brett $
  */
 public class DefaultArtifactHandler
@@ -32,6 +32,8 @@ public class DefaultArtifactHandler
     private String directory;
 
     private String packaging;
+
+    private boolean includesDependencies;
 
     public DefaultArtifactHandler()
     {
@@ -77,5 +79,10 @@ public class DefaultArtifactHandler
             packaging = type;
         }
         return packaging;
+    }
+
+    public boolean isIncludesDependencies()
+    {
+        return includesDependencies;
     }
 }

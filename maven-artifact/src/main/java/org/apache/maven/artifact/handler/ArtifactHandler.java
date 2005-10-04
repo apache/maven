@@ -31,4 +31,6 @@ public interface ArtifactHandler
     String getClassifier();
 
     String getPackaging();
+
+    boolean isIncludesDependencies();
 }

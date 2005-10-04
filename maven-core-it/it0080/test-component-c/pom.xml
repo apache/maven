@@ -1,0 +1,23 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>test-components</artifactId>
+    <groupId>test</groupId>
+    <version>0.1</version>
+  </parent>
+
+  <groupId>test</groupId>
+  <artifactId>test-component-c</artifactId>
+  <version>0.1</version>
+  <name>Test Component C</name>
+  <packaging>ear</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>test</groupId>
+      <artifactId>test-component-b</artifactId>
+      <version>0.1</version>
+      <type>war</type>
+    </dependency>
+  </dependencies>
+</project>

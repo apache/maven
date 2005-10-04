@@ -217,6 +217,9 @@ it0078: Test that configuration for maven-compiler-plugin is injected from
 it0079: Test that source attachments have the same build number as the main
         artifact when deployed.
 
+it0080: Test that depending on a WAR doesn't also get its dependencies
+        transitively.
+
 -------------------------------------------------------------------------------
 
 - generated sources
