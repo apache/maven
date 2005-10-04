@@ -50,7 +50,9 @@ public class ArtifactDeployerTest
 
         Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        artifactDeployer.deploy( artifactBasedir, "artifact-1.0", artifact, remoteRepository(), localRepository() );
+        File file = new File( artifactBasedir, "artifact-1.0.jar" );
+
+        artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
 
         assertRemoteArtifactPresent( artifact );
     }

@@ -25,10 +25,31 @@ public interface ArtifactDeployer
 {
     String ROLE = ArtifactDeployer.class.getName();
 
+    /**
+     * Deploy an artifact from a particular directory. The artifact handler is used to determine the filename
+     * of the source file.
+     *
+     * @param basedir the directory where the artifact is stored
+     * @param finalName the name of the artifact sans extension
+     * @param artifact the artifact definition
+     * @param deploymentRepository the repository to deploy to
+     * @param localRepository the local repository to install into
+     * @throws ArtifactDeploymentException if an error occurred deploying the artifact
+     * @deprecated to be removed before 2.0 after the instlal/deploy plugins use the alternate method
+     */
     void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 
+    /**
+     * Deploy an artifact from a particular file.
+     *
+     * @param source the file to deploy
+     * @param artifact the artifact definition
+     * @param deploymentRepository the repository to deploy to
+     * @param localRepository the local repository to install into
+     * @throws ArtifactDeploymentException if an error occurred deploying the artifact
+     */
     void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository,
                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;

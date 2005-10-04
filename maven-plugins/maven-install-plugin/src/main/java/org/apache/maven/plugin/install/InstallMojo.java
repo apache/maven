@@ -108,8 +108,8 @@ public class InstallMojo
             }
             else
             {
-                // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
-                installer.install( buildDirectory, finalName, artifact, localRepository );
+                File file = new File( buildDirectory, finalName + "." + artifact.getArtifactHandler().getExtension() );
+                installer.install( file, artifact, localRepository );
             }
 
             for ( Iterator i = attachedArtifacts.iterator(); i.hasNext(); )

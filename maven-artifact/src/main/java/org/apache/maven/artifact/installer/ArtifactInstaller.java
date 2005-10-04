@@ -33,11 +33,12 @@ public interface ArtifactInstaller
      * Install an artifact from a particular directory. The artifact handler is used to determine the filename
      * of the source file.
      *
-     * @param basedir         the directory where the artifact is stored
-     * @param finalName       the name of the artifact sans extension
-     * @param artifact        the artifact definition
+     * @param basedir the directory where the artifact is stored
+     * @param finalName the name of the artifact sans extension
+     * @param artifact the artifact definition
      * @param localRepository the local repository to install into
      * @throws ArtifactInstallationException if an error occurred installing the artifact
+     * @deprecated to be removed before 2.0 after the instlal/deploy plugins use the alternate method
      */
     void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException;
@@ -46,8 +47,8 @@ public interface ArtifactInstaller
     /**
      * Install an artifact from a particular file.
      *
-     * @param source          the file to install
-     * @param artifact        the artifact definition
+     * @param source the file to install
+     * @param artifact the artifact definition
      * @param localRepository the local repository to install into
      * @throws ArtifactInstallationException if an error occurred installing the artifact
      */

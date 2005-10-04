@@ -139,7 +139,8 @@ public class DeployMojo
             }
             else
             {
-                deployer.deploy( buildDirectory, finalName, artifact, deploymentRepository, localRepository );
+                File file = new File( buildDirectory, finalName + "." + artifact.getArtifactHandler().getExtension() );
+                deployer.deploy( file, artifact, deploymentRepository, localRepository );
             }
 
             for ( Iterator i = attachedArtifacts.iterator(); i.hasNext(); )
