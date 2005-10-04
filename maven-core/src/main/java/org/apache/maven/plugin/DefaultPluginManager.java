@@ -307,7 +307,7 @@ public class DefaultPluginManager
         try
         {
             Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null,
-                                                             project.getProjectReferences() );
+                                                                 project.getProjectReferences() );
             addedPlugin.setIntroducedDependencyArtifacts( artifacts );
         }
         catch ( InvalidVersionSpecificationException e )
@@ -1134,6 +1134,7 @@ public class DefaultPluginManager
         Set artifacts = new HashSet();
         artifacts.add( "classworlds" );
         artifacts.add( "commons-cli" );
+        artifacts.add( "doxia-sink-api" );
         artifacts.add( "jline" );
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
@@ -1144,10 +1145,11 @@ public class DefaultPluginManager
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-plugin-parameter-documenter" );
-        artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-profile" );
         artifacts.add( "maven-project" );
+        artifacts.add( "maven-reporting-api" );
+        artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-input-handler" );
@@ -1156,8 +1158,6 @@ public class DefaultPluginManager
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-ssh" );
-        artifacts.add( "doxia-sink-api" );
-        artifacts.add( "maven-reporting-api" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 
