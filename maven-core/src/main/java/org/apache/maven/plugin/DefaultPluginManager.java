@@ -314,7 +314,7 @@ public class DefaultPluginManager
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        // NOTE: I'm putting these checks in here, since this is the central point of access for 
+        // NOTE: I'm putting these checks in here, since this is the central point of access for
         // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
@@ -1110,32 +1110,7 @@ public class DefaultPluginManager
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
 
-        LoggerManager manager = null;
-
-        try
-        {
-            manager = (LoggerManager) container.lookup( LoggerManager.ROLE );
-
-            mojoLogger = new DefaultLog( manager.getLoggerForComponent( Mojo.ROLE ) );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ContextException( "Error locating a logger manager", e );
-        }
-        finally
-        {
-            if ( manager != null )
-            {
-                try
-                {
-                    container.release( manager );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().error( "Error releasing the logger manager - ignoring", e );
-                }
-            }
-        }
+        mojoLogger = new DefaultLog( container.getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
     }
 
     public void initialize()
