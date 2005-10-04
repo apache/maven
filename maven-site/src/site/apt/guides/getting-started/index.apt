@@ -299,7 +299,9 @@ m2 package
  You can now take a look in the the <<<${basedir}/target>>> directory and you will see the generated JAR file.
 
  Now you'll want to install the artifact you've generated, the JAR file, in your local repository
- (<<<~/.m2/repository>>> is the default value). To do so execute the following command:
+ (<<<~/.m2/repository>>> is the default value). For more information on repositories you can refer to our
+ {{{introduction-to-archetypes.html}Introduction to Repositories}} but now on to installing our artifact!
+ To do so execute the following command:
 
 +----+
 
@@ -346,6 +348,14 @@ Results :
 [INFO] ----------------------------------------------------------------------------
 
 +----+
+
+ Now you have walked through setting up setting up a typical Maven project, building, testing, packaging and installing.
+ This is likely the vast majority of what you will be doing with Maven and if you'ved noticed everything you've been
+ able to do up to this point has been driven by an 18 line file, namely the project's model or POM. If you look at
+ a typical Ant {{{../../ant/build-a1.xml}build file}} that provides the same functionality that we've achieved thus
+ far you'll notice it's already twice the size of the POM and we're just getting started! There is far more
+ functionality available to you as a user of Maven without requiring any additions to our POM as it is currently. To
+ get any more functionality out of our example Ant build file you must keep making error prone additions.
 
 ~~* How do I package resources inside my JAR?
 ~~  o EIDSL

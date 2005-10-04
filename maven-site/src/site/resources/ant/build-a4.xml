@@ -28,4 +28,25 @@
   <target name="jar" description="o Create the jar" depends="compile">
     <jar jarfile="target/${final.name.api}.jar"/>
   </target>
+  <target name="test" depends="test:compile" description="Run all acceptance tests and unit tests">
+    <mkdir dir="${test.reports.dir}"/>
+    <junit printsummary="no" fork="yes" forkmode="once" haltonfailure="${junit.haltonfailure}" includeantruntime="true">
+      <sysproperty key="java.awt.headless" value="true"/>
+      <classpath refid="classpath"/>
+      <formatter type="brief" usefile="no"/>
+      <formatter type="xml"/>
+      <batchtest todir="${test.reports.dir}">
+        <fileset dir="src/test/java">
+          <include name="${test.src.includes}"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${test.reports.dir}">
+      <fileset dir="${test.reports.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.reports.dir}/html"/>
+    </junitreport>
+    <echo message="Detailed results written to report : ${test.reports.dir}/html/index.html"/>
+  </target>
 </project>

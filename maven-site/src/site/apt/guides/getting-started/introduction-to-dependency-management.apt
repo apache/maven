@@ -1,0 +1,36 @@
+ ------
+ Introduction to Dependency Management
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Introduction to Dependency Management
+
+* How to Maintain Versions of Dependencies
+
+ In a multi-project
+
+ so using something as geronimo/continuum/cargo as an example i can document that placing all deps used by the overall project in a TLP depMan section is the way to go?
+
+ o use TLP for all deps used in a project
+ o in each project declare the dep and using groupId/artifactId and scope
+
+  if you provide exclusions in your dependency, and exclusions in your depMgmt, the exclusions are NOT merged...local always wins
+<jdcasey> it's only an issue for exclusions, because it's a complex element
+
+      so exclusions in the depMan element at the parent level and child level are not merged? is that correct?
+<jason> and the child level will win for a given dependency?
+<jdcasey> um, not sure how that works...haven't looked at it, but I believe that's correct...
+<jdcasey> I'd have to look at the code
+
+        and injection only happens if there isn't something in the way
+<jdcasey> :)
+
+injection in depMan
+
+-----
+
+-----
+ 
