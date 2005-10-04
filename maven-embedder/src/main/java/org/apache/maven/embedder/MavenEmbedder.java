@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.Properties;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -107,8 +108,6 @@ public class MavenEmbedder
     private ProfileManager profileManager;
 
     private PluginDescriptorBuilder pluginDescriptorBuilder;
-
-    private EventDispatcher eventDispatcher;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -372,20 +371,24 @@ public class MavenEmbedder
                          List goals,
                          EventMonitor eventMonitor,
                          TransferListener transferListener,
+                         Properties properties,
                          File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
-        execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, executionRootDirectory );
+        execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, properties, executionRootDirectory );
     }
 
     public void execute( List projects,
                          List goals,
                          EventMonitor eventMonitor,
                          TransferListener transferListener,
+                         Properties properties,
                          File executionRootDirectory )
         throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
         ReactorManager rm = new ReactorManager( projects );
+
+        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
         eventDispatcher.addEventMonitor( eventMonitor );
 
@@ -404,6 +407,25 @@ public class MavenEmbedder
         if ( transferListener != null )
         {
             wagonManager.setDownloadMonitor( transferListener );
+        }
+
+        // ----------------------------------------------------------------------
+        // Maven should not be using system properties internally but because
+        // it does for now I'll just take properties that are handed to me
+        // and set them so that the plugin expression evaluator will work
+        // as expected.
+        // ----------------------------------------------------------------------
+
+        if ( properties != null )
+        {
+            for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
+            {
+                String key = (String) i.next();
+
+                String value = properties.getProperty( key );
+
+                System.setProperty( key, value );
+            }
         }
 
         MavenExecutionResponse response = lifecycleExecutor.execute( session,
@@ -574,8 +596,6 @@ public class MavenEmbedder
             modelWriter = new MavenXpp3Writer();
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
-
-            eventDispatcher = new DefaultEventDispatcher();
 
             profileManager = new DefaultProfileManager( embedder.getContainer() );
 

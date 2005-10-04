@@ -8,13 +8,12 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 public class MavenEmbedderTest
@@ -71,11 +70,16 @@ public class MavenEmbedderTest
 
         File pomFile = new File( targetDirectory, "pom.xml" );
 
-        MavenProject pom = maven.readProjectWithDependencies( pomFile );
+        MavenProject pom = maven.readProjectWithDependencies( pomFile );        
 
         EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
 
-        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), targetDirectory );
+        maven.execute( pom,
+                       Collections.singletonList( "package" ),
+                       eventMonitor,
+                       new ConsoleDownloadMonitor(),
+                       null,
+                       targetDirectory );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 

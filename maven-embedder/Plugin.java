@@ -38,7 +38,7 @@ public class Plugin
         
         System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<");        
         
-        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), targetDirectory );
+        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), null, targetDirectory );
         
         System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<");        
     }
