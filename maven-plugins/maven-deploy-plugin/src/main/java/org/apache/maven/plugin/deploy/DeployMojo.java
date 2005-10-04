@@ -139,7 +139,12 @@ public class DeployMojo
             }
             else
             {
-                File file = new File( buildDirectory, finalName + "." + artifact.getArtifactHandler().getExtension() );
+                File file = artifact.getFile();
+                if ( file == null )
+                {
+                    throw new MojoExecutionException(
+                        "The packaging for this project did not assign a file to the build artifact" );
+                }
                 deployer.deploy( file, artifact, deploymentRepository, localRepository );
             }
 
