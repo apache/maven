@@ -119,9 +119,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</connection>
-    <developerConnection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0-beta-3</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
