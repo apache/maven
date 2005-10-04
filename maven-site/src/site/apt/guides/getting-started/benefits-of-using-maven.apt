@@ -8,110 +8,143 @@
 
 Benefits of using Maven
 
-+-----+
+*John Casey
 
-<jdcasey> standardization
-<jdcasey> reuse
-<jdcasey> consistency
-<jdcasey> (wrt build output)
-<jdcasey> let's see
-<jdcasey> dependency management
-<jdcasey> scalability (lower level of additional info/code to add a new step to the build process)
+ [[1]]standardization
 
-ashley williams
-1. Dependency management
-2. Build lifecycle management
-3. Large existing repository
-4. Eclipse aware (sort of)
-5. Well documented (hopefully soon)
+ [[2]]reuse
 
-eric hartmann
-* One directory layout,
-* A single way to define dependencies,
-* Setting up a project is really fast,
-* 99% of my needs are available out of the box,
+ [[3]]consistency wrt build output
 
-And my last is for maven 2.0:
-* Transitive dependencies ! :-)
+ [[4]]dependency management
 
-vincent massol
-Generally speaking:
-- common build structure
-- build best practices enforcement (shared build meme)
-- automated build of application, from source code to pre-production
-platform => fast time to market with reduced risks
-- works well with distributed teams ;-) Location doesn't matter.
+ [[5]]scalability (lower level of additional info/code to add a new step to the build process)
 
-Compared to Ant:
-- Higher level of reusability between builds
-- Faster turn around time to set up a powerful build (once you're used to
-Maven)
-- Less maintenance
-- Shared build meme. I know how to build any maven project
-- Greater momentum: Ant is now legacy and not moving fast ahead. Maven is
-forging ahead fast and there's a potential of having lots of high-value
-tools around Maven (CI, Dashboard project, IDE integration, etc).
+ []
 
-emmanuel
-<evenisse> 1- All artifacts are versionned and store in a repository
-<evenisse> 2- build process is standardized for all projects
-<evenisse> 3- a lot of goals are available so it isn't necessary to develop some specific build process part contrary to ANT
-<evenisse> 4- we can reuse existing ANT tasks in build process with antrun plugin
-<evenisse> 5- it provide quality project information with generated site
-<evenisse> (6)- Easy to learn and use
+*Ashley williams
 
-david jackman
-1. Dependency management
-2. Makes the build process much easier at the project level (i.e. don't
-have to create very much for each project for Maven to build it
-correctly, and those things you do create are more declarative than
-functional)
-3. Automatic project web sites with consistent information about each
-project
-4. Recommended standards and best practices for project layout and
-definition
+ [[1]]Dependency management
 
-jesse
-1) Promotes modular design of code.
+ [[2]]Build lifecycle management
 
-by making it simple to manage mulitple projects it allows the design to be laid out into muliple logical parts, weaving
-these parts together through the use of dependency tracking in pom files.
+ [[3]]Large existing repository
 
-2) Enforces modular design of code.
+ [[4]]Eclipse aware (sort of)
 
-it is easy to pay lipservice to modular code, but when the code is in seperate compiling projects it is impossible to
-cross pollinate references between modules of code unless you specifically allow for it in your dependency management...
-there is no 'I'll just do this now and fix it later' implementations.
+ [[5]]Well documented (hopefully soon)
 
-3) Dependency Management is clearly declared.
-with the dependency management mechanism you have to try to screw up your jar versioning...there is none of the classic
-problem of 'which version of this vendor jar is this?'  And setting it up on an existing project rips the top off of
-the existing mess if it exists when you are forced to make 'unknown' versions in your repository to get things up
-and running...that or lie to yourself that you know the actual version of ABC.jar.
+ []
 
-4) strong typed life cycle
+*Eric Hartmann
 
-there is a strong defined lifecycle that a software system goes thru from the initiation of a build to the end...
-and the users are allowed to mix and match their system to the lifecycle instead of cobble together their own
-lifecycle..  this has the additional benefit of allowing people to move from one project to another and speak
-using the same vocabulary in terms of software building
+ [[1]]One directory layout,
 
-henning
-1) (most important) quick project setup, no complicated build.xml
-   files, just a POM and go
+ [[2]]A single way to define dependencies,
 
-2) all developers in a project use the same jar dependencies due to
-centralized POM.
+ [[3]]Setting up a project is really fast,
 
-3) getting a number of reports and metrics for a project "for free"
+ [[4]]99% of my needs are available out of the box,
 
-4) reduce the size of source distributions, because jars can be pulled
-from a central location
+ [[5]]Transitive dependencies ! :-)
 
-roberto castro
-  Hi Jason, the main benefits of using Maven in the company I work are: the fact Maven generates every artifact with its version in the artifact's name, it helps identify then even when configuring the artifacts dependencies; the other benefit is the Remote Repository, where all dependencies and artifacts of my sistems are deployed.
-Using the Remote Repository it is not necessary any more to save jar files in CVS, in orther to garantee that, during the compilation of a system, it will use the jar file saved in CVS.
-I think the generation of the system Web Site is another benefit of using Maven.
-        Regards,
+ []
 
-+-----+
+*Vincent Massol
+
+ [[1]]common build structure
+
+ [[2]]build best practices enforcement (shared build meme)
+
+ [[3]]automated build of application, from source code to pre-production platform => fast time to market with reduced risks
+
+ [[4]]works well with distributed teams ;-) Location doesn't matter.
+
+ []
+
+ Compared to Ant:
+
+ [[1]]Higher level of reusability between builds
+
+ [[2]]Faster turn around time to set up a powerful build (once you're used to Maven)
+
+ [[3]]Less maintenance
+
+ [[4]]Shared build meme. I know how to build any maven project
+
+ [[5]]Greater momentum: Ant is now legacy and not moving fast ahead. Maven is forging ahead fast and there's a potential of having lots of high-value
+  tools around Maven (CI, Dashboard project, IDE integration, etc).
+
+ []
+
+*Emmanuel Venisse
+
+ [[1]]All artifacts are versionned and store in a repository
+
+ [[2]]build process is standardized for all projects
+
+ [[3]]a lot of goals are available so it isn't necessary to develop some specific build process part contrary to ANT
+      we can reuse existing ANT tasks in build process with antrun plugin
+
+ [[4]]it provide quality project information with generated site
+
+ [[5]]Easy to learn and use
+
+ []
+
+*David Jackman
+
+ [[1]]Dependency management
+
+ [[2]]Makes the build process much easier at the project level (i.e. don't have to create very much for each project for Maven to build it
+     correctly, and those things you do create are more declarative than functional)
+
+ [[3]]Automatic project web sites with consistent information about each project
+
+ [[4]]Recommended standards and best practices for project layout and definition
+
+ []
+
+*Jesse Mcconnell
+
+ [[1]] Promotes modular design of code.
+       by making it simple to manage mulitple projects it allows the design to be laid out into muliple logical parts, weaving
+       these parts together through the use of dependency tracking in pom files.
+
+ [[2]] Enforces modular design of code.
+       it is easy to pay lipservice to modular code, but when the code is in seperate compiling projects it is impossible to
+       cross pollinate references between modules of code unless you specifically allow for it in your dependency management...
+       there is no 'I'll just do this now and fix it later' implementations.
+
+ [[3]] Dependency Management is clearly declared.
+       with the dependency management mechanism you have to try to screw up your jar versioning...there is none of the classic
+       problem of 'which version of this vendor jar is this?'  And setting it up on an existing project rips the top off of
+       the existing mess if it exists when you are forced to make 'unknown' versions in your repository to get things up
+       and running...that or lie to yourself that you know the actual version of ABC.jar.
+
+ [[4]] strong typed life cycle
+       there is a strong defined lifecycle that a software system goes thru from the initiation of a build to the end...
+       and the users are allowed to mix and match their system to the lifecycle instead of cobble together their own
+       lifecycle..  this has the additional benefit of allowing people to move from one project to another and speak
+       using the same vocabulary in terms of software building
+ []
+
+*Henning
+
+ [[1]] quick project setup, no complicated build.xml files, just a POM and go
+
+ [[2]] all developers in a project use the same jar dependencies due to centralized POM.
+
+ [[3]] getting a number of reports and metrics for a project "for free"
+
+ [[4]] reduce the size of source distributions, because jars can be pulled from a central location
+
+*Roberto Castro
+
+ [[1]] Consistency in artifact naming
+
+ [[2]] Use of remote repository
+
+ [[3]] Web site generation
+
+ []
