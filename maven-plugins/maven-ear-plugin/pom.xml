@@ -8,7 +8,7 @@
   <artifactId>maven-ear-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Ear plugin</name>
-  <version>2.0-beta-2</version>
+  <version>2.0-beta-3-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
