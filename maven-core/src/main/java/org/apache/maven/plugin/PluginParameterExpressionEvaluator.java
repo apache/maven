@@ -278,7 +278,7 @@ public class PluginParameterExpressionEvaluator
                 value = project.getProperties().getProperty( expression );
             }
 
-            if ( value == null )
+            if ( value == null && properties != null )
             {
                 // We will attempt to get nab a system property as a way to specify a
                 // parameter to a plugins. My particular case here is allowing the surefire

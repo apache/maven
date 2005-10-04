@@ -70,7 +70,7 @@ public class MavenEmbedderTest
 
         File pomFile = new File( targetDirectory, "pom.xml" );
 
-        MavenProject pom = maven.readProjectWithDependencies( pomFile );        
+        MavenProject pom = maven.readProjectWithDependencies( pomFile );
 
         EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
 
@@ -78,7 +78,7 @@ public class MavenEmbedderTest
                        Collections.singletonList( "package" ),
                        eventMonitor,
                        new ConsoleDownloadMonitor(),
-                       null,
+                       new Properties(),
                        targetDirectory );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
