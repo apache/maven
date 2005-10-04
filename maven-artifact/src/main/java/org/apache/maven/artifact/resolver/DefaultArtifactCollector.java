@@ -280,43 +280,41 @@ public class DefaultArtifactCollector
         }
     }
 
-    private void checkScopeUpdate( ResolutionNode node, ResolutionNode previous, List listeners )
+    private void checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
     {
         boolean updateScope = false;
-        Artifact newArtifact = node.getArtifact();
-        Artifact previousArtifact = previous.getArtifact();
+        Artifact farthestArtifact = farthest.getArtifact();
+        Artifact nearestArtifact = nearest.getArtifact();
 
-        if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) && (
-            Artifact.SCOPE_TEST.equals( previousArtifact.getScope() ) ||
-                Artifact.SCOPE_PROVIDED.equals( previousArtifact.getScope() ) ) )
+        if ( Artifact.SCOPE_RUNTIME.equals( farthestArtifact.getScope() ) && (
+            Artifact.SCOPE_TEST.equals( nearestArtifact.getScope() ) ||
+                Artifact.SCOPE_PROVIDED.equals( nearestArtifact.getScope() ) ) )
         {
             updateScope = true;
         }
 
-        if ( Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() ) &&
-            !Artifact.SCOPE_COMPILE.equals( previousArtifact.getScope() ) )
+        if ( Artifact.SCOPE_COMPILE.equals( farthestArtifact.getScope() ) &&
+            !Artifact.SCOPE_COMPILE.equals( nearestArtifact.getScope() ) )
         {
             updateScope = true;
+        }
+
+        // current POM rules all
+        if ( nearest.getDepth() < 2 && updateScope )
+        {
+            updateScope = false;
+
+            fireEvent( ResolutionListener.UPDATE_SCOPE_CURRENT_POM, listeners, nearest, farthestArtifact );
         }
 
         if ( updateScope )
         {
-            int event;
-            if ( previous.getDepth() < 2 )
-            {
-                event = ResolutionListener.UPDATE_SCOPE_CURRENT_POM;
-            }
-            else
-            {
-                event = ResolutionListener.UPDATE_SCOPE;
-            }
-
-            fireEvent( event, listeners, previous, newArtifact );
+            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
 
             // previously we cloned the artifact, but it is more effecient to just update the scope
             // if problems are later discovered that the original object needs its original scope value, cloning may
             // again be appropriate
-            previousArtifact.setScope( newArtifact.getScope() );
+            nearestArtifact.setScope( farthestArtifact.getScope() );
         }
     }
 

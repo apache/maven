@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -249,7 +250,20 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
         assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, getArtifact( "junit", res.getArtifacts() ).getScope() );
+        assertEquals( "Check scope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
+    }
+
+    public void testResolveLocalWithNewerVersionButLesserScopeResolvedFirst()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec b = createArtifact( "junit", "3.8.1", Artifact.SCOPE_TEST );
+        ArtifactSpec a = createArtifact( "commons-logging", "1.0" );
+        a.addDependency( "junit", "3.7" );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
+        assertEquals( "Check scope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
 
     public void testResolveNearestWithRanges()
@@ -380,7 +394,9 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        // local wins now, and irrelevant if not local as test/provided aren't transitive
+//        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        assertEquals( "Check scope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
     public void testResolveRuntimeScopeOverTestScope()
@@ -396,21 +412,25 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
+        // local wins now, and irrelevant if not local as test/provided aren't transitive
+//        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
+        assertEquals( "Check scope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
     public void testResolveCompileScopeOverRuntimeScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
-        ArtifactSpec a = createArtifact( "a", "1.0" );
-        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME );
+        ArtifactSpec root = createArtifact( "root", "1.0" );
+        ArtifactSpec a = root.addDependency( "a", "1.0" );
+        root.addDependency( "c", "3.0", Artifact.SCOPE_RUNTIME );
 
         a.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
 
         Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[]{root.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, root.artifact, modifiedC} ),
+                      res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
     }
@@ -428,7 +448,9 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        // local wins now, and irrelevant if not local as test/provided aren't transitive
+//        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        assertEquals( "Check scope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
     public void testResolveRuntimeScopeOverProvidedScope()
@@ -444,7 +466,9 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
+        // local wins now, and irrelevant if not local as test/provided aren't transitive
+//        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
+        assertEquals( "Check scope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
     public void testProvidedScopeNotTransitive()
@@ -591,7 +615,7 @@ public class DefaultArtifactCollectorTest
 
     private static Set createSet( Object[] x )
     {
-        return new HashSet( Arrays.asList( x ) );
+        return new LinkedHashSet( Arrays.asList( x ) );
     }
 
     private class ArtifactSpec

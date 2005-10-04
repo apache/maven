@@ -69,10 +69,9 @@ public class WarningResolutionListener
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
-            logger.warn( "\n\tArtifact " + artifact.getId() + " has scope '" + artifact.getScope() +
-                "' replaced with '" + scope + "'\n" +
-                "\tas a dependency has given a broader scope. If this is not intended, use -X to locate the dependency,\n" +
-                "\tor force the desired scope using dependencyManagement.\n" );
+            logger.warn( "\n\tArtifact " + artifact.getId() + " retains local scope '" + artifact.getScope() +
+                "' overriding broader scope '" + scope + "'\n" +
+                "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
             ignoredArtifacts.add( artifact );
         }
     }

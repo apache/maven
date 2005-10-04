@@ -68,7 +68,8 @@ public class DebugResolutionListener
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        updateScope( artifact, scope );
+        logger.debug( indent + artifact.getId() + " (not setting scope to: " + scope + "; local scope " +
+            artifact.getScope() + " wins)" );
     }
 
     public void updateScope( Artifact artifact, String scope )

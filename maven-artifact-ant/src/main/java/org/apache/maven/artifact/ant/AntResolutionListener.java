@@ -74,7 +74,8 @@ public class AntResolutionListener
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        updateScope( artifact, scope );
+        project.log( indent + artifact.getId() + " (not setting scope to: " + scope + "; local scope " +
+            artifact.getScope() + " wins)" );
     }
 
     public void selectVersionFromRange( Artifact artifact )
