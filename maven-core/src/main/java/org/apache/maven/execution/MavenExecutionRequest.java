@@ -23,6 +23,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -49,18 +50,20 @@ public interface MavenExecutionRequest
     void setRecursive( boolean recursive );
 
     boolean isRecursive();
-    
+
     void setReactorActive( boolean reactorActive );
-    
+
     boolean isReactorActive();
-    
+
     void setPomFile( String pomFile );
-    
+
     String getPomFile();
 
     void setFailureBehavior( String failureBehavior );
-    
+
     String getFailureBehavior();
 
     ProfileManager getGlobalProfileManager();
+
+    Properties getExecutionProperties();
 }

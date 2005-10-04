@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -65,24 +66,31 @@ public class PluginParameterExpressionEvaluator
     private final MojoExecution mojoExecution;
 
     private final MavenProject project;
-    
+
     private final String basedir;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, MojoExecution mojoExecution,
-                                               PathTranslator pathTranslator, Logger logger, MavenProject project )
+    private final Properties properties;
+
+    public PluginParameterExpressionEvaluator( MavenSession context,
+                                               MojoExecution mojoExecution,
+                                               PathTranslator pathTranslator,
+                                               Logger logger,
+                                               MavenProject project,
+                                               Properties properties )
     {
         this.context = context;
         this.mojoExecution = mojoExecution;
         this.pathTranslator = pathTranslator;
         this.logger = logger;
         this.project = project;
-        
+        this.properties = properties;
+
         String basedir = null;
-        
+
         if ( project != null )
         {
             File projectFile = project.getFile();
-            
+
             // this should always be the case for non-super POM instances...
             if ( projectFile != null )
             {
@@ -94,7 +102,7 @@ public class PluginParameterExpressionEvaluator
         {
             basedir = System.getProperty( "user.dir" );
         }
-        
+
         this.basedir = basedir;
     }
 
@@ -277,7 +285,7 @@ public class PluginParameterExpressionEvaluator
                 // plugin to run a single test so I want to specify that class on the cli
                 // as a parameter.
 
-                value = System.getProperty( expression );
+                value = properties.getProperty( expression );
             }
         }
 

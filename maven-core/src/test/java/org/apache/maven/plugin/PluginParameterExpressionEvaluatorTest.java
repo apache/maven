@@ -62,7 +62,7 @@ public class PluginParameterExpressionEvaluatorTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "pom.xml" ).getCanonicalFile() );
 
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( project, null );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( project, null, new Properties() );
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/classes" );
         String actual = new File( value.toString() ).getCanonicalPath();
@@ -84,7 +84,7 @@ public class PluginParameterExpressionEvaluatorTest
         
         MavenProject project = new MavenProject( model );
         
-        ExpressionEvaluator ee = createExpressionEvaluator( project, null );
+        ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
 
         Object value = ee.evaluate( "${" + key + "}" );
 
@@ -94,7 +94,7 @@ public class PluginParameterExpressionEvaluatorTest
     public void testBasedirExtractionWithMissingProject()
         throws Exception
     {
-        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null, new Properties() );
 
         Object value = ee.evaluate( "${basedir}" );
 
@@ -106,12 +106,14 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String sysprop = "PPEET_sysprop1";
 
-        if ( System.getProperty( sysprop ) == null )
+        Properties executionProperties = new Properties();
+
+        if ( executionProperties.getProperty( sysprop ) == null )
         {
-            System.setProperty( sysprop, "value" );
+            executionProperties.setProperty( sysprop, "value" );
         }
 
-        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null, executionProperties );
 
         Object value = ee.evaluate( "${" + sysprop + "}" );
 
@@ -123,12 +125,14 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String sysprop = "PPEET.sysprop2";
 
-        if ( System.getProperty( sysprop ) == null )
+        Properties executionProperties = new Properties();
+
+        if ( executionProperties.getProperty( sysprop ) == null )
         {
-            System.setProperty( sysprop, "value" );
+            executionProperties.setProperty( sysprop, "value" );
         }
 
-        ExpressionEvaluator ee = createExpressionEvaluator( null, null );
+        ExpressionEvaluator ee = createExpressionEvaluator( null, null, executionProperties );
 
         Object value = ee.evaluate( "${" + sysprop + "}" );
 
@@ -139,13 +143,13 @@ public class PluginParameterExpressionEvaluatorTest
         throws CycleDetectedException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, "." );
+                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".", new Properties() );
     }
 
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null, new Properties() );
         Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
         assertEquals( "local", ( (DefaultArtifactRepository) value ).getId() );
@@ -161,7 +165,7 @@ public class PluginParameterExpressionEvaluatorTest
         Model model = new Model();
         model.setBuild( build );
 
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null, new Properties() );
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
 
@@ -177,7 +181,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         pd.setArtifacts( Collections.singletonList( artifact ) );
 
-        ExpressionEvaluator ee = createExpressionEvaluator( createDefaultProject(), pd );
+        ExpressionEvaluator ee = createExpressionEvaluator( createDefaultProject(), pd, new Properties() );
 
         Object value = ee.evaluate( "${plugin.artifacts}" );
 
@@ -197,7 +201,7 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenProject( new Model() );
     }
 
-    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor )
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
         throws Exception
     {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
@@ -214,7 +218,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MojoExecution mojoExecution = new MojoExecution( mojo );
 
-        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project );
+        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project, executionProperties );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version )

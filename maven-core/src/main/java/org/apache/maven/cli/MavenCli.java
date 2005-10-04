@@ -100,8 +100,6 @@ public class MavenCli
             return 1;
         }
 
-        initializeSystemProperties( commandLine );
-
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
 
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
@@ -146,6 +144,13 @@ public class MavenCli
 
             return 1;
         }
+
+        // ----------------------------------------------------------------------
+        // The execution properties need to be created before the settings
+        // are constructed.
+        // ----------------------------------------------------------------------
+
+        Properties executionProperties = getExecutionProperties( commandLine );
 
         Settings settings = null;
 
@@ -204,7 +209,12 @@ public class MavenCli
                 }
             }
 
-            request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager );
+            request = createRequest( commandLine,
+                                     settings,
+                                     eventDispatcher,
+                                     loggerManager,
+                                     profileManager,
+                                     executionProperties );
 
             setProjectFileOptions( commandLine, request );
 
@@ -347,9 +357,12 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( CommandLine commandLine, Settings settings,
-                                                        EventDispatcher eventDispatcher, LoggerManager loggerManager,
-                                                        ProfileManager profileManager )
+    private static MavenExecutionRequest createRequest( CommandLine commandLine,
+                                                        Settings settings,
+                                                        EventDispatcher eventDispatcher,
+                                                        LoggerManager loggerManager,
+                                                        ProfileManager profileManager,
+                                                        Properties executionProperties )
         throws ComponentLookupException
     {
         MavenExecutionRequest request;
@@ -357,11 +370,18 @@ public class MavenCli
         ArtifactRepository localRepository = createLocalRepository( embedder, settings, commandLine );
 
         File userDir = new File( System.getProperty( "user.dir" ) );
-        request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                    commandLine.getArgList(), userDir.getPath(), profileManager );
+
+        request = new DefaultMavenExecutionRequest( localRepository,
+                                                    settings,
+                                                    eventDispatcher,
+                                                    commandLine.getArgList(),
+                                                    userDir.getPath(),
+                                                    profileManager,
+                                                    executionProperties );
 
         // TODO [BP]: do we set one per mojo? where to do it?
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
+
         if ( logger != null )
         {
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
@@ -490,8 +510,10 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    private static void initializeSystemProperties( CommandLine commandLine )
+    private static Properties getExecutionProperties( CommandLine commandLine )
     {
+        Properties executionProperties = new Properties();
+
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
         // and therefore are set in the session properties. System properties
@@ -501,14 +523,17 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
+
             for ( int i = 0; i < defStrs.length; ++i )
             {
-                setCliProperty( defStrs[i] );
+                setCliProperty( defStrs[i], executionProperties );
             }
         }
+
+        return executionProperties;
     }
 
-    private static void setCliProperty( String property )
+    private static void setCliProperty( String property, Properties executionProperties )
     {
         String name;
 
@@ -528,6 +553,13 @@ public class MavenCli
 
             value = property.substring( i + 1 ).trim();
         }
+
+        executionProperties.setProperty( name, value );
+
+        // ----------------------------------------------------------------------
+        // I'm leaving the setting of system properties here as not to break
+        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
+        // ----------------------------------------------------------------------
 
         System.setProperty( name, value );
     }

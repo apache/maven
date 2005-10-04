@@ -26,6 +26,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -50,9 +51,16 @@ public class MavenSession
 
     private boolean usingPOMsFromFilesystem;
 
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
-                         String executionRootDir )
+    private final Properties executionProperties;
+
+    public MavenSession( PlexusContainer container,
+                         Settings settings,
+                         ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher,
+                         ReactorManager reactorManager,
+                         List goals,
+                         String executionRootDir,
+                         Properties executionProperties )
     {
         this.container = container;
 
@@ -67,6 +75,8 @@ public class MavenSession
         this.goals = goals;
 
         this.executionRootDir = executionRootDir;
+
+        this.executionProperties = executionProperties;
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
@@ -87,6 +97,11 @@ public class MavenSession
     public List getGoals()
     {
         return goals;
+    }
+
+    public Properties getExecutionProperties()
+    {
+        return executionProperties;
     }
 
     // ----------------------------------------------------------------------

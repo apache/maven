@@ -400,7 +400,8 @@ public class MavenEmbedder
                                                  eventDispatcher,
                                                  rm,
                                                  goals,
-                                                 executionRootDirectory.getAbsolutePath() );
+                                                 executionRootDirectory.getAbsolutePath(),
+                                                 properties);
 
         session.setUsingPOMsFromFilesystem( true );
 

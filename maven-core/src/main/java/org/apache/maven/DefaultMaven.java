@@ -487,8 +487,14 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm )
     {
-        return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory() );
+        return new MavenSession( container,
+                                 request.getSettings(),
+                                 request.getLocalRepository(),
+                                 request.getEventDispatcher(),
+                                 rpm,
+                                 request.getGoals(),
+                                 request.getBaseDirectory(),
+                                 request.getExecutionProperties() );
     }
 
     /**

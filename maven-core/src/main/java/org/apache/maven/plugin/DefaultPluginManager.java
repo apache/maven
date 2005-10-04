@@ -85,6 +85,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Properties;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -505,7 +506,10 @@ public class DefaultPluginManager
         return pluginContainer;
     }
 
-    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report,
+    private Mojo getConfiguredMojo( MavenSession session,
+                                    Xpp3Dom dom,
+                                    MavenProject project,
+                                    boolean report,
                                     MojoExecution mojoExecution )
         throws ComponentLookupException, PluginConfigurationException, PluginManagerException
     {
@@ -558,7 +562,8 @@ public class DefaultPluginManager
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution,
                                                                                           pathTranslator, getLogger(),
-                                                                                          project );
+                                                                                          project,
+                                                                                          session.getExecutionProperties() );
 
         PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration,
                                                                                    mojoDescriptor );
@@ -1041,8 +1046,8 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to retrieve component configurator for plugin configuration",
-                                                    e );
+                                                   "Unable to retrieve component configurator for plugin configuration",
+                                                   e );
         }
         finally
         {

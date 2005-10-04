@@ -23,6 +23,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -56,9 +57,15 @@ public class DefaultMavenExecutionRequest
 
     private final ProfileManager globalProfileManager;
 
-    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
-                                         EventDispatcher eventDispatcher, List goals, String baseDirectory,
-                                         ProfileManager globalProfileManager )
+    private final Properties executionProperties;
+
+    public DefaultMavenExecutionRequest( ArtifactRepository localRepository,
+                                         Settings settings,
+                                         EventDispatcher eventDispatcher,
+                                         List goals,
+                                         String baseDirectory,
+                                         ProfileManager globalProfileManager,
+                                         Properties executionProperties )
     {
         this.localRepository = localRepository;
 
@@ -69,8 +76,10 @@ public class DefaultMavenExecutionRequest
         this.eventDispatcher = eventDispatcher;
 
         this.baseDirectory = baseDirectory;
-        
+
         this.globalProfileManager = globalProfileManager;
+
+        this.executionProperties = executionProperties;
     }
 
     public Settings getSettings()
@@ -101,6 +110,11 @@ public class DefaultMavenExecutionRequest
     public List getGoals()
     {
         return goals;
+    }
+
+    public Properties getExecutionProperties()
+    {
+        return executionProperties;
     }
 
     // ----------------------------------------------------------------------
@@ -156,7 +170,7 @@ public class DefaultMavenExecutionRequest
     {
         return failureBehavior;
     }
-    
+
     public ProfileManager getGlobalProfileManager()
     {
         return globalProfileManager;
