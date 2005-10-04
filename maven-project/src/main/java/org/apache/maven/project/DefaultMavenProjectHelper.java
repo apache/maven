@@ -17,8 +17,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Resource;
+import org.apache.maven.project.artifact.AttachedArtifact;
 
 import java.io.File;
 import java.util.List;
@@ -26,16 +26,10 @@ import java.util.List;
 public class DefaultMavenProjectHelper
     implements MavenProjectHelper
 {
-    // requirement.
-    private ArtifactFactory artifactFactory;
 
     public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile )
     {
-        Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
-                                                                          project.getArtifactId(),
-                                                                          project.getVersion(), 
-                                                                          artifactType,
-                                                                          artifactClassifier );
+        Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType, artifactClassifier );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );

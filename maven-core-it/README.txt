@@ -214,6 +214,9 @@ it0078: Test that configuration for maven-compiler-plugin is injected from
         PluginManagement section even when it's not explicitly defined in the
         plugins section.
 
+it0079: Test that source attachments have the same build number as the main
+        artifact when deployed.
+
 -------------------------------------------------------------------------------
 
 - generated sources

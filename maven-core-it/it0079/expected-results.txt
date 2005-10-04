@@ -1,0 +1,2 @@
+target/test-repo/org/apache/maven/it/maven-core-it0079/SNAPSHOT/maven-core-it0079-*-1.jar
+target/test-repo/org/apache/maven/it/maven-core-it0079/SNAPSHOT/maven-core-it0079-*-1-sources.jar
