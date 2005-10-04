@@ -4,7 +4,7 @@
   <artifactId>maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven Project</name>
-  <version>2.0-beta-3-SNAPSHOT</version>
+  <version>2.0-beta-3</version>
   <description>Maven components parent</description>
   <url>http://maven.apache.org/maven2/</url>
   <issueManagement>
@@ -119,9 +119,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
-    <developerConnection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</connection>
+    <developerConnection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0-beta-3</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
@@ -148,6 +148,7 @@
     <module>maven-monitor</module>
     <module>maven-plugin-api</module>
     <module>maven-plugin-descriptor</module>
+    <module>maven-plugin-parameter-documenter</module>
     <module>maven-plugin-registry</module>
     <module>maven-plugin-tools</module>
     <module>maven-profile</module>
