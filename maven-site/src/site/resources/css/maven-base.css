@@ -28,15 +28,15 @@ div.clear{
 div.clear hr{
   display: none;
 }
-#projectLogo {
+#bannerRight {
   font-size: xx-large; 
   font-weight: bold;
   
 }
-#organizationLogo img, #projectLogo img, #projectLogo span{
+#bannerLeft img, #bannerRight img, #bannerRight span{
   margin: 0px;
 }
-#projectLogo span{
+#bannerRight span{
     border: 1px solid;
     padding: 4px 10px 4px 10px;
     background-color: #eee;
