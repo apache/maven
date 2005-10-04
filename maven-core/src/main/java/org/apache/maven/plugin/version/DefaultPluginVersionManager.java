@@ -566,7 +566,6 @@ public class DefaultPluginVersionManager
     }
 
     private void writeUserRegistry( String groupId, String artifactId, PluginRegistry pluginRegistry )
-        throws PluginVersionResolutionException
     {
         File pluginRegistryFile = pluginRegistry.getRuntimeInfo().getFile();
 
@@ -584,14 +583,12 @@ public class DefaultPluginVersionManager
 
                 PluginRegistryXpp3Writer writer = new PluginRegistryXpp3Writer();
 
-                writer.write( fWriter, PluginRegistryUtils.extractUserPluginRegistry( pluginRegistry ) );
+                writer.write( fWriter, extractedUserRegistry );
             }
             catch ( IOException e )
             {
-                // TODO: should we soften this to a warning??
-                throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Cannot rewrite user-level plugin-registry.xml with new plugin version.",
-                                                            e );
+                getLogger().warn( "Cannot rewrite user-level plugin-registry.xml with new plugin version of plugin: \'"
+                                      + groupId + ":" + artifactId + "\'.", e );
             }
             finally
             {
@@ -666,9 +663,11 @@ public class DefaultPluginVersionManager
                     }
                 }
 
-                if ( pluginValid )
+                String artifactVersion = artifact.getVersion();
+                
+                if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
                 {
-                    version = artifact.getVersion();
+                    version = artifactVersion;
                 }
             }
         }

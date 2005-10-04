@@ -14,9 +14,12 @@
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.0-alpha-3</version>
+
+        <!-- The following configuration can be removed with modello -alpha-5 -->
         <configuration>
           <packageWithVersion>false</packageWithVersion>
         </configuration>
+
         <executions>
           <execution>
             <goals>

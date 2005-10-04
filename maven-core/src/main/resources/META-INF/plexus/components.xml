@@ -270,8 +270,13 @@
             org.apache.maven.plugins:maven-jar-plugin:jar,
             org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata
           </package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+          <install>
+            org.apache.maven.plugins:maven-install-plugin:install,
+            org.apache.maven.plugins:maven-plugin-plugin:updateRegistry
+          </install>
+          <deploy>
+            org.apache.maven.plugins:maven-deploy-plugin:deploy
+          </deploy>
         </phases>
         <!-- END SNIPPET: maven-plugin-lifecycle -->
       </configuration>

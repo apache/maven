@@ -18,6 +18,8 @@
         <configuration>
           <version>1.0.0</version>
           <model>src/main/mdo/paramdoc.mdo</model>
+
+          <!-- The following config can be removed with modello -alpha-5 -->
           <packageWithVersion>false</packageWithVersion>
         </configuration>
         
