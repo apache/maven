@@ -51,7 +51,7 @@
     <dependencySet>
       <outputDirectory>core</outputDirectory>
       <includes>
-        <include>plexus:plexus-container-default</include>
+        <include>org.codehaus.plexus:plexus-container-default</include>
         <include>plexus:plexus-utils</include>
       </includes>
     </dependencySet>
@@ -64,7 +64,7 @@
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>plexus:plexus-container-default</exclude>
+        <exclude>org.codehaus.plexus:plexus-container-default</exclude>
         <exclude>classworlds:classworlds</exclude>
         <exclude>plexus:plexus-utils</exclude>
         <!-- transitively picked up via default container - not needed -->
