@@ -74,19 +74,27 @@ definition
 jesse
 1) Promotes modular design of code.
 
-by making it simple to manage mulitple projects it allows the design to be laid out into muliple logical parts, weaving these parts together through the use of dependency tracking in pom files.
+by making it simple to manage mulitple projects it allows the design to be laid out into muliple logical parts, weaving
+these parts together through the use of dependency tracking in pom files.
 
 2) Enforces modular design of code.
 
-it is easy to pay lipservice to modular code, but when the code is in seperate compiling projects it is impossible to cross pollinate references between modules of code unless you specifically allow for it in your dependency management...there is no 'I'll just do this now and fix it later' implementations.
+it is easy to pay lipservice to modular code, but when the code is in seperate compiling projects it is impossible to
+cross pollinate references between modules of code unless you specifically allow for it in your dependency management...
+there is no 'I'll just do this now and fix it later' implementations.
 
 3) Dependency Management is clearly declared.
-
-with the dependency management mechanism you have to try to screw up your jar versioning...there is none of the classic problem of 'which version of this vendor jar is this?'  And setting it up on an existing project rips the top off of the existing mess if it exists when you are forced to make 'unknown' versions in your repository to get things up and running...that or lie to yourself that you know the actual version of ABC.jar.
+with the dependency management mechanism you have to try to screw up your jar versioning...there is none of the classic
+problem of 'which version of this vendor jar is this?'  And setting it up on an existing project rips the top off of
+the existing mess if it exists when you are forced to make 'unknown' versions in your repository to get things up
+and running...that or lie to yourself that you know the actual version of ABC.jar.
 
 4) strong typed life cycle
 
-there is a strong defined lifecycle that a software system goes thru from the initiation of a build to the end...and the users are allowed to mix and match their system to the lifecycle instead of cobble together their own lifecycle..  this has the additional benefit of allowing people to move from one project to another and speak using the same vocabulary in terms of software building
+there is a strong defined lifecycle that a software system goes thru from the initiation of a build to the end...
+and the users are allowed to mix and match their system to the lifecycle instead of cobble together their own
+lifecycle..  this has the additional benefit of allowing people to move from one project to another and speak
+using the same vocabulary in terms of software building
 
 henning
 1) (most important) quick project setup, no complicated build.xml
