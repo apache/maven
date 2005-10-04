@@ -34,7 +34,8 @@
          |
          -->
         <exclude>jsch:jsch</exclude>                
-        <exclude>org.apache.maven.wagon:wagon-ssh</exclude>                        
+        <exclude>org.apache.maven.wagon:wagon-ssh</exclude>
+        <exclude>plexus:plexus-container-default</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
