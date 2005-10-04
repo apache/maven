@@ -26,6 +26,7 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
+import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -474,7 +475,7 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getRepository() != null )
                 {
-                    Repository repository = new Repository();
+                    DeploymentRepository repository = new DeploymentRepository();
 
                     childDistMgmt.setRepository( repository );
 
@@ -490,7 +491,7 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getSnapshotRepository() != null )
                 {
-                    Repository repository = new Repository();
+                    DeploymentRepository repository = new DeploymentRepository();
 
                     childDistMgmt.setSnapshotRepository( repository );
 

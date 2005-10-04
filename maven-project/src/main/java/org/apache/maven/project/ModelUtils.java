@@ -42,6 +42,7 @@ import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Site;
+import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -650,7 +651,7 @@ public final class ModelUtils
 
             if ( repo != null )
             {
-                RepositoryBase newRepo = new RepositoryBase();
+                DeploymentRepository newRepo = new DeploymentRepository();
 
                 newRepo.setId( repo.getId() );
                 newRepo.setLayout( repo.getLayout() );
@@ -677,7 +678,7 @@ public final class ModelUtils
 
             if ( sRepo != null )
             {
-                RepositoryBase newRepo = new RepositoryBase();
+                DeploymentRepository newRepo = new DeploymentRepository();
 
                 newRepo.setId( sRepo.getId() );
                 newRepo.setLayout( sRepo.getLayout() );

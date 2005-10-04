@@ -632,14 +632,15 @@ public class DefaultMavenProjectBuilder
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            ArtifactRepository repo = ProjectUtils.buildArtifactRepositoryBase( dm.getRepository(),
-                                                                                artifactRepositoryFactory, container );
+            ArtifactRepository repo = ProjectUtils.buildDeploymentArtifactRepository( dm.getRepository(),
+                                                                                      artifactRepositoryFactory,
+                                                                                      container );
             project.setReleaseArtifactRepository( repo );
 
             if ( dm.getSnapshotRepository() != null )
             {
-                repo = ProjectUtils.buildArtifactRepositoryBase( dm.getSnapshotRepository(), artifactRepositoryFactory,
-                                                                 container );
+                repo = ProjectUtils.buildDeploymentArtifactRepository( dm.getSnapshotRepository(),
+                                                                       artifactRepositoryFactory, container );
                 project.setSnapshotArtifactRepository( repo );
             }
         }

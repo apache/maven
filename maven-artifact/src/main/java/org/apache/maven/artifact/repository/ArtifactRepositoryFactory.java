@@ -25,7 +25,8 @@ public interface ArtifactRepositoryFactory
 {
     String ROLE = ArtifactRepositoryFactory.class.getName();
 
-    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout );
+    ArtifactRepository createDeploymentArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
+                                                           boolean uniqueVersion );
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
                                                  ArtifactRepositoryPolicy snapshots,
@@ -34,5 +35,4 @@ public interface ArtifactRepositoryFactory
     void setGlobalUpdatePolicy( String snapshotPolicy );
 
     void setGlobalChecksumPolicy( String checksumPolicy );
-
 }

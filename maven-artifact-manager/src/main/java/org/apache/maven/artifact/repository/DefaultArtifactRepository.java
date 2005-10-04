@@ -38,8 +38,10 @@ public class DefaultArtifactRepository
 
     private ArtifactRepositoryPolicy releases;
 
+    private boolean uniqueVersion;
+
     /**
-     * Create a local repository or a deployment repository.
+     * Create a local repository or a test repository.
      *
      * @param id the unique identifier of the repository
      * @param url the URL of the repository
@@ -48,6 +50,21 @@ public class DefaultArtifactRepository
     public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
         this( id, url, layout, null, null );
+    }
+
+    /**
+     * Create a remote deployment repository.
+     *
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
+     * @param uniqueVersion whether to assign each snapshot a unique version
+     */
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, boolean uniqueVersion )
+    {
+        super( id, url );
+        this.layout = layout;
+        this.uniqueVersion = uniqueVersion;
     }
 
     /**
@@ -116,5 +133,10 @@ public class DefaultArtifactRepository
     public String getKey()
     {
         return getId();
+    }
+
+    public boolean isUniqueVersion()
+    {
+        return uniqueVersion;
     }
 }

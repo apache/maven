@@ -49,4 +49,6 @@ public interface ArtifactRepository
     ArtifactRepositoryLayout getLayout();
 
     String getKey();
+
+    boolean isUniqueVersion();
 }

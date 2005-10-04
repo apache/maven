@@ -77,10 +77,15 @@ public class SnapshotTransformation
     {
         if ( artifact.isSnapshot() )
         {
+            Snapshot snapshot = new Snapshot();
+            if ( remoteRepository.isUniqueVersion() )
+            {
+                snapshot.setTimestamp( getDeploymentTimestamp() );
+            }
+
+            // we update the build number anyway so that it doesn't get lost. It requires the timestamp to take effect
             int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
 
-            Snapshot snapshot = new Snapshot();
-            snapshot.setTimestamp( getDeploymentTimestamp() );
             snapshot.setBuildNumber( buildNumber + 1 );
 
             RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );

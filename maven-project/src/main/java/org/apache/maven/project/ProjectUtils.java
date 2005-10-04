@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.model.DeploymentRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -59,9 +60,9 @@ public final class ProjectUtils
         return repos;
     }
 
-    public static ArtifactRepository buildArtifactRepositoryBase( RepositoryBase repo,
-                                                                  ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                  PlexusContainer container )
+    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
+                                                                        ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                                        PlexusContainer container )
         throws ProjectBuildingException
     {
         if ( repo != null )
@@ -72,7 +73,7 @@ public final class ProjectUtils
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
 
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout );
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, layout, repo.isUniqueVersion() );
         }
         else
         {

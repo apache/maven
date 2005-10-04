@@ -29,10 +29,10 @@ public class DefaultArtifactRepositoryFactory
 
     private String globalChecksumPolicy;
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout )
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
+                                                        ArtifactRepositoryLayout repositoryLayout, boolean uniqueVersion )
     {
-        return new DefaultArtifactRepository( id, url, repositoryLayout );
+        return new DefaultArtifactRepository( id, url, repositoryLayout, uniqueVersion );
     }
 
     public ArtifactRepository createArtifactRepository( String id, String url,
