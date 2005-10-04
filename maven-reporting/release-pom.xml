@@ -1,12 +1,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven</artifactId>
+  <groupId>org.apache.maven.reporting</groupId>
+  <artifactId>maven-reporting</artifactId>
   <packaging>pom</packaging>
-  <name>Maven Project</name>
+  <name>Maven Reporting</name>
   <version>2.0-beta-3</version>
   <description>Maven components parent</description>
-  <url>http://maven.apache.org/maven2/</url>
+  <url>http://maven.apache.org/maven2/maven-reporting</url>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
@@ -21,6 +21,7 @@
       </notifier>
     </notifiers>
   </ciManagement>
+  <inceptionYear>2005</inceptionYear>
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
@@ -119,15 +120,31 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0-beta-3</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0-beta-3</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-reporting</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-reporting</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-reporting</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
   <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+    <directory>target</directory>
     <plugins>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
@@ -138,25 +155,8 @@
     </plugins>
   </build>
   <modules>
-    <module>maven-archiver</module>
-    <module>maven-artifact</module>
-    <module>maven-artifact-manager</module>
-    <module>maven-artifact-ant</module>
-    <module>maven-artifact-test</module>
-    <module>maven-core</module>
-    <module>maven-model</module>
-    <module>maven-monitor</module>
-    <module>maven-plugin-api</module>
-    <module>maven-plugin-descriptor</module>
-    <module>maven-plugin-parameter-documenter</module>
-    <module>maven-plugin-registry</module>
-    <module>maven-plugin-tools</module>
-    <module>maven-profile</module>
-    <module>maven-project</module>
-    <module>maven-reporting</module>
-    <module>maven-repository-metadata</module>
-    <module>maven-script</module>
-    <module>maven-settings</module>
+    <module>maven-reporting-api</module>
+    <module>maven-reporting-impl</module>
   </modules>
   <repositories>
     <repository>
@@ -166,6 +166,14 @@
       <id>snapshots</id>
       <name>Maven Central Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -177,6 +185,14 @@
       <name>Maven Central Plugins Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </pluginRepository>
   </pluginRepositories>
   <dependencies>
     <dependency>
@@ -186,25 +202,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-7</version>
-      </dependency>
-      <dependency>
-        <groupId>plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-4</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <reporting>
+    <outputDirectory>target/site</outputDirectory>
+  </reporting>
   <distributionManagement>
     <repository>
       <id>repo1</id>
@@ -218,7 +218,7 @@
     </snapshotRepository>
     <site>
       <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/maven-reporting</url>
     </site>
   </distributionManagement>
 </project>
