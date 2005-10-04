@@ -530,6 +530,8 @@ public class MavenCli
             }
         }
 
+        executionProperties.putAll( System.getProperties() );
+
         return executionProperties;
     }
 
