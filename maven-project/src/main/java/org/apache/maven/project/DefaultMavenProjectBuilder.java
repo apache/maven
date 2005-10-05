@@ -676,8 +676,10 @@ public class DefaultMavenProjectBuilder
                 "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
         }
 
-        project.setRemoteArtifactRepositories( remoteRepositories );
-
+        project.setRemoteArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getRepositories(),
+                                                                                       artifactRepositoryFactory,
+                                                                                       container ) );
+        
         // TODO: these aren't taking active project artifacts into consideration in the reactor
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
         project.setReportArtifacts( createReportArtifacts( project.getReportPlugins() ) );

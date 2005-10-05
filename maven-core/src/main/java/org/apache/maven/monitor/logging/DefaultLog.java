@@ -35,12 +35,24 @@ public class DefaultLog
 
     public void debug( CharSequence content )
     {
-        logger.debug( content.toString() );
+        logger.debug( toString( content ) );
+    }
+
+    private String toString( CharSequence content )
+    {
+        if ( content == null )
+        {
+            return "";
+        }
+        else
+        {
+            return content.toString();
+        }
     }
 
     public void debug( CharSequence content, Throwable error )
     {
-        logger.debug( content.toString(), error );
+        logger.debug( toString( content ), error );
     }
 
     public void debug( Throwable error )
@@ -50,12 +62,12 @@ public class DefaultLog
 
     public void info( CharSequence content )
     {
-        logger.info( content.toString() );
+        logger.info( toString( content ) );
     }
 
     public void info( CharSequence content, Throwable error )
     {
-        logger.info( content.toString(), error );
+        logger.info( toString( content ), error );
     }
 
     public void info( Throwable error )
@@ -65,12 +77,12 @@ public class DefaultLog
 
     public void warn( CharSequence content )
     {
-        logger.warn( content.toString() );
+        logger.warn( toString( content ) );
     }
 
     public void warn( CharSequence content, Throwable error )
     {
-        logger.warn( content.toString(), error );
+        logger.warn( toString( content ), error );
     }
 
     public void warn( Throwable error )
@@ -80,12 +92,12 @@ public class DefaultLog
 
     public void error( CharSequence content )
     {
-        logger.error( content.toString() );
+        logger.error( toString( content ) );
     }
 
     public void error( CharSequence content, Throwable error )
     {
-        logger.error( content.toString(), error );
+        logger.error( toString( content ), error );
     }
 
     public void error( Throwable error )
