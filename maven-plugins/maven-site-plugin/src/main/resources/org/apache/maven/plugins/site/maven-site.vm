@@ -10,6 +10,10 @@
 
     #if( $e.getChild( "src" ) )
         #set ( $src = $e.getChild( "src" ).getValue() )
+        #if ( ! ( $src.toLowerCase().startsWith("http") || $src.toLowerCase().startsWith("https") ) )
+            #set ( $src = $PathTool.calculateLink( $src, $relativePath ) )
+            #set ( $src = $src.replaceAll( "\\", "/" ) )
+        #end
         #if ( $e.getChild( "alt" ) )
             #set ( $alt = $e.getChild( "alt" ).getValue() )
         #else
@@ -25,7 +29,7 @@
     #else
         </span>
     #end
-  #end  
+  #end
 #end
 
 #macro ( links )
@@ -35,7 +39,7 @@
     #set ( $counter = $counter + 1 )
     <a href="$item.getAttribute( "href" )">$item.getAttribute( "name" )</a>
     #if ( $links.getChildCount() > $counter )
-      | 
+      |
     #end
   #end
 #end
@@ -46,15 +50,15 @@
       #set ( $subitemHref = $PathTool.calculateLink( $subitem.getAttribute( "href" ), $relativePath ) )
       #set ( $subitemHref = $subitemHref.replaceAll( "\\", "/" ) )
 
-      #if ( $currentFileName == $subitemHref ) 
+      #if ( $currentFileName == $subitemHref )
         #set ( $display = true )
       #end
-          
+
       #displayTree( $display $subitem )
     #end
   #end
 #end
-        
+
 #macro ( menuItem $item )
   #set ( $collapse = "none" )
   #set ( $currentItemHref = $PathTool.calculateLink( $item.getAttribute( "href" ), $relativePath ) )
@@ -68,13 +72,13 @@
       ## By default collapsed
       #set ( $collapse = "collapsed" )
     #end
-    
-    #if ( $currentFileName == $currentItemHref ) 
+
+    #if ( $currentFileName == $currentItemHref )
       #set ( $collapse = "expanded" )
     #end
   #end
   <li class="$collapse">
-    #if ( $currentFileName == $currentItemHref ) 
+    #if ( $currentFileName == $currentItemHref )
       <strong><a href="$currentItemHref">$item.getAttribute( "name" )</a></strong>
     #else
       <a href="$currentItemHref">$item.getAttribute( "name" )</a>
