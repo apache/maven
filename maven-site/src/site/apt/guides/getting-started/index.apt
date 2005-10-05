@@ -23,19 +23,34 @@ Maven Getting Started Guide
 Sections
 
  * {{{index.html#What is Maven?}What is Maven?}}
+
  * {{{index.html#How can Maven benefit my development process?}How can Maven benefit my development process?}}
+
  * {{{index.html#How do I make my first Maven project?}How do I make my first Maven project?}}
+
  * {{{index.html#How do I compile my application sources?}How do I compile my application sources?}}
+
  * {{{index.html#How do I compile my test sources and run my unit tests?}How do I compile my test sources and run my unit tests?}}
+
  * {{{index.html#How do I create a JAR and install it in my local repository?}How do I create a JAR and install it in my local repository?}}
+
  * {{{index.html#How do I filter resources against my POM?}How do I filter resources against my POM?}}
+
  * {{{index.html#How do I filter resources against a properties file?}How do I filter resources against a properties file?}}
+
  * {{{index.html#How do I use external dependencies?}How do I use external dependencies?}}
+
  * {{{index.html#How do I deploy my jar in my remote repository?}How do I deploy my jar in my remote repository?}}
+
  * {{{index.html#How do I create documentation?}}How do I create documentation?}
+
  * {{{index.html#How do I deploy my site?}How do I deploy my site?}}
+
  * {{{index.html#How do I use plug-ins?}How do I use plug-ins?}}
+
  * {{{index.html#How do I control what version of plug-in I use?}How do I control what version of plug-in I use?}}
+
+ []
 
 * {What is Maven?}
 
