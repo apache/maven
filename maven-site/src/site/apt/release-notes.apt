@@ -1,36 +1,40 @@
  ------
-Release Notes - Maven 2.0 Beta 2
+Release Notes - Maven 2.0 Beta 3
  ------
 Brett Porter
  ------
-27 September 2005
+4 October 2005
  ------
 
-  The Apache Maven team are proud to announce the second beta release of Maven 2.0.
+  The Apache Maven team are proud to announce the third beta release of Maven 2.0.
 
   Download it from {{http://maven.apache.org/maven2/download.html}}
 
   Maven is a software project management and comprehension tool. Based on the concept of a project object model
   (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
 
-  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11861} a number of bug fixes and enhancements}}>> since the previous release on 16 September.
+  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=12015} a number of bug fixes and improvements}}>> since the previous release on 27 September.
 
   Maven 2.0 is a rewrite of the popular Maven application to achieve a number of new goals, and to provide a stable
   basis to take it into the future.
 
-  The main improvements in this release are:
+  Also now available are beta versions of the following plugins from our friends at the mojo.codehaus.org project:
 
-    * Bug fixes in the reporting API to allow the clover plugin to work in more scenarios
+    * Changelog
 
-    * Bug fixes in the artifact collector for version ranges
+    * Changes (including JIRA and Announcement)
 
-    * Improvements to offline mode
+    * XMLBeans
 
-  This release is considered stable with a feature set comparable to Maven 1.0. Further betas and the final are expected
-  to be backwards compatible, with a primary goal of bugfixes, usability improvements, and documentation.
+    * Taglist (formerly tasklist)
 
-  The current roadmap is to make weekly beta releases to encourage faster turnaround for issues found by the
-  community.
+    * JXR
+
+    * Surefire Report (formerly junit report)
+
+  This release is considered stable with a feature set that encompasses and supersedes Maven 1.0.
+  The final release is expected to be backwards compatible, with a primary goal of bugfixes, usability improvements,
+  and documentation.
 
   This core release is independent of the plugins available. Further releases of plugins will be made separately.
   See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix}} for more information.

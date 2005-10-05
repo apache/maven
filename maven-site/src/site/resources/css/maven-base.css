@@ -46,7 +46,6 @@ div.clear hr{
 	float:left;
 	color: #666;
 	text-shadow: #7CFC00;
-
 } 
 .xright, #bannerRight img, #bannerRight span{
   float:right;
@@ -191,6 +190,6 @@ div.clear hr{
 }
 
 .subsection p {
-	font-size: 11px;
+	font-size: 12px;
 }
 

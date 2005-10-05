@@ -8,11 +8,11 @@ body {
 }
 td, select, input, li{
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	font-size: 11px;
+	font-size: 12px;
 	color:#333333;
 }
 code{
-  font-size: 13px;
+  font-size: 12px;
 }
 a {
   text-decoration: none;
@@ -58,7 +58,7 @@ h3 {
 }
 p {
   line-height: 1.3em;
-  font-size: 11px;
+  font-size: 12px;
   color: #000;
 }
 #breadcrumbs {
@@ -99,7 +99,7 @@ table.bodyTable th {
 }
 
 table.bodyTable th, table.bodyTable td {
-  font-size: 1em;
+  font-size: 11px;
 }
 
 table.bodyTable tr.a {
