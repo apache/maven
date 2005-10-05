@@ -1,0 +1,17 @@
+ ------
+ Guide to using Extensions
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Using Extensions
+
+ * Maven Wagon Providers
+ * Maven SCM Providers
+ * Plug-ins that define their own lifecycle
+
+ When creating your own lifecycles:
+ This is a missing instruction on the build lifecycle page. You need to
+ add the plugin to the project, <extensions>true</extensions>

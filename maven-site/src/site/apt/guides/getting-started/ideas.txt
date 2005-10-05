@@ -6,41 +6,6 @@
  12 October 2005
  -----
 
-Guides
-
-* Guide to using multiple repositories
-
- There are two different ways that you can specify the use of multiple repositories. The first
- is to specify
-
-+----+
-
-<project>
-...
-  <repositories>
-    <repository>
-      <id>my-repo1</id>
-      <name>your custom repo</name>
-      <url>http://jarsm2.dyndns.dk</url>
-    </repository>
-    <repository>
-      <id>my-repo2</id>
-      <name>your custom repo</name>
-      <url>http://jarsm2.dyndns.dk</url>
-    </repository>
-  </repositories>
-...
-</project>
-
-+----+
-
-
-
-if you specify repositories in profiles you must remember to activate that
-particular profile! and the use of mirrors
-
-* 
-
 * Guide to using project properties
 
 Actually, no. It's *like* the properties defined in profiles in syntax,
@@ -58,19 +23,6 @@ the <project> element. So:
 
 +----+
 
-* Guide to project inheritance
-
-Profile inheritance the same as standard inheritence and resources sets are currently not
-inherited.
-
-DefaultModelInheritenceAssembler.
-
-Merged:
-- dependencies
-- developers and contributors
-- plugin lists (including reports)
-- plugin executions with matching ids
-- plugin configuration
 
 * Guide to system properties
 
@@ -115,56 +67,10 @@ support ntmlv2:
 
 http://www.mail-archive.com/httpclient-dev@jakarta.apache.org/msg01861.html
 
-==
-
-Using extensions and why they are needed.
-
-==
-
 How to use Ant constructs from m2.
-
-==
-
-* How maven's classloaders work
-
- To add a bit of detail for a volunteer to submit as documentation... :)
-
- m2/core/boot is what is in the java classpath (ie, just classworlds,
- which constructs classloaders for the rest of the system)
-
- the top level classloader contains plexus container and plexus utils
- (see m2/core), and also has access to classworlds
-
- the next classloader has the libraries in m2/lib (a bug in beta 1
- incorporated commons-logging and -lang, sorry about that!) In general
- these are just maven libraries. We hope to further separate these in
- future to just be maven apis.
-
- after that, each plugin has its own classloader, including its
- dependencies, itself, and the libraries above. It *does not* contain
- the project dependencies like in m1, but instead has access to a list
- of JAR files in case they are needed.
-
- In addition, a project can list "extensions". These are loaded into
- the same place as m2/lib and so available to the maven core and all
- plugins for the currnet project and subsequent projects (in future, we
- plan to remove it from subsequent projects).
-
-
-==
 
 How artifact resolution works, this would be a long one more advanced in
 scope.
-
-==
-
-
-==
-
-When creating your own lifecycles:
-
-This is a missing instruction on the build lifecycle page. You need to
-add the plugin to the project, <extensions>true</extensions>
 
 ==
 
@@ -227,10 +133,6 @@ example of generating sources
 How to modify the manifest.
 
 ~~ * How do I deal with a dependency that is already supplied by my runtime?
-
-~~* How do I deploy my jar in Ibiblio?
-
-~~* How do I internationalize my site?
 
 +-----+
 

@@ -14,6 +14,8 @@ Introduction to the POM
   o Explain the notion of the Super POM
   o Show what a minimal POM can look like
 
+* {{Super POM}}
+
 %{snippet|id=superpom|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-project/src/main/resources/org/apache/maven/project/pom-4.0.0.xml}
 
 +-----+
@@ -35,3 +37,20 @@ Introduction to the POM
 </project>
 
 +-----+
+
+* Project Inheritance
+
+ Elements in the POM that are merged are the following:
+
+ * dependencies
+
+ * developers and contributors
+
+ * plugin lists (including reports)
+
+ * plugin executions with matching ids
+
+ * plugin configuration
+
+ <<NOTE:>> Profile inheritance the same inheritance strategy as used for the POM itself.
+

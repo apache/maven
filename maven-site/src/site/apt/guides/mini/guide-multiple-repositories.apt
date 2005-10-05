@@ -1,0 +1,86 @@
+ ------
+ Guide to using Multiple Repositories
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Setting up Multiple Repositories
+
+ There are two different ways that you can specify the use of multiple repositories. The first
+ way is to specify in a POM which repositories you want to use:
+
++----+
+
+<project>
+...
+  <repositories>
+    <repository>
+      <id>my-repo1</id>
+      <name>your custom repo</name>
+      <url>http://jarsm2.dyndns.dk</url>
+    </repository>
+    <repository>
+      <id>my-repo2</id>
+      <name>your custom repo</name>
+      <url>http://jarsm2.dyndns.dk</url>
+    </repository>
+  </repositories>
+...
+</project>
+
++----+
+
+ The <<<repositories>>> element is inherited so you would usually specify the repositories
+ to use for a group of projects by defining a <<<repositories>>> element at the top of your
+ inheritance chain.
+
+ <<NOTE:>> You will also get the standard set of repositories as defined in the 
+ {{{../getting-started/introduction-to-the-pom.html#Super POM}Super POM}}.
+
+ The other way you can specify the use of multiple repositories by creating a profile in
+ your <<<~/.m2/settings.xml>>> file like the following:
+
++----+
+
+<settings>
+ ...
+ <profiles>
+   ...
+   <profile>
+     <id>myprofile</id>
+     <repositories>
+       <repository>
+         <id>my-repo2</id>
+         <name>your custom repo</name>
+         <url>http://jarsm2.dyndns.dk</url>
+       </repository>
+     </repositories>
+   </profile>
+   ...
+ </profiles>
+
+ <activeProfiles>
+   <activeProfile>myprofile</activeProfile>
+ </activeProfiles>
+ ...
+</settings>
+
++----+
+
+ If you specify repositories in profiles you must remember to activate that
+ particular profile! As you can see above we do this by registering a profile
+ to be active in the <<<activeProfiles>>> element.
+
+ You could also activate this profile on the command like by executing the following
+ command:
+
++----+
+
+m2 -Pmyprofile ...
+
++----+
+
+ In fact the <<<-P>>> option will take a CSV list of profiles to activate if you wish to
+ activate multiple profiles simultaneously.
