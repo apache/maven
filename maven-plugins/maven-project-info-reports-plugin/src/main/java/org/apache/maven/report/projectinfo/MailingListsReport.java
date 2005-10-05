@@ -26,7 +26,6 @@ import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,7 @@ public class MailingListsReport
 {
     /**
      * Report output directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
@@ -52,7 +51,7 @@ public class MailingListsReport
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -61,7 +60,7 @@ public class MailingListsReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -205,11 +204,11 @@ public class MailingListsReport
 
             if ( otherArchives )
             {
-                tableHeader( new String[] { name, subscribe, unsubscribe, post, archive, archivesOther } );
+                tableHeader( new String[]{name, subscribe, unsubscribe, post, archive, archivesOther} );
             }
             else
             {
-                tableHeader( new String[] { name, subscribe, unsubscribe, post, archive } );
+                tableHeader( new String[]{name, subscribe, unsubscribe, post, archive} );
             }
 
             for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
@@ -225,10 +224,24 @@ public class MailingListsReport
 
                 textRow.add( createLinkPatternedText( unsubscribe, mailingList.getUnsubscribe() ) );
 
-                textRow.add( createLinkPatternedText( post, mailingList.getPost() ) );
+                if ( mailingList.getPost() != null && mailingList.getPost().length() > 0 )
+                {
+                    textRow.add( createLinkPatternedText( post, mailingList.getPost() ) );
+                }
+                else
+                {
+                    textRow.add( "-" );
+                }
 
-                textRow.add( createLinkPatternedText( getArchiveServer( mailingList.getArchive() ), mailingList
-                    .getArchive() ) );
+                if ( mailingList.getArchive() != null && mailingList.getArchive().length() > 0 )
+                {
+                    textRow.add( createLinkPatternedText( getArchiveServer( mailingList.getArchive() ),
+                                                          mailingList.getArchive() ) );
+                }
+                else
+                {
+                    textRow.add( "-" );
+                }
 
                 if ( ( ( mailingList.getOtherArchives() != null ) ) && ( !mailingList.getOtherArchives().isEmpty() ) )
                 {
@@ -296,7 +309,7 @@ public class MailingListsReport
      * For instance, if the archive uri is
      * <code>http://www.mail-archive.com/dev@maven.apache.org</code>, this
      * method return <code>www.mail-archive.com</code>
-     * 
+     *
      * @param uri
      * @return the server name of a web-based mailing list archive server
      */
@@ -304,7 +317,7 @@ public class MailingListsReport
     {
         if ( StringUtils.isEmpty( uri ) )
         {
-            return "???UNKWOWN???";
+            return "???UNKNOWN???";
         }
 
         int at = uri.indexOf( "//" );

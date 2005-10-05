@@ -456,7 +456,9 @@ public abstract class AbstractMavenReportRenderer
         String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator( schemes );
 
-        if ( EmailValidator.getInstance().isValid( href ) )
+        if ( ( EmailValidator.getInstance().isValid( href ) ) ||
+             ( ( href.indexOf( "?" ) != -1 ) &&
+               ( EmailValidator.getInstance().isValid( href.substring( 0, href.indexOf( "?" ) ) ) ) ) )
         {
             return "mailto:" + href;
         }
