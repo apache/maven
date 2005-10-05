@@ -52,7 +52,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>1.0-alpha-2</version>
+      <version>1.0-alpha-3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

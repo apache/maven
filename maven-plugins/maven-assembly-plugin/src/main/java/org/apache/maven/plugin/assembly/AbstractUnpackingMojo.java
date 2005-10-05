@@ -17,17 +17,16 @@ package org.apache.maven.plugin.assembly;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Base routines for assembly and unpack goals.
@@ -71,88 +70,58 @@ public abstract class AbstractUnpackingMojo
      */
     protected File workDirectory;
 
+
+    /**
+     * To look up Archiver/UnArchiver implementations
+     *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
+     * @required
+     */
+
+    protected ArchiverManager archiverManager;
+
+
     /**
      * Unpacks the archive file.
      *
      * @param file File to be unpacked.
      * @param location Location where to put the unpacked files.
-     * @throws IOException
      */
+
     protected void unpack( File file, File location )
-        throws IOException
+        throws MojoExecutionException
     {
-        String fileName = file.getAbsolutePath().toLowerCase().trim();
-        // Should be checking for '.' too?
-        // Not doing this to be consistent with existing code
-        if ( fileName.endsWith( "jar" ) )
+        String archiveExt = FileUtils.getExtension( file.getAbsolutePath() ).toLowerCase();
+
+        this.getLog().info( "Look up archiver type: " + archiveExt );
+
+        UnArchiver unArchiver;
+
+        try
         {
-            unpackJar( file, location );
+            unArchiver = this.archiverManager.getUnArchiver( archiveExt );
         }
-        else if ( fileName.endsWith( "zip" ) )
+        catch ( NoSuchArchiverException e )
         {
-            unpackZip( file, location );
+            throw new MojoExecutionException( "Unknown archive file: " + file );
+        }
+
+        try
+        {
+            unArchiver.setSourceFile( file );
+
+            unArchiver.setDestDirectory( location );
+
+            unArchiver.extract();
+        }
+        catch ( IOException ioe )
+        {
+            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location );
+        }
+        catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location );
         }
     }
-
-    /**
-     * Unpacks the Jar file.
-     *
-     * @param file File to be unpack/unjar.
-     * @param tempLocation Location where to put the unpacked files.
-     * @throws IOException
-     */
-    private void unpackJar( File file, File tempLocation )
-        throws IOException
-    {
-        if ( !file.getAbsolutePath().toLowerCase().trim().endsWith( "jar" ) )
-        {
-            getLog().warn( "Trying to unpack a non-jar file " + file.getAbsolutePath() + " - IGNORING" );
-            return;
-        }
-
-        JarFile jar = new JarFile( file );
-        for ( Enumeration e = jar.entries(); e.hasMoreElements(); )
-        {
-            JarEntry entry = (JarEntry) e.nextElement();
-
-            if ( !entry.isDirectory() )
-            {
-                File outFile = new File( tempLocation, entry.getName() );
-                outFile.getParentFile().mkdirs();
-                IOUtil.copy( jar.getInputStream( entry ), new FileOutputStream( outFile ) );
-            }
-        }
-    }
-
-    /**
-     * Unpacks the Zip file.
-     *
-     * @param file Zip file to be unpacked.
-     * @param tempLocation Location where to unpack the files.
-     * @throws IOException
-     */
-    private void unpackZip( File file, File tempLocation )
-        throws IOException
-    {
-        if ( !file.getAbsolutePath().toLowerCase().trim().endsWith( "zip" ) )
-        {
-            getLog().warn( "Trying to unpack a non-zip file " + file.getAbsolutePath() + " - IGNORING" );
-            return;
-        }
-
-        ZipFile zip = new ZipFile( file );
-        for ( Enumeration e = zip.entries(); e.hasMoreElements(); )
-        {
-            ZipEntry entry = (ZipEntry) e.nextElement();
-
-            if ( !entry.isDirectory() )
-            {
-                File outFile = new File( tempLocation, entry.getName() );
-                outFile.getParentFile().mkdirs();
-                IOUtil.copy( zip.getInputStream( entry ), new FileOutputStream( outFile ) );
-            }
-        }
-    }
-
 
 }

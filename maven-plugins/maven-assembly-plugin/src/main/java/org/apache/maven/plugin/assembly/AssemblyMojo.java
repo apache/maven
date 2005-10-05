@@ -32,9 +32,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
-import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -145,10 +144,13 @@ public class AssemblyMojo
             File destFile;
             try
             {
-                // TODO: use component roles? Can we do that in a mojo?
                 Archiver archiver = createArchiver( format );
 
                 destFile = createArchive( archiver, assembly, filename );
+            }
+            catch ( NoSuchArchiverException e )
+            {
+                throw new MojoExecutionException( e.getMessage() );
             }
             catch ( ArchiverException e )
             {
@@ -482,13 +484,13 @@ public class AssemblyMojo
      * @return archiver  Archiver generated
      * @throws ArchiverException
      */
-    private static Archiver createArchiver( String format )
-        throws ArchiverException
+    private Archiver createArchiver( String format )
+        throws ArchiverException, NoSuchArchiverException
     {
         Archiver archiver;
         if ( format.startsWith( "tar" ) )
         {
-            TarArchiver tarArchiver = new TarArchiver();
+            TarArchiver tarArchiver = (TarArchiver) this.archiverManager.getArchiver( "tar" );
             archiver = tarArchiver;
             int index = format.indexOf( '.' );
             if ( index >= 0 )
@@ -513,21 +515,9 @@ public class AssemblyMojo
                 tarArchiver.setCompression( tarCompressionMethod );
             }
         }
-        else if ( format.startsWith( "zip" ) )
-        {
-            archiver = new ZipArchiver();
-        }
-        else if ( format.startsWith( "jar" ) )
-        {
-            // TODO: use MavenArchiver for manifest?
-            JarArchiver jarArchiver = new JarArchiver();
-            jarArchiver.setCompress( true );
-            archiver = jarArchiver;
-        }
         else
         {
-            // TODO: better handling
-            throw new IllegalArgumentException( "Unknown format: " + format );
+            archiver = this.archiverManager.getArchiver( format );
         }
         return archiver;
     }
