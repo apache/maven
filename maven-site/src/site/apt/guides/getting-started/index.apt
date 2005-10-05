@@ -9,15 +9,15 @@
 Maven Getting Started Guide
 
  This guide is intended as a reference for those working with Maven for the first time,  but is also intended to serve as
- a cookbook with self-contained references and solutions for common usecases. It is recommended as a first time user
- that you step through the material in a sequential fashion. For users more familiar with Maven the guide endeavours
+ a cookbook with self-contained references and solutions for common usecases. For first time users, it is recommended 
+ that you step through the material in a sequential fashion. For users more familiar with Maven, this guide endeavours
  to provide a quick solution for the need at hand. It is assumed at this point that you have downloaded Maven and
  installed Maven on your local machine. If you have not done so please refer to the 
  {{{../../download.html}Download and Installation}} instructions.
 
  Ok, so you now have Maven installed and we're ready to go. Before we jump into our examples we'll very briefly go over
  what Maven is and how it can help you with your daily work and collaborative efforts with team members. Maven will, of
- course, work for small projects but Maven shines in helping teams operate more effectively by allowing team members
+ course, work for small projects, but Maven shines in helping teams operate more effectively by allowing team members
  to focus on what the stakeholders of a project require. You can leave the build infrastructure to Maven!
 
 Sections
@@ -77,7 +77,7 @@ Sections
  []
 
  If you want more background information on Maven you can check out {{{../../background/philosophy-of-maven.html}The Philosophy of Maven}} and
- the {{{../../background/history-of-maven.html}The History of Maven}}. Now we want to move on to why you, the user, can benefit from
+ {{{../../background/history-of-maven.html}The History of Maven}}. Now let's move on to how you, the user, can benefit from
  using Maven.
 
 * {How can Maven benefit my development process?}
@@ -91,14 +91,14 @@ Sections
 
 * {How do I make my first Maven project?}
 
- We are going to jump head long into creating your first Maven project!
+ We are going to jump headlong into creating your first Maven project!
  To create our first Maven project we are going to use Maven's archetype mechanism. An archetype is defined as
  <an original pattern or model from which all other things of the same kind are made>. In Maven, an archetype is a template
  of a project which is combined with some user input to produce a working Maven project that has been tailored to the
  user's requirements. We are going to show you how the archetype mechanism works now, but if you would to know more about
  archetypes please refer to our {{{introduction-to-archetypes.html}Introduction to Archetypes}}.
 
- On to creating your first project! In order to create the simplest of Maven projects execute the following from
+ On to creating your first project! In order to create the simplest of Maven projects, execute the following from
  the command line:
 
 +-----+
@@ -107,8 +107,9 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 
 +-----+
 
- Once you have executed this command you will notice a few things have happened. First you will notice that
- a file names <<<pom.xml>>> has been created which should look like this:
+ Once you have executed this command, you will notice a few things have happened. First, you will notice that
+ a directory names <<<my-app>>> has been created for the new project, and this directory contains a file named 
+ <<<pom.xml>>> that should look like this:
 
 +-----+
 
@@ -121,7 +122,6 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
-  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -134,49 +134,50 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 
 +-----+
 
- What is contained in the <<<pom.xml>>> is the Project Object Model (POM) for this project. The POM is the basic unit
+ <<<pom.xml>>> contains the Project Object Model (POM) for this project. The POM is the basic unit
  of work in Maven. This is important to remember because Maven is inherently project-centric in that everything revolves
  around the notion of a project. In short, the POM contains every important piece of information about your project and
  is essentially one-stop-shopping for finding anything related to your project. Understanding the POM is important and
  new users are encouraged to refer to the {{{introduction-to-the-pom.html}Introduction to the POM}}.
 
-  This is a very simple POM but still displays the key elements every POM contains so lets walk through each of them
+  This is a very simple POM but still displays the key elements every POM contains, so let's walk through each of them
   to familiarize you with the POM essentials:
 
   * <<project>> This is the top-level element in all Maven pom.xml files.
 
   * <<modelVersion>> This element indicates what version of the object model this POM is using. The version of the
-    model itself changes very infrequently but it is mandatory in order to ensure stability of use when and if
-    the Maven developers deem a change to the model necessasry.
+    model itself changes very infrequently but it is mandatory in order to ensure stability of use if and when
+    the Maven developers deem it necessary to change the model.
 
-  * <<groupId>> This element indicates the unique groupId of the organization or group that created the project.
-    The groupId is on of the key identifiers of a project and is typically based on the fully qualified
+  * <<groupId>> This element indicates the unique identifier of the organization or group that created the project.
+    The groupId is one of the key identifiers of a project and is typically based on the fully qualified
     domain name of your organization. For example  <<<org.apache.maven.plugins>>> is the designated groupId for
     all Maven plug-ins.
 
   * <<artifactId>> This element indicates the unique base name of the primary artifact being generated by this project.
     The primary artifact for a project is typically a JAR file. Secondary artifacts like source bundles also use
     the artifactId as part of their final name. A typical artifact produced by would have the form
-    \<artifactId\>-\<version\>.\<extension\>.
+    \<artifactId\>-\<version\>.\<extension\> (for example, <<<myapp-1.0.jar>>>).
 
-  * <<packaging>> This element indicates the packing to be used by this artifact. This not only means if the artifact
-    produced is JAR, WAR, or EAR but can also indicate a specific lifecycle to use as part of the build process. This
-    is a topic we will deal with further on in the guide, just keep in mind the indicated packaging of a project
-    can play a part in customizing the build lifecycle. The default value for the <<<packaging>>> element is JAR
+  * <<packaging>> This element indicates the package type to be used by this artifact (e.g. JAR, WAR, EAR, etc.).
+    This not only means if the artifact
+    produced is JAR, WAR, or EAR but can also indicate a specific lifecycle to use as part of the build process. (The
+    lifecycle is a topic we will deal with further on in the guide. For now, just keep in mind that the indicated packaging of a project
+    can play a part in customizing the build lifecycle.) The default value for the <<<packaging>>> element is JAR
     so you do not have to specify this for most projects.
 
   * <<version>> This element indicates the version of the artifact generated by the project. Maven goes a long way
-    to help you with version management and you will often see the <<<SNAPSHOT>>> designator in a version which
-    indicates a project is in a state of development. We will discuss the use of snapshots and how they work further
-    on in the guide.
+    to help you with version management and you will often see the <<<SNAPSHOT>>> designator in a version, which
+    indicates that a project is in a state of development. We will discuss the use of snapshots and how they work further
+    on in this guide.
 
-  * <<name>> This element indicates the display name used for the project. This name is often used in Maven's
+  * <<name>> This element indicates the display name used for the project. This is often used in Maven's
     generated documentation.
 
-  * <<url>> This element indicates where the project's site can be found. This url is often used in Maven's
+  * <<url>> This element indicates where the project's site can be found. This is often used in Maven's
     generated documentation.
 
-  * <<description>> This elements provides a basic description of your project. This url is often used in
+  * <<description>> This elements provides a basic description of your project. This is often used in
     Maven's generated documentation.
 
   []
@@ -207,9 +208,10 @@ my-app
 
 +-----+
 
- As you can see, the project created from the archetype has a POM, a source tree for you applications sources and
- a source tree for your test sources. This is the standard layout for Maven projects where the application sources
- reside in <<<${basedir}/src/main/java>>> and test sources reside in <<<${basedir}/src/test/java>>>.
+ As you can see, the project created from the archetype has a POM, a source tree for your application's sources and
+ a source tree for your test sources. This is the standard layout for Maven projects (the application sources
+ reside in <<<$\{basedir\}/src/main/java>>> and test sources reside in <<<$\{basedir\}/src/test/java>>>, where $\{basedir\}
+ represents the directory containing <<<pom.xml>>>).
 
  If you were to create a Maven project by hand this is the directory structure that we recommend using. This is a
  Maven convention and to learn more about it you can read our
@@ -236,29 +238,34 @@ m2 compile
 [INFO]    task-segment: [compile]
 [INFO] ----------------------------------------------------------------------------
 [INFO] artifact org.apache.maven.plugins:maven-resources-plugin: checking for updates from central
+...
 [INFO] artifact org.apache.maven.plugins:maven-compiler-plugin: checking for updates from central
+...
 [INFO] [resources:resources]
+...
 [INFO] [compiler:compile]
 Compiling 1 source file to <dir>/my-app/target/classes
 [INFO] ----------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ----------------------------------------------------------------------------
-[INFO] Total time: 5 seconds
+[INFO] Total time: 3 minutes 54 seconds
 [INFO] Finished at: Fri Sep 23 15:48:34 GMT-05:00 2005
 [INFO] Final Memory: 2M/6M
 [INFO] ----------------------------------------------------------------------------
 
 +-----+
 
- As you can see from the output the compiled classes where placed in <<<${basedir}/target/classes>>> which is
+~~DJ  When they run this the first time, it will take a LONG time because of downloading all the dependencies.
+~~DJ  You really should say something about that here so they understand what's going on and don't get scared.
+ As you can see from the output, the compiled classes were placed in <<<$\{basedir\}/target/classes>>>, which is
  another standard convention employed by Maven. So, if you're a keen observer you'll notice that using the
  standard conventions the POM above is very small and you haven't explicity had to tell Maven where any of
  your sources are or where the output should go. By following the standard Maven conventions you can get
- a lot done with very little effort! Just as a casual comparison lets take a look at what you might have had to do
+ a lot done with very little effort! Just as a casual comparison, let's take a look at what you might have had to do
  in {{{http://ant.apache.org}Ant}} to accomplish the same {{{../../ant/build-a1.xml}thing}}.
 
- Now this is simply to compile a single tree of application sources and the Ant script shown is pretty much the same
- size as the POM shown above. But we'll see how much more we can do with just that simple POM above!
+ Now, this is simply to compile a single tree of application sources and the Ant script shown is pretty much the same
+ size as the POM shown above. But we'll see how much more we can do with just that simple POM!
 
 * {How do I compile my test sources and run my unit tests?}
 
