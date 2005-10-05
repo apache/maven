@@ -76,15 +76,15 @@ Sections
 
  []
 
- If you want more background information on Maven you can check out {{{background/philosophy-of-maven.html}The Philosophy of Maven}} and
- the {{{background/history-of-maven.html}The History of Maven}}. Now we want to move on to why you, the user, can benefit from
+ If you want more background information on Maven you can check out {{{../../background/philosophy-of-maven.html}The Philosophy of Maven}} and
+ the {{{../../background/history-of-maven.html}The History of Maven}}. Now we want to move on to why you, the user, can benefit from
  using Maven.
 
 * {How can Maven benefit my development process?}
 
  Maven can provide benefits for your build process by employing standard conventions and practices to accelerate your development
  cycle while at the same time helping you achieve a higher rate of success. For a more detailed look at how
- Maven can help you with your development process please refer to {{{benefits-of-using-maven.html}The Benefits of Using Maven}}.
+ Maven can help you with your development process please refer to {{{../../benefits-of-using-maven.html}The Benefits of Using Maven}}.
 
  Now that we have covered a little bit of the history and purpose of Maven let's get into some real examples to
  get you up and running with Maven!
