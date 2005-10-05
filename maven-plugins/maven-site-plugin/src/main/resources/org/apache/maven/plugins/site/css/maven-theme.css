@@ -1,3 +1,6 @@
+body {
+  padding: 0px 0px 10px 0px;
+}
 body, td, select, input, li{
   font-family: Verdana, Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -109,4 +112,10 @@ dl {
 }
 dt {
   color: #900;
+}
+#organizationLogo img, #projectLogo img, #projectLogo span{
+  margin: 8px;
+}
+#banner {
+  border-bottom: 1px solid #fff;
 }

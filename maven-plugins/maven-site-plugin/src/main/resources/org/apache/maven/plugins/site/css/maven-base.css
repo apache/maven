@@ -1,6 +1,6 @@
 body {
   margin: 0px;
-  padding: 0px 0px 10px 0px;
+  padding: 0px;
 }
 img {
   border:none;
@@ -31,7 +31,7 @@ div.clear hr{
   font-weight: bold;
 }
 #bannerLeft img, #bannerRight img {
-  margin: 8px;
+  margin: 0px;
 }
 .xleft, #bannerLeft img {
   float:left;
@@ -42,20 +42,21 @@ div.clear hr{
   text-shadow: #7CFC00;
 }
 #banner {
-  border-bottom: 1px solid #fff;
+  padding: 0px;
 }
 #banner img {
   border: none;
 }
-#footer, #breadcrumbs {
+#breadcrumbs {
   padding: 3px 10px 3px 10px;
 }
 #leftColumn {
- width: 18%;
+ width: 150px;
  float:left;
 }
 #bodyColumn {
-  margin-left: 20%;
+  margin-right: 1.5em;
+  margin-left: 177px;
 }
 #legend {
   padding: 8px 0 8px 0;
@@ -63,7 +64,12 @@ div.clear hr{
 #navcolumn {
   padding: 8px 4px 0 8px;
 }
-#navcolumn h5, #navcolumn ul {
+#navcolumn h5 {
+  margin: 0;
+  padding: 0;
+  font-size: small;
+}
+#navcolumn ul {
   margin: 0;
   padding: 0;
   font-size: small;
@@ -124,6 +130,7 @@ div.clear hr{
   padding: 4px;
 }
 #footer {
+  padding: 3px 10px 3px 10px;
   font-size: x-small;
 }
 #breadcrumbs {

@@ -72,3 +72,4 @@ images/folder-open.gif
 css/maven-base.css
 css/print.css
 css/maven-theme.css
+css/maven-classic.css
