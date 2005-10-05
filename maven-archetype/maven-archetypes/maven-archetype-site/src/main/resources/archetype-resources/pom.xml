@@ -3,6 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
+  <version>${version}</version>
   <name>Maven</name>
   <url>http://maven.apache.org/maven2</url>
   <inceptionYear>2001</inceptionYear>
