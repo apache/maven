@@ -16,7 +16,7 @@ Build Lifecycle
   For the person building a project, this means that it is only necessary to learn a small set of commands to build any
   Maven project, and the POM will ensure they get the results they desired.
 
-   The most common lifecycle phases that would be executed on a project are the following:
+   The most common lifecycle phases that would be executed on a project are the following (a complete list of the lifecycle phases is given below):
 
     * <<<validate>>> - validate the project is correct and all necessary information is available
 
@@ -86,17 +86,17 @@ m2 clean:clean install
 | <<<deploy>>>                 | <<<deploy:deploy>>>
 *------------------------------+---------------------------------------------------------------------------------------+
 
-  This is an almost standard set of bindings, however, some packages handle them differently. For example, a project
+  This is an almost standard set of bindings; however, some packages handle them differently. For example, a project
   that is purely metadata (packaging <<<pom>>>) only binds the <<<install>>> and <<<deploy>>> phases.
 
   Note that for some packaging tpyes to be available, you may also need to include a particular plugin in your
-  <<<build>>> section, similarly to the next section. One example of a plugin that requires this is the Plexus plugin,
+  <<<build>>> section (as described in the next section). One example of a plugin that requires this is the Plexus plugin,
   which provides a <<<plexus-application>>> and <<<plexus-service>>> packaging.
 
 ** Plugins
 
   The second way to add goals to phases is to configure plugins in your project. As you will see in the later sections,
-  plugins contain information that says where to bind particular goals to. Note that adding the plugin on its own is not
+  plugins contain information that indicate which lifecycle phase to bind each goal to. Note that adding the plugin on its own is not
   enough information - you must also specify the goals you want run as part of your build.
 
   The goals that are configured will be added to the goals already bound to the lifecycle from the packaging selected.
@@ -128,8 +128,8 @@ m2 clean:clean install
 ...
 ----
 
-  You might be wondering why that executions element is there? That is so that you can run the same goal multiple times
-  with different configuration, if needed. Separate executions can also be given an ID so that during inheritence or the
+  You might be wondering why that executions element is there. That is so that you can run the same goal multiple times
+  with different configuration if needed. Separate executions can also be given an ID so that during inheritence or the
   application of profiles you can control whether goal configuration is merged or turned into an additional execution.
 
   When multiple executions are given that match a particular phase, they are executed in the order specified in the POM,
@@ -137,7 +137,7 @@ m2 clean:clean install
 
   Now, in the case of <<<modello:java>>>, it only makes sense in the <<<generate-sources>>> phase. But some goals can be
   used in more than one phase, and there may not be a sensible default. For those, you can specify the phase yourself.
-  For example, let's say you have a goal <<<touch:timestamp>>> that echos the current time to file, and you want it to
+  For example, let's say you have a goal <<<touch:timestamp>>> that echos the current time to a file, and you want it to
   run in the <<<process-test-resources>>> phase to indicate when the tests were started. This would be configured like
   so:
 
@@ -163,7 +163,7 @@ m2 clean:clean install
 
 * Build Lifecycle Phase Reference
 
-  The following phases are executed in the order given, up to the point of the one specified.
+  The following lists all build lifecycle phases, which are executed in the order given up to the point of the one specified.
 
 *-------------------------------+--------------------------------------------------------------------------------------+
 | <<<validate>>>                | validate the project is correct and all necessary information is available.
@@ -231,7 +231,7 @@ m2 clean:clean install
 
 ** Specifying a New Packaging
 
-  If your plugin is intended to provide a unique artifact type, then you will need to not only provide the goal to
+  If your plugin is intended to provide a unique artifact type, then you will need to provide not only the goal to
   package it with, but also a mapping of how the default lifecycle should behave.
 
   This is currently achieved by adding a Plexus descriptor to your plugin (or modifying it if it already exists).
@@ -264,7 +264,7 @@ m2 clean:clean install
 
   In this example, the <<<role-hint>>> is used to specify the packaging, and the <<<role>>> of
   <<<org.apache.maven.lifecycle.mapping.LifecycleMapping>>> indicates this is a lifecycle mapping for that packaging.
-  Implementation is required, and while you can provide your own, the default given above should suit and standard case.
+  <<<implementation>>> is required, and while you can provide your own, the default given above should suit the standard case.
 
   The phases to bind are listed in the configuration element, and each that is given can have one goal associated with
   that phase for that particular packaging.
@@ -373,7 +373,7 @@ private MavenProject executedProject;
   to bind a goal one or more times to a particular phase, as well as specifying configuration. Note that configuration
   already provided in the POM to that plugin that is not part of a specific execution will also be applied.
 
-  The lifecycle ID given here, <<<clover>>> can then be used in the mojo to specify what to overlay on the forked
+  The lifecycle ID given here (<<<clover>>>) can then be used in the mojo to specify what to overlay on the forked
   lifecycle when executing it, using the following mojo level declaration:
 
 ----

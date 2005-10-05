@@ -48,8 +48,8 @@
           <li>
             <i>Dependency mediation</i>
             - this determines what version of a dependency will be used when multiple
-            different ones are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
-            you can always guarantee a version by declaring it explicitly in the project's POM.
+            versions of an artifact are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
+            you can always guarantee a version by declaring it explicitly in your project's POM.
           </li>
           <li>
             <i>Dependency scope</i>
@@ -198,7 +198,7 @@
 </project>]]></source>
         </p>
         <p>
-          These two example POMs share a common dependencies and each one non-trivial dependency. This information
+          These two example POMs share a common dependency and each has one non-trivial dependency. This information
           can be put in the parent POM like this:
           <source><![CDATA[
 <project>

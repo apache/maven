@@ -74,7 +74,7 @@
           <li>To be able to implement the features demanded that were not possible under the Maven 1.0 architecture</li>
         </ul>
         <p>
-          Unfortunately, to reach these goals - we've had to sacrifice backwards compatibility to do this. Instead of
+          Unfortunately, to reach these goals we've had to sacrifice backwards compatibility. Instead of
           making many small incremental changes that would break compatibility often over time, we decided to build on a
           new, solid base that can be reliable for the future, and also to maintain the existing Maven 1.x product to
           ensure that existing users are not left out in the cold.
@@ -83,7 +83,7 @@
     </faq>
 
     <faq id="tech-review">
-      <question>What does beta release mean?</question>
+      <question>What does "beta release" mean?</question>
       <answer>
         <p>
           Maven 2.0 is now in beta testing. We believe it is equally functional to Maven 1.0, however there are still
@@ -165,7 +165,7 @@
         <p>
           We get asked a lot whether Maven 2.0 will support other languages, in particular Groovy.
           We will allow the use of Groovy - and virtually any other scripting
-          language if there is demand, or someone can commit a small amount of time to implementing a
+          language (if there is demand) or someone can commit a small amount of time to implementing a
           factory for it.
         </p>
         <p>

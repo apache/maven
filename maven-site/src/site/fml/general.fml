@@ -86,11 +86,11 @@
           Absolutely yes!
         </p>
         <p>
-          By configuring &lt;sourceDirectory&gt;, &lt;resources&gt; and other elements of
-          the &lt;build&gt; section.
+          By configuring &amp;lt;sourceDirectory&amp;gt;, &amp;lt;resources&amp;gt; and other elements of
+          the &amp;lt;build&amp;gt; section.
         </p>
         <p>
-          In addition, you may need to change plugin configuration if you are
+          In addition, you may need to change the plugin configuration if you are
           not using plugin defaults for their files/directories.
         </p>
       </answer>
@@ -113,7 +113,7 @@
       <answer>
         <p>
           You most probably need to configure Maven to use a proxy. Please see the information on
-          <a href="configuration.html">configuring settings.xml</a> for how to configure your proxy
+          <a href="configuration.html">configuring settings.xml</a> for information on how to configure your proxy
           for Maven.
         </p>
       </answer>

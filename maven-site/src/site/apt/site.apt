@@ -75,14 +75,14 @@ m2 site:site
   only SSH is supported, as above which copies to the host <<<www.mycompany.com>>> in the path <<</www/docs/project/>>>.
 
   Deploying the site is done with the <<<site:deploy>>> goal. Note that you cannot just call the deployment goal on its own, however.
-  You must presently run the <<<site:site>>> goal independantly.
+  You must presently run the <<<site:site>>> goal as well.
 
 ---------------
 m2 site:site site:deploy
 ---------------
 
   <<Note:>> the trailing slash in the URL above indicates that any subprojects that inherit this value should append their artifact ID to
-  the path instead of using it as is.
+  the path instead of using it as-is.
 
 * Creating a Site Descriptor
 
@@ -132,7 +132,7 @@ m2 site:site site:deploy
 * Adding Extra Resources
 
   You can add any arbitrary resources to you site by including them in a
-  <<<resources>>> directory as shown below. Addition CSS will be picked up
+  <<<resources>>> directory as shown below. Additional CSS files will be picked up
   when they are placed in the <<<css>>> directory within the <<<resources>>>
   directory.
 
@@ -220,5 +220,5 @@ m2 site:site site:deploy
       +- site_fr.xml      (French site descriptor)
 --------------------
 
-  With one site descriptor by language, translated site can evolve independently.
+  With one site descriptor per language, the translated site(s) can evolve independently.
 

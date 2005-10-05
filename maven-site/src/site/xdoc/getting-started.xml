@@ -6,7 +6,7 @@
   <body>
     <section name="Getting Started">
       <p>
-        This section will help you create a trivial project, and build it, and should provide enough information
+        This section will help you create a trivial project and build it, and should provide enough information
         to build any project that requires Maven 2.0. It assumed that you have already
         <a href="download.html">Downloaded and Installed</a>
         a Maven 2.0 release.
@@ -23,7 +23,7 @@
         </p>
         <source>m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app</source>
         <p>
-          This command has created a layout according the the conventions laid out
+          This command creates a layout according the the conventions laid out
           <a href="http://maven.apache.org/reference/conventions.html">here</a>
           .
         </p>
@@ -170,7 +170,7 @@
       <a name="configuring_plugins"/>
       <subsection name="Configuring Plugins">
         <p>
-          What if you would like to customise whether a plugins is enabled, or how a plugin operates?
+          What if you would like to customise whether a plugins is enabled or how a plugin operates?
           In Maven 1.0, you would have added some
           <code>preGoal</code>
           to
@@ -244,9 +244,9 @@
           -DgroupId=com.mycompany.app -DartifactId=my-webapp \
           -DarchetypeArtifactId=maven-archetype-webapp</source>
         <p>
-          Note that these must all be on a single line. This will create a directory
+          Note that these must all be on a single line. This will create a directory called
           <code>my-webapp</code>
-          and the following
+          containing the following
           project descriptor:
         </p>
         <source><![CDATA[<project>
@@ -391,7 +391,7 @@
           <code>my-app</code>
           JAR. This does a few things: it makes it available
           on the classpath to any code in the WAR (none in this case), it makes sure the JAR is always built before the
-          WAR, and it indicates to the WAR plugin to include the JAR in it's library directory.
+          WAR, and it indicates to the WAR plugin to include the JAR in its library directory.
         </p>
         <p>
           You may have noticed that
@@ -420,7 +420,7 @@
           and the artifacts in the reactor will be used from the target directories instead of the local repository.
         </p>
         <p>
-          You might like to generate you IDEA workspace again from the top level directory...
+          You might like to generate your IDEA workspace again from the top level directory...
         </p>
         <source>m2 idea:idea</source>
       </subsection>

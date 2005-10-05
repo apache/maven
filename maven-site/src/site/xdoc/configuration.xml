@@ -29,8 +29,8 @@
       </p>
       <p>
         <b>Note:</b>
-        the installation and user configuration can not be used to add shared project information -
-        for example setting
+        the installation and user configuration cannot be used to add shared project information -
+        for example, setting
         <code>&lt;organization&gt;</code>
         or
         <code>&lt;distributionManagement&gt;</code>
@@ -68,14 +68,14 @@
       <p>
         You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and
         password are only required if your proxy requires basic authentication (note that later releases may support
-        storing your passwords in a secured keystore - in the mean time, please ensure your
+        storing your passwords in a secured keystore - in the meantime, please ensure your
         <code>settings.xml</code>
         file is secured with permissions appropriate for your operating system).
       </p>
       <p>
         The
         <code>nonProxyHosts</code>
-        setting accepts wild cards, and each host not to proxy is separated by the
+        setting accepts wild cards, and each host name is separated by a
         <code>|</code>
         character. This matches the
         <a href="http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html">JDK configuration</a>
@@ -150,11 +150,11 @@
         <li>There is a synchronized mirror on the internet that is geographically closer and faster</li>
         <li>You want to replace a particular repository with your own internal repository which you have greater
           control over</li>
-        <li>You want to run maven-proxy to provide a local cache to a mirror and need to use it's URL instead</li>
+        <li>You want to run maven-proxy to provide a local cache to a mirror and need to use its URL instead</li>
       </ul>
       <p>
         To configure a mirror of a given repository, you provide it in your settings file, giving the new repository
-        it's own
+        its own
         <code>id</code>
         and
         <code>url</code>
@@ -182,7 +182,7 @@
   .]]></source>
       <p>
         <i>Please note:</i>
-        this particular is not actually set up for Maven 2 yet, so this should be treated as an
+        this particular feature is not actually set up for Maven 2 yet, so this should be treated as an
         example only.
       </p>
     </section>

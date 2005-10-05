@@ -7,13 +7,13 @@
       <answer>
         <p>
           Maven 2.0 will feel very different to a Maven 1.0 user - and perhaps a little strange. But it is a lot simpler
-          to work with, and closer to how Maven was always meant to be! The key changes from Maven 1.0 are:
+          to work with and closer to how Maven was always meant to be! The key changes from Maven 1.0 are:
         </p>
         <ul>
           <li>
             <i>Faster and smaller</i>
-            - The Maven core no longer uses Ant, Jelly or Xerces making it much smaller, has
-            fewer dependencies and is perfect for embedding in other tools.
+            - The Maven core no longer uses Ant, Jelly or Xerces making it much smaller, have
+            fewer dependencies, and is perfect for embedding in other tools.
           </li>
           <li>
             <i>Defined build lifecycle</i>

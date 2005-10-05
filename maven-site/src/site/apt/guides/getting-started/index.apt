@@ -20,7 +20,12 @@ Maven Getting Started Guide
  course, work for small projects but Maven shines in helping teams operate more effectively by allowing team members
  to focus on what the stakeholders of a project require. You can leave the build infrastructure to Maven!
 
-* What is Maven?
+Sections
+
+ * {{{link1}What is Maven?}}
+
+
+* {link1} What is Maven?
 
  At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt <to apply patterns to
  a project's build infrastructure in order to promote comprehension and productivity by providing a clear path in the

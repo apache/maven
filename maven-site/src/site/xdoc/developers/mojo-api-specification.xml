@@ -29,7 +29,7 @@
         the way of the programmer with its new Mojo API. This opens up the
         opportunity for many Mojos to be reused outside of Maven, or bridged
         into Maven from external systems like Ant.</p>
-      <p>NOTE: For now, we will limit the discussion to Java-based mojos, since
+      <p>NOTE: For now, we will limit the discussion to Java-based Mojos, since
         each scripting language will present these same basic requirements with
         various forms of implementation.</p>
       <p>Although the requirements on Mojos are minimal by design, there are
@@ -55,7 +55,7 @@
         must implement (or else extend its abstract base class counterpart
         <code>org.apache.maven.plugin.AbstractMojo</code>
         ). This interface
-        guarantees the correct execution contract for the mojo: no parameters,
+        guarantees the correct execution contract for the Mojo: no parameters,
         void return type, and a throws clause that allows only
         <code>org.apache.maven.plugin.MojoExecutionException</code>
         and its
@@ -73,7 +73,7 @@
         under the path
         <code>META-INF/maven</code>
         inside the Plugin jar file. Fortunately,
-        Maven also provides a set of javadoc annotations and tools to generate
+        Maven also provides a set of Javadoc annotations and tools to generate
         this descriptor, so developers don't have to worry about directly
         authoring or maintaining a separate XML metadata file.
       </p>
@@ -86,7 +86,7 @@
         <p>This interface forms the contract required for Mojos to interact
           with the Maven infrastructure. It features an
           <code>execute()</code>
-          method, which trigger's the Mojo's build-process behavior, and can
+          method, which triggers the Mojo's build-process behavior, and can
           throw a
           <code>MojoExecutionException</code>
           if an error condition
@@ -323,12 +323,12 @@
         descriptor must accompany these classes inside the plugin jar. This
         descriptor file is used to provide metadata about the parameters and
         other component requirements for a set of Mojos so that Maven can
-        initialize the Mojo and validate it's configuration before executing
+        initialize the Mojo and validate its configuration before executing
         it. As such, the plugin descriptor has a certain set of information
         that is required for each Mojo specification to be valid, as well as
         requirements for the overall plugin descriptor itself.</p>
       <p>NOTE: In the following discussion, bolded items are the descriptor's
-        element name along with a javadoc annotation (if applicable) supporting
+        element name along with a Javadoc annotation (if applicable) supporting
         that piece of the plugin descriptor. A couple of examples are:
         <b>someElement
           (@annotation parameterName="parameterValue")</b>
@@ -355,7 +355,7 @@
             <td>Descriptors for each Mojo provided by the plugin, each inside a
               <b>mojo</b>
               sub-element. Mojo descriptors are covered in detail
-              below. Obviously, a plugin without any declared mojos doesn't
+              below. Obviously, a plugin without any declared Mojos doesn't
               make sense, so the
               <b>mojos</b>
               element is required, along with
@@ -404,7 +404,7 @@
             <td>none (detected)</td>
             <td>Yes</td>
             <td>The Mojo's fully-qualified class name (or script path in
-              the case of non-java mojos).</td>
+              the case of non-Java Mojos).</td>
           </tr>
           <tr>
             <td>language</td>
@@ -412,7 +412,7 @@
             <td>No. Default:
               <code>java</code>
             </td>
-            <td>The implementation language for this Mojo (java,
+            <td>The implementation language for this Mojo (Java,
               beanshell, etc.).</td>
           </tr>
           <tr>
@@ -475,8 +475,8 @@
             <td>No</td>
             <td>The description of this Mojo's functionality.
               <i>Using the
-                toolset, this will be the class-level javadoc description
-                provided. NOTE: While this is not a required part of the mojo
+                toolset, this will be the class-level Javadoc description
+                provided. NOTE: While this is not a required part of the Mojo
                 specification, it SHOULD be provided to enable future
                 tool support for browsing, etc. and for clarity.</i>
             </td>
@@ -494,8 +494,8 @@
           </tr>
         </table>
       </p>
-      <p>Each Mojo specifies the parameters that it expects to be able to work
-        with. These parameters are the Mojo's link to the outside world, and
+      <p>Each Mojo specifies the parameters that it expects in order to work.
+        These parameters are the Mojo's link to the outside world, and
         will be satisfied through a combination of POM/project values, plugin
         configurations (from the POM and configuration defaults), and System
         properties.</p>
@@ -527,7 +527,7 @@
               parameter from the Mojo's declared defaults (discussed below) or
               from the POM.
               <i>Using the toolset, this is detected as the
-                java field name.</i>
+                Java field name.</i>
             </td>
           </tr>
           <tr>
@@ -544,11 +544,11 @@
             <td>type</td>
             <td>none (detected)</td>
             <td>Yes</td>
-            <td>The java type for this parameter. This is used to validate the
+            <td>The Java type for this parameter. This is used to validate the
               result of any expressions used to calculate the value which
               should be injected into the Mojo for this parameter.
               <i>Using the
-                toolset, this is detected as the class of the java field
+                toolset, this is detected as the class of the Java field
                 corresponding to this parameter.</i>
             </td>
           </tr>
@@ -589,7 +589,7 @@
             <td>none (detected)</td>
             <td>No</td>
             <td>The description of this parameter's use inside the Mojo.
-              <i>Using the toolset, this is detected as the javadoc description
+              <i>Using the toolset, this is detected as the Javadoc description
                 for the field. NOTE: While this is not a required part of the
                 parameter specification, it SHOULD be provided to enable future
                 tool support for browsing, etc. and for clarity.</i>
@@ -618,14 +618,14 @@
             <td>@deprecated</td>
             <td>No</td>
             <td>Marks a parameter as deprecated. The rules on deprecation are
-              the same as normal java with language elements. This will trigger
+              the same as normal Java with language elements. This will trigger
               a warning when a user tries to configure a parameter marked as
               deprecated.</td>
           </tr>
         </table>
       </p>
       <p>The final component of a plugin descriptor is the dependencies. This
-        enables the plugin to function independently of it's POM (or at least
+        enables the plugin to function independently of its POM (or at least
         to declare the libraries it needs to run). Dependencies are taken from
         the
         <b>runtime</b>
@@ -644,15 +644,15 @@
         needs to do is declare his project to be a plugin from within the POM.
         Once this is done, Maven will call the appropriate descriptor
         generators, etc. to produce an artifact that is ready for use within
-        Maven builds. Optional metadata can be injected via javadoc annotation
-        (and possibly jdk5 annotations in the future) as described above,
+        Maven builds. Optional metadata can be injected via Javadoc annotation
+        (and possibly JDK5 annotations in the future) as described above,
         enabling richer interactions between the Mojo and the user. The
         section below describes the changes to the POM which are necessary to
         create plugin artifacts.</p>
     </section>
     <section name="Project Descriptor (POM) Requirements">
       <p>From the POM, Maven plugin projects look quite similar to any other
-        project. For pure java plugins, the differences are even smaller than
+        project. For pure Java plugins, the differences are even smaller than
         for script-based plugins. The following details the POM elements
         which are necessary to build a Maven plugin artifact.</p>
       <p>
@@ -680,9 +680,9 @@
             </td>
             <td>In the case of script-based Mojos (which are not covered in
               detail within this document), the POM must include an additional
-              element to distinguish script sources from (optional) java
-              supporting classes. This element is the scriptSourceDirectory,
-              inside the build section. This directory is included in the list
+              element to distinguish script sources from (optional) Java
+              supporting classes. This element is <code>scriptSourceDirectory</code>,
+              inside the <code>build</code> section. This directory is included in the list
               of resources which accompany any compiled code in the resulting
               artifact. It is specified separately from the resources in the
               build section to denote its special status as an alternate source
@@ -711,7 +711,7 @@
                 href="plugin-overview.html">link</a>
             ]
           </li>
-          <li>QDox Project (javadoc annotations) [
+          <li>QDox Project (Javadoc annotations) [
             <a
                 href="http://qdox.codehaus.org">link</a>
             ]

@@ -63,7 +63,7 @@ Plugin Overview
   and the parameters it is expecting.
   
   MOJO is a play on POJO (Plain-old-Java-object), substituting "Maven" for
-  "Plain".  Mojo is also an iteresting word (see {{{http://www.answers.com/mojo&r=67}definition}}.  
+  "Plain".  Mojo is also an iteresting word (see {{{http://www.answers.com/mojo&r=67}definition}}).  
   From {{{http://www.wikipedia.org}Wikipedia}}, a "mojo" is defined as:
   "...a small bag worn by a person under the clothes (also known as a mojo hand). 
   Such bags were thought to have supernatural powers, such as protecting from evil, 
@@ -161,12 +161,15 @@ Plugin Overview
   
 ** Why Change the Plugin Architecture?
 
-  See the previous question for the long version, but the short version can
+  See the previous section for the long version, but the short version can
   be summed up by the following list of benefits.
 
     * A managed lifecycle
+    
     * Multiple implementation languages
+    
     * Reusability outside of the build system
+    
     * The ability to write Maven plugins entirely in Java
     
   In Maven 1.0, a plugin was defined using Jelly, and while it was possibly to 
