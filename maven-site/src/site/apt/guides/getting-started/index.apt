@@ -22,10 +22,22 @@ Maven Getting Started Guide
 
 Sections
 
- * {{{link1}What is Maven?}}
+ * {{{index.html#What is Maven?}What is Maven?}}
+ * {{{index.html#How can Maven benefit my development process?}How can Maven benefit my development process?}}
+ * {{{index.html#How do I make my first Maven project?}How do I make my first Maven project?}}
+ * {{{index.html#How do I compile my application sources?}How do I compile my application sources?}}
+ * {{{index.html#How do I compile my test sources and run my unit tests?}How do I compile my test sources and run my unit tests?}}
+ * {{{index.html#How do I create a JAR and install it in my local repository?}How do I create a JAR and install it in my local repository?}}
+ * {{{index.html#How do I filter resources against my POM?}How do I filter resources against my POM?}}
+ * {{{index.html#How do I filter resources against a properties file?}How do I filter resources against a properties file?}}
+ * {{{index.html#How do I use external dependencies?}How do I use external dependencies?}}
+ * {{{index.html#How do I deploy my jar in my remote repository?}How do I deploy my jar in my remote repository?}}
+ * {{{index.html#How do I create documentation?}}How do I create documentation?}
+ * {{{index.html#How do I deploy my site?}How do I deploy my site?}}
+ * {{{index.html#How do I use plug-ins?}How do I use plug-ins?}}
+ * {{{index.html#How do I control what version of plug-in I use?}How do I control what version of plug-in I use?}}
 
-
-* {link1} What is Maven?
+* {What is Maven?}
 
  At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt <to apply patterns to
  a project's build infrastructure in order to promote comprehension and productivity by providing a clear path in the
@@ -53,7 +65,7 @@ Sections
  the {{{background/history-of-maven.html}The History of Maven}}. Now we want to move on to why you, the user, can benefit from
  using Maven.
 
-* How can Maven benefit my development process?
+* {How can Maven benefit my development process?}
 
  Maven can provide benefits for your build process by employing standard conventions and practices to accelerate your development
  cycle while at the same time helping you achieve a higher rate of success. For a more detailed look at how
@@ -62,7 +74,7 @@ Sections
  Now that we have covered a little bit of the history and purpose of Maven let's get into some real examples to
  get you up and running with Maven!
 
-* How do I make my first Maven project?
+* {How do I make my first Maven project?}
 
  We are going to jump head long into creating your first Maven project!
  To create our first Maven project we are going to use Maven's archetype mechanism. An archetype is defined as
@@ -190,7 +202,7 @@ my-app
 
  Now that we have a POM, some application sources, and some test sources you are probably asking ...
 
-* How do I compile my application sources?
+* {How do I compile my application sources?}
 
  Execute the following command to compile your application sources:
 
@@ -233,7 +245,7 @@ Compiling 1 source file to <dir>/my-app/target/classes
  Now this is simply to compile a single tree of application sources and the Ant script shown is pretty much the same
  size as the POM shown above. But we'll see how much more we can do with just that simple POM above!
 
-* How do I compile my test sources and run my unit tests?
+* {How do I compile my test sources and run my unit tests?}
 
  So you can now compile your applications sources and now you've got some unit tests that you want to compile
  and execute because every programmer always writes and executes their unit tests (nudge nudge wink wink).
@@ -293,7 +305,7 @@ Results :
  Now that you can compile your application sources and compile your tests and execute them you'll want to move
  on to the next logical step so you'll be asking ...
 
-* How do I create a JAR and install it in my local repository?
+* {How do I create a JAR and install it in my local repository?}
 
  Making a JAR file is straight forward enough and can be accomplished by executing the following command:
 
@@ -498,7 +510,7 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
 
 +----+
 
-* How do I filter resources against my POM?
+* {How do I filter resources against my POM?}
 
 +----+
 
@@ -541,7 +553,7 @@ application.version=${pom.version}
 
 +----+
 
-* How do I filter resources against a properties file?
+* {How do I filter resources against a properties file?}
 
 +----+
 
@@ -597,9 +609,7 @@ environment=${environment}
 
 +----+
 
-+----+
-
-* How do I use external dependencies?
+* {How do I use external dependencies?}
 
  You probably noticed already noticed a <<<dependencies>>> element in the POM we've been using as an example
  so you have in fact been using an external dependency but we'll here we'll go more in depth about how Maven's
@@ -651,7 +661,7 @@ environment=${environment}
 
 +----+
 
-* How do I deploy my jar in my remote repository?
+* {How do I deploy my jar in my remote repository?}
 
 +----+
 
@@ -725,7 +735,7 @@ environment=${environment}
 
 +----+
 
-* How do I create documentation?
+* {How do I create documentation?}
 
  To get you jump started with Maven's documentation system you can use the archetype mechanism to generate a site
  for you without your existing project using the following command:
@@ -811,7 +821,7 @@ m2 site:site
 
  The resulting site will be in <<<target/site/...>>>
 
-* How do I deploy my site?
+* {How do I deploy my site?}
 
   To be able to deploy the site, you must first declare a location to distribute to in your <<<pom.xml>>>, similar to the repository for
   deployment.
@@ -977,9 +987,9 @@ m2 site:site site:deploy
 
   With one site descriptor by language, translated site can evolve independently.
 
-* How do I use plug-ins?
+* {How do I use plug-ins?}
 
-* How do I control what version of plug-in I use?
+* {How do I control what version of plug-in I use?}
 
 ~~http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix
 
