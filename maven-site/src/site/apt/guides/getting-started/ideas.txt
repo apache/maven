@@ -200,4 +200,10 @@ example of generating sources
 
 How to modify the manifest.
 
+~~ * How do I deal with a dependency that is already supplied by my runtime?
+
+~~* How do I deploy my jar in Ibiblio?
+
+~~* How do I internationalize my site?
+
 +-----+

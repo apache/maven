@@ -35,3 +35,7 @@ the JDK configuration equivalent.
   .
   .
 </settings>
+
++----+
+
+ Please note that urrently NTML proxies are not supported as they have not been tested.
