@@ -1,0 +1,35 @@
+ ------
+ Guide to Creating Assemblies
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
++----+
+
+<project>
+  <parent>
+    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>2.0-beta-3-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-embedder</artifactId>
+  <name>Maven Embedder</name>
+  <version>2.0-beta-3-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptor>src/main/assembly/dep.xml</descriptor>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
+
++----+
