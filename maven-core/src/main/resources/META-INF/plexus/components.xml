@@ -93,6 +93,16 @@
     </component>
     <!--
     |
+    |ProfileActivationDiagnoser
+    |
+    -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>ProfileActivationDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.ProfileActivationDiagnoser</implementation>
+    </component>
+    <!--
+    |
     |PluginConfigurationDiagnoser
     |
     -->

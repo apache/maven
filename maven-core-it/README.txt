@@ -289,6 +289,10 @@ it1015: Test that expressions that self-reference within the POM result in an
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
+it1018: Test formatting of error caused by invalid profiles.xml syntax.
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
 These are a set of builds that are more complex than single-project or reactor
 invocations. They follow a process external to maven itself, invoking
 different lifecycle phases and/or goals on multiple projects within each test

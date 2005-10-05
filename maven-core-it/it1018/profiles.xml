@@ -1,0 +1,11 @@
+<profilesXml>
+  <!-- activeProfiles>
+    <activeProfile>test</activeProfile>
+  </activeProfiles -->
+  <profiles>
+    <profile>
+      <id>test</id>
+      <junk/>
+    </profile>
+  </profiles>
+</profilesXml>
