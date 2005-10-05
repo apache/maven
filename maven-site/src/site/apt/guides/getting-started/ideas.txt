@@ -1,17 +1,30 @@
-+-----+
+ ----
+ Guides
+ -----
+ Jason van Zyl
+ -----
+ 12 October 2005
+ -----
 
-multiple repositories
+Guides
+
+* Guide to using multiple repositories
+
+ There are two different ways that you can specify the use of multiple repositories. The first
+ is to specify
+
++----+
 
 <project>
 ...
   <repositories>
     <repository>
-      <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <url>http://repo1.maven.org/maven2</url>
+      <id>my-repo1</id>
+      <name>your custom repo</name>
+      <url>http://jarsm2.dyndns.dk</url>
     </repository>
     <repository>
-      <id>my-repo</id>
+      <id>my-repo2</id>
       <name>your custom repo</name>
       <url>http://jarsm2.dyndns.dk</url>
     </repository>
@@ -19,27 +32,33 @@ multiple repositories
 ...
 </project>
 
++----+
+
+
+
 if you specify repositories in profiles you must remember to activate that
-particular profile!
+particular profile! and the use of mirrors
 
-and the use of mirrors
+* 
 
-==
-
-Project properties
+* Guide to using project properties
 
 Actually, no. It's *like* the properties defined in profiles in syntax,
 but this is a properties section that is specified as a direct child of
 the <project> element. So:
 
++----+
+
 <project>
-~  ...
-~  <properties>
-~    <name>value</name>
-~  </properties>
+  ...
+  <properties>
+    <name>value</name>
+  </properties>
 </project>
 
-==
++----+
+
+* Guide to project inheritance
 
 Profile inheritance the same as standard inheritence and resources sets are currently not
 inherited.
@@ -53,9 +72,11 @@ Merged:
 - plugin executions with matching ids
 - plugin configuration
 
-==
+* Guide to system properties
 
-System vars are accessed implicitly in m2...try:
+ System vars are accessed implicitly in m2...try:
+
++----+
 
 <configuration>
   <debug>${build.debug}</debug>
@@ -63,16 +84,7 @@ System vars are accessed implicitly in m2...try:
   <target>${build.jdk}</target>
 </configuration>
 
-==
-
-How to attach sources to a release?
-
-> How does the sources plugin realize that it is part of a snapshot
-> build, and therefore not generate a sources JAR?
->
-> I didn't notice anything obvious in the source code for the Mojo at
-
-It only does so when the release profile (see the root POM) is activated.
++----+
 
 ==
 
@@ -93,8 +105,6 @@ And how do I make archetypes for use in my organization?
 
 ==
 
-How to do a test release and deployment. Trying to work through this with
-raphael at the moment.
 
 ==
 
@@ -115,7 +125,31 @@ How to use Ant constructs from m2.
 
 ==
 
-How maven's classloaders work
+* How maven's classloaders work
+
+ To add a bit of detail for a volunteer to submit as documentation... :)
+
+ m2/core/boot is what is in the java classpath (ie, just classworlds,
+ which constructs classloaders for the rest of the system)
+
+ the top level classloader contains plexus container and plexus utils
+ (see m2/core), and also has access to classworlds
+
+ the next classloader has the libraries in m2/lib (a bug in beta 1
+ incorporated commons-logging and -lang, sorry about that!) In general
+ these are just maven libraries. We hope to further separate these in
+ future to just be maven apis.
+
+ after that, each plugin has its own classloader, including its
+ dependencies, itself, and the libraries above. It *does not* contain
+ the project dependencies like in m1, but instead has access to a list
+ of JAR files in case they are needed.
+
+ In addition, a project can list "extensions". These are loaded into
+ the same place as m2/lib and so available to the maven core and all
+ plugins for the currnet project and subsequent projects (in future, we
+ plan to remove it from subsequent projects).
+
 
 ==
 
@@ -124,14 +158,6 @@ scope.
 
 ==
 
-Archetype generation problems:
-
-This looks like:
-http://jira.codehaus.org/browse/MNG-916
-
-Please check ~/.m2/plugin-registry.xml - if that has RELEASE as a
-version in there somewhere, remove it - that should correct the
-problem.
 
 ==
 
@@ -207,3 +233,5 @@ How to modify the manifest.
 ~~* How do I internationalize my site?
 
 +-----+
+
+~~ How to do a test release and deployment. Trying to work through this with raphael at the moment.
