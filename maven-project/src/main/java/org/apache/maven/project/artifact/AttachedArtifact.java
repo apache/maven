@@ -4,10 +4,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class AttachedArtifact
@@ -110,6 +113,16 @@ public class AttachedArtifact
     public boolean isSnapshot()
     {
         return parent.isSnapshot();
+    }
+
+    public void addMetadata( ArtifactMetadata metadata )
+    {
+        // ignore. The parent artifact will handle metadata.
+    }
+
+    public Collection getMetadataList()
+    {
+        return Collections.EMPTY_LIST;
     }
 
 }

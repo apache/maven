@@ -324,6 +324,7 @@ public class DefaultMavenProjectBuilder
     {
         Artifact projectArtifact;
 
+        // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
         if ( "pom".equals( artifact.getType() ) )
         {
             projectArtifact = artifact;
@@ -342,62 +343,67 @@ public class DefaultMavenProjectBuilder
         Model model;
         if ( project == null )
         {
-            // TODO: can't assume artifact is a POM
             try
             {
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
                 File file = projectArtifact.getFile();
-                model = readModel( file );
-
-                String downloadUrl = null;
-                ArtifactStatus status = ArtifactStatus.NONE;
-
-                DistributionManagement distributionManagement = model.getDistributionManagement();
-                if ( distributionManagement != null )
+                if ( projectArtifact.isResolved() )
                 {
-                    downloadUrl = distributionManagement.getDownloadUrl();
+                    model = readModel( file );
 
-                    status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
-                }
+                    String downloadUrl = null;
+                    ArtifactStatus status = ArtifactStatus.NONE;
 
-                // TODO: configurable actions dependant on status
-                if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
-                {
-                    // use default policy (enabled, daily update, warn on bad checksum)
-                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
-                    // TODO: re-enable [MNG-798/865]
-                    policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-
-                    if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
+                    DistributionManagement distributionManagement = model.getDistributionManagement();
+                    if ( distributionManagement != null )
                     {
-                        getLogger().info(
-                            projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
-                        try
+                        downloadUrl = distributionManagement.getDownloadUrl();
+
+                        status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
+                    }
+
+                    // TODO: configurable actions dependant on status
+                    if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
+                    {
+                        // use default policy (enabled, daily update, warn on bad checksum)
+                        ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
+                        // TODO: re-enable [MNG-798/865]
+                        policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
+
+                        if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
                         {
-                            projectArtifact.setResolved( false );
-                            artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories,
-                                                            localRepository );
-                        }
-                        catch ( ArtifactResolutionException e )
-                        {
-                            getLogger().warn( "Error updating POM - using existing version" );
-                            getLogger().debug( "Cause", e );
+                            getLogger().info(
+                                projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
+                            try
+                            {
+                                projectArtifact.setResolved( false );
+                                artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories,
+                                                                localRepository );
+                            }
+                            catch ( ArtifactResolutionException e )
+                            {
+                                getLogger().warn( "Error updating POM - using existing version" );
+                                getLogger().debug( "Cause", e );
+                            }
                         }
                     }
-                }
 
-                // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
-                // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
-                if ( downloadUrl != null )
-                {
-                    projectArtifact.setDownloadUrl( downloadUrl );
+                    // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
+                    // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
+                    if ( downloadUrl != null )
+                    {
+                        projectArtifact.setDownloadUrl( downloadUrl );
+                    }
+                    else
+                    {
+                        projectArtifact.setDownloadUrl( model.getUrl() );
+                    }
                 }
                 else
                 {
-                    projectArtifact.setDownloadUrl( model.getUrl() );
+                    model = createStubModel( projectArtifact );
                 }
-
             }
             catch ( ArtifactResolutionException e )
             {
@@ -405,40 +411,7 @@ public class DefaultMavenProjectBuilder
                 // only not found should have the below behaviour
 //                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
 
-                getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact.getId() + " *****\n" );
-
-                model = new Model();
-                model.setModelVersion( "4.0.0" );
-                model.setArtifactId( projectArtifact.getArtifactId() );
-                model.setGroupId( projectArtifact.getGroupId() );
-                model.setVersion( projectArtifact.getVersion() );
-                // TODO: not correct in some instances
-                model.setPackaging( projectArtifact.getType() );
-
-                model.setDistributionManagement( new DistributionManagement() );
-                model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );
-
-/* TODO: we should only do this if we can verify the existence of the JAR itself
-                File file = artifact.getFile();
-                file.getParentFile().mkdirs();
-
-                FileWriter writer = null;
-                try
-                {
-                    writer = new FileWriter( file );
-
-                    MavenXpp3Writer w = new MavenXpp3Writer();
-                    w.write( writer, model );
-                }
-                catch ( IOException ioe )
-                {
-                    getLogger().warn( "Attempted to write out a temporary generated POM, but failed", ioe );
-                }
-                finally
-                {
-                    IOUtil.close( writer );
-                }
-*/
+                model = createStubModel( projectArtifact );
             }
         }
         else
@@ -446,6 +419,45 @@ public class DefaultMavenProjectBuilder
             model = project.getModel();
         }
 
+        return model;
+    }
+
+    private Model createStubModel(Artifact projectArtifact)
+    {
+        getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact.getId() + " *****\n" );
+
+        Model model = new Model();
+        model.setModelVersion( "4.0.0" );
+        model.setArtifactId( projectArtifact.getArtifactId() );
+        model.setGroupId( projectArtifact.getGroupId() );
+        model.setVersion( projectArtifact.getVersion() );
+        // TODO: not correct in some instances
+        model.setPackaging( projectArtifact.getType() );
+
+        model.setDistributionManagement( new DistributionManagement() );
+        model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );
+
+/* TODO: we should only do this if we can verify the existence of the JAR itself
+        File file = artifact.getFile();
+        file.getParentFile().mkdirs();
+
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( file );
+
+            MavenXpp3Writer w = new MavenXpp3Writer();
+            w.write( writer, model );
+        }
+        catch ( IOException ioe )
+        {
+            getLogger().warn( "Attempted to write out a temporary generated POM, but failed", ioe );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+*/
         return model;
     }
 
