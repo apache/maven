@@ -1,0 +1,27 @@
+ ------
+ Guide to Configuring Plug-ins
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
++----+
+<project>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <options>
+            <option implementation="java.lang.String>one</option>
+            <option implementation="java.lang.String>two</option>
+            <option implementation="java.lang.String>three</option>
+          </options>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
++----+
