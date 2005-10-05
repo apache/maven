@@ -1,0 +1,11 @@
+<archetype>
+  <id>mmld-plugin</id>
+  <sources>
+    <source>src/main/java/CopyFileTag.java</source>
+    <source>src/main/java/MyMojoTagLibrary.java</source>
+  </sources>
+  <resources>
+    <resource>src/main/resources/META-INF/marmalade/myMojo.def</resource>
+    <resource>src/main/resources/myMojo.mmld</resource>
+  </resources>
+</archetype>
