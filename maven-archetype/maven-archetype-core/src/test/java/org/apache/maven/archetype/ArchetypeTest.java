@@ -51,27 +51,32 @@ public class ArchetypeTest
 
         parameters.put( "package", "org.apache.maven.quickstart" );
 
-        parameters.put( "outputDirectory", new File( getBasedir(), "target/archetype" ).getPath() );
+        parameters.put( "basedir", getTestFile( "target" ).getAbsolutePath() );
 
         // ----------------------------------------------------------------------
         // This needs to be encapsulated in a maven test case.
         // ----------------------------------------------------------------------
 
-        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       "legacy" );
+        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         String mavenRepoLocal = getTestFile( "target/local-repository" ).toURL().toString();
+
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", mavenRepoLocal, layout );
 
         List remoteRepositories = new ArrayList();
 
         String mavenRepoRemote = getTestFile( "src/test/repository" ).toURL().toString();
+
         ArtifactRepository remoteRepository = new DefaultArtifactRepository( "remote", mavenRepoRemote, layout );
 
         remoteRepositories.add( remoteRepository );
 
-        archetype.createArchetype( "org.apache.maven.archetypes", "maven-archetype-quickstart", "1.0-alpha-1-SNAPSHOT",
-                                   localRepository, remoteRepositories, parameters );
+        archetype.createArchetype( "org.apache.maven.archetypes",
+                                   "maven-archetype-quickstart",
+                                   "1.0-alpha-1-SNAPSHOT",
+                                   localRepository,
+                                   remoteRepositories,
+                                   parameters );
 
         // TODO: validate output
     }

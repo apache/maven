@@ -118,34 +118,31 @@ public class MavenArchetypeMojo
 
         String basedir = System.getProperty( "user.dir" );
 
-        // TODO: allow this to be configured
-        File outputDirectory = new File( basedir, artifactId );
-
-        if ( outputDirectory.exists() )
-        {
-            throw new MojoExecutionException( outputDirectory.getName() +
-                " already exists - please run from a clean directory" );
-        }
-
         if ( packageName == null )
         {
             getLog().info( "Defaulting package to group ID: " + groupId );
+
             packageName = groupId;
         }
 
         // TODO: context mojo more appropriate?
         Map map = new HashMap();
-        map.put( "outputDirectory", outputDirectory.getAbsolutePath() );
+
+        map.put( "basedir", basedir );
+
         map.put( "package", packageName );
+
         map.put( "packageName", packageName );
+
         map.put( "groupId", groupId );
+
         map.put( "artifactId", artifactId );
+
         map.put( "version", version );
 
         try
         {
-            archetype.createArchetype( archetypeGroupId, archetypeArtifactId, archetypeVersion, localRepository,
-                                       remoteRepositories, map );
+            archetype.createArchetype( archetypeGroupId, archetypeArtifactId, archetypeVersion, localRepository, remoteRepositories, map );
         }
         catch ( ArchetypeNotFoundException e )
         {

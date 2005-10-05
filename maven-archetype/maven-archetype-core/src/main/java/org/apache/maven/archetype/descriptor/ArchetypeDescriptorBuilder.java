@@ -36,6 +36,18 @@ public class ArchetypeDescriptorBuilder
 
         descriptor.setId( dom.getChild( "id" ).getValue() );
 
+        Xpp3Dom allowPartialDom = dom.getChild( "allowPartial" );
+
+        if ( allowPartialDom != null )
+        {
+            String allowPartial = allowPartialDom.getValue();
+
+            if ( allowPartial.equals( "true" ) || allowPartial.equals( "1" ) || allowPartial.equals( "on" ) )
+            {
+                descriptor.setAllowPartial( true );
+            }
+        }
+
         // ----------------------------------------------------------------------
         // Main
         // ----------------------------------------------------------------------

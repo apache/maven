@@ -33,6 +33,14 @@ public class ArchetypeDescriptor
 
     private List siteResources;
 
+    /**
+     * This indicates the archetype can be a whole project or can be part
+     * of another project. An example is a site archetype where the POM and
+     * directory structure may already exist and you simply want to generate
+     * the site directory structure.
+     */
+    private boolean allowPartial;
+
     public ArchetypeDescriptor()
     {
         sources = new ArrayList();
@@ -108,6 +116,16 @@ public class ArchetypeDescriptor
     public List getSiteResources()
     {
         return siteResources;
+    }
+
+    public boolean isAllowPartial()
+    {
+        return allowPartial;
+    }
+
+    public void setAllowPartial( boolean allowPartial )
+    {
+        this.allowPartial = allowPartial;
     }
 }
 

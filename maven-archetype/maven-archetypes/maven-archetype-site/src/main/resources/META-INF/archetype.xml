@@ -1,5 +1,6 @@
 <archetype>
   <id>plugin</id>
+  <allowPartial>true</allowPartial>
   <siteResources>
     <resource>src/site/site.xml</resource>
     <resource>src/site/site_fr.xml</resource>
