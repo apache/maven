@@ -150,7 +150,7 @@ public class AssemblyMojo
             }
             catch ( NoSuchArchiverException e )
             {
-                throw new MojoExecutionException( e.getMessage() );
+                throw new MojoFailureException( "Unable to obtain archiver for extension '" + format + "'" );
             }
             catch ( ArchiverException e )
             {
@@ -166,7 +166,7 @@ public class AssemblyMojo
     }
 
     protected File createArchive( Archiver archiver, Assembly assembly, String filename )
-        throws ArchiverException, IOException, MojoExecutionException
+        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException
     {
         File destFile;
         processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
@@ -200,7 +200,7 @@ public class AssemblyMojo
             InputStream resourceAsStream = getClass().getResourceAsStream( "/assemblies/" + descriptorId + ".xml" );
             if ( resourceAsStream == null )
             {
-                throw new MojoExecutionException( "Descriptor with ID '" + descriptorId + "' not found" );
+                throw new MojoFailureException( "Descriptor with ID '" + descriptorId + "' not found" );
             }
             r = new InputStreamReader( resourceAsStream );
         }
@@ -238,7 +238,7 @@ public class AssemblyMojo
      * @param includeBaseDirectory
      */
     protected void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
-        throws ArchiverException, IOException, MojoExecutionException
+        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException
     {
         for ( Iterator i = dependencySets.iterator(); i.hasNext(); )
         {

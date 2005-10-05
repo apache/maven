@@ -18,6 +18,7 @@ package org.apache.maven.plugin.assembly;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -36,7 +37,7 @@ import java.util.Set;
 public abstract class AbstractUnpackingMojo
     extends AbstractMojo
 {
-    static protected final String[] EMPTY_STRING_ARRAY = {};
+    protected static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
      * The output directory of the assembled distribution file.
@@ -89,7 +90,7 @@ public abstract class AbstractUnpackingMojo
      */
 
     protected void unpack( File file, File location )
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         String archiveExt = FileUtils.getExtension( file.getAbsolutePath() ).toLowerCase();
 
@@ -103,7 +104,7 @@ public abstract class AbstractUnpackingMojo
         }
         catch ( NoSuchArchiverException e )
         {
-            throw new MojoExecutionException( "Unknown archive file: " + file );
+            throw new MojoFailureException( "Unable to obtain unarchiver for extension '" + archiveExt + "'" );
         }
 
         try
@@ -114,13 +115,13 @@ public abstract class AbstractUnpackingMojo
 
             unArchiver.extract();
         }
-        catch ( IOException ioe )
+        catch ( IOException e )
         {
-            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location );
+            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location, e );
         }
         catch ( ArchiverException e )
         {
-            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location );
+            throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location, e );
         }
     }
 

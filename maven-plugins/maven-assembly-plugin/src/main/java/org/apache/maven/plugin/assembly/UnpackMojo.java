@@ -1,11 +1,5 @@
 package org.apache.maven.plugin.assembly;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
-
-import java.io.File;
-import java.util.Iterator;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -22,6 +16,12 @@ import java.util.Iterator;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * Unpack project dependencies.  Currently supports dependencies of type jar and zip.
@@ -39,28 +39,8 @@ public class UnpackMojo
      * @throws MojoExecutionException
      */
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
-        try
-        {
-            doExecute();
-        }
-        catch ( Exception e )
-        {
-            // TODO: don't catch exception
-            throw new MojoExecutionException( "Error unpacking", e );
-        }
-    }
-
-    /**
-     * Unpacks the project dependencies.
-     *
-     * @throws Exception
-     */
-    private void doExecute()
-        throws Exception
-    {
-
         for ( Iterator j = dependencies.iterator(); j.hasNext(); )
         {
             Artifact artifact = (Artifact) j.next();
@@ -86,4 +66,5 @@ public class UnpackMojo
             }
         }
     }
+
 }
