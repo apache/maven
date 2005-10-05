@@ -87,6 +87,10 @@ public abstract class AbstractGeneratorMojo
         pluginDescriptor.setVersion( project.getVersion() );
 
         pluginDescriptor.setGoalPrefix( goalPrefix );
+        
+        pluginDescriptor.setName( project.getName() );
+        
+        pluginDescriptor.setDescription( project.getDescription() );
 
         try
         {

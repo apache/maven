@@ -37,6 +37,9 @@ public class PluginDescriptorBuilder
         pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
         pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
         pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
+        
+        pluginDescriptor.setName( c.getChild( "name" ).getValue() );
+        pluginDescriptor.setDescription( c.getChild( "description" ).getValue() );
 
         String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
 

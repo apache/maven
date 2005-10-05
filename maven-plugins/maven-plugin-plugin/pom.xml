@@ -24,6 +24,11 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
+
+  <prerequisites>
+    <maven>2.0-beta-4-SNAPSHOT</maven>
+  </prerequisites>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -41,8 +46,13 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-descriptor</artifactId>
+      <version>2.0-beta-4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-api</artifactId>
-      <version>2.0-beta-3</version>
+      <version>2.0-beta-4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

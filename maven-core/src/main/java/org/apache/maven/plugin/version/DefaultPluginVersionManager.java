@@ -90,6 +90,14 @@ public class DefaultPluginVersionManager
                                          ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException
     {
+        // before we do anything else, if this is a self-reference we need to short-circuit the resolution process.
+        String projectKey = constructPluginKey( project.getGroupId(), project.getArtifactId() );
+        
+        if ( projectKey.equals( constructPluginKey( groupId, artifactId ) ) )
+        {
+            return project.getVersion();
+        }
+        
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 

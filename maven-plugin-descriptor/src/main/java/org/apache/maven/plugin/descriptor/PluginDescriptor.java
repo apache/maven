@@ -29,13 +29,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -59,7 +58,7 @@ public class PluginDescriptor
     private boolean inheritedByDefault = true;
 
     private List artifacts;
-
+    
     private Map lifecycleMappings;
 
     private ClassRealm classRealm;
@@ -68,6 +67,10 @@ public class PluginDescriptor
     private Map artifactMap;
 
     private Set introducedDependencyArtifacts;
+
+    private String name;
+
+    private String description;
 
     // ----------------------------------------------------------------------
     //
@@ -321,5 +324,25 @@ public class PluginDescriptor
     public Set getIntroducedDependencyArtifacts()
     {
         return introducedDependencyArtifacts != null ? introducedDependencyArtifacts : Collections.EMPTY_SET;
+    }
+    
+    public void setName( String name )
+    {
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public void setDescription( String description )
+    {
+        this.description = description;
+    }
+    
+    public String getDescription()
+    {
+        return description;
     }
 }
