@@ -1,0 +1,13 @@
+ ------
+ Guide to Moving From Maven 1.x to Maven 2.x
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+No there isn't something yet but it's planned. I have presented some slides
+at javaZone 2005 about "From m1 to m2". Maybe that could help you in the
+meantime:
+
+http://blogs.codehaus.org/people/vmassol/archives/001170_javazone_2005.html
