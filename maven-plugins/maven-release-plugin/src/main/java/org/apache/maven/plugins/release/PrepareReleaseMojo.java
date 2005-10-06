@@ -1176,6 +1176,8 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION ) )
         {
+            getLog().info( "Checking in modified POMs" );
+
             checkIn( "[maven-release-plugin] prepare release " + getTagLabel() );
 
             try
@@ -1194,6 +1196,8 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_REMOVED_RELEASE_POM ) )
         {
+            getLog().info( "Removing release POMs" );
+
             File currentReleasePomFile = null;
 
             try
@@ -1259,6 +1263,8 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION ) )
         {
+            getLog().info( "Checking in development POMs" );
+
             checkIn( "[maven-release-plugin] prepare for next development iteration" );
 
             try
