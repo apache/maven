@@ -31,6 +31,12 @@ Documentation
 
  * {{{mini/guide-generating-sources.html}Guide to Generating Sources}}
 
+ * {{{mini/guide-ide-eclipse.html}Guide to using Eclipse with Maven 2.x}}
+
+ * {{{mini/guide-ide-idea.html}Guide to using IDEA with Maven 2.x}}
+
+ * {{{mini/guide-ide-netbeans.html}Guide to using Netbeans with Maven 2.x}}
+
  * {{{mini/guide-m1-m2.html}Guide to Moving From Maven 1.x to Maven 2.x}}
 
  * {{{mini/guide-manifest.html}Guide to Working with Manifests}}
@@ -42,6 +48,8 @@ Documentation
  * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 
  * {{{mini/guide-proxies.html}Guide to using proxies}}
+
+ * {{{mini/guide-test-customization.html}Guide to test customization}}
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
