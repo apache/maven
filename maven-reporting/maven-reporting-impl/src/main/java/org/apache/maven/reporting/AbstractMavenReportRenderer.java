@@ -377,7 +377,7 @@ public abstract class AbstractMavenReportRenderer
                         }
                         else
                         {
-                            text( text );
+                            text( href );
                         }
                     }
                 }
