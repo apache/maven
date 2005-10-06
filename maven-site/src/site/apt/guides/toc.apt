@@ -1,0 +1,62 @@
+ ------ 
+ Summary of Maven 2.x documentation 
+ ------ 
+ Jason van Zyl 
+ ------ 
+ 12 October 2005 
+ ------ 
+
+Documentation
+
+
+* Guides
+
+ * {{{getting-started/index.html}Getting Started Guide}}
+
+ * {{{plugin-development/index.html}Plug-in Developer's Guide}}
+
+* Mini Guides
+
+ * {{{guide-assemblies.apt}Guide to Creating Assemblies}}
+
+ * {{{guide-configuring-plugins.apt}Guide to Configuring Plug-ins}}
+
+ * {{{guide-deployment-security-settings.apt}Guide to Deployment and Security Settings}}
+
+ * {{{guide-ear.apt}Guide to EARs}}
+
+ * {{{guide-generating-sources.apt}Guide to Generating Sources}}
+
+ * {{{guide-m1-m2.apt}Guide to Moving From Maven 1.x to Maven 2.x}}
+
+ * {{{guide-manifest.apt}Guide to Working with Manifests}}
+
+ * {{{guide-maven-classloading.apt}Guide to Maven Classloading}}
+
+ * {{{guide-mirror-settings.apt}Guide to Mirror Settings}}
+
+ * {{{guide-multiple-repositories.apt}Guide to using Multiple Repositories}}
+
+ * {{{guide-proxies.apt}Guide to using proxies}}
+
+ * {{{guide-template.apt}Guide}}
+
+ * {{{guide-using-extensions.apt}Guide to using Extensions}}
+
+ * {{{guide-webapp.apt}Guide to Webapps}}
+
+
+* Introductions
+
+ * {{{introduction-to-archetypes.apt}Introduction to Archetypes}}}
+
+ * {{{introduction-to-dependency-management.apt}Introduction to Dependency Management}}}
+
+ * {{{introduction-to-repositories.apt}Introduction to Repositories}}}
+
+ * {{{introduction-to-the-lifecycle.apt}Introduction to the Lifecycle}}}
+
+ * {{{introduction-to-the-pom.apt}Introduction to the POM}}}
+
+ * {{{introduction-to-the-standard-directory-layout.apt}Introduction to the Standard Directory Layout}}}
+
