@@ -68,6 +68,56 @@ public class MyQueryMojo
  <<<options>>> element maps to the <<<options>>> field. The mapping mechanism can deal with arrays by inspecting
  the type of the field and determining if a suitable mapping is possible.
 
+
+* Mapping complex objects
+
+  Mapping complex types is also fairly straight forward in Maven so let's look at a simple example where we
+  are trying to map a configuration for Person object. The <<<configuration>>> element might look like the
+  following:
+
++----+
+
+...
+<configuration>
+ <person>
+   <firstName>Jason</firstName>
+   <lastName>van Zyl</lastName>
+ </person>
+</configuration>
+...
+
++----+
+
+ The rules for mapping complex objects are as follows:
+
+ * There must be a private field that corresponds to name of the element being mapped. So in our case the
+   <<<person>>> element must map to a <<<person>>> field.
+
+ * The object instantiated must be in the same package as the Mojo itself. So if your mojo is in
+   <<<com.mycompany.mojo.query>>> then the mapping mechanism will look in that package for an
+   object named <<<Person>>>. As you can see the mechanism will capitalize the first letter of
+   the element name and use that to search for the object to instantiate.
+
+ * If you wish to have the object to be instantiated live in a different package or have a more
+   complicated name then you must specify this using an <<<implementation>>> attribute like the
+   following:
+
+ []
+
++----+
+
+...
+<configuration>
+ <person implementation="com.mycompany.mojo.query.SuperPerson">
+   <firstName>Jason</firstName>
+   <lastName>van Zyl</lastName>
+ </person>
+</configuration>
+...
+
++----+
+
+
 * Mapping to collections
 
  The configuration mapping mechanism can easily deal with most collections so let's go through a few examples
@@ -75,13 +125,9 @@ public class MyQueryMojo
 
 ** Mapping lists
 
-
-
 ** Mapping maps
 
 ** Mapping properties
-
-* Mapping complex objects
 
 * Using setters
 
