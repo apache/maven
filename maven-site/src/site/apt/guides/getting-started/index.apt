@@ -9,10 +9,10 @@
 Maven Getting Started Guide
 
  This guide is intended as a reference for those working with Maven for the first time,  but is also intended to serve as
- a cookbook with self-contained references and solutions for common usecases. For first time users, it is recommended 
+ a cookbook with self-contained references and solutions for common usecases. For first time users, it is recommended
  that you step through the material in a sequential fashion. For users more familiar with Maven, this guide endeavours
  to provide a quick solution for the need at hand. It is assumed at this point that you have downloaded Maven and
- installed Maven on your local machine. If you have not done so please refer to the 
+ installed Maven on your local machine. If you have not done so please refer to the
  {{{../../download.html}Download and Installation}} instructions.
 
  Ok, so you now have Maven installed and we're ready to go. Before we jump into our examples we'll very briefly go over
@@ -108,7 +108,7 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 +-----+
 
  Once you have executed this command, you will notice a few things have happened. First, you will notice that
- a directory names <<<my-app>>> has been created for the new project, and this directory contains a file named 
+ a directory names <<<my-app>>> has been created for the new project, and this directory contains a file named
  <<<pom.xml>>> that should look like this:
 
 +-----+
@@ -353,6 +353,8 @@ m2 install
 +----+
 
  Upon executing this command you should see the following output:
+
+~~ [!:glick] tell users what the defaults are for the includes and excludes
 
 +----+
 
