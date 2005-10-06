@@ -354,8 +354,6 @@ m2 install
 
  Upon executing this command you should see the following output:
 
-~~ [!:glick] tell users what the defaults are for the includes and excludes
-
 +----+
 
 [INFO] ----------------------------------------------------------------------------
@@ -393,6 +391,25 @@ Results :
 [INFO] ----------------------------------------------------------------------------
 
 +----+
+
+ Note that the surefire plugin looks for tests contained in files with a particular naming convention. By default
+ the tests included are:
+
+ * <<<\*\*/\*Test.java>>>
+
+ * <<<\*\*/Test\*.java>>>
+
+ * <<<\*\*/\*TestCase.java>>>
+
+ []
+
+ And the default excludes are:
+
+ * <<<\*\*/Abstract\\*Test.java>>>
+
+ * <<<\*\*/Abstract\*TestCase.java>>>
+
+ []
 
  Now you have walked through setting up setting up a typical Maven project, building, testing, packaging and installing.
  This is likely the vast majority of what you will be doing with Maven and if you'ved noticed everything you've been
