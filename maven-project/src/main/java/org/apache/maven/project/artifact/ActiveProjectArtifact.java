@@ -259,7 +259,7 @@ public class ActiveProjectArtifact
 
     public void setRelease( boolean release )
     {
-        artifact.setResolved( release );
+        artifact.setRelease( release );
     }
 
     public List getAvailableVersions()

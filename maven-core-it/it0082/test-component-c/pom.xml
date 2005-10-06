@@ -1,0 +1,41 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>test-components</artifactId>
+    <groupId>test</groupId>
+    <version>0.1</version>
+  </parent>
+
+  <groupId>test</groupId>
+  <artifactId>test-component-c</artifactId>
+  <version>0.1</version>
+  <name>Test Component C</name>
+  <packaging>war</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <goalItem>my-test</goalItem>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshots</id>
+      <name>Maven Central Plugins Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

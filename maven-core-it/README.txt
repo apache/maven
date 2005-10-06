@@ -117,7 +117,6 @@ it0040: Test the use of a packaging from a plugin
 it0041: Test the use of a new type from a plugin
 
 it0042: Test that the reactor can establish the artifact location of known projects for dependencies
-        First test generate sources to see that it works even when they aren't compiled
 
 it0043: Test for repository inheritence - ensure using the same id overrides the defaults
 
@@ -222,6 +221,9 @@ it0080: Test that depending on a WAR doesn't also get its dependencies
         transitively.
 
 it0081: Test per-plugin dependencies.
+
+it0082: Test that the reactor can establish the artifact location of known projects for dependencies
+        using process-sources to see that it works even when they aren't compiled
 
 -------------------------------------------------------------------------------
 

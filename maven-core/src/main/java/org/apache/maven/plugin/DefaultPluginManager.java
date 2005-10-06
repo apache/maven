@@ -268,7 +268,16 @@ public class DefaultPluginManager
                 // TODO: if not matching, we should get the correct artifact from that project (attached)
                 if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
                 {
-                    pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                    // if the project artifact doesn't exist, don't use it. We haven't built that far.
+                    if ( project.getArtifact().getFile() != null && project.getArtifact().getFile().exists() )
+                    {
+                        pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                    }
+                    else
+                    {
+                        getLogger().warn( "Plugin found in the reactor has not been built when it's use was attempted" +
+                            " - resolving from the repository instead" );
+                    }
                 }
             }
         }
