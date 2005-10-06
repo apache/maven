@@ -27,7 +27,7 @@
     <!-- TODO: disable dependencies -->
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
+        <groupId>org.apache.maven.pluginsx</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
     </plugins>

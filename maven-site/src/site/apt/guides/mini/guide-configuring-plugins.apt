@@ -70,7 +70,12 @@ public class MyQueryMojo
 
 * Mapping to collections
 
+ The configuration mapping mechanism can easily deal with most collections so let's go through a few examples
+ to show you how it's done:
+
 ** Mapping lists
+
+
 
 ** Mapping maps
 
