@@ -51,4 +51,8 @@ public interface ArtifactRepository
     String getKey();
 
     boolean isUniqueVersion();
+
+    void setBlacklisted( boolean blackListed );
+
+    boolean isBlacklisted();
 }

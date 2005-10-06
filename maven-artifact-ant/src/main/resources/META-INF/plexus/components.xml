@@ -139,6 +139,11 @@
       <!--
             <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
       -->
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+      </requirements>
     </component>
 
     <!--

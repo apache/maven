@@ -18,6 +18,9 @@ package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author jdcasey
  */
@@ -29,8 +32,11 @@ public class DefaultArtifactRepositoryFactory
 
     private String globalChecksumPolicy;
 
+    private final Map artifactRepositories = new HashMap();
+
     public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout, boolean uniqueVersion )
+                                                                  ArtifactRepositoryLayout repositoryLayout,
+                                                                  boolean uniqueVersion )
     {
         return new DefaultArtifactRepository( id, url, repositoryLayout, uniqueVersion );
     }
@@ -40,6 +46,16 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
+        if ( artifactRepositories.containsKey( id ) )
+        {
+            ArtifactRepository repository = (ArtifactRepository) artifactRepositories.get( id );
+            // TODO: this should be an if there are duplicates?
+            if ( repository.getUrl().equals( url ) )
+            {
+                return repository;
+            }
+        }
+
         if ( snapshots == null )
         {
             snapshots = new ArtifactRepositoryPolicy();
@@ -62,7 +78,12 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        return new DefaultArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+        DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots,
+                                                                              releases );
+
+        artifactRepositories.put( id, repository );
+
+        return repository;
     }
 
     public void setGlobalUpdatePolicy( String updatePolicy )

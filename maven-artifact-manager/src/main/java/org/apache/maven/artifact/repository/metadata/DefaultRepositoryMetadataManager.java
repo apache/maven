@@ -70,6 +70,10 @@ public class DefaultRepositoryMetadataManager
                 {
                     getLogger().debug( "Skipping disabled repository " + repository.getId() );
                 }
+                else if ( repository.isBlacklisted() )
+                {
+                    getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
+                }
                 else
                 {
                     File file = new File( localRepository.getBasedir(),
@@ -111,7 +115,7 @@ public class DefaultRepositoryMetadataManager
             ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
                 : repository.getReleases();
 
-            if ( policy.isEnabled() )
+            if ( policy.isEnabled() && !repository.isBlacklisted() )
             {
                 if ( loadMetadata( metadata, repository, localRepository, previousMetadata ) )
                 {
@@ -260,7 +264,6 @@ public class DefaultRepositoryMetadataManager
 
     private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,
                                 String checksumPolicy )
-        throws ArtifactMetadataRetrievalException
     {
         if ( !wagonManager.isOnline() )
         {
@@ -284,7 +287,11 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+            getLogger().warn( metadata + " could not be found on repository: " + repository.getId() +
+                " due to an error: " + e.getCause().getMessage() );
+            getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
+            getLogger().debug( "Exception", e );
+            repository.setBlacklisted( true );
         }
     }
 

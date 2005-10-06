@@ -19,6 +19,7 @@ package org.apache.maven.artifact.manager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
@@ -71,6 +72,8 @@ public class DefaultWagonManager
     private TransferListener downloadMonitor;
 
     private boolean online = true;
+
+    private ArtifactRepositoryFactory repositoryFactory;
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
@@ -253,17 +256,21 @@ public class DefaultWagonManager
 
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-        if ( policy.isEnabled() )
+        if ( !policy.isEnabled() )
+        {
+            getLogger().debug( "Skipping disabled repository " + repository.getId() );
+        }
+        else if ( repository.isBlacklisted() )
+        {
+            getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
+        }
+        else
         {
             getLogger().debug( "Trying repository " + repository.getId() );
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy() );
             getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
-        }
-        else
-        {
-            getLogger().debug( "Skipping disabled repository " + repository.getId() );
         }
     }
 
@@ -289,8 +296,9 @@ public class DefaultWagonManager
         ArtifactRepository mirror = getMirror( repository.getId() );
         if ( mirror != null )
         {
-            repository = new DefaultArtifactRepository( mirror.getId(), mirror.getUrl(), repository.getLayout(),
-                                                        repository.getSnapshots(), repository.getReleases() );
+            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
         }
 
         String protocol = repository.getProtocol();

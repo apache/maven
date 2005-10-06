@@ -40,6 +40,8 @@ public class DefaultArtifactRepository
 
     private boolean uniqueVersion;
 
+    private boolean blacklisted;
+
     /**
      * Create a local repository or a test repository.
      *
@@ -138,5 +140,15 @@ public class DefaultArtifactRepository
     public boolean isUniqueVersion()
     {
         return uniqueVersion;
+    }
+
+    public boolean isBlacklisted()
+    {
+        return blacklisted;
+    }
+
+    public void setBlacklisted( boolean blacklisted )
+    {
+        this.blacklisted = blacklisted;
     }
 }
