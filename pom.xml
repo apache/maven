@@ -111,6 +111,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>vmassol</id>
+      <name>Vincent Massol</name>
+      <email>vmassol@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <licenses>
     <license>
