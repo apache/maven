@@ -35,26 +35,25 @@ import java.util.ResourceBundle;
 
 /**
  * Generates the Project Team report.
- * 
- * @goal project-team
- * 
+ *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal project-team
  */
 public class TeamListReport
     extends AbstractMavenReport
 {
     /**
      * Report output directory.
-     * 
-     * @parameter expression="${project.build.directory}/site"
+     *
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -63,7 +62,7 @@ public class TeamListReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -173,7 +172,8 @@ public class TeamListReport
                 .append( "    var now = new Date();\n" )
                 .append( "    var nowTime = now.getTime();\n" )
                 .append( "    var localOffset = now.getTimezoneOffset();\n" )
-                .append( "    var developerTime = nowTime + ( offset * 60 * 60 * 1000 ) + ( localOffset * 60 * 1000 );\n" )
+                .append(
+                    "    var developerTime = nowTime + ( offset * 60 * 60 * 1000 ) + ( localOffset * 60 * 1000 );\n" )
                 .append( "    var developerDate = new Date(developerTime);\n" ).append( "\n" )
                 .append( "    document.getElementById(id).innerHTML = developerDate;\n" ).append( "}\n" )
                 .append( "\n" )
@@ -209,17 +209,8 @@ public class TeamListReport
                 String actualTime = getBundle( locale ).getString( "report.team-list.developers.actualtime" );
                 String properties = getBundle( locale ).getString( "report.team-list.developers.properties" );
 
-                tableHeader( new String[] {
-                    id,
-                    name,
-                    email,
-                    url,
-                    organization,
-                    organizationUrl,
-                    roles,
-                    timeZone,
-                    actualTime,
-                    properties } );
+                tableHeader( new String[]{id, name, email, url, organization, organizationUrl, roles, timeZone,
+                    actualTime, properties} );
 
                 // To handle JS
                 int developersRows = 0;
@@ -240,7 +231,8 @@ public class TeamListReport
 
                     tableCell( developer.getOrganization() );
 
-                    tableCell( createLinkPatternedText( developer.getOrganizationUrl(), developer.getOrganizationUrl() ) );
+                    tableCell(
+                        createLinkPatternedText( developer.getOrganizationUrl(), developer.getOrganizationUrl() ) );
 
                     if ( developer.getRoles() != null )
                     {
@@ -313,16 +305,8 @@ public class TeamListReport
                 String actualTime = getBundle( locale ).getString( "report.team-list.contributors.actualtime" );
                 String properties = getBundle( locale ).getString( "report.team-list.contributors.properties" );
 
-                tableHeader( new String[] {
-                    name,
-                    email,
-                    url,
-                    organization,
-                    organizationUrl,
-                    roles,
-                    timeZone,
-                    actualTime,
-                    properties } );
+                tableHeader( new String[]{name, email, url, organization, organizationUrl, roles, timeZone, actualTime,
+                    properties} );
 
                 // To handle JS
                 int contributorsRows = 0;

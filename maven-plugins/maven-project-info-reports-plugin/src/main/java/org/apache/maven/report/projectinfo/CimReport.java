@@ -23,7 +23,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
-
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,11 +34,10 @@ import java.util.ResourceBundle;
 
 /**
  * Generates the Project Continuous Integration System report.
- * 
- * @goal cim
- * 
+ *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal cim
  */
 public class CimReport
     extends AbstractMavenReport
@@ -49,16 +47,16 @@ public class CimReport
     // ----------------------------------------------------------------------
 
     /**
-     * Report output directory.  
-     * 
-     * @parameter expression="${project.build.directory}/site"
+     * Report output directory.
+     *
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
      * Doxia SiteRender.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -67,7 +65,7 @@ public class CimReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -215,16 +213,15 @@ public class CimReport
                 String address = getBundle( locale ).getString( "report.cim.notifiers.column.address" );
                 String configuration = getBundle( locale ).getString( "report.cim.notifiers.column.configuration" );
 
-                tableHeader( new String[] { type, address, configuration } );
+                tableHeader( new String[]{type, address, configuration} );
 
                 for ( Iterator i = notifiers.iterator(); i.hasNext(); )
                 {
                     Notifier notifier = (Notifier) i.next();
 
-                    tableRow( new String[] {
-                        notifier.getType(),
+                    tableRow( new String[]{notifier.getType(),
                         createLinkPatternedText( notifier.getAddress(), notifier.getAddress() ),
-                        propertiesToString( notifier.getConfiguration() ) } );
+                        propertiesToString( notifier.getConfiguration() )} );
                 }
 
                 endTable();
@@ -235,7 +232,7 @@ public class CimReport
 
         /**
          * Checks if a CIM system is bugzilla, continium...
-         * 
+         *
          * @return true if the CIM system is bugzilla, continium..., false
          *         otherwise.
          */

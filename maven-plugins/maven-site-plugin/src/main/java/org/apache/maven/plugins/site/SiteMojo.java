@@ -113,7 +113,7 @@ public class SiteMojo
     /**
      * Directory containing the generated project sites and report distributions.
      *
-     * @parameter expression="${project.build.directory}/site"
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private File outputDirectory;

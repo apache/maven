@@ -44,7 +44,7 @@ public class MailingListsReport
     /**
      * Report output directory.
      *
-     * @parameter expression="${project.build.directory}/site"
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;

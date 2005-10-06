@@ -52,7 +52,7 @@ public class SiteDeployMojo
     extends AbstractMojo
 {
     /**
-     * @parameter alias="siteDirectory" expression="${project.build.directory}/site"
+     * @parameter alias="siteDirectory" expression="${project.reporting.outputDirectory}"
      * @required
      */
     private File inputDirectory;

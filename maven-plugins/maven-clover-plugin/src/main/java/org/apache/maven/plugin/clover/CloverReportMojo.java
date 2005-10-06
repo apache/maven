@@ -17,12 +17,12 @@ package org.apache.maven.plugin.clover;
  */
 
 import com.cenqua.clover.reporters.html.HtmlReporter;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -35,7 +35,8 @@ import java.util.ResourceBundle;
  * @goal clover
  * @execute phase="test" lifecycle="clover"
  */
-public class CloverReportMojo extends AbstractMavenReport
+public class CloverReportMojo
+    extends AbstractMavenReport
 {
     /**
      * @parameter expression="${project.build.directory}/clover/clover.db"
@@ -44,15 +45,13 @@ public class CloverReportMojo extends AbstractMavenReport
     private String cloverDatabase;
 
     /**
-     * @parameter expression="${project.build.directory}/site/clover"
+     * @parameter expression="${project.reporting.outputDirectory}/clover"
      * @required
      */
     private String outputDirectory;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private SiteRenderer siteRenderer;
 
@@ -157,8 +156,8 @@ public class CloverReportMojo extends AbstractMavenReport
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "An error has occurred in " + getName( Locale.ENGLISH )
-                + " report generation.", e );
+            throw new MojoExecutionException(
+                "An error has occurred in " + getName( Locale.ENGLISH ) + " report generation.", e );
         }
     }
 

@@ -60,9 +60,7 @@ public class PluginReport
     /**
      * Doxia Site Renderer.
      *
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private SiteRenderer siteRenderer;
 
@@ -78,8 +76,7 @@ public class PluginReport
     /**
      * Mojo scanner tools.
      *
-     * @parameter expression="${component.org.apache.maven.tools.plugin.scanner.MojoScanner}"
-     * @required
+     * @component
      */
     protected MojoScanner mojoScanner;
 

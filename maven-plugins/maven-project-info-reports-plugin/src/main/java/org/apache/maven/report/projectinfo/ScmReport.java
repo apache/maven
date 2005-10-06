@@ -40,26 +40,25 @@ import java.util.ResourceBundle;
 
 /**
  * Generates the Project Source Code Management report.
- * 
- * @goal scm
- * 
+ *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal scm
  */
 public class ScmReport
     extends AbstractMavenReport
 {
     /**
      * Report output directory.
-     * 
-     * @parameter expression="${project.build.directory}/site"
+     *
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -68,7 +67,7 @@ public class ScmReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -77,7 +76,7 @@ public class ScmReport
 
     /**
      * Maven SCM Manager.
-     * 
+     *
      * @parameter expression="${component.org.apache.maven.scm.manager.ScmManager}"
      * @required
      * @readonly
@@ -160,7 +159,9 @@ public class ScmReport
 
         private ScmManager scmManager;
 
-        /** To support more SCM */
+        /**
+         * To support more SCM
+         */
         private String anonymousConnection;
 
         private String devConnection;
@@ -204,8 +205,7 @@ public class ScmReport
             anonymousConnection = scm.getConnection();
             devConnection = scm.getDeveloperConnection();
 
-            if ( StringUtils.isEmpty( anonymousConnection ) &&
-                StringUtils.isEmpty( devConnection ) &&
+            if ( StringUtils.isEmpty( anonymousConnection ) && StringUtils.isEmpty( devConnection ) &&
                 StringUtils.isEmpty( scm.getUrl() ) )
             {
                 startSection( getTitle() );
@@ -216,7 +216,7 @@ public class ScmReport
 
                 return;
             }
-            
+
             ScmRepository anonymousRepository = getScmRepository( anonymousConnection );
             ScmRepository devRepository = getScmRepository( devConnection );
 
@@ -241,7 +241,7 @@ public class ScmReport
 
         /**
          * Render the overview section
-         * 
+         *
          * @param anonymousRepository the anonymous repository
          */
         private void renderOverViewSection( ScmRepository anonymousRepository )
@@ -278,7 +278,7 @@ public class ScmReport
 
         /**
          * Render the web access section
-         * 
+         *
          * @param scmUrl The URL to the project's browsable repository.
          */
         private void renderWebAccesSection( String scmUrl )
@@ -302,15 +302,14 @@ public class ScmReport
         /**
          * Render the anonymous access section depending the repository.
          * <p>Note: ClearCase, Starteam et Perforce seems to have no anonymous access.</>
-         * 
+         *
          * @param anonymousRepository the anonymous repository
          */
         private void renderAnonymousAccessSection( ScmRepository anonymousRepository )
         {
-            if ( ( isScmSystem( anonymousRepository, "clearcase" ) )
-                || ( isScmSystem( anonymousRepository, "perforce" ) )
-                || ( isScmSystem( anonymousRepository, "starteam" ) ) 
-                || ( StringUtils.isEmpty( anonymousConnection ) ) )
+            if ( ( isScmSystem( anonymousRepository, "clearcase" ) ) ||
+                ( isScmSystem( anonymousRepository, "perforce" ) ) ||
+                ( isScmSystem( anonymousRepository, "starteam" ) ) || ( StringUtils.isEmpty( anonymousConnection ) ) )
             {
                 return;
             }
@@ -348,7 +347,7 @@ public class ScmReport
 
         /**
          * Render the developer access section
-         * 
+         *
          * @param devRepository the dev repository
          */
         private void renderDeveloperAccessSection( ScmRepository devRepository )
@@ -357,7 +356,7 @@ public class ScmReport
             {
                 return;
             }
-            
+
             startSection( getBundle( locale ).getString( "report.scm.devaccess.title" ) );
 
             if ( ( devRepository != null ) && ( isScmSystem( devRepository, "clearcase" ) ) )
@@ -410,7 +409,7 @@ public class ScmReport
 
         /**
          * Render the access from behind a firewall section
-         * 
+         *
          * @param devRepository the dev repository
          */
         private void renderAccessBehindFirewallSection( ScmRepository devRepository )
@@ -441,7 +440,7 @@ public class ScmReport
 
         /**
          * Render the access from behind a firewall section
-         * 
+         *
          * @param anonymousRepository the anonymous repository
          * @param devRepository the dev repository
          */
@@ -472,7 +471,7 @@ public class ScmReport
          * Create the documentation to provide an developer access with a <code>Clearcase</code> SCM.
          * For example, generate the following command line:
          * <p>cleartool checkout module</p>
-         * 
+         *
          * @param clearCaseRepo
          */
         private void developerAccessClearCase( ClearCaseScmProviderRepository clearCaseRepo )
@@ -492,10 +491,9 @@ public class ScmReport
          * For example, generate the following command line:
          * <p>cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic login</p>
          * <p>cvs -z3 -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co maven-plugins/dist</p>
-         * 
-         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
-         * 
+         *
          * @param cvsRepo
+         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
          */
         private void anonymousAccessCVS( CvsScmProviderRepository cvsRepo )
         {
@@ -515,10 +513,9 @@ public class ScmReport
          * For example, generate the following command line:
          * <p>cvs -d :pserver:username@cvs.apache.org:/home/cvs login</p>
          * <p>cvs -z3 -d :ext:username@cvs.apache.org:/home/cvs co maven-plugins/dist</p>
-         * 
-         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
-         * 
+         *
          * @param cvsRepo
+         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
          */
         private void developerAccessCVS( CvsScmProviderRepository cvsRepo )
         {
@@ -542,10 +539,9 @@ public class ScmReport
          * For example, generate the following command line:
          * <p>p4 -H hostname -p port -u username -P password path</p>
          * <p>p4 -H hostname -p port -u username -P password path submit -c changement</p>
-         * 
-         * @see <a href="http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html">http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html</>
-         * 
+         *
          * @param perforceRepo
+         * @see <a href="http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html">http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html</>
          */
         private void developerAccessPerforce( PerforceScmProviderRepository perforceRepo )
         {
@@ -578,7 +574,7 @@ public class ScmReport
          * For example, generate the following command line:
          * <p>stcmd co -x -nologo -stop -p myusername:mypassword@myhost:1234/projecturl -is</p>
          * <p>stcmd ci -x -nologo -stop -p myusername:mypassword@myhost:1234/projecturl -f NCI -is</p>
-         * 
+         *
          * @param starteamRepo
          */
         private void developerAccessStarteam( StarteamScmProviderRepository starteamRepo )
@@ -608,10 +604,9 @@ public class ScmReport
          * Create the documentation to provide an anonymous access with a <code>SVN</code> SCM.
          * For example, generate the following command line:
          * <p>svn checkout http://svn.apache.org/repos/asf/maven/components/trunk maven</p>
-         * 
-         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
-         * 
+         *
          * @param svnRepo
+         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
          */
         private void anonymousAccessSVN( SvnScmProviderRepository svnRepo )
         {
@@ -628,10 +623,9 @@ public class ScmReport
          * For example, generate the following command line:
          * <p>svn checkout https://svn.apache.org/repos/asf/maven/components/trunk maven</p>
          * <p>svn commit --username your-username -m "A message"</p>
-         * 
-         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
-         * 
+         *
          * @param svnRepo
+         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
          */
         private void developerAccessSVN( SvnScmProviderRepository svnRepo )
         {
@@ -653,7 +647,7 @@ public class ScmReport
 
         /**
          * Return a <code>SCM repository</code> defined by a given url
-         * 
+         *
          * @param scmUrl an SCM URL
          * @return a valid SCM repository or null
          */
@@ -681,12 +675,11 @@ public class ScmReport
         /**
          * Convenience method that return true is the defined <code>SCM repository</code> is a known provider.
          * <p>Actually, we fully support Clearcase, CVS, Perforce, Starteam, SVN by the maven-scm-providers component.</p>
-         * 
-         * @see <a href="http://svn.apache.org/repos/asf/maven/scm/trunk/maven-scm-providers/">maven-scm-providers</a>
-         * 
-         * @param scmRepository a SCM repository 
-         * @param scmProvider a SCM provider name 
+         *
+         * @param scmRepository a SCM repository
+         * @param scmProvider a SCM provider name
          * @return true if the provider of the given SCM repository is equal to the given scm provider.
+         * @see <a href="http://svn.apache.org/repos/asf/maven/scm/trunk/maven-scm-providers/">maven-scm-providers</a>
          */
         private static boolean isScmSystem( ScmRepository scmRepository, String scmProvider )
         {

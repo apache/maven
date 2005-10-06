@@ -26,32 +26,30 @@ import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
  * Generates the Project Issue Tracking report.
- * 
- * @goal issue-tracking
- * 
+ *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal issue-tracking
  */
 public class IssueTrackingReport
     extends AbstractMavenReport
 {
     /**
      * Report outpur directory.
-     * 
-     * @parameter expression="${project.build.directory}/site"
+     *
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -60,7 +58,7 @@ public class IssueTrackingReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -212,7 +210,7 @@ public class IssueTrackingReport
 
         /**
          * Checks if a issue management system is Jira, bugzilla...
-         * 
+         *
          * @return true if the issue management system is Jira, bugzilla, false
          *         otherwise.
          */

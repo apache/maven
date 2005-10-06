@@ -48,15 +48,15 @@ public class DependenciesReport
 {
     /**
      * Report output directory.
-     * 
-     * @parameter expression="${project.build.directory}/site"
+     *
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
      * Doxia Site Renderer.
-     * 
+     *
      * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
      * @required
      * @readonly
@@ -65,7 +65,7 @@ public class DependenciesReport
 
     /**
      * The Maven Project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -74,7 +74,7 @@ public class DependenciesReport
 
     /**
      * Maven ArtifactFactory.
-     * 
+     *
      * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
      * @required
      * @readonly
@@ -83,7 +83,7 @@ public class DependenciesReport
 
     /**
      * Maven Project Builder.
-     * 
+     *
      * @parameter expression="${component.org.apache.maven.project.MavenProjectBuilder}"
      * @required
      * @readonly
@@ -92,7 +92,7 @@ public class DependenciesReport
 
     /**
      * Local Repository.
-     * 
+     *
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -245,9 +245,10 @@ public class DependenciesReport
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new IllegalArgumentException( "Can't find a valid Maven project in the repository for the artifact ["
-                                                            + artifact.getGroupId() + ":" + artifact.getArtifactId()
-                                                            + ":" + artifact.getVersion() + "]." );
+                    throw new IllegalArgumentException(
+                        "Can't find a valid Maven project in the repository for the artifact [" +
+                            artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() +
+                            "]." );
                 }
 
                 tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
@@ -289,10 +290,10 @@ public class DependenciesReport
                     catch ( ProjectBuildingException e )
                     {
                         // TODO: better exception handling needed - log PBE
-                        throw new IllegalArgumentException( "Can't find a valid Maven project in the repository for the artifact ["
-                                                                + artifact.getGroupId() + ":"
-                                                                + artifact.getArtifactId() + ":"
-                                                                + artifact.getVersion() + "]." );
+                        throw new IllegalArgumentException(
+                            "Can't find a valid Maven project in the repository for the artifact [" +
+                                artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() +
+                                "]." );
                     }
                     tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
                         artifactProject.getDescription(),
@@ -349,14 +350,17 @@ public class DependenciesReport
             throws ProjectBuildingException
         {
             Artifact projectArtifact = artifact;
-            
+
             if ( !"pom".equals( artifact.getType() ) )
             {
-                projectArtifact = artifactFactory.createProjectArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
+                projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(),
+                                                                         artifact.getArtifactId(),
+                                                                         artifact.getVersion(), artifact.getScope() );
             }
-            
+
             // TODO: we should use the MavenMetadataSource instead
-            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(), localRepository );
+            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(),
+                                                            localRepository );
         }
     }
 
