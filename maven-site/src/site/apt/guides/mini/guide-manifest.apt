@@ -1,0 +1,110 @@
+ ------
+ Guide to Working with Manifests
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Guide to Working with Manifests
+
++----+
+
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
+
++----+
+
++----+
+
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: jvanzyl
+Build-Jdk: 1.4.2_09
+Extension-Name: my-app
+Specification-Vendor: MyCompany Inc
+Implementation-Vendor: MyCompany Inc
+Implementation-Title: my-app
+Implementation-Version: 1.0-SNAPSHOT
+mode: development
+url: http://maven.apache.org
+
++----+
+
++----+
+
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <!--
+            <index>true</true>
+            -->
+            <manifest>
+              <mainClass>com.mycompany.app.App</mainClass/>
+              <packageName>com.mycompany.app</packageName>
+              <!--
+              <addClasspath/>
+              <addExtensions/>
+              <classpathPrefix/>
+              -->
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
+
++----+
+
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: jvanzyl
+Package: org.com.foo.app
+Build-Jdk: 1.4.2_09
+Extension-Name: my-app
+Specification-Vendor: MyCompany Inc
+Implementation-Vendor: MyCompany Inc
+Implementation-Title: my-app
+Implementation-Version: 1.0-SNAPSHOT
+Main-Class: org.com.foo.App
+mode: development
+url: http://maven.apache.org
+
++----+
+
+
+
+
++----+
