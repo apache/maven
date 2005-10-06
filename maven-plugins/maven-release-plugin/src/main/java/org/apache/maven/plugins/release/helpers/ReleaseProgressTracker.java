@@ -203,20 +203,19 @@ public class ReleaseProgressTracker
         {
             releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".connection", connection );
         }
-        
+
         String devConnection = scm.getDeveloperConnection();
         if ( devConnection != null )
         {
-            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".developerConnection",
-                                           devConnection );
+            releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".developerConnection", devConnection );
         }
-        
+
         String url = scm.getUrl();
         if ( url != null )
         {
             releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".url", url );
         }
-        
+
         String tag = scm.getTag();
         if ( tag != null )
         {
@@ -231,19 +230,19 @@ public class ReleaseProgressTracker
         {
             scm.setConnection( connection );
         }
-        
-        String devConnection = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".connection" );
+
+        String devConnection = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".developerConnection" );
         if ( devConnection != null )
         {
             scm.setDeveloperConnection( devConnection );
         }
-        
+
         String url = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".url" );
         if ( url != null )
         {
             scm.setUrl( url );
         }
-        
+
         String tag = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".tag" );
         if ( tag != null )
         {
