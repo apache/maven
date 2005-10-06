@@ -61,9 +61,9 @@ public class MavenArchiver
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
 
+/* TODO: rethink this, it wasn't working
         Artifact projectArtifact = project.getArtifact();
 
-/* TODO: rethink this, it wasn't working
         if ( projectArtifact.isSnapshot() )
         {
             Manifest.Attribute buildNumberAttr = new Manifest.Attribute( "Build-Number", "" +
