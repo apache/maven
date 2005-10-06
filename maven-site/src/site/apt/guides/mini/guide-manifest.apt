@@ -68,7 +68,7 @@ url: http://maven.apache.org
               <mainClass>com.mycompany.app.App</mainClass/>
               <packageName>com.mycompany.app</packageName>
               <!--
-              <addClasspath/>
+              <addClasspath>true</addClasspath>
               <addExtensions/>
               <classpathPrefix/>
               -->
