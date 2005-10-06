@@ -13,50 +13,52 @@ Documentation
 
  * {{{getting-started/index.html}Getting Started Guide}}
 
- * {{{plugin-development/index.html}Plug-in Developer's Guide}}
+ * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
+
+ * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
+ 
+ * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
 
 * Mini Guides
 
- * {{{guide-assemblies.apt}Guide to Creating Assemblies}}
+ * {{{mini/guide-assemblies.html}Guide to Creating Assemblies}}
 
- * {{{guide-configuring-plugins.apt}Guide to Configuring Plug-ins}}
+ * {{{mini/guide-configuring-plugins.html}Guide to Configuring Plug-ins}}
 
- * {{{guide-deployment-security-settings.apt}Guide to Deployment and Security Settings}}
+ * {{{mini/guide-deployment-security-settings.html}Guide to Deployment and Security Settings}}
 
- * {{{guide-ear.apt}Guide to EARs}}
+ * {{{mini/guide-ear.html}Guide to EARs}}
 
- * {{{guide-generating-sources.apt}Guide to Generating Sources}}
+ * {{{mini/guide-generating-sources.html}Guide to Generating Sources}}
 
- * {{{guide-m1-m2.apt}Guide to Moving From Maven 1.x to Maven 2.x}}
+ * {{{mini/guide-m1-m2.html}Guide to Moving From Maven 1.x to Maven 2.x}}
 
- * {{{guide-manifest.apt}Guide to Working with Manifests}}
+ * {{{mini/guide-manifest.html}Guide to Working with Manifests}}
 
- * {{{guide-maven-classloading.apt}Guide to Maven Classloading}}
+ * {{{mini/guide-maven-classloading.html}Guide to Maven Classloading}}
 
- * {{{guide-mirror-settings.apt}Guide to Mirror Settings}}
+ * {{{mini/guide-mirror-settings.html}Guide to Mirror Settings}}
 
- * {{{guide-multiple-repositories.apt}Guide to using Multiple Repositories}}
+ * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 
- * {{{guide-proxies.apt}Guide to using proxies}}
+ * {{{mini/guide-proxies.html}Guide to using proxies}}
 
- * {{{guide-template.apt}Guide}}
+ * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
- * {{{guide-using-extensions.apt}Guide to using Extensions}}
-
- * {{{guide-webapp.apt}Guide to Webapps}}
+ * {{{mini/guide-webapp.html}Guide to Webapps}}
 
 
-* Introductions
+* Introductory Material
 
- * {{{introduction-to-archetypes.apt}Introduction to Archetypes}}}
+ * {{{introduction/introduction-to-archetypes.html}Introduction to Archetypes}}
 
- * {{{introduction-to-dependency-management.apt}Introduction to Dependency Management}}}
+ * {{{introduction/introduction-to-dependency-management.html}Introduction to Dependency Management}}
 
- * {{{introduction-to-repositories.apt}Introduction to Repositories}}}
+ * {{{introduction/introduction-to-repositories.html}Introduction to Repositories}}
 
- * {{{introduction-to-the-lifecycle.apt}Introduction to the Lifecycle}}}
+ * {{{introduction/introduction-to-the-lifecycle.html}Introduction to the Lifecycle}}
 
- * {{{introduction-to-the-pom.apt}Introduction to the POM}}}
+ * {{{introduction/introduction-to-the-pom.html}Introduction to the POM}}
 
- * {{{introduction-to-the-standard-directory-layout.apt}Introduction to the Standard Directory Layout}}}
+ * {{{introduction/introduction-to-the-standard-directory-layout.html}Introduction to the Standard Directory Layout}}
 
