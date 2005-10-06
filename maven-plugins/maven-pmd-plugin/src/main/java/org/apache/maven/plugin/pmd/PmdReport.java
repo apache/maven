@@ -56,15 +56,13 @@ public class PmdReport
     extends AbstractMavenReport
 {
     /**
-     * @parameter expression="${project.build.directory}/site"
+     * @parameter expression="${project.reporting.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private SiteRenderer siteRenderer;
 
