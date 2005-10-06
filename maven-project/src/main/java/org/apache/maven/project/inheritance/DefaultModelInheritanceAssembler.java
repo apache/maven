@@ -19,14 +19,13 @@ package org.apache.maven.project.inheritance;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
-import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -484,6 +483,8 @@ public class DefaultModelInheritanceAssembler
                     repository.setName( parentDistMgmt.getRepository().getName() );
 
                     repository.setUrl( parentDistMgmt.getRepository().getUrl() );
+
+                    repository.setUniqueVersion( parentDistMgmt.getRepository().isUniqueVersion() );
                 }
             }
 
@@ -500,6 +501,8 @@ public class DefaultModelInheritanceAssembler
                     repository.setName( parentDistMgmt.getSnapshotRepository().getName() );
 
                     repository.setUrl( parentDistMgmt.getSnapshotRepository().getUrl() );
+
+                    repository.setUniqueVersion( parentDistMgmt.getRepository().isUniqueVersion() );
                 }
             }
         }
