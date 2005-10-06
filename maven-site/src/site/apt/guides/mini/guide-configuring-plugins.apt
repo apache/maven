@@ -8,8 +8,33 @@
 
 Guide to Configuring Plug-ins
 
+ In Maven plug-ins are configured by specifying a <<<configuration>>> element where the child elements of the
+ <<<configuration>>> element are mapped to fields, or setters, inside your Mojo (remember that a plug-in consists of
+ one or more Mojos where a Mojo maps to a goal). Say, for example, we had a Mojo that performed a query against
+ a particular URL, with a specified timeout and list of options. The Mojo might look like the following:
 
++----+
 
+public class MyQueryMojo
+    extends AbstractMojo
+{
+    private String url;
+
+    private int timeout;
+
+    private String[] options;
+
+    public void execute()
+        throws MojoExecutionException
+    {
+        ...
+    }
+}
+
++----+
+
+ To configure the Mojo from your POM with the desired URL, timeout and options you might have something like
+ the following:
 
 +----+
 
@@ -20,6 +45,8 @@ Guide to Configuring Plug-ins
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
+          <url>http://www.foobar.com/query</url>
+          <timeout>10</timeout>
           <options>
             <option>one</option>
             <option>two</option>
@@ -31,5 +58,55 @@ Guide to Configuring Plug-ins
   </build>
   ...
 </project>
+
++----+
+
+ As you can see the elements in the configuration match the names of the fields in the Mojo. The configuration
+ mechanism Maven employs is very similar to the way {{{http://xstream.codehaus.org}XStream}} works where elements
+ in XML are mapped to objects. So from the example above you can see that the mapping is pretty straight forward the
+ <<<url>>> element maps to the <<<url>>> field, the <<<timeout>>> element maps to the <<<timeout>>> field and the
+ <<<options>>> element maps to the <<<options>>> field. The mapping mechanism can deal with arrays by inspecting
+ the type of the field and determining if a suitable mapping is possible.
+
+* Mapping to collections
+
+** Mapping lists
+
+** Mapping maps
+
+** Mapping properties
+
+* Mapping complex objects
+
+* Using setters
+
+ You are not restricted to using private field mapping which is good if you are trying to make you Mojos resuable
+ outside the context of Maven. Using the example above we could name our private fields using the underscore
+ convention and provide setters that the configuration mapping mechanism can use. So our Mojo would look
+ like the following:
+
++----+
+
+public class MyQueryMojo
+    extends AbstractMojo
+{
+    private String _url;
+
+    private int _timeout;
+
+    private String[] _options;
+
+    public void setUrl( String url ){ _url = url; }
+
+    public void setTimeout( int timeout ){ _timeout = timeout; }
+
+    public void setOptions( String[] options ){ _options = options; }
+
+    public void execute()
+        throws MojoExecutionException
+    {
+        ...
+    }
+}
 
 +----+
