@@ -136,7 +136,7 @@
       @import url("$relativePath/css/maven-theme.css");
       @import url("$relativePath/css/site.css");
     </style>
-    <link rel="stylesheet" href="$relativePath/style/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="$relativePath/css/print.css" type="text/css" media="print" />
     #foreach( $author in $authors )
       <meta name="author" content="$author" />
     #end
