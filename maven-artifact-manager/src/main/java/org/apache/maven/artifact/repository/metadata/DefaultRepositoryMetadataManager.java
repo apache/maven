@@ -126,6 +126,7 @@ public class DefaultRepositoryMetadataManager
         }
         if ( loadMetadata( metadata, localRepository, localRepository, previousMetadata ) )
         {
+            metadata.setRepository( null );
             selected = localRepository;
         }
 
