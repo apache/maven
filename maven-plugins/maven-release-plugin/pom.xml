@@ -25,7 +25,7 @@
       <version>2.0-beta-2</version>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-input-handler-api</artifactId>
       <version>1.0-alpha-3</version>
     </dependency>
