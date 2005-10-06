@@ -8,37 +8,26 @@ Maven 2 Site Plugin
 
 *How to Use Site plugin
 
-  Here is a link for more information {{{http://maven.apache.org/maven2/site.html}http://maven.apache.org/maven2/site.html}}
- ------
- Maven 2 Site Plugin
- ------
-
-Maven 2 Site Plugin
-
- Generate the project's site and report distributions.
-
-*How to Use
-
   Using the site plugin is very easy, just execute the site goal from your project
 
 -------------------
   m2 site:site
 -------------------
-  
+
   and it would generate its default reports.
 
   *jdepend
 
   *checkstyle
-  
+
   *surefire-report
-  
+
   *javadoc
-  
+
   *jxr (cross reference)
-  
+
   *taglist
-  
+
   *changelog
 
 
