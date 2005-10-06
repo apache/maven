@@ -269,7 +269,7 @@ public class DefaultPluginManager
                 if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
                 {
                     // if the project artifact doesn't exist, don't use it. We haven't built that far.
-                    if ( project.getArtifact().getFile() != null && project.getArtifact().getFile().exists() )
+                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
                     {
                         pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
                     }
@@ -584,7 +584,7 @@ public class DefaultPluginManager
         PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration,
                                                                                    mojoDescriptor );
 
-        checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator, plugin );
+        checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 
         populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, pluginContainer,
                               expressionEvaluator );
@@ -746,7 +746,7 @@ public class DefaultPluginManager
     }
 
     private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration,
-                                          ExpressionEvaluator expressionEvaluator, Mojo plugin )
+                                          ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         // TODO: this should be built in to the configurator, as we presently double process the expressions
@@ -1082,29 +1082,6 @@ public class DefaultPluginManager
                 }
             }
         }
-    }
-
-    private Field findPluginField( Class clazz, String key )
-        throws NoSuchFieldException
-    {
-        Field field = null;
-
-        while ( field == null )
-        {
-            try
-            {
-                field = clazz.getDeclaredField( key );
-            }
-            catch ( NoSuchFieldException e )
-            {
-                clazz = clazz.getSuperclass();
-                if ( clazz.equals( Object.class ) )
-                {
-                    throw e;
-                }
-            }
-        }
-        return field;
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter,
