@@ -1,1 +1,1 @@
-package
+generate-sources

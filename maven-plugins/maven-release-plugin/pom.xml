@@ -26,8 +26,8 @@
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-input-handler</artifactId>
-      <version>1.0-alpha-2</version>
+      <artifactId>plexus-input-handler-api</artifactId>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>

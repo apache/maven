@@ -23,11 +23,6 @@
         <exclude>commons-logging:commons-logging</exclude>
         <exclude>commons-cli:commons-cli</exclude>
         <!--
-        I should be able to exclude this because I don't want tool integrators
-        to have to use this at all ...
-        <exclude>jline:jline</exclude>
-        -->
-        <!--
          |
          | When the embedder API provides deployment options this can be put
          | back in along with some other libraries for convenience.
@@ -35,6 +30,7 @@
          -->
         <exclude>jsch:jsch</exclude>                
         <exclude>org.apache.maven.wagon:wagon-ssh</exclude>
+        <!-- TODO: can probably be removed now -->
         <exclude>plexus:plexus-container-default</exclude>
       </excludes>
     </dependencySet>

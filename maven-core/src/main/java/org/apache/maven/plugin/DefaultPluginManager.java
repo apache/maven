@@ -1135,7 +1135,6 @@ public class DefaultPluginManager
         artifacts.add( "classworlds" );
         artifacts.add( "commons-cli" );
         artifacts.add( "doxia-sink-api" );
-        artifacts.add( "jline" );
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
@@ -1152,7 +1151,7 @@ public class DefaultPluginManager
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
         artifacts.add( "plexus-container-default" );
-        artifacts.add( "plexus-input-handler" );
+        artifacts.add( "plexus-input-handler-api" );
         artifacts.add( "plexus-utils" );
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );

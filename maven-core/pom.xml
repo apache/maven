@@ -118,15 +118,9 @@
       <version>2.0-beta-4-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-input-handler</artifactId>
-      <version>1.0-alpha-2</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>plexus</groupId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-input-handler-api</artifactId>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
