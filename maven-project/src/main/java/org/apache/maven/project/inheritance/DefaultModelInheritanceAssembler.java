@@ -502,7 +502,7 @@ public class DefaultModelInheritanceAssembler
 
                     repository.setUrl( parentDistMgmt.getSnapshotRepository().getUrl() );
 
-                    repository.setUniqueVersion( parentDistMgmt.getRepository().isUniqueVersion() );
+                    repository.setUniqueVersion( parentDistMgmt.getSnapshotRepository().isUniqueVersion() );
                 }
             }
         }
