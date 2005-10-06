@@ -28,7 +28,7 @@ Building Maven 2.0
   To build Maven 2.0, you need the <<<components>>> module. To check that out, run the command:
 
 -------------------
-svn co http://svn.apache.org/repos/asf/maven/components/trunk maven-components
+svn co https://svn.apache.org/repos/asf/maven/components/trunk maven-components
 -------------------
 
   The <<<maven-components>>> directory will contain the source code. Note that this contains all of the plugins and
