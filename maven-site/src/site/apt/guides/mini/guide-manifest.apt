@@ -80,6 +80,7 @@ url: http://maven.apache.org
               <mainClass>com.mycompany.app.App</mainClass/>
               <packageName>com.mycompany.app</packageName>
               <!-- options
+              <manifestFile>/path/to/MANIFEST.MF</manifestFile>
               <addClasspath>true</addClasspath>
               <addExtensions/>
               <classpathPrefix/>
