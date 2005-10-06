@@ -127,7 +127,7 @@ public class CheckstyleReport
 
     /**
      * Specifies the location of the supperssions XML file to use. The plugin defines a Checkstyle
-     * property named <code>checkstyle.supperssions.file</code> with the value of this
+     * property named <code>checkstyle.suppressions.file</code> with the value of this
      * property. This allows using the Checkstyle property your own custom checkstyle
      * configuration file when specifying a suppressions file.
      *
