@@ -1,5 +1,5 @@
 #banner, #footer, #leftcol, #breadcrumbs, .docs #toc, .docs .courtesylinks, #leftColumn, #navColumn {
-	display: none;
+	display: none !important;
 }
 #bodyColumn, body.docs div.docs {
 	margin: 0 !important;

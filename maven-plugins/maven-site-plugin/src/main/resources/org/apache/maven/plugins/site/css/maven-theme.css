@@ -5,6 +5,10 @@ body, td, select, input, li{
   font-family: Verdana, Helvetica, Arial, sans-serif;
   font-size: 13px;
 }
+code{
+  font-family: Courier, monospace;
+  font-size: 13px;
+}
 a {
   text-decoration: none;
 }
