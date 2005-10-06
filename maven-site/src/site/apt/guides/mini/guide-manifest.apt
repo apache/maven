@@ -8,6 +8,10 @@
 
 Guide to Working with Manifests
 
+ In order to modify the manifest of the resultant JAR produced by the jar plug-in you need to create a configuration
+ for the jar plug-in. In this first example we'll add some entries to the manifest by specifying what we'd like
+ in the <<<configuration>>> element of the jar plug-in:
+
 +----+
 
 <project>
@@ -32,6 +36,10 @@ Guide to Working with Manifests
 </project>
 
 +----+
+
+ As you see above you can use literal values or you can have values from the POM interpolated into literals
+ or simply use straight POM expressions. So this is what your resultant <<<MANIFEST.MF>>> will look like inside
+ the generated JAR:
 
 +----+
 
@@ -50,6 +58,10 @@ url: http://maven.apache.org
 
 +----+
 
+ If you need to do more then simply add some manifest entries there are more options like activating indexing of the
+ JAR, setting the main-class, packageName ... Here's an example of what the <<<configuration>>> element of the
+ JAR plug-in might look like:
+
 +----+
 
 <project>
@@ -67,7 +79,7 @@ url: http://maven.apache.org
             <manifest>
               <mainClass>com.mycompany.app.App</mainClass/>
               <packageName>com.mycompany.app</packageName>
-              <!--
+              <!-- options
               <addClasspath>true</addClasspath>
               <addExtensions/>
               <classpathPrefix/>
@@ -84,6 +96,10 @@ url: http://maven.apache.org
   </build>
   ...
 </project>
+
++----+
+
+ So this is what your resultant <<<MANIFEST.MF>>> will look like inside the generated JAR:
 
 +----+
 
@@ -104,7 +120,3 @@ url: http://maven.apache.org
 
 +----+
 
-
-
-
-+----+
