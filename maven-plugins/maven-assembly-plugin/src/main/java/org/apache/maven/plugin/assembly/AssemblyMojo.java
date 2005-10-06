@@ -294,7 +294,15 @@ public class AssemblyMojo
 
                         if ( process )
                         {
-                            unpack( artifact.getFile(), tempLocation );
+                            try
+                            {
+                                unpack( artifact.getFile(), tempLocation );
+                            }
+                            catch ( NoSuchArchiverException e )
+                            {
+                                throw new MojoExecutionException(
+                                    "Unable to obtain unarchiver for file '" + artifact.getFile() + "'" );
+                            }
                         }
                         archiver.addDirectory( tempLocation, null,
                                                (String[]) getDefaultExcludes().toArray( EMPTY_STRING_ARRAY ) );

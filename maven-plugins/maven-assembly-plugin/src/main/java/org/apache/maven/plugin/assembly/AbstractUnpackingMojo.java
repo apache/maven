@@ -18,7 +18,6 @@ package org.apache.maven.plugin.assembly;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -90,25 +89,16 @@ public abstract class AbstractUnpackingMojo
      */
 
     protected void unpack( File file, File location )
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException, NoSuchArchiverException
     {
         String archiveExt = FileUtils.getExtension( file.getAbsolutePath() ).toLowerCase();
 
-        this.getLog().info( "Look up archiver type: " + archiveExt );
-
-        UnArchiver unArchiver;
-
         try
         {
+            UnArchiver unArchiver;
+
             unArchiver = this.archiverManager.getUnArchiver( archiveExt );
-        }
-        catch ( NoSuchArchiverException e )
-        {
-            throw new MojoFailureException( "Unable to obtain unarchiver for extension '" + archiveExt + "'" );
-        }
 
-        try
-        {
             unArchiver.setSourceFile( file );
 
             unArchiver.setDestDirectory( location );

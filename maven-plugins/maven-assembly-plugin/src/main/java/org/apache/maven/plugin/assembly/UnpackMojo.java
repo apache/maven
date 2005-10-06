@@ -19,6 +19,7 @@ package org.apache.maven.plugin.assembly;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 
 import java.io.File;
 import java.util.Iterator;
@@ -62,9 +63,17 @@ public class UnpackMojo
             if ( process )
             {
                 File file = artifact.getFile();
-                unpack( file, tempLocation );
+                try
+                {
+                    unpack( file, tempLocation );
+                }
+                catch ( NoSuchArchiverException e )
+                {
+                    this.getLog().info( "Skip unpacking dependency file with unknown extension: " + file.getPath() );
+                }
             }
         }
     }
+
 
 }
