@@ -122,7 +122,8 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
+        assertTrue( result.getMessage( 0 ).indexOf(
+            "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -132,7 +133,8 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
+        assertTrue( result.getMessage( 0 ).indexOf(
+            "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
     public void testMissingAll()
@@ -159,6 +161,22 @@ public class DefaultModelValidatorTest
         assertEquals( 1, result.getMessageCount() );
 
         assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingRepositoryId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-repository-id-pom.xml" );
+
+        assertEquals( 4, result.getMessageCount() );
+
+        assertEquals( "'repositories.repository.id' is missing.", result.getMessage( 0 ) );
+
+        assertEquals( "'repositories.repository.url' is missing.", result.getMessage( 1 ) );
+
+        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
+
+        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
     }
 
     private ModelValidationResult validate( String testName )

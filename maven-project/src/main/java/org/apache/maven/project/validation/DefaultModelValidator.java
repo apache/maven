@@ -24,6 +24,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Repository;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
@@ -64,14 +65,15 @@ public class DefaultModelValidator
             validateSubElementStringNotEmpty( d, "dependencies.dependency.type", result, d.getType() );
 
             validateSubElementStringNotEmpty( d, "dependencies.dependency.version", result, d.getVersion() );
-            
+
             if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
             {
                 result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
             }
             else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
             {
-                result.addMessage( "For dependency " + d + ": only dependency with system scope can specify systemPath." );
+                result.addMessage(
+                    "For dependency " + d + ": only dependency with system scope can specify systemPath." );
             }
         }
 
@@ -83,18 +85,20 @@ public class DefaultModelValidator
                 Dependency d = (Dependency) it.next();
 
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.artifactId", result,
-                                        d.getArtifactId() );
+                                                  d.getArtifactId() );
 
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", result,
-                                        d.getGroupId() );
-                
+                                                  d.getGroupId() );
+
                 if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
                 {
-                    result.addMessage( "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
+                    result.addMessage(
+                        "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
                 }
                 else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
                 {
-                    result.addMessage( "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
+                    result.addMessage(
+                        "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
                 }
             }
         }
@@ -125,9 +129,25 @@ public class DefaultModelValidator
             }
         }
 
+        validateRepositories( result, model.getRepositories(), "repositories.repository" );
+
+        validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+
         forcePluginExecutionIdCollision( model, result );
 
         return result;
+    }
+
+    private void validateRepositories( ModelValidationResult result, List repositories, String prefix )
+    {
+        for ( Iterator it = repositories.iterator(); it.hasNext(); )
+        {
+            Repository repository = (Repository) it.next();
+
+            validateStringNotEmpty( prefix + ".id", result, repository.getId() );
+
+            validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
+        }
     }
 
     private void forcePluginExecutionIdCollision( Model model, ModelValidationResult result )
@@ -194,7 +214,8 @@ public class DefaultModelValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateSubElementStringNotEmpty( Object subElementInstance, String fieldName, ModelValidationResult result, String string )
+    private boolean validateSubElementStringNotEmpty( Object subElementInstance, String fieldName,
+                                                      ModelValidationResult result, String string )
     {
         if ( !validateSubElementNotNull( subElementInstance, fieldName, result, string ) )
         {
@@ -229,7 +250,7 @@ public class DefaultModelValidator
 
         return false;
     }
-    
+
     /**
      * Asserts:
      * <p/>
@@ -237,7 +258,8 @@ public class DefaultModelValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateSubElementNotNull( Object subElementInstance, String fieldName, ModelValidationResult result, Object object )
+    private boolean validateSubElementNotNull( Object subElementInstance, String fieldName,
+                                               ModelValidationResult result, Object object )
     {
         if ( object != null )
         {

@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>foo</artifactId>
+  <groupId>foo</groupId>
+  <version>99.44</version>
+  <packaging>bleh</packaging>
+  <repositories>
+    <repository>
+
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+
+    </pluginRepository>
+  </pluginRepositories>
+</project>
