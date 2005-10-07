@@ -121,3 +121,11 @@ url: http://maven.apache.org
 
 +----+
 
+~~ suggestion by jorg
+~~ it would be nice if the Specification-Version could be easily generated to be major.minor of pom.currentVersion i.e. that
+~~
+~~ 1.2 ==> 1.2
+~~ 1.2.1 ==> 1.2
+~~ 1.2-SNAPSHOT ==> 1.2
+
+for the javaapp-plugin I did something like this in Jelly ...
