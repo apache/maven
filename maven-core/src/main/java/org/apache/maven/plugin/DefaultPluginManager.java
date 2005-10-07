@@ -231,7 +231,7 @@ public class DefaultPluginManager
             Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(),
                                                                        plugin.getVersion() );
             MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
-                                                                            localRepository );
+                                                                            localRepository, false );
             // if we don't have the required Maven version, then ignore an update
             if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {

@@ -306,6 +306,13 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        return buildFromRepository( artifact, remoteArtifactRepositories, localRepository, true );
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                             ArtifactRepository localRepository, boolean allowStubModel )
+        throws ProjectBuildingException
+    {
         String cacheKey = createCacheKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         MavenProject project = (MavenProject) projectCache.get( cacheKey );
         if ( project != null )
@@ -313,14 +320,14 @@ public class DefaultMavenProjectBuilder
             return project;
         }
 
-        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
 
         return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories, null,
                       null );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                           ArtifactRepository localRepository )
+                                           ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException
     {
         Artifact projectArtifact;
@@ -349,6 +356,7 @@ public class DefaultMavenProjectBuilder
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
                 File file = projectArtifact.getFile();
+                // TODO: how can this not be true?
                 if ( projectArtifact.isResolved() )
                 {
                     model = readModel( file );
@@ -408,9 +416,13 @@ public class DefaultMavenProjectBuilder
                         projectArtifact.setDownloadUrl( model.getUrl() );
                     }
                 }
-                else
+                else if ( allowStubModel )
                 {
                     model = createStubModel( projectArtifact );
+                }
+                else
+                {
+                    throw new ProjectBuildingException( "POM could not be resolved from the repository" );
                 }
             }
             catch ( ArtifactResolutionException e )
@@ -419,7 +431,14 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ArtifactNotFoundException e )
             {
-                model = createStubModel( projectArtifact );
+                if ( allowStubModel )
+                {
+                    model = createStubModel( projectArtifact );
+                }
+                else
+                {
+                    throw new ProjectBuildingException( "POM not found in repository", e );
+                }
             }
         }
         else
@@ -854,7 +873,7 @@ public class DefaultMavenProjectBuilder
                 // we can't query the parent to ask where it is :)
                 List remoteRepositories = new ArrayList( aggregatedRemoteWagonRepositories );
                 remoteRepositories.addAll( parentSearchRepositories );
-                model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository );
+                model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
             }
 
             File parentProjectDir = null;

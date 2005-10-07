@@ -92,12 +92,12 @@ public class DefaultPluginVersionManager
     {
         // before we do anything else, if this is a self-reference we need to short-circuit the resolution process.
         String projectKey = constructPluginKey( project.getGroupId(), project.getArtifactId() );
-        
+
         if ( projectKey.equals( constructPluginKey( groupId, artifactId ) ) )
         {
             return project.getVersion();
         }
-        
+
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
@@ -595,8 +595,9 @@ public class DefaultPluginVersionManager
             }
             catch ( IOException e )
             {
-                getLogger().warn( "Cannot rewrite user-level plugin-registry.xml with new plugin version of plugin: \'"
-                                      + groupId + ":" + artifactId + "\'.", e );
+                getLogger().warn(
+                    "Cannot rewrite user-level plugin-registry.xml with new plugin version of plugin: \'" + groupId +
+                        ":" + artifactId + "\'.", e );
             }
             finally
             {
@@ -653,7 +654,7 @@ public class DefaultPluginVersionManager
             if ( artifact.getFile() != null )
             {
                 MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
-                                                                                localRepository );
+                                                                                localRepository, false );
 
                 boolean pluginValid = true;
 
@@ -672,7 +673,7 @@ public class DefaultPluginVersionManager
                 }
 
                 String artifactVersion = artifact.getVersion();
-                
+
                 if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
                 {
                     version = artifactVersion;

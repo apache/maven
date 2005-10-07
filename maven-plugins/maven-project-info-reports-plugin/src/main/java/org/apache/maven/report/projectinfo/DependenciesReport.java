@@ -351,16 +351,18 @@ public class DependenciesReport
         {
             Artifact projectArtifact = artifact;
 
+            boolean allowStubModel = false;
             if ( !"pom".equals( artifact.getType() ) )
             {
                 projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(),
                                                                          artifact.getArtifactId(),
                                                                          artifact.getVersion(), artifact.getScope() );
+                allowStubModel = true;
             }
 
             // TODO: we should use the MavenMetadataSource instead
-            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(),
-                                                            localRepository );
+            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(), localRepository,
+                                                            allowStubModel );
         }
     }
 

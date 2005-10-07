@@ -106,8 +106,8 @@ public class MavenMetadataSource
             {
                 try
                 {
-                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
-                                                                       localRepository );
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository,
+                                                                       true );
                 }
                 catch ( InvalidModelException e )
                 {

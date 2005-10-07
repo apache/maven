@@ -68,6 +68,20 @@ public interface MavenProjectBuilder
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
+    /**
+     * Build the artifact from the local repository, resolving it if necessary.
+     *
+     * @param artifact the artifact description
+     * @param localRepository the local repository
+     * @param remoteArtifactRepositories the remote repository list
+     * @param allowStubModel return a stub if the POM is not found
+     * @return the built project
+     * @throws ProjectBuildingException
+     */
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                      ArtifactRepository localRepository, boolean allowStubModel )
+        throws ProjectBuildingException;
+
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 }
