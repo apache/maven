@@ -31,6 +31,8 @@ Documentation
 
  * {{{mini/guide-ear.html}Guide to EARs}}
 
+ * {{{mini/guide-embedding-m2.html}Guide to Embedding Maven 2.x}}
+
  * {{{mini/guide-generating-sources.html}Guide to Generating Sources}}
 
  * {{{mini/guide-ide-eclipse.html}Guide to using Eclipse with Maven 2.x}}

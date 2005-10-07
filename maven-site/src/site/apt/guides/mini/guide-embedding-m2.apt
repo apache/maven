@@ -1,0 +1,66 @@
+ ------
+ Guide to Embedding Maven 2.x
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Embedding Maven 2.x
+
+ The Maven Embedder is intended to be the single component that tool
+ integrators will need to access all the features of Maven. The Maven Embedder
+ is currently a work in progress but is advancing rapidly as it is being used
+ for a Maven 2.x plugin for Eclipse. The Maven Embedder will be release in its
+ final form after the final release of Maven 2.0 itself.
+ 
+ Here are some of the features  provided by the Maven Embedder:
+ 
+ * Reading/writing <<<pom.xml>>> files as models
+ 
+ * Reading/writing <<<pom.xml>>> files as projects
+ 
+ * Retrieval of standard lifecycle phases
+ 
+ * Retrieval of plugin metadata
+ 
+ * Execution of Maven
+ 
+ []
+ 
++----+
+
+public class Plugin
+{
+    public Plugin()
+        throws Exception
+    {
+        MavenEmbedder maven = new MavenEmbedder();
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        maven.setClassLoader( classLoader );
+
+        maven.setLogger( new MavenEmbedderConsoleLogger() );
+
+        maven.start();
+
+        File targetDirectory = new File( System.getProperty( "user.dir" ), "target/embedder-test-project" );
+
+        File pomFile = new File( targetDirectory, "pom.xml" );
+
+        MavenProject pom = maven.readProjectWithDependencies( pomFile );
+
+        EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
+
+        maven.execute( pom, Collections.singletonList( "package" ), eventMonitor, new ConsoleDownloadMonitor(), null, targetDirectory );
+    }
+
+    public static void main( String[] args )
+        throws Exception
+    {
+        Plugin plugin = new Plugin();
+    }
+}
+
++----+
