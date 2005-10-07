@@ -476,9 +476,9 @@ public class DefaultProfileInjector
                     }
                 }
 
-                profileReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
+                modelReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
 
-                profileReporting.flushReportPluginMap();
+                modelReporting.flushReportPluginMap();
             }
         }
     }
