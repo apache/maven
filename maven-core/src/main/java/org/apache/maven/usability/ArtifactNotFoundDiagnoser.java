@@ -17,9 +17,9 @@ package org.apache.maven.usability;
  */
 
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 
-public class ArtifactResolverDiagnoser
+public class ArtifactNotFoundDiagnoser
     implements ErrorDiagnoser
 {
 
@@ -27,13 +27,13 @@ public class ArtifactResolverDiagnoser
 
     public boolean canDiagnose( Throwable error )
     {
-        return DiagnosisUtils.containsInCausality( error, ArtifactResolutionException.class );
+        return DiagnosisUtils.containsInCausality( error, ArtifactNotFoundException.class );
     }
 
     public String diagnose( Throwable error )
     {
-        ArtifactResolutionException exception = (ArtifactResolutionException) DiagnosisUtils.getFromCausality( error,
-                                                                                                               ArtifactResolutionException.class );
+        ArtifactNotFoundException exception = (ArtifactNotFoundException) DiagnosisUtils.getFromCausality( error,
+                                                                                                           ArtifactNotFoundException.class );
 
         StringBuffer message = new StringBuffer();
 

@@ -122,6 +122,21 @@
       <implementation>org.apache.maven.usability.PluginContainerDiagnoser</implementation>
     </component>
     <!--
+    |
+    |ArtifactNotFoundDiagnoser
+    |
+    -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>ArtifactNotFoundDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.ArtifactNotFoundDiagnoser</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
      |
      |ArtifactResolverDiagnoser
      |
