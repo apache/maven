@@ -42,3 +42,32 @@ m2 -DupdateReleaseInfo=true install
 +----+
 
   At this point, you can run the mojo with "<<<m2 hello:sayhi>>>".
+
+
+Attaching the Mojo to the Build Lifecycle
+
+  You can also configure your plugin to attach specific goals to a particular
+  phase of the build lifecycle.  Here is an example:
+
++-----+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>sample.plugin</groupId>
+        <artifactId>maven-hello-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>sayhi</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
++-----+
+
+  This causes the simple mojo to be executed whenever Java code is compiled.
+  For more information on binding a mojo to phases in the lifecycle, please
+  refer to the {{{/maven2/lifecycle.html}Build Lifecycle}} document.

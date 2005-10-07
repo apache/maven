@@ -23,6 +23,8 @@ Documentation
 
  * {{{mini/guide-assemblies.html}Guide to Creating Assemblies}}
 
+ * {{{mini/guide-bash-m2-completion.html}Guide to Maven 2.x auto completion using BASH}}
+
  * {{{mini/guide-configuring-plugins.html}Guide to Configuring Plug-ins}}
 
  * {{{mini/guide-coping-with-sun-jars.html}Guide to Coping with Sun JARs}}
