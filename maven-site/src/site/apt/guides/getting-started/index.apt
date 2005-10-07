@@ -652,7 +652,7 @@ environment=${environment}
 
 * {How do I use external dependencies?}
 
- You probably noticed already noticed a <<<dependencies>>> element in the POM we've been using as an example
+ You probably already noticed a <<<dependencies>>> element in the POM we've been using as an example
  so you have in fact been using an external dependency but we'll here we'll go more in depth about how Maven's
  dependency management system works. For a thorough introduction please refer to our
  {{{introduction-to-archetypes.html}Introduction to Dependency Management}}.
