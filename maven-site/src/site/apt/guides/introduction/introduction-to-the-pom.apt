@@ -8,11 +8,15 @@
 
 Introduction to the POM
 
-  o You need a Project Object Model (POM)
-  o Explain what is a POM is?
-  o Explain that the POM is the fundamental unit of work in Maven
-  o Explain the notion of the Super POM
-  o Show what a minimal POM can look like
+  * You need a Project Object Model (POM)
+  
+  * Explain what is a POM is?
+  
+  * Explain that the POM is the fundamental unit of work in Maven
+  
+  * Explain the notion of the Super POM
+  
+  * Show what a minimal POM can look like
 
 * {{Super POM}}
 
@@ -51,6 +55,8 @@ Introduction to the POM
  * plugin executions with matching ids
 
  * plugin configuration
+ 
+ []
 
  <<NOTE:>> Profile inheritance the same inheritance strategy as used for the POM itself.
 
