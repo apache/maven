@@ -15,3 +15,5 @@ Powered by Maven 2.x
  * {{{http://openejb.codehaus.org}OpenEJB}}
  
  * {{{http://www.activemq.org}ActiveMQ}}
+
+ * {{{http://gforge.public.thoughtworks.org/projects/dbfixture/}DbFixture}}
