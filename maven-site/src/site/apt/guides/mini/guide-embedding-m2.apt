@@ -64,3 +64,6 @@ public class Plugin
 }
 
 +----+
+
+ There are many known issues with the embedder and you can find them 
+ {{http://jira.codehaus.org/secure/IssueNavigator.jspa?reset=true&mode=hide&pid=10500&sorter/order=DESC&sorter/field=priority&resolutionIds=-1&component=11850}here}}.
