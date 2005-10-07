@@ -1,0 +1,44 @@
+ ------
+ Plugin Development Guide - Executing Your First Mojo
+ ------
+ Bob Allison
+ ------
+ 12 October 2005
+ ------
+ 
+
+Executing Your First Mojo
+
+  The most direct means of executing your new plugin is to specify the
+  plugin goal directly on the command line.  To do this, you need to
+  specify a fully-qualified goal in the form of:
+
++----+
+groupID:artifactID:version:goal
++----+
+
+  For example, to run the simple mojo in the sample plugin, you would enter
+  "<<<m2 sample.plugin:maven-hello-plugin:1.0-SNAPSHOT:sayhi>>>" on the
+  command line.
+
+Shortening the Command Line
+
+  It is possible to shorten the amount of typing needed on the command
+  line.  To do this, you need to install the plugin with the
+  <<<updateReleaseInfo>>> option set to true; for example:
+
++----+
+m2 -DupdateReleaseInfo=true install
++----+
+
+  You also need to add your plugin's group ID to the list of group IDs
+  searched by default.  To do this, you need to add the following to
+  your <<<settings.xml>>> file:
+
++----+
+<pluginGroups>
+  <pluginGroup>sample.plugin</pluginGroup>
+</pluginGroups>
++----+
+
+  At this point, you can run the mojo with "<<<m2 hello:sayhi>>>".

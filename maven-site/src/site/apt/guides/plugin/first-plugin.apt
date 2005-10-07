@@ -1,0 +1,15 @@
+ -------
+ Plugin Development Guide - Your First Plugin
+ -------
+ Bob Allison
+ -------
+ 12 October 2005
+ -------
+
+Your First Plugin
+
+  This section of the document walks the reader through the process
+  of building a simple plugin which takes no parameters and simply
+  displays a message on the screen when run.  It covers the basics of
+  setting up a project to create a plugin, the minimal contents of a
+  Java mojo, and the means to cause the mojo to be executed.
