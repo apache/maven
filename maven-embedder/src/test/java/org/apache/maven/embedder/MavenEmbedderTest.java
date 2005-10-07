@@ -123,6 +123,19 @@ public class MavenEmbedderTest
     }
 
     // ----------------------------------------------------------------------
+    // Repository
+    // ----------------------------------------------------------------------
+
+    public void testLocalRepositoryRetrieval()
+        throws Exception
+    {
+        System.out.println( "maven.getLocalRepository() = " + maven.getLocalRepository() );
+
+        assertNotNull( maven.getLocalRepository().getBasedir() );
+    }
+
+
+    // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 

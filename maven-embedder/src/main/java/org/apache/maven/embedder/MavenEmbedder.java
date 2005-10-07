@@ -240,6 +240,11 @@ public class MavenEmbedder
         return localRepositoryDirectory;
     }
 
+    public ArtifactRepository getLocalRepository()
+    {
+        return localRepository;
+    }
+
     public MavenEmbedderLogger getLogger()
     {
         return logger;
@@ -392,7 +397,11 @@ public class MavenEmbedder
 
         eventDispatcher.addEventMonitor( eventMonitor );
 
-        rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+        // If this option is set the exception seems to be hidden ...
+
+        //rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+
+        rm.setFailureBehavior( ReactorManager.FAIL_FAST );
 
         MavenSession session = new MavenSession( embedder.getContainer(),
                                                  settings,
@@ -435,7 +444,7 @@ public class MavenEmbedder
 
         if ( response.isExecutionFailure() )
         {
-            throw new MojoExecutionException( "Integration test failed" );
+            throw new MojoExecutionException( "Project failed to build.", response.getException() );
         }
     }
 
@@ -574,8 +583,6 @@ public class MavenEmbedder
 
         if ( logger != null )
         {
-            System.out.println( "logger = " + logger );
-
             embedder.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
         }
 

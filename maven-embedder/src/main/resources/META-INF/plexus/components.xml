@@ -289,11 +289,13 @@
     <component>
       <role>org.apache.maven.project.MavenProjectHelper</role>
       <implementation>org.apache.maven.project.DefaultMavenProjectHelper</implementation>
+      <!--
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
       </requirements>
+      -->
     </component>
     <!--
     |
@@ -880,6 +882,7 @@
     
     <component>
       <role>org.codehaus.plexus.components.inputhandler.InputHandler</role>
+      <role-hint>default</role-hint>
       <implementation>org.codehaus.plexus.components.inputhandler.DefaultInputHandler</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
