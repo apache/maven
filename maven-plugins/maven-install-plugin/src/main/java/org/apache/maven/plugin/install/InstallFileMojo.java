@@ -30,6 +30,7 @@ import java.io.File;
  * @version $Id$
  * @goal install-file
  * @requiresProject false
+ * @aggregator 
  */
 public class InstallFileMojo
     extends AbstractInstallMojo
