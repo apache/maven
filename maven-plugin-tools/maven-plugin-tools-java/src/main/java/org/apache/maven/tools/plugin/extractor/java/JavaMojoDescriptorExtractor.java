@@ -259,17 +259,8 @@ public class JavaMojoDescriptorExtractor
         // Project flag
         // ----------------------------------------------------------------------
 
-        DocletTag requiresProject = findInClassHierarchy( javaClass, GOAL_REQUIRES_PROJECT );
-
-        if ( requiresProject != null )
-        {
-            String requiresProjectValue = requiresProject.getValue();
-
-            if ( requiresProjectValue != null )
-            {
-                mojoDescriptor.setProjectRequired( Boolean.valueOf( requiresProjectValue ).booleanValue() );
-            }
-        }
+        boolean value = getBooleanTagValue( javaClass, GOAL_REQUIRES_PROJECT, mojoDescriptor.isProjectRequired() );
+        mojoDescriptor.setProjectRequired( value );
 
         // ----------------------------------------------------------------------
         // Aggregator flag
@@ -286,41 +277,46 @@ public class JavaMojoDescriptorExtractor
         // requiresDirectInvocation flag
         // ----------------------------------------------------------------------
 
-        DocletTag requiresDirectInvocation = findInClassHierarchy( javaClass, GOAL_REQUIRES_DIRECT_INVOCATION );
-
-        if ( requiresDirectInvocation != null )
-        {
-            mojoDescriptor.setDirectInvocationOnly( true );
-        }
+        value = getBooleanTagValue( javaClass, GOAL_REQUIRES_DIRECT_INVOCATION,
+                                    mojoDescriptor.isDirectInvocationOnly() );
+        mojoDescriptor.setDirectInvocationOnly( value );
 
         // ----------------------------------------------------------------------
         // Online flag
         // ----------------------------------------------------------------------
 
-        DocletTag requiresOnline = findInClassHierarchy( javaClass, GOAL_REQUIRES_ONLINE );
-
-        if ( requiresOnline != null )
-        {
-            mojoDescriptor.setOnlineRequired( true );
-        }
+        value = getBooleanTagValue( javaClass, GOAL_REQUIRES_ONLINE, mojoDescriptor.isOnlineRequired() );
+        mojoDescriptor.setOnlineRequired( value );
 
         // ----------------------------------------------------------------------
         // inheritByDefault flag
         // ----------------------------------------------------------------------
 
-        DocletTag inheritByDefault = findInClassHierarchy( javaClass, GOAL_INHERIT_BY_DEFAULT );
-
-        if ( inheritByDefault != null )
-        {
-            mojoDescriptor.setInheritedByDefault( Boolean.valueOf( inheritByDefault.getValue() ).booleanValue() );
-        }
+        value = getBooleanTagValue( javaClass, GOAL_INHERIT_BY_DEFAULT, mojoDescriptor.isInheritedByDefault() );
+        mojoDescriptor.setInheritedByDefault( value );
 
         extractParameters( mojoDescriptor, javaClass );
 
         return mojoDescriptor;
     }
 
-    private DocletTag findInClassHierarchy( JavaClass javaClass, String tagName )
+    private static boolean getBooleanTagValue( JavaClass javaClass, String tagName, boolean defaultValue )
+    {
+        DocletTag requiresProject = findInClassHierarchy( javaClass, tagName );
+
+        if ( requiresProject != null )
+        {
+            String requiresProjectValue = requiresProject.getValue();
+
+            if ( requiresProjectValue != null && requiresProjectValue.length() > 0 )
+            {
+                defaultValue = Boolean.valueOf( requiresProjectValue ).booleanValue();
+            }
+        }
+        return defaultValue;
+    }
+
+    private static DocletTag findInClassHierarchy( JavaClass javaClass, String tagName )
     {
         DocletTag tag = javaClass.getTagByName( tagName );
 
