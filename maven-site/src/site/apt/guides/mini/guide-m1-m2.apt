@@ -7,6 +7,14 @@
  ------
 
  * repoclean
+
+ ** Projects using multiproject or project properties
+
+ Maven 1.x POMs that use multiproject and/or project.properties must be 
+ deployed by version 1.5 or later of the Artifact plugin for repoclean to 
+ successfully convert them.  This ensures that any parent POMs and/or POM 
+ properties are fully resolved by Maven before deploying the POM.
+
  * planned tools
 
  No there isn't something yet but it's planned. I have presented some slides
