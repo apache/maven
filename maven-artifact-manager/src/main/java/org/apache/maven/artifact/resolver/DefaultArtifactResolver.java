@@ -90,7 +90,6 @@ public class DefaultArtifactResolver
                     artifact.setResolved( true );
                 }
             }
-            // skip artifacts with a file - they are already resolved
             else if ( !artifact.isResolved() )
             {
                 // ----------------------------------------------------------------------
@@ -113,6 +112,7 @@ public class DefaultArtifactResolver
                 }
 
                 File destination = artifact.getFile();
+                boolean resolved = false;
                 if ( !destination.exists() || force )
                 {
                     if ( !wagonManager.isOnline() )
@@ -150,11 +150,22 @@ public class DefaultArtifactResolver
                         throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                     }
 
-                    if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+                    resolved = true;
+                }
+                else if ( destination.exists() )
+                {
+                    // locally resolved...no need to hit the remote repo.
+                    artifact.setResolved( true );
+                }
+
+                if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+                {
+                    String version = artifact.getVersion();
+                    artifact.selectVersion( artifact.getBaseVersion() );
+                    File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                    if ( resolved || !copy.exists() )
                     {
-                        String version = artifact.getVersion();
-                        artifact.selectVersion( artifact.getBaseVersion() );
-                        File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                        // recopy file if it was reresolved, or doesn't exist.
                         try
                         {
                             FileUtils.copyFile( destination, copy );
@@ -164,13 +175,9 @@ public class DefaultArtifactResolver
                             throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use",
                                                                    artifact, remoteRepositories, e );
                         }
-                        artifact.selectVersion( version );
                     }
-                }
-                else if ( destination.exists() )
-                {
-                    // locally resolved...no need to hit the remote repo.
-                    artifact.setResolved( true );
+                    artifact.setFile( copy );
+                    artifact.selectVersion( version );
                 }
             }
         }
