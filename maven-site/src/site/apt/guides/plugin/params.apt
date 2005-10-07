@@ -1,0 +1,184 @@
+   -----
+   Plugin Development Guide - Adding Parameters
+   -----
+
+What Are Parameters
+
+  It is unlikely that a mojo will be very useful without parameters.
+  Parameters provide a few very important functions:
+
+  * It provides hooks to allow the user to adjust the operation of the
+    plugin to suit their needs.
+
+  * It provides a means to easily extract the value of elements from
+    the POM without the need to navigate the objects.
+
+Defining Parameters Within a Mojo
+
+  Defining a parameter is as simple as creating an instance variable
+  in the mojo and adding the proper annotations.  Listed below is an
+  example of a parameter for the simple mojo:
+
++-----+
+    /**
+     * The greeting to display.
+     * @parameter expression="Hello"
+     */
+    private String greeting;
++-----+
+
+  The portion before the annotations is the description of the
+  parameter.  The "<<<parameter>>>" annotation identifies
+  the variable as a mojo parameter.  The "<<<expression>>>"
+  parameter defines the default value for the variable.  This value can
+  include expressions which reference the project, such as
+  "<<<${project.version}>>>" (more can be found in the
+  "Parameter Expressions" document).  The name of the variable is used
+  as the name of the parameter.
+
+Configuring Parameters in a Project
+
+  Configuring the parameter values for a plugin is done in a Maven 2
+  project within the <<<pom.xml>>> file as part of defining the
+  plugin in the project.  An example of configuring a plugin:
+
++-----+
+<plugin>
+  <groupId>sample.plugin</groupId>
+  <artifactId>maven-hello-plugin</artifactId>
+  <configuration>
+    <greeting>Welcome</greeting>
+  </configuration>
+</plugin>
++-----+
+
+  In the configuration section, the element name
+  ("<<<greeting>>>") is the parameter name and the contents of
+  the element ("<<<Welcome>>>") is the value to be assigned to
+  the parameter.  More details can be found in the Getting Started
+  Guide section on
+  {{{/maven2/getting-started.html#configuring_plugins}configuring plugins}}.
+
+Parameter Types With One Value
+
+  Listed below are the various types of simple variables which can be used as
+  parameters in your mojos, along with any rules on how the values in the
+  POM are interpreted.
+
+* Boolean
+
+  This includes variables typed <<<boolean>>> and <<<Boolean>>>.  When reading
+  the configuration, the text "<<<true>>>" causes the parameter to be set to
+  true and all other text causes the parameter to be set to false.
+
+* Fixed-Point Numbers
+
+  This includes variables typed <<<byte>>>, <<<Byte>>>, <<<int>>>,
+  <<<Integer>>>, <<<long>>>, <<<Long>>>, <<<short>>>, and <<<Short>>>.  When
+  reading the configuration, the text in the XML file is converted to an
+  integer value using either <<<Integer.parseInt()>>> or the <<<valueOf()>>>
+  method of the appropriate class.  This means that the strings must be valid
+  decimal integer values, consisting only of the digits 0 to 9 with an optional
+  <<<->>> in front for a negative value.
+
+* Floating-Point Numbers
+
+  This includes variables typed <<<double>>>, <<<Double>>>, <<<float>>>, and
+  <<<Float>>>.  When reading the configuration, the text in the XML file is
+  converted to binary form using the <<<valueOf()>>> method for the appropriate
+  class.  This means that the strings can take on any format specified in
+  section 3.10.2 of the Java Language Specification.  Some samples of valid
+  values are <<<1.0>>> and <<<6.02E+23>>>.
+
+* Dates
+
+  This includes variables typed <<<Date>>>.  When reading the configuration,
+  the text in the XML file is converted using one of the following date
+  formats: "<<<yyyy-MM-dd HH:mm:ss.S a>>>" (a sample date is "2005-10-06
+  2:22:55.1 PM") or "<<<yyyy-MM-dd HH:mm:ssa>>>" (a sample date is "2005-10-06
+  2:22:55PM").  Note that parsing is done using <<<DateFormat.parse()>>> which
+  allows some leniency in formatting.  If the method can parse a date and time
+  out of what is specified it will do so even if it doesn't exactly match the
+  patterns above.
+
+* Files and Directories
+
+  This includes variables typed <<<File>>>.  When reading the configuration,
+  the text in the XML file is used as the path to the desired file or
+  directory.  If the path is relative (does not start with <<</>>> or a drive
+  letter like <<<C:>>>), the path is relative to the directory containing
+  the POM.
+
+* URLs
+
+  This includes variables typed <<<URL>>>.  When reading the configuration, the
+  text in the XML file is used as the URL.  The format must follow the RFC 2396
+  guidelines, and looks like any web browser URL
+  (<<<scheme://host:port/path/to/file>>>).  No restrictions are placed on the
+  content of any of the parts of the URL while converting the URL.
+
+* Plain Text
+
+  This includes variables typed <<<char>>>, <<<Character>>>, <<<StringBuffer>>>,
+  and <<<String>>>.  When reading the configuration, the text in the XML file is
+  used as the value to be assigned to the parameter.  For <<<char>>> and
+  <<<Character>>> parameters, only the first character of the text is used.
+
+Parameter Types With Multiple Values
+
+  Listed below are the various types of composite objects which can be used as
+  parameters in your mojos, along with any rules on how the values in the
+  POM are interpreted.  In general, the class of the object created to hold the
+  parameter value (as well as the class for each element within the parameter
+  value) is determined as follows (the first step which yields a valid class
+  is used):
+
+  [[1]] If the XML contains an <<<implementation>>> hint, that is used
+
+  [[2]] If the XML tag contains a <<<.>>>, try that as a class name
+
+  [[3]] Try the XML tag as a class in the same package as the object being
+        configured
+
+  [[4]] For arrays, use the class of the array (for example, use <<<String>>>
+        for a <<<String[]>>> parameter); for collections and maps, use the
+        class specified in the mojo configuration for the collection or map;
+        use <<<String>>> for entries in a collection and values in a map
+
+  Once the type for the element is defined, the text in the XML file is
+  converted to the appropriate type of object
+
+* Arrays
+
+  Array type parameters are configured by specifying the parameter multiple
+  times (for example, "<<< <param>value1</param> <param>value2</param> >>>").
+
+* Collections
+
+  This category covers any class which implements <<<java.util.Collection>>>
+  such as <<<ArrayList>>> or <<<HashSet>>>.  These parameters are configured by
+  specifying the parameter multiple times just like an array.
+
+* Maps
+
+  This category covers any class which implements <<<java.util.Map>>>
+  such as <<<HashMap>>> but does <<not>> implement <<<java.util.Properties>>>.
+  These parameters are configured by including XML tags in the form
+  <<< <key>value</key> >>> in the parameter configuration.
+
+* Properties
+
+  This category covers any map which implements <<<java.util.Properties>>>.
+  These parameters are configured by including XML tags in the form
+  <<< <key>value</key> >>> in the parameter configuration.  \xAB<Is this
+  correct?  The Properties converter does not use the same calls to extract
+  the information as the Map converter does, but it looks like it might be
+  accomplishing the same thing.  Otherwise, it looks like the XML should be
+  <property name="name" value="value"/>.>\xBB
+
+* Other Object Classes
+
+  This category covers any class which does not implement <<<java.util.Map>>>,
+  <<<java.util.Collection>>>, or <<<java.util.Dictionary>>>.
+  These parameters are configured by \xAB<how does this type of parameter
+  get configured?  It is not clear from reading ObjectWithFieldsConverter.java>\xBB
