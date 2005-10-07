@@ -1,0 +1,54 @@
+ ------
+ Guide to Maven 2.x auto completion using BASH
+ ------
+ Trygve Laugstol
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+ 
+Guide to Maven 2.x auto completion using BASH 
+
+ First you must go to the following site to install the BASH programmable
+ auto completion setup if your distro doesn't have it by default. I don't
+ think many do so you'll need to go {{{http://www.caliban.org/bash/index.shtml#completion}here}}.
+ 
+ Once you've setup your system for auto completion you need to take the
+ following:
+ 
++----+
+
+#!/bin/bash
+
+_m2_make_goals()
+{
+  plugin=$1
+  mojos=$2
+  for mojo in $mojos
+  do
+    export goals="$goals $plugin:$mojo"
+  done
+}
+
+_m2_complete()
+{
+  local cur goals
+
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  goals='test install package'
+  goals=$goals _m2_make_goals "clean" "clean"
+  goals=$goals _m2_make_goals "doxia" "site"
+  goals=$goals _m2_make_goals "eclipse" "eclipse"
+  goals=$goals _m2_make_goals "idea" "idea"
+  goals=$goals _m2_make_goals "plexus" "app bundle-application bundle-runtime descriptor runtime service"
+  cur=`echo $cur | sed 's/\\\\//g'`
+  COMPREPLY=($(compgen -W "${goals}" ${cur} | sed 's/\\\\//g') )
+}
+
+complete -F _m2_complete -o filenames m2
+
++----+
+
+ And place it in <<</etc/bash_completion.d/m2>>>. Once you've done that the
+ next time you start up your BASH shell you will have m2 auto completion!
