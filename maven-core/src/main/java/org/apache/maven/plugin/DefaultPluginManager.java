@@ -22,6 +22,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -74,7 +75,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -147,7 +147,8 @@ public class DefaultPluginManager
 
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                           ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException,
+        ArtifactNotFoundException
     {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
@@ -163,7 +164,8 @@ public class DefaultPluginManager
 
     private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project,
                                                     ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, PluginManagerException, ArtifactResolutionException
+        throws PluginVersionResolutionException, PluginManagerException, ArtifactNotFoundException,
+        ArtifactResolutionException
     {
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
@@ -187,7 +189,7 @@ public class DefaultPluginManager
 
                 project.addPlugin( plugin );
             }
-            catch ( ArtifactResolutionException e )
+            catch ( ArtifactNotFoundException e )
             {
                 String groupId = plugin.getGroupId();
                 String artifactId = plugin.getArtifactId();
@@ -255,7 +257,7 @@ public class DefaultPluginManager
 
     protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project,
                               ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException
+        throws ArtifactResolutionException, PluginManagerException, ArtifactNotFoundException
     {
         // TODO: share with MMS? Not sure if it belongs here
         if ( project.getProjectReferences() != null && !project.getProjectReferences().isEmpty() )
@@ -330,7 +332,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactResolutionException, PluginManagerException, MojoExecutionException, MojoFailureException
+        throws ArtifactResolutionException, PluginManagerException, MojoExecutionException, MojoFailureException,
+        ArtifactNotFoundException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -461,7 +464,7 @@ public class DefaultPluginManager
     }
 
     public MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws PluginManagerException
+        throws PluginManagerException, ArtifactNotFoundException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
@@ -489,7 +492,8 @@ public class DefaultPluginManager
     }
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException
+        throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException,
+        ArtifactNotFoundException
     {
         String version = reportPlugin.getVersion();
 
@@ -527,7 +531,7 @@ public class DefaultPluginManager
 
     private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report,
                                     MojoExecution mojoExecution )
-        throws ComponentLookupException, PluginConfigurationException, PluginManagerException
+        throws ComponentLookupException, PluginConfigurationException, PluginManagerException, ArtifactNotFoundException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -593,7 +597,7 @@ public class DefaultPluginManager
 
     private void ensurePluginContainerIsComplete( PluginDescriptor pluginDescriptor, PlexusContainer pluginContainer,
                                                   MavenProject project, MavenSession session )
-        throws PluginConfigurationException
+        throws PluginConfigurationException, ArtifactNotFoundException
     {
         // if the plugin's already been used once, don't re-do this step...
         // otherwise, we have to finish resolving the plugin's classpath and start the container.
@@ -662,7 +666,7 @@ public class DefaultPluginManager
 
     private void resolveCoreArtifacts( List unresolved, ArtifactRepository localRepository,
                                        List resolutionRepositories )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         for ( Iterator it = unresolved.iterator(); it.hasNext(); )
         {
@@ -1152,7 +1156,7 @@ public class DefaultPluginManager
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver, String scope,
                                                 ArtifactFactory artifactFactory, MavenProject project )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
@@ -1172,7 +1176,8 @@ public class DefaultPluginManager
         }
         catch ( InvalidVersionSpecificationException e )
         {
-            throw new ArtifactResolutionException( "Error in dependency version", e );
+            // TODO: should that exception be derived from ArtifactResolutionException instead?
+            throw new ArtifactResolutionException( e.getMessage(), artifact );
         }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 artifact, context.getLocalRepository(),
@@ -1187,7 +1192,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void downloadDependencies( MavenProject project, MavenSession context, ArtifactResolver artifactResolver )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();
         List remoteArtifactRepositories = project.getRemoteArtifactRepositories();

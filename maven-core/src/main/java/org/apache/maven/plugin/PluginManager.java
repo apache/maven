@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -39,10 +40,11 @@ public interface PluginManager
     String ROLE = PluginManager.class.getName();
 
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws MojoExecutionException, PluginManagerException, ArtifactResolutionException, MojoFailureException;
+        throws MojoExecutionException, PluginManagerException, ArtifactResolutionException, MojoFailureException,
+        ArtifactNotFoundException;
 
     MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws PluginManagerException;
+        throws PluginManagerException, ArtifactNotFoundException;
 
     PluginDescriptor getPluginDescriptorForPrefix( String prefix );
 
@@ -51,10 +53,12 @@ public interface PluginManager
 
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException,
+        ArtifactNotFoundException;
 
     PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException;
+        throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException,
+        ArtifactNotFoundException;
 
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws ComponentLookupException, PluginManagerException;

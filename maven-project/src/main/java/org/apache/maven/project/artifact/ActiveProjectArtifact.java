@@ -21,6 +21,8 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
@@ -275,5 +277,17 @@ public class ActiveProjectArtifact
     public boolean isOptional()
     {
         return artifact.isOptional();
+    }
+
+    public ArtifactVersion getSelectedVersion()
+        throws OverConstrainedVersionException
+    {
+        return artifact.getSelectedVersion();
+    }
+
+    public boolean isSelectedVersionKnown()
+        throws OverConstrainedVersionException
+    {
+        return artifact.isSelectedVersionKnown();
     }
 }

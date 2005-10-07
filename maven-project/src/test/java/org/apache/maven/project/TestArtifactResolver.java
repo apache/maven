@@ -23,6 +23,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
@@ -192,7 +193,7 @@ public class TestArtifactResolver
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
                                                          ArtifactRepository localRepository, List remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories,
                                           new Source( artifactFactory, repositoryFactory, container ), filter );
@@ -201,7 +202,7 @@ public class TestArtifactResolver
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
                                                          List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
                                           new Source( artifactFactory, repositoryFactory, container ) );

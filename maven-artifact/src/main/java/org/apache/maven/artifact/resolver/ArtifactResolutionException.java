@@ -17,9 +17,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,38 +25,44 @@ import java.util.List;
  * @version $Id$
  */
 public class ArtifactResolutionException
-    extends Exception
+    extends AbstractArtifactResolutionException
 {
-    private String groupId;
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        List remoteRepositories, List path, Throwable t )
+    {
+        super( message, groupId, artifactId, version, type, remoteRepositories, path, t );
+    }
 
-    private String artifactId;
+    public ArtifactResolutionException( String message, Artifact artifact )
+    {
+        super( message, artifact );
+    }
 
-    private String version;
+    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
+    {
+        super( message, artifact, remoteRepositories );
+    }
 
-    private String type;
+    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    {
+        super( message, artifact, remoteRepositories, t );
+    }
 
-    private String downloadUrl;
-
-    private List remoteRepositories;
-
-    private final String originalMessage;
-
-    private final String path;
-
+/*
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
                                         List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
         super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, path ),
                t );
-        
+
         this.originalMessage = message;
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.type = type;
         this.version = version;
         this.remoteRepositories = remoteRepositories;
-        this.downloadUrl = downloadUrl;
         this.path = constructArtifactPath( path );
+        this.downloadUrl = downloadUrl;
     }
 
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
@@ -80,93 +84,6 @@ public class ArtifactResolutionException
         this.remoteRepositories = remoteRepositories;
         this.downloadUrl = downloadUrl;
         this.path = constructArtifactPath( path );
-    }
-    
-    public String getOriginalMessage()
-    {
-        return originalMessage;
-    }
-
-    private static final String LS = System.getProperty( "line.separator" );
-
-    private static String constructArtifactPath( List path )
-    {
-        StringBuffer sb = new StringBuffer();
-        
-        if ( path != null )
-        {
-            sb.append( LS );
-            sb.append( "Path to dependency: " );
-            sb.append( LS );
-            int num = 1;
-            for ( Iterator i = path.iterator(); i.hasNext(); )
-            {
-                sb.append( "\t" );
-                sb.append( num++ );
-                sb.append( ") " );
-                sb.append( i.next() );
-                sb.append( LS );
-            }
-        }
-        
-        return sb.toString();
-    }
-
-    private static String constructMessage( String message, String groupId, String artifactId, String version,
-                                            String type, List remoteRepositories, String downloadUrl, List path )
-    {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append( message );
-        sb.append( LS );
-        sb.append( "  " + groupId + ":" + artifactId + ":" + version + ":" + type );
-        sb.append( LS );
-        if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
-        {
-            sb.append( LS );
-            sb.append( "from the specified remote repositories:" );
-            sb.append( LS + "  " );
-
-            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-            {
-                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
-
-                sb.append( remoteRepository.getId() );
-                sb.append( " (" );
-                sb.append( remoteRepository.getUrl() );
-                sb.append( ")" );
-                if ( i.hasNext() )
-                {
-                    sb.append( ",\n  " );
-                }
-            }
-        }
-
-        sb.append( constructArtifactPath( path ) );
-        sb.append( LS );
-
-        if ( downloadUrl != null && !type.equals( "pom" ) )
-        {
-            sb.append( LS );
-            sb.append( LS );
-            sb.append( "Try downloading the file manually from" );
-            sb.append( LS );
-            sb.append( "  " + downloadUrl );
-            sb.append( LS );
-            sb.append( "and install it using the command: " );
-            sb.append( LS );
-            sb.append( "  m2 install:install-file -DgroupId=" );
-            sb.append( groupId );
-            sb.append( " -DartifactId=" );
-            sb.append( artifactId );
-            sb.append( " -Dversion=" );
-            sb.append( version );
-            sb.append( " -Dpackaging=" );
-            sb.append( type );
-            sb.append( " -Dfile=/path/to/file" );
-        }
-
-        return sb.toString();
     }
 
     public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
@@ -190,44 +107,10 @@ public class ArtifactResolutionException
     public ArtifactResolutionException( String message, Throwable cause )
     {
         super( message, cause );
-        
+
         this.originalMessage = message;
         this.path = "";
     }
 
-    public String getGroupId()
-    {
-        return groupId;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public List getRemoteRepositories()
-    {
-        return remoteRepositories;
-    }
-
-    public String getDownloadUrl()
-    {
-        return downloadUrl;
-    }
-    
-    public String getArtifactPath()
-    {
-        return path;
-    }
-    
+*/
 }

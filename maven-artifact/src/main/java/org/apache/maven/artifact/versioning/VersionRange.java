@@ -16,6 +16,8 @@ package org.apache.maven.artifact.versioning;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -377,27 +379,7 @@ public class VersionRange
         return restrictions;
     }
 
-    private ArtifactVersion max( ArtifactVersion v1, ArtifactVersion v2 )
-    {
-        if ( v1 == null )
-        {
-            return v2;
-        }
-        if ( v2 == null )
-        {
-            return v1;
-        }
-        else if ( v1.compareTo( v2 ) > 0 )
-        {
-            return v1;
-        }
-        else
-        {
-            return v2;
-        }
-    }
-
-    public ArtifactVersion getSelectedVersion()
+    public ArtifactVersion getSelectedVersion( Artifact artifact )
         throws OverConstrainedVersionException
     {
         ArtifactVersion version;
@@ -409,7 +391,7 @@ public class VersionRange
         {
             if ( restrictions.size() == 0 )
             {
-                throw new OverConstrainedVersionException( "The artifact has no valid ranges" );
+                throw new OverConstrainedVersionException( "The artifact has no valid ranges", artifact );
             }
             else
             {
@@ -425,7 +407,7 @@ public class VersionRange
         return version;
     }
 
-    public boolean isSelectedVersionKnown()
+    public boolean isSelectedVersionKnown( Artifact artifact )
         throws OverConstrainedVersionException
     {
         boolean value = false;
@@ -437,7 +419,7 @@ public class VersionRange
         {
             if ( restrictions.size() == 0 )
             {
-                throw new OverConstrainedVersionException( "The artifact has no valid ranges" );
+                throw new OverConstrainedVersionException( "The artifact has no valid ranges", artifact );
             }
             else
             {

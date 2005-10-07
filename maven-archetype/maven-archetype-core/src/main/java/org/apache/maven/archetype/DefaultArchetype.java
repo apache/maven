@@ -21,6 +21,7 @@ import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
@@ -66,8 +67,8 @@ public class DefaultArchetype
     private static final String DEFAULT_RESOURCE_DIR = "/src/main/resources";
 
     private static final String DEFAULT_SOURCE_DIR = "/src/main/java";
-    
-    
+
+
     private VelocityComponent velocity;
 
     private ArtifactResolver artifactResolver;
@@ -82,12 +83,8 @@ public class DefaultArchetype
     // artifactId = maven-foo-archetype
     // version = latest
 
-    public void createArchetype( String archetypeGroupId,
-                                 String archetypeArtifactId,
-                                 String archetypeVersion,
-                                 ArtifactRepository localRepository,
-                                 List remoteRepositories,
-                                 Map parameters )
+    public void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
+                                 ArtifactRepository localRepository, List remoteRepositories, Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException
     {
         // ----------------------------------------------------------------------
@@ -103,6 +100,11 @@ public class DefaultArchetype
         }
         catch ( ArtifactResolutionException e )
         {
+            // TODO: this is an error now, not "not found"
+            throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
             throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
         }
 
@@ -115,7 +117,8 @@ public class DefaultArchetype
             {
                 getLogger().info( "----------------------------------------------------------------------------" );
 
-                getLogger().info( "Using following parameters for creating Archetype: " + archetypeArtifactId + ":" + archetypeVersion );
+                getLogger().info( "Using following parameters for creating Archetype: " + archetypeArtifactId + ":" +
+                    archetypeVersion );
 
                 getLogger().info( "----------------------------------------------------------------------------" );
 
@@ -160,7 +163,8 @@ public class DefaultArchetype
 
             if ( is == null )
             {
-                throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR + " descriptor cannot be found." );
+                throw new ArchetypeDescriptorException(
+                    "The " + ARCHETYPE_DESCRIPTOR + " descriptor cannot be found." );
             }
 
             descriptor = (ArchetypeDescriptor) builder.build( new InputStreamReader( is ) );
@@ -192,7 +196,8 @@ public class DefaultArchetype
 
             if ( outputDirectoryFile.exists() )
             {
-                throw new ArchetypeTemplateProcessingException( outputDirectoryFile.getName() + " already exists - please run from a clean directory" );
+                throw new ArchetypeTemplateProcessingException(
+                    outputDirectoryFile.getName() + " already exists - please run from a clean directory" );
             }
 
             pomFile = new File( outputDirectoryFile, ARCHETYPE_POM );
@@ -263,14 +268,15 @@ public class DefaultArchetype
 
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "********************* Debug info for resources created from generated Model ***********************" );
+                getLogger().debug(
+                    "********************* Debug info for resources created from generated Model ***********************" );
             }
 
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Was build element found in generated POM?: " + foundBuildElement );
             }
-            
+
             // create source directory if specified in POM
             if ( foundBuildElement && null != build.getSourceDirectory() )
             {
@@ -285,7 +291,8 @@ public class DefaultArchetype
 
                 srcDirectory = StringUtils.replace( srcDirectory, "\\", "/" );
 
-                FileUtils.mkdir( outputDirectory + ( srcDirectory.startsWith( "/" ) ? srcDirectory : ( "/" + srcDirectory ) ) );
+                FileUtils.mkdir(
+                    outputDirectory + ( srcDirectory.startsWith( "/" ) ? srcDirectory : ( "/" + srcDirectory ) ) );
             }
 
             // create script source directory if specified in POM
@@ -303,7 +310,7 @@ public class DefaultArchetype
                 scriptSourceDirectory = StringUtils.replace( scriptSourceDirectory, "\\", "/" );
 
                 FileUtils.mkdir( outputDirectory + ( scriptSourceDirectory.startsWith( "/" ) ? scriptSourceDirectory
-                                                               : ( "/" + scriptSourceDirectory ) ) );
+                    : ( "/" + scriptSourceDirectory ) ) );
             }
 
             // create resource director(y/ies) if specified in POM
@@ -326,7 +333,8 @@ public class DefaultArchetype
 
                     resourceDirectory = StringUtils.replace( resourceDirectory, "\\", "/" );
 
-                    FileUtils.mkdir( outputDirectory + ( resourceDirectory.startsWith( "/" ) ? resourceDirectory : ( "/" + resourceDirectory ) ) );
+                    FileUtils.mkdir( outputDirectory +
+                        ( resourceDirectory.startsWith( "/" ) ? resourceDirectory : ( "/" + resourceDirectory ) ) );
                 }
             }
             // create test source directory if specified in POM
@@ -343,7 +351,8 @@ public class DefaultArchetype
 
                 testDirectory = StringUtils.replace( testDirectory, "\\", "/" );
 
-                FileUtils.mkdir( outputDirectory + ( testDirectory.startsWith( "/" ) ? testDirectory : ( "/" + testDirectory ) ) );
+                FileUtils.mkdir(
+                    outputDirectory + ( testDirectory.startsWith( "/" ) ? testDirectory : ( "/" + testDirectory ) ) );
             }
 
             // create test resource directory if specified in POM
@@ -367,11 +376,12 @@ public class DefaultArchetype
                     testResourceDirectory = StringUtils.replace( testResourceDirectory, "\\", "/" );
 
                     FileUtils.mkdir( outputDirectory + ( testResourceDirectory.startsWith( "/" ) ? testResourceDirectory
-                                                                   : ( "/" + testResourceDirectory ) ) );
+                        : ( "/" + testResourceDirectory ) ) );
                 }
             }
 
-            getLogger().info( "********************* End of debug info from resources from generated POM ***********************" );
+            getLogger().info(
+                "********************* End of debug info from resources from generated POM ***********************" );
 
             // ----------------------------------------------------------------------
             // Main
@@ -473,8 +483,8 @@ public class DefaultArchetype
         }
     }
 
-    protected void processTemplate( String outputDirectory, Context context, String template,
-                                   boolean packageInFileName, String packageName )
+    protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName,
+                                    String packageName )
         throws Exception
     {
         File f;

@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.wagon.events.TransferListener;
@@ -44,11 +45,11 @@ public interface MavenProjectBuilder
 
     MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager, TransferListener transferListener )
-        throws ProjectBuildingException, ArtifactResolutionException;
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
 
     MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
-        throws ProjectBuildingException, ArtifactResolutionException;
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
 
     // ----------------------------------------------------------------------
     //

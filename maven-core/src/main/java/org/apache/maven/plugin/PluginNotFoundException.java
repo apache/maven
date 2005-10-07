@@ -16,7 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 
 /**
  * Exception occurring trying to resolve a plugin.
@@ -25,11 +25,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  * @version $Id$
  */
 public class PluginNotFoundException
-    extends ArtifactResolutionException
+    extends ArtifactNotFoundException
 {
-    public PluginNotFoundException( ArtifactResolutionException e )
+    public PluginNotFoundException( ArtifactNotFoundException e )
     {
-        super( "Mojo could not be found - check that the goal name is correct", e.getGroupId(), e.getArtifactId(),
-               e.getVersion(), "maven-plugin", e.getRemoteRepositories(), e.getDownloadUrl(), e );
+        super( "Plugin could not be found - check that the goal name is correct", e.getGroupId(), e.getArtifactId(),
+               e.getVersion(), "maven-plugin", e.getRemoteRepositories(), e.getDownloadUrl(), e.getCause() );
     }
 }

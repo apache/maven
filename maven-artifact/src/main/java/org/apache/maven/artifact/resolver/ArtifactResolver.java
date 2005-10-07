@@ -38,37 +38,37 @@ public interface ArtifactResolver
     String ROLE = ArtifactResolver.class.getName();
 
     void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source,
                                                   List listeners )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
                                                   ArtifactRepository localRepository, List remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                                   ArtifactRepository localRepository, List remoteRepositories,
                                                   ArtifactMetadataSource source )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                                   ArtifactRepository localRepository, List remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                                   ArtifactRepository localRepository, List remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 }

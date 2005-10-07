@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -102,6 +103,10 @@ public class InstallWagonProviderTask
             throw new BuildException( "Unable to locate wagon provider in remote repository", e );
         }
         catch ( InvalidVersionSpecificationException e )
+        {
+            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+        }
+        catch ( ArtifactNotFoundException e )
         {
             throw new BuildException( "Unable to locate wagon provider in remote repository", e );
         }

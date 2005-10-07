@@ -20,6 +20,8 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -519,5 +521,17 @@ public class DefaultArtifact
     public boolean isOptional()
     {
         return optional;
+    }
+
+    public ArtifactVersion getSelectedVersion()
+        throws OverConstrainedVersionException
+    {
+        return versionRange.getSelectedVersion( this );
+    }
+
+    public boolean isSelectedVersionKnown()
+        throws OverConstrainedVersionException
+    {
+        return versionRange.isSelectedVersionKnown( this );
     }
 }

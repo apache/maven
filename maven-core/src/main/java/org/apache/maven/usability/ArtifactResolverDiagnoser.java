@@ -17,43 +17,45 @@ package org.apache.maven.usability;
  */
 
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
 {
-    
+
     private WagonManager wagonManager;
 
     public boolean canDiagnose( Throwable error )
     {
-        return DiagnosisUtils.containsInCausality( error, ArtifactResolutionException.class );
+        return DiagnosisUtils.containsInCausality( error, AbstractArtifactResolutionException.class );
     }
 
     public String diagnose( Throwable error )
     {
-        ArtifactResolutionException exception = (ArtifactResolutionException) DiagnosisUtils.getFromCausality( error, ArtifactResolutionException.class );
+        AbstractArtifactResolutionException exception = (AbstractArtifactResolutionException) DiagnosisUtils.getFromCausality(
+            error, ArtifactResolutionException.class );
 
         StringBuffer message = new StringBuffer();
-        
+
         message.append( "Failed to resolve artifact." );
-        message.append( "\n\n");
+        message.append( "\n\n" );
         message.append( exception.getMessage() );
-        
+
         if ( !wagonManager.isOnline() )
         {
             message.append( "\n" ).append( DiagnosisUtils.getOfflineWarning() );
         }
 
         Throwable root = DiagnosisUtils.getRootCause( exception );
-        
+
         if ( root != null )
         {
             message.append( "\nRoot Cause: " ).append( root.getMessage() );
         }
-        
+
         message.append( "\n" );
-        
+
         return message.toString();
     }
 

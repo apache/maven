@@ -17,6 +17,7 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Extension;
@@ -32,5 +33,6 @@ import org.codehaus.plexus.PlexusContainerException;
 public interface ExtensionManager
 {
     void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, InvalidVersionSpecificationException;
+        throws ArtifactResolutionException, PlexusContainerException, InvalidVersionSpecificationException,
+        ArtifactNotFoundException;
 }

@@ -1,5 +1,10 @@
 package org.apache.maven.artifact.versioning;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+
+import java.util.List;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -23,10 +28,16 @@ package org.apache.maven.artifact.versioning;
  * @version $Id$
  */
 public class OverConstrainedVersionException
-    extends Exception
+    extends ArtifactResolutionException
 {
-    public OverConstrainedVersionException( String msg )
+    public OverConstrainedVersionException( String msg, Artifact artifact )
     {
-        super( msg );
+        super( msg, artifact );
     }
+
+    public OverConstrainedVersionException( String msg, Artifact artifact, List remoteRepositories )
+    {
+        super( msg, artifact, remoteRepositories );
+    }
+
 }

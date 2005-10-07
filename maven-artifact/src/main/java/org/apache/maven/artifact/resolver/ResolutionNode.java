@@ -116,7 +116,7 @@ public class ResolutionNode
             {
                 // set the recommended version
                 VersionRange versionRange = artifact.getVersionRange();
-                String version = versionRange.getSelectedVersion().toString();
+                String version = artifact.getSelectedVersion().toString();
                 artifact.selectVersion( version );
             }
 

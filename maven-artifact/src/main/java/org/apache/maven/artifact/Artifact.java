@@ -20,6 +20,8 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.io.File;
@@ -154,4 +156,10 @@ public interface Artifact
     void setAvailableVersions( List versions );
 
     boolean isOptional();
+
+    ArtifactVersion getSelectedVersion()
+        throws OverConstrainedVersionException;
+
+    boolean isSelectedVersionKnown()
+        throws OverConstrainedVersionException;
 }

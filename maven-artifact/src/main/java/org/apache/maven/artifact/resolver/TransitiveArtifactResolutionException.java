@@ -32,9 +32,4 @@ public class TransitiveArtifactResolutionException
     {
         super( message, artifact, remoteRepositories, t );
     }
-
-    public TransitiveArtifactResolutionException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
 }

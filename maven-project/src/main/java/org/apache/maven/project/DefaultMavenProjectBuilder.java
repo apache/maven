@@ -24,6 +24,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -153,7 +154,7 @@ public class DefaultMavenProjectBuilder
 
     public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
                                                ProfileManager profileManager )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
         return buildWithDependencies( projectDescriptor, localRepository, profileManager, null );
     }
@@ -163,7 +164,7 @@ public class DefaultMavenProjectBuilder
      */
     public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
                                                ProfileManager profileManager, TransferListener transferListener )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
         MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, profileManager );
 
@@ -373,8 +374,8 @@ public class DefaultMavenProjectBuilder
 
                         if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
                         {
-                            getLogger().info(
-                                projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
+                            getLogger().info( projectArtifact.getArtifactId() +
+                                ": updating metadata due to status of '" + status + "'" );
                             try
                             {
                                 projectArtifact.setResolved( false );
@@ -385,6 +386,13 @@ public class DefaultMavenProjectBuilder
                             {
                                 getLogger().warn( "Error updating POM - using existing version" );
                                 getLogger().debug( "Cause", e );
+                            }
+                            catch ( ArtifactNotFoundException e )
+                            {
+                                getLogger().warn( "Error updating POM - not found. Removing local copy." );
+                                getLogger().debug( "Cause", e );
+                                file.delete();
+                                throw e;
                             }
                         }
                     }
@@ -407,10 +415,10 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ArtifactResolutionException e )
             {
-                // TODO: a not found would be better vs other errors
-                // only not found should have the below behaviour
-//                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
-
+                throw new ProjectBuildingException( "Error getting the POM in the repository", e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
                 model = createStubModel( projectArtifact );
             }
         }
@@ -422,7 +430,7 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
-    private Model createStubModel(Artifact projectArtifact)
+    private Model createStubModel( Artifact projectArtifact )
     {
         getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact.getId() + " *****\n" );
 
@@ -676,10 +684,9 @@ public class DefaultMavenProjectBuilder
                 "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
         }
 
-        project.setRemoteArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getRepositories(),
-                                                                                       artifactRepositoryFactory,
-                                                                                       container ) );
-        
+        project.setRemoteArtifactRepositories(
+            ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container ) );
+
         // TODO: these aren't taking active project artifacts into consideration in the reactor
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
         project.setReportArtifacts( createReportArtifacts( project.getReportPlugins() ) );

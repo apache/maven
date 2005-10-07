@@ -62,44 +62,37 @@ public class DefaultArtifactCollector
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
 
-        try
+        root.addDependencies( artifacts, remoteRepositories, filter );
+
+        recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
+                 listeners );
+
+        Set set = new HashSet();
+
+        for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
         {
-            root.addDependencies( artifacts, remoteRepositories, filter );
-
-            recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                     listeners );
-
-            Set set = new HashSet();
-
-            for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
+            List nodes = (List) i.next();
+            for ( Iterator j = nodes.iterator(); j.hasNext(); )
             {
-                List nodes = (List) i.next();
-                for ( Iterator j = nodes.iterator(); j.hasNext(); )
+                ResolutionNode node = (ResolutionNode) j.next();
+                if ( !node.equals( root ) && node.isActive() )
                 {
-                    ResolutionNode node = (ResolutionNode) j.next();
-                    if ( !node.equals( root ) && node.isActive() )
+                    Artifact artifact = node.getArtifact();
+
+                    // If it was optional, we don't add it or its children, just allow the update of the version and scope
+                    if ( !node.getArtifact().isOptional() )
                     {
-                        Artifact artifact = node.getArtifact();
+                        artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                        // If it was optional, we don't add it or its children, just allow the update of the version and scope
-                        if ( !node.getArtifact().isOptional() )
-                        {
-                            artifact.setDependencyTrail( node.getDependencyTrail() );
-
-                            set.add( node );
-                        }
+                        set.add( node );
                     }
                 }
             }
+        }
 
-            ArtifactResolutionResult result = new ArtifactResolutionResult();
-            result.setArtifactResolutionNodes( set );
-            return result;
-        }
-        catch ( OverConstrainedVersionException e )
-        {
-            throw new ArtifactResolutionException( "Unable to mediate dependency", e );
-        }
+        ArtifactResolutionResult result = new ArtifactResolutionResult();
+        result.setArtifactResolutionNodes( set );
+        return result;
     }
 
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
@@ -212,11 +205,9 @@ public class DefaultArtifactCollector
                         if ( artifact.getVersion() == null )
                         {
                             // set the recommended version
-                            VersionRange versionRange = artifact.getVersionRange();
-
                             // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
                             ArtifactVersion version;
-                            if ( !versionRange.isSelectedVersionKnown() )
+                            if ( !artifact.isSelectedVersionKnown() )
                             {
                                 List versions = artifact.getAvailableVersions();
                                 if ( versions == null )
@@ -226,6 +217,7 @@ public class DefaultArtifactCollector
                                     artifact.setAvailableVersions( versions );
                                 }
 
+                                VersionRange versionRange = artifact.getVersionRange();
                                 version = versionRange.matchVersion( versions );
 
                                 if ( version == null )
@@ -234,18 +226,19 @@ public class DefaultArtifactCollector
                                     {
                                         throw new OverConstrainedVersionException(
                                             "No versions are present in the repository for the artifact with a range " +
-                                                versionRange );
+                                                versionRange, artifact, remoteRepositories );
                                     }
                                     else
                                     {
                                         throw new OverConstrainedVersionException( "Couldn't find a version in " +
-                                            versions + " to match range " + versionRange );
+                                            versions + " to match range " + versionRange, artifact,
+                                                                                          remoteRepositories );
                                     }
                                 }
                             }
                             else
                             {
-                                version = versionRange.getSelectedVersion();
+                                version = artifact.getSelectedVersion();
                             }
 
                             artifact.selectVersion( version.toString() );

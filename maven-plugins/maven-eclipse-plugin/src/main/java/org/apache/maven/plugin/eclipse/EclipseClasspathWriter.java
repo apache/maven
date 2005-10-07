@@ -16,16 +16,10 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.logging.Log;
@@ -34,8 +28,16 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Writes eclipse .classpath file.
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:kenney@neonics.com">Kenney Westerhof</a>
  * @author <a href="mailto:fgiust@users.sourceforge.net">Fabrizio Giustina</a>
@@ -52,13 +54,13 @@ public class EclipseClasspathWriter
     }
 
     /**
-     * @todo the list of needed parameters is really long, maybe this should become a Plexus component
      * @param outputDirectory TODO
+     * @todo the list of needed parameters is really long, maybe this should become a Plexus component
      */
     protected void write( File projectBaseDir, File basedir, MavenProject project, List referencedReactorArtifacts,
-                         EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
-                         ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
-                         List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
+                          EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
+                          ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
+                          List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
         throws EclipsePluginException
     {
 
@@ -70,7 +72,8 @@ public class EclipseClasspathWriter
         }
         catch ( IOException ex )
         {
-            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
+            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
+                                              ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );
@@ -105,7 +108,7 @@ public class EclipseClasspathWriter
         writer.startElement( "classpathentry" ); //$NON-NLS-1$
         writer.addAttribute( "kind", "output" ); //$NON-NLS-1$ //$NON-NLS-2$
         writer.addAttribute( "path", EclipseUtils.toRelativeAndFixSeparator( projectBaseDir,  //$NON-NLS-1$  
-            outputDirectory, false ) );
+                                                                             outputDirectory, false ) );
         writer.endElement();
 
         // ----------------------------------------------------------------------
@@ -150,9 +153,10 @@ public class EclipseClasspathWriter
     }
 
     private void addDependency( XMLWriter writer, Artifact artifact, List referencedReactorArtifacts,
-                               ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                               ArtifactFactory artifactFactory, List remoteArtifactRepositories,
-                               boolean downloadSources )
+                                ArtifactRepository localRepository, ArtifactResolver artifactResolver,
+                                ArtifactFactory artifactFactory, List remoteArtifactRepositories,
+                                boolean downloadSources )
+        throws EclipsePluginException
     {
 
         String path;
@@ -183,9 +187,9 @@ public class EclipseClasspathWriter
 
             if ( downloadSources )
             {
-            	Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories,
-                                                                  localRepository, artifactResolver, artifactFactory );
-            	
+                Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories, localRepository,
+                                                                  artifactResolver, artifactFactory );
+
                 if ( !sourceArtifact.isResolved() )
                 {
                     log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
@@ -194,12 +198,12 @@ public class EclipseClasspathWriter
                 else
                 {
                     log.debug( Messages.getString( "EclipseClasspathWriter.sourcesavailable", //$NON-NLS-1$
-                                                   new Object[] {
-                                                       sourceArtifact.getArtifactId(),
-                                                       sourceArtifact.getFile().getAbsolutePath() } ) );
+                                                   new Object[]{sourceArtifact.getArtifactId(),
+                                                       sourceArtifact.getFile().getAbsolutePath()} ) );
 
                     sourcepath = "M2_REPO/" //$NON-NLS-1$
-                        + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifact.getFile().getAbsolutePath(), false );
+                        + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile,
+                                                                  sourceArtifact.getFile().getAbsolutePath(), false );
                 }
 
             }
@@ -220,22 +224,26 @@ public class EclipseClasspathWriter
 
     }
 
-    
-    private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                                       ArtifactFactory artifactFactory )
+
+    private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories,
+                                             ArtifactRepository localRepository, ArtifactResolver artifactResolver,
+                                             ArtifactFactory artifactFactory )
+        throws EclipsePluginException
     {
         // source artifact: use the "sources" classifier added by the source plugin
-        Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact
-            .getArtifactId(), artifact.getVersion(), "java-source", "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
+        Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(),
+                                                                                artifact.getArtifactId(),
+                                                                                artifact.getVersion(), "java-source",
+                                                                                "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
 
         try
         {
             log.debug( Messages.getString( "EclipseClasspathWriter.lookingforsources", //$NON-NLS-1$
-                                               sourceArtifact.getArtifactId() ) );
+                                           sourceArtifact.getArtifactId() ) );
 
             artifactResolver.resolve( sourceArtifact, remoteArtifactRepositories, localRepository );
         }
-        catch ( ArtifactResolutionException e )
+        catch ( ArtifactNotFoundException e )
         {
             // ignore, the jar has not been found
             if ( log.isDebugEnabled() )
@@ -243,7 +251,11 @@ public class EclipseClasspathWriter
                 log.debug( "Cannot resolve source artifact", e );
             }
         }
-        
+        catch ( ArtifactResolutionException e )
+        {
+            throw new EclipsePluginException( "Error getting soruce artifact", e );
+        }
+
         return sourceArtifact;
     }
 }

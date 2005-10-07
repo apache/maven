@@ -205,7 +205,7 @@ public class ArtifactResolverTest
             artifactResolver.resolve( k, remoteRepositories(), localRepository() );
             fail( "Resolution succeeded when it should have failed" );
         }
-        catch ( ArtifactResolutionException expected )
+        catch ( ArtifactNotFoundException expected )
         {
             assertTrue( true );
         }

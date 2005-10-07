@@ -18,6 +18,7 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -255,7 +256,7 @@ public class DefaultMaven
                             logError( response );
                         }
                     }
-                    else if ( exception instanceof ArtifactResolutionException )
+                    else if ( exception instanceof ArtifactNotFoundException )
                     {
                         logFailure( response, exception, null );
                     }
@@ -487,13 +488,8 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm )
     {
-        return new MavenSession( container,
-                                 request.getSettings(),
-                                 request.getLocalRepository(),
-                                 request.getEventDispatcher(),
-                                 rpm,
-                                 request.getGoals(),
-                                 request.getBaseDirectory(),
+        return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
+                                 request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory(),
                                  request.getExecutionProperties() );
     }
 
