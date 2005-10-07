@@ -161,7 +161,7 @@ public class AssemblyMojo
                 throw new MojoExecutionException( "Error creating assembly", e );
             }
 
-            projectHelper.attachArtifact( project, format, format + "-assembly", destFile );
+            projectHelper.attachArtifact( project, format, assembly.getId(), destFile );
         }
     }
 
