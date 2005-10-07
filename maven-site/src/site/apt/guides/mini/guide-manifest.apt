@@ -77,7 +77,7 @@ url: http://maven.apache.org
             <index>true</true>
             -->
             <manifest>
-              <mainClass>com.mycompany.app.App</mainClass/>
+              <mainClass>com.mycompany.app.App</mainClass>
               <packageName>com.mycompany.app</packageName>
               <!-- options
               <manifestFile>/path/to/MANIFEST.MF</manifestFile>

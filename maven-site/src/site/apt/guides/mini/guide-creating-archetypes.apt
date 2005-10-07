@@ -1,0 +1,30 @@
+ ------
+ Guide to Creating Archetypes
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Guide to Creating Archetypes
+
++----+
+
+archetype
+|-- pom.xml
+`-- src
+    `-- main
+        `-- resources
+            |-- META-INF
+            |   `-- archetype.xml
+            `-- archetype-resources
+                |-- pom.xml
+                `-- src
+                    |-- main
+                    |   `-- java
+                    |       `-- App.java
+                    `-- test
+                        `-- java
+                            `-- AppTest.java
+
++----+
