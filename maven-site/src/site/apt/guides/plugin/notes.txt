@@ -1,0 +1,2 @@
+Packaging plugins are required to call project.getArtifact().setFile(
+fileYouGenerated ) to properly work in the reactor.
