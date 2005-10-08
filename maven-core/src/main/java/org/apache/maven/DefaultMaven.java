@@ -154,12 +154,14 @@ public class DefaultMaven
 
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
 
+        loadSettingsProfiles( globalProfileManager, request.getSettings() );
+
+        getLogger().info( "Scanning for projects..." );
+
         boolean foundProjects = true;
         List projects;
         try
         {
-            loadSettingsProfiles( globalProfileManager, request.getSettings() );
-
             List files = getProjectFiles( request );
 
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
@@ -193,7 +195,7 @@ public class DefaultMaven
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
 
-        ReactorManager rm = null;
+        ReactorManager rm;
         try
         {
             rm = new ReactorManager( projects );
@@ -208,6 +210,17 @@ public class DefaultMaven
         catch ( CycleDetectedException e )
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
+        }
+
+        if ( rm.hasMultipleProjects() )
+        {
+            getLogger().info( "Reactor build order: " );
+
+            for ( Iterator i = rm.getSortedProjects().iterator(); i.hasNext(); )
+            {
+                MavenProject project = (MavenProject) i.next();
+                getLogger().info( "  " + project.getName() );
+            }
         }
 
         try
