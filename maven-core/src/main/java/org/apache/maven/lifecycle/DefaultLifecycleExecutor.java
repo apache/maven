@@ -201,7 +201,8 @@ public class DefaultLifecycleExecutor
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
                                       MavenProject rootProject, EventDispatcher dispatcher,
                                       MavenExecutionResponse response )
-        throws ArtifactNotFoundException, MojoExecutionException, LifecycleExecutionException, MojoFailureException
+        throws ArtifactNotFoundException, MojoExecutionException, LifecycleExecutionException, MojoFailureException,
+        ArtifactResolutionException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
         {
@@ -368,7 +369,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task )
-        throws MojoExecutionException, MojoFailureException, ArtifactNotFoundException
+        throws MojoExecutionException, MojoFailureException, ArtifactNotFoundException, ArtifactResolutionException
     {
         if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
         {
@@ -385,6 +386,10 @@ public class DefaultLifecycleExecutor
             else if ( e instanceof ArtifactNotFoundException )
             {
                 throw (ArtifactNotFoundException) e;
+            }
+            else if ( e instanceof ArtifactResolutionException )
+            {
+                throw (ArtifactResolutionException) e;
             }
             else
             {
