@@ -37,6 +37,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -75,15 +76,15 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String key = "m2.name";
         String checkValue = "value";
-        
+
         Properties properties = new Properties();
         properties.setProperty( key, checkValue );
-        
+
         Model model = new Model();
         model.setProperties( properties );
-        
+
         MavenProject project = new MavenProject( model );
-        
+
         ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
 
         Object value = ee.evaluate( "${" + key + "}" );
@@ -143,13 +144,15 @@ public class PluginParameterExpressionEvaluatorTest
         throws CycleDetectedException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".", new Properties() );
+                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".",
+                                 new Properties(), new Date() );
     }
 
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null, new Properties() );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null,
+                                                                             new Properties() );
         Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
         assertEquals( "local", ( (DefaultArtifactRepository) value ).getId() );
@@ -165,7 +168,8 @@ public class PluginParameterExpressionEvaluatorTest
         Model model = new Model();
         model.setBuild( build );
 
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null, new Properties() );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null,
+                                                                             new Properties() );
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
 
@@ -201,7 +205,8 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenProject( new Model() );
     }
 
-    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor,
+                                                           Properties executionProperties )
         throws Exception
     {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
@@ -218,7 +223,8 @@ public class PluginParameterExpressionEvaluatorTest
 
         MojoExecution mojoExecution = new MojoExecution( mojo );
 
-        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project, executionProperties );
+        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project,
+                                                       executionProperties );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version )
