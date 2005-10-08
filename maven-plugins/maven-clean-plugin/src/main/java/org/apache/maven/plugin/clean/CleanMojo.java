@@ -28,7 +28,7 @@ import java.io.File;
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$
  */
-public class CleanPlugin
+public class CleanMojo
     extends AbstractMojo
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
