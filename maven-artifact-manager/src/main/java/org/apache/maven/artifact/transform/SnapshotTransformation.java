@@ -133,12 +133,9 @@ public class SnapshotTransformation
 
         if ( !wagonManager.isOnline() )
         {
-            getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-
-            getLogger().info( "System is offline. Assuming build number of 0 for " + metadata.getGroupId() + ":" +
-                metadata.getArtifactId() + " snapshot." );
-
-            return 0;
+            // build number is a required feature for metadata consistency
+            throw new ArtifactMetadataRetrievalException(
+                "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
         }
 
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );

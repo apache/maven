@@ -59,8 +59,8 @@ public class DefaultArtifactDeployer
     {
         if ( !wagonManager.isOnline() )
         {
-            getLogger().warn( "System is offline. Cannot deploy artifact: " + artifact + "." );
-            return;
+            // deployment shouldn't silently fail when offline
+            throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
         }
 
         try

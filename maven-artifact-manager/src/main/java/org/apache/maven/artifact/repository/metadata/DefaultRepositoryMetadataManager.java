@@ -85,7 +85,7 @@ public class DefaultRepositoryMetadataManager
                     {
                         getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
 
-                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy() );
+                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
                     }
 
                     // touch file so that this is not checked again until interval has passed
@@ -247,14 +247,15 @@ public class DefaultRepositoryMetadataManager
     {
         if ( !wagonManager.isOnline() )
         {
-            getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-            return;
+            // metadata is required for deployment, can't be offline
+            throw new ArtifactMetadataRetrievalException(
+                "System is offline. Cannot resolve required metadata:\n" + metadata.extendedToString() );
         }
 
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
-        resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
 
         if ( file.exists() )
         {
@@ -264,12 +265,23 @@ public class DefaultRepositoryMetadataManager
     }
 
     private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,
-                                String checksumPolicy )
+                                String checksumPolicy, boolean allowBlacklisting )
+        throws ArtifactMetadataRetrievalException
     {
         if ( !wagonManager.isOnline() )
         {
-            getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-            return;
+            if ( !allowBlacklisting )
+            {
+                getLogger().debug(
+                    "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+                return;
+            }
+            else
+            {
+                // metadata is required for deployment, can't be offline
+                throw new ArtifactMetadataRetrievalException(
+                    "System is offline. Cannot resolve required metadata:\n" + metadata.extendedToString() );
+            }
         }
 
         try
@@ -292,7 +304,7 @@ public class DefaultRepositoryMetadataManager
                 " due to an error: " + e.getCause().getMessage() );
             getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
-            repository.setBlacklisted( true );
+            repository.setBlacklisted( allowBlacklisting );
         }
     }
 
@@ -307,8 +319,9 @@ public class DefaultRepositoryMetadataManager
     {
         if ( !wagonManager.isOnline() )
         {
-            getLogger().warn( "System is offline. Cannot deploy metadata:\n" + metadata.extendedToString() + "\n\n" );
-            return;
+            // deployment shouldn't silently fail when offline
+            throw new ArtifactMetadataRetrievalException(
+                "System is offline. Cannot deploy metadata:\n" + metadata.extendedToString() );
         }
 
         getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
@@ -316,7 +329,7 @@ public class DefaultRepositoryMetadataManager
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
 
-        resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
 
         metadata.storeInLocalRepository( localRepository, deploymentRepository );
 
