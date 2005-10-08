@@ -68,9 +68,17 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
-        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+        try
+        {
+            Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+            fail( "Should have failed to interpolate with invalid reference" );
+        }
+        catch ( ModelInterpolationException expected )
+        {
+            assertTrue( true );
+        }
 
-        assertEquals( "${something}", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
+//        assertEquals( "${something}", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
     }
 
     public void testTwoReferences()
