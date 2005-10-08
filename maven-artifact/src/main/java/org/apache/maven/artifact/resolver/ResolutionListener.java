@@ -1,6 +1,7 @@
 package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 /*
 * Copyright 2001-2005 The Apache Software Foundation.
@@ -48,6 +49,8 @@ public interface ResolutionListener
 
     int SELECT_VERSION_FROM_RANGE = 10;
 
+    int RESTRICT_RANGE = 11;
+
     void testArtifact( Artifact node );
 
     void startProcessChildren( Artifact artifact );
@@ -67,4 +70,6 @@ public interface ResolutionListener
     void updateScopeCurrentPom( Artifact artifact, String scope );
 
     void selectVersionFromRange( Artifact artifact );
+
+    void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange );
 }

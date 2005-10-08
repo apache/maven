@@ -322,8 +322,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
 
-        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories, null,
-                      null );
+        return build( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -451,7 +450,7 @@ public class DefaultMavenProjectBuilder
 
     private Model createStubModel( Artifact projectArtifact )
     {
-        getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact.getId() + " *****\n" );
+        getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact + " *****\n" );
 
         Model model = new Model();
         model.setModelVersion( "4.0.0" );

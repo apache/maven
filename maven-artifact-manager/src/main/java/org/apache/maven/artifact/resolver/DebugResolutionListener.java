@@ -17,6 +17,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -53,39 +54,45 @@ public class DebugResolutionListener
 
     public void includeArtifact( Artifact artifact )
     {
-        logger.debug( indent + artifact.getId() + " (selected for " + artifact.getScope() + ")" );
+        logger.debug( indent + artifact + " (selected for " + artifact.getScope() + ")" );
     }
 
     public void omitForNearer( Artifact omitted, Artifact kept )
     {
-        logger.debug( indent + omitted.getId() + " (removed - nearer found: " + kept.getVersion() + ")" );
+        logger.debug( indent + omitted + " (removed - nearer found: " + kept.getVersion() + ")" );
     }
 
     public void omitForCycle( Artifact omitted )
     {
-        logger.debug( indent + omitted.getId() + " (removed - causes a cycle in the graph)" );
+        logger.debug( indent + omitted + " (removed - causes a cycle in the graph)" );
     }
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        logger.debug( indent + artifact.getId() + " (not setting scope to: " + scope + "; local scope " +
-            artifact.getScope() + " wins)" );
+        logger.debug( indent + artifact + " (not setting scope to: " + scope + "; local scope " + artifact.getScope() +
+            " wins)" );
     }
 
     public void updateScope( Artifact artifact, String scope )
     {
-        logger.debug( indent + artifact.getId() + " (setting scope to: " + scope + ")" );
+        logger.debug( indent + artifact + " (setting scope to: " + scope + ")" );
     }
 
     public void selectVersionFromRange( Artifact artifact )
     {
-        logger.debug( indent + artifact.getId() + " (setting version to: " + artifact.getVersion() + " from range: " +
+        logger.debug( indent + artifact + " (setting version to: " + artifact.getVersion() + " from range: " +
             artifact.getVersionRange() + ")" );
+    }
+
+    public void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange )
+    {
+        logger.debug( indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: " +
+            replacement.getVersionRange() + " to: " + newRange + " )" );
     }
 
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
-        String msg = indent + artifact.getId();
+        String msg = indent + artifact;
         msg += " (";
         if ( replacement.getVersion() != null )
         {

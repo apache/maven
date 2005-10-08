@@ -83,7 +83,7 @@ public class DefaultArtifactResolver
                 if ( !systemFile.exists() )
                 {
                     throw new ArtifactNotFoundException(
-                        "System artifact: " + artifact.getId() + " not found in path: " + systemFile, artifact );
+                        "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
                 }
                 else
                 {
@@ -117,7 +117,7 @@ public class DefaultArtifactResolver
                 {
                     if ( !wagonManager.isOnline() )
                     {
-                        getLogger().debug( "System is offline. Cannot resolve artifact: " + artifact.getId() + "." );
+                        getLogger().debug( "System is offline. Cannot resolve artifact: " + artifact + "." );
 
                         return;
                     }

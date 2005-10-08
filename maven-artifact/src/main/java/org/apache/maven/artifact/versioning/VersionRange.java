@@ -221,11 +221,17 @@ public class VersionRange
                 }
             }
         }
-        else
+        else if ( recommendedVersion != null )
         {
             // no range, so the recommended version is valid
             version = recommendedVersion;
         }
+/* TODO: should throw this immediately, but need artifact
+        else
+        {
+            throw new OverConstrainedVersionException( "Restricting incompatible version ranges" );
+        }
+*/
 
         return new VersionRange( version, restrictions );
     }
@@ -500,5 +506,10 @@ public class VersionRange
             }
         }
         return matched;
+    }
+
+    public boolean hasRestrictions()
+    {
+        return !restrictions.isEmpty() && recommendedVersion == null;
     }
 }

@@ -148,7 +148,14 @@ public class DefaultArtifactCollector
                     {
                         // TODO: shouldn't need to double up on this work, only done for simplicity of handling recommended
                         // version but the restriction is identical
-                        previous.getArtifact().setVersionRange( previousRange.restrict( currentRange ) );
+                        VersionRange newRange = previousRange.restrict( currentRange );
+                        // TODO: ick. this forces the OCE that should have come from the previous call. It is still correct
+                        if ( newRange.isSelectedVersionKnown( previous.getArtifact() ) )
+                        {
+                            fireEvent( ResolutionListener.RESTRICT_RANGE, listeners, node, previous.getArtifact(),
+                                       newRange );
+                        }
+                        previous.getArtifact().setVersionRange( newRange );
                         node.getArtifact().setVersionRange( currentRange.restrict( previousRange ) );
                     }
 
@@ -318,6 +325,12 @@ public class DefaultArtifactCollector
 
     private void fireEvent( int event, List listeners, ResolutionNode node, Artifact replacement )
     {
+        fireEvent( event, listeners, node, replacement, null );
+    }
+
+    private void fireEvent( int event, List listeners, ResolutionNode node, Artifact replacement,
+                            VersionRange newRange )
+    {
         for ( Iterator i = listeners.iterator(); i.hasNext(); )
         {
             ResolutionListener listener = (ResolutionListener) i.next();
@@ -337,7 +350,12 @@ public class DefaultArtifactCollector
                     listener.includeArtifact( node.getArtifact() );
                     break;
                 case ResolutionListener.OMIT_FOR_NEARER:
-                    listener.omitForNearer( node.getArtifact(), replacement );
+                    String version = node.getArtifact().getVersion();
+                    String replacementVersion = replacement.getVersion();
+                    if ( version != null ? !version.equals( replacementVersion ) : replacementVersion != null )
+                    {
+                        listener.omitForNearer( node.getArtifact(), replacement );
+                    }
                     break;
                 case ResolutionListener.OMIT_FOR_CYCLE:
                     listener.omitForCycle( node.getArtifact() );
@@ -353,6 +371,13 @@ public class DefaultArtifactCollector
                     break;
                 case ResolutionListener.SELECT_VERSION_FROM_RANGE:
                     listener.selectVersionFromRange( node.getArtifact() );
+                    break;
+                case ResolutionListener.RESTRICT_RANGE:
+                    if ( node.getArtifact().getVersionRange().hasRestrictions() ||
+                        replacement.getVersionRange().hasRestrictions() )
+                    {
+                        listener.restrictRange( node.getArtifact(), replacement, newRange );
+                    }
                     break;
                 default:
                     throw new IllegalStateException( "Unknown event: " + event );

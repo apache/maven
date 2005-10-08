@@ -636,7 +636,7 @@ public class PrepareReleaseMojo
 
                 message.append( "    " );
 
-                message.append( artifact.getId() );
+                message.append( artifact );
 
                 message.append( "\n" );
             }
@@ -901,8 +901,8 @@ public class PrepareReleaseMojo
 
                             if ( ArtifactUtils.isSnapshot( version ) )
                             {
-                                throw new MojoExecutionException( "Unresolved SNAPSHOT version of: " +
-                                    artifact.getId() + ". Cannot proceed with release." );
+                                throw new MojoExecutionException(
+                                    "Unresolved SNAPSHOT version of: " + artifact + ". Cannot proceed with release." );
                             }
                         }
 
@@ -1155,7 +1155,7 @@ public class PrepareReleaseMojo
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
-                    throw new MojoExecutionException( "Cannot resolve " + artifactUsage + ": " + artifact.getId(), e );
+                    throw new MojoExecutionException( "Cannot resolve " + artifactUsage + ": " + artifact, e );
                 }
             }
 

@@ -109,7 +109,7 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidModelException e )
                 {
-                    getLogger().warn( "POM for: \'" + pomArtifact.getId() +
+                    getLogger().warn( "POM for: \'" + pomArtifact +
                         "\' does not appear to be valid. Its will be ignored for artifact resolution." );
 
                     project = null;

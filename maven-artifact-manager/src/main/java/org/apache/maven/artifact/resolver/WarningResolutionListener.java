@@ -17,6 +17,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.HashSet;
@@ -69,7 +70,7 @@ public class WarningResolutionListener
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
-            logger.warn( "\n\tArtifact " + artifact.getId() + " retains local scope '" + artifact.getScope() +
+            logger.warn( "\n\tArtifact " + artifact + " retains local scope '" + artifact.getScope() +
                 "' overriding broader scope '" + scope + "'\n" +
                 "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
             ignoredArtifacts.add( artifact );
@@ -85,6 +86,10 @@ public class WarningResolutionListener
     }
 
     public void selectVersionFromRange( Artifact artifact )
+    {
+    }
+
+    public void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange )
     {
     }
 }

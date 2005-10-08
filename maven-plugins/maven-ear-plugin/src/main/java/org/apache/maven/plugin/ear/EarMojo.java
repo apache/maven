@@ -130,7 +130,7 @@ public class EarMojo
                 if ( !sourceFile.isFile() )
                 {
                     throw new MojoExecutionException( "Cannot copy a directory: " + sourceFile.getAbsolutePath() +
-                        "; Did you package/install " + module.getArtifact().getId() + "?" );
+                        "; Did you package/install " + module.getArtifact() + "?" );
                 }
 
                 FileUtils.copyFile( module.getArtifact().getFile(), destinationFile );

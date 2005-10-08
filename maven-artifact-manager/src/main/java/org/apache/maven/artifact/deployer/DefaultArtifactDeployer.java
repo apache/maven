@@ -59,10 +59,10 @@ public class DefaultArtifactDeployer
     {
         if ( !wagonManager.isOnline() )
         {
-            getLogger().warn( "System is offline. Cannot deploy artifact: " + artifact.getId() + "." );
+            getLogger().warn( "System is offline. Cannot deploy artifact: " + artifact + "." );
             return;
         }
-        
+
         try
         {
             transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
