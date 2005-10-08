@@ -35,6 +35,7 @@
     <menu name="Overview">
       <item name="Introduction" href="introduction.html"/>
       <item name="How to Use" href="howto.html"/>
+      <item name="Descriptor Format" href="assembly.html"/>
       <item name="Predefined Descriptors" href="descriptor.html"/>
     </menu>
     ${reports}
