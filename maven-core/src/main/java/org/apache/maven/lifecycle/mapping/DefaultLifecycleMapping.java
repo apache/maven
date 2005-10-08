@@ -16,8 +16,10 @@ package org.apache.maven.lifecycle.mapping;
  * limitations under the License.
  */
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Lifecycle mapping for a POM.
@@ -28,10 +30,24 @@ import java.util.HashMap;
 public class DefaultLifecycleMapping
     implements LifecycleMapping
 {
-    private Map phases = new HashMap();
+    private List lifecycles;
 
-    public Map getPhases()
+    private Map lifecycleMap;
+
+    public Map getPhases( String lifecycle )
     {
-        return phases;
+        if ( lifecycleMap == null )
+        {
+            lifecycleMap = new HashMap();
+
+            for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
+            {
+                Lifecycle l = (Lifecycle) i.next();
+                lifecycleMap.put( l.getId(), l );
+            }
+        }
+        Lifecycle l = (Lifecycle) lifecycleMap.get( lifecycle );
+        return l != null ? l.getPhases() : null;
     }
+
 }

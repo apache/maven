@@ -42,7 +42,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
-import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -84,11 +83,13 @@ public class DefaultLifecycleExecutor
 
     private ExtensionManager extensionManager;
 
-    private List phases;
+    private List lifecycles;
 
     private ArtifactHandlerManager artifactHandlerManager;
 
     private List defaultReports;
+
+    private Map phaseToLifecycleMap;
 
     // ----------------------------------------------------------------------
     //
@@ -416,7 +417,7 @@ public class DefaultLifecycleExecutor
 
                 // if it's a phase, then we don't need to check whether it's an aggregator.
                 // simply add it to the current task partition.
-                if ( phases.contains( task ) )
+                if ( getPhaseToLifecycleMap().containsKey( task ) )
                 {
                     if ( currentSegment != null && currentSegment.aggregate() )
                     {
@@ -507,11 +508,13 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, ArtifactNotFoundException, MojoExecutionException,
         ArtifactResolutionException, MojoFailureException
     {
-        if ( phases.contains( task ) )
+        if ( getPhaseToLifecycleMap().containsKey( task ) )
         {
+            Lifecycle lifecycle = getLifecycleForPhase( task );
+
             // we have a lifecycle phase, so lets bind all the necessary goals
-            Map lifecycleMappings = constructLifecycleMappings( session, task, project );
-            executeGoalWithLifecycle( task, session, lifecycleMappings, project, response );
+            Map lifecycleMappings = constructLifecycleMappings( session, task, project, lifecycle );
+            executeGoalWithLifecycle( task, session, lifecycleMappings, project, response, lifecycle );
         }
         else
         {
@@ -520,11 +523,11 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings,
-                                           MavenProject project, MavenExecutionResponse response )
+                                           MavenProject project, MavenExecutionResponse response, Lifecycle lifecycle )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException,
         ArtifactNotFoundException
     {
-        List goals = processGoalChain( task, lifecycleMappings );
+        List goals = processGoalChain( task, lifecycleMappings, lifecycle );
 
         executeGoals( goals, session, project, response );
     }
@@ -759,13 +762,15 @@ public class DefaultLifecycleExecutor
         Map lifecycleMappings = null;
         if ( targetPhase != null )
         {
+            Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
+
             // Create new lifecycle
-            lifecycleMappings = constructLifecycleMappings( session, targetPhase, project );
+            lifecycleMappings = constructLifecycleMappings( session, targetPhase, project, lifecycle );
 
             String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
             if ( executeLifecycle != null )
             {
-                Lifecycle lifecycleOverlay;
+                org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
                 try
                 {
                     lifecycleOverlay = pluginDescriptor.getLifecycleMapping( executeLifecycle );
@@ -810,7 +815,9 @@ public class DefaultLifecycleExecutor
         MavenProject executionProject = new MavenProject( project );
         if ( targetPhase != null )
         {
-            executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject, response );
+            Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
+
+            executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject, response, lifecycle );
         }
         else
         {
@@ -819,6 +826,18 @@ public class DefaultLifecycleExecutor
             executeGoals( Collections.singletonList( new MojoExecution( desc ) ), session, executionProject, response );
         }
         project.setExecutionProject( executionProject );
+    }
+
+    private Lifecycle getLifecycleForPhase( String phase )
+        throws LifecycleExecutionException
+    {
+        Lifecycle lifecycle = (Lifecycle) getPhaseToLifecycleMap().get( phase );
+
+        if ( lifecycle == null )
+        {
+            throw new LifecycleExecutionException( "Unable to find lifecycle for phase '" + phase + "'" );
+        }
+        return lifecycle;
     }
 
     private MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
@@ -866,11 +885,12 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project )
+    private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project,
+                                            Lifecycle lifecycle )
         throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
     {
         // first, bind those associated with the packaging
-        Map lifecycleMappings = bindLifecycleForPackaging( session, selectedPhase, project );
+        Map lifecycleMappings = bindLifecycleForPackaging( session, selectedPhase, project, lifecycle );
 
         // next, loop over plugins and for any that have a phase, bind it
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
@@ -883,14 +903,15 @@ public class DefaultLifecycleExecutor
         return lifecycleMappings;
     }
 
-    private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project )
+    private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project,
+                                           Lifecycle lifecycle )
         throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
     {
-        Map mappings = findMappingsForLifecycle( session, project );
+        Map mappings = findMappingsForLifecycle( session, project, lifecycle );
 
         Map lifecycleMappings = new HashMap();
 
-        for ( Iterator i = phases.iterator(); i.hasNext(); )
+        for ( Iterator i = lifecycle.getPhases().iterator(); i.hasNext(); )
         {
             String phase = (String) i.next();
 
@@ -926,16 +947,21 @@ public class DefaultLifecycleExecutor
         return lifecycleMappings;
     }
 
-    private Map findMappingsForLifecycle( MavenSession session, MavenProject project )
+    private Map findMappingsForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
         throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
     {
         String packaging = project.getPackaging();
-        LifecycleMapping m;
+        Map mappings = null;
 
         try
         {
-            m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session.getSettings(),
-                                                  session.getLocalRepository() );
+            LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging,
+                                                                   session.getSettings(),
+                                                                   session.getLocalRepository() );
+            if ( m != null )
+            {
+                mappings = m.getPhases( lifecycle.getId() );
+            }
         }
         catch ( PluginVersionResolutionException e )
         {
@@ -948,20 +974,39 @@ public class DefaultLifecycleExecutor
                 "Cannot load extension plugin obtaining lifecycle mappings for: \'" + packaging + "\'.", e );
         }
 
-        if ( m == null )
+        Map defaultMappings = lifecycle.getDefaultPhases();
+
+        if ( mappings == null )
         {
             try
             {
-                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+                LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+                mappings = m.getPhases( lifecycle.getId() );
             }
             catch ( ComponentLookupException e )
             {
-                throw new LifecycleExecutionException(
-                    "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
+                if ( defaultMappings == null )
+                {
+                    throw new LifecycleExecutionException(
+                        "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
+                }
             }
         }
 
-        return m.getPhases();
+        if ( mappings == null )
+        {
+            if ( defaultMappings == null )
+            {
+                throw new LifecycleExecutionException(
+                    "Cannot find lifecycle mapping for packaging: \'" + packaging + "\', and there is no default" );
+            }
+            else
+            {
+                mappings = defaultMappings;
+            }
+        }
+
+        return mappings;
     }
 
     private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
@@ -1159,16 +1204,16 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private List processGoalChain( String task, Map phaseMap )
+    private List processGoalChain( String task, Map phaseMap, Lifecycle lifecycle )
     {
         List goals = new ArrayList();
 
         // only execute up to the given phase
-        int index = phases.indexOf( task );
+        int index = lifecycle.getPhases().indexOf( task );
 
         for ( int i = 0; i <= index; i++ )
         {
-            String p = (String) phases.get( i );
+            String p = (String) lifecycle.getPhases().get( i );
 
             List phaseGoals = (List) phaseMap.get( p );
 
@@ -1185,7 +1230,7 @@ public class DefaultLifecycleExecutor
         throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
     {
         String goal;
-        Plugin plugin = null;
+        Plugin plugin;
 
         PluginDescriptor pluginDescriptor = null;
 
@@ -1331,6 +1376,38 @@ public class DefaultLifecycleExecutor
     protected void line()
     {
         getLogger().info( "----------------------------------------------------------------------------" );
+    }
+
+    public Map getPhaseToLifecycleMap()
+        throws LifecycleExecutionException
+    {
+        if ( phaseToLifecycleMap == null )
+        {
+            phaseToLifecycleMap = new HashMap();
+
+            for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
+            {
+                Lifecycle lifecycle = (Lifecycle) i.next();
+
+                for ( Iterator p = lifecycle.getPhases().iterator(); p.hasNext(); )
+                {
+                    String phase = (String) p.next();
+
+                    if ( phaseToLifecycleMap.containsKey( phase ) )
+                    {
+                        Lifecycle prevLifecycle = (Lifecycle) phaseToLifecycleMap.get( phase );
+                        throw new LifecycleExecutionException( "Phase '" + phase +
+                            "' is defined in more than one lifecycle: '" + lifecycle.getId() + "' and '" +
+                            prevLifecycle.getId() + "'" );
+                    }
+                    else
+                    {
+                        phaseToLifecycleMap.put( phase, lifecycle );
+                    }
+                }
+            }
+        }
+        return phaseToLifecycleMap;
     }
 
     private static class TaskSegment

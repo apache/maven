@@ -182,40 +182,67 @@
         </requirement>
       </requirements>
       <configuration>
-        <!-- START SNIPPET: lifecyle -->
-        <phases>
-          <phase implementation="java.lang.String">validate</phase>
-          <phase implementation="java.lang.String">initialize</phase>
-          <phase implementation="java.lang.String">generate-sources</phase>
-          <phase implementation="java.lang.String">process-sources</phase>
-          <phase implementation="java.lang.String">generate-resources</phase>
-          <phase implementation="java.lang.String">process-resources</phase>
-          <phase implementation="java.lang.String">compile</phase>
-          <phase implementation="java.lang.String">process-classes</phase>
-          <phase implementation="java.lang.String">generate-test-sources</phase>
-          <phase implementation="java.lang.String">process-test-sources</phase>
-          <phase implementation="java.lang.String">generate-test-resources</phase>
-          <phase implementation="java.lang.String">process-test-resources</phase>
-          <phase implementation="java.lang.String">test-compile</phase>
-          <phase implementation="java.lang.String">test</phase>
-          <phase implementation="java.lang.String">package</phase>
-          <phase implementation="java.lang.String">integration-test</phase>
-          <phase implementation="java.lang.String">verify</phase>
-          <phase implementation="java.lang.String">install</phase>
-          <phase implementation="java.lang.String">deploy</phase>
-        </phases>
-        <!-- END SNIPPET: lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: lifecycle -->
+            <phases>
+              <phase>validate</phase>
+              <phase>initialize</phase>
+              <phase>generate-sources</phase>
+              <phase>process-sources</phase>
+              <phase>generate-resources</phase>
+              <phase>process-resources</phase>
+              <phase>compile</phase>
+              <phase>process-classes</phase>
+              <phase>generate-test-sources</phase>
+              <phase>process-test-sources</phase>
+              <phase>generate-test-resources</phase>
+              <phase>process-test-resources</phase>
+              <phase>test-compile</phase>
+              <phase>test</phase>
+              <phase>package</phase>
+              <phase>integration-test</phase>
+              <phase>verify</phase>
+              <phase>install</phase>
+              <phase>deploy</phase>
+            </phases>
+            <!-- END SNIPPET: lifecycle -->
+          </lifecycle>
+          <lifecycle>
+            <id>clean</id>
+            <phases>
+              <phase>pre-clean</phase>
+              <phase>clean</phase>
+              <phase>post-clean</phase>
+            </phases>
+            <default-phases>
+              <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
+            </default-phases>
+          </lifecycle>
+          <lifecycle>
+            <id>site</id>
+            <phases>
+              <phase>pre-site</phase>
+              <phase>site</phase>
+              <phase>post-site</phase>
+            </phases>
+            <default-phases>
+              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
+            </default-phases>
+          </lifecycle>
+        </lifecycles>
         <!-- START SNIPPET: default-reports -->
         <defaultReports>
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-project-info-reports-plugin</report>
+          <report>org.apache.maven.plugins:maven-project-info-reports-plugin</report>
           <!-- TODO: currently in mojo - should they be defaults any more?
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-checkstyle-plugin</report>
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-javadoc-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-changelog-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-surefire-report-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-jdepend-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-jxr-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-taglist-plugin</report>
+          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
+          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
+                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
+                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
+                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
           -->
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
@@ -247,12 +274,17 @@
       <role-hint>pom</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: pom-lifecycle -->
-        <phases>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: pom-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: pom-lifecycle -->
+            <phases>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: pom-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -261,20 +293,26 @@
       <role-hint>jar</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: jar-lifecycle -->
-        <phases>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>
-            org.apache.maven.plugins:maven-jar-plugin:jar
-          </package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: jar-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: jar-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>
+                org.apache.maven.plugins:maven-jar-plugin:jar
+              </package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: jar-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -283,27 +321,33 @@
       <role-hint>maven-plugin</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: maven-plugin-lifecycle -->
-        <phases>
-          <generate-resources>org.apache.maven.plugins:maven-plugin-plugin:descriptor</generate-resources>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>
-            org.apache.maven.plugins:maven-jar-plugin:jar,
-            org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata
-          </package>
-          <install>
-            org.apache.maven.plugins:maven-install-plugin:install,
-            org.apache.maven.plugins:maven-plugin-plugin:updateRegistry
-          </install>
-          <deploy>
-            org.apache.maven.plugins:maven-deploy-plugin:deploy
-          </deploy>
-        </phases>
-        <!-- END SNIPPET: maven-plugin-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: maven-plugin-lifecycle -->
+            <phases>
+              <generate-resources>org.apache.maven.plugins:maven-plugin-plugin:descriptor</generate-resources>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>
+                org.apache.maven.plugins:maven-jar-plugin:jar,
+                org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata
+              </package>
+              <install>
+                org.apache.maven.plugins:maven-install-plugin:install,
+                org.apache.maven.plugins:maven-plugin-plugin:updateRegistry
+              </install>
+              <deploy>
+                org.apache.maven.plugins:maven-deploy-plugin:deploy
+              </deploy>
+            </phases>
+            <!-- END SNIPPET: maven-plugin-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -312,20 +356,26 @@
       <role-hint>ejb</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: ejb-lifecycle -->
-        <phases>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>
-            org.apache.maven.plugins:maven-ejb-plugin:ejb
-          </package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: ejb-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: ejb-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>
+                org.apache.maven.plugins:maven-ejb-plugin:ejb
+              </package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: ejb-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -334,18 +384,24 @@
       <role-hint>war</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: war-lifecycle -->
-        <phases>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>org.apache.maven.plugins:maven-war-plugin:war</package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: war-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: war-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>org.apache.maven.plugins:maven-war-plugin:war</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: war-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -354,15 +410,21 @@
       <role-hint>ear</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: ear-lifecycle -->
-        <phases>
-          <generate-resources>org.apache.maven.plugins:maven-ear-plugin:generate-application-xml</generate-resources>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <package>org.apache.maven.plugins:maven-ear-plugin:ear</package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: ear-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: ear-lifecycle -->
+            <phases>
+              <generate-resources>
+                org.apache.maven.plugins:maven-ear-plugin:generate-application-xml</generate-resources>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <package>org.apache.maven.plugins:maven-ear-plugin:ear</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: ear-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
@@ -371,18 +433,24 @@
       <role-hint>rar</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <!-- START SNIPPET: rar-lifecycle -->
-        <phases>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>org.apache.maven.plugins:maven-rar-plugin:rar</package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </phases>
-        <!-- END SNIPPET: rar-lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: rar-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>org.apache.maven.plugins:maven-rar-plugin:rar</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: rar-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 

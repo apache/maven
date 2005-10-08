@@ -19,12 +19,43 @@ package org.apache.maven.lifecycle.mapping;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
+ * Class Lifecycle.
  */
-public interface LifecycleMapping
+public class Lifecycle
 {
-    String ROLE = LifecycleMapping.class.getName();
+    /**
+     * Field id
+     */
+    private String id;
 
-    Map getPhases( String lifecycle );
+    /**
+     * Field phases
+     */
+    private Map phases;
+
+    /**
+     * Method getId
+     */
+    public String getId()
+    {
+        return this.id;
+    } //-- String getId() 
+
+    /**
+     * Method getPhases
+     */
+    public Map getPhases()
+    {
+        return this.phases;
+    }
+
+    /**
+     * Method setId
+     *
+     * @param id
+     */
+    public void setId( String id )
+    {
+        this.id = id;
+    } //-- void setId(String) 
 }
