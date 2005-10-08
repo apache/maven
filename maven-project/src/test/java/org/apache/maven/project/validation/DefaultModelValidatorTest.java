@@ -65,6 +65,18 @@ public class DefaultModelValidatorTest
         assertEquals( "'groupId' is missing.", result.getMessage( 0 ) );
     }
 
+    public void testInvalidIds()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "invalid-ids-pom.xml" );
+
+        assertEquals( 2, result.getMessageCount() );
+
+        assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getMessage( 0 ) );
+
+        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getMessage( 1 ) );
+    }
+
     public void testMissingType()
         throws Exception
     {

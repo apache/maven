@@ -37,6 +37,8 @@ import java.util.List;
 public class DefaultModelValidator
     implements ModelValidator
 {
+    private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
+
     ///////////////////////////////////////////////////////////////////////////
     // ModelValidator Implementation
 
@@ -46,9 +48,9 @@ public class DefaultModelValidator
 
         validateStringNotEmpty( "modelVersion", result, model.getModelVersion() );
 
-        validateStringNotEmpty( "groupId", result, model.getGroupId() );
+        validateId( "groupId", result, model.getGroupId() );
 
-        validateStringNotEmpty( "artifactId", result, model.getArtifactId() );
+        validateId( "artifactId", result, model.getArtifactId() );
 
         validateStringNotEmpty( "packaging", result, model.getPackaging() );
 
@@ -58,13 +60,13 @@ public class DefaultModelValidator
         {
             Dependency d = (Dependency) it.next();
 
-            validateSubElementStringNotEmpty( d, "dependencies.dependency.artifactId", result, d.getArtifactId() );
+            validateId( "dependencies.dependency.artifactId", result, d.getArtifactId() );
 
-            validateSubElementStringNotEmpty( d, "dependencies.dependency.groupId", result, d.getGroupId() );
+            validateId( "dependencies.dependency.groupId", result, d.getGroupId() );
 
-            validateSubElementStringNotEmpty( d, "dependencies.dependency.type", result, d.getType() );
+            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType() );
 
-            validateSubElementStringNotEmpty( d, "dependencies.dependency.version", result, d.getVersion() );
+            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
             {
@@ -136,6 +138,23 @@ public class DefaultModelValidator
         forcePluginExecutionIdCollision( model, result );
 
         return result;
+    }
+
+    private boolean validateId( String fieldName, ModelValidationResult result, String id )
+    {
+        if ( !validateStringNotEmpty( fieldName, result, id ) )
+        {
+            return false;
+        }
+        else
+        {
+            boolean match = id.matches( ID_REGEX );
+            if ( !match )
+            {
+                result.addMessage( "'" + fieldName + "' with value '" + id + "' does not match a valid id pattern." );
+            }
+            return match;
+        }
     }
 
     private void validateRepositories( ModelValidationResult result, List repositories, String prefix )
