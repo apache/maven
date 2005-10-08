@@ -49,7 +49,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
@@ -259,30 +258,7 @@ public class DefaultPluginManager
                               ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, ArtifactNotFoundException
     {
-        // TODO: share with MMS? Not sure if it belongs here
-        if ( project.getProjectReferences() != null && !project.getProjectReferences().isEmpty() )
-        {
-            // TODO: use MavenProject getProjectReferenceId
-            String refId = plugin.getGroupId() + ":" + plugin.getArtifactId();
-            MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
-            if ( ref != null && ref.getArtifact() != null )
-            {
-                // TODO: if not matching, we should get the correct artifact from that project (attached)
-                if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
-                {
-                    // if the project artifact doesn't exist, don't use it. We haven't built that far.
-                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
-                    {
-                        pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
-                    }
-                    else
-                    {
-                        getLogger().warn( "Plugin found in the reactor has not been built when it's use was attempted" +
-                            " - resolving from the repository instead" );
-                    }
-                }
-            }
-        }
+        pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
@@ -318,7 +294,7 @@ public class DefaultPluginManager
         try
         {
             Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null,
-                                                                 project.getProjectReferences() );
+                                                                 project );
             addedPlugin.setIntroducedDependencyArtifacts( artifacts );
         }
         catch ( InvalidVersionSpecificationException e )
@@ -630,6 +606,8 @@ public class DefaultPluginManager
 
                     if ( !artifact.equals( pluginArtifact ) )
                     {
+                        artifact = project.replaceWithActiveArtifact( artifact );
+
                         pluginContainer.addJarResource( artifact.getFile() );
                     }
                 }

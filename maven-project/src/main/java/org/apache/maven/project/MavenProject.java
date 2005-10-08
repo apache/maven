@@ -45,6 +45,7 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.overlay.BuildOverlay;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -1408,7 +1409,7 @@ public class MavenProject
         throws InvalidVersionSpecificationException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope,
-                                                    dependencyFilter, projectReferences );
+                                                    dependencyFilter, this );
     }
 
     public void addProjectReference( MavenProject project )
@@ -1453,5 +1454,35 @@ public class MavenProject
     public String getDefaultGoal()
     {
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
+    }
+
+    public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
+    {
+        if ( getProjectReferences() != null && !getProjectReferences().isEmpty() )
+        {
+            // TODO: use MavenProject getProjectReferenceId
+            String refId = pluginArtifact.getGroupId() + ":" + pluginArtifact.getArtifactId();
+            MavenProject ref = (MavenProject) getProjectReferences().get( refId );
+            if ( ref != null && ref.getArtifact() != null )
+            {
+                // TODO: if not matching, we should get the correct artifact from that project (attached)
+                if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
+                {
+                    // if the project artifact doesn't exist, don't use it. We haven't built that far.
+                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
+                    {
+                        pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                    }
+                    else
+                    {
+/* TODO...
+                        logger.warn( "Artifact found in the reactor has not been built when it's use was " +
+                            "attempted - resolving from the repository instead" );
+*/
+                    }
+                }
+            }
+        }
+        return pluginArtifact;
     }
 }

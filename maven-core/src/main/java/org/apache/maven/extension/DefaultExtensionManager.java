@@ -70,6 +70,9 @@ public class DefaultExtensionManager
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
+
+                a = project.replaceWithActiveArtifact( a );
+
                 container.addJarResource( a.getFile() );
             }
         }

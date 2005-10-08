@@ -18,7 +18,6 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -57,7 +56,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -259,7 +257,7 @@ public class MavenMetadataSource
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
-                                       ArtifactFilter dependencyFilter, Map projectReferences )
+                                       ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidVersionSpecificationException
     {
         Set projectArtifacts = new HashSet( dependencies.size() );
@@ -315,20 +313,9 @@ public class MavenMetadataSource
 
                 artifact.setDependencyFilter( dependencyFilter );
 
-                if ( projectReferences != null )
+                if ( project != null )
                 {
-                    // TODO: use MavenProject getProjectReferenceId
-                    String refId = d.getGroupId() + ":" + d.getArtifactId();
-                    MavenProject project = (MavenProject) projectReferences.get( refId );
-                    if ( project != null && project.getArtifact() != null )
-                    {
-                        // TODO: if not matching, we should get the correct artifact from that project (attached)
-                        if ( project.getArtifact().getDependencyConflictId().equals(
-                            artifact.getDependencyConflictId() ) )
-                        {
-                            artifact = new ActiveProjectArtifact( project, artifact );
-                        }
-                    }
+                    artifact = project.replaceWithActiveArtifact( artifact );
                 }
 
                 projectArtifacts.add( artifact );
@@ -363,21 +350,6 @@ public class MavenMetadataSource
         }
 
         return versions;
-    }
-
-    private Metadata loadMetadata( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                   ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
-
-        Metadata metadata = null;
-        if ( metadataFile.exists() )
-        {
-            metadata = readMetadata( metadataFile );
-        }
-        return metadata;
     }
 
     /**
