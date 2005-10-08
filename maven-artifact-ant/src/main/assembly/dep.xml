@@ -19,6 +19,8 @@
       <scope>runtime</scope>
       <excludes>
         <exclude>ant:ant</exclude>
+        <!-- TODO: remove when all references are moved to the new group -->
+        <exclude>plexus:plexus-utils</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

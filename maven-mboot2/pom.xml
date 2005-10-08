@@ -15,7 +15,7 @@
     <dependency>
       <groupId>org.codehaus.modello</groupId>
       <artifactId>modello-plugin-xpp3</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-6-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -23,7 +23,7 @@
     <dependency>
       <groupId>classworlds</groupId>
       <artifactId>classworlds</artifactId>
-      <version>1.1-alpha-1</version>
+      <version>1.1-alpha-2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

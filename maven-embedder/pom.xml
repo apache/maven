@@ -26,7 +26,7 @@
       <artifactId>plexus-container-default</artifactId>
     </dependency>    
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.0.4-SNAPSHOT</version>
     </dependency>  

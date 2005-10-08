@@ -40,9 +40,9 @@ public class MBoot
 {
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin-api",
         "maven-artifact", "maven-plugin-descriptor", "maven-repository-metadata", "maven-artifact-manager",
-        "maven-artifact-test", "maven-script/maven-script-beanshell",
-        "maven-profile", "maven-project", "maven-plugin-registry", "maven-reporting/maven-reporting-api",
-        "maven-reporting/maven-reporting-impl", "maven-plugin-parameter-documenter", "maven-core", "maven-archiver",
+        "maven-artifact-test", "maven-script/maven-script-beanshell", "maven-profile", "maven-project",
+        "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-reporting/maven-reporting-impl",
+        "maven-plugin-parameter-documenter", "maven-core", "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
         "maven-plugin-tools/maven-plugin-tools-beanshell", "maven-plugin-tools/maven-plugin-tools-pluggy",
         "maven-core-it-verifier"};
@@ -355,7 +355,7 @@ public class MBoot
             {
                 coreDeps = reader.getDependencies();
                 corePom = new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
-                                          reader.getPackaging() );
+                                          reader.getPackaging(), Collections.EMPTY_LIST );
             }
 
             System.out.println( "--------------------------------------------------------------------" );
@@ -364,8 +364,8 @@ public class MBoot
         reader = new ModelReader( downloader, true );
         reader.parse( new File( basedir, "maven-plugin-tools/maven-plugin-tools-pluggy/pom.xml" ) );
         List dependencies = new ArrayList( reader.getDependencies() );
-        dependencies.add(
-            new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(), reader.getPackaging() ) );
+        dependencies.add( new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
+                                          reader.getPackaging(), Collections.EMPTY_LIST ) );
         IsolatedClassLoader cl = createClassloaderFromDependencies( dependencies, bootstrapClassLoader,
                                                                     localRepository );
 

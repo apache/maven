@@ -104,11 +104,24 @@ public class ModelReader
 
     private Exclusion currentExclusion;
 
+    private final Set excluded;
+
+    private final List chain;
+
     public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
+    {
+        this( downloader, resolveTransitiveDependencies, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+    }
+
+    public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies, Set excluded, List chain )
     {
         this.downloader = downloader;
 
         this.resolveTransitiveDependencies = resolveTransitiveDependencies;
+
+        this.excluded = excluded;
+
+        this.chain = chain;
     }
 
     public List getRemoteRepositories()
@@ -151,7 +164,9 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            currentDependency = new Dependency();
+            List chain = Collections.singletonList(
+                new Dependency( groupId, artifactId, version, packaging, this.chain ) );
+            currentDependency = new Dependency( chain );
 
             insideDependency = true;
         }
@@ -230,9 +245,10 @@ public class ModelReader
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false );
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false,
+                                         excluded, Collections.EMPTY_LIST );
 
-            addDependencies( p.getDependencies(), parentDependencies, null, Collections.EMPTY_SET );
+            addDependencies( p.getDependencies(), parentDependencies, null, excluded );
 
             addDependencies( p.getManagedDependencies(), managedDependencies, null, Collections.EMPTY_SET );
 
@@ -422,26 +438,31 @@ public class ModelReader
         {
             Dependency dependency = (Dependency) it.next();
 
-            if ( dependency.getVersion() == null )
+            if ( !excluded.contains( dependency.getConflictId() ) )
             {
-                Dependency managedDependency = (Dependency) managedDependencies.get( dependency.getConflictId() );
-                if ( managedDependency == null )
+                if ( dependency.getVersion() == null )
                 {
-                    throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" + version +
-                        "] " + "Dependency " + dependency.getConflictId() +
-                        " is missing a version, and nothing is found in dependencyManagement. " );
+                    Dependency managedDependency = (Dependency) managedDependencies.get( dependency.getConflictId() );
+                    if ( managedDependency == null )
+                    {
+                        throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" +
+                            version + "] " + "Dependency " + dependency.getConflictId() +
+                            " is missing a version, and nothing is found in dependencyManagement. " );
+                    }
+                    dependency.setVersion( managedDependency.getVersion() );
                 }
-                dependency.setVersion( managedDependency.getVersion() );
-            }
 
-            if ( resolveTransitiveDependencies )
-            {
-                ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
-                                             dependency.getVersion(), dependency.getType(),
-                                             resolveTransitiveDependencies );
+                if ( resolveTransitiveDependencies )
+                {
+                    Set excluded = new HashSet( this.excluded );
+                    excluded.addAll( dependency.getExclusions() );
 
-                addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(),
-                                 dependency.getExclusions() );
+                    ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
+                                                 dependency.getVersion(), dependency.getType(),
+                                                 resolveTransitiveDependencies, excluded, dependency.getChain() );
+
+                    addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(), excluded );
+                }
             }
         }
     }
@@ -460,6 +481,11 @@ public class ModelReader
 
             if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) )
             {
+                if ( "plexus".equals( d.getGroupId() ) && ( "plexus-utils".equals( d.getArtifactId() ) ||
+                    "plexus-container-default".equals( d.getArtifactId() ) ) )
+                {
+                    throw new IllegalStateException( d.getConflictId() + " found in chain " + d.getChain() );
+                }
                 target.put( d.getConflictId(), d );
             }
         }
@@ -485,7 +511,7 @@ public class ModelReader
     }
 
     private ModelReader retrievePom( String groupId, String artifactId, String version, String type,
-                                     boolean resolveTransitiveDependencies )
+                                     boolean resolveTransitiveDependencies, Set excluded, List chain )
         throws SAXException
     {
         String key = groupId + ":" + artifactId + ":" + version;
@@ -497,11 +523,11 @@ public class ModelReader
 
         inProgress.add( key );
 
-        ModelReader p = new ModelReader( downloader, resolveTransitiveDependencies );
+        ModelReader p = new ModelReader( downloader, resolveTransitiveDependencies, excluded, chain );
 
         try
         {
-            Dependency pom = new Dependency( groupId, artifactId, version, type );
+            Dependency pom = new Dependency( groupId, artifactId, version, type, chain );
             downloader.downloadDependencies( Collections.singletonList( pom ) );
 
             Repository localRepository = downloader.getLocalRepository();

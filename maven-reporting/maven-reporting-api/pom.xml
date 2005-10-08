@@ -23,6 +23,16 @@
       <groupId>doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
       <version>1.0-alpha-4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

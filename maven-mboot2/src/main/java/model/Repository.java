@@ -17,6 +17,7 @@ package model;
  */
 
 import java.io.File;
+import java.util.Collections;
 
 /**
  * Repository path management.
@@ -55,7 +56,7 @@ public class Repository
 
     public File getArtifactFile( String groupId, String artifactId, String version, String type )
     {
-        Dependency d = new Dependency( groupId, artifactId, version, type );
+        Dependency d = new Dependency( groupId, artifactId, version, type, Collections.EMPTY_LIST );
 
         return getArtifactFile( d );
 
@@ -101,7 +102,7 @@ public class Repository
 
     public String getMetadataPath( String groupId, String artifactId, String version, String type, String filename )
     {
-        Dependency dependency = new Dependency( groupId, artifactId, version, type );
+        Dependency dependency = new Dependency( groupId, artifactId, version, type, Collections.EMPTY_LIST );
 
         String repositoryPath;
         if ( LAYOUT_LEGACY.equals( layout ) )
@@ -111,14 +112,11 @@ public class Repository
         else if ( LAYOUT_DEFAULT.equals( layout ) )
         {
             repositoryPath = dependency.getGroupId().replace( '.', '/' );
-//            if ( !dependency.getType().equals( "pom" ) )
-//            {
             repositoryPath = repositoryPath + "/" + dependency.getArtifactId();
             if ( version != null )
             {
                 repositoryPath = repositoryPath + "/" + dependency.getVersion();
             }
-//            }
             repositoryPath = repositoryPath + "/" + filename;
         }
         else

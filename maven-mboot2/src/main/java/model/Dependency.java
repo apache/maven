@@ -1,6 +1,8 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -52,12 +54,17 @@ public class Dependency
 
     private Set exclusions = new HashSet();
 
-    public Dependency()
+    private List chain;
+
+    public Dependency( List chain )
     {
+        this.chain = new ArrayList( chain );
+        this.chain.add( this );
     }
 
-    public Dependency( String groupId, String artifactId, String version, String type )
+    public Dependency( String groupId, String artifactId, String version, String type, List chain )
     {
+        this( chain );
         this.version = version;
         this.artifactId = artifactId;
         this.groupId = groupId;
@@ -288,5 +295,10 @@ public class Dependency
     public Set getExclusions()
     {
         return exclusions;
+    }
+
+    public List getChain()
+    {
+        return chain;
     }
 }

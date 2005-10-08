@@ -108,7 +108,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
@@ -120,6 +120,16 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-input-handler-api</artifactId>
       <version>1.0-alpha-3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -141,6 +151,12 @@
       <artifactId>wagon-ssh</artifactId>
       <version>1.0-alpha-4</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <reporting>
