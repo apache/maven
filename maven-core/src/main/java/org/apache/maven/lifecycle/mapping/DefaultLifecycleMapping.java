@@ -34,20 +34,40 @@ public class DefaultLifecycleMapping
 
     private Map lifecycleMap;
 
+    /** @deprecated use lifecycles instead */
+    private Map phases;
+
     public Map getPhases( String lifecycle )
     {
         if ( lifecycleMap == null )
         {
             lifecycleMap = new HashMap();
 
-            for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
+            if ( lifecycles != null )
             {
-                Lifecycle l = (Lifecycle) i.next();
-                lifecycleMap.put( l.getId(), l );
+                for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
+                {
+                    Lifecycle l = (Lifecycle) i.next();
+                    lifecycleMap.put( l.getId(), l );
+                }
             }
         }
         Lifecycle l = (Lifecycle) lifecycleMap.get( lifecycle );
-        return l != null ? l.getPhases() : null;
+
+        Map mappings = null;
+        if ( l == null )
+        {
+            if ( "default".equals( lifecycle ) )
+            {
+                mappings = phases;
+            }
+        }
+        else
+        {
+            mappings = l.getPhases();
+        }
+
+        return mappings;
     }
 
 }
