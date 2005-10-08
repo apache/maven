@@ -24,6 +24,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,14 +54,11 @@ public class MavenSession
 
     private final Properties executionProperties;
 
-    public MavenSession( PlexusContainer container,
-                         Settings settings,
-                         ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher,
-                         ReactorManager reactorManager,
-                         List goals,
-                         String executionRootDir,
-                         Properties executionProperties )
+    private final Date startTime;
+
+    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         String executionRootDir, Properties executionProperties, Date startTime )
     {
         this.container = container;
 
@@ -77,6 +75,8 @@ public class MavenSession
         this.executionRootDir = executionRootDir;
 
         this.executionProperties = executionProperties;
+
+        this.startTime = startTime;
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
@@ -160,5 +160,10 @@ public class MavenSession
     public boolean isUsingPOMsFromFilesystem()
     {
         return usingPOMsFromFilesystem;
+    }
+
+    public Date getStartTime()
+    {
+        return startTime;
     }
 }

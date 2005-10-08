@@ -121,7 +121,7 @@ public class DefaultLifecycleExecutor
 
         MavenExecutionResponse response = new MavenExecutionResponse();
 
-        response.setStart( new Date() );
+        response.setStart( session.getStartTime() );
 
         try
         {

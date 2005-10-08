@@ -22,6 +22,7 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -59,13 +60,11 @@ public class DefaultMavenExecutionRequest
 
     private final Properties executionProperties;
 
-    public DefaultMavenExecutionRequest( ArtifactRepository localRepository,
-                                         Settings settings,
-                                         EventDispatcher eventDispatcher,
-                                         List goals,
-                                         String baseDirectory,
-                                         ProfileManager globalProfileManager,
-                                         Properties executionProperties )
+    private final Date startTime;
+
+    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
+                                         EventDispatcher eventDispatcher, List goals, String baseDirectory,
+                                         ProfileManager globalProfileManager, Properties executionProperties )
     {
         this.localRepository = localRepository;
 
@@ -80,6 +79,8 @@ public class DefaultMavenExecutionRequest
         this.globalProfileManager = globalProfileManager;
 
         this.executionProperties = executionProperties;
+
+        this.startTime = new Date();
     }
 
     public Settings getSettings()
@@ -174,5 +175,10 @@ public class DefaultMavenExecutionRequest
     public ProfileManager getGlobalProfileManager()
     {
         return globalProfileManager;
+    }
+
+    public Date getStartTime()
+    {
+        return startTime;
     }
 }

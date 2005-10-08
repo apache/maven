@@ -505,7 +505,7 @@ public class DefaultMaven
     {
         return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
                                  request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory(),
-                                 request.getExecutionProperties() );
+                                 request.getExecutionProperties(), request.getStartTime() );
     }
 
     /**
