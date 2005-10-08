@@ -58,6 +58,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
+import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -1036,8 +1037,12 @@ public class DefaultPluginManager
                 configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE );
             }
 
+            ConfigurationListener listener = new DebugConfigurationListener( getLogger() );
+
+            getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' -->" );
             configurator.configureComponent( plugin, configuration, expressionEvaluator,
-                                             pluginContainer.getContainerRealm() );
+                                             pluginContainer.getContainerRealm(), listener );
+            getLogger().debug( "-- end configuration --" );
         }
         catch ( ComponentConfigurationException e )
         {
