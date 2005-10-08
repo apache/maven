@@ -864,6 +864,8 @@ public class DefaultMavenProjectBuilder
                 // as we go in order to do this.
                 // ----------------------------------------------------------------------
 
+                getLogger().debug( "Retrieving parent-POM from the repository for project: " + project.getId() );
+
                 parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
                                                                        parentModel.getArtifactId(),
                                                                        parentModel.getVersion() );
