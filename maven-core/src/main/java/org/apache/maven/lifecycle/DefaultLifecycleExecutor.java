@@ -224,6 +224,8 @@ public class DefaultLifecycleExecutor
                     // Event monitoring.
                     String event = MavenEvents.PROJECT_EXECUTION;
 
+                    long buildStartTime = System.currentTimeMillis();
+
                     dispatcher.dispatchStart( event, rootProject.getId() + " ( " + segment + " )" );
 
                     try
@@ -240,24 +242,24 @@ public class DefaultLifecycleExecutor
                             catch ( MojoExecutionException e )
                             {
                                 // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( ArtifactResolutionException e )
                             {
                                 // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( MojoFailureException e )
                             {
-                                handleExecutionFailure( rm, rootProject, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( ArtifactNotFoundException e )
                             {
-                                handleExecutionFailure( rm, rootProject, e, task );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                         }
 
-                        rm.registerBuildSuccess( rootProject );
+                        rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
 
                         dispatcher.dispatchEnd( event, rootProject.getId() + " ( " + segment + " )" );
                     }
@@ -307,6 +309,8 @@ public class DefaultLifecycleExecutor
                         // Event monitoring.
                         String event = MavenEvents.PROJECT_EXECUTION;
 
+                        long buildStartTime = System.currentTimeMillis();
+
                         dispatcher.dispatchStart( event, currentProject.getId() + " ( " + segment + " )" );
 
                         try
@@ -322,24 +326,24 @@ public class DefaultLifecycleExecutor
                                 catch ( MojoExecutionException e )
                                 {
                                     // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( ArtifactResolutionException e )
                                 {
                                     // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( MojoFailureException e )
                                 {
-                                    handleExecutionFailure( rm, currentProject, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( ArtifactNotFoundException e )
                                 {
-                                    handleExecutionFailure( rm, currentProject, e, task );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                             }
 
-                            rm.registerBuildSuccess( currentProject );
+                            rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
 
                             dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
                         }
@@ -368,12 +372,13 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task )
+    private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task,
+                                         long buildStartTime )
         throws MojoExecutionException, MojoFailureException, ArtifactNotFoundException, ArtifactResolutionException
     {
         if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
         {
-            rm.registerBuildFailure( project, e, task );
+            rm.registerBuildFailure( project, e, task, System.currentTimeMillis() - buildStartTime );
 
             if ( e instanceof MojoExecutionException )
             {
@@ -400,7 +405,7 @@ public class DefaultLifecycleExecutor
         }
         else if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) )
         {
-            rm.registerBuildFailure( project, e, task );
+            rm.registerBuildFailure( project, e, task, System.currentTimeMillis() - buildStartTime );
 
             rm.blackList( project );
         }

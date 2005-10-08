@@ -59,12 +59,15 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -326,7 +329,7 @@ public class DefaultMaven
 
             if ( rm.hasBuildFailure( project ) )
             {
-                logReactorSummaryLine( project.getName(), "FAILED" );
+                logReactorSummaryLine( project.getName(), "FAILED", rm.getBuildFailure( project ).getTime() );
             }
             else if ( rm.isBlackListed( project ) )
             {
@@ -334,7 +337,7 @@ public class DefaultMaven
             }
             else if ( rm.hasBuildSuccess( project ) )
             {
-                logReactorSummaryLine( project.getName(), "SUCCESS" );
+                logReactorSummaryLine( project.getName(), "SUCCESS", rm.getBuildSuccess( project ).getTime() );
             }
             else
             {
@@ -348,22 +351,56 @@ public class DefaultMaven
 
     private void logReactorSummaryLine( String name, String status )
     {
+        logReactorSummaryLine( name, status, -1 );
+    }
+
+    private void logReactorSummaryLine( String name, String status, long time )
+    {
         StringBuffer messageBuffer = new StringBuffer();
 
         messageBuffer.append( name );
 
-        int dotCount = 65;
+        int dotCount = 55;
 
         dotCount -= name.length();
+
+        messageBuffer.append( " " );
 
         for ( int i = 0; i < dotCount; i++ )
         {
             messageBuffer.append( '.' );
         }
 
+        messageBuffer.append( " " );
+
         messageBuffer.append( status );
 
+        if ( time >= 0 )
+        {
+            messageBuffer.append( " [" );
+
+            messageBuffer.append( getFormattedTime( time ) );
+
+            messageBuffer.append( "]" );
+        }
+
         getLogger().info( messageBuffer.toString() );
+    }
+
+    private static String getFormattedTime( long time )
+    {
+        String pattern = "s.SSS's'";
+        if ( time / 60000L > 0 )
+        {
+            pattern = "m:s" + pattern;
+            if ( time / 3600000L > 0 )
+            {
+                pattern = "H:m" + pattern;
+            }
+        }
+        DateFormat fmt = new SimpleDateFormat( pattern );
+        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+        return fmt.format( new Date( time ) );
     }
 
     private MavenExecutionResponse dispatchErrorResponse( EventDispatcher dispatcher, String event,

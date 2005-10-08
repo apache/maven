@@ -124,9 +124,9 @@ public class ReactorManager
         return blackList.contains( ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() ) );
     }
 
-    public void registerBuildFailure( MavenProject project, Exception error, String task )
+    public void registerBuildFailure( MavenProject project, Exception error, String task, long time )
     {
-        buildFailuresByProject.put( project.getId(), new BuildFailure( error, task ) );
+        buildFailuresByProject.put( project.getId(), new BuildFailure( error, task, time ) );
     }
 
     public boolean hasBuildFailures()
@@ -159,31 +159,19 @@ public class ReactorManager
         return buildSuccessesByProject.containsKey( project.getId() );
     }
 
-    public void registerBuildSuccess( MavenProject project )
+    public void registerBuildSuccess( MavenProject project, long time )
     {
-        buildSuccessesByProject.put( project.getId(), project );
+        buildSuccessesByProject.put( project.getId(), new BuildSuccess( project, time ) );
     }
 
-    private static class BuildFailure
+    public BuildFailure getBuildFailure( MavenProject project )
     {
-        private Exception cause;
-
-        private String task;
-
-        BuildFailure( Exception cause, String task )
-        {
-            this.cause = cause;
-            this.task = task;
-        }
-
-        String getTask()
-        {
-            return task;
-        }
-
-        Exception getCause()
-        {
-            return cause;
-        }
+        return (BuildFailure) buildFailuresByProject.get( project.getId() );
     }
+
+    public BuildSuccess getBuildSuccess( MavenProject project )
+    {
+        return (BuildSuccess) buildSuccessesByProject.get( project.getId() );
+    }
+
 }
