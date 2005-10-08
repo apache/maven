@@ -730,7 +730,7 @@ public class MavenCli
             System.out.println();
 
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "maven [options] [goal [goal2 [goal3] ...]]", "\nOptions:", options, "\n" );
+            formatter.printHelp( "maven [options] [<goal(s)>] [<phase(s)>]", "\nOptions:", options, "\n" );
         }
     }
 }
