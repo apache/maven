@@ -529,7 +529,14 @@ public class DefaultLifecycleExecutor
     {
         List goals = processGoalChain( task, lifecycleMappings, lifecycle );
 
-        executeGoals( goals, session, project, response );
+        if ( !goals.isEmpty() )
+        {
+            executeGoals( goals, session, project, response );
+        }
+        else
+        {
+            getLogger().info( "No goals needed for project - skipping" );
+        }
     }
 
     private void executeStandaloneGoal( String task, MavenSession session, MavenProject project,
