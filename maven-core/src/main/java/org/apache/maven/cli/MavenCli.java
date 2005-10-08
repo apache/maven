@@ -52,6 +52,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -159,7 +160,13 @@ public class MavenCli
         {
             settings = buildSettings( commandLine );
         }
-        catch ( Exception e )
+        catch ( SettingsConfigurationException e )
+        {
+            showError( "Error reading settings.xml: " + e.getMessage(), e, showErrors );
+
+            return 1;
+        }
+        catch ( ComponentLookupException e )
         {
             showFatalError( "Unable to read settings.xml", e, showErrors );
 
@@ -265,7 +272,7 @@ public class MavenCli
     }
 
     private static Settings buildSettings( CommandLine commandLine )
-        throws Exception
+        throws ComponentLookupException, SettingsConfigurationException
     {
         String userSettingsPath = null;
 
@@ -278,24 +285,36 @@ public class MavenCli
 
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
 
-        if ( userSettingsPath != null )
+        try
         {
-            File userSettingsFile = new File( userSettingsPath );
+            if ( userSettingsPath != null )
+            {
+                File userSettingsFile = new File( userSettingsPath );
 
-            if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
-            {
-                settings = settingsBuilder.buildSettings( userSettingsFile );
+                if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
+                {
+                    settings = settingsBuilder.buildSettings( userSettingsFile );
+                }
+                else
+                {
+                    System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
+                        " is invalid. Using default path." );
+                }
             }
-            else
+
+            if ( settings == null )
             {
-                System.out.println(
-                    "WARNING: Alternate user settings file: " + userSettingsPath + " is invalid. Using default path." );
+                settings = settingsBuilder.buildSettings();
             }
         }
-
-        if ( settings == null )
+        catch ( IOException e )
         {
-            settings = settingsBuilder.buildSettings();
+            throw new SettingsConfigurationException( "Error reading settings file", e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new SettingsConfigurationException( e.getMessage(), e.getDetail(), e.getLineNumber(),
+                                                      e.getColumnNumber() );
         }
 
         // why aren't these part of the runtime info? jvz.
