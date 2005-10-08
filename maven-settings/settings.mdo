@@ -402,12 +402,14 @@
           <version>1.0.0</version>
           <description><![CDATA[The proxy port.]]></description>
           <type>int</type>
+          <defaultValue>8080</defaultValue>
         </field>
         <field>
           <name>host</name>
           <version>1.0.0</version>
           <description><![CDATA[The proxy host.]]></description>
           <type>String</type>
+          <required>true</required>
         </field>
         <field>
           <name>nonProxyHosts</name>

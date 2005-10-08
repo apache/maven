@@ -24,6 +24,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
+import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -152,7 +153,7 @@ public class MavenCli
 
         Properties executionProperties = getExecutionProperties( commandLine );
 
-        Settings settings = null;
+        Settings settings;
 
         try
         {
@@ -209,11 +210,7 @@ public class MavenCli
                 }
             }
 
-            request = createRequest( commandLine,
-                                     settings,
-                                     eventDispatcher,
-                                     loggerManager,
-                                     profileManager,
+            request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager,
                                      executionProperties );
 
             setProjectFileOptions( commandLine, request );
@@ -249,6 +246,11 @@ public class MavenCli
         catch ( ReactorException e )
         {
             showFatalError( "Error executing Maven for a project", e, showErrors );
+            return 1;
+        }
+        catch ( SettingsConfigurationException e )
+        {
+            showError( e.getMessage(), e, showErrors );
             return 1;
         }
 
@@ -357,12 +359,20 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( CommandLine commandLine,
-                                                        Settings settings,
-                                                        EventDispatcher eventDispatcher,
-                                                        LoggerManager loggerManager,
-                                                        ProfileManager profileManager,
-                                                        Properties executionProperties )
+    private static void showError( String message, Exception e, boolean show )
+    {
+        System.err.println( message );
+        if ( show )
+        {
+            System.err.println( "Error stacktrace:" );
+
+            e.printStackTrace();
+        }
+    }
+
+    private static MavenExecutionRequest createRequest( CommandLine commandLine, Settings settings,
+                                                        EventDispatcher eventDispatcher, LoggerManager loggerManager,
+                                                        ProfileManager profileManager, Properties executionProperties )
         throws ComponentLookupException
     {
         MavenExecutionRequest request;
@@ -371,12 +381,8 @@ public class MavenCli
 
         File userDir = new File( System.getProperty( "user.dir" ) );
 
-        request = new DefaultMavenExecutionRequest( localRepository,
-                                                    settings,
-                                                    eventDispatcher,
-                                                    commandLine.getArgList(),
-                                                    userDir.getPath(),
-                                                    profileManager,
+        request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
+                                                    commandLine.getArgList(), userDir.getPath(), profileManager,
                                                     executionProperties );
 
         // TODO [BP]: do we set one per mojo? where to do it?

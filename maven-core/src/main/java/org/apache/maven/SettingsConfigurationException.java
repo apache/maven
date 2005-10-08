@@ -16,22 +16,17 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.reactor.ReactorException;
-
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * If there was an error in the settings file.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface Maven
+public class SettingsConfigurationException
+    extends Exception
 {
-    static String ROLE = Maven.class.getName();
-
-    String POMv4 = "pom.xml";
-
-    String RELEASE_POMv4 = "release-pom.xml";
-
-    MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws ReactorException, SettingsConfigurationException;
+    public SettingsConfigurationException( String message )
+    {
+        super( message );
+    }
 }

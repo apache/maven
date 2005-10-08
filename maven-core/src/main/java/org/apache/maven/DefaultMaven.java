@@ -102,7 +102,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws ReactorException
+        throws ReactorException, SettingsConfigurationException
     {
         if ( request.getSettings().isOffline() )
         {
@@ -515,7 +515,7 @@ public class DefaultMaven
      * the wagons, shouldn't we?
      */
     private void resolveParameters( Settings settings )
-        throws ComponentLookupException, ComponentLifecycleException
+        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
@@ -525,6 +525,11 @@ public class DefaultMaven
 
             if ( proxy != null )
             {
+                if ( proxy.getHost() == null )
+                {
+                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                }
+
                 wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
                                        proxy.getPassword(), proxy.getNonProxyHosts() );
             }
