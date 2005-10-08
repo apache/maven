@@ -142,11 +142,16 @@ public class RegexBasedModelInterpolator
                 // but this could result in multiple lookups of stringValue, and replaceAll is not correct behaviour
                 matcher.reset( result );
             }
+/*
+        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
+        // timing of executing the interpolation
+        
             else
             {
                 throw new ModelInterpolationException(
                     "Expression '" + wholeExpr + "' did not evaluate to anything in the model" );
             }
+*/
         }
 
         return result;

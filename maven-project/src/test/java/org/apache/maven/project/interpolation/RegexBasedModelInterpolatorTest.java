@@ -68,17 +68,24 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
+/*
+        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
+        // timing of executing the interpolation
+
         try
         {
-            Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+            new RegexBasedModelInterpolator().interpolate( model, context );
             fail( "Should have failed to interpolate with invalid reference" );
         }
         catch ( ModelInterpolationException expected )
         {
             assertTrue( true );
         }
+*/
 
-//        assertEquals( "${something}", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        assertEquals( "${something}", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
     }
 
     public void testTwoReferences()
