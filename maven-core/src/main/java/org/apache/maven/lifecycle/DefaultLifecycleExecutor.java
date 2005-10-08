@@ -255,6 +255,8 @@ public class DefaultLifecycleExecutor
                             }
                         }
 
+                        rm.registerBuildSuccess( rootProject );
+
                         dispatcher.dispatchEnd( event, rootProject.getId() + " ( " + segment + " )" );
                     }
                     catch ( LifecycleExecutionException e )
@@ -334,6 +336,8 @@ public class DefaultLifecycleExecutor
                                     handleExecutionFailure( rm, currentProject, e, task );
                                 }
                             }
+
+                            rm.registerBuildSuccess( currentProject );
 
                             dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
                         }

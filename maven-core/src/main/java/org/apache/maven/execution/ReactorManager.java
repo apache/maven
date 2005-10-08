@@ -45,31 +45,33 @@ public class ReactorManager
     private String failureBehavior = FAIL_FAST;
 
     private final ProjectSorter sorter;
-    
+
+    private Map buildSuccessesByProject = new HashMap();
+
     public ReactorManager( List projects )
         throws CycleDetectedException
     {
         this.sorter = new ProjectSorter( projects );
     }
-    
+
     public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
-        
+
         if ( pluginContextsByKey == null )
         {
             pluginContextsByKey = new HashMap();
             pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
         }
-        
+
         Map pluginContext = (Map) pluginContextsByKey.get( plugin.getPluginLookupKey() );
-        
+
         if ( pluginContext == null )
         {
             pluginContext = new HashMap();
             pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
         }
-        
+
         return pluginContext;
     }
 
@@ -150,6 +152,16 @@ public class ReactorManager
     public MavenProject getTopLevelProject()
     {
         return sorter.getTopLevelProject();
+    }
+
+    public boolean hasBuildSuccess( MavenProject project )
+    {
+        return buildSuccessesByProject.containsKey( project.getId() );
+    }
+
+    public void registerBuildSuccess( MavenProject project )
+    {
+        buildSuccessesByProject.put( project.getId(), project );
     }
 
     private static class BuildFailure

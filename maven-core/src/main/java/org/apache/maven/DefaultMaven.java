@@ -152,19 +152,18 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
-        ReactorManager rm;
-
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
 
         boolean foundProjects = true;
+        List projects;
         try
         {
             loadSettingsProfiles( globalProfileManager, request.getSettings() );
 
             List files = getProjectFiles( request );
 
-            List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                             request.getSettings(), globalProfileManager, !request.isReactorActive() );
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
+                                        request.getSettings(), globalProfileManager, !request.isReactorActive() );
 
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
@@ -175,15 +174,6 @@ public class DefaultMaven
                 projects.add( superProject );
 
                 foundProjects = false;
-            }
-
-            rm = new ReactorManager( projects );
-
-            String requestFailureBehavior = request.getFailureBehavior();
-
-            if ( requestFailureBehavior != null )
-            {
-                rm.setFailureBehavior( requestFailureBehavior );
             }
         }
         catch ( IOException e )
@@ -198,11 +188,24 @@ public class DefaultMaven
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
-        catch ( CycleDetectedException e )
+        catch ( ProfileActivationException e )
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
-        catch ( ProfileActivationException e )
+
+        ReactorManager rm = null;
+        try
+        {
+            rm = new ReactorManager( projects );
+
+            String requestFailureBehavior = request.getFailureBehavior();
+
+            if ( requestFailureBehavior != null )
+            {
+                rm.setFailureBehavior( requestFailureBehavior );
+            }
+        }
+        catch ( CycleDetectedException e )
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
@@ -228,18 +231,13 @@ public class DefaultMaven
                     if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) &&
                         exception instanceof ReactorException )
                     {
-                        logFailure( response, exception, null );
-
-                        if ( rm.hasMultipleProjects() && response.executedMultipleProjects() )
-                        {
-                            writeReactorSummary( rm );
-                        }
+                        logFailure( response, rm, exception, null );
                     }
                     else if ( exception instanceof MojoFailureException )
                     {
                         MojoFailureException e = (MojoFailureException) exception;
 
-                        logFailure( response, e, e.getLongMessage() );
+                        logFailure( response, rm, e, e.getLongMessage() );
                     }
                     else if ( exception instanceof MojoExecutionException )
                     {
@@ -248,7 +246,7 @@ public class DefaultMaven
                         {
                             MojoExecutionException e = (MojoExecutionException) exception;
 
-                            logFailure( response, e, e.getLongMessage() );
+                            logFailure( response, rm, e, e.getLongMessage() );
                         }
                         else
                         {
@@ -258,7 +256,7 @@ public class DefaultMaven
                     }
                     else if ( exception instanceof ArtifactNotFoundException )
                     {
-                        logFailure( response, exception, null );
+                        logFailure( response, rm, exception, null );
                     }
                     else
                     {
@@ -321,9 +319,13 @@ public class DefaultMaven
             {
                 logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
             }
-            else
+            else if ( rm.hasBuildSuccess( project ) )
             {
                 logReactorSummaryLine( project.getName(), "SUCCESS" );
+            }
+            else
+            {
+                logReactorSummaryLine( project.getName(), "NOT BUILT" );
             }
         }
 
@@ -360,7 +362,7 @@ public class DefaultMaven
         response.setStart( new Date() );
         response.setFinish( new Date() );
         response.setException( e );
-        logFailure( response, e, null );
+        logError( response );
 
         return response;
     }
@@ -628,8 +630,12 @@ public class DefaultMaven
 
     }
 
-    protected void logFailure( MavenExecutionResponse r, Throwable error, String longMessage )
+    protected void logFailure( MavenExecutionResponse r, ReactorManager rm, Throwable error, String longMessage )
     {
+        if ( rm.hasMultipleProjects() && r.executedMultipleProjects() )
+        {
+            writeReactorSummary( rm );
+        }
         line();
 
         getLogger().info( "BUILD FAILURE" );
