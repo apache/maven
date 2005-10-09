@@ -448,6 +448,7 @@
             which the project belongs.  These attributes are utilized when
             documentation is created (for copyright notices and links).
           ]]></description>
+          <alias>organisation</alias>
           <association>
             <type>Organization</type>
           </association>
@@ -1139,12 +1140,14 @@
         <!-- TODO: should this just be a single Organization element -->
         <field>
           <name>organization</name>
+          <alias>organisation</alias>
           <version>3.0.0+</version>
           <description><![CDATA[The organization to which the contributor belongs.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>organizationUrl</name>
+          <alias>organisationUrl</alias>
           <version>3.0.0+</version>
           <description><![CDATA[The URL of the organization.]]></description>
           <type>String</type>
