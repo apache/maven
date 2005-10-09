@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import util.FileUtils;
+
 public class ArtifactDownloader
 {
     public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
@@ -226,6 +228,11 @@ public class ArtifactDownloader
                     log( "Downloading " + url );
                     HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
                                        proxyUserName, proxyPassword, true );
+                    if ( dep.getVersion().indexOf( "SNAPSHOT" ) >= 0 )
+                    {
+                        String name = destinationFile.getName().replace( version, dep.getVersion() );
+                        FileUtils.copyFile( destinationFile, new File( destinationFile.getParentFile(), name ) );
+                    }
                 }
 
                 // Artifact was found, continue checking additional remote repos (if any)
