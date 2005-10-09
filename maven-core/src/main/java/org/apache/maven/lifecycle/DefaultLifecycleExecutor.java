@@ -242,24 +242,20 @@ public class DefaultLifecycleExecutor
                             catch ( MojoExecutionException e )
                             {
                                 // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task,
-                                                        System.currentTimeMillis() - buildStartTime );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( ArtifactResolutionException e )
                             {
                                 // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task,
-                                                        System.currentTimeMillis() - buildStartTime );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( MojoFailureException e )
                             {
-                                handleExecutionFailure( rm, rootProject, e, task,
-                                                        System.currentTimeMillis() - buildStartTime );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                             catch ( ArtifactNotFoundException e )
                             {
-                                handleExecutionFailure( rm, rootProject, e, task,
-                                                        System.currentTimeMillis() - buildStartTime );
+                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
                             }
                         }
 
@@ -330,24 +326,20 @@ public class DefaultLifecycleExecutor
                                 catch ( MojoExecutionException e )
                                 {
                                     // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task,
-                                                            System.currentTimeMillis() - buildStartTime );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( ArtifactResolutionException e )
                                 {
                                     // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task,
-                                                            System.currentTimeMillis() - buildStartTime );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( MojoFailureException e )
                                 {
-                                    handleExecutionFailure( rm, currentProject, e, task,
-                                                            System.currentTimeMillis() - buildStartTime );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                                 catch ( ArtifactNotFoundException e )
                                 {
-                                    handleExecutionFailure( rm, currentProject, e, task,
-                                                            System.currentTimeMillis() - buildStartTime );
+                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
                                 }
                             }
 
