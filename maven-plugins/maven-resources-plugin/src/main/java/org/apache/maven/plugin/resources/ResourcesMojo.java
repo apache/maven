@@ -184,7 +184,10 @@ public class ResourcesMojo
     {
         if ( !filtering )
         {
-            FileUtils.copyFile( from, to );
+            if ( to.lastModified() < from.lastModified() )
+            {
+                FileUtils.copyFile( from, to );
+            }
         }
         else
         {
