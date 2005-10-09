@@ -409,6 +409,14 @@ public class AntBuildWriter
             // TODO: should the artifacthandler be used instead?
             String path = toRelative( localRepository, artifact.getFile().getPath() );
 
+            File parentDirs = new File( path ).getParentFile();
+            if ( parentDirs != null ) 
+            {
+                writer.startElement( "mkdir" );
+                writer.addAttribute( "dir", parentDirs.getAbsolutePath() );
+                writer.endElement(); // mkdir
+            }
+            
             for ( Iterator j = project.getRepositories().iterator(); j.hasNext(); )
             {
                 Repository repository = (Repository) j.next();
