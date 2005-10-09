@@ -34,6 +34,7 @@ import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.StringOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -187,6 +188,10 @@ public class CheckstyleReport
      */
     private SiteRenderer siteRenderer;
 
+    private static final File[] EMPTY_FILE_ARRAY = new File[0];
+
+    private StringOutputStream stringOutputStream;
+
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
@@ -243,7 +248,7 @@ public class CheckstyleReport
 
         FilterSet filterSet = getSuppressions();
 
-        Checker checker = null;
+        Checker checker;
 
         try
         {
@@ -276,12 +281,7 @@ public class CheckstyleReport
             checker.addListener( listener );
         }
 
-        if ( useFile != null )
-        {
-            OutputStream out = getOutputStream( useFile );
-
-            checker.addListener( new DefaultLogger( out, true ) );
-        }
+        checker.addListener( getConsoleListener() );
 
         AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory, getBundle( locale ) );
 
@@ -290,6 +290,11 @@ public class CheckstyleReport
         int nbErrors = checker.process( files );
 
         checker.destroy();
+
+        if ( stringOutputStream != null )
+        {
+            getLog().info( stringOutputStream.toString() );
+        }
 
         if ( failsOnError && nbErrors > 0 )
         {
@@ -385,7 +390,7 @@ public class CheckstyleReport
             throw new MavenReportException( "Failed to get source files", ioe );
         }
 
-        return (File[]) ( files.toArray( new File[0] ) );
+        return (File[]) files.toArray( EMPTY_FILE_ARRAY );
     }
 
     private Properties getOverridingProperties()
@@ -427,7 +432,7 @@ public class CheckstyleReport
     {
         URL configFile;
 
-        if ( StringUtils.isEmpty( format ) || ( "sun".equalsIgnoreCase( format.trim() ) ) )
+        if ( StringUtils.isEmpty( format ) || "sun".equalsIgnoreCase( format.trim() ) )
         {
             // By default
             configFile = getClass().getResource( "/config/sun_checks.xml" );
@@ -482,6 +487,26 @@ public class CheckstyleReport
         {
             throw new MavenReportException( "failed to load suppressions XML: " + suppressionsFile, ce );
         }
+    }
+
+    private DefaultLogger getConsoleListener()
+        throws MavenReportException
+    {
+        DefaultLogger consoleListener;
+
+        if ( useFile == null )
+        {
+            stringOutputStream = new StringOutputStream();
+            consoleListener = new DefaultLogger( stringOutputStream, false );
+        }
+        else
+        {
+            OutputStream out = getOutputStream( useFile );
+
+            consoleListener = new DefaultLogger( out, true );
+        }
+
+        return consoleListener;
     }
 
     private static ResourceBundle getBundle( Locale locale )
