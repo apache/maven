@@ -24,11 +24,6 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
-
-  <prerequisites>
-    <maven>2.0-beta-4-SNAPSHOT</maven>
-  </prerequisites>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
