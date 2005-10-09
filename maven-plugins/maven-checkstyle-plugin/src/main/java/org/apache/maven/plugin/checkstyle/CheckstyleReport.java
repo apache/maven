@@ -105,7 +105,7 @@ public class CheckstyleReport
      * Specifies the location of the License file (a.k.a. the header file) that is used by Checkstyle
      * to verify that source code has the correct copyright.
      *
-     * @parameter
+     * @parameter expression="${basedir}/LICENSE.txt"
      */
     private String headerFile;
 
