@@ -8,6 +8,29 @@
 
 Guide to Creating Archetypes
 
+ Creating an archetype is a pretty straight forward process. An archetype is simply a JAR file that contains
+ the project prototype you wish to create. You need to create and archetype descriptor and specify the resources
+ that make up the project prototype. An archetype descriptor lists all the files that will be contained in the
+ archetype and categorizes them so they can be processed correctly by the archetype generation mechanism. The
+ archetype descriptor for the quickstart archetype shown in the getting started guide looks like the following:
+
++----+
+
+<archetype>
+  <id>quickstart</id>
+  <sources>
+    <source>src/main/java/App.java</source>
+  </sources>
+  <testSources>
+    <source>src/test/java/AppTest.java</source>
+  </testSources>
+</archetype>
+
++----+
+
+ Once you have the descriptor you need to create the resources for the archetype. Again we will use the quickstart
+ archetype as an example and show the whole directory structure of the archetype project:
+
 +----+
 
 archetype
@@ -28,3 +51,12 @@ archetype
                             `-- AppTest.java
 
 +----+
+
+ To make the archetype available for use your local system you simply need to execute the following command:
+
++----+
+
+m2 package
+
++----+
+
