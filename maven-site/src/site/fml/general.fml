@@ -156,14 +156,14 @@ Where: <path-to-file>  the path to the file to load
       <question>How do I unsubscribe from Maven mailing lists?</question>
       <answer>
         To unsubscribe from a Maven mailing list you simply send a message to
-        \<mailing-list\>-unsubscribe@maven.apache.org. So, if you have
+        \[mailing-list\]-unsubscribe@maven.apache.org. So, if you have
         subscribed to users@maven.apache.org then you would send a message 
         to users-unsubscribe@maven.apache.org in order to get off the list.
         People tend to have problems when they subscribe with one address and
         attempt to unsubscribe with another. So make sure that you are using the
         same address when unsubscribing that you used to subscribe before
         asking for help. If you find you still cannot get off a list then
-        send a message to \<mailing-list\>-help@maven.apache.org. These
+        send a message to \[mailing-list\]-help@maven.apache.org. These
         instructions are also appended to every message sent out on 
         a maven mailing list ...
       </answer>      
