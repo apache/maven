@@ -25,6 +25,7 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,26 +44,6 @@ public abstract class AbstractMavenReport
     extends AbstractMojo
     implements MavenReport
 {
-    /**
-     * @todo share, use default excludes from plexus utils.
-     */
-    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
-        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
-
-        // CVS
-        "**/CVS", "**/CVS/**", "**/.cvsignore",
-
-        // SCCS
-        "**/SCCS", "**/SCCS/**",
-
-        // Visual SourceSafe
-        "**/vssver.scc",
-
-        // Subversion
-        "**/.svn", "**/.svn/**",
-
-        // Mac
-        "**/.DS_Store"};
 
     private Sink sink;
 

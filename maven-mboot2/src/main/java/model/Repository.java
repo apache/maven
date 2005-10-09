@@ -80,10 +80,7 @@ public class Repository
         else if ( LAYOUT_DEFAULT.equals( layout ) )
         {
             repositoryPath = dependency.getGroupId().replace( '.', '/' );
-//            if ( !dependency.getType().equals( "pom" ) )
-//            {
             repositoryPath = repositoryPath + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
-//            }
             repositoryPath = repositoryPath + "/" + dependency.getArtifact();
         }
         else

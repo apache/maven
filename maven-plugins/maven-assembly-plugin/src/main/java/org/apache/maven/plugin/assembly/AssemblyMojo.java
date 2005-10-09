@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -304,8 +303,7 @@ public class AssemblyMojo
                                     "Unable to obtain unarchiver for file '" + artifact.getFile() + "'" );
                             }
                         }
-                        archiver.addDirectory( tempLocation, null,
-                                               (String[]) getDefaultExcludes().toArray( EMPTY_STRING_ARRAY ) );
+                        archiver.addDirectory( tempLocation, null, FileUtils.getDefaultExcludes() );
                     }
                     else
                     {
@@ -378,7 +376,7 @@ public class AssemblyMojo
 
             // TODO: default excludes should be in the archiver?
             List excludesList = fileSet.getExcludes();
-            excludesList.addAll( getDefaultExcludes() );
+            excludesList.addAll( FileUtils.getDefaultExcludesAsList() );
             String[] excludes = (String[]) excludesList.toArray( EMPTY_STRING_ARRAY );
 
             File archiveBaseDir = new File( directory );
@@ -528,42 +526,6 @@ public class AssemblyMojo
             archiver = this.archiverManager.getArchiver( format );
         }
         return archiver;
-    }
-
-    /**
-     * Insert into the exclude list the default excludes file pattern.
-     *
-     * @return defaultExcludes List containing the default patterns of files to be excluded.
-     */
-    public static List getDefaultExcludes()
-    {
-        List defaultExcludes = new ArrayList();
-        defaultExcludes.add( "**/*~" );
-        defaultExcludes.add( "**/#*#" );
-        defaultExcludes.add( "**/.#*" );
-        defaultExcludes.add( "**/%*%" );
-        defaultExcludes.add( "**/._*" );
-
-        // CVS
-        defaultExcludes.add( "**/CVS" );
-        defaultExcludes.add( "**/CVS/**" );
-        defaultExcludes.add( "**/.cvsignore" );
-
-        // SCCS
-        defaultExcludes.add( "**/SCCS" );
-        defaultExcludes.add( "**/SCCS/**" );
-
-        // Visual SourceSafe
-        defaultExcludes.add( "**/vssver.scc" );
-
-        // Subversion
-        defaultExcludes.add( "**/.svn" );
-        defaultExcludes.add( "**/.svn/**" );
-
-        // Mac
-        defaultExcludes.add( "**/.DS_Store" );
-
-        return defaultExcludes;
     }
 
     private void copyReplacingLineEndings( File source, File dest, String lineEndings )

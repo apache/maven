@@ -369,14 +369,15 @@ public class CheckstyleReport
             excludesStr.append( excludes );
         }
 
-        for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++ )
+        String[] defaultExcludes = FileUtils.getDefaultExcludes();
+        for ( int i = 0; i < defaultExcludes.length; i++ )
         {
             if ( excludesStr.length() > 0 )
             {
                 excludesStr.append( "," );
             }
 
-            excludesStr.append( DEFAULT_EXCLUDES[i] );
+            excludesStr.append( defaultExcludes[i] );
         }
 
         List files;

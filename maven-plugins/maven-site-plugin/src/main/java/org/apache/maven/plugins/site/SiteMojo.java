@@ -69,32 +69,6 @@ public class SiteMojo
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
     /**
-     * Patterns which should be excluded by default.
-     */
-    // TODO Push me into a shared area (plexus-utils?)
-    private static final String[] DEFAULT_EXCLUDES = new String[]{
-        // Miscellaneous typical temporary files
-        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
-
-        // CVS
-        "**/CVS", "**/CVS/**", "**/.cvsignore",
-
-        // SCCS
-        "**/SCCS", "**/SCCS/**",
-
-        // Visual SourceSafe
-        "**/vssver.scc",
-
-        // Subversion
-        "**/.svn", "**/.svn/**",
-
-        // Arch/Bazaar
-        "**/.arch-ids", "**/.arch-ids/**",
-
-        // Mac
-        "**/.DS_Store"};
-
-    /**
      * Directory containing source for apt, fml and xdoc docs.
      *
      * @parameter expression="${basedir}/src/site"
@@ -294,7 +268,7 @@ public class SiteMojo
 
                 // Try to find duplicate files
                 Map duplicate = new LinkedHashMap();
-                String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
+                String defaultExcludes = StringUtils.join( FileUtils.getDefaultExcludes(), "," );
 
                 if ( siteDirectoryFile.exists() )
                 {
