@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import util.FileUtils;
+import util.StringUtils;
 
 public class ArtifactDownloader
 {
@@ -230,7 +231,7 @@ public class ArtifactDownloader
                                        proxyUserName, proxyPassword, true );
                     if ( dep.getVersion().indexOf( "SNAPSHOT" ) >= 0 )
                     {
-                        String name = destinationFile.getName().replace( version, dep.getVersion() );
+                        String name = StringUtils.replace( destinationFile.getName(), version, dep.getVersion() );
                         FileUtils.copyFile( destinationFile, new File( destinationFile.getParentFile(), name ) );
                     }
                 }
