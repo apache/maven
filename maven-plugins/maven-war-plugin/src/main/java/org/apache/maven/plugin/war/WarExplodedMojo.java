@@ -30,7 +30,7 @@ public class WarExplodedMojo
 {
     public void execute() throws MojoExecutionException
     {
-        buildExplodedWebapp( getWebappDirectory(), getWebappDirectory() );
+        buildExplodedWebapp( getWebappDirectory() );
     }
 
 }
