@@ -123,7 +123,7 @@ public class DependenciesTask
             throw new BuildException( "Invalid version specification", e );
         }
 
-        log( "Resolving dependencies..." );
+        log( "Resolving dependencies...", Project.MSG_VERBOSE );
 
         WagonManager wagonManager = (WagonManager) lookup( WagonManager.ROLE );
         wagonManager.setDownloadMonitor( new AntDownloadMonitor() );
