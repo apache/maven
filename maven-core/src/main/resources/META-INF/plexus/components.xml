@@ -470,7 +470,7 @@
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
-          <role>org.codehaus.plexus.components.inputhandler.InputHandler</role>
+          <role>org.codehaus.plexus.components.interactivity.InputHandler</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
