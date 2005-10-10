@@ -34,6 +34,16 @@
       <groupId>plexus</groupId>
       <artifactId>plexus-site-renderer</artifactId>
       <version>1.0-alpha-2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
