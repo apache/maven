@@ -11,7 +11,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>RELEASE</version>
         <configuration>
           <descriptor>src/main/assembly/dep.xml</descriptor>
         </configuration>
@@ -44,7 +43,7 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-5-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -54,7 +53,7 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-5-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

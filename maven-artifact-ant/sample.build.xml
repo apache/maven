@@ -110,8 +110,8 @@
   <target name="test-deploy-spaces" depends="initTaskDefs">
     <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5-SNAPSHOT"/>
 
-    <echo file="test file.txt">dummy</echo>
-    <artifact:deploy file="test file.txt">
+    <echo file="target/test file.txt">dummy</echo>
+    <artifact:deploy file="target/test file.txt">
       <remoteRepository url="scp://localhost/tmp/deployment-repo" />
       <pom refid="maven.project"/>
     </artifact:deploy>
