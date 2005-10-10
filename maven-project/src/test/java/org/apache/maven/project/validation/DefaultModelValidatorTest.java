@@ -191,6 +191,18 @@ public class DefaultModelValidatorTest
         assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
     }
 
+    public void testMissingResourceDirectory()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-resource-directory-pom.xml" );
+
+        assertEquals( 2, result.getMessageCount() );
+
+        assertEquals( "'build.resources.resource.directory' is missing.", result.getMessage( 0 ) );
+
+        assertEquals( "'build.testResources.testResource.directory' is missing.", result.getMessage( 1 ) );
+    }
+
     private ModelValidationResult validate( String testName )
         throws Exception
     {

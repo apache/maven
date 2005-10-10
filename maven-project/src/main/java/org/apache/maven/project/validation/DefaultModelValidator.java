@@ -25,6 +25,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
@@ -115,6 +116,20 @@ public class DefaultModelValidator
                 validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
 
                 validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
+            }
+
+            for ( Iterator it = build.getResources().iterator(); it.hasNext(); )
+            {
+                Resource r = (Resource) it.next();
+
+                validateStringNotEmpty( "build.resources.resource.directory", result, r.getDirectory() );
+            }
+
+            for ( Iterator it = build.getTestResources().iterator(); it.hasNext(); )
+            {
+                Resource r = (Resource) it.next();
+
+                validateStringNotEmpty( "build.testResources.testResource.directory", result, r.getDirectory() );
             }
         }
 
