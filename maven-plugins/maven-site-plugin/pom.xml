@@ -9,6 +9,9 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Site plugin</name>
   <version>2.0-beta-3-SNAPSHOT</version>
+  <prerequisites>
+    <maven>2.0-beta-4-SNAPSHOT</maven>
+  </prerequisites>
   <developers>
     <developer>
       <id>vsiveton</id>
@@ -45,11 +48,23 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-ssh</artifactId>
       <version>1.0-alpha-4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

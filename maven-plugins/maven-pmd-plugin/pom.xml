@@ -10,6 +10,9 @@
   <name>Maven PMD Plugin</name>
   <version>2.0-alpha-3-SNAPSHOT</version>
   <inceptionYear>2005</inceptionYear>
+  <prerequisites>
+    <maven>2.0-beta-4-SNAPSHOT</maven>
+  </prerequisites>
   <dependencies>
     <dependency>
       <groupId>pmd</groupId>

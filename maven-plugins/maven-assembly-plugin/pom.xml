@@ -10,7 +10,7 @@
   <name>Maven Assembly Plugin</name>
   <version>2.0-beta-2-SNAPSHOT</version>
   <prerequisites>
-    <maven>2.0-beta-3</maven>
+    <maven>2.0-beta-4-SNAPSHOT</maven>
   </prerequisites>
   <developers>
     <developer>
