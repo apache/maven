@@ -29,6 +29,13 @@
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
       <classpath refid="maven.classpath"/>
     </typedef>
+
+    <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
+
+    <artifact:remoteRepository id="deploy.repository" url="file://localhost/${basedir}/target/deployment-repo" layout="legacy"/>
+
+    <artifact:pom file="pom.xml" id="maven.project"/>
+
   </target>
 
   <target name="test-no-deps" depends="initTaskDefs">
@@ -62,12 +69,6 @@
   </target>
 
   <target name="foo" depends="initTaskDefs">
-    <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
-
-    <artifact:remoteRepository id="deploy.repository" url="file://${basedir}/target/deployment-repo" layout="legacy"/>
-
-    <artifact:pom file="pom.xml" id="maven.project"/>
-
     <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2">
         <exclusion groupId="junit" artifactId="junit"/>
@@ -101,6 +102,22 @@
       <fileset refid="my.compile.dependency.fileset"/>
     </copy>
 
+    <antcall target="test-deploy" />
+
+    <antcall target="test-legacy-pom" />
+  </target>
+
+  <target name="test-deploy-spaces" depends="initTaskDefs">
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5-SNAPSHOT"/>
+
+    <echo file="test file.txt">dummy</echo>
+    <artifact:deploy file="test file.txt">
+      <remoteRepository url="scp://localhost/tmp/deployment-repo" />
+      <pom refid="maven.project"/>
+    </artifact:deploy>
+  </target>
+
+  <target name="test-deploy" depends="initTaskDefs">
     <property name="outJar" value="${maven.project.build.directory}/${maven.project.build.finalName}.jar"/>
 
     <artifact:install file="${outJar}">
@@ -113,7 +130,7 @@
       <pom refid="maven.project"/>
     </artifact:deploy>
 
-    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-4"/>
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5-SNAPSHOT"/>
 
     <artifact:deploy file="${outJar}">
       <remoteRepository url="scp://localhost/tmp/deployment-repo">
@@ -121,11 +138,10 @@
       </remoteRepository>
       <pom refid="maven.project"/>
     </artifact:deploy>
-
-    <antcall target="test-legacy-pom" />
   </target>
 
   <target name="test-scm" depends="initTaskDefs">
+    <echo>Testing SCM Wagon</echo>
     <mkdir dir="target"/>
 
     <pathconvert targetos="unix" property="repo.path.unix">
