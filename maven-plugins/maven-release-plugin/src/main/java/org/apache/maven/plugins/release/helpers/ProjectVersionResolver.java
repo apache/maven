@@ -20,7 +20,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.components.inputhandler.InputHandler;
+import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class ProjectVersionResolver
                     projectVersion = inputVersion;
                 }
             }
-            catch ( Exception e )
+            catch ( IOException e )
             {
                 throw new MojoExecutionException( "Can't read release version from user input.", e );
             }
@@ -112,13 +112,19 @@ public class ProjectVersionResolver
         // releaseVersion = 1.0.4
         // snapshotVersion = 1.0.5-SNAPSHOT
 
-        String staticVersionPart = null;
-        String nextVersionString = null;
+        String staticVersionPart;
+        String nextVersionString;
 
+        int rcIdx = projectVersion.toLowerCase().lastIndexOf( "-rc" );
         int dashIdx = projectVersion.lastIndexOf( "-" );
         int dotIdx = projectVersion.lastIndexOf( "." );
 
-        if ( dashIdx > 0 )
+        if ( rcIdx >= dashIdx )
+        {
+            staticVersionPart = projectVersion.substring( 0, rcIdx + 3 );
+            nextVersionString = projectVersion.substring( rcIdx + 3 );
+        }
+        else if ( dashIdx > 0 )
         {
             staticVersionPart = projectVersion.substring( 0, dashIdx + 1 );
             nextVersionString = projectVersion.substring( dashIdx + 1 );
