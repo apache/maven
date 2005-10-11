@@ -168,26 +168,25 @@ public class DefaultPluginVersionManager
             }
         }
 
-        // TODO: Remove this...it shouldn't be needed anymore.
-        
+        // TODO: Remove this...it shouldn't be needed anymore. Leaving it in for backward compat.
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
         // in settings.xml.
-//        if ( StringUtils.isEmpty( version ) )
-//        {
-//            // 1. resolve the version to be used
-//            version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
-//                                          Artifact.RELEASE_VERSION );
-//
-//            if ( version != null )
-//            {
-//                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
-//                updatedVersion = version;
-//
-//                // 3. Persist this version without prompting.
-//                forcePersist = true;
-//                promptToPersist = false;
-//            }
-//        }
+        if ( StringUtils.isEmpty( version ) )
+        {
+            // 1. resolve the version to be used
+            version = resolveMetaVersion( groupId, artifactId, project, localRepository,
+                                          Artifact.RELEASE_VERSION );
+
+            if ( version != null )
+            {
+                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
+                updatedVersion = version;
+
+                // 3. Persist this version without prompting.
+                forcePersist = true;
+                promptToPersist = false;
+            }
+        }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
         if ( StringUtils.isEmpty( version ) )
