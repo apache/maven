@@ -21,6 +21,7 @@ import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.tools.ant.BuildException;
@@ -54,35 +55,47 @@ public class DeployTask
             throw new BuildException( "A POM element is required to deploy to the repository" );
         }
 
-        if ( remoteRepository == null )
-        {
-            if ( pom.getDistributionManagement() == null || pom.getDistributionManagement().getRepository() == null )
-            {
-                throw new BuildException( "A distributionManagement element is required in your POM to deploy" );
-            }
+        Artifact artifact = createArtifact( pom );
 
-            remoteRepository = createAntRemoteRepositoryBase( pom.getDistributionManagement().getRepository() );
+        DistributionManagement distributionManagement = pom.getDistributionManagement();
+
+        if ( remoteSnapshotRepository == null && remoteRepository == null )
+        {
+            if ( distributionManagement != null )
+            {
+                if ( distributionManagement.getSnapshotRepository() != null )
+                {
+                    remoteSnapshotRepository = createAntRemoteRepositoryBase(
+                        distributionManagement.getSnapshotRepository() );
+                }
+                if ( distributionManagement.getRepository() != null )
+                {
+                    remoteRepository = createAntRemoteRepositoryBase( distributionManagement.getRepository() );
+                }
+            }
         }
 
         if ( remoteSnapshotRepository == null )
         {
-            if ( pom.getDistributionManagement().getSnapshotRepository() != null )
-            {
-                remoteSnapshotRepository = createAntRemoteRepositoryBase(
-                    pom.getDistributionManagement().getSnapshotRepository() );
-            }
+            remoteSnapshotRepository = remoteRepository;
         }
 
-        // Deploy the POM
-        Artifact artifact = createArtifact( pom );
-
-        ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
-
-        if ( remoteSnapshotRepository != null && artifact.isSnapshot() )
+        ArtifactRepository deploymentRepository = null;
+        if ( artifact.isSnapshot() && remoteSnapshotRepository != null )
         {
             deploymentRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
         }
+        else if ( remoteRepository != null )
+        {
+            deploymentRepository = createRemoteArtifactRepository( remoteRepository );
+        }
+        else
+        {
+            throw new BuildException(
+                "A distributionManagement element or remoteRepository element is required to deploy" );
+        }
 
+        // Deploy the POM
         boolean isPomArtifact = "pom".equals( pom.getPackaging() );
         if ( !isPomArtifact )
         {

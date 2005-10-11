@@ -70,7 +70,7 @@
 
   <target name="foo" depends="initTaskDefs">
     <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
-      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2">
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-4">
         <exclusion groupId="junit" artifactId="junit"/>
       </dependency>
       <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
@@ -164,7 +164,7 @@
     <artifact:remoteRepository id="deploy.repository" url="scm:svn:${scm.url}" layout="default"/>
 
     <artifact:dependencies pathId="dependency.classpath">
-      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-4"/>
       <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
@@ -183,7 +183,7 @@
     <artifact:localRepository id="local.repository.scm" location="${basedir}/target/local-repo-scm" layout="default"/>
 
     <artifact:dependencies pathId="dependency.classpath.scm">
-      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-4"/>
       <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-6-SNAPSHOT"/>
       <localRepository refid="local.repository.scm"/>
       <remoteRepository refid="deploy.repository"/>
@@ -201,6 +201,13 @@
     <artifact:dependencies>
       <pom refid="invalid-ref" />
     </artifact:dependencies>
+  </target>
+
+  <target name="test-no-dist-mgmt" depends="initTaskDefs">
+    <artifact:deploy file="sample-build-test.pom">
+      <pom file="sample-build-test.pom" />
+      <remoteRepository refid="deploy.repository" />
+    </artifact:deploy>  
   </target>
 </project>
 
