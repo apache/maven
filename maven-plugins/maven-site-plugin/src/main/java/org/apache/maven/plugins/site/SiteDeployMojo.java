@@ -23,18 +23,16 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.ConnectionException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.UnsupportedProtocolException;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.observers.Debug;
-import org.apache.maven.wagon.providers.ssh.SshCommandExecutor;
+import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.repository.Repository;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Deploys website using scp/file protocol.
@@ -58,11 +56,6 @@ public class SiteDeployMojo
     private File inputDirectory;
 
     /**
-     * @parameter
-     */
-    private String unzipCommand = "unzip -o";
-
-    /**
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -70,9 +63,7 @@ public class SiteDeployMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.manager.WagonManager}"
-     * @required
-     * @readonly
+     * @component
      */
     private WagonManager wagonManager;
 
@@ -82,17 +73,6 @@ public class SiteDeployMojo
         if ( !inputDirectory.exists() )
         {
             throw new MojoExecutionException( "The site does not exist, please run site:site first" );
-        }
-
-        File zipFile;
-
-        try
-        {
-            zipFile = File.createTempFile( "site", ".zip" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Cannot create site archive!", e );
         }
 
         DistributionManagement distributionManagement = project.getDistributionManagement();
@@ -121,159 +101,66 @@ public class SiteDeployMojo
 
         Repository repository = new Repository( id, url );
 
-        String siteProtocol = repository.getProtocol();
+        // TODO: work on moving this into the deployer like the other deploy methods
 
-        if ( "scp".equals( siteProtocol ) )
+        Wagon wagon = null;
+        try
         {
-            scpDeploy( zipFile, id, repository );
+            wagon = wagonManager.getWagon( repository.getProtocol() );
         }
-        else if ( "file".equals( siteProtocol ) )
+        catch ( UnsupportedProtocolException e )
         {
-            File toDir = new File( repository.getBasedir() );
-            fileDeploy( toDir );
+            throw new MojoExecutionException( "Unsupported protocol: '" + repository.getProtocol() + "'", e );
         }
-        else
+
+        if ( !wagon.supportsDirectoryCopy() )
         {
             throw new MojoExecutionException(
-                "The deploy mojo currently only supports site deployment using the 'scp' and 'file' protocols." );
+                "Wagon protocol '" + repository.getProtocol() + "' doesn't support directory copying" );
         }
-    }
-
-
-    /**
-     * @throws MojoExecutionException
-     */
-    private void fileDeploy( File toDir )
-        throws MojoExecutionException
-    {
-        try
-        {
-            FileUtils.copyDirectoryStructure( inputDirectory, toDir );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Error transfering site!", e );
-        }
-    }
-
-
-    /**
-     * @param zipFile
-     * @param id
-     * @param repository
-     * @throws MojoExecutionException
-     */
-    private void scpDeploy( File zipFile, String id, Repository repository )
-        throws MojoExecutionException
-    {
-        SshCommandExecutor commandExecutor = null;
 
         try
         {
-            commandExecutor = (SshCommandExecutor) wagonManager.getWagon( "scp" );
-
-            commandExecutor.connect( repository, wagonManager.getAuthenticationInfo( id ) );
-
-            String basedir = repository.getBasedir();
-
-            List files = FileUtils.getFileNames( inputDirectory, "**/**", "", false );
-
-            createZip( files, zipFile, inputDirectory );
-
             Debug debug = new Debug();
 
-            commandExecutor.addSessionListener( debug );
+            wagon.addSessionListener( debug );
 
-            commandExecutor.addTransferListener( debug );
+            wagon.addTransferListener( debug );
 
-            String cmd = " mkdir -p " + basedir;
+            wagon.connect( repository, wagonManager.getAuthenticationInfo( id ) );
 
-            commandExecutor.executeCommand( cmd );
-
-            commandExecutor.put( zipFile, zipFile.getName() );
-
-            // TODO: cat to file is temporary until the ssh executor is fixed to deal with output
-            cmd = " cd " + basedir + ";" + unzipCommand + " " + zipFile.getName() + " >scpdeploymojo.log";
-
-            commandExecutor.executeCommand( cmd );
-
-            if ( !basedir.endsWith( "/" ) )
-            {
-                basedir = basedir + "/";
-            }
-
-            commandExecutor.executeCommand( "rm -f " + basedir + zipFile.getName() + " scpdeploymojo.log" );
+            wagon.putDirectory( inputDirectory, "." );
         }
-        catch ( Exception e )
+        catch ( ResourceDoesNotExistException e )
         {
-            throw new MojoExecutionException( "Error transfering site archive!", e );
+            throw new MojoExecutionException( "Error uploading site", e );
         }
-        finally
+        catch ( TransferFailedException e )
         {
-            if ( commandExecutor != null )
-            {
-                try
-                {
-                    commandExecutor.disconnect();
-                }
-                catch ( ConnectionException e )
-                {
-                    //what to to here?
-                }
-            }
-
-            if ( !zipFile.delete() )
-            {
-                zipFile.deleteOnExit();
-            }
+            throw new MojoExecutionException( "Error uploading site", e );
         }
-    }
-
-
-    public void createZip( List files, File zipName, File basedir )
-        throws Exception
-    {
-        ZipOutputStream zos = new ZipOutputStream( new FileOutputStream( zipName ) );
-
-        try
+        catch ( AuthorizationException e )
         {
-            for ( int i = 0; i < files.size(); i++ )
-            {
-                String file = (String) files.get( i );
-
-                writeZipEntry( zos, new File( basedir, file ), file );
-            }
+            throw new MojoExecutionException( "Error uploading site", e );
+        }
+        catch ( ConnectionException e )
+        {
+            throw new MojoExecutionException( "Error uploading site", e );
+        }
+        catch ( AuthenticationException e )
+        {
+            throw new MojoExecutionException( "Error uploading site", e );
         }
         finally
         {
-            zos.close();
-        }
-    }
-
-    private void writeZipEntry( ZipOutputStream jar, File source, String entryName )
-        throws Exception
-    {
-        byte[] buffer = new byte[1024];
-
-        int bytesRead;
-
-        FileInputStream is = new FileInputStream( source );
-
-        try
-        {
-            ZipEntry entry = new ZipEntry( entryName );
-
-            jar.putNextEntry( entry );
-
-            while ( ( bytesRead = is.read( buffer ) ) != -1 )
+            try
             {
-                jar.write( buffer, 0, bytesRead );
+                wagon.disconnect();
             }
-        }
-
-        finally
-        {
-            is.close();
+            catch ( ConnectionException e )
+            {
+                getLog().error( "Error disconnecting wagon - ignored", e );
+            }
         }
     }
 }
