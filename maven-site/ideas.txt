@@ -32,21 +32,6 @@ the <project> element. So:
 
 +----+
 
-
-* Guide to system properties
-
- System vars are accessed implicitly in m2...try:
-
-+----+
-
-<configuration>
-  <debug>${build.debug}</debug>
-  <source>${build.jdk}</source>
-  <target>${build.jdk}</target>
-</configuration>
-
-+----+
-
 ==
 
 How do I get the list of artifacts within my plugin?
