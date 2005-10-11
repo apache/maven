@@ -96,7 +96,7 @@ public class ReactorManager
 
     public void blackList( MavenProject project )
     {
-        blackList( ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() ) );
+        blackList( getProjectKey( project ) );
     }
 
     private void blackList( String id )
@@ -113,7 +113,11 @@ public class ReactorManager
                 {
                     String dependentId = (String) it.next();
 
-                    blackList( dependentId );
+                    if ( !buildSuccessesByProject.containsKey( dependentId ) &&
+                        !buildFailuresByProject.containsKey( dependentId ) )
+                    {
+                        blackList( dependentId );
+                    }
                 }
             }
         }
@@ -121,12 +125,17 @@ public class ReactorManager
 
     public boolean isBlackListed( MavenProject project )
     {
-        return blackList.contains( ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() ) );
+        return blackList.contains( getProjectKey( project ) );
+    }
+
+    private static String getProjectKey( MavenProject project )
+    {
+        return ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
     }
 
     public void registerBuildFailure( MavenProject project, Exception error, String task, long time )
     {
-        buildFailuresByProject.put( project.getId(), new BuildFailure( error, task, time ) );
+        buildFailuresByProject.put( getProjectKey( project ), new BuildFailure( error, task, time ) );
     }
 
     public boolean hasBuildFailures()
@@ -136,7 +145,7 @@ public class ReactorManager
 
     public boolean hasBuildFailure( MavenProject project )
     {
-        return buildFailuresByProject.containsKey( project.getId() );
+        return buildFailuresByProject.containsKey( getProjectKey( project ) );
     }
 
     public boolean hasMultipleProjects()
@@ -156,22 +165,22 @@ public class ReactorManager
 
     public boolean hasBuildSuccess( MavenProject project )
     {
-        return buildSuccessesByProject.containsKey( project.getId() );
+        return buildSuccessesByProject.containsKey( getProjectKey( project ) );
     }
 
     public void registerBuildSuccess( MavenProject project, long time )
     {
-        buildSuccessesByProject.put( project.getId(), new BuildSuccess( project, time ) );
+        buildSuccessesByProject.put( getProjectKey( project ), new BuildSuccess( project, time ) );
     }
 
     public BuildFailure getBuildFailure( MavenProject project )
     {
-        return (BuildFailure) buildFailuresByProject.get( project.getId() );
+        return (BuildFailure) buildFailuresByProject.get( getProjectKey( project ) );
     }
 
     public BuildSuccess getBuildSuccess( MavenProject project )
     {
-        return (BuildSuccess) buildSuccessesByProject.get( project.getId() );
+        return (BuildSuccess) buildSuccessesByProject.get( getProjectKey( project ) );
     }
 
 }
