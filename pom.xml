@@ -219,15 +219,10 @@
   </dependencyManagement>
   <distributionManagement>
     <repository>
-      <id>repo1</id>
+      <id>localhost</id>
       <name>Maven Central Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
+      <url>scp://localhost/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <name>Maven Central Development Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
-    </snapshotRepository>
     <site>
       <id>website</id>
       <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>

@@ -459,6 +459,8 @@ public class MavenCli
             wagonManager.setDownloadMonitor( new BatchModeDownloadMonitor() );
         }
 
+        wagonManager.setInteractive( interactive );
+
         return (Maven) embedder.lookup( Maven.ROLE );
     }
 

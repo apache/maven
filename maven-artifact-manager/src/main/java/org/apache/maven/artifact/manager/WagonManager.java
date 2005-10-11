@@ -75,4 +75,6 @@ public interface WagonManager
     ProxyInfo getProxy( String protocol );
 
     AuthenticationInfo getAuthenticationInfo( String id );
+
+    void setInteractive( boolean interactive );
 }

@@ -75,6 +75,8 @@ public class DefaultWagonManager
 
     private ArtifactRepositoryFactory repositoryFactory;
 
+    private boolean interactive = true;
+
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
@@ -83,6 +85,7 @@ public class DefaultWagonManager
         try
         {
             wagon = (Wagon) container.lookup( Wagon.ROLE, protocol );
+            wagon.setInteractive( interactive );
         }
         catch ( ComponentLookupException e )
         {
@@ -671,5 +674,10 @@ public class DefaultWagonManager
     public boolean isOnline()
     {
         return online;
+    }
+
+    public void setInteractive( boolean interactive )
+    {
+        this.interactive = interactive;
     }
 }
