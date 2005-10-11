@@ -17,6 +17,7 @@ package org.apache.maven.plugin.version;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -92,6 +93,25 @@ public class DefaultPluginVersionManager
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
+        // if there was no explicit version, try for one in the reactor
+        if ( version == null )
+        {
+            // check self
+            if ( project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
+            {
+                version = project.getVersion();
+            }
+            else if ( project.getProjectReferences() != null )
+            {
+                String refId = ArtifactUtils.versionlessKey( groupId, artifactId );
+                MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
+                if ( ref != null )
+                {
+                    version = ref.getVersion();
+                }
+            }
+        }
+
         // we're NEVER going to persist POM-derived plugin versions.
         String updatedVersion = null;
 
@@ -121,8 +141,8 @@ public class DefaultPluginVersionManager
                 if ( Boolean.TRUE.equals( pluginUpdateOverride ) ||
                     ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
-                    updatedVersion = resolveMetaVersion( groupId, artifactId, project,
-                                                         localRepository, Artifact.LATEST_VERSION );
+                    updatedVersion = resolveMetaVersion( groupId, artifactId, project, localRepository,
+                                                         Artifact.LATEST_VERSION );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -154,8 +174,7 @@ public class DefaultPluginVersionManager
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project, localRepository,
-                                          Artifact.LATEST_VERSION );
+            version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
 
             if ( version != null )
             {
@@ -168,14 +187,12 @@ public class DefaultPluginVersionManager
             }
         }
 
-        // TODO: Remove this...it shouldn't be needed anymore. Leaving it in for backward compat.
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
         // in settings.xml.
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project, localRepository,
-                                          Artifact.RELEASE_VERSION );
+            version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
 
             if ( version != null )
             {
@@ -624,7 +641,7 @@ public class DefaultPluginVersionManager
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         project.replaceWithActiveArtifact( artifact );
-        
+
         String version = null;
 
         if ( artifact.isResolved() )
@@ -651,7 +668,8 @@ public class DefaultPluginVersionManager
                     boolean pluginValid = true;
 
                     // if we don't have the required Maven version, then ignore an update
-                    if ( pluginProject.getPrerequisites() != null && pluginProject.getPrerequisites().getMaven() != null )
+                    if ( pluginProject.getPrerequisites() != null &&
+                        pluginProject.getPrerequisites().getMaven() != null )
                     {
                         DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
                             pluginProject.getPrerequisites().getMaven() );
