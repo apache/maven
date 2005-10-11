@@ -22,7 +22,7 @@ import org.apache.tools.ant.taskdefs.Taskdef;
 public abstract class AbstractCloverMojo extends AbstractMojo
 {
     /**
-     * @parameter expression=""
+     * @parameter
      */
     private String licenseFile;
 
@@ -35,6 +35,7 @@ public abstract class AbstractCloverMojo extends AbstractMojo
     protected void registerLicenseFile()
     {
         String licenseToUse = this.licenseFile;
+
         if (licenseToUse == null)
         {
             licenseToUse = getClass().getResource("/clover.license").getFile();
