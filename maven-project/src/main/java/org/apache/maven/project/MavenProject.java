@@ -1461,7 +1461,7 @@ public class MavenProject
         if ( getProjectReferences() != null && !getProjectReferences().isEmpty() )
         {
             // TODO: use MavenProject getProjectReferenceId
-            String refId = pluginArtifact.getGroupId() + ":" + pluginArtifact.getArtifactId();
+            String refId = ArtifactUtils.versionlessKey( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId() );
             MavenProject ref = (MavenProject) getProjectReferences().get( refId );
             if ( ref != null && ref.getArtifact() != null )
             {
