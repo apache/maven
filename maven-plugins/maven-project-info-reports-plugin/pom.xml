@@ -95,4 +95,12 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <!-- for reactor ordering -->
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
