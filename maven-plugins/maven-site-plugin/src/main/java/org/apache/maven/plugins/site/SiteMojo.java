@@ -226,8 +226,8 @@ public class SiteMojo
         Map categories = categorizeReports( reports );
 
         Comparator reportComparator = new ReportComparator();
-        List projectInfos = Collections.sort( (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION ), reportComparator );
-        List projectReports = Collections.sort( (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS ), reportComparator );
+        List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
+        List projectReports = (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS );
 
         if ( projectInfos == null )
         {
@@ -239,6 +239,9 @@ public class SiteMojo
             projectReports = Collections.EMPTY_LIST;
         }
 
+        Collections.sort( projectInfos, reportComparator );
+        Collections.sort( projectReports, reportComparator );
+        
         try
         {
             List localesList = initLocalesList();
