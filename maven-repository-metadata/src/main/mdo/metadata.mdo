@@ -108,6 +108,16 @@
                     v.getVersions().add( version );
                 }
             }
+          
+            if ( "null".equals( versioning.getLastUpdated() ) )
+            {
+                versioning.setLastUpdated( null );
+            }
+
+            if ( "null".equals( v.getLastUpdated() ) )
+            {
+                v.setLastUpdated( null );
+            }
 
             if ( versioning.getLastUpdated() == null || versioning.getLastUpdated().length() == 0 )
             {

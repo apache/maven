@@ -93,23 +93,33 @@ public class DefaultPluginVersionManager
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
+        // NOTE: [jc; 11-Oct-2005] We CANNOT have this type of code in here. It will prevent plugins from building themselves,
+        // if they are part of the lifecycle mapping. For example, try the following:
+        //
+        // 1. Uncomment the remainder of the following code block and rebuild the core jar; put it in the m2 distro
+        // 2. rm -Rf <local-repo>/org/apache/maven/plugins/maven-surefire-plugin
+        // 3. go to <maven>/maven-plugins/maven-surefire-plugin, and try to build it.
+        //
+        // In the above example, the surefire plugin fails to build because the version used for testing is
+        // resolved to the version currently being built...which obviously doesn't exist yet.
+        
         // if there was no explicit version, try for one in the reactor
         if ( version == null )
         {
             // check self
-            if ( project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
-            {
-                version = project.getVersion();
-            }
-            else if ( project.getProjectReferences() != null )
-            {
+//            if ( project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
+//            {
+//                version = project.getVersion();
+//            }
+//            else if ( project.getProjectReferences() != null )
+//            {
                 String refId = ArtifactUtils.versionlessKey( groupId, artifactId );
                 MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
                 if ( ref != null )
                 {
                     version = ref.getVersion();
                 }
-            }
+//            }
         }
 
         // we're NEVER going to persist POM-derived plugin versions.
@@ -640,70 +650,61 @@ public class DefaultPluginVersionManager
     {
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
-        project.replaceWithActiveArtifact( artifact );
-
         String version = null;
 
-        if ( artifact.isResolved() )
+        try
         {
-            version = artifact.getVersion();
-        }
-        else
-        {
-            try
+            ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository,
+                                                                               project.getPluginArtifactRepositories() );
+
+            // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
+            // artifact.
+            artifact = resolutionGroup.getPomArtifact();
+
+            // make sure this artifact was actually resolved to a file in the repo...
+            if ( artifact.getFile() != null )
             {
-                ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository,
-                                                                                   project.getPluginArtifactRepositories() );
+                MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project
+                    .getPluginArtifactRepositories(), localRepository, false );
 
-                // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
-                // artifact.
-                artifact = resolutionGroup.getPomArtifact();
+                boolean pluginValid = true;
 
-                // make sure this artifact was actually resolved to a file in the repo...
-                if ( artifact.getFile() != null )
+                // if we don't have the required Maven version, then ignore an update
+                if ( pluginProject.getPrerequisites() != null &&
+                    pluginProject.getPrerequisites().getMaven() != null )
                 {
-                    MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project
-                        .getPluginArtifactRepositories(), localRepository, false );
+                    DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
+                        pluginProject.getPrerequisites().getMaven() );
 
-                    boolean pluginValid = true;
-
-                    // if we don't have the required Maven version, then ignore an update
-                    if ( pluginProject.getPrerequisites() != null &&
-                        pluginProject.getPrerequisites().getMaven() != null )
+                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
                     {
-                        DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                            pluginProject.getPrerequisites().getMaven() );
-
-                        if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
-                        {
-                            getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
-                                " as it requires Maven version " + requiredVersion );
-                            pluginValid = false;
-                        }
-                    }
-
-                    String artifactVersion = artifact.getVersion();
-
-                    if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
-                    {
-                        version = artifactVersion;
+                        getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
+                            " as it requires Maven version " + requiredVersion );
+                        pluginValid = false;
                     }
                 }
+
+                String artifactVersion = artifact.getVersion();
+
+                if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
+                {
+                    version = artifactVersion;
+                }
             }
-            catch ( ArtifactMetadataRetrievalException e )
-            {
-                getLogger().debug( "Failed to resolve " + metaVersionId + " version", e );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Unable to build resolve plugin project information", e );
-            }
-            catch ( IOException e )
-            {
-                throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Unable to determine Maven version for comparison", e );
-            }
+        }
+        catch ( ArtifactMetadataRetrievalException e )
+        {
+            getLogger().debug( "Failed to resolve " + metaVersionId + " version", e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new PluginVersionResolutionException( groupId, artifactId,
+                                                        "Unable to build resolve plugin project information", e );
+        }
+        catch ( IOException e )
+        {
+            throw new PluginVersionResolutionException( groupId, artifactId,
+                                                        "Unable to determine Maven version for comparison", e );
         }
 
         return version;
