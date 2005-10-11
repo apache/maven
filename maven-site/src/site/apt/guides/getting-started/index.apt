@@ -650,6 +650,23 @@ environment=${environment}
 
 +----+
 
+* How do I filter against system properties
+
+ You simply specify the system property using the standard variable notion as show below:
+
++----+
+
+# application.properties
+
+application.name=${pom.name}
+application.version=${pom.version}
+
+environment=${environment}
+
+java.version=${java.version}
+
++----+
+
 * {How do I use external dependencies?}
 
  You probably already noticed a <<<dependencies>>> element in the POM we've been using as an example
