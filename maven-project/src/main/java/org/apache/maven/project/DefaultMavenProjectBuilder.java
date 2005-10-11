@@ -167,7 +167,7 @@ public class DefaultMavenProjectBuilder
                                                ProfileManager profileManager, TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, profileManager );
+        MavenProject project = build( projectDescriptor, localRepository, profileManager );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -265,11 +265,20 @@ public class DefaultMavenProjectBuilder
                                ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        return buildFromSourceFile( projectDescriptor, localRepository, profileManager );
+        return buildFromSourceFile( projectDescriptor, localRepository, profileManager, true );
+    }
+
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
+                               ProfileManager profileManager, boolean checkDistributionManagementStatus )
+        throws ProjectBuildingException
+    {
+        return buildFromSourceFile( projectDescriptor, localRepository, profileManager,
+                                    checkDistributionManagementStatus );
     }
 
     private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
-                                              ProfileManager profileManager )
+                                              ProfileManager profileManager,
+                                              boolean checkDistributionManagementStatus )
         throws ProjectBuildingException
     {
         Model model = readModel( "unknown", projectDescriptor );
@@ -283,10 +292,13 @@ public class DefaultMavenProjectBuilder
                                       buildArtifactRepositories( getSuperModel() ),
                                       projectDescriptor.getAbsoluteFile().getParentFile(), profileManager );
 
-        if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
+        if ( checkDistributionManagementStatus )
         {
-            throw new ProjectBuildingException( project.getId(), 
-                "Invalid project file: distribution status must not be specified for a project outside of the repository" );
+            if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
+            {
+                throw new ProjectBuildingException( project.getId(), 
+                    "Invalid project file: distribution status must not be specified for a project outside of the repository" );
+            }
         }
 
         // Only translate the base directory for files in the source tree
