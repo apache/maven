@@ -16,12 +16,6 @@ package org.apache.maven.report.projectinfo;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
-
-import org.apache.maven.Maven;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
@@ -33,6 +27,11 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
 
 /**
  * An abstract TestCase class to test <code>Maven Reports</code> generated.
@@ -150,10 +149,10 @@ public abstract class AbstractMavenReportTestCase
     {
         File projectDir = getTestProjectDir( projectDirName );
 
-        File pom = new File( projectDir, Maven.POMv4 );
+        File pom = new File( projectDir, "pom.xml" );
         if ( !pom.exists() )
         {
-            throw new IllegalArgumentException( "No '" + Maven.POMv4 + "' file exists in the test project directory '"
+            throw new IllegalArgumentException( "No 'pom.xml' file exists in the test project directory '"
                 + projectDir.getAbsolutePath() + "'" );
         }
 
