@@ -774,7 +774,6 @@ public class JavadocReport
                 addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
                 addArgIfNotEmpty( arguments, "-docencoding", quotedArgument( docencoding ) );
                 addArgIfNotEmpty( arguments, "-doctitle", quotedArgument( doctitle ) );
-                addArgIfNotEmpty( arguments, "-excludePackageNames", quotedArgument( excludePackageNames ) );
                 addArgIfNotEmpty( arguments, "-excludedocfilessubdir", quotedPathArgument( excludedocfilessubdir ),
                                   1.4f );
                 addArgIfNotEmpty( arguments, "-footer", quotedArgument( footer ) );
