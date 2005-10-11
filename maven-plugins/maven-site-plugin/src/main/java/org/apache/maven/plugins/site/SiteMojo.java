@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Comparator;
 
 /**
  * Generates the project site.
@@ -224,8 +225,9 @@ public class SiteMojo
 
         Map categories = categorizeReports( reports );
 
-        List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
-        List projectReports = (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS );
+        Comparator reportComparator = new ReportComparator();
+        List projectInfos = Collections.sort( (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION ), reportComparator );
+        List projectReports = Collections.sort( (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS ), reportComparator );
 
         if ( projectInfos == null )
         {
