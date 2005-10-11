@@ -301,7 +301,7 @@ public class DefaultRepositoryMetadataManager
         catch ( TransferFailedException e )
         {
             getLogger().warn( metadata + " could not be found on repository: " + repository.getId() +
-                " due to an error: " + e.getCause().getMessage() );
+                " due to an error: " + e.getMessage() );
             getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
             repository.setBlacklisted( allowBlacklisting );
