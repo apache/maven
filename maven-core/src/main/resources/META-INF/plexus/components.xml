@@ -226,9 +226,11 @@
               <phase>pre-site</phase>
               <phase>site</phase>
               <phase>post-site</phase>
+              <phase>site-deploy</phase>
             </phases>
             <default-phases>
               <site>org.apache.maven.plugins:maven-site-plugin:site</site>
+              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
             </default-phases>
           </lifecycle>
         </lifecycles>
