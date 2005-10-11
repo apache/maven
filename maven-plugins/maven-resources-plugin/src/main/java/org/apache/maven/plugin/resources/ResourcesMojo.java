@@ -163,7 +163,7 @@ public class ResourcesMojo
     private void initializeFiltering()
         throws MojoExecutionException
     {
-        filterProperties = new Properties();
+        filterProperties = new Properties( System.getProperties() );
         for ( Iterator i = filters.iterator(); i.hasNext(); )
         {
             String filtersfile = (String) i.next();

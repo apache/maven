@@ -272,12 +272,12 @@ public class SurefirePlugin
         {
             Artifact artifact = (Artifact) i.next();
 
-            if ( "junit".equals( artifact.getArtifactId() ) || "surefire".equals( artifact.getArtifactId() ) )
-            {
-                getLog().debug( artifact.getFile().getAbsolutePath() );
+//            if ( "junit".equals( artifact.getArtifactId() ) || "surefire".equals( artifact.getArtifactId() ) )
+//            {
+                getLog().debug( "Adding to surefire test classpath: " + artifact.getFile().getAbsolutePath() );
 
                 surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
-            }
+//            }
         }
 
         addReporters(surefireBooter);
