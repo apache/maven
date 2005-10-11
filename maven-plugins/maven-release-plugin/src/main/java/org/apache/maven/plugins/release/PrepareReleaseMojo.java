@@ -16,6 +16,19 @@ package org.apache.maven.plugins.release;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -49,19 +62,6 @@ import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 /**
  * Prepare for a release in SCM
  *
@@ -86,7 +86,7 @@ public class PrepareReleaseMojo
      * @required
      * @readonly
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * @parameter expression="${settings.interactiveMode}"
@@ -183,7 +183,7 @@ public class PrepareReleaseMojo
     {
         try
         {
-            getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_INITIALIZED );
+            getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_INITIALIZED );
         }
         catch ( IOException e )
         {
@@ -220,7 +220,7 @@ public class PrepareReleaseMojo
 
                 try
                 {
-                    getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
+                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
                 }
                 catch ( IOException e )
                 {
@@ -253,7 +253,7 @@ public class PrepareReleaseMojo
 
                 try
                 {
-                    getReleaseProgress().checkpoint( basedir,
+                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
                                                      ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT );
                 }
                 catch ( IOException e )
@@ -268,7 +268,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_PREPARED_RELEASE );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_PREPARED_RELEASE );
             }
             catch ( IOException e )
             {
@@ -405,11 +405,11 @@ public class PrepareReleaseMojo
         {
             try
             {
-                releaseProgress = ReleaseProgressTracker.loadOrCreate( basedir );
+                releaseProgress = ReleaseProgressTracker.loadOrCreate( basedir.getAbsolutePath() );
             }
             catch ( IOException e )
             {
-                getLog().warn( "Cannot read existing release progress file from directory: " + basedir + "." );
+                getLog().warn( "Cannot read existing release progress file from directory: " + basedir.getAbsolutePath() + "." );
                 getLog().debug( "Cause", e );
 
                 releaseProgress = ReleaseProgressTracker.create();
@@ -490,7 +490,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                ScmHelper scm = getScm( basedir );
+                ScmHelper scm = getScm( basedir.getAbsolutePath() );
 
                 changedFiles = scm.getStatus();
             }
@@ -529,7 +529,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED );
             }
             catch ( IOException e )
             {
@@ -824,11 +824,11 @@ public class PrepareReleaseMojo
 
             try
             {
-                canonicalBasedir = trimPathForScmCalculation( new File( basedir ) );
+                canonicalBasedir = trimPathForScmCalculation( basedir );
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Cannot canonicalize basedir: " + basedir, e );
+                throw new MojoExecutionException( "Cannot canonicalize basedir: " + basedir.getAbsolutePath(), e );
             }
 
             for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
@@ -1037,7 +1037,7 @@ public class PrepareReleaseMojo
 
                     releasePomPath = releasePomPath.substring( canonicalBasedir.length() + 1 );
 
-                    ScmHelper scm = getScm( basedir );
+                    ScmHelper scm = getScm( basedir.getAbsolutePath() );
 
                     scm.add( releasePomPath );
                 }
@@ -1052,7 +1052,7 @@ public class PrepareReleaseMojo
 
                 try
                 {
-                    getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
+                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
                 }
                 catch ( IOException e )
                 {
@@ -1182,7 +1182,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION );
             }
             catch ( IOException e )
             {
@@ -1202,7 +1202,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                String canonicalBasedir = trimPathForScmCalculation( new File( basedir ) );
+                String canonicalBasedir = trimPathForScmCalculation( basedir );
 
                 for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
                 {
@@ -1214,7 +1214,7 @@ public class PrepareReleaseMojo
 
                     releasePomPath = releasePomPath.substring( canonicalBasedir.length() + 1 );
 
-                    ScmHelper scm = getScm( basedir );
+                    ScmHelper scm = getScm( basedir.getAbsolutePath() );
 
                     scm.remove( "Removing for next development iteration.", releasePomPath );
 
@@ -1234,7 +1234,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_REMOVED_RELEASE_POM );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_REMOVED_RELEASE_POM );
             }
             catch ( IOException e )
             {
@@ -1269,7 +1269,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION );
             }
             catch ( IOException e )
             {
@@ -1281,7 +1281,7 @@ public class PrepareReleaseMojo
     private void checkIn( String message )
         throws MojoExecutionException
     {
-        ScmHelper scm = getScm( basedir );
+        ScmHelper scm = getScm( basedir.getAbsolutePath() );
 
         String tag = scm.getTag();
 
@@ -1362,7 +1362,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                ScmHelper scm = getScm( basedir );
+                ScmHelper scm = getScm( basedir.getAbsolutePath() );
 
                 scm.setTag( tag );
 
@@ -1377,7 +1377,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_TAGGED_RELEASE );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_TAGGED_RELEASE );
             }
             catch ( IOException e )
             {

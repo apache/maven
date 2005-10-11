@@ -30,7 +30,7 @@ public class AntlrPlugin
      * @parameter expression="${basedir}/src/main/antlr"
      * @required
      */
-    private String sourceDirectory;
+    private File sourceDirectory;
 
      /**
      * @parameter expression="${project.build.directory}/generated-sources/antlr"

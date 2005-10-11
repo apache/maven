@@ -47,7 +47,7 @@ public class VerifierMojo
      * @parameter expression="${basedir}"
      * @required
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * @parameter expression="${basedir}/src/test/verifier/verifications.xml"
@@ -85,7 +85,7 @@ public class VerifierMojo
         File result = file;
         if ( !file.isAbsolute() )
         {
-            result = new File( new File( this.basedir ), file.getPath() );
+            result = new File(  basedir , file.getPath() );
         }
         return result;
     }
@@ -200,7 +200,7 @@ public class VerifierMojo
         return result;
     }
 
-    public void setBaseDir( String basedir )
+    public void setBaseDir( File basedir )
     {
         this.basedir = basedir;
     }

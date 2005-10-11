@@ -45,21 +45,21 @@ public class EarMojo
      * @parameter expression="${basedir}/src/main/application"
      * @required
      */
-    private String earSourceDirectory;
+    private File earSourceDirectory;
 
     /**
      * The location of the manifest file to be used within the ear file.
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/MANIFEST.MF"
      */
-    private String manifestFile;
+    private File manifestFile;
 
     /**
      * The location of the application.xml file to be used within the ear file.
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/application.xml"
      */
-    private String applicationXmlFile;
+    private File applicationXmlFile;
 
     /**
      * The directory for the generated EAR.
@@ -144,7 +144,7 @@ public class EarMojo
         // Copy source files
         try
         {
-            File earSourceDir = new File( earSourceDirectory );
+            File earSourceDir = earSourceDirectory;
             if ( earSourceDir.exists() )
             {
                 getLog().info( "Copy ear sources to " + getWorkDirectory().getAbsolutePath() );
@@ -206,7 +206,8 @@ public class EarMojo
 
     private void includeCustomManifestFile()
     {
-        File customManifestFile = new File( manifestFile );
+        File customManifestFile = manifestFile;
+        
         if ( !customManifestFile.exists() )
         {
             getLog().info( "Could not find manifest file: " + manifestFile + " - Generating one" );

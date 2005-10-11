@@ -52,14 +52,14 @@ public class RarMojo
      * @parameter expression="${basedir}/src/main/rar"
      * @required
      */
-    private String rarSourceDirectory;
+    private File rarSourceDirectory;
 
     /**
      * The location of the ra.xml file to be used within the rar file.
      *
      * @parameter expression="${basedir}/src/main/rar/META-INF/ra.xml"
      */
-    private String raXmlFile;
+    private File raXmlFile;
 
     /**
      * Specify if the generated jar file of this project should be
@@ -74,7 +74,7 @@ public class RarMojo
      *
      * @parameter expression="${basedir}/src/main/rar/META-INF/MANIFEST.MF"
      */
-    private String manifestFile;
+    private File manifestFile;
 
     /**
      * Directory that resources are copied to during the build.
@@ -181,7 +181,7 @@ public class RarMojo
         // Copy source files
         try
         {
-            File rarSourceDir = new File( rarSourceDirectory );
+            File rarSourceDir =  rarSourceDirectory;
             if ( rarSourceDir.exists() )
             {
                 getLog().info( "Copy rar resources to " + getBuildDir().getAbsolutePath() );
@@ -241,7 +241,7 @@ public class RarMojo
 
     private void includeCustomManifestFile()
     {
-        File customManifestFile = new File( manifestFile );
+        File customManifestFile = manifestFile;
         if ( !customManifestFile.exists() )
         {
             getLog().info( "Could not find manifest file: " + manifestFile +" - Generating one");
@@ -256,10 +256,10 @@ public class RarMojo
     private void includeCustomRaXmlFile()
         throws IOException
     {
-        if (raXmlFile == null || raXmlFile.trim().length() == 0) {
+        if (raXmlFile == null) {
 
         }
-        File raXml = new File(raXmlFile );
+        File raXml = raXmlFile;
         if (raXml.exists()) {
             getLog().info( "Using ra.xml "+ raXmlFile);
             File metaInfDir = new File(getBuildDir(), "META-INF");

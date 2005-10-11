@@ -64,7 +64,7 @@ public class SurefirePlugin
      * @parameter expression="${basedir}"
      * @required
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * The directory containing generated classes of the project being tested.
@@ -230,7 +230,7 @@ public class SurefirePlugin
         //
         // ----------------------------------------------------------------------
 
-        System.setProperty( "basedir", basedir );
+        System.setProperty( "basedir", basedir.getAbsolutePath() );
 
         System.setProperty( "localRepository", localRepository.getBasedir() );
 

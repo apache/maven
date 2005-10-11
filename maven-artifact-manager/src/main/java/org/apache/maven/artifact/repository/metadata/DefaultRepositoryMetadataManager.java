@@ -93,10 +93,6 @@ public class DefaultRepositoryMetadataManager
                     {
                         file.setLastModified( System.currentTimeMillis() );
                     }
-                    else
-                    {
-                        metadata.storeInLocalRepository( localRepository, repository );
-                    }
                 }
             }
             cachedMetadata.add( metadata.getKey() );

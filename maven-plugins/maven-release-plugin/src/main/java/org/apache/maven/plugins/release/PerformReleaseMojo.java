@@ -16,6 +16,11 @@ package org.apache.maven.plugins.release;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
@@ -26,10 +31,6 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Perform a release from SCM
@@ -47,7 +48,7 @@ public class PerformReleaseMojo
      * @required
      * @readonly
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * @parameter expression="${goals}"
@@ -159,7 +160,7 @@ public class PerformReleaseMojo
         {
             try
             {
-                releaseProgress = ReleaseProgressTracker.load( basedir );
+                releaseProgress = ReleaseProgressTracker.load( basedir.getAbsolutePath() );
             }
             catch ( IOException e )
             {
