@@ -600,6 +600,7 @@ public class JavadocReport
                 }
             }
 
+            StringBuffer options = new StringBuffer();
             StringBuffer classpath = new StringBuffer();
             for ( Iterator i = getProject().getCompileClasspathElements().iterator(); i.hasNext(); )
             {
@@ -610,9 +611,11 @@ public class JavadocReport
                     classpath.append( PATH_SEPARATOR );
                 }
             }
+
             if ( classpath.length() > 0 )
             {
-                classpath.insert( 0, "-classpath " );
+                options.append( "-classpath " );
+                options.append( quotedPathArgument( classpath.toString() ) );
             }
 
             StringBuffer sourcePath = new StringBuffer();
@@ -625,7 +628,7 @@ public class JavadocReport
                 {
                     for ( int j = 0; j < fileList.length; j++ )
                     {
-                        files.append( fileList[j] );
+                        files.append( quotedPathArgument( fileList[j] ) );
                         files.append( "\n" );
                     }
                 }
@@ -672,13 +675,13 @@ public class JavadocReport
             addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
             if ( !StringUtils.isEmpty( doclet ) )
             {
-                addArgIfNotEmpty( arguments, "-doclet", doclet );
-                addArgIfNotEmpty( arguments, "-docletPath", docletPath );
+                addArgIfNotEmpty( arguments, "-doclet", quotedArgument( doclet ) );
+                addArgIfNotEmpty( arguments, "-docletPath", quotedPathArgument( docletPath ) );
             }
-            addArgIfNotEmpty( arguments, "-encoding", encoding );
-            addArgIfNotEmpty( arguments, "-extdirs", extdirs );
-            addArgIfNotEmpty( arguments, "-exclude", excludePackageNames, 1.4f );
-            addArgIfNotEmpty( arguments, "-locale", this.locale );
+            addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
+            addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
+            addArgIfNotEmpty( arguments, "-exclude", quotedArgument( excludePackageNames ), 1.4f );
+            addArgIfNotEmpty( arguments, "-locale", quotedArgument( this.locale ) );
             if ( !StringUtils.isEmpty( maxmemory ) )
             {
                 // Allow '128' or '128m'
@@ -732,24 +735,17 @@ public class JavadocReport
                 addArgIf( arguments, old, "-1.1" );
             }
 
-            addArgIfNotEmpty( arguments, "-overview", overview );
+            addArgIfNotEmpty( arguments, "-overview", quotedArgument( overview ) );
             addArgIf( arguments, showPackage, "-package" );
             addArgIf( arguments, showPrivate, "-private" );
             addArgIf( arguments, showProtected, "-protected" );
             addArgIf( arguments, public_, "-public" );
             addArgIf( arguments, quiet, "-quiet", 1.4f );
-            addArgIfNotEmpty( arguments, "-source", source, 1.4f );
+            addArgIfNotEmpty( arguments, "-source", quotedArgument( source ), 1.4f );
             addArgIf( arguments, verbose, "-verbose" );
-            addArgIfNotEmpty( arguments, "-additionalparam", additionalparam );
+            addArgIfNotEmpty( arguments, "-additionalparam", quotedArgument( additionalparam ) );
 
-            addArgIfNotEmpty( arguments, "-sourcePath", sourcePath.toString() );
-            if ( classpath.length() > 0 )
-            {
-                file = new File( javadocDirectory, "classpath" );
-                file.deleteOnExit();
-                FileUtils.fileWrite( file.getAbsolutePath(), classpath.toString() );
-                cmd.createArgument().setValue( "@classpath" );
-            }
+            addArgIfNotEmpty( arguments, "-sourcePath", quotedPathArgument( sourcePath.toString() ) );
 
             // javadoc arguments for default doclet
             if ( StringUtils.isEmpty( doclet ) )
@@ -771,21 +767,22 @@ public class JavadocReport
                 // End Specify default values
 
                 addArgIf( arguments, author, "-author" );
-                addArgIfNotEmpty( arguments, "-bottom", bottom );
+                addArgIfNotEmpty( arguments, "-bottom", quotedArgument( bottom ) );
                 addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
-                addArgIfNotEmpty( arguments, "-charset", charset );
-                addArgIfNotEmpty( arguments, "-d", javadocDirectory.toString() );
+                addArgIfNotEmpty( arguments, "-charset", quotedArgument( charset ) );
+                addArgIfNotEmpty( arguments, "-d", quotedPathArgument( javadocDirectory.toString() ) );
                 addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
-                addArgIfNotEmpty( arguments, "-docencoding", docencoding );
-                addArgIfNotEmpty( arguments, "-doctitle", doctitle );
-                addArgIfNotEmpty( arguments, "-excludePackageNames", excludePackageNames );
-                addArgIfNotEmpty( arguments, "-excludedocfilessubdir", excludedocfilessubdir, 1.4f );
-                addArgIfNotEmpty( arguments, "-footer", footer );
-                addArgIfNotEmpty( arguments, "-group", group, true );
-                addArgIfNotEmpty( arguments, "-header", header );
-                addArgIfNotEmpty( arguments, "-helpfile", helpfile );
-                addArgIfNotEmpty( arguments, "-link", link, true );
-                addArgIfNotEmpty( arguments, "-linkoffline", linkoffline, true );
+                addArgIfNotEmpty( arguments, "-docencoding", quotedArgument( docencoding ) );
+                addArgIfNotEmpty( arguments, "-doctitle", quotedArgument( doctitle ) );
+                addArgIfNotEmpty( arguments, "-excludePackageNames", quotedArgument( excludePackageNames ) );
+                addArgIfNotEmpty( arguments, "-excludedocfilessubdir", quotedPathArgument( excludedocfilessubdir ),
+                                  1.4f );
+                addArgIfNotEmpty( arguments, "-footer", quotedArgument( footer ) );
+                addArgIfNotEmpty( arguments, "-group", quotedArgument( group ), true );
+                addArgIfNotEmpty( arguments, "-header", quotedArgument( header ) );
+                addArgIfNotEmpty( arguments, "-helpfile", quotedPathArgument( helpfile ) );
+                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
+                addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
                 addArgIf( arguments, linksource, "-linksource", 1.4f );
                 addArgIf( arguments, nodeprecated, "-nodeprecated" );
                 addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
@@ -793,24 +790,31 @@ public class JavadocReport
                 addArgIf( arguments, nohelp, "-nohelp" );
                 addArgIf( arguments, noindex, "-noindex" );
                 addArgIf( arguments, nonavbar, "-nonavbar" );
-                addArgIfNotEmpty( arguments, "-noqualifier", noqualifier, 1.4f );
+                addArgIfNotEmpty( arguments, "-noqualifier", quotedArgument( noqualifier ), 1.4f );
                 addArgIf( arguments, nosince, "-nosince" );
                 addArgIf( arguments, notree, "-notree" );
                 addArgIf( arguments, serialwarn, "-serialwarn" );
                 addArgIf( arguments, splitindex, "-splitindex" );
-                addArgIfNotEmpty( arguments, "-stylesheetfile", stylesheetfile );
-                addArgIfNotEmpty( arguments, "-tag", tag, 1.4f, true );
-                addArgIfNotEmpty( arguments, "-taglet", taglet, 1.4f );
-                addArgIfNotEmpty( arguments, "-tagletpath", tagletpath, 1.4f );
+                addArgIfNotEmpty( arguments, "-stylesheetfile", quotedPathArgument( stylesheetfile ) );
+                addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
+                addArgIfNotEmpty( arguments, "-taglet", quotedArgument( taglet ), 1.4f );
+                addArgIfNotEmpty( arguments, "-tagletpath", quotedPathArgument( tagletpath ), 1.4f );
                 addArgIf( arguments, use, "-use" );
                 addArgIf( arguments, version, "-version" );
-                addArgIfNotEmpty( arguments, "-windowtitle", windowtitle );
+                addArgIfNotEmpty( arguments, "-windowtitle", quotedArgument( windowtitle ) );
             }
 
-            for ( Iterator it = arguments.iterator(); it.hasNext(); )
+            if ( options.length() > 0 )
             {
-                String current = (String) it.next();
-                cmd.createArgument().setValue( current );
+                File optionsFile = new File( javadocDirectory, "options" );
+                for ( Iterator it = arguments.iterator(); it.hasNext(); )
+                {
+                    options.append( " " );
+                    options.append( (String) it.next() );
+                }
+                FileUtils.fileWrite( optionsFile.getAbsolutePath(), options.toString() );
+                cmd.createArgument().setValue( "@options" );
+                optionsFile.deleteOnExit();
             }
 
             cmd.createArgument().setValue( "@files" );
@@ -991,6 +995,37 @@ public class JavadocReport
         {
             getLog().warn( key + " option is not supported on Java version < " + requiredJavaVersion );
         }
+    }
+
+    /**
+     * Convenience method to wrap an argument value in quotes. Intended for values which may contain whitespaces.
+     *
+     * @param value the argument value.
+     */
+    private String quotedArgument( String value )
+    {
+        if ( !StringUtils.isEmpty( value ) )
+        {
+            return "'" + value + "'";
+        }
+
+        return value;
+    }
+
+    /**
+     * Convenience method to format a path argument so that it is properly interpreted by the javadoc tool. Intended
+     * for path values which may contain whitespaces.
+     *
+     * @param value the argument value.
+     */
+    private String quotedPathArgument( String value )
+    {
+        if ( !StringUtils.isEmpty( value ) )
+        {
+            return "'" + value.replace( '\\', '/' ) + "'";
+        }
+
+        return value;
     }
 
     /**
