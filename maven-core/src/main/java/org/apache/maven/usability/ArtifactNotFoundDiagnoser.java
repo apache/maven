@@ -37,9 +37,12 @@ public class ArtifactNotFoundDiagnoser
 
         StringBuffer message = new StringBuffer();
 
-        message.append( "Failed to resolve artifact." );
+        message.append( "Failed to resolve artifact.\n" );
+        message.append( "\nGroupId: " ).append( exception.getGroupId() );
+        message.append( "\nArtifactId: " ).append( exception.getArtifactId() );
+        message.append( "\nVersion: " ).append( exception.getVersion() );
         message.append( "\n\n" );
-        message.append( exception.getMessage() );
+        message.append( "Reason: " ).append( exception.getMessage() );
 
         if ( !wagonManager.isOnline() )
         {

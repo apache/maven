@@ -37,7 +37,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
-import org.apache.maven.project.InvalidModelException;
+import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -107,10 +107,10 @@ public class MavenMetadataSource
                     project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository,
                                                                        true );
                 }
-                catch ( InvalidModelException e )
+                catch ( InvalidProjectModelException e )
                 {
                     getLogger().warn( "POM for: \'" + pomArtifact +
-                        "\' does not appear to be valid. Its will be ignored for artifact resolution." );
+                        "\' does not appear to be valid. Its will be ignored for artifact resolution.\n\nReason: " + e.getMessage() + "\n\n" );
 
                     project = null;
                 }

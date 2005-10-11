@@ -1,1 +1,1 @@
---no-plugin-registry --check-plugin-latest --fail-never
+--no-plugin-registry --fail-never

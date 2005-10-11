@@ -1,6 +1,7 @@
 package org.apache.maven.plugins.projecthelp;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -215,6 +216,11 @@ public class DescribeMojo
                 throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId
                     + "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
             }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId
+                                                  + "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
+            }
         }
         
         return descriptor;
@@ -325,6 +331,26 @@ public class DescribeMojo
         String eGoal = md.getExecuteGoal();
         String eLife = md.getExecuteLifecycle();
         String ePhase = md.getExecutePhase();
+        
+        if ( eGoal != null || ePhase != null )
+        {
+            buffer.append( "\n\nBefore this mojo executes, it will call:\n" );
+            
+            if ( eGoal != null )
+            {
+                buffer.append( "\nSingle mojo: \'" ).append( eGoal ).append( "\'" );
+            }
+            
+            if ( ePhase != null )
+            {
+                buffer.append( "\nPhase: \'" ).append( ePhase ).append( "\'" );
+                
+                if ( eLife != null )
+                {
+                    buffer.append( " in Lifecycle Overlay: \'" ).append( eLife ).append( "\'" );
+                }
+            }
+        }
         
         List parameters = md.getParameters();
         

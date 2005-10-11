@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -183,7 +184,7 @@ public class DefaultMavenProjectBuilder
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact projectArtifact = project.getArtifact();
 
-        Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
+        Map managedVersions = createManagedVersionMap( project.getId(), project.getDependencyManagement() );
 
         ensureMetadataSourceIsInitialized();
 
@@ -193,7 +194,7 @@ public class DefaultMavenProjectBuilder
         }
         catch ( InvalidVersionSpecificationException e )
         {
-            throw new ProjectBuildingException( "Error in dependency version", e );
+            throw new ProjectBuildingException( project.getId(), "Error in dependency version", e );
         }
 
         if ( transferListener != null )
@@ -223,12 +224,12 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ComponentLookupException e )
             {
-                throw new ProjectBuildingException( "Cannot lookup metadata source for building the project.", e );
+                throw new ProjectBuildingException( "all", "Cannot lookup metadata source for building the project.", e );
             }
         }
     }
 
-    private Map createManagedVersionMap( DependencyManagement dependencyManagement )
+    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement )
         throws ProjectBuildingException
     {
         Map map;
@@ -249,7 +250,7 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( "Unable to parse dependency version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse dependency version", e );
                 }
             }
         }
@@ -271,7 +272,7 @@ public class DefaultMavenProjectBuilder
                                               ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        Model model = readModel( projectDescriptor );
+        Model model = readModel( "unknown", projectDescriptor );
 
         // Always cache files in the source tree over those in the repository
         MavenProject p = new MavenProject( model );
@@ -284,7 +285,7 @@ public class DefaultMavenProjectBuilder
 
         if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
         {
-            throw new ProjectBuildingException(
+            throw new ProjectBuildingException( project.getId(), 
                 "Invalid project file: distribution status must not be specified for a project outside of the repository" );
         }
 
@@ -350,6 +351,8 @@ public class DefaultMavenProjectBuilder
         Model model;
         if ( project == null )
         {
+            String projectId = ArtifactUtils.versionlessKey( projectArtifact );
+            
             try
             {
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
@@ -358,7 +361,7 @@ public class DefaultMavenProjectBuilder
                 // TODO: how can this not be true?
                 if ( projectArtifact.isResolved() )
                 {
-                    model = readModel( file );
+                    model = readModel( projectId, file );
 
                     String downloadUrl = null;
                     ArtifactStatus status = ArtifactStatus.NONE;
@@ -421,12 +424,12 @@ public class DefaultMavenProjectBuilder
                 }
                 else
                 {
-                    throw new ProjectBuildingException( "POM could not be resolved from the repository" );
+                    throw new ProjectBuildingException( projectId, "POM could not be resolved from the repository" );
                 }
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new ProjectBuildingException( "Error getting the POM in the repository", e );
+                throw new ProjectBuildingException( projectId, "Error getting the POM in the repository", e );
             }
             catch ( ArtifactNotFoundException e )
             {
@@ -436,7 +439,7 @@ public class DefaultMavenProjectBuilder
                 }
                 else
                 {
-                    throw new ProjectBuildingException( "POM not found in repository", e );
+                    throw new ProjectBuildingException( projectId, "POM not found in repository", e );
                 }
             }
         }
@@ -514,6 +517,8 @@ public class DefaultMavenProjectBuilder
         // Use a TreeSet to ensure ordering is retained
         Set aggregatedRemoteWagonRepositories = new LinkedHashSet();
 
+        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+        
         List activeExternalProfiles;
         try
         {
@@ -528,7 +533,7 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ProfileActivationException e )
         {
-            throw new ProjectBuildingException( "Failed to calculate active external profiles.", e );
+            throw new ProjectBuildingException( projectId, "Failed to calculate active external profiles.", e );
         }
 
         for ( Iterator i = activeExternalProfiles.iterator(); i.hasNext(); )
@@ -586,12 +591,31 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ProjectBuildingException( "Error building project from \'" + pomLocation + "\': " + model.getId(),
+            throw new ProjectBuildingException( project.getId(), "Error building project from \'" + pomLocation + "\': " + model.getId(),
                                                 e );
         }
         projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
                           project );
         return project;
+    }
+
+    private String safeVersionlessKey( String groupId, String artifactId )
+    {
+        String gid = groupId;
+        
+        if ( StringUtils.isEmpty( gid ) )
+        {
+            gid = "unknown";
+        }
+        
+        String aid = artifactId;
+        
+        if ( StringUtils.isEmpty( aid ) )
+        {
+            aid = "unknown";
+        }
+        
+        return ArtifactUtils.versionlessKey( gid, aid );
     }
 
     private List buildArtifactRepositories( Model model )
@@ -698,17 +722,16 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new ProjectBuildingException( "Failed to validate POM for \'" + pomLocation +
-                "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
+            throw new InvalidProjectModelException( project.getId(), pomLocation, "Failed to validate POM", validationResult );
         }
 
         project.setRemoteArtifactRepositories(
             ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container ) );
 
         // TODO: these aren't taking active project artifacts into consideration in the reactor
-        project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
-        project.setReportArtifacts( createReportArtifacts( project.getReportPlugins() ) );
-        project.setExtensionArtifacts( createExtensionArtifacts( project.getBuildExtensions() ) );
+        project.setPluginArtifacts( createPluginArtifacts( project.getId(), project.getBuildPlugins() ) );
+        project.setReportArtifacts( createReportArtifacts( project.getId(), project.getReportPlugins() ) );
+        project.setExtensionArtifacts( createExtensionArtifacts( project.getId(), project.getBuildExtensions() ) );
 
         return project;
     }
@@ -756,7 +779,9 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ProfileActivationException e )
         {
-            throw new ProjectBuildingException( "Failed to activate local (project-level) build profiles.", e );
+            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+            
+            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles.", e );
         }
 
         MavenProject project = new MavenProject( model );
@@ -769,17 +794,19 @@ public class DefaultMavenProjectBuilder
 
         if ( parentModel != null )
         {
+            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+            
             if ( StringUtils.isEmpty( parentModel.getGroupId() ) )
             {
-                throw new ProjectBuildingException( "Missing groupId element from parent element" );
+                throw new ProjectBuildingException( projectId, "Missing groupId element from parent element" );
             }
             else if ( StringUtils.isEmpty( parentModel.getArtifactId() ) )
             {
-                throw new ProjectBuildingException( "Missing artifactId element from parent element" );
+                throw new ProjectBuildingException( projectId, "Missing artifactId element from parent element" );
             }
             else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
-                throw new ProjectBuildingException( "Missing version element from parent element" );
+                throw new ProjectBuildingException( projectId, "Missing version element from parent element" );
             }
 
             // the only way this will have a value is if we find the parent on disk...
@@ -818,7 +845,7 @@ public class DefaultMavenProjectBuilder
 
                 if ( parentDescriptor != null && parentDescriptor.exists() )
                 {
-                    Model candidateParent = readModel( parentDescriptor );
+                    Model candidateParent = readModel( projectId, parentDescriptor );
 
                     String candidateParentGroupId = candidateParent.getGroupId();
                     if ( candidateParentGroupId == null && candidateParent.getParent() != null )
@@ -908,7 +935,9 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException( "Failed to calculate active build profiles.", e );
+                String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+                
+                throw new ProjectBuildingException( projectId, "Failed to calculate active build profiles.", e );
             }
 
             for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
@@ -967,27 +996,27 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( File file )
+    private Model readModel( String projectId, File file )
         throws ProjectBuildingException
     {
         Reader reader = null;
         try
         {
             reader = new FileReader( file );
-            return readModel( reader );
+            return readModel( projectId, file.getAbsolutePath(), reader );
         }
         catch ( FileNotFoundException e )
         {
-            throw new ProjectBuildingException( "Could not find the model file '" + file.getAbsolutePath() + "'.", e );
+            throw new ProjectBuildingException( projectId, "Could not find the model file '" + file.getAbsolutePath() + "'.", e );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "Failed to build model from file '" + file.getAbsolutePath() +
+            throw new ProjectBuildingException( projectId, "Failed to build model from file '" + file.getAbsolutePath() +
                 "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "Failed to parse model from file '" + file.getAbsolutePath() +
+            throw new ProjectBuildingException( projectId, "Failed to parse model from file '" + file.getAbsolutePath() +
                 "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
@@ -996,8 +1025,8 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( Reader reader )
-        throws IOException, XmlPullParserException, InvalidModelException
+    private Model readModel( String projectId, String pomLocation, Reader reader )
+        throws IOException, XmlPullParserException, InvalidProjectModelException
     {
         StringWriter sw = new StringWriter();
 
@@ -1007,7 +1036,7 @@ public class DefaultMavenProjectBuilder
 
         if ( modelSource.indexOf( "<modelVersion>4.0.0" ) < 0 )
         {
-            throw new InvalidModelException( "Invalid POM (not v4.0.0 modelVersion)" );
+            throw new InvalidProjectModelException( projectId, pomLocation, "Invalid POM (not v4.0.0 modelVersion)" );
         }
 
         StringReader sReader = new StringReader( modelSource );
@@ -1015,23 +1044,23 @@ public class DefaultMavenProjectBuilder
         return modelReader.read( sReader );
     }
 
-    private Model readModel( URL url )
+    private Model readModel( String projectId, URL url )
         throws ProjectBuildingException
     {
         InputStreamReader reader = null;
         try
         {
             reader = new InputStreamReader( url.openStream() );
-            return readModel( reader );
+            return readModel( projectId, url.toExternalForm(), reader );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "Failed build model from URL \'" + url.toExternalForm() +
+            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
                 "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "Failed to parse model from URL \'" + url.toExternalForm() +
+            throw new ProjectBuildingException( projectId, "Failed to parse model from URL \'" + url.toExternalForm() +
                 "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
@@ -1050,7 +1079,7 @@ public class DefaultMavenProjectBuilder
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    protected Set createPluginArtifacts( List plugins )
+    protected Set createPluginArtifacts( String projectId, List plugins )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1077,7 +1106,7 @@ public class DefaultMavenProjectBuilder
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new ProjectBuildingException( "Unable to parse plugin version", e );
+                throw new ProjectBuildingException( projectId, "Unable to parse plugin version", e );
             }
 
             if ( artifact != null )
@@ -1090,7 +1119,7 @@ public class DefaultMavenProjectBuilder
     }
 
     // TODO: share with createPluginArtifacts?
-    protected Set createReportArtifacts( List reports )
+    protected Set createReportArtifacts( String projectId, List reports )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1119,7 +1148,7 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( "Unable to parse plugin version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse plugin version", e );
                 }
 
                 if ( artifact != null )
@@ -1133,7 +1162,7 @@ public class DefaultMavenProjectBuilder
     }
 
     // TODO: share with createPluginArtifacts?
-    protected Set createExtensionArtifacts( List extensions )
+    protected Set createExtensionArtifacts( String projectId, List extensions )
         throws ProjectBuildingException
     {
         Set extensionArtifacts = new HashSet();
@@ -1162,7 +1191,7 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( "Unable to parse extension version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse extension version", e );
                 }
 
                 if ( artifact != null )
@@ -1215,7 +1244,9 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ProjectBuildingException( "Error building super-project", e );
+            String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
+            
+            throw new ProjectBuildingException( projectId, "Error building super-project", e );
         }
     }
 
@@ -1228,7 +1259,9 @@ public class DefaultMavenProjectBuilder
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
-        return readModel( url );
+        String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
+        
+        return readModel( projectId, url );
     }
 
     public void contextualize( Context context )

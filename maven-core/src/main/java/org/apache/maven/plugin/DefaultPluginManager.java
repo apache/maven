@@ -171,51 +171,73 @@ public class DefaultPluginManager
         // FIXME: need to find out how a plugin gets marked as 'installed'
         // and no ChildContainer exists. The check for that below fixes
         // the 'Can't find plexus container for plugin: xxx' error.
-        if ( !pluginCollector.isPluginInstalled( plugin ) || container.getChildContainer( plugin.getKey() ) == null )
+        try
         {
-            try
+            VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+
+            List remoteRepositories = new ArrayList();
+            remoteRepositories.addAll( project.getPluginArtifactRepositories() );
+            remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
+
+            checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
+            
+            Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
+                                                                            plugin.getArtifactId(), versionRange );
+            
+            pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
+
+            artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
+
+            if ( !pluginArtifact.isResolved() )
             {
-                VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+                throw new PluginContainerException( plugin, "Cannot resolve artifact for plugin." );
+            }
 
-                List remoteRepositories = new ArrayList();
-                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
-                remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
-
-                checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
-
-                Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
-                                                                                plugin.getArtifactId(), versionRange );
+            PlexusContainer pluginContainer = container.getChildContainer( plugin.getKey() );
+            
+            File pluginFile = pluginArtifact.getFile();
+            
+            if ( !pluginCollector.isPluginInstalled( plugin ) || pluginContainer == null )
+            {
                 addPlugin( plugin, pluginArtifact, project, localRepository );
-
-                project.addPlugin( plugin );
             }
-            catch ( ArtifactNotFoundException e )
+            else if ( pluginFile.lastModified() > pluginContainer.getCreationDate().getTime() )
             {
-                String groupId = plugin.getGroupId();
-                String artifactId = plugin.getArtifactId();
-                String version = plugin.getVersion();
-
-                if ( groupId == null || artifactId == null || version == null )
-                {
-                    throw new PluginNotFoundException( e );
-                }
-                else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
-                    version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
-                {
-                    throw new PluginNotFoundException( e );
-                }
-                else
-                {
-                    throw e;
-                }
+                getLogger().info( "Reloading plugin container for: " + plugin.getKey() + ". The plugin artifact has changed." );
+                
+                pluginContainer.dispose();
+                
+                addPlugin( plugin, pluginArtifact, project, localRepository );
             }
-            catch ( InvalidVersionSpecificationException e )
+
+            project.addPlugin( plugin );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            String groupId = plugin.getGroupId();
+            String artifactId = plugin.getArtifactId();
+            String version = plugin.getVersion();
+
+            if ( groupId == null || artifactId == null || version == null )
             {
-                throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
-                                                            "Invalid version specification", e );
+                throw new PluginNotFoundException( e );
+            }
+            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
+                version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+            {
+                throw new PluginNotFoundException( e );
+            }
+            else
+            {
+                throw e;
             }
         }
-
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
+                                                        "Invalid version specification", e );
+        }
+        
         return pluginCollector.getPluginDescriptor( plugin );
     }
 
@@ -259,15 +281,6 @@ public class DefaultPluginManager
                               ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, ArtifactNotFoundException
     {
-        pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
-
-        artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
-
-        if ( !pluginArtifact.isResolved() )
-        {
-            throw new PluginContainerException( plugin, "Cannot resolve artifact for plugin." );
-        }
-
         PlexusContainer child;
         try
         {
@@ -380,7 +393,7 @@ public class DefaultPluginManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new MojoExecutionException( "Error looking up plugin: ", e );
+            throw new MojoExecutionException( "Error looking up mojo: " + goalName, e );
         }
 
         // Event monitoring.
@@ -503,6 +516,7 @@ public class DefaultPluginManager
         {
             throw new PluginManagerException( "Cannot find PlexusContainer for plugin: " + pluginKey );
         }
+        
         return pluginContainer;
     }
 

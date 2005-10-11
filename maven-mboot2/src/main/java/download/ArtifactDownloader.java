@@ -163,9 +163,24 @@ public class ArtifactDownloader
                     File file = localFile;
                     if ( remoteFile.exists() )
                     {
-                        if ( !localFile.exists() || localFile.lastModified() < remoteFile.lastModified() )
+                        if ( !localFile.exists() )
                         {
                             file = remoteFile;
+                        }
+                        else
+                        {
+                            RepositoryMetadata localMetadata = RepositoryMetadata.read( localFile );
+                            
+                            RepositoryMetadata remoteMetadata = RepositoryMetadata.read( remoteFile );
+                            
+                            if ( remoteMetadata.getLastUpdatedUtc() > localMetadata.getLastUpdatedUtc() )
+                            {
+                                file = remoteFile;
+                            }
+                            else
+                            {
+                                file = localFile;
+                            }
                         }
                     }
 

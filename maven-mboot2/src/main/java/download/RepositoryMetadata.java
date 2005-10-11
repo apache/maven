@@ -26,9 +26,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * I/O for repository metadata.
@@ -174,6 +179,21 @@ public class RepositoryMetadata
             baseVersion = StringUtils.replace( baseVersion, "SNAPSHOT", snapshotTimestamp + "-" + snapshotBuildNumber );
         }
         return baseVersion;
+    }
+    
+    public long getLastUpdatedUtc()
+    {
+        TimeZone timezone = TimeZone.getTimeZone( "UTC" );
+        DateFormat fmt = new SimpleDateFormat( "yyyyMMddHHmmss" );
+        
+        try
+        {
+            return fmt.parse( lastUpdated ).getTime();
+        }
+        catch ( ParseException e )
+        {
+            return -1;
+        }
     }
 
     public void setLastUpdated( String lastUpdated )

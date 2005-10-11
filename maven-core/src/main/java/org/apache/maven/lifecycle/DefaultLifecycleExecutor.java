@@ -106,6 +106,8 @@ public class DefaultLifecycleExecutor
     public MavenExecutionResponse execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
+        // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
+        // within the same reactor (using an inclusion pattern to gather them up)...
         MavenProject rootProject = rm.getTopLevelProject();
 
         List goals = session.getGoals();

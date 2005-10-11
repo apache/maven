@@ -1,1 +1,1 @@
---check-plugin-latest --no-plugin-registry -DperformRelease=true
+--no-plugin-registry -DperformRelease=true

@@ -448,7 +448,7 @@ public class DefaultMaven
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
-                    throw new ProjectBuildingException( "Unable to build project '" + project.getFile() +
+                    throw new ProjectBuildingException( project.getId(), "Unable to build project '" + project.getFile() +
                         "; it requires Maven version " + version.toString() );
                 }
             }
@@ -500,7 +500,7 @@ public class DefaultMaven
             if ( pom.length() == 0 )
             {
                 throw new ProjectBuildingException(
-                    "The file " + pom.getAbsolutePath() + " you specified has zero length." );
+                    "unknown", "The file " + pom.getAbsolutePath() + " you specified has zero length." );
             }
         }
 

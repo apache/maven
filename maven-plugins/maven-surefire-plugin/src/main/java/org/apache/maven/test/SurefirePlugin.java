@@ -268,14 +268,14 @@ public class SurefirePlugin
             surefireBooter.addClassPathUrl( classpathElement );
         }
 
-        for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
-        {
-            Artifact artifact = (Artifact) i.next();
-
-            getLog().debug( artifact.getFile().getAbsolutePath() );
-
-            surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
-        }
+//        for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
+//        {
+//            Artifact artifact = (Artifact) i.next();
+//
+//            getLog().debug( artifact.getFile().getAbsolutePath() );
+//
+//            surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
+//        }
 
         addReporters(surefireBooter);
         

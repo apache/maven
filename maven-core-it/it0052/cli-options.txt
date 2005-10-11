@@ -1,1 +1,1 @@
---check-plugin-latest --no-plugin-registry
+--no-plugin-registry

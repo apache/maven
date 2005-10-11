@@ -350,15 +350,6 @@ public class MavenCli
             runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
         }
 
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_LATEST_CHECK ) )
-        {
-            runtimeInfo.setCheckLatestPluginVersion( Boolean.TRUE );
-        }
-        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_LATEST_CHECK ) )
-        {
-            runtimeInfo.setCheckLatestPluginVersion( Boolean.FALSE );
-        }
-
         return runtimeInfo;
     }
 
@@ -633,10 +624,6 @@ public class MavenCli
 
         public static final String SUPPRESS_PLUGIN_REGISTRY = "npr";
 
-        public static final String FORCE_PLUGIN_LATEST_CHECK = "cpl";
-
-        public static final String SUPPRESS_PLUGIN_LATEST_CHECK = "npl";
-
         public static final char CHECKSUM_FAILURE_POLICY = 'C';
 
         public static final char CHECKSUM_WARNING_POLICY = 'c';
@@ -661,8 +648,6 @@ public class MavenCli
                     SET_SYSTEM_PROPERTY ) );
             options.addOption(
                 OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
-//            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
-//                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
             options.addOption(
                 OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
             options.addOption(
@@ -692,11 +677,7 @@ public class MavenCli
                 "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
             options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
                 "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
-            options.addOption( OptionBuilder.withLongOpt( "check-plugin-latest" ).withDescription(
-                "Force checking of LATEST metadata for plugin versions" ).create( FORCE_PLUGIN_LATEST_CHECK ) );
-            options.addOption( OptionBuilder.withLongOpt( "no-plugin-latest" ).withDescription(
-                "Suppress checking of LATEST metadata for plugin versions" ).create( SUPPRESS_PLUGIN_LATEST_CHECK ) );
-
+            
             options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
                 "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
 

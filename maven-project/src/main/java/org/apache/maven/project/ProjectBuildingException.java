@@ -23,18 +23,22 @@ package org.apache.maven.project;
 public class ProjectBuildingException
     extends Exception
 {
-    public ProjectBuildingException( String message )
+    private final String projectId;
+
+    public ProjectBuildingException( String projectId, String message )
     {
         super( message );
+        this.projectId = projectId;
     }
 
-    public ProjectBuildingException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public ProjectBuildingException( String message, Throwable cause )
+    public ProjectBuildingException( String projectId, String message, Throwable cause )
     {
         super( message, cause );
+        this.projectId = projectId;
+    }
+    
+    public String getProjectId()
+    {
+        return projectId;
     }
 }

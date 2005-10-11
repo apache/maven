@@ -34,7 +34,7 @@ public class RuntimeInfo
     private boolean pluginRegistryActive = true;
     
     // using Boolean for 3VL (null for not-set, otherwise override with value)
-    private Boolean checkLatest;
+//    private Boolean checkLatest;
     
     private Map activeProfileToSourceLevel = new HashMap();
     
@@ -127,14 +127,4 @@ public class RuntimeInfo
         return localRepositorySourceLevel;
     }
     
-    public void setCheckLatestPluginVersion( Boolean checkLatest )
-    {
-        this.checkLatest = checkLatest;
-    }
-    
-    public Boolean getCheckLatestPluginVersion()
-    {
-        return checkLatest;
-    }
-
 }
