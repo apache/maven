@@ -196,5 +196,11 @@
       <pom refid="maven.project"/>
     </artifact:deploy>
   </target>
+
+  <target name="test-invalid-pom-ref" depends="initTaskDefs">
+    <artifact:dependencies>
+      <pom refid="invalid-ref" />
+    </artifact:dependencies>
+  </target>
 </project>
 

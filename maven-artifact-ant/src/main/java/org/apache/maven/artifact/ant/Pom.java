@@ -86,6 +86,10 @@ public class Pom
         if ( refid != null )
         {
             instance = (Pom) getProject().getReference( refid );
+            if ( instance == null )
+            {
+                throw new BuildException( "Invalid reference: '" + refid + "'" );
+            }
         }
         return instance;
     }
