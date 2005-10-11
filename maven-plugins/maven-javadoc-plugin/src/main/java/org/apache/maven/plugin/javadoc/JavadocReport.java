@@ -672,6 +672,7 @@ public class JavadocReport
             cmd.setExecutable( getJavadocPath() );
 
             // General javadoc arguments
+            addArgIfNotEmpty( arguments, "-locale", quotedArgument( this.locale ) );
             addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
             if ( !StringUtils.isEmpty( doclet ) )
             {
@@ -681,7 +682,6 @@ public class JavadocReport
             addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
             addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
             addArgIfNotEmpty( arguments, "-exclude", quotedArgument( excludePackageNames ), 1.4f );
-            addArgIfNotEmpty( arguments, "-locale", quotedArgument( this.locale ) );
             if ( !StringUtils.isEmpty( maxmemory ) )
             {
                 // Allow '128' or '128m'
