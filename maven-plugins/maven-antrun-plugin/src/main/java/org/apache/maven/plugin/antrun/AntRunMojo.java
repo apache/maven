@@ -23,6 +23,8 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Target;
 
+import java.io.File;
+
 /**
  * Maven AntRun Mojo.
  *
@@ -57,10 +59,22 @@ public class AntRunMojo
     private Target tasks;
 
     /**
+     * @parameter expression="${sourceRoot}"
+     */
+    private File sourceRoot;
+
+
+    /**
      */
     public void execute()
         throws MojoExecutionException
     {
         executeTasks( tasks, project );
+
+        if ( sourceRoot != null )
+        {
+            getLog().info( "Registering compile source root " + sourceRoot );
+            project.addCompileSourceRoot( sourceRoot.toString() );
+        }
     }
 }
