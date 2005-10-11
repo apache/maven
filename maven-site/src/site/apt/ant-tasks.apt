@@ -390,7 +390,19 @@ Type Reference
 *----------------------+--------------------------------------------------------+
 | <<<layout>>>         | The layout of the remote repository. The valid options are <<<legacy>>> (Maven 1), or <<<default>>> (Maven 2).
 *----------------------+--------------------------------------------------------+
-| <<<snapshotPolicy>>> | How often to check for updates on dependencies with a version that includes <<<SNAPSHOT>>>. Valid values are <<<never>>>, <<<interval:MINUTES>>>, <<<daily>>> (<default)>, <<<always>>>.
+| <<<snapshots>>>      | Policies regarding downloading snapshot artifacts.
+*----------------------+--------------------------------------------------------+
+| <<<releases>>>       | Policies regarding downloading released artifacts.
+*----------------------+--------------------------------------------------------+
+
+* <<<snapshots>>>, <<<releases>>>
+
+  Policies about downloading each type of artifact.
+
+*----------------------+--------------------------------------------------------+
+| <<<enabled>>>        | Whether to download this type of artifact from the repository. Default is <<<true>>>.
+*----------------------+--------------------------------------------------------+
+| <<<updatePolicy>>>   | How often to check for updates on dependencies with that are snapshots or include a range of versions. Valid values are <<<never>>>, <<<interval:MINUTES>>>, <<<daily>>> (<default)>, <<<always>>>.
 *----------------------+--------------------------------------------------------+
 | <<<checksumPolicy>>> | How to treat missing or incorrect checksums for the dependencies that are downloaded. Valid values are <<<warn>>> (<default>) and <<<fail>>>.
 *----------------------+--------------------------------------------------------+
