@@ -45,7 +45,7 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.components.inputhandler.InputHandler;
+import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
