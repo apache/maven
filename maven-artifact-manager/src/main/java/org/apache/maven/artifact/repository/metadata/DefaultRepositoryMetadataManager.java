@@ -93,6 +93,11 @@ public class DefaultRepositoryMetadataManager
                     {
                         file.setLastModified( System.currentTimeMillis() );
                     }
+                    else
+                    {
+                        // this ensures that files are not continuously checked when they don't exist remotely
+                        metadata.storeInLocalRepository( localRepository, repository );
+                    }
                 }
             }
             cachedMetadata.add( metadata.getKey() );
