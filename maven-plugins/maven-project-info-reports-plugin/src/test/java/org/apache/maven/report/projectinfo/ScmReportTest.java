@@ -16,13 +16,13 @@ package org.apache.maven.report.projectinfo;
  * limitations under the License.
  */
 
-import java.net.URL;
-
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.TextBlock;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+
+import java.net.URL;
 
 /**
  * Test the <code>Scm Report</code> generation for defined projects in the <code>PROJECTS_DIR</code> directory.
@@ -46,7 +46,9 @@ public class ScmReportTest
 
     private static final String UNKNOWN_PROJECT = "project-info-reports-plugin-scm-unknown";
 
-    /** WebConversation object */
+    /**
+     * WebConversation object
+     */
     private static final WebConversation webConversation = new WebConversation();
 
     /**
@@ -61,335 +63,268 @@ public class ScmReportTest
      * Test a the <code>ClearCase</code> SCM report
      */
     public void testClearCaseScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( CLEARCASE_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( CLEARCASE_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 8 );
 
-            assertEquals( textBlocks.length, 8 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.devaccess.clearcase.intro" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.devaccess.clearcase.intro" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 
     /**
      * Test a the <code>CVS</code> SCM report
      */
     public void testCVSScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( CVS_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( CVS_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 9 );
 
-            assertEquals( textBlocks.length, 9 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.cvs.intro" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.devaccess.cvs.intro" ), textBlocks[7].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[8].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.cvs.intro" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.devaccess.cvs.intro" ), textBlocks[7].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[8].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 
     /**
      * Test a the <code>Perforce</code> SCM report
      */
     public void testPerforceScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( PERFORCE_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( PERFORCE_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 8 );
 
-            assertEquals( textBlocks.length, 8 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.devaccess.perforce.intro" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.devaccess.perforce.intro" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 
     /**
      * Test a the <code>Starteam</code> SCM report
      */
     public void testStarteamScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( STARTEAM_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( STARTEAM_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 8 );
 
-            assertEquals( textBlocks.length, 8 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.devaccess.starteam.intro" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.devaccess.starteam.intro" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[7].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 
     /**
      * Test a the <code>SVN</code> SCM report
      */
     public void testSVNScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( SVN_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( SVN_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 15 );
 
-            assertEquals( textBlocks.length, 15 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.svn.intro" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.devaccess.svn.intro1" ), textBlocks[7].getText() );
+        assertEquals( getString( "report.scm.devaccess.svn.intro2" ), textBlocks[8].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[9].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.svn.intro" ), textBlocks[10].getText() );
+        assertEquals( getString( "report.scm.accessthroughtproxy.title" ), textBlocks[11].getText() );
+        assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro1" ), textBlocks[12].getText() );
+        assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro2" ), textBlocks[13].getText() );
+        assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro3" ), textBlocks[14].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.svn.intro" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.devaccess.svn.intro1" ), textBlocks[7].getText() );
-            assertEquals( getString( "report.scm.devaccess.svn.intro2" ), textBlocks[8].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[9].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.svn.intro" ), textBlocks[10].getText() );
-            assertEquals( getString( "report.scm.accessthroughtproxy.title" ), textBlocks[11].getText() );
-            assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro1" ), textBlocks[12].getText() );
-            assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro2" ), textBlocks[13].getText() );
-            assertEquals( getString( "report.scm.accessthroughtproxy.svn.intro3" ), textBlocks[14].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 
     /**
      * Test a the <code>unknown</code> SCM report
      */
     public void testUnknownScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( UNKNOWN_PROJECT );
 
-        try
-        {
-            loadTestMavenProject( UNKNOWN_PROJECT );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getScm() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getScm() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.scm.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.scm.title" ), response.getTitle() );
+        // Test the sections
+        TextBlock[] textBlocks = response.getTextBlocks();
 
-            // Test the sections
-            TextBlock[] textBlocks = response.getTextBlocks();
+        assertEquals( textBlocks.length, 11 );
 
-            assertEquals( textBlocks.length, 11 );
+        assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
+        assertEquals( getString( "report.scm.general.intro" ), textBlocks[2].getText() );
+        assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[3].getText() );
+        assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[4].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[5].getText() );
+        assertEquals( getString( "report.scm.anonymousaccess.general.intro" ), textBlocks[6].getText() );
+        assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[7].getText() );
+        assertEquals( getString( "report.scm.devaccess.general.intro" ), textBlocks[8].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[9].getText() );
+        assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[10].getText() );
 
-            assertEquals( getString( "report.scm.overview.title" ), textBlocks[1].getText() );
-            assertEquals( getString( "report.scm.general.intro" ), textBlocks[2].getText() );
-            assertEquals( getString( "report.scm.webaccess.title" ), textBlocks[3].getText() );
-            assertEquals( getString( "report.scm.webaccess.url" ), textBlocks[4].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.title" ), textBlocks[5].getText() );
-            assertEquals( getString( "report.scm.anonymousaccess.general.intro" ), textBlocks[6].getText() );
-            assertEquals( getString( "report.scm.devaccess.title" ), textBlocks[7].getText() );
-            assertEquals( getString( "report.scm.devaccess.general.intro" ), textBlocks[8].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.title" ), textBlocks[9].getText() );
-            assertEquals( getString( "report.scm.accessbehindfirewall.general.intro" ), textBlocks[10].getText() );
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 }

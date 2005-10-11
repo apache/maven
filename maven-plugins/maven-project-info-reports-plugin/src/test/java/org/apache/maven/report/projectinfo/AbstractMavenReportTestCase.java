@@ -55,13 +55,6 @@ public abstract class AbstractMavenReportTestCase
     protected static String M2_SITE_GOAL = "site:site";
 
     /**
-     * Set this to 'true' to bypass unit tests entirely.
-     *
-     * @parameter expression="${maven.test.skip}"
-     */
-    protected boolean skip;
-
-    /**
      * The default locale is English.
      */
     protected Locale locale = Locale.ENGLISH;

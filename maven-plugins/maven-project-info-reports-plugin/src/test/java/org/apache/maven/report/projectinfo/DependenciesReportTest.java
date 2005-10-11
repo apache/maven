@@ -16,13 +16,13 @@ package org.apache.maven.report.projectinfo;
  * limitations under the License.
  */
 
-import java.net.URL;
-
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
+
+import java.net.URL;
 
 /**
  * Test the <code>Scm Report</code> generation for defined projects in the <code>PROJECTS_DIR</code> directory.
@@ -36,7 +36,9 @@ public class DependenciesReportTest
 {
     private static final String TEST1 = "project-info-reports-plugin-test1";
 
-    /** WebConversation object */
+    /**
+     * WebConversation object
+     */
     private static final WebConversation webConversation = new WebConversation();
 
     /**
@@ -51,49 +53,38 @@ public class DependenciesReportTest
      * Test a the <code>ClearCase</code> SCM report
      */
     public void testClearCaseScmReport()
+        throws Exception
     {
-        if ( skip )
-        {
-            return;
-        }
+        loadTestMavenProject( TEST1 );
 
-        try
-        {
-            loadTestMavenProject( TEST1 );
+        assertNotNull( getTestMavenProject() );
+        assertNotNull( getTestMavenProject().getDependencies() );
 
-            assertNotNull( getTestMavenProject() );
-            assertNotNull( getTestMavenProject().getDependencies() );
+        executeMaven2CommandLine();
 
-            executeMaven2CommandLine();
+        URL reportURL = getGeneratedReport().toURL();
+        assertNotNull( reportURL );
 
-            URL reportURL = getGeneratedReport().toURL();
-            assertNotNull( reportURL );
+        // HTTPUnit
+        WebRequest request = new GetMethodWebRequest( reportURL.toString() );
+        WebResponse response = webConversation.getResponse( request );
 
-            // HTTPUnit
-            WebRequest request = new GetMethodWebRequest( reportURL.toString() );
-            WebResponse response = webConversation.getResponse( request );
+        // Basic HTML tests
+        assertTrue( response.isHTML() );
+        assertTrue( response.getContentLength() > 0 );
 
-            // Basic HTML tests
-            assertTrue( response.isHTML() );
-            assertTrue( response.getContentLength() > 0 );
+        // Test the Page title
+        assertEquals( getString( "report.dependencies.title" ), response.getTitle() );
 
-            // Test the Page title
-            assertEquals( getString( "report.dependencies.title" ), response.getTitle() );
+        // Test the tables
+        WebTable[] webTables = response.getTables();
+        assertEquals( webTables.length, 2 );
 
-            // Test the tables
-            WebTable[] webTables = response.getTables();
-            assertEquals( webTables.length, 2 );
+        assertEquals( webTables[0].getColumnCount(), 5 );
+        assertEquals( webTables[0].getRowCount(), 1 + getTestMavenProject().getDependencies().size() );
 
-            assertEquals( webTables[0].getColumnCount(), 5);
-            assertEquals( webTables[0].getRowCount(), 1 + getTestMavenProject().getDependencies().size());
+        assertEquals( webTables[1].getColumnCount(), 5 );
 
-            assertEquals( webTables[1].getColumnCount(), 5);
-
-            testLinks( response );
-        }
-        catch ( Exception e )
-        {
-            assertFalse( true );
-        }
+        testLinks( response );
     }
 }
