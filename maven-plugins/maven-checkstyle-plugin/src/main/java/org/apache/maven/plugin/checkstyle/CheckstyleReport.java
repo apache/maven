@@ -33,8 +33,8 @@ import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.StringOutputStream;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -119,8 +120,7 @@ public class CheckstyleReport
 
     /**
      * If null, the checkstyle task will display violations on stdout. Otherwise, the text file will be
-     * created with the violations. Note: This is in addition to the XML result file (containing
-     * the violations in XML format which is always created.
+     * created with the violations.
      *
      * @parameter
      */
@@ -238,6 +238,16 @@ public class CheckstyleReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
+        Map files = executeCheckstyle();
+
+        CheckstyleReportGenerator generator = new CheckstyleReportGenerator( getSink(), getBundle( locale ) );
+
+        generator.generateReport( files );
+    }
+
+    private Map executeCheckstyle()
+        throws MavenReportException
+    {
         File[] files = getFilesToProcess( includes, excludes );
 
         String configFile = getConfigFile();
@@ -252,8 +262,8 @@ public class CheckstyleReport
 
         try
         {
-            Configuration config = ConfigurationLoader
-                .loadConfiguration( configFile, new PropertiesExpander( overridingProperties ) );
+            Configuration config = ConfigurationLoader.loadConfiguration( configFile, new PropertiesExpander(
+                overridingProperties ) );
 
             checker = new Checker();
 
@@ -283,7 +293,7 @@ public class CheckstyleReport
 
         checker.addListener( getConsoleListener() );
 
-        AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory, getBundle( locale ) );
+        CheckstyleReportListener sinkListener = new CheckstyleReportListener( sourceDirectory );
 
         checker.addListener( sinkListener );
 
@@ -300,6 +310,8 @@ public class CheckstyleReport
         {
             throw new MavenReportException( "There are " + nbErrors + " formatting errors." );
         }
+
+        return sinkListener.getFiles();
     }
 
     /* (non-Javadoc)
