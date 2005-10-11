@@ -1,16 +1,25 @@
- ----
- Guides
- -----
- Jason van Zyl
- -----
- 12 October 2005
- -----
+- multi module howto
+- per user scm setup
+  - outline behaviour when connection and developConnection are defined
+   
+   Our current URL looks like:
+   scm:cvs:pserver:@cvs.host.name:/cvsroot:module-version
+   
+   Using this URL, the default is to connect to the CVS server using the
+   same userid as the current user.  This is the desired behavior and I
+   don't want to mess that up.  I just would like a means to add a userid
+   in the URL only in special circumstances like Continuum.
+   
+   We might want to do something where we say it is a best practice to
+   specify a ${user} and take it from the environment and allow an override.
 
 * Guide to using project properties
 
 Actually, no. It's *like* the properties defined in profiles in syntax,
 but this is a properties section that is specified as a direct child of
 the <project> element. So:
+
+- testing a plugin
 
 +----+
 
@@ -124,16 +133,3 @@ I've pasted an example of a trivial modified settings.xml file below.
    <localRepository>F:\m2-repository\repository</localRepository>
 </settings>
 
-==
-
-example of generating sources
-
-==
-
-How to modify the manifest.
-
-~~ * How do I deal with a dependency that is already supplied by my runtime?
-
-+-----+
-
-~~ How to do a test release and deployment. Trying to work through this with raphael at the moment.

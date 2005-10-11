@@ -5,3 +5,57 @@
  ------
  12 October 2005
  ------
+
+ Let's run though a short example to try and help. To generate sources you must first have a plugin that
+ participates in the generate-sources phase like the Antlr plugin:
+
++----+
+
+/**
+ * @goal generate
+ * @phase generate-sources
+ * @requiresDependencyResolution compile
+ * @description Antlr plugin
+ */
+
++----+
+
+ The first two lines say "I want to be fit into the generate-sources
+ phase and my 'handle' is generate".
+
+ So this is all fine and dandy, we have a plugin that wants to generate
+ some sources from a Antlr grammar but how do we use it. You need to
+ specify that you want to use it in your POM:
+
++----+
+
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antlr-plugin</artifactId>
+        <configuration>
+          <grammars>java.g</grammars>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
+
++----+
+
+ If you then type "m2 compile" m2 will walk through the {{{../introduction/introduction-to-the-lifecycle.html}lifecycle}}
+ and will eventually hit the generate-sources phase and see you have a plugin configured that
+ wants to participate in that phase and the antlr plugin is executed with
+ your given configuration.
+
