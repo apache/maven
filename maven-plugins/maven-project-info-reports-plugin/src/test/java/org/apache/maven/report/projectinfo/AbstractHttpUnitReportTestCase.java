@@ -49,13 +49,13 @@ public abstract class AbstractHttpUnitReportTestCase
         // NavBar
         assertEquals( "index.html", links[1].getURLString() );
         assertEquals( "project-info.html", links[2].getURLString() );
-        assertEquals( "dependencies.html", links[3].getURLString() );
-        assertEquals( "integration.html", links[4].getURLString() );
+        assertEquals( "integration.html", links[3].getURLString() );
+        assertEquals( "dependencies.html", links[4].getURLString() );
         assertEquals( "issue-tracking.html", links[5].getURLString() );
-        assertEquals( "license.html", links[6].getURLString() );
-        assertEquals( "mail-lists.html", links[7].getURLString() );
-        assertEquals( "source-repository.html", links[8].getURLString() );
-        assertEquals( "team-list.html", links[9].getURLString() );
+        assertEquals( "mail-lists.html", links[6].getURLString() );
+        assertEquals( "license.html", links[7].getURLString() );
+        assertEquals( "team-list.html", links[8].getURLString() );
+        assertEquals( "source-repository.html", links[9].getURLString() );
         // Content skipped
     }
 }
