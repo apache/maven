@@ -172,7 +172,7 @@ public class CheckstyleReport
      * @parameter expression="${project.build.sourceDirectory}"
      * @required
      */
-    private String sourceDirectory;
+    private File sourceDirectory;
 
     /**
      * @parameter expression="${project}"
@@ -238,6 +238,11 @@ public class CheckstyleReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
+        if ( !canGenerateReport() )
+        {
+            throw new MavenReportException( "No source directory to process for style" );
+        }
+
         Map files = executeCheckstyle();
 
         CheckstyleReportGenerator generator = new CheckstyleReportGenerator( getSink(), getBundle( locale ) );
@@ -396,7 +401,7 @@ public class CheckstyleReport
 
         try
         {
-            files = FileUtils.getFiles( new File( sourceDirectory ), includes, excludesStr.toString() );
+            files = FileUtils.getFiles( sourceDirectory, includes, excludesStr.toString() );
         }
         catch ( IOException ioe )
         {
@@ -525,5 +530,11 @@ public class CheckstyleReport
     private static ResourceBundle getBundle( Locale locale )
     {
         return ResourceBundle.getBundle( "checkstyle-report", locale, CheckstyleReport.class.getClassLoader() );
+    }
+
+    public boolean canGenerateReport()
+    {
+        // TODO: would be good to scan the files here
+        return super.canGenerateReport() && sourceDirectory.exists();
     }
 }

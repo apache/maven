@@ -22,6 +22,10 @@ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.Map;
+import java.util.List;
+import java.io.File;
+
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -32,31 +36,31 @@ public class CheckstyleReportListener
     extends AutomaticBean
     implements AuditListener
 {
-    private String sourceDirectory;
-    
-    private TreeMap files;
-    
+    private File sourceDirectory;
+
+    private Map files;
+
     private String currentFile;
-    
-    private LinkedList events;
-    
+
+    private List events;
+
     private SeverityLevel severityLevel;
-    
-    public CheckstyleReportListener( String sourceDirectory )
+
+    public CheckstyleReportListener( File sourceDirectory )
     {
         this.sourceDirectory = sourceDirectory;
     }
-    
+
     public void setSeverityLevelFilter( SeverityLevel severityLevel )
     {
         this.severityLevel = severityLevel;
     }
-    
+
     public SeverityLevel getSeverityLevelFilter()
     {
         return severityLevel;
     }
-    
+
     public void auditStarted( AuditEvent event )
     {
         setFiles( new TreeMap() );
@@ -69,12 +73,12 @@ public class CheckstyleReportListener
 
     public void fileStarted( AuditEvent event )
     {
-        currentFile = StringUtils.substring( event.getFileName(), sourceDirectory.length() + 1 );
+        currentFile = StringUtils.substring( event.getFileName(), sourceDirectory.getPath().length() + 1 );
         currentFile = StringUtils.replace( currentFile, "\\", "/" );
-        
+
         if ( !getFiles().containsKey( currentFile ) )
             getFiles().put( currentFile, new LinkedList() );
-        
+
         events = (LinkedList) getFiles().get( currentFile );
     }
 
@@ -87,24 +91,24 @@ public class CheckstyleReportListener
     public void addError( AuditEvent event )
     {
         if ( SeverityLevel.IGNORE.equals( event.getSeverityLevel() ) ) return;
-        
+
         if ( severityLevel == null || severityLevel.equals( event.getSeverityLevel() ) )
         {
             events.add( event );
         }
     }
-    
+
     public void addException( AuditEvent event, Throwable throwable )
     {
         //Do Nothing
     }
 
-    public TreeMap getFiles()
+    public Map getFiles()
     {
         return files;
     }
 
-    public void setFiles( TreeMap files )
+    public void setFiles( Map files )
     {
         this.files = files;
     }

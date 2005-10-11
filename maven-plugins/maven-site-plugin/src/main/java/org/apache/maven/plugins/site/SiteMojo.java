@@ -220,6 +220,8 @@ public class SiteMojo
             attributes.put( "outputEncoding", outputEncoding );
         }
 
+        List reports = filterReports( this.reports );
+
         Map categories = categorizeReports( reports );
 
         List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
@@ -298,8 +300,8 @@ public class SiteMojo
                 List generatedReportsFileName = Collections.EMPTY_LIST;
                 if ( reports != null )
                 {
-                    generatedReportsFileName = generateReportsPages( reports, locale, outputDirectory, defaultLocale,
-                                                                     siteDescriptor );
+                    generatedReportsFileName =
+                        generateReportsPages( reports, locale, outputDirectory, defaultLocale, siteDescriptor );
                 }
 
                 //Generate overview pages
@@ -396,6 +398,20 @@ public class SiteMojo
         {
             throw new MojoExecutionException( "Error during site generation", e );
         }
+    }
+
+    private List filterReports( List reports )
+    {
+        List filteredReports = new ArrayList( reports.size() );
+        for ( Iterator i = reports.iterator(); i.hasNext(); )
+        {
+            MavenReport report = (MavenReport) i.next();
+            if ( report.canGenerateReport() )
+            {
+                filteredReports.add( report );
+            }
+        }
+        return filteredReports;
     }
 
     /**
@@ -528,6 +544,7 @@ public class SiteMojo
             for ( Iterator i = reports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
+
                 buffer.append( "        <item name=\"" );
                 buffer.append( report.getName( locale ) );
                 buffer.append( "\" href=\"/" );

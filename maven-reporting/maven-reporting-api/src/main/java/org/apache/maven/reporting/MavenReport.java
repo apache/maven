@@ -53,4 +53,6 @@ public interface MavenReport
     File getReportOutputDirectory();
 
     boolean isExternalReport();
+
+    boolean canGenerateReport();
 }

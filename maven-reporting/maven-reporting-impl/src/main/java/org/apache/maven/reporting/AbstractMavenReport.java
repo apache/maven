@@ -190,4 +190,9 @@ public abstract class AbstractMavenReport
     {
         return false;
     }
+
+    public boolean canGenerateReport()
+    {
+        return true;
+    }
 }
