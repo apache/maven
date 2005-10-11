@@ -106,9 +106,7 @@ public class PrepareReleaseMojo
     private PluginVersionManager pluginVersionManager;
 
     /**
-     * @parameter expression="${component.org.codehaus.plexus.components.inputhandler.InputHandler}"
-     * @required
-     * @readonly
+     * @component
      */
     private InputHandler inputHandler;
 
