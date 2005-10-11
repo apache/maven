@@ -17,10 +17,9 @@ package org.apache.maven.plugin.verifier;
  */
 
 import junit.framework.TestCase;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
-
-import org.apache.maven.plugin.MojoExecutionException;
 
 public class VerifierMojoTest
     extends TestCase
@@ -28,7 +27,7 @@ public class VerifierMojoTest
     public void testPrefixWithBaseDir()
     {
         VerifierMojo mojo = new VerifierMojo();
-        mojo.setBaseDir( "c:/some/path" );
+        mojo.setBaseDir( new File( "c:/some/path" ) );
 
         File result = mojo.getAbsoluteFileToCheck( new File( "target/dummy.txt" ) );
 
@@ -39,13 +38,12 @@ public class VerifierMojoTest
     public void testDoNotPrefixWhenAbsolutePath()
     {
         VerifierMojo mojo = new VerifierMojo();
-        mojo.setBaseDir( new File( "/some/path" ).getAbsolutePath() );
+        mojo.setBaseDir( new File( "/some/path" ).getAbsoluteFile() );
 
         File absoluteFile = new File( "/project/target/dummy.txt" ).getAbsoluteFile();
         File result = mojo.getAbsoluteFileToCheck( absoluteFile );
 
-        File expectedResult = absoluteFile;
-        assertEquals( expectedResult.getPath(), result.getPath() );
+        assertEquals( absoluteFile.getPath(), result.getPath() );
     }
 
     public void testCheckFileThatDoesNotExist()
@@ -53,7 +51,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/FileDoesNotExist.xml" ).getFile() );
-        mojo.setBaseDir( "c:/some/path" );
+        mojo.setBaseDir( new File( "c:/some/path" ) );
         mojo.setVerificationFile( file );
         mojo.setFailOnError( true );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
@@ -82,7 +80,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/FileExists.xml" ).getFile() );
-        mojo.setBaseDir( file.getParent() );
+        mojo.setBaseDir( file.getParentFile() );
         mojo.setVerificationFile( file );
         mojo.setFailOnError( true );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
@@ -103,7 +101,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/InexistentFile.xml" ).getFile() );
-        mojo.setBaseDir( "c:/some/path" );
+        mojo.setBaseDir( new File( "c:/some/path" ) );
         mojo.setVerificationFile( file );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
         {
@@ -123,7 +121,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/InexistentFileThatExists.xml" ).getFile() );
-        mojo.setBaseDir( file.getParent() );
+        mojo.setBaseDir( file.getParentFile() );
         mojo.setVerificationFile( file );
         mojo.setFailOnError( true );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
@@ -152,7 +150,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/FileExistsValidContent.xml" ).getFile() );
-        mojo.setBaseDir( file.getParent() );
+        mojo.setBaseDir( file.getParentFile() );
         mojo.setVerificationFile( file );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
         {
@@ -172,7 +170,7 @@ public class VerifierMojoTest
     {
         VerifierMojo mojo = new VerifierMojo();
         File file = new File( getClass().getResource( "/FileExistsInvalidContent.xml" ).getFile() );
-        mojo.setBaseDir( file.getParent() );
+        mojo.setBaseDir( file.getParentFile() );
         mojo.setVerificationFile( file );
         mojo.setFailOnError( true );
         mojo.setVerificationResultPrinter( new VerificationResultPrinter()
