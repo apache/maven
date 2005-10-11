@@ -93,6 +93,16 @@
     </component>
     <!--
     |
+    |MojoExecutionExceptionDiagnoser
+    |
+    -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>MojoExecutionExceptionDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.MojoExecutionExceptionDiagnoser</implementation>
+    </component>
+    <!--
+    |
     |ProjectBuildDiagnoser
     |
     -->
