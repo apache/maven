@@ -142,6 +142,22 @@ public class MBoot
         }
     }
 
+    private static String getSettingsPath( String[] args )
+        throws Exception
+    {
+        for ( int i = 0; i < args.length; i++ ) {
+            if ( args[ i ].equals( "-s" ) )
+            {
+                if ( i == args.length - 1 )
+                {
+                    throw new Exception( "missing argument to -s" );
+                }
+                return args[ i + 1 ];
+            }
+        }
+        return null;
+    }
+
     public void run( String[] args )
         throws Exception
     {
@@ -151,7 +167,18 @@ public class MBoot
 
         String userHome = System.getProperty( "user.home" );
 
-        File settingsXml = new File( userHome, ".m2/settings.xml" );
+        String settingsXmlPath = getSettingsPath( args );
+
+        File settingsXml;
+
+        if ( settingsXmlPath != null )
+        {
+             System.out.println( "Using settings from " + settingsXmlPath );
+             settingsXml = new File( settingsXmlPath );
+        } else
+        {
+             settingsXml = new File( userHome, ".m2/settings.xml" );
+        }
 
         if ( settingsXml.exists() )
         {
