@@ -48,7 +48,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0.4-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
