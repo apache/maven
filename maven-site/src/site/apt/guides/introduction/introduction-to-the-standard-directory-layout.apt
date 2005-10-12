@@ -9,17 +9,21 @@
 Introduction to the Standard Directory Layout
 
 *--------------------------+-----------------------------------------------+
-| src/main/java            | Main sources  
+| src/main/java            | Application/Library sources
 *--------------------------+-----------------------------------------------+
-| src/main/resources       | Main resources   
+| src/main/resources       | Application/Library resources
 *--------------------------+-----------------------------------------------+
-| src/main/filters         |   
+| src/main/filters         | Resource filter files
 *--------------------------+-----------------------------------------------+
-| src/test/java            |    
+| src/main/assembly        | Assembly descriptors
 *--------------------------+-----------------------------------------------+
-| src/test/resources       |    
+| src/main/config          | Configuration files
 *--------------------------+-----------------------------------------------+
-| src/test/filters         |    
+| src/test/java            | Test sources
 *--------------------------+-----------------------------------------------+
-| src/site                 |    
+| src/test/resources       | Test resources
+*--------------------------+-----------------------------------------------+
+| src/test/filters         | Test resource filter files
+*--------------------------+-----------------------------------------------+
+| src/site                 | Site 
 *--------------------------+-----------------------------------------------+
