@@ -20,13 +20,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,15 +46,6 @@ public class AntBuildWriter
     {
         this.project = project;
         this.localRepository = localRepository;
-    }
-
-    public void write()
-        throws IOException
-    {
-        writeBuildXml();
-
-        System.out.println(
-            "Wrote Ant project for " + project.getArtifactId() + " to " + project.getBasedir().getAbsolutePath() );
     }
 
     // ----------------------------------------------------------------------
@@ -95,7 +86,7 @@ public class AntBuildWriter
 
         writer.endElement(); // project
 
-        close( w );
+        IOUtil.close( w );
     }
 
     private void writeCompileTestsTarget( XMLWriter writer, List testCompileSourceRoots )
@@ -488,24 +479,6 @@ public class AntBuildWriter
         writer.addAttribute( "value", project.getBuild().getOutput() );
         writer.endElement(); // property
 */
-    }
-
-    private void close( Writer closeable )
-    {
-        if ( closeable == null )
-        {
-            return;
-        }
-
-        try
-        {
-            closeable.close();
-        }
-        catch ( Exception e )
-        {
-            // ignore
-            // TODO: warn
-        }
     }
 
     // TODO: move to plexus-utils or use something appropriate from there (eclipse plugin too)

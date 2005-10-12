@@ -61,11 +61,14 @@ public class AntMojo
 
         try
         {
-            antBuildWriter.write();
+            antBuildWriter.writeBuildXml();
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Error building Ant script", e );
         }
+
+        getLog().info(
+            "Wrote Ant project for " + project.getArtifactId() + " to " + project.getBasedir().getAbsolutePath() );
     }
 }
