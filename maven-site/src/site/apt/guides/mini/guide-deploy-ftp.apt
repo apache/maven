@@ -7,3 +7,87 @@
  ------
 
 Guide to deploying with FTP
+
+ In order to deploy artifacts using FTP you must first specify the use of an FTP server in the
+ <<distributionManagement>> element of your POM as well as specifying an <<extension>> in your
+ <<build>> element which will pull in the FTP artifacts required to deploy with FTP:
+
++----+
+
+<project>
+  <parent>
+    <groupId>com.stchome</groupId>
+    <artifactId>mavenFull</artifactId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.1-SNAPSHOT</version>
+  <name>Maven Quick Start Archetype</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- Enabling the use of FTP -->
+  <distributionManagement>
+    <repository>
+    <id>ftp-repository</id>
+    <url>ftp://repository.mycompany.com</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ftp</artifactId>
+         <version>1.0-alpha-3</version>
+      </extension>
+    </extensions>
+  </build>
+
+</project>
+
++----+
+
+ Your <<<settings.xml>>> would contain a <<<server>>> element where the <<id>> of that element matches <<id>> of the
+ FTP repository specified in the POM above:
+
++----+
+
+<settings>
+
+  ...
+
+  <servers>
+    <server>
+      <id>ftp-repository</id>
+      <username>user</username>
+      <password>pass</password>
+    </server>
+
+  </servers>
+
+  ...
+
+</settings>
+
++----+
+
+ You should, of course, make sure that you can login into the specified FTP server by hand before attempting the
+ deployment with Maven. Once you have verified that everything is setup correctly you can now deploy your artifacts
+ using Maven:
+
++----+
+
+m2 deploy
+
++----+
