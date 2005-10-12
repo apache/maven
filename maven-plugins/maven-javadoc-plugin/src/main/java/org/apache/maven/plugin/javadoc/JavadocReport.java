@@ -885,6 +885,10 @@ public class JavadocReport
         {
             javadocExe = new File( SystemUtils.getJavaHome() + "/../sh", javadocCommand );
         }
+        else if ( SystemUtils.IS_OS_MAC_OSX )
+        {
+            javadocExe = new File( SystemUtils.getJavaHome() + "/bin", javadocCommand );
+        }
         else
         {
             javadocExe = new File( SystemUtils.getJavaHome() + "/../bin", javadocCommand );
