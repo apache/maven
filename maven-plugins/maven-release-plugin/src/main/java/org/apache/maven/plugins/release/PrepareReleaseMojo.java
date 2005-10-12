@@ -16,19 +16,6 @@ package org.apache.maven.plugins.release;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -61,6 +48,19 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Prepare for a release in SCM
@@ -96,12 +96,12 @@ public class PrepareReleaseMojo
     private boolean interactive;
 
     /**
-     * @component role="org.apache.maven.artifact.metadata.ArtifactMetadataSource"
+     * @component
      */
     private ArtifactMetadataSource artifactMetadataSource;
 
     /**
-     * @component role="org.apache.maven.plugin.version.PluginVersionManager"
+     * @component
      */
     private PluginVersionManager pluginVersionManager;
 
@@ -218,7 +218,8 @@ public class PrepareReleaseMojo
 
                 try
                 {
-                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
+                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                     ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
                 }
                 catch ( IOException e )
                 {
@@ -266,7 +267,8 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_PREPARED_RELEASE );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                 ReleaseProgressTracker.CP_PREPARED_RELEASE );
             }
             catch ( IOException e )
             {
@@ -407,7 +409,8 @@ public class PrepareReleaseMojo
             }
             catch ( IOException e )
             {
-                getLog().warn( "Cannot read existing release progress file from directory: " + basedir.getAbsolutePath() + "." );
+                getLog().warn(
+                    "Cannot read existing release progress file from directory: " + basedir.getAbsolutePath() + "." );
                 getLog().debug( "Cause", e );
 
                 releaseProgress = ReleaseProgressTracker.create();
@@ -527,7 +530,8 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                 ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED );
             }
             catch ( IOException e )
             {
@@ -586,8 +590,8 @@ public class PrepareReleaseMojo
         {
             Artifact artifact = (Artifact) i.next();
 
-            String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
-                                                                              artifact.getArtifactId() );
+            String artifactVersion =
+                getVersionResolver().getResolvedVersion( artifact.getGroupId(), artifact.getArtifactId() );
 
             if ( artifactVersion == null )
             {
@@ -606,8 +610,8 @@ public class PrepareReleaseMojo
         {
             Artifact artifact = (Artifact) i.next();
 
-            String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
-                                                                              artifact.getArtifactId() );
+            String artifactVersion =
+                getVersionResolver().getResolvedVersion( artifact.getGroupId(), artifact.getArtifactId() );
 
             if ( artifactVersion == null )
             {
@@ -672,8 +676,8 @@ public class PrepareReleaseMojo
                 // Avoid in dep mgmt
                 if ( dep.getVersion() != null )
                 {
-                    String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
-                                                                                      dep.getArtifactId() );
+                    String resolvedVersion =
+                        getVersionResolver().getResolvedVersion( dep.getGroupId(), dep.getArtifactId() );
 
                     if ( resolvedVersion != null )
                     {
@@ -694,8 +698,8 @@ public class PrepareReleaseMojo
 
                 if ( dep.getVersion() != null )
                 {
-                    String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
-                                                                                      dep.getArtifactId() );
+                    String resolvedVersion =
+                        getVersionResolver().getResolvedVersion( dep.getGroupId(), dep.getArtifactId() );
 
                     if ( resolvedVersion != null )
                     {
@@ -721,8 +725,8 @@ public class PrepareReleaseMojo
                     // Avoid in plugin mgmt
                     if ( plugin.getVersion() != null )
                     {
-                        String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                          plugin.getArtifactId() );
+                        String resolvedVersion =
+                            getVersionResolver().getResolvedVersion( plugin.getGroupId(), plugin.getArtifactId() );
 
                         if ( resolvedVersion != null )
                         {
@@ -743,8 +747,8 @@ public class PrepareReleaseMojo
 
                     if ( plugin.getVersion() != null )
                     {
-                        String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                          plugin.getArtifactId() );
+                        String resolvedVersion =
+                            getVersionResolver().getResolvedVersion( plugin.getGroupId(), plugin.getArtifactId() );
 
                         if ( resolvedVersion != null )
                         {
@@ -761,8 +765,8 @@ public class PrepareReleaseMojo
             {
                 Extension ext = (Extension) i.next();
 
-                String resolvedVersion = getVersionResolver().getResolvedVersion( ext.getGroupId(),
-                                                                                  ext.getArtifactId() );
+                String resolvedVersion =
+                    getVersionResolver().getResolvedVersion( ext.getGroupId(), ext.getArtifactId() );
 
                 if ( resolvedVersion != null )
                 {
@@ -782,8 +786,8 @@ public class PrepareReleaseMojo
             {
                 ReportPlugin plugin = (ReportPlugin) i.next();
 
-                String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                  plugin.getArtifactId() );
+                String resolvedVersion =
+                    getVersionResolver().getResolvedVersion( plugin.getGroupId(), plugin.getArtifactId() );
 
                 if ( resolvedVersion != null )
                 {
@@ -848,8 +852,8 @@ public class PrepareReleaseMojo
                 {
                     String snapshotVersion = projectVersion;
 
-                    projectVersion = getVersionResolver().getResolvedVersion( project.getGroupId(),
-                                                                              project.getArtifactId() );
+                    projectVersion =
+                        getVersionResolver().getResolvedVersion( project.getGroupId(), project.getArtifactId() );
 
                     if ( ArtifactUtils.isSnapshot( projectVersion ) )
                     {
@@ -1001,8 +1005,8 @@ public class PrepareReleaseMojo
 
                         Artifact artifact = (Artifact) extensionArtifacts.get( extensionId );
 
-                        String version = resolveVersion( artifact, "extension",
-                                                         releaseProject.getPluginArtifactRepositories() );
+                        String version =
+                            resolveVersion( artifact, "extension", releaseProject.getPluginArtifactRepositories() );
 
                         ext.setVersion( version );
                     }
@@ -1050,7 +1054,8 @@ public class PrepareReleaseMojo
 
                 try
                 {
-                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
+                    getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                     ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
                 }
                 catch ( IOException e )
                 {
@@ -1140,8 +1145,8 @@ public class PrepareReleaseMojo
     private String resolveVersion( Artifact artifact, String artifactUsage, List pluginArtifactRepositories )
         throws MojoExecutionException
     {
-        String resolvedVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
-                                                                          artifact.getArtifactId() );
+        String resolvedVersion =
+            getVersionResolver().getResolvedVersion( artifact.getGroupId(), artifact.getArtifactId() );
 
         if ( resolvedVersion == null )
         {
@@ -1180,7 +1185,8 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                 ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION );
             }
             catch ( IOException e )
             {
@@ -1232,7 +1238,8 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_REMOVED_RELEASE_POM );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                 ReleaseProgressTracker.CP_REMOVED_RELEASE_POM );
             }
             catch ( IOException e )
             {
@@ -1267,7 +1274,8 @@ public class PrepareReleaseMojo
 
             try
             {
-                getReleaseProgress().checkpoint( basedir.getAbsolutePath(), ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION );
+                getReleaseProgress().checkpoint( basedir.getAbsolutePath(),
+                                                 ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION );
             }
             catch ( IOException e )
             {

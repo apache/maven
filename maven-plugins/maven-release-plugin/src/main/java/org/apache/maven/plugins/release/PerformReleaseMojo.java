@@ -16,11 +16,6 @@ package org.apache.maven.plugins.release;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
@@ -31,6 +26,11 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Perform a release from SCM
@@ -60,14 +60,21 @@ public class PerformReleaseMojo
      * @required
      */
     protected String workingDirectory;
-    
+
     /**
      * @parameter expression="${project}"
      * @required
      * @readonly
      */
     protected MavenProject project;
-    
+
+    /**
+     * @parameter expression="${settings.interactiveMode}"
+     * @required
+     * @readonly
+     */
+    private boolean interactive;
+
     private ReleaseProgressTracker releaseProgress;
 
     protected void executeTask()
@@ -114,37 +121,40 @@ public class PerformReleaseMojo
 
         cl.createArgument().setLine( "--no-plugin-updates" );
 
-        cl.createArgument().setLine( "--batch-mode" );
-        
+        if ( !interactive )
+        {
+            cl.createArgument().setLine( "--batch-mode" );
+        }
+
         List profiles = project.getActiveProfiles();
-        
+
         if ( profiles != null && !profiles.isEmpty() )
         {
             StringBuffer buffer = new StringBuffer();
-            
+
             buffer.append( "-P " );
-            
+
             for ( Iterator it = profiles.iterator(); it.hasNext(); )
             {
                 Profile profile = (Profile) it.next();
-                
+
                 buffer.append( profile.getId() ).append( "," );
             }
-            
+
             buffer.setLength( buffer.length() - 1 );
-            
+
             cl.createArgument().setLine( buffer.toString() );
         }
-        
+
         StreamConsumer consumer = new DefaultConsumer();
 
         try
         {
             int result = CommandLineUtils.executeCommandLine( cl, consumer, consumer );
-            
+
             if ( result != 0 )
             {
-                throw new MojoExecutionException("Result of m2 execution is: \'" + result + "\'. Release failed." );
+                throw new MojoExecutionException( "Result of m2 execution is: \'" + result + "\'. Release failed." );
             }
         }
         catch ( CommandLineException e )
