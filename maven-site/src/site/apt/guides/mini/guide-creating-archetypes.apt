@@ -56,7 +56,18 @@ archetype
 
 +----+
 
-m2 package
+m2 install
 
 +----+
 
+ Now that you have created an archetype you can try it on your local system by using the following command:
+
++----+
+
+m2 archetype:create -DgroupId=com.mycompany.app \
+    -DartifactId=my-archetype -DarchetypeGroupId=<artifact-group-id> -DarchetypeArtifactId=<archetype-artifact-id>
+
++----+
+
+ Once you are happy with the state of your archetype you can deploy (or submit it to ibiblio) it as any other artifact and
+ the archetype will then be available to any user of Maven.
