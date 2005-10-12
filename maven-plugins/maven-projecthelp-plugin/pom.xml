@@ -11,6 +11,14 @@
   <version>2.0-beta-2-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
   
+  <description>
+    Provides mojos aimed at helping the user to make sense out of
+    the build environment. It includes mojos to view the effective
+    POM and settings files, after inheritance and active profiles
+    have been applied, as well as a 'describe' mojo to give the
+    user information about how to use a plugin.
+  </description>
+
   <prerequisites>
     <maven>2.0-beta-4-SNAPSHOT</maven>
   </prerequisites>
