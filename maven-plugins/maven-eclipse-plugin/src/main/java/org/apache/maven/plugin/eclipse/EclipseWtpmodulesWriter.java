@@ -16,14 +16,9 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
@@ -31,8 +26,15 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Writes eclipse .wtpmodules file.
+ *
  * @author <a href="mailto:fgiust@users.sourceforge.net">Fabrizio Giustina</a>
  * @version $Id$
  */
@@ -47,8 +49,8 @@ public class EclipseWtpmodulesWriter
     }
 
     protected void write( File basedir, MavenProject project, List referencedReactorArtifacts,
-                         EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository )
-        throws EclipsePluginException
+                          EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository )
+        throws MojoExecutionException
     {
         FileWriter w;
 
@@ -58,7 +60,8 @@ public class EclipseWtpmodulesWriter
         }
         catch ( IOException ex )
         {
-            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
+                                              ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );
@@ -173,7 +176,7 @@ public class EclipseWtpmodulesWriter
     }
 
     private void writeWarSpecificResources( XMLWriter writer, File basedir, MavenProject project,
-                                           List referencedReactorArtifacts, ArtifactRepository localRepository )
+                                            List referencedReactorArtifacts, ArtifactRepository localRepository )
     {
 
         String warSourceDirectory = EclipseUtils.getPluginSetting( project, "maven-war-plugin", //$NON-NLS-1$
@@ -195,7 +198,7 @@ public class EclipseWtpmodulesWriter
     }
 
     private void addDependency( XMLWriter writer, Artifact artifact, List referencedReactorProjects,
-                               ArtifactRepository localRepository )
+                                ArtifactRepository localRepository )
     {
         String handle;
 
@@ -205,7 +208,8 @@ public class EclipseWtpmodulesWriter
             //    <dependency-type>uses</dependency-type>
             //  </dependent-module>
 
-            handle = "module:/resource/" + artifact.getArtifactId() + "/" + artifact.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$
+            handle = "module:/resource/" + artifact.getArtifactId() + "/" +
+                artifact.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$
         }
         else
         {

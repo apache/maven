@@ -16,14 +16,15 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -42,22 +43,24 @@ public class EclipseSettingsWriter
     }
 
     protected void write( File projectBaseDir, File outputDir, MavenProject project )
-        throws EclipsePluginException
+        throws MojoExecutionException
     {
 
         // check if it's necessary to create project specific settings
         Properties coreSettings = new Properties();
 
-        String source = EclipseUtils.getPluginSetting( project, "maven-compiler-plugin", "source", null ); //$NON-NLS-1$ //$NON-NLS-2$
-        String target = EclipseUtils.getPluginSetting( project, "maven-compiler-plugin", "target", null ); //$NON-NLS-1$ //$NON-NLS-2$
+        String source = EclipseUtils.getPluginSetting( project, "maven-compiler-plugin", "source",
+                                                       null ); //$NON-NLS-1$ //$NON-NLS-2$
+        String target = EclipseUtils.getPluginSetting( project, "maven-compiler-plugin", "target",
+                                                       null ); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if ( source != null && !source.equals( "1.3" ) ) //$NON-NLS-1$
+        if ( source != null && !"1.3".equals( source ) ) //$NON-NLS-1$
         {
             coreSettings.put( "org.eclipse.jdt.core.compiler.source", source ); //$NON-NLS-1$
             coreSettings.put( "org.eclipse.jdt.core.compiler.compliance", source ); //$NON-NLS-1$
         }
 
-        if ( target != null && !target.equals( "1.2" ) ) //$NON-NLS-1$
+        if ( target != null && !"1.2".equals( target ) ) //$NON-NLS-1$
         {
             coreSettings.put( "org.eclipse.jdt.core.compiler.codegen.targetPlatform", target ); //$NON-NLS-1$
         }
@@ -81,11 +84,13 @@ public class EclipseSettingsWriter
             }
             catch ( FileNotFoundException e )
             {
-                throw new EclipsePluginException( Messages.getString( "EclipseSettingsWriter.cannotcreatesettings" ), e ); //$NON-NLS-1$
+                throw new MojoExecutionException( Messages.getString( "EclipseSettingsWriter.cannotcreatesettings" ),
+                                                  e ); //$NON-NLS-1$
             }
             catch ( IOException e )
             {
-                throw new EclipsePluginException( Messages.getString( "EclipseSettingsWriter.errorwritingsettings" ), e ); //$NON-NLS-1$
+                throw new MojoExecutionException( Messages.getString( "EclipseSettingsWriter.errorwritingsettings" ),
+                                                  e ); //$NON-NLS-1$
             }
         }
         else

@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
@@ -61,7 +62,7 @@ public class EclipseClasspathWriter
                           EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
                           ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
                           List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
-        throws EclipsePluginException
+        throws MojoExecutionException
     {
 
         FileWriter w;
@@ -72,7 +73,7 @@ public class EclipseClasspathWriter
         }
         catch ( IOException ex )
         {
-            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
                                               ex ); //$NON-NLS-1$
         }
 
@@ -156,7 +157,7 @@ public class EclipseClasspathWriter
                                 ArtifactRepository localRepository, ArtifactResolver artifactResolver,
                                 ArtifactFactory artifactFactory, List remoteArtifactRepositories,
                                 boolean downloadSources )
-        throws EclipsePluginException
+        throws MojoExecutionException
     {
 
         String path;
@@ -228,7 +229,7 @@ public class EclipseClasspathWriter
     private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories,
                                              ArtifactRepository localRepository, ArtifactResolver artifactResolver,
                                              ArtifactFactory artifactFactory )
-        throws EclipsePluginException
+        throws MojoExecutionException
     {
         // source artifact: use the "sources" classifier added by the source plugin
         Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(),
@@ -253,7 +254,7 @@ public class EclipseClasspathWriter
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new EclipsePluginException( "Error getting soruce artifact", e );
+            throw new MojoExecutionException( "Error getting source artifact", e );
         }
 
         return sourceArtifact;

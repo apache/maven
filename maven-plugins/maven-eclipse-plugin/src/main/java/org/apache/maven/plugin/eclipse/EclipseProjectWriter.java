@@ -16,22 +16,24 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Writes eclipse .project file.
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:kenney@neonics.com">Kenney Westerhof</a>
  * @author <a href="mailto:fgiust@users.sourceforge.net">Fabrizio Giustina</a>
@@ -48,8 +50,8 @@ public class EclipseProjectWriter
     }
 
     protected void write( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject,
-                         List reactorArtifacts, List projectnatures, List buildCommands )
-        throws EclipsePluginException
+                          List reactorArtifacts, List projectnatures, List buildCommands )
+        throws MojoExecutionException
     {
         FileWriter w;
 
@@ -59,7 +61,8 @@ public class EclipseProjectWriter
         }
         catch ( IOException ex )
         {
-            throw new EclipsePluginException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
+                                              ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );

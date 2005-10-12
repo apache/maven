@@ -21,6 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -160,9 +161,9 @@ public class EclipsePlugin
      * @parameter expression="${eclipse.workspace}"
      */
     private File outputDir;
-    
+
     /**
-     * The default output directory 
+     * The default output directory
      *
      * @parameter expression="${project.build.outputDirectory}"
      */
@@ -262,9 +263,8 @@ public class EclipsePlugin
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
-        
         if ( executedProject == null )
         {
             // backwards compat with alpha-2 only
@@ -332,7 +332,7 @@ public class EclipsePlugin
     }
 
     public void write()
-        throws EclipsePluginException
+        throws MojoExecutionException
     {
         File projectBaseDir = executedProject.getFile().getParentFile();
 
@@ -340,12 +340,14 @@ public class EclipsePlugin
         List reactorArtifacts = EclipseUtils.resolveReactorArtifacts( project, reactorProjects );
 
         // build a list of UNIQUE source dirs (both src and resources) to be used in classpath and wtpmodules
-        EclipseSourceDir[] sourceDirs = EclipseUtils.buildDirectoryList( executedProject, outputDir, getLog(), outputDirectory );
+        EclipseSourceDir[] sourceDirs =
+            EclipseUtils.buildDirectoryList( executedProject, outputDir, getLog(), outputDirectory );
 
         // use project since that one has all artifacts resolved.
         new EclipseClasspathWriter( getLog() ).write( projectBaseDir, outputDir, project, reactorArtifacts, sourceDirs,
                                                       classpathContainers, localRepository, artifactResolver,
-                                                      artifactFactory, remoteArtifactRepositories, downloadSources, outputDirectory );
+                                                      artifactFactory, remoteArtifactRepositories, downloadSources,
+                                                      outputDirectory );
 
         new EclipseProjectWriter( getLog() ).write( projectBaseDir, outputDir, project, executedProject,
                                                     reactorArtifacts, projectnatures, buildcommands );
@@ -360,11 +362,11 @@ public class EclipsePlugin
     }
 
     private void assertNotEmpty( String string, String elementName )
-        throws EclipsePluginException
+        throws MojoFailureException
     {
         if ( string == null )
         {
-            throw new EclipsePluginException(
+            throw new MojoFailureException(
                 Messages.getString( "EclipsePlugin.missingelement", elementName ) ); //$NON-NLS-1$
         }
     }
@@ -374,7 +376,8 @@ public class EclipsePlugin
         this.downloadSources = downloadSources;
     }
 
-    public void setOutputDirectory(String outputDirectory) {
+    public void setOutputDirectory( String outputDirectory )
+    {
         this.outputDirectory = outputDirectory;
     }
 }
