@@ -18,14 +18,47 @@ Coping with SUN JARs
  Another problem is that Sun's appears not to have any sort of convention
  for naming their own JARs so we have taken steps in suggesting some common
  names for Sun's artifacts. You can find a list of our suggestions here:
- 
- ~~ Incorporate this document here. jvz.
- 
- http://maven.apache.org/reference/standard-sun-jar-names.html
- 
+
+*-------------------------------------------+-------------------+----------------+
+|Product artifact                           | Group ID          | Artifact ID
+*-------------------------------------------+-------------------+----------------+
+| Java Activation Framework                 | javax.activation  | activation
+*-------------------------------------------+-------------------+----------------+
+| J2EE                                      | javax.j2ee        | j2ee
+*-------------------------------------------+-------------------+----------------+
+| JDO                                       | javax.jdo         | jdo
+*-------------------------------------------+-------------------+----------------+
+| JMS                                       | javax.jms         | jms
+*-------------------------------------------+-------------------+----------------+
+| JavaMail                                  | javax.mail        | mail
+*-------------------------------------------+-------------------+----------------+
+| EJB 3                                     | javax.persistence | ejb
+*-------------------------------------------+-------------------+----------------+
+| J2EE Connector Architecture               | javax.resource    | connector-api
+*-------------------------------------------+-------------------+----------------+
+| Java Authorization Contract for Containers| javax.security    | jacc
+*-------------------------------------------+-------------------+----------------+
+| Servlet                                   | javax.servlet     | servlet-api
+*-------------------------------------------+-------------------+----------------+
+| Servlet JSP                               | javax.servlet     | jsp-api
+*-------------------------------------------+-------------------+----------------+
+| Servlet JSTL                              | javax.servlet     | jstl
+*-------------------------------------------+-------------------+----------------+
+| JDBC 2.0 Optional Package                 | javax.sql         | jdbc-stdext
+*-------------------------------------------+-------------------+----------------+
+| Java Transaction API (JTA)                | javax.transaction | jta
+*-------------------------------------------+-------------------+----------------+
+| Java XML RPC                              | javax.xml         | jaxrpc
+*-------------------------------------------+-------------------+----------------+
+| Portlet                                   | javax.portlet     | portlet-api
+*-------------------------------------------+-------------------+----------------+
+| JNDI                                      | javax.naming      | jndi
+*-------------------------------------------+-------------------+----------------+
+
  When you add a Sun dependency to your POM if you use the our suggestions
  as noted above then Maven 2.x can help you locate the JARs by providing
  the site where they can be retrieved. It is important that you follow
  the suggested naming conventions as even though we cannot store the
  JARs at Ibiblio we can store metadata about those JARs and it is the
  metadata that contains location and retrieval information.
+
