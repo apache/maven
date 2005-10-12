@@ -40,6 +40,9 @@ public class EffectivePomPlugin
 {
 
     /**
+     * The projects in the current build. The effective-POM for
+     * each of these projects will written.
+     * 
      * @parameter expression="${reactorProjects}"
      * @required
      * @readonly
@@ -47,6 +50,8 @@ public class EffectivePomPlugin
     private List projects;
 
     /**
+     * If specified, write the output to this path.
+     * 
      * @parameter expression="${output}"
      */
     private File output;

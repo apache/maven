@@ -37,6 +37,9 @@ public class EffectiveSettingsMojo
 {
 
     /**
+     * The system settings for Maven. This is the instance resulting from 
+     * merging global- and user-level settings files.
+     * 
      * @parameter expression="${settings}"
      * @readonly
      * @required
@@ -44,7 +47,9 @@ public class EffectiveSettingsMojo
     private Settings settings;
 
     /**
-     * @parameter
+     * If specified write the effective settings file out to this path.
+     * 
+     * @parameter expression="${output}"
      */
     private String output;
 
@@ -115,22 +120,12 @@ public class EffectiveSettingsMojo
         }
     }
 
-    protected final String getOutput()
-    {
-        return output;
-    }
-
-    protected final void setOutput( String output )
+    public final void setOutput( String output )
     {
         this.output = output;
     }
 
-    protected final Settings getSettings()
-    {
-        return settings;
-    }
-
-    protected final void setSettings( Settings settings )
+    public final void setSettings( Settings settings )
     {
         this.settings = settings;
     }
