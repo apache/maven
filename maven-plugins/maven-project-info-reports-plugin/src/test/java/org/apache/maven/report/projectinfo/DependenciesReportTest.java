@@ -52,7 +52,7 @@ public class DependenciesReportTest
     /**
      * Test a the <code>ClearCase</code> SCM report
      */
-    public void testClearCaseScmReport()
+    public void testDependenciesReport()
         throws Exception
     {
         loadTestMavenProject( TEST1 );
