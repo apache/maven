@@ -17,6 +17,7 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class GenerateApplicationXmlMojo
     private String generatedDescriptorLocation;
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         // Initializes ear modules
         super.execute();
@@ -115,47 +116,42 @@ public class GenerateApplicationXmlMojo
         }
 
         // Generate deployment descriptor and copy it to the build directory
+        getLog().info( "Generating application.xml" );
         try
         {
-            getLog().info( "Generating application.xml" );
             generateDeploymentDescriptor();
+        }
+        catch ( EarPluginException e )
+        {
+            throw new MojoExecutionException( "Failed to generate application.xml", e );
+        }
+
+        try
+        {
             FileUtils.copyFileToDirectory( new File( generatedDescriptorLocation, "application.xml" ),
                                            new File( getWorkDirectory(), "META-INF" ) );
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Failed to generate application.xml", e );
+            throw new MojoExecutionException( "Unable to copy application.xml to final destination", e );
         }
     }
 
     /**
      * Generates the deployment descriptor if necessary.
-     *
-     * @throws IOException
      */
     protected void generateDeploymentDescriptor()
-        throws IOException
+        throws EarPluginException
     {
         File outputDir = new File( generatedDescriptorLocation );
         if ( !outputDir.exists() )
         {
-            outputDir.mkdir();
+            outputDir.mkdirs();
         }
 
         File descriptor = new File( outputDir, "application.xml" );
-        if ( !descriptor.exists() )
-        {
-            descriptor.createNewFile();
-        }
 
         ApplicationXmlWriter writer = new ApplicationXmlWriter( version, encoding );
-        try
-        {
-            writer.write( descriptor, getModules(), displayName, description );
-        }
-        catch ( EarPluginException e )
-        {
-            throw new IOException( "Unable to generate application.xml[" + e.getMessage() + "]" );
-        }
+        writer.write( descriptor, getModules(), displayName, description );
     }
 }

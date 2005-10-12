@@ -19,6 +19,7 @@ package org.apache.maven.plugin.ear;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -103,7 +104,7 @@ public class EarMojo
 
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         // Initializes ear modules
         super.execute();
@@ -207,7 +208,7 @@ public class EarMojo
     private void includeCustomManifestFile()
     {
         File customManifestFile = manifestFile;
-        
+
         if ( !customManifestFile.exists() )
         {
             getLog().info( "Could not find manifest file: " + manifestFile + " - Generating one" );

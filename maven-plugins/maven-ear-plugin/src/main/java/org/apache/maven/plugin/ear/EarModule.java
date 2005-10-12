@@ -17,6 +17,7 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.util.Set;
@@ -58,7 +59,7 @@ public interface EarModule
     /**
      * Appends the <tt>XML</tt> representation of this module.
      *
-     * @param writer  the writer to use
+     * @param writer the writer to use
      * @param version the version of the <tt>application.xml</tt> file
      */
     public void appendModule( XMLWriter writer, String version );
@@ -70,6 +71,6 @@ public interface EarModule
      * @throws EarPluginException if the artifact could not be resolved
      */
     public void resolveArtifact( Set artifacts )
-        throws EarPluginException;
+        throws EarPluginException, MojoFailureException;
 
 }

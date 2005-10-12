@@ -17,6 +17,7 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.util.Set;
@@ -63,7 +64,7 @@ public class WebModule
     }
 
     public void resolveArtifact( Set artifacts )
-        throws EarPluginException
+        throws MojoFailureException
     {
         // Let's resolve the artifact
         super.resolveArtifact( artifacts );

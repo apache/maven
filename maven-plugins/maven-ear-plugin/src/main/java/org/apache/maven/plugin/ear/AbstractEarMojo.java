@@ -19,6 +19,7 @@ package org.apache.maven.plugin.ear;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -68,7 +69,7 @@ public abstract class AbstractEarMojo
     private List allModules;
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         getLog().debug( "Resolving ear modules ..." );
 

@@ -17,6 +17,7 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoFailureException;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -71,17 +72,13 @@ public abstract class AbstractEarModule
     }
 
     public void resolveArtifact( Set artifacts )
-        throws EarPluginException
+        throws MojoFailureException
     {
-        if ( artifact != null )
-        {
-            return;
-        }
-        else
+        if ( artifact == null )
         {
             if ( groupId == null || artifactId == null )
             {
-                throw new EarPluginException(
+                throw new MojoFailureException(
                     "Could not resolve artifact[" + groupId + ":" + artifactId + ":" + getType() + "]" );
             }
 
@@ -98,8 +95,12 @@ public abstract class AbstractEarModule
             }
 
             // Artifact has not been found
-            throw new EarPluginException( "Artifact[" + groupId + ":" + artifactId + ":" + getType() + "] " +
+            throw new MojoFailureException( "Artifact[" + groupId + ":" + artifactId + ":" + getType() + "] " +
                 "is not a dependency of the project." );
+        }
+        else
+        {
+            return;
         }
     }
 
