@@ -80,6 +80,13 @@ public class JavadocReport
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
+    
+    /**
+     * @parameter default-value="${settings.offline}"
+     * @required
+     * @readonly
+     */
+    private boolean isOffline;
 
     /**
      * Specifies the destination directory where javadoc saves the generated HTML files.
@@ -798,9 +805,14 @@ public class JavadocReport
             addArgIfNotEmpty( arguments, "-group", quotedArgument( group ), true );
             addArgIfNotEmpty( arguments, "-header", quotedArgument( header ) );
             addArgIfNotEmpty( arguments, "-helpfile", quotedPathArgument( helpfile ) );
-            addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
-            addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
-            addArgIf( arguments, linksource, "-linksource", 1.4f );
+            
+            if ( !isOffline )
+            {
+                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
+                addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
+                addArgIf( arguments, linksource, "-linksource", 1.4f );
+            }
+            
             addArgIf( arguments, nodeprecated, "-nodeprecated" );
             addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
             addArgIf( arguments, nocomment, "-nocomment", 1.4f );
