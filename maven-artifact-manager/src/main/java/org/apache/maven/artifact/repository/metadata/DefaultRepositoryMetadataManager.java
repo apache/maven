@@ -271,7 +271,7 @@ public class DefaultRepositoryMetadataManager
     {
         if ( !wagonManager.isOnline() )
         {
-            if ( !allowBlacklisting )
+            if ( allowBlacklisting )
             {
                 getLogger().debug(
                     "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
