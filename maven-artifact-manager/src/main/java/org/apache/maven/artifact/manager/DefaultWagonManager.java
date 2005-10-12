@@ -536,7 +536,7 @@ public class DefaultWagonManager
         }
         catch ( IOException e )
         {
-            throw new TransferFailedException( "Invalid checksum file", e );
+            throw new ChecksumFailedException( "Invalid checksum file", e );
         }
     }
 

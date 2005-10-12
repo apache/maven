@@ -17,6 +17,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -126,10 +127,10 @@ public class TestArtifactResolver
             List artifactRepositories;
             try
             {
-                artifactRepositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
-                                                                               repositoryFactory, container );
+                artifactRepositories =
+                    ProjectUtils.buildArtifactRepositories( model.getRepositories(), repositoryFactory, container );
             }
-            catch ( ProjectBuildingException e )
+            catch ( InvalidRepositoryException e )
             {
                 throw new ArtifactMetadataRetrievalException( e );
             }

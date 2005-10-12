@@ -16,14 +16,15 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.model.DeploymentRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -40,7 +41,7 @@ public final class ProjectUtils
     public static List buildArtifactRepositories( List repositories,
                                                   ArtifactRepositoryFactory artifactRepositoryFactory,
                                                   PlexusContainer container )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException
     {
 
         List repos = new ArrayList();
@@ -49,8 +50,8 @@ public final class ProjectUtils
         {
             Repository mavenRepo = (Repository) i.next();
 
-            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo, artifactRepositoryFactory,
-                                                                       container );
+            ArtifactRepository artifactRepo =
+                buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
 
             if ( !repos.contains( artifactRepo ) )
             {
@@ -63,7 +64,7 @@ public final class ProjectUtils
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
                                                                         ArtifactRepositoryFactory artifactRepositoryFactory,
                                                                         PlexusContainer container )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
@@ -73,7 +74,8 @@ public final class ProjectUtils
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
 
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, layout, repo.isUniqueVersion() );
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, layout,
+                                                                                 repo.isUniqueVersion() );
         }
         else
         {
@@ -84,7 +86,7 @@ public final class ProjectUtils
     public static ArtifactRepository buildArtifactRepository( Repository repo,
                                                               ArtifactRepositoryFactory artifactRepositoryFactory,
                                                               PlexusContainer container )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
@@ -128,7 +130,7 @@ public final class ProjectUtils
     }
 
     private static ArtifactRepositoryLayout getRepositoryLayout( RepositoryBase mavenRepo, PlexusContainer container )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException
     {
         String layout = mavenRepo.getLayout();
 
@@ -139,7 +141,7 @@ public final class ProjectUtils
         }
         catch ( ComponentLookupException e )
         {
-            throw new ProjectBuildingException( "all", "Cannot find layout implementation corresponding to: \'" + layout +
+            throw new InvalidRepositoryException( "Cannot find layout implementation corresponding to: \'" + layout +
                 "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
         }
         return repositoryLayout;

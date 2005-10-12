@@ -5,11 +5,9 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,8 +26,8 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
         throws ExtractionException, InvalidPluginDescriptorException
     {
-        Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( project.getScriptSourceRoots(),
-                                                                      getScriptFileExtension() );
+        Map scriptFilesKeyedByBasedir =
+            gatherScriptSourcesByBasedir( project.getScriptSourceRoots(), getScriptFileExtension() );
 
         List mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
 
@@ -74,32 +72,14 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
                     outputFile.getParentFile().mkdirs();
                 }
 
-                FileInputStream in = null;
-                FileOutputStream out = null;
-
                 try
                 {
-                    in = new FileInputStream( scriptFile );
-                    out = new FileOutputStream( outputFile );
-
-                    byte[] buffer = new byte[16];
-                    int read = -1;
-
-                    while ( ( read = in.read( buffer ) ) > -1 )
-                    {
-                        out.write( buffer, 0, read );
-                    }
-
-                    out.flush();
+                    FileUtils.copyFile( scriptFile, outputFile );
                 }
                 catch ( IOException e )
                 {
-                    throw new ExtractionException( "Cannot copy script file: " + scriptFile + " to output: " + outputFile, e );
-                }
-                finally
-                {
-                    IOUtil.close( in );
-                    IOUtil.close( out );
+                    throw new ExtractionException(
+                        "Cannot copy script file: " + scriptFile + " to output: " + outputFile, e );
                 }
             }
         }

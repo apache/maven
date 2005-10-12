@@ -1,4 +1,6 @@
-package org.apache.maven.usability.plugin;/*
+package org.apache.maven.artifact;
+
+/*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +16,17 @@ package org.apache.maven.usability.plugin;/*
  * limitations under the License.
  */
 
-public class ExpressionDocumentationException
+/**
+ * Error constructing an artifact repository.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
+ */
+public class InvalidRepositoryException
     extends Exception
 {
-    static final long serialVersionUID = 1;
-
-    public ExpressionDocumentationException( String message, Throwable cause )
+    public InvalidRepositoryException( String message, Throwable throwable )
     {
-        super( message, cause );
+        super( message, throwable );
     }
-
-    public ExpressionDocumentationException( String message )
-    {
-        super( message );
-    }
-
 }
