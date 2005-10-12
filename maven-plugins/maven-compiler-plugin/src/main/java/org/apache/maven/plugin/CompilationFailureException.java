@@ -26,14 +26,13 @@ import java.util.List;
  * @version $Id$
  */
 public class CompilationFailureException
-    extends MojoExecutionException
+    extends MojoFailureException
 {
     private static final String LS = System.getProperty( "line.separator" );
 
     public CompilationFailureException( List messages )
     {
-        // TODO: this is a bit nasty
-        super( messages, "Compilation failure", longMessage( messages ) );
+        super( null, "Compilation failure", longMessage( messages ) );
     }
 
     public static String longMessage( List messages )
