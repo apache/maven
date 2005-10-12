@@ -43,7 +43,6 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-5-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -62,7 +61,6 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
-      <version>1.0-alpha-5-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
