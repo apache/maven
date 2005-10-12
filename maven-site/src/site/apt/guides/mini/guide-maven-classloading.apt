@@ -8,32 +8,38 @@
 
 How Maven's classloaders work
 
+ Maven uses the {{{http://classworlds.codehaus.org}Classworlds}} classloading framework with which we
+ create our classloader graph. If you look in your <<<${maven.home}/m2/core>>> directory you will see a single JAR
+ which is the classworlds JAR we use to boot the classloader graph. The Classworlds JAR is the only element of
+ the Java $CLASSPATH and Classworlds then builds the following graph of classloaders where the <<<plexus.core>>> classloader, 
+ or Realm in Classworlds, is the parent in the context of Maven.
+
 +----+
-
-main is org.apache.maven.cli.MavenCli from plexus.core.maven
-
-set maven.home default ${user.home}/m2
 
 [plexus.core]
-load ${maven.home}/core/*.jar
-
+${maven.home}/core/*.jar
+    ^
+    |
+    |
 [plexus.core.maven]
-load ${maven.home}/lib/*.jar
+${maven.home}/lib/*.jar
+    ^
+    |
+    |
+[per plugin]
 
 +----+
 
- m2/core/boot is what is in the java classpath (ie, just classworlds, which constructs classloaders for the 
- rest of the system)
+ The top level classloader contains plexus container and plexus utils, and also has access to Classworlds.
 
- the top level classloader contains plexus container and plexus utils (see m2/core), and also has access to classworlds
+ The next classloader down the graph contain the core requirements of Maven. In general these are just Maven libraries.
+ We hope to further separate these in the future to just be Maven APIs and have the implementations selected at
+ runtime as required by the system.
 
- the next classloader has the libraries in m2/lib In general these are just maven libraries. We hope to further
- separate these in future to just be maven apis.
-
- after that, each plugin has its own classloader, including its dependencies, itself, and the libraries above.
- It *does not* contain the project dependencies like in m1, but instead has access to a list of JAR files in case
+ After that, each plugin has its own classloader, including its dependencies, itself, and the libraries above.
+ It *does not* contain the project dependencies as in Maven 1.x, but instead has access to a list of JAR files in case
  they are needed.
 
- In addition, a project can list "extensions". These are loaded into the same place as m2/lib and so available to
- the maven core and all plugins for the currnet project and subsequent projects (in future, we plan to remove it
- from subsequent projects).
+ In addition, a project can list <<extensions>>. These are loaded into <<<[plexus.maven.core]>>> classloader and
+ so available to the Maven core and all plug-ins for the current project and subsequent projects (in the future,
+ we plan to remove it from subsequent projects).
