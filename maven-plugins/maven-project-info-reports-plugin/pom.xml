@@ -102,7 +102,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration><skip>true</skip></configuration>
       </plugin>
-    </plugins>
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
       </plugin>
