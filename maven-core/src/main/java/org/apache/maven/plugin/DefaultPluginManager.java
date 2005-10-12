@@ -207,6 +207,8 @@ public class DefaultPluginManager
                 
                 pluginContainer.dispose();
                 
+                pluginCollector.flushPluginDescriptor( plugin );
+                
                 addPlugin( plugin, pluginArtifact, project, localRepository );
             }
 

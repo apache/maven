@@ -25,6 +25,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,7 +53,7 @@ public class MavenPluginCollector
             
             // TODO: see comment in getPluginDescriptor
             String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
-
+            
             if ( !pluginsInProcess.contains( key ) )
             {
                 pluginsInProcess.add( key );
@@ -86,6 +87,22 @@ public class MavenPluginCollector
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
     {
         return (PluginDescriptor) pluginIdsByPrefix.get( prefix );
+    }
+
+    public void flushPluginDescriptor( Plugin plugin )
+    {
+        pluginsInProcess.remove( plugin.getKey() );
+        pluginDescriptors.remove( plugin.getKey() );
+        
+        for ( Iterator it = pluginIdsByPrefix.entrySet().iterator(); it.hasNext(); )
+        {
+            Map.Entry entry = (Map.Entry) it.next();
+            
+            if ( plugin.getKey().equals( entry.getValue() ) )
+            {
+                it.remove();
+            }
+        }
     }
 
 }
