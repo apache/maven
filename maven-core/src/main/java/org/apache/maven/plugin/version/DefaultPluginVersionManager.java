@@ -93,33 +93,21 @@ public class DefaultPluginVersionManager
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
-        // NOTE: [jc; 11-Oct-2005] We CANNOT have this type of code in here. It will prevent plugins from building themselves,
-        // if they are part of the lifecycle mapping. For example, try the following:
-        //
-        // 1. Uncomment the remainder of the following code block and rebuild the core jar; put it in the m2 distro
-        // 2. rm -Rf <local-repo>/org/apache/maven/plugins/maven-surefire-plugin
-        // 3. go to <maven>/maven-plugins/maven-surefire-plugin, and try to build it.
-        //
-        // In the above example, the surefire plugin fails to build because the version used for testing is
-        // resolved to the version currently being built...which obviously doesn't exist yet.
-        
+        // NOTE: We CANNOT check the current project version here, so delay it until later.
+        // It will prevent plugins from building themselves, if they are part of the lifecycle mapping.
+
         // if there was no explicit version, try for one in the reactor
         if ( version == null )
         {
-            // check self
-//            if ( project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
-//            {
-//                version = project.getVersion();
-//            }
-//            else if ( project.getProjectReferences() != null )
-//            {
+            if ( project.getProjectReferences() != null )
+            {
                 String refId = ArtifactUtils.versionlessKey( groupId, artifactId );
                 MavenProject ref = (MavenProject) project.getProjectReferences().get( refId );
                 if ( ref != null )
                 {
                     version = ref.getVersion();
                 }
-//            }
+            }
         }
 
         // we're NEVER going to persist POM-derived plugin versions.
@@ -151,8 +139,8 @@ public class DefaultPluginVersionManager
                 if ( Boolean.TRUE.equals( pluginUpdateOverride ) ||
                     ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
-                    updatedVersion = resolveMetaVersion( groupId, artifactId, project, localRepository,
-                                                         Artifact.LATEST_VERSION );
+                    updatedVersion =
+                        resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -214,12 +202,13 @@ public class DefaultPluginVersionManager
                 promptToPersist = false;
             }
         }
-        
-        // if we're still empty here, and the current project matches the plugin in question, use the current project's 
+
+        // if we're still empty here, and the current project matches the plugin in question, use the current project's
         // version, I guess...
-        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
+        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId ) &&
+            project.getArtifactId().equals( artifactId ) )
         {
-              version = project.getVersion();
+            version = project.getVersion();
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
@@ -275,8 +264,8 @@ public class DefaultPluginVersionManager
             //
             // NOTE: We're incorporating here, to make the usages of this check more consistent and 
             // resistant to change.
-            promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null &&
-                inInteractiveMode;
+            promptToPersist =
+                promptToPersist && pluginUpdateOverride == null && applyToAll == null && inInteractiveMode;
 
             if ( promptToPersist )
             {
@@ -327,8 +316,8 @@ public class DefaultPluginVersionManager
             }
             else
             {
-                SimpleDateFormat format = new SimpleDateFormat(
-                    org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+                SimpleDateFormat format =
+                    new SimpleDateFormat( org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
 
                 try
                 {
@@ -569,8 +558,8 @@ public class DefaultPluginVersionManager
             {
                 plugin.setUseVersion( version );
 
-                SimpleDateFormat format = new SimpleDateFormat(
-                    org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+                SimpleDateFormat format =
+                    new SimpleDateFormat( org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
 
                 plugin.setLastChecked( format.format( new Date() ) );
             }
@@ -661,8 +650,8 @@ public class DefaultPluginVersionManager
 
         try
         {
-            ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository,
-                                                                               project.getPluginArtifactRepositories() );
+            ResolutionGroup resolutionGroup =
+                artifactMetadataSource.retrieve( artifact, localRepository, project.getPluginArtifactRepositories() );
 
             // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
             // artifact.
@@ -677,11 +666,10 @@ public class DefaultPluginVersionManager
                 boolean pluginValid = true;
 
                 // if we don't have the required Maven version, then ignore an update
-                if ( pluginProject.getPrerequisites() != null &&
-                    pluginProject.getPrerequisites().getMaven() != null )
+                if ( pluginProject.getPrerequisites() != null && pluginProject.getPrerequisites().getMaven() != null )
                 {
-                    DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                        pluginProject.getPrerequisites().getMaven() );
+                    DefaultArtifactVersion requiredVersion =
+                        new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
 
                     if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
                     {
