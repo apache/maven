@@ -193,7 +193,7 @@ public abstract class AbstractCompilerMojo
     protected abstract File getOutputDirectory();
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, CompilationFailureException
     {
         // ----------------------------------------------------------------------
         // Look up the compiler. This is done before other code than can
