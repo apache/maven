@@ -300,6 +300,7 @@ public class AssemblyMojo
                         // TODO: something like zipfileset in plexus-archiver
 //                        archiver.addJar(  )
 
+                        // TODO is the extension always 3 characters long?
                         File tempLocation = new File( workDirectory, name.substring( 0, name.length() - 4 ) );
                         boolean process = false;
                         if ( !tempLocation.exists() )
@@ -324,7 +325,7 @@ public class AssemblyMojo
                                     "Unable to obtain unarchiver for file '" + artifact.getFile() + "'" );
                             }
                         }
-                        archiver.addDirectory( tempLocation, null, FileUtils.getDefaultExcludes() );
+                        archiver.addDirectory( tempLocation, output, null, FileUtils.getDefaultExcludes() );
                     }
                     else
                     {
