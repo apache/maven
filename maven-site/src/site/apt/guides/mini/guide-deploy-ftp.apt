@@ -9,8 +9,8 @@
 Guide to deploying with FTP
 
  In order to deploy artifacts using FTP you must first specify the use of an FTP server in the
- <<distributionManagement>> element of your POM as well as specifying an <<extension>> in your
- <<build>> element which will pull in the FTP artifacts required to deploy with FTP:
+ <<distributionManagement>> element of your POM as well as specifying an <<<extension>>> in your
+ <<<build>>> element which will pull in the FTP artifacts required to deploy with FTP:
 
 +----+
 
@@ -58,7 +58,7 @@ Guide to deploying with FTP
 
 +----+
 
- Your <<<settings.xml>>> would contain a <<<server>>> element where the <<id>> of that element matches <<id>> of the
+ Your <<<settings.xml>>> would contain a <<<server>>> element where the <<<id>>> of that element matches <<<id>>> of the
  FTP repository specified in the POM above:
 
 +----+

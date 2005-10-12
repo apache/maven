@@ -10,15 +10,15 @@
 
  ** Projects using multiproject or project properties
 
- Maven 1.x POMs that use multiproject and/or project.properties must be 
- deployed by version 1.5 or later of the Artifact plugin for repoclean to 
- successfully convert them.  This ensures that any parent POMs and/or POM 
+ Maven 1.x POMs that use multiproject and/or project.properties must be deployed by version 1.5 or later of the
+ Artifact plugin for repoclean to  successfully convert them.  This ensures that any parent POMs and/or POM
  properties are fully resolved by Maven before deploying the POM.
 
  * planned tools
 
- No there isn't something yet but it's planned. I have presented some slides
- at javaZone 2005 about "From m1 to m2". Maybe that could help you in the
- meantime:
+ No there isn't something yet but it's planned. I have presented some slides at javaZone 2005 about "From m1 to m2".
+ Maybe that could help you in the meantime:
 
  http://blogs.codehaus.org/people/vmassol/archives/001170_javazone_2005.html
+
+~~ doco coming from jay hartley

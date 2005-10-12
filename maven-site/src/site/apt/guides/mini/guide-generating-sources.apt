@@ -23,9 +23,8 @@
  The first two lines say "I want to be fit into the generate-sources
  phase and my 'handle' is generate".
 
- So this is all fine and dandy, we have a plugin that wants to generate
- some sources from a Antlr grammar but how do we use it. You need to
- specify that you want to use it in your POM:
+ So this is all fine and dandy, we have a plugin that wants to generate some sources from a Antlr grammar but how
+ do we use it. You need to specify that you want to use it in your POM:
 
 +----+
 
@@ -55,7 +54,7 @@
 +----+
 
  If you then type "m2 compile" m2 will walk through the {{{../introduction/introduction-to-the-lifecycle.html}lifecycle}}
- and will eventually hit the generate-sources phase and see you have a plugin configured that
+ and will eventually hit the <<<generate-sources>>> phase and see you have a plugin configured that
  wants to participate in that phase and the antlr plugin is executed with
  your given configuration.
 

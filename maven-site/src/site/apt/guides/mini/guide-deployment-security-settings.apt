@@ -8,7 +8,7 @@
 
 Security and Deployment Settings
 
- Repositories to deploy to are defined in a project in the <distributionManagement> section. However, you cannot put
+ Repositories to deploy to are defined in a project in the <<<distributionManagement>>> section. However, you cannot put
  your username, password, or other security settings in that project. For that reason, you should add a server
  definition to your own settings with an id that matches that of the deployment repository in the project.
 

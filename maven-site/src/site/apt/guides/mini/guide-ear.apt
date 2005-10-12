@@ -39,7 +39,7 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-webapp -Darchety
 
 +----+
 
-m2 clean:clean package
+m2 clean package
 
 +----+
 

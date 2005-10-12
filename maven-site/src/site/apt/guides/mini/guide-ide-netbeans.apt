@@ -7,3 +7,11 @@
  ------
   
 Guide to using Netbeans with Maven 2.x
+
+ To generate the Netbeans project files from your POM you execute the following command:
+
++----+
+
+m2 ...
+
++----+

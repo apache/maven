@@ -6,4 +6,12 @@
  12 October 2005
  ------
  
-Guide to using Eclipse with Maven 2.0 
+Guide to using Eclipse with Maven 2.x
+
+ To generate the Eclipse project files from your POM you execute the following command:
+
++----+
+
+m2 eclipse:eclipse
+
++----+
