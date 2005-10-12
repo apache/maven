@@ -105,7 +105,7 @@ public class CompilerMojo
     }
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, CompilationFailureException
     {
         super.execute();
 
