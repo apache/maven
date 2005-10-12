@@ -10,9 +10,9 @@
   <version>1.0-alpha-4-SNAPSHOT</version>
   <dependencies>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-velocity</artifactId>
-      <version>1.0</version>
+      <version>1.1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>

@@ -31,9 +31,9 @@
       <version>2.0-beta-4-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-site-renderer</artifactId>
-      <version>1.0-alpha-2</version>
+      <version>1.0-alpha-3-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <groupId>plexus</groupId>
