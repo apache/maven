@@ -62,7 +62,7 @@ public class ErrorDiagnostics
                     {
                         errorProcessed = true;
 
-                        message = diagnose( error );
+                        message = diagnoser.diagnose( error );
 
                         break;
                     }
