@@ -22,9 +22,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * A Maven2 plugin to generate an Ant build file.
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @goal ant
@@ -36,6 +38,7 @@ public class AntMojo
 {
     /**
      * The project to create a build for.
+     *
      * @parameter expression="${project}"
      * @required
      */
@@ -43,6 +46,7 @@ public class AntMojo
 
     /**
      * The location of the local repository.
+     *
      * @parameter expression="${localRepository}"
      * @required
      */
@@ -59,7 +63,7 @@ public class AntMojo
         {
             antBuildWriter.write();
         }
-        catch ( AntPluginException e )
+        catch ( IOException e )
         {
             throw new MojoExecutionException( "Error building Ant script", e );
         }

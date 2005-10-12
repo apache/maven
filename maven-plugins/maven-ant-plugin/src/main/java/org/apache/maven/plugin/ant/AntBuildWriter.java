@@ -49,7 +49,7 @@ public class AntBuildWriter
     }
 
     public void write()
-        throws AntPluginException
+        throws IOException
     {
         writeBuildXml();
 
@@ -62,19 +62,12 @@ public class AntBuildWriter
     // ----------------------------------------------------------------------
 
     protected void writeBuildXml()
-        throws AntPluginException
+        throws IOException
     {
         FileWriter w;
 
-        try
-        {
-            // TODO: parameter
-            w = new FileWriter( new File( project.getBasedir(), "build.xml" ) );
-        }
-        catch ( IOException ex )
-        {
-            throw new AntPluginException( "Exception while opening file.", ex );
-        }
+        // TODO: parameter
+        w = new FileWriter( new File( project.getBasedir(), "build.xml" ) );
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );
 
@@ -410,13 +403,13 @@ public class AntBuildWriter
             String path = toRelative( localRepository, artifact.getFile().getPath() );
 
             File parentDirs = new File( path ).getParentFile();
-            if ( parentDirs != null ) 
+            if ( parentDirs != null )
             {
                 writer.startElement( "mkdir" );
                 writer.addAttribute( "dir", parentDirs.getAbsolutePath() );
                 writer.endElement(); // mkdir
             }
-            
+
             for ( Iterator j = project.getRepositories().iterator(); j.hasNext(); )
             {
                 Repository repository = (Repository) j.next();
