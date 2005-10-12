@@ -32,12 +32,15 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.velocity.VelocityComponent;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
@@ -56,10 +59,6 @@ public class DefaultArchetype
     extends AbstractLogEnabled
     implements Archetype
 {
-    // ----------------------------------------------------------------------
-    // Components
-    // ----------------------------------------------------------------------
-
     private static final String DEFAULT_TEST_RESOURCE_DIR = "/src/test/resources";
 
     private static final String DEFAULT_TEST_SOURCE_DIR = "/src/test/java";
@@ -68,6 +67,9 @@ public class DefaultArchetype
 
     private static final String DEFAULT_SOURCE_DIR = "/src/main/java";
 
+    // ----------------------------------------------------------------------
+    // Components
+    // ----------------------------------------------------------------------
 
     private VelocityComponent velocity;
 
@@ -100,8 +102,7 @@ public class DefaultArchetype
         }
         catch ( ArtifactResolutionException e )
         {
-            // TODO: this is an error now, not "not found"
-            throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
+            throw new ArchetypeDescriptorException( "Cannot download archetype.", e );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -147,7 +148,7 @@ public class DefaultArchetype
 
         ArchetypeDescriptorBuilder builder = new ArchetypeDescriptorBuilder();
 
-        ArchetypeDescriptor descriptor = null;
+        ArchetypeDescriptor descriptor;
 
         URLClassLoader archetypeJarLoader;
 
@@ -167,9 +168,13 @@ public class DefaultArchetype
                     "The " + ARCHETYPE_DESCRIPTOR + " descriptor cannot be found." );
             }
 
-            descriptor = (ArchetypeDescriptor) builder.build( new InputStreamReader( is ) );
+            descriptor = builder.build( new InputStreamReader( is ) );
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new ArchetypeDescriptorException( "Error reading the " + ARCHETYPE_DESCRIPTOR + " descriptor.", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new ArchetypeDescriptorException( "Error reading the " + ARCHETYPE_DESCRIPTOR + " descriptor.", e );
         }
@@ -234,214 +239,12 @@ public class DefaultArchetype
 
         try
         {
-            if ( !pomFile.exists() )
-            {
-                processTemplate( outputDirectory, context, ARCHETYPE_POM, false, null );
-            }
-
-            // ---------------------------------------------------------------------
-            // Model generated for the new archetype, so process it now
-            // ---------------------------------------------------------------------
-
-            FileReader pomReader = new FileReader( pomFile );
-
-            MavenXpp3Reader reader = new MavenXpp3Reader();
-
-            Model generatedModel = reader.read( pomReader );
-
-            // XXX: Following POM processing block may be a candidate for 
-            // refactoring out into service methods or moving to 
-            // createProjectDirectoryStructure(outputDirectory)
-            Build build = null;
-
-            boolean overrideSrcDir = false;
-
-            boolean overrideScriptSrcDir = false;
-
-            boolean overrideResourceDir = false;
-
-            boolean overrideTestSrcDir = false;
-
-            boolean overrideTestResourceDir = false;
-
-            boolean foundBuildElement = ( null != ( build = generatedModel.getBuild() ) );
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "********************* Debug info for resources created from generated Model ***********************" );
-            }
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Was build element found in generated POM?: " + foundBuildElement );
-            }
-
-            // create source directory if specified in POM
-            if ( foundBuildElement && null != build.getSourceDirectory() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Overriding default source directory " );
-                }
-
-                overrideSrcDir = true;
-
-                String srcDirectory = build.getSourceDirectory();
-
-                srcDirectory = StringUtils.replace( srcDirectory, "\\", "/" );
-
-                FileUtils.mkdir(
-                    outputDirectory + ( srcDirectory.startsWith( "/" ) ? srcDirectory : ( "/" + srcDirectory ) ) );
-            }
-
-            // create script source directory if specified in POM
-            if ( foundBuildElement && null != build.getScriptSourceDirectory() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Overriding default script source directory " );
-                }
-
-                overrideScriptSrcDir = true;
-
-                String scriptSourceDirectory = build.getScriptSourceDirectory();
-
-                scriptSourceDirectory = StringUtils.replace( scriptSourceDirectory, "\\", "/" );
-
-                FileUtils.mkdir( outputDirectory + ( scriptSourceDirectory.startsWith( "/" ) ? scriptSourceDirectory
-                    : ( "/" + scriptSourceDirectory ) ) );
-            }
-
-            // create resource director(y/ies) if specified in POM
-            if ( foundBuildElement && build.getResources().size() > 0 )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().info( "Overriding default resource directory " );
-                }
-
-                overrideResourceDir = true;
-
-                Iterator resourceItr = build.getResources().iterator();
-
-                while ( resourceItr.hasNext() )
-                {
-                    Resource resource = (Resource) resourceItr.next();
-
-                    String resourceDirectory = resource.getDirectory();
-
-                    resourceDirectory = StringUtils.replace( resourceDirectory, "\\", "/" );
-
-                    FileUtils.mkdir( outputDirectory +
-                        ( resourceDirectory.startsWith( "/" ) ? resourceDirectory : ( "/" + resourceDirectory ) ) );
-                }
-            }
-            // create test source directory if specified in POM
-            if ( foundBuildElement && null != build.getTestSourceDirectory() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Overriding default test directory " );
-                }
-
-                overrideTestSrcDir = true;
-
-                String testDirectory = build.getTestSourceDirectory();
-
-                testDirectory = StringUtils.replace( testDirectory, "\\", "/" );
-
-                FileUtils.mkdir(
-                    outputDirectory + ( testDirectory.startsWith( "/" ) ? testDirectory : ( "/" + testDirectory ) ) );
-            }
-
-            // create test resource directory if specified in POM
-            if ( foundBuildElement && build.getTestResources().size() > 0 )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Overriding default test resource directory " );
-                }
-
-                overrideTestResourceDir = true;
-
-                Iterator testResourceItr = build.getTestResources().iterator();
-
-                while ( testResourceItr.hasNext() )
-                {
-                    Resource resource = (Resource) testResourceItr.next();
-
-                    String testResourceDirectory = resource.getDirectory();
-
-                    testResourceDirectory = StringUtils.replace( testResourceDirectory, "\\", "/" );
-
-                    FileUtils.mkdir( outputDirectory + ( testResourceDirectory.startsWith( "/" ) ? testResourceDirectory
-                        : ( "/" + testResourceDirectory ) ) );
-                }
-            }
-
-            getLogger().info(
-                "********************* End of debug info from resources from generated POM ***********************" );
-
-            // ----------------------------------------------------------------------
-            // Main
-            // ----------------------------------------------------------------------
-
-            if ( descriptor.getSources().size() > 0 )
-            {
-                if ( !overrideSrcDir )
-                {
-                    FileUtils.mkdir( outputDirectory + DEFAULT_SOURCE_DIR );
-                }
-                processSources( outputDirectory, context, descriptor.getSources(), packageName );
-            }
-
-            if ( descriptor.getResources().size() > 0 )
-            {
-                if ( !overrideResourceDir )
-                {
-                    FileUtils.mkdir( outputDirectory + DEFAULT_RESOURCE_DIR );
-                }
-                processResources( outputDirectory, context, descriptor.getResources(), packageName );
-            }
-
-            // ----------------------------------------------------------------------
-            // Test
-            // ----------------------------------------------------------------------
-
-            if ( descriptor.getTestSources().size() > 0 )
-            {
-                if ( !overrideTestSrcDir )
-                {
-                    FileUtils.mkdir( outputDirectory + DEFAULT_TEST_SOURCE_DIR );
-                }
-
-                processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
-            }
-
-            if ( descriptor.getTestResources().size() > 0 )
-            {
-                if ( !overrideTestResourceDir )
-                {
-                    FileUtils.mkdir( outputDirectory + DEFAULT_TEST_RESOURCE_DIR );
-                }
-                processResources( outputDirectory, context, descriptor.getTestResources(), packageName );
-            }
-
-            // ----------------------------------------------------------------------
-            // Site
-            // ----------------------------------------------------------------------
-
-            if ( descriptor.getSiteResources().size() > 0 )
-            {
-                processResources( outputDirectory, context, descriptor.getSiteResources(), packageName );
-            }
-
+            processTemplates( pomFile, outputDirectory, context, descriptor, packageName );
         }
-        catch ( Exception e )
-        {
-            throw new ArchetypeTemplateProcessingException( "Error processing templates.", e );
-        }
+//        catch ( Exception e )
+//        {
+//            throw new ArchetypeTemplateProcessingException( "Error processing templates.", e );
+//        }
         finally
         {
             Thread.currentThread().setContextClassLoader( old );
@@ -457,12 +260,229 @@ public class DefaultArchetype
 
     }
 
+    private void processTemplates( File pomFile, String outputDirectory, Context context,
+                                   ArchetypeDescriptor descriptor, String packageName )
+        throws ArchetypeTemplateProcessingException
+    {
+        if ( !pomFile.exists() )
+        {
+            processTemplate( outputDirectory, context, ARCHETYPE_POM, false, null );
+        }
+
+        // ---------------------------------------------------------------------
+        // Model generated for the new archetype, so process it now
+        // ---------------------------------------------------------------------
+
+        Model generatedModel = null;
+        try
+        {
+            FileReader pomReader = new FileReader( pomFile );
+
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+
+            generatedModel = reader.read( pomReader );
+        }
+        catch ( IOException e )
+        {
+            throw new ArchetypeTemplateProcessingException( "Error reading POM", e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new ArchetypeTemplateProcessingException( "Error reading POM", e );
+        }
+
+        // XXX: Following POM processing block may be a candidate for
+        // refactoring out into service methods or moving to
+        // createProjectDirectoryStructure(outputDirectory)
+        Build build = generatedModel.getBuild();
+
+        boolean overrideSrcDir = false;
+
+        boolean overrideResourceDir = false;
+
+        boolean overrideTestSrcDir = false;
+
+        boolean overrideTestResourceDir = false;
+
+        boolean foundBuildElement = build != null;
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "********************* Debug info for resources created from generated Model ***********************" );
+        }
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Was build element found in generated POM?: " + foundBuildElement );
+        }
+
+        // create source directory if specified in POM
+        if ( foundBuildElement && null != build.getSourceDirectory() )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Overriding default source directory " );
+            }
+
+            overrideSrcDir = true;
+
+            String srcDirectory = build.getSourceDirectory();
+
+            srcDirectory = StringUtils.replace( srcDirectory, "\\", "/" );
+
+            FileUtils.mkdir( getOutputDirectory( outputDirectory, srcDirectory ) );
+        }
+
+        // create script source directory if specified in POM
+        if ( foundBuildElement && null != build.getScriptSourceDirectory() )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Overriding default script source directory " );
+            }
+
+            String scriptSourceDirectory = build.getScriptSourceDirectory();
+
+            scriptSourceDirectory = StringUtils.replace( scriptSourceDirectory, "\\", "/" );
+
+            FileUtils.mkdir( getOutputDirectory( outputDirectory, scriptSourceDirectory ) );
+        }
+
+        // create resource director(y/ies) if specified in POM
+        if ( foundBuildElement && build.getResources().size() > 0 )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().info( "Overriding default resource directory " );
+            }
+
+            overrideResourceDir = true;
+
+            Iterator resourceItr = build.getResources().iterator();
+
+            while ( resourceItr.hasNext() )
+            {
+                Resource resource = (Resource) resourceItr.next();
+
+                String resourceDirectory = resource.getDirectory();
+
+                resourceDirectory = StringUtils.replace( resourceDirectory, "\\", "/" );
+
+                FileUtils.mkdir( getOutputDirectory( outputDirectory, resourceDirectory ) );
+            }
+        }
+        // create test source directory if specified in POM
+        if ( foundBuildElement && null != build.getTestSourceDirectory() )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Overriding default test directory " );
+            }
+
+            overrideTestSrcDir = true;
+
+            String testDirectory = build.getTestSourceDirectory();
+
+            testDirectory = StringUtils.replace( testDirectory, "\\", "/" );
+
+            FileUtils.mkdir( getOutputDirectory( outputDirectory, testDirectory ) );
+        }
+
+        // create test resource directory if specified in POM
+        if ( foundBuildElement && build.getTestResources().size() > 0 )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Overriding default test resource directory " );
+            }
+
+            overrideTestResourceDir = true;
+
+            Iterator testResourceItr = build.getTestResources().iterator();
+
+            while ( testResourceItr.hasNext() )
+            {
+                Resource resource = (Resource) testResourceItr.next();
+
+                String testResourceDirectory = resource.getDirectory();
+
+                testResourceDirectory = StringUtils.replace( testResourceDirectory, "\\", "/" );
+
+                FileUtils.mkdir( getOutputDirectory( outputDirectory, testResourceDirectory ) );
+            }
+        }
+
+        getLogger().info(
+            "********************* End of debug info from resources from generated POM ***********************" );
+
+        // ----------------------------------------------------------------------
+        // Main
+        // ----------------------------------------------------------------------
+
+        if ( descriptor.getSources().size() > 0 )
+        {
+            if ( !overrideSrcDir )
+            {
+                FileUtils.mkdir( outputDirectory + DEFAULT_SOURCE_DIR );
+            }
+            processSources( outputDirectory, context, descriptor.getSources(), packageName );
+        }
+
+        if ( descriptor.getResources().size() > 0 )
+        {
+            if ( !overrideResourceDir )
+            {
+                FileUtils.mkdir( outputDirectory + DEFAULT_RESOURCE_DIR );
+            }
+            processResources( outputDirectory, context, descriptor.getResources(), packageName );
+        }
+
+        // ----------------------------------------------------------------------
+        // Test
+        // ----------------------------------------------------------------------
+
+        if ( descriptor.getTestSources().size() > 0 )
+        {
+            if ( !overrideTestSrcDir )
+            {
+                FileUtils.mkdir( outputDirectory + DEFAULT_TEST_SOURCE_DIR );
+            }
+
+            processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
+        }
+
+        if ( descriptor.getTestResources().size() > 0 )
+        {
+            if ( !overrideTestResourceDir )
+            {
+                FileUtils.mkdir( outputDirectory + DEFAULT_TEST_RESOURCE_DIR );
+            }
+            processResources( outputDirectory, context, descriptor.getTestResources(), packageName );
+        }
+
+        // ----------------------------------------------------------------------
+        // Site
+        // ----------------------------------------------------------------------
+
+        if ( descriptor.getSiteResources().size() > 0 )
+        {
+            processResources( outputDirectory, context, descriptor.getSiteResources(), packageName );
+        }
+    }
+
+    private String getOutputDirectory( String outputDirectory, String testResourceDirectory )
+    {
+        return outputDirectory +
+            ( testResourceDirectory.startsWith( "/" ) ? testResourceDirectory : "/" + testResourceDirectory );
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
     protected void processSources( String outputDirectory, Context context, List sources, String packageName )
-        throws Exception
+        throws ArchetypeTemplateProcessingException
     {
         for ( Iterator i = sources.iterator(); i.hasNext(); )
         {
@@ -473,7 +493,7 @@ public class DefaultArchetype
     }
 
     protected void processResources( String outputDirectory, Context context, List resources, String packageName )
-        throws Exception
+        throws ArchetypeTemplateProcessingException
     {
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
@@ -485,7 +505,7 @@ public class DefaultArchetype
 
     protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName,
                                     String packageName )
-        throws Exception
+        throws ArchetypeTemplateProcessingException
     {
         File f;
 
@@ -513,15 +533,25 @@ public class DefaultArchetype
             f.getParentFile().mkdirs();
         }
 
-        Writer writer = new FileWriter( f );
+        Writer writer = null;
+        try
+        {
+            writer = new FileWriter( f );
 
-        template = ARCHETYPE_RESOURCES + "/" + template;
+            template = ARCHETYPE_RESOURCES + "/" + template;
 
-        velocity.getEngine().mergeTemplate( template, context, writer );
+            velocity.getEngine().mergeTemplate( template, context, writer );
 
-        writer.flush();
-
-        writer.close();
+            writer.flush();
+        }
+        catch ( Exception e )
+        {
+            throw new ArchetypeTemplateProcessingException( "Error merging velocity templates", e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
     }
 
     protected void createProjectDirectoryStructure( String outputDirectory )

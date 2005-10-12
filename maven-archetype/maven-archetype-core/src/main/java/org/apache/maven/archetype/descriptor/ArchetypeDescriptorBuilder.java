@@ -16,10 +16,12 @@ package org.apache.maven.archetype.descriptor;
  * limitations under the License.
  */
 
-import java.io.Reader;
-
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -28,7 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class ArchetypeDescriptorBuilder
 {
     public ArchetypeDescriptor build( Reader reader )
-        throws Exception
+        throws IOException, XmlPullParserException
     {
         ArchetypeDescriptor descriptor = new ArchetypeDescriptor();
 
@@ -42,7 +44,7 @@ public class ArchetypeDescriptorBuilder
         {
             String allowPartial = allowPartialDom.getValue();
 
-            if ( allowPartial.equals( "true" ) || allowPartial.equals( "1" ) || allowPartial.equals( "on" ) )
+            if ( "true".equals( allowPartial ) || "1".equals( allowPartial ) || "on".equals( allowPartial ) )
             {
                 descriptor.setAllowPartial( true );
             }

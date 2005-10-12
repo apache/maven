@@ -30,30 +30,16 @@ public class ArchetypeDescriptorBuilderTest
     public void testBuilder()
         throws Exception
     {
-        String xml =
-            "<archetype>" +
-            "  <id>standard</id>" +
-            "  <sources>" +
-            "    <source>source0</source>" +
-            "    <source>source1</source>" +
-            "  </sources>" +
-            "  <resources>" +
-            "    <resource>resource0</resource>" +
-            "    <resource>resource1</resource>" +
-            "  </resources>" +
-            "  <testSources>" +
-            "    <source>testSource0</source>" +
-            "    <source>testSource1</source>" +
-            "  </testSources>" +
-            "  <testResources>" +
-            "    <resource>testResource0</resource>" +
-            "    <resource>testResource1</resource>" +
-            "  </testResources>" +
-            "</archetype>";
+        String xml = "<archetype>" + "  <id>standard</id>" + "  <sources>" + "    <source>source0</source>" +
+            "    <source>source1</source>" + "  </sources>" + "  <resources>" + "    <resource>resource0</resource>" +
+            "    <resource>resource1</resource>" + "  </resources>" + "  <testSources>" +
+            "    <source>testSource0</source>" + "    <source>testSource1</source>" + "  </testSources>" +
+            "  <testResources>" + "    <resource>testResource0</resource>" + "    <resource>testResource1</resource>" +
+            "  </testResources>" + "</archetype>";
 
         ArchetypeDescriptorBuilder builder = new ArchetypeDescriptorBuilder();
 
-        ArchetypeDescriptor descriptor = (ArchetypeDescriptor) builder.build( new StringReader( xml ) );
+        ArchetypeDescriptor descriptor = builder.build( new StringReader( xml ) );
 
         assertEquals( "standard", descriptor.getId() );
 
