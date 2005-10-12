@@ -87,12 +87,11 @@ public class TestCompilerMojo
     private Set testExcludes = new HashSet();
 
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, CompilationFailureException
     {
         if ( skip )
         {
             getLog().info( "Not compiling test sources" );
-            return;
         }
         else
         {
