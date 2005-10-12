@@ -143,18 +143,14 @@ public class SiteMojo
     /**
      * Site Renderer
      *
-     * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private Renderer siteRenderer;
 
     /**
      * Internationalization.
      *
-     * @parameter expression="${component.org.codehaus.plexus.i18n.I18N}"
-     * @required
-     * @readonly
+     * @component 
      */
     private I18N i18n;
 
@@ -241,7 +237,7 @@ public class SiteMojo
 
         Collections.sort( projectInfos, reportComparator );
         Collections.sort( projectReports, reportComparator );
-        
+
         try
         {
             List localesList = initLocalesList();
