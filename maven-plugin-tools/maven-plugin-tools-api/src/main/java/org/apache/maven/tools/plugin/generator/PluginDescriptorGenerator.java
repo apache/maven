@@ -63,6 +63,8 @@ public class PluginDescriptorGenerator
 
             w.startElement( "plugin" );
 
+            element( w, "description", pluginDescriptor.getDescription() );
+
             element( w, "groupId", pluginDescriptor.getGroupId() );
 
             element( w, "artifactId", pluginDescriptor.getArtifactId() );
@@ -113,6 +115,21 @@ public class PluginDescriptorGenerator
         w.writeText( mojoDescriptor.getGoal() );
 
         w.endElement();
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        String description = mojoDescriptor.getDescription();
+        
+        if ( description != null )
+        {
+            w.startElement( "description" );
+
+            w.writeText( mojoDescriptor.getDescription() );
+
+            w.endElement();
+        }
 
         // ----------------------------------------------------------------------
         //

@@ -107,7 +107,7 @@ public class PluginDescriptorBuilder
         mojo.setPluginDescriptor( pluginDescriptor );
 
         mojo.setGoal( c.getChild( "goal" ).getValue() );
-
+        
         mojo.setImplementation( c.getChild( "implementation" ).getValue() );
 
         PlexusConfiguration langConfig = c.getChild( "language" );
