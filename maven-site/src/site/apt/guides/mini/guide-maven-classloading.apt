@@ -6,27 +6,34 @@
  12 October 2005
  ------
 
-How maven's classloaders work
+How Maven's classloaders work
 
- To add a bit of detail for a volunteer to submit as documentation... :)
++----+
 
- m2/core/boot is what is in the java classpath (ie, just classworlds,
- which constructs classloaders for the rest of the system)
+main is org.apache.maven.cli.MavenCli from plexus.core.maven
 
- the top level classloader contains plexus container and plexus utils
- (see m2/core), and also has access to classworlds
+set maven.home default ${user.home}/m2
 
- the next classloader has the libraries in m2/lib (a bug in beta 1
- incorporated commons-logging and -lang, sorry about that!) In general
- these are just maven libraries. We hope to further separate these in
- future to just be maven apis.
+[plexus.core]
+load ${maven.home}/core/*.jar
 
- after that, each plugin has its own classloader, including its
- dependencies, itself, and the libraries above. It *does not* contain
- the project dependencies like in m1, but instead has access to a list
- of JAR files in case they are needed.
+[plexus.core.maven]
+load ${maven.home}/lib/*.jar
 
- In addition, a project can list "extensions". These are loaded into
- the same place as m2/lib and so available to the maven core and all
- plugins for the currnet project and subsequent projects (in future, we
- plan to remove it from subsequent projects).
++----+
+
+ m2/core/boot is what is in the java classpath (ie, just classworlds, which constructs classloaders for the 
+ rest of the system)
+
+ the top level classloader contains plexus container and plexus utils (see m2/core), and also has access to classworlds
+
+ the next classloader has the libraries in m2/lib In general these are just maven libraries. We hope to further
+ separate these in future to just be maven apis.
+
+ after that, each plugin has its own classloader, including its dependencies, itself, and the libraries above.
+ It *does not* contain the project dependencies like in m1, but instead has access to a list of JAR files in case
+ they are needed.
+
+ In addition, a project can list "extensions". These are loaded into the same place as m2/lib and so available to
+ the maven core and all plugins for the currnet project and subsequent projects (in future, we plan to remove it
+ from subsequent projects).
