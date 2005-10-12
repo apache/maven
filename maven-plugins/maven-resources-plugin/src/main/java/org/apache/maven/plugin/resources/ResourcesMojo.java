@@ -27,9 +27,13 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
@@ -50,6 +54,12 @@ import java.util.Properties;
 public class ResourcesMojo
     extends AbstractMojo
 {
+    
+    /**
+     * @parameter
+     */
+    private String encoding;
+    
     /**
      * The output directory into which to copy the resources.
      *
@@ -95,6 +105,15 @@ public class ResourcesMojo
     {
         initializeFiltering();
 
+        if ( encoding == null || encoding.length() < 1 )
+        {
+            getLog().info( "Using default encoding to copy filtered resources." );
+        }
+        else
+        {
+            getLog().info( "Using encoding: \'" + encoding + "\' to copy filtered resources." );
+        }
+        
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
             Resource resource = (Resource) i.next();
@@ -192,10 +211,24 @@ public class ResourcesMojo
         else
         {
             // buffer so it isn't reading a byte at a time!
-            Reader fileReader = new BufferedReader( new FileReader( from ) );
+            Reader fileReader = null;
             Writer fileWriter = null;
             try
             {
+                if ( encoding == null || encoding.length() < 1 )
+                {
+                    fileReader = new BufferedReader( new FileReader( from ) );
+                    fileWriter = new FileWriter( to );
+                }
+                else
+                {
+                    FileInputStream instream = new FileInputStream( from );
+                    FileOutputStream outstream = new FileOutputStream( to );
+                    
+                    fileReader = new BufferedReader( new InputStreamReader( instream, encoding ) );
+                    fileWriter = new OutputStreamWriter( outstream, encoding );
+                }
+                
                 // support ${token}
                 Reader reader = new InterpolationFilterReader( fileReader, filterProperties, "${", "}" );
 
@@ -203,8 +236,6 @@ public class ResourcesMojo
                 reader = new InterpolationFilterReader( reader, filterProperties, "@", "@" );
 
                 reader = new InterpolationFilterReader( reader, new ReflectionProperties( project ), "${", "}" );
-
-                fileWriter = new FileWriter( to );
 
                 IOUtil.copy( reader, fileWriter );
             }
