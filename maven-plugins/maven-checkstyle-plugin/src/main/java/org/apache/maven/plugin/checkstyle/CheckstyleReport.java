@@ -38,15 +38,16 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -240,7 +241,8 @@ public class CheckstyleReport
     {
         if ( !canGenerateReport() )
         {
-            throw new MavenReportException( "No source directory to process for style" );
+            // TODO: failure if not a report
+            throw new MavenReportException( "No source directory to process for checkstyle" );
         }
 
         Map files = executeCheckstyle();
@@ -253,22 +255,30 @@ public class CheckstyleReport
     private Map executeCheckstyle()
         throws MavenReportException
     {
-        File[] files = getFilesToProcess( includes, excludes );
+        File[] files = new File[0];
+        try
+        {
+            files = getFilesToProcess( includes, excludes );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenReportException( "Error getting files to process", e );
+        }
 
         String configFile = getConfigFile();
 
         Properties overridingProperties = getOverridingProperties();
 
-        ModuleFactory moduleFactory = getModuleFactory();
-
-        FilterSet filterSet = getSuppressions();
-
         Checker checker;
 
         try
         {
-            Configuration config = ConfigurationLoader.loadConfiguration( configFile, new PropertiesExpander(
-                overridingProperties ) );
+            ModuleFactory moduleFactory = getModuleFactory();
+
+            FilterSet filterSet = getSuppressions();
+
+            Configuration config =
+                ConfigurationLoader.loadConfiguration( configFile, new PropertiesExpander( overridingProperties ) );
 
             checker = new Checker();
 
@@ -313,6 +323,8 @@ public class CheckstyleReport
 
         if ( failsOnError && nbErrors > 0 )
         {
+            // TODO: should be a failure, not an error. Report is not meant to throw an exception here (so site would
+            // work regardless of config), but should record this information
             throw new MavenReportException( "There are " + nbErrors + " formatting errors." );
         }
 
@@ -348,6 +360,7 @@ public class CheckstyleReport
             }
             else
             {
+                // TODO: failure if not a report
                 throw new MavenReportException(
                     "Invalid output file format: (" + outputFileFormat + "). Must be 'plain' or 'xml'." );
             }
@@ -359,25 +372,27 @@ public class CheckstyleReport
     private OutputStream getOutputStream( File file )
         throws MavenReportException
     {
+        File parentFile = file.getAbsoluteFile().getParentFile();
+
+        if ( !parentFile.exists() )
+        {
+            parentFile.mkdirs();
+        }
+
+        FileOutputStream fileOutputStream = null;
         try
         {
-            File parentFile = file.getAbsoluteFile().getParentFile();
-
-            if ( !parentFile.exists() )
-            {
-                parentFile.mkdirs();
-            }
-
-            return new FileOutputStream( file );
+            fileOutputStream = new FileOutputStream( file );
         }
-        catch ( IOException ioe )
+        catch ( FileNotFoundException e )
         {
-            throw new MavenReportException( "Can't open file for output: " + file.getAbsolutePath(), ioe );
+            throw new MavenReportException( "Unable to create output stream: " + file, e );
         }
+        return fileOutputStream;
     }
 
     private File[] getFilesToProcess( String includes, String excludes )
-        throws MavenReportException
+        throws MavenReportException, IOException
     {
         StringBuffer excludesStr = new StringBuffer();
 
@@ -397,16 +412,7 @@ public class CheckstyleReport
             excludesStr.append( defaultExcludes[i] );
         }
 
-        List files;
-
-        try
-        {
-            files = FileUtils.getFiles( sourceDirectory, includes, excludesStr.toString() );
-        }
-        catch ( IOException ioe )
-        {
-            throw new MavenReportException( "Failed to get source files", ioe );
-        }
+        List files = FileUtils.getFiles( sourceDirectory, includes, excludesStr.toString() );
 
         return (File[]) files.toArray( EMPTY_FILE_ARRAY );
     }
@@ -420,7 +426,14 @@ public class CheckstyleReport
         {
             if ( propertiesFile != null )
             {
-                p.load( new FileInputStream( propertiesFile ) );
+                if ( propertiesFile.exists() )
+                {
+                    p.load( new FileInputStream( propertiesFile ) );
+                }
+                else
+                {
+                    getLog().warn( "File '" + propertiesFile + "' not found - skipping" );
+                }
             }
             else if ( propertiesURL != null )
             {
@@ -465,6 +478,7 @@ public class CheckstyleReport
         }
         else
         {
+            // TODO: failure if not a report
             throw new MavenReportException( "Invalid configuration file format: " + format );
         }
 
@@ -472,21 +486,14 @@ public class CheckstyleReport
     }
 
     private ModuleFactory getModuleFactory()
-        throws MavenReportException
+        throws CheckstyleException
     {
         if ( StringUtils.isEmpty( packageNamesFile ) )
         {
             return null;
         }
 
-        try
-        {
-            return PackageNamesLoader.loadModuleFactory( packageNamesFile );
-        }
-        catch ( CheckstyleException ce )
-        {
-            throw new MavenReportException( "failed to load package names XML: " + packageNamesFile, ce );
-        }
+        return PackageNamesLoader.loadModuleFactory( packageNamesFile );
     }
 
     private FilterSet getSuppressions()

@@ -22,7 +22,6 @@ import org.apache.maven.model.Notifier;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
-import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
@@ -107,7 +106,6 @@ public class CimReport
     }
 
     public void executeReport( Locale locale )
-        throws MavenReportException
     {
         CimRenderer r = new CimRenderer( getSink(), getProject().getModel(), locale );
 

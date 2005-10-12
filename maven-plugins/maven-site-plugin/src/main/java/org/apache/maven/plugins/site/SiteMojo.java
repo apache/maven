@@ -18,6 +18,7 @@ package org.apache.maven.plugins.site;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -51,7 +53,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Comparator;
 
 /**
  * Generates the project site.
@@ -150,7 +151,7 @@ public class SiteMojo
     /**
      * Internationalization.
      *
-     * @component 
+     * @component
      */
     private I18N i18n;
 
@@ -178,7 +179,7 @@ public class SiteMojo
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         if ( templateDirectory == null )
         {
@@ -289,11 +290,7 @@ public class SiteMojo
                 }
 
                 // Exception if a file is duplicate
-                String msg = createDuplicateExceptionMsg( duplicate, locale );
-                if ( msg != null )
-                {
-                    throw new MavenReportException( msg );
-                }
+                checkDuplicates( duplicate, locale );
 
                 String siteDescriptor = getSiteDescriptor( reports, locale, projectInfos, projectReports );
 
@@ -1132,13 +1129,13 @@ public class SiteMojo
     }
 
     /**
-     * Create an <code>Exception</code> message if a file is duplicate.
+     * Throw an exception if a file is duplicate.
      *
      * @param duplicate a map of duplicate files
      * @param locale the current locale
-     * @return the Message to throw
      */
-    private String createDuplicateExceptionMsg( Map duplicate, Locale locale )
+    private void checkDuplicates( Map duplicate, Locale locale )
+        throws MojoFailureException
     {
         if ( duplicate.size() > 0 )
         {
@@ -1182,11 +1179,9 @@ public class SiteMojo
 
             if ( sb != null )
             {
-                return sb.toString();
+                throw new MojoFailureException( sb.toString() );
             }
         }
-
-        return null;
     }
 
     /**

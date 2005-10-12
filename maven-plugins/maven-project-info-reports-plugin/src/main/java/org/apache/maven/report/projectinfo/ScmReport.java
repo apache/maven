@@ -21,7 +21,6 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
-import org.apache.maven.reporting.MavenReportException;
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
 import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.provider.clearcase.repository.ClearCaseScmProviderRepository;
@@ -135,7 +134,6 @@ public class ScmReport
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
     public void executeReport( Locale locale )
-        throws MavenReportException
     {
         ScmRenderer r = new ScmRenderer( scmManager, getSink(), getProject().getModel(), locale );
 

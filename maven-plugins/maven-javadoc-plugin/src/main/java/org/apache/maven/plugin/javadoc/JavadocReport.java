@@ -19,6 +19,7 @@ package org.apache.maven.plugin.javadoc;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
@@ -28,6 +29,7 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
@@ -579,29 +581,29 @@ public class JavadocReport
     protected void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            int actualYear = Calendar.getInstance().get( Calendar.YEAR );
-            String year = String.valueOf( actualYear );
+        int actualYear = Calendar.getInstance().get( Calendar.YEAR );
+        String year = String.valueOf( actualYear );
 
-            Model model = getProject().getModel();
-            if ( model.getInceptionYear() != null )
+        Model model = getProject().getModel();
+        if ( model.getInceptionYear() != null )
+        {
+            if ( StringUtils.isNumeric( model.getInceptionYear() ) )
             {
-                if ( StringUtils.isNumeric( model.getInceptionYear() ) )
+                if ( Integer.valueOf( model.getInceptionYear() ).intValue() != actualYear )
                 {
-                    if ( Integer.valueOf( model.getInceptionYear() ).intValue() != actualYear )
-                    {
-                        year = model.getInceptionYear() + "-" + String.valueOf( actualYear );
-                    }
-                }
-                else
-                {
-                    getLog().warn( "The inception year is not a valid year." );
+                    year = model.getInceptionYear() + "-" + String.valueOf( actualYear );
                 }
             }
+            else
+            {
+                getLog().warn( "The inception year is not a valid year." );
+            }
+        }
 
-            StringBuffer options = new StringBuffer();
-            StringBuffer classpath = new StringBuffer();
+        StringBuffer options = new StringBuffer();
+        StringBuffer classpath = new StringBuffer();
+        try
+        {
             for ( Iterator i = getProject().getCompileClasspathElements().iterator(); i.hasNext(); )
             {
                 classpath.append( (String) i.next() );
@@ -611,226 +613,251 @@ public class JavadocReport
                     classpath.append( PATH_SEPARATOR );
                 }
             }
+        }
+        catch ( DependencyResolutionRequiredException e )
+        {
+            throw new MavenReportException( "Error in plugin descriptor - compile dependencies were not resolved", e );
+        }
 
-            if ( classpath.length() > 0 )
+        if ( classpath.length() > 0 )
+        {
+            options.append( "-classpath " );
+            options.append( quotedPathArgument( classpath.toString() ) );
+        }
+
+        StringBuffer sourcePath = new StringBuffer();
+        StringBuffer files = new StringBuffer();
+        for ( Iterator i = getProject().getCompileSourceRoots().iterator(); i.hasNext(); )
+        {
+            String sourceDirectory = (String) i.next();
+            String[] fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[]{"java"} );
+            if ( fileList != null && fileList.length != 0 )
             {
-                options.append( "-classpath " );
-                options.append( quotedPathArgument( classpath.toString() ) );
-            }
-
-            StringBuffer sourcePath = new StringBuffer();
-            StringBuffer files = new StringBuffer();
-            for ( Iterator i = getProject().getCompileSourceRoots().iterator(); i.hasNext(); )
-            {
-                String sourceDirectory = (String) i.next();
-                String[] fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[]{"java"} );
-                if ( fileList != null && fileList.length != 0 )
+                for ( int j = 0; j < fileList.length; j++ )
                 {
-                    for ( int j = 0; j < fileList.length; j++ )
-                    {
-                        files.append( quotedPathArgument( fileList[j] ) );
-                        files.append( "\n" );
-                    }
-                }
-
-                sourcePath.append( sourceDirectory );
-
-                if ( i.hasNext() )
-                {
-                    sourcePath.append( PATH_SEPARATOR );
+                    files.append( quotedPathArgument( fileList[j] ) );
+                    files.append( "\n" );
                 }
             }
 
-            if ( files.length() == 0 )
+            sourcePath.append( sourceDirectory );
+
+            if ( i.hasNext() )
             {
-                return;
+                sourcePath.append( PATH_SEPARATOR );
             }
+        }
 
-            File javadocDirectory = getReportOutputDirectory();
+        if ( files.length() == 0 )
+        {
+            return;
+        }
 
-            if ( !javadocDirectory.equals( getOutputDirectory() ) )
-            {
-                // we're in site-embedded report mode, so Doxia has set the
-                // reportOutputDirectory to the basedir of the site.
-                // Append 'apidocs'.
-                javadocDirectory = new File( javadocDirectory, "apidocs" );
-            }
-            javadocDirectory.mkdirs();
+        File javadocDirectory = getReportOutputDirectory();
 
-            File file = new File( javadocDirectory, "files" );
-            file.deleteOnExit();
+        if ( !javadocDirectory.equals( getOutputDirectory() ) )
+        {
+            // we're in site-embedded report mode, so Doxia has set the
+            // reportOutputDirectory to the basedir of the site.
+            // Append 'apidocs'.
+            javadocDirectory = new File( javadocDirectory, "apidocs" );
+        }
+        javadocDirectory.mkdirs();
+
+        File file = new File( javadocDirectory, "files" );
+        file.deleteOnExit();
+        try
+        {
             FileUtils.fileWrite( file.getAbsolutePath(), files.toString() );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenReportException( "Unable to write temporary file for command execution", e );
+        }
 
+        try
+        {
             // Copy default style sheet
             copyDefaultStylesheet( javadocDirectory );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenReportException( "Unable to copy default stylesheet", e );
+        }
 
-            Commandline cmd = new Commandline();
+        Commandline cmd = new Commandline();
 
-            List arguments = new ArrayList();
+        List arguments = new ArrayList();
 
-            cmd.setWorkingDirectory( javadocDirectory.getAbsolutePath() );
-            cmd.setExecutable( getJavadocPath() );
+        cmd.setWorkingDirectory( javadocDirectory.getAbsolutePath() );
+        cmd.setExecutable( getJavadocPath() );
 
-            // General javadoc arguments
-            addArgIfNotEmpty( arguments, "-locale", quotedArgument( this.locale ) );
-            addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
-            if ( !StringUtils.isEmpty( doclet ) )
+        // General javadoc arguments
+        addArgIfNotEmpty( arguments, "-locale", quotedArgument( this.locale ) );
+        addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
+        if ( !StringUtils.isEmpty( doclet ) )
+        {
+            addArgIfNotEmpty( arguments, "-doclet", quotedArgument( doclet ) );
+            addArgIfNotEmpty( arguments, "-docletPath", quotedPathArgument( docletPath ) );
+        }
+        addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
+        addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
+        addArgIfNotEmpty( arguments, "-exclude", quotedArgument( excludePackageNames ), 1.4f );
+        if ( !StringUtils.isEmpty( maxmemory ) )
+        {
+            // Allow '128' or '128m'
+            if ( NumberUtils.isDigits( maxmemory ) )
             {
-                addArgIfNotEmpty( arguments, "-doclet", quotedArgument( doclet ) );
-                addArgIfNotEmpty( arguments, "-docletPath", quotedPathArgument( docletPath ) );
-            }
-            addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
-            addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
-            addArgIfNotEmpty( arguments, "-exclude", quotedArgument( excludePackageNames ), 1.4f );
-            if ( !StringUtils.isEmpty( maxmemory ) )
-            {
-                // Allow '128' or '128m'
-                if ( NumberUtils.isDigits( maxmemory ) )
-                {
-                    addArgIf( arguments, true, "-J-Xmx" + maxmemory + "m" );
-                }
-                else
-                {
-                    if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) ) &&
-                        ( maxmemory.toLowerCase().endsWith( "m" ) ) )
-                    {
-                        addArgIf( arguments, true, "-J-Xmx" + maxmemory );
-                    }
-                    else
-                    {
-                        getLog().error(
-                            "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
-                    }
-                }
-            }
-
-            if ( !StringUtils.isEmpty( minmemory ) )
-            {
-                // Allow '128' or '128m'
-                if ( NumberUtils.isDigits( minmemory ) )
-                {
-                    addArgIf( arguments, true, "-J-Xms" + minmemory + "m" );
-                }
-                else
-                {
-                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) &&
-                        ( minmemory.toLowerCase().endsWith( "m" ) ) )
-                    {
-                        addArgIf( arguments, true, "-J-Xms" + minmemory );
-                    }
-                    else
-                    {
-                        getLog().error(
-                            "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
-                    }
-                }
-            }
-
-            if ( old && SystemUtils.isJavaVersionAtLeast( 1.4f ) )
-            {
-                getLog().warn( "Javadoc 1.4 doesn't support the -1.1 switch anymore. Ignore this option." );
+                addArgIf( arguments, true, "-J-Xmx" + maxmemory + "m" );
             }
             else
             {
-                addArgIf( arguments, old, "-1.1" );
-            }
-
-            addArgIfNotEmpty( arguments, "-overview", quotedArgument( overview ) );
-            addArgIf( arguments, showPackage, "-package" );
-            addArgIf( arguments, showPrivate, "-private" );
-            addArgIf( arguments, showProtected, "-protected" );
-            addArgIf( arguments, public_, "-public" );
-            addArgIf( arguments, quiet, "-quiet", 1.4f );
-            addArgIfNotEmpty( arguments, "-source", quotedArgument( source ), 1.4f );
-            addArgIf( arguments, verbose, "-verbose" );
-            addArgIfNotEmpty( arguments, "-additionalparam", quotedArgument( additionalparam ) );
-
-            addArgIfNotEmpty( arguments, "-sourcePath", quotedPathArgument( sourcePath.toString() ) );
-
-            // javadoc arguments for default doclet
-            if ( StringUtils.isEmpty( doclet ) )
-            {
-                bottom = StringUtils.replace( bottom, "{currentYear}", year );
-                if ( project.getInceptionYear() != null )
+                if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) ) &&
+                    ( maxmemory.toLowerCase().endsWith( "m" ) ) )
                 {
-                    bottom = StringUtils.replace( bottom, "{inceptionYear}", project.getInceptionYear() );
+                    addArgIf( arguments, true, "-J-Xmx" + maxmemory );
                 }
                 else
                 {
-                    bottom = StringUtils.replace( bottom, "{inceptionYear}-", "" );
+                    getLog().error( "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
                 }
-
-                if ( StringUtils.isEmpty( stylesheetfile ) )
-                {
-                    stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
-                }
-                // End Specify default values
-
-                addArgIf( arguments, author, "-author" );
-                addArgIfNotEmpty( arguments, "-bottom", quotedArgument( bottom ) );
-                addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
-                addArgIfNotEmpty( arguments, "-charset", quotedArgument( charset ) );
-                addArgIfNotEmpty( arguments, "-d", quotedPathArgument( javadocDirectory.toString() ) );
-                addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
-                addArgIfNotEmpty( arguments, "-docencoding", quotedArgument( docencoding ) );
-                addArgIfNotEmpty( arguments, "-doctitle", quotedArgument( doctitle ) );
-                addArgIfNotEmpty( arguments, "-excludedocfilessubdir", quotedPathArgument( excludedocfilessubdir ),
-                                  1.4f );
-                addArgIfNotEmpty( arguments, "-footer", quotedArgument( footer ) );
-                addArgIfNotEmpty( arguments, "-group", quotedArgument( group ), true );
-                addArgIfNotEmpty( arguments, "-header", quotedArgument( header ) );
-                addArgIfNotEmpty( arguments, "-helpfile", quotedPathArgument( helpfile ) );
-                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
-                addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
-                addArgIf( arguments, linksource, "-linksource", 1.4f );
-                addArgIf( arguments, nodeprecated, "-nodeprecated" );
-                addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
-                addArgIf( arguments, nocomment, "-nocomment", 1.4f );
-                addArgIf( arguments, nohelp, "-nohelp" );
-                addArgIf( arguments, noindex, "-noindex" );
-                addArgIf( arguments, nonavbar, "-nonavbar" );
-                addArgIfNotEmpty( arguments, "-noqualifier", quotedArgument( noqualifier ), 1.4f );
-                addArgIf( arguments, nosince, "-nosince" );
-                addArgIf( arguments, notree, "-notree" );
-                addArgIf( arguments, serialwarn, "-serialwarn" );
-                addArgIf( arguments, splitindex, "-splitindex" );
-                addArgIfNotEmpty( arguments, "-stylesheetfile", quotedPathArgument( stylesheetfile ) );
-                addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
-                addArgIfNotEmpty( arguments, "-taglet", quotedArgument( taglet ), 1.4f );
-                addArgIfNotEmpty( arguments, "-tagletpath", quotedPathArgument( tagletpath ), 1.4f );
-                addArgIf( arguments, use, "-use" );
-                addArgIf( arguments, version, "-version" );
-                addArgIfNotEmpty( arguments, "-windowtitle", quotedArgument( windowtitle ) );
             }
+        }
 
-            if ( options.length() > 0 )
+        if ( !StringUtils.isEmpty( minmemory ) )
+        {
+            // Allow '128' or '128m'
+            if ( NumberUtils.isDigits( minmemory ) )
             {
-                File optionsFile = new File( javadocDirectory, "options" );
-                for ( Iterator it = arguments.iterator(); it.hasNext(); )
+                addArgIf( arguments, true, "-J-Xms" + minmemory + "m" );
+            }
+            else
+            {
+                if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) &&
+                    ( minmemory.toLowerCase().endsWith( "m" ) ) )
                 {
-                    options.append( " " );
-                    options.append( (String) it.next() );
+                    addArgIf( arguments, true, "-J-Xms" + minmemory );
                 }
-                FileUtils.fileWrite( optionsFile.getAbsolutePath(), options.toString() );
-                cmd.createArgument().setValue( "@options" );
-                optionsFile.deleteOnExit();
+                else
+                {
+                    getLog().error( "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
+                }
+            }
+        }
+
+        if ( old && SystemUtils.isJavaVersionAtLeast( 1.4f ) )
+        {
+            getLog().warn( "Javadoc 1.4 doesn't support the -1.1 switch anymore. Ignore this option." );
+        }
+        else
+        {
+            addArgIf( arguments, old, "-1.1" );
+        }
+
+        addArgIfNotEmpty( arguments, "-overview", quotedArgument( overview ) );
+        addArgIf( arguments, showPackage, "-package" );
+        addArgIf( arguments, showPrivate, "-private" );
+        addArgIf( arguments, showProtected, "-protected" );
+        addArgIf( arguments, public_, "-public" );
+        addArgIf( arguments, quiet, "-quiet", 1.4f );
+        addArgIfNotEmpty( arguments, "-source", quotedArgument( source ), 1.4f );
+        addArgIf( arguments, verbose, "-verbose" );
+        addArgIfNotEmpty( arguments, "-additionalparam", quotedArgument( additionalparam ) );
+
+        addArgIfNotEmpty( arguments, "-sourcePath", quotedPathArgument( sourcePath.toString() ) );
+
+        // javadoc arguments for default doclet
+        if ( StringUtils.isEmpty( doclet ) )
+        {
+            bottom = StringUtils.replace( bottom, "{currentYear}", year );
+            if ( project.getInceptionYear() != null )
+            {
+                bottom = StringUtils.replace( bottom, "{inceptionYear}", project.getInceptionYear() );
+            }
+            else
+            {
+                bottom = StringUtils.replace( bottom, "{inceptionYear}-", "" );
             }
 
-            cmd.createArgument().setValue( "@files" );
+            if ( StringUtils.isEmpty( stylesheetfile ) )
+            {
+                stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
+            }
+            // End Specify default values
 
-            getLog().info( Commandline.toString( cmd.getCommandline() ) );
+            addArgIf( arguments, author, "-author" );
+            addArgIfNotEmpty( arguments, "-bottom", quotedArgument( bottom ) );
+            addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
+            addArgIfNotEmpty( arguments, "-charset", quotedArgument( charset ) );
+            addArgIfNotEmpty( arguments, "-d", quotedPathArgument( javadocDirectory.toString() ) );
+            addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
+            addArgIfNotEmpty( arguments, "-docencoding", quotedArgument( docencoding ) );
+            addArgIfNotEmpty( arguments, "-doctitle", quotedArgument( doctitle ) );
+            addArgIfNotEmpty( arguments, "-excludedocfilessubdir", quotedPathArgument( excludedocfilessubdir ), 1.4f );
+            addArgIfNotEmpty( arguments, "-footer", quotedArgument( footer ) );
+            addArgIfNotEmpty( arguments, "-group", quotedArgument( group ), true );
+            addArgIfNotEmpty( arguments, "-header", quotedArgument( header ) );
+            addArgIfNotEmpty( arguments, "-helpfile", quotedPathArgument( helpfile ) );
+            addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
+            addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
+            addArgIf( arguments, linksource, "-linksource", 1.4f );
+            addArgIf( arguments, nodeprecated, "-nodeprecated" );
+            addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
+            addArgIf( arguments, nocomment, "-nocomment", 1.4f );
+            addArgIf( arguments, nohelp, "-nohelp" );
+            addArgIf( arguments, noindex, "-noindex" );
+            addArgIf( arguments, nonavbar, "-nonavbar" );
+            addArgIfNotEmpty( arguments, "-noqualifier", quotedArgument( noqualifier ), 1.4f );
+            addArgIf( arguments, nosince, "-nosince" );
+            addArgIf( arguments, notree, "-notree" );
+            addArgIf( arguments, serialwarn, "-serialwarn" );
+            addArgIf( arguments, splitindex, "-splitindex" );
+            addArgIfNotEmpty( arguments, "-stylesheetfile", quotedPathArgument( stylesheetfile ) );
+            addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
+            addArgIfNotEmpty( arguments, "-taglet", quotedArgument( taglet ), 1.4f );
+            addArgIfNotEmpty( arguments, "-tagletpath", quotedPathArgument( tagletpath ), 1.4f );
+            addArgIf( arguments, use, "-use" );
+            addArgIf( arguments, version, "-version" );
+            addArgIfNotEmpty( arguments, "-windowtitle", quotedArgument( windowtitle ) );
+        }
 
-            int exitCode = CommandLineUtils.executeCommandLine( cmd, new DefaultConsumer(), new DefaultConsumer() );
+        if ( options.length() > 0 )
+        {
+            File optionsFile = new File( javadocDirectory, "options" );
+            for ( Iterator it = arguments.iterator(); it.hasNext(); )
+            {
+                options.append( " " );
+                options.append( (String) it.next() );
+            }
+            try
+            {
+                FileUtils.fileWrite( optionsFile.getAbsolutePath(), options.toString() );
+            }
+            catch ( IOException e )
+            {
+                throw new MavenReportException( "Unable to write temporary file for command execution", e );
+            }
+            cmd.createArgument().setValue( "@options" );
+            optionsFile.deleteOnExit();
+        }
+
+        cmd.createArgument().setValue( "@files" );
+
+        getLog().info( Commandline.toString( cmd.getCommandline() ) );
+
+        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
+        try
+        {
+            int exitCode = CommandLineUtils.executeCommandLine( cmd, new DefaultConsumer(), err );
 
             if ( exitCode != 0 )
             {
-                throw new MavenReportException( "Exit code: " + exitCode );
+                throw new MavenReportException( "Exit code: " + exitCode + " - " + err.getOutput() );
             }
         }
-        catch ( Exception e )
+        catch ( CommandLineException e )
         {
-            getLog().debug( e );
-            throw new MavenReportException( "An error has occurred in javadoc report generation.", e );
+            throw new MavenReportException( "Unable to execute javadoc command", e );
         }
     }
 
@@ -1034,10 +1061,8 @@ public class JavadocReport
      * @param resource the resource
      * @return InputStream An input stream for reading the resource, or <tt>null</tt>
      *         if the resource could not be found
-     * @throws Exception if any
      */
     private static InputStream getStream( String resource )
-        throws Exception
     {
         return JavadocReport.class.getClassLoader().getResourceAsStream( resource );
     }
@@ -1047,14 +1072,14 @@ public class JavadocReport
      * loader to the output directory.
      *
      * @param outputDirectory the output directory
-     * @throws Exception if any
+     * @throws IOException if any
      * @see #DEFAULT_CSS_NAME
      */
     private void copyDefaultStylesheet( File outputDirectory )
-        throws Exception
+        throws IOException
     {
 
-        if ( ( outputDirectory == null ) || ( !outputDirectory.exists() ) )
+        if ( outputDirectory == null || !outputDirectory.exists() )
         {
             throw new IOException( "The outputDirectory " + outputDirectory + " doesn't exists." );
         }
@@ -1084,6 +1109,6 @@ public class JavadocReport
 
     public boolean isExternalReport()
     {
-        return true;
+        return true && super.isExternalReport();
     }
 }

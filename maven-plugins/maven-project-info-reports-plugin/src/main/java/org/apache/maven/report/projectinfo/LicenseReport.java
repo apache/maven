@@ -21,7 +21,6 @@ import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
-import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.IOUtil;
@@ -128,7 +127,6 @@ public class LicenseReport
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
     public void executeReport( Locale locale )
-        throws MavenReportException
     {
         LicenseRenderer r = new LicenseRenderer( getSink(), getProject(), locale );
 

@@ -24,7 +24,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
-import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
@@ -151,7 +150,6 @@ public class DependenciesReport
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
     public void executeReport( Locale locale )
-        throws MavenReportException
     {
         DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale, mavenProjectBuilder,
                                                            artifactFactory, localRepository );
