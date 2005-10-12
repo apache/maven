@@ -23,8 +23,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -141,30 +141,30 @@ public class SurefirePlugin
      * @parameter expression="${plugin.artifacts}"
      */
     private List pluginArtifacts;
-    
+
     /**
      * Option to print summary of test suites or just print the test cases that has errors.
-     * 
-     *  @parameter expression="${surefire.printSummary}"
-     *             default-value="true"
+     *
+     * @parameter expression="${surefire.printSummary}"
+     * default-value="true"
      */
     private boolean printSummary;
-    
+
     /**
      * Selects the formatting for the test report to be generated.  Can be set as brief, plain, or xml.
-     * 
+     *
      * @parameter expression="${surefire.reportFormat}"
-     *            default-value="brief"       
+     * default-value="brief"
      */
-     private String reportFormat;
-     
-     /**
-      * Option to generate a file test report or just output the test report to the console.
-      * 
-      * @parameter expression="${surefire.useFile}"
-      *            default-value="true"
-      */
-     private boolean useFile;
+    private String reportFormat;
+
+    /**
+     * Option to generate a file test report or just output the test report to the console.
+     *
+     * @parameter expression="${surefire.useFile}"
+     * default-value="true"
+     */
+    private boolean useFile;
 
     public void execute()
         throws MojoExecutionException
@@ -215,11 +215,13 @@ public class SurefirePlugin
             // Have to wrap in an ArrayList as surefire expects an ArrayList instead of a List for some reason
             if ( includes == null || includes.size() == 0 )
             {
-                includes = new ArrayList( Arrays.asList( new String[] { "**/Test*.java", "**/*Test.java", "**/*TestCase.java" } ) );
+                includes = new ArrayList(
+                    Arrays.asList( new String[]{"**/Test*.java", "**/*Test.java", "**/*TestCase.java"} ) );
             }
             if ( excludes == null || excludes.size() == 0 )
             {
-                excludes = new ArrayList( Arrays.asList( new String[] { "**/Abstract*Test.java", "**/Abstract*TestCase.java" } ) );
+                excludes = new ArrayList(
+                    Arrays.asList( new String[]{"**/Abstract*Test.java", "**/Abstract*TestCase.java"} ) );
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
@@ -272,16 +274,21 @@ public class SurefirePlugin
         {
             Artifact artifact = (Artifact) i.next();
 
-//            if ( "junit".equals( artifact.getArtifactId() ) || "surefire".equals( artifact.getArtifactId() ) )
-//            {
+            // TODO: this is crude for now. We really want to get "surefire-booter" and all its dependencies, but the
+            // artifacts don't keep track of their children. We could just throw all of them in, but that would add an
+            // unnecessary maven-artifact dependency which is precisely the reason we are isolating the classloader
+            if ( "junit".equals( artifact.getArtifactId() ) || "surefire".equals( artifact.getArtifactId() ) ||
+                "surefire-booter".equals( artifact.getArtifactId() ) ||
+                "plexus-utils".equals( artifact.getArtifactId() ) )
+            {
                 getLog().debug( "Adding to surefire test classpath: " + artifact.getFile().getAbsolutePath() );
 
                 surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
-//            }
+            }
         }
 
-        addReporters(surefireBooter);
-        
+        addReporters( surefireBooter );
+
         boolean success;
 
         try
@@ -367,15 +374,15 @@ public class SurefirePlugin
 
         return list;
     }
-    
+
     /**
-     * <p> Adds Reporters that will generate reports with different formatting. 
-     * <p> The Reporter that will be added will be based on the value of the parameter 
-     *     useFile, reportFormat, and printSummary.
-     *     
+     * <p> Adds Reporters that will generate reports with different formatting.
+     * <p> The Reporter that will be added will be based on the value of the parameter
+     * useFile, reportFormat, and printSummary.
+     *
      * @param surefireBooter The surefire booter that will run tests.
      */
-    private void addReporters(SurefireBooter surefireBooter)
+    private void addReporters( SurefireBooter surefireBooter )
     {
 
         if ( useFile )
@@ -409,6 +416,6 @@ public class SurefirePlugin
                 surefireBooter.addReport( "org.codehaus.surefire.report.DetailedConsoleReporter" );
             }
         }
-        surefireBooter.addReport( "org.codehaus.surefire.report.XMLReporter" );   
+        surefireBooter.addReport( "org.codehaus.surefire.report.XMLReporter" );
     }
 }
