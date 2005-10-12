@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import util.AbstractReader;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.IOException;
 
 /**
  * Parse a POM.
@@ -108,18 +108,23 @@ public class ModelReader
 
     private final List chain;
 
+    private final String inheritedScope;
+
     public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
     {
-        this( downloader, resolveTransitiveDependencies, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+        this( downloader, null, resolveTransitiveDependencies, Collections.EMPTY_SET, Collections.EMPTY_LIST );
     }
 
-    public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies, Set excluded, List chain )
+    public ModelReader( ArtifactDownloader downloader, String inheritedScope, boolean resolveTransitiveDependencies,
+                        Set excluded, List chain )
     {
         this.downloader = downloader;
 
         this.resolveTransitiveDependencies = resolveTransitiveDependencies;
 
         this.excluded = excluded;
+
+        this.inheritedScope = inheritedScope;
 
         this.chain = chain;
     }
@@ -245,12 +250,12 @@ public class ModelReader
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false, excluded,
-                                         Collections.EMPTY_LIST );
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", inheritedScope, false,
+                                         excluded, Collections.EMPTY_LIST );
 
-            addDependencies( p.getDependencies(), parentDependencies, null, excluded );
+            addDependencies( p.getDependencies(), parentDependencies, inheritedScope, excluded );
 
-            addDependencies( p.getManagedDependencies(), managedDependencies, null, Collections.EMPTY_SET );
+            addDependencies( p.getManagedDependencies(), managedDependencies, inheritedScope, Collections.EMPTY_SET );
 
             resources.addAll( p.getResources() );
 
@@ -440,28 +445,33 @@ public class ModelReader
 
             if ( !excluded.contains( dependency.getConflictId() ) )
             {
-                if ( dependency.getVersion() == null )
+                if ( !dependency.getScope().equals( Dependency.SCOPE_TEST ) || inheritedScope == null )
                 {
-                    Dependency managedDependency = (Dependency) managedDependencies.get( dependency.getConflictId() );
-                    if ( managedDependency == null )
+                    if ( dependency.getVersion() == null )
                     {
-                        throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" +
-                            version + "] " + "Dependency " + dependency.getConflictId() +
-                            " is missing a version, and nothing is found in dependencyManagement. " );
+                        Dependency managedDependency =
+                            (Dependency) managedDependencies.get( dependency.getConflictId() );
+                        if ( managedDependency == null )
+                        {
+                            throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" +
+                                version + "] " + "Dependency " + dependency.getConflictId() +
+                                " is missing a version, and nothing is found in dependencyManagement. " );
+                        }
+                        dependency.setVersion( managedDependency.getVersion() );
                     }
-                    dependency.setVersion( managedDependency.getVersion() );
-                }
 
-                if ( resolveTransitiveDependencies )
-                {
-                    Set excluded = new HashSet( this.excluded );
-                    excluded.addAll( dependency.getExclusions() );
+                    if ( resolveTransitiveDependencies )
+                    {
+                        Set excluded = new HashSet( this.excluded );
+                        excluded.addAll( dependency.getExclusions() );
 
-                    ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
-                                                 dependency.getVersion(), dependency.getType(),
-                                                 resolveTransitiveDependencies, excluded, dependency.getChain() );
+                        ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
+                                                     dependency.getVersion(), dependency.getType(),
+                                                     dependency.getScope(), resolveTransitiveDependencies, excluded,
+                                                     dependency.getChain() );
 
-                    addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(), excluded );
+                        addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(), excluded );
+                    }
                 }
             }
         }
@@ -515,7 +525,8 @@ public class ModelReader
     }
 
     private ModelReader retrievePom( String groupId, String artifactId, String version, String type,
-                                     boolean resolveTransitiveDependencies, Set excluded, List chain )
+                                     String inheritedScope, boolean resolveTransitiveDependencies, Set excluded,
+                                     List chain )
         throws SAXException
     {
         String key = groupId + ":" + artifactId + ":" + version;
@@ -527,7 +538,7 @@ public class ModelReader
 
         inProgress.add( key );
 
-        ModelReader p = new ModelReader( downloader, resolveTransitiveDependencies, excluded, chain );
+        ModelReader p = new ModelReader( downloader, inheritedScope, resolveTransitiveDependencies, excluded, chain );
 
         try
         {
