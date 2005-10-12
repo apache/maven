@@ -241,10 +241,6 @@ public class DefaultArchetype
         {
             processTemplates( pomFile, outputDirectory, context, descriptor, packageName );
         }
-//        catch ( Exception e )
-//        {
-//            throw new ArchetypeTemplateProcessingException( "Error processing templates.", e );
-//        }
         finally
         {
             Thread.currentThread().setContextClassLoader( old );
@@ -273,7 +269,7 @@ public class DefaultArchetype
         // Model generated for the new archetype, so process it now
         // ---------------------------------------------------------------------
 
-        Model generatedModel = null;
+        Model generatedModel;
         try
         {
             FileReader pomReader = new FileReader( pomFile );
