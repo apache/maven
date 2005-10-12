@@ -214,6 +214,13 @@ public class DefaultPluginVersionManager
                 promptToPersist = false;
             }
         }
+        
+        // if we're still empty here, and the current project matches the plugin in question, use the current project's 
+        // version, I guess...
+        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId ) && project.getArtifactId().equals( artifactId ) )
+        {
+              version = project.getVersion();
+        }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
         if ( StringUtils.isEmpty( version ) )
