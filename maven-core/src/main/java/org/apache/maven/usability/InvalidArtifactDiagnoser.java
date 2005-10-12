@@ -1,6 +1,7 @@
 package org.apache.maven.usability;
 
 import org.apache.maven.artifact.InvalidArtifactRTException;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

@@ -70,45 +70,55 @@ public class InstallWagonProviderTask
     public void execute()
         throws BuildException
     {
-        MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
-
-        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
-        ArtifactRepository artifactRepository = createRemoteArtifactRepository( getDefaultRemoteRepository() );
-        List remoteRepositories = Collections.singletonList( artifactRepository );
         try
         {
-            ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-            VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-            Artifact providerArtifact = factory.createExtensionArtifact( "org.apache.maven.wagon", artifactId,
-                                                                         versionRange );
-            ArtifactResolutionResult result = resolver.resolveTransitively( Collections.singleton( providerArtifact ),
-                                                                            createArtifact( createDummyPom() ),
-                                                                            createLocalArtifactRepository(),
-                                                                            remoteRepositories, metadataSource, null );
+            MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
 
-            log( "Installing provider: " + providerArtifact );
-
-            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+            ArtifactRepository artifactRepository = createRemoteArtifactRepository( getDefaultRemoteRepository() );
+            List remoteRepositories = Collections.singletonList( artifactRepository );
+            try
             {
-                Artifact a = (Artifact) i.next();
-                getEmbedder().getContainer().addJarResource( a.getFile() );
+                ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+                VersionRange versionRange = VersionRange.createFromVersionSpec( version );
+                Artifact providerArtifact = factory.createExtensionArtifact( "org.apache.maven.wagon", artifactId,
+                                                                             versionRange );
+                ArtifactResolutionResult result = resolver.resolveTransitively( Collections
+                    .singleton( providerArtifact ), createArtifact( createDummyPom() ),
+                                                                                createLocalArtifactRepository(),
+                                                                                remoteRepositories, metadataSource,
+                                                                                null );
+
+                log( "Installing provider: " + providerArtifact );
+
+                for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+                {
+                    Artifact a = (Artifact) i.next();
+                    getEmbedder().getContainer().addJarResource( a.getFile() );
+                }
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            }
+            catch ( PlexusContainerException e )
+            {
+                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
             }
         }
-        catch ( ArtifactResolutionException e )
+        catch ( BuildException e )
         {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            diagnoseError( e );
+            
+            throw e;
         }
 
     }

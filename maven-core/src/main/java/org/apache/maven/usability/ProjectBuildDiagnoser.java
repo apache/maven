@@ -3,6 +3,8 @@ package org.apache.maven.usability;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
 public class ProjectBuildDiagnoser
     implements ErrorDiagnoser

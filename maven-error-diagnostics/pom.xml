@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ../../../m2-subclipse/maven-site/target/site/maven-v4_0_0.xsd ">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
+    <version>2.0-beta-4-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-error-diagnostics</artifactId>
+  <name>Maven Error Diagnostics</name>
+  
+  <description>
+    Provides a manager component which will process a given Throwable instance through a set of diagnostic
+    sub-components, and return a String message with user-friendly information about the error and possibly
+    how to fix it.
+  </description>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+  </dependencies>
+</project>

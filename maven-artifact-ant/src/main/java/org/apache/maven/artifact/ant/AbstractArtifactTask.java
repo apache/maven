@@ -31,6 +31,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -365,6 +366,29 @@ public abstract class AbstractArtifactTask
         pom.setMavenProject( mavenProject );
 
         return pom;
+    }
+    
+    public void diagnoseError( Throwable error )
+    {
+        try
+        {
+            ErrorDiagnostics diagnostics = (ErrorDiagnostics) embedder.lookup( ErrorDiagnostics.ROLE );
+            
+            StringBuffer message = new StringBuffer();
+
+            message.append( "An error has occurred while processing the Maven artifact tasks.\n" );
+            message.append( " Diagnosis:\n\n" );
+
+            message.append( diagnostics.diagnose( error ) );
+            
+            message.append( "\n\n" );
+            
+            log( message.toString(), Project.MSG_INFO );
+        }
+        catch ( ComponentLookupException e )
+        {
+            log( "Failed to retrieve error diagnoser.", Project.MSG_DEBUG );
+        }
     }
 
     public void addPom( Pom pom )

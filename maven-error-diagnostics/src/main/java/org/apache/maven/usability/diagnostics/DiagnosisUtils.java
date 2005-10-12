@@ -1,4 +1,4 @@
-package org.apache.maven.usability;
+package org.apache.maven.usability.diagnostics;
 
 
 /*
@@ -21,12 +21,6 @@ public final class DiagnosisUtils
 {
     private DiagnosisUtils()
     {
-    }
-    
-    public static String getOfflineWarning()
-    {
-        return "\nNOTE: Maven is executing in offline mode. Any artifacts not already in your local\n" +
-                "repository will be inaccessible.\n";
     }
     
     public static boolean containsInCausality( Throwable error, Class test )

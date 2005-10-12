@@ -1,6 +1,8 @@
 package org.apache.maven.usability;
 
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public class ProfileActivationDiagnoser

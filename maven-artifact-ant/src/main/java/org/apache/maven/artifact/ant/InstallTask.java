@@ -41,36 +41,45 @@ public class InstallTask
 
     public void execute()
     {
-        ArtifactRepository localRepo = createLocalArtifactRepository();
-
-        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        Pom pom = buildPom( builder, localRepo );
-
-        Artifact artifact = createArtifact( pom );
-
-        boolean isPomArtifact = "pom".equals( pom.getPackaging() );
-        if ( !isPomArtifact )
-        {
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom.getFile() );
-            artifact.addMetadata( metadata );
-        }
-
-        ArtifactInstaller installer = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
         try
         {
+            ArtifactRepository localRepo = createLocalArtifactRepository();
+
+            MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+            Pom pom = buildPom( builder, localRepo );
+
+            Artifact artifact = createArtifact( pom );
+
+            boolean isPomArtifact = "pom".equals( pom.getPackaging() );
             if ( !isPomArtifact )
             {
-                installer.install( file, artifact, localRepo );
+                ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom.getFile() );
+                artifact.addMetadata( metadata );
             }
-            else
+
+            ArtifactInstaller installer = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
+            try
             {
-                installer.install( pom.getFile(), artifact, localRepo );
+                if ( !isPomArtifact )
+                {
+                    installer.install( file, artifact, localRepo );
+                }
+                else
+                {
+                    installer.install( pom.getFile(), artifact, localRepo );
+                }
+            }
+            catch ( ArtifactInstallationException e )
+            {
+                // TODO: install exception that does not give a trace
+                throw new BuildException( "Error installing artifact", e );
             }
         }
-        catch ( ArtifactInstallationException e )
+        catch ( BuildException e )
         {
-            // TODO: install exception that does not give a trace
-            throw new BuildException( "Error installing artifact", e );
+            diagnoseError( e );
+            
+            throw e;
         }
     }
 

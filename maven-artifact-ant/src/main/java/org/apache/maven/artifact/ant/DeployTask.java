@@ -45,81 +45,90 @@ public class DeployTask
 
     public void execute()
     {
-        ArtifactRepository localRepo = createLocalArtifactRepository();
-        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-
-        Pom pom = buildPom( builder, localRepo );
-
-        if ( pom == null )
-        {
-            throw new BuildException( "A POM element is required to deploy to the repository" );
-        }
-
-        Artifact artifact = createArtifact( pom );
-
-        DistributionManagement distributionManagement = pom.getDistributionManagement();
-
-        if ( remoteSnapshotRepository == null && remoteRepository == null )
-        {
-            if ( distributionManagement != null )
-            {
-                if ( distributionManagement.getSnapshotRepository() != null )
-                {
-                    remoteSnapshotRepository = createAntRemoteRepositoryBase(
-                        distributionManagement.getSnapshotRepository() );
-                }
-                if ( distributionManagement.getRepository() != null )
-                {
-                    remoteRepository = createAntRemoteRepositoryBase( distributionManagement.getRepository() );
-                }
-            }
-        }
-
-        if ( remoteSnapshotRepository == null )
-        {
-            remoteSnapshotRepository = remoteRepository;
-        }
-
-        ArtifactRepository deploymentRepository = null;
-        if ( artifact.isSnapshot() && remoteSnapshotRepository != null )
-        {
-            deploymentRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
-        }
-        else if ( remoteRepository != null )
-        {
-            deploymentRepository = createRemoteArtifactRepository( remoteRepository );
-        }
-        else
-        {
-            throw new BuildException(
-                "A distributionManagement element or remoteRepository element is required to deploy" );
-        }
-
-        // Deploy the POM
-        boolean isPomArtifact = "pom".equals( pom.getPackaging() );
-        if ( !isPomArtifact )
-        {
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom.getFile() );
-            artifact.addMetadata( metadata );
-        }
-
-        log( "Deploying to " + deploymentRepository.getUrl() );
-        ArtifactDeployer deployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
         try
         {
-            if ( !isPomArtifact )
+            ArtifactRepository localRepo = createLocalArtifactRepository();
+            MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+
+            Pom pom = buildPom( builder, localRepo );
+
+            if ( pom == null )
             {
-                deployer.deploy( file, artifact, deploymentRepository, localRepo );
+                throw new BuildException( "A POM element is required to deploy to the repository" );
+            }
+
+            Artifact artifact = createArtifact( pom );
+
+            DistributionManagement distributionManagement = pom.getDistributionManagement();
+
+            if ( remoteSnapshotRepository == null && remoteRepository == null )
+            {
+                if ( distributionManagement != null )
+                {
+                    if ( distributionManagement.getSnapshotRepository() != null )
+                    {
+                        remoteSnapshotRepository = createAntRemoteRepositoryBase( distributionManagement
+                            .getSnapshotRepository() );
+                    }
+                    if ( distributionManagement.getRepository() != null )
+                    {
+                        remoteRepository = createAntRemoteRepositoryBase( distributionManagement.getRepository() );
+                    }
+                }
+            }
+
+            if ( remoteSnapshotRepository == null )
+            {
+                remoteSnapshotRepository = remoteRepository;
+            }
+
+            ArtifactRepository deploymentRepository = null;
+            if ( artifact.isSnapshot() && remoteSnapshotRepository != null )
+            {
+                deploymentRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
+            }
+            else if ( remoteRepository != null )
+            {
+                deploymentRepository = createRemoteArtifactRepository( remoteRepository );
             }
             else
             {
-                deployer.deploy( pom.getFile(), artifact, deploymentRepository, localRepo );
+                throw new BuildException(
+                                          "A distributionManagement element or remoteRepository element is required to deploy" );
+            }
+
+            // Deploy the POM
+            boolean isPomArtifact = "pom".equals( pom.getPackaging() );
+            if ( !isPomArtifact )
+            {
+                ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom.getFile() );
+                artifact.addMetadata( metadata );
+            }
+
+            log( "Deploying to " + deploymentRepository.getUrl() );
+            ArtifactDeployer deployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
+            try
+            {
+                if ( !isPomArtifact )
+                {
+                    deployer.deploy( file, artifact, deploymentRepository, localRepo );
+                }
+                else
+                {
+                    deployer.deploy( pom.getFile(), artifact, deploymentRepository, localRepo );
+                }
+            }
+            catch ( ArtifactDeploymentException e )
+            {
+                // TODO: deployment exception that does not give a trace
+                throw new BuildException( "Error deploying artifact", e );
             }
         }
-        catch ( ArtifactDeploymentException e )
+        catch ( BuildException e )
         {
-            // TODO: deployment exception that does not give a trace
-            throw new BuildException( "Error deploying artifact", e );
+            diagnoseError( e );
+            
+            throw e;
         }
     }
 

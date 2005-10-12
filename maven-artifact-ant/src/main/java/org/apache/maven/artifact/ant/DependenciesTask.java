@@ -75,161 +75,170 @@ public class DependenciesTask
      */
     public void execute()
     {
-        ArtifactRepository localRepo = createLocalArtifactRepository();
-
-        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
-        MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
-
-        List dependencies = this.dependencies;
-
-        Pom pom = buildPom( projectBuilder, localRepo );
-        if ( pom != null )
-        {
-            if ( !dependencies.isEmpty() )
-            {
-                throw new BuildException( "You cannot specify both dependencies and a pom in the dependencies task" );
-            }
-
-            dependencies = pom.getDependencies();
-
-            for ( Iterator i = pom.getRepositories().iterator(); i.hasNext(); )
-            {
-                Repository pomRepository = (Repository) i.next();
-
-                remoteRepositories.add( createAntRemoteRepository( pomRepository ) );
-            }
-        }
-        else
-        {
-            // we have to have some sort of Pom object in order to satisfy the requirements for building the
-            // originating Artifact below...
-            pom = createDummyPom();
-        }
-
-        if ( dependencies.isEmpty() )
-        {
-            log( "There were no dependencies specified", Project.MSG_WARN );
-        }
-
-        Set artifacts;
         try
         {
-            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, null );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new BuildException( "Invalid version specification", e );
-        }
+            ArtifactRepository localRepo = createLocalArtifactRepository();
 
-        log( "Resolving dependencies...", Project.MSG_VERBOSE );
+            ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+            MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+            ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+            MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
 
-        WagonManager wagonManager = (WagonManager) lookup( WagonManager.ROLE );
-        wagonManager.setDownloadMonitor( new AntDownloadMonitor() );
+            List dependencies = this.dependencies;
 
-        ArtifactResolutionResult result;
-        try
-        {
-            Artifact pomArtifact = artifactFactory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(),
-                                                                        pom.getVersion(), pom.getPackaging() );
-
-            List listeners = Collections.EMPTY_LIST;
-            if ( verbose )
+            Pom pom = buildPom( projectBuilder, localRepo );
+            if ( pom != null )
             {
-                listeners = Collections.singletonList( new AntResolutionListener( getProject() ) );
-            }
-
-            List remoteRepositories = getRemoteRepositories();
-
-            RemoteRepository remoteRepository = getDefaultRemoteRepository();
-            remoteRepositories.add( remoteRepository );
-
-            List remoteArtifactRepositories = createRemoteArtifactRepositories( remoteRepositories );
-
-            // TODO: managed dependencies
-            Map managedDependencies = Collections.EMPTY_MAP;
-
-            ArtifactFilter filter = null;
-            if ( useScope != null )
-            {
-                filter = new ScopeArtifactFilter( useScope );
-            }
-            if ( type != null )
-            {
-                TypeArtifactFilter typeArtifactFilter = new TypeArtifactFilter( type );
-                if ( filter != null )
+                if ( !dependencies.isEmpty() )
                 {
-                    AndArtifactFilter andFilter = new AndArtifactFilter();
-                    andFilter.add( filter );
-                    andFilter.add( typeArtifactFilter );
-                    filter = andFilter;
+                    throw new BuildException( "You cannot specify both dependencies and a pom in the dependencies task" );
                 }
-                else
+
+                dependencies = pom.getDependencies();
+
+                for ( Iterator i = pom.getRepositories().iterator(); i.hasNext(); )
                 {
-                    filter = typeArtifactFilter;
+                    Repository pomRepository = (Repository) i.next();
+
+                    remoteRepositories.add( createAntRemoteRepository( pomRepository ) );
                 }
             }
-
-            result = resolver.resolveTransitively( artifacts, pomArtifact, managedDependencies, localRepo,
-                                                   remoteArtifactRepositories, metadataSource, filter, listeners );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new BuildException( "Unable to resolve artifact", e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            // TODO: improve handling
-            throw new BuildException( "Unable to locate artifact", e );
-        }
-
-        if ( pathId != null && getProject().getReference( pathId ) != null )
-        {
-            throw new BuildException( "Reference ID " + pathId + " already exists" );
-        }
-
-        if ( filesetId != null && getProject().getReference( filesetId ) != null )
-        {
-            throw new BuildException( "Reference ID " + filesetId + " already exists" );
-        }
-
-        FileList fileList = new FileList();
-        fileList.setDir( getLocalRepository().getLocation() );
-
-        FileSet fileSet = new FileSet();
-        fileSet.setDir( fileList.getDir( getProject() ) );
-
-        if ( result.getArtifacts().isEmpty() )
-        {
-            fileSet.createExclude().setName( "**/**" );
-        }
-        else
-        {
-            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            else
             {
-                Artifact artifact = (Artifact) i.next();
-                String filename = localRepo.pathOf( artifact );
+                // we have to have some sort of Pom object in order to satisfy the requirements for building the
+                // originating Artifact below...
+                pom = createDummyPom();
+            }
 
-                FileList.FileName file = new FileList.FileName();
-                file.setName( filename );
+            if ( dependencies.isEmpty() )
+            {
+                log( "There were no dependencies specified", Project.MSG_WARN );
+            }
 
-                fileList.addConfiguredFile( file );
+            Set artifacts;
+            try
+            {
+                artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, null );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new BuildException( "Invalid version specification", e );
+            }
 
-                fileSet.createInclude().setName( filename );
+            log( "Resolving dependencies...", Project.MSG_VERBOSE );
+
+            WagonManager wagonManager = (WagonManager) lookup( WagonManager.ROLE );
+            wagonManager.setDownloadMonitor( new AntDownloadMonitor() );
+
+            ArtifactResolutionResult result;
+            try
+            {
+                Artifact pomArtifact = artifactFactory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(), pom
+                    .getVersion(), pom.getPackaging() );
+
+                List listeners = Collections.EMPTY_LIST;
+                if ( verbose )
+                {
+                    listeners = Collections.singletonList( new AntResolutionListener( getProject() ) );
+                }
+
+                List remoteRepositories = getRemoteRepositories();
+
+                RemoteRepository remoteRepository = getDefaultRemoteRepository();
+                remoteRepositories.add( remoteRepository );
+
+                List remoteArtifactRepositories = createRemoteArtifactRepositories( remoteRepositories );
+
+                // TODO: managed dependencies
+                Map managedDependencies = Collections.EMPTY_MAP;
+
+                ArtifactFilter filter = null;
+                if ( useScope != null )
+                {
+                    filter = new ScopeArtifactFilter( useScope );
+                }
+                if ( type != null )
+                {
+                    TypeArtifactFilter typeArtifactFilter = new TypeArtifactFilter( type );
+                    if ( filter != null )
+                    {
+                        AndArtifactFilter andFilter = new AndArtifactFilter();
+                        andFilter.add( filter );
+                        andFilter.add( typeArtifactFilter );
+                        filter = andFilter;
+                    }
+                    else
+                    {
+                        filter = typeArtifactFilter;
+                    }
+                }
+
+                result = resolver.resolveTransitively( artifacts, pomArtifact, managedDependencies, localRepo,
+                                                       remoteArtifactRepositories, metadataSource, filter, listeners );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new BuildException( "Unable to resolve artifact", e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                // TODO: improve handling
+                throw new BuildException( "Unable to locate artifact", e );
+            }
+
+            if ( pathId != null && getProject().getReference( pathId ) != null )
+            {
+                throw new BuildException( "Reference ID " + pathId + " already exists" );
+            }
+
+            if ( filesetId != null && getProject().getReference( filesetId ) != null )
+            {
+                throw new BuildException( "Reference ID " + filesetId + " already exists" );
+            }
+
+            FileList fileList = new FileList();
+            fileList.setDir( getLocalRepository().getLocation() );
+
+            FileSet fileSet = new FileSet();
+            fileSet.setDir( fileList.getDir( getProject() ) );
+
+            if ( result.getArtifacts().isEmpty() )
+            {
+                fileSet.createExclude().setName( "**/**" );
+            }
+            else
+            {
+                for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+                {
+                    Artifact artifact = (Artifact) i.next();
+                    String filename = localRepo.pathOf( artifact );
+
+                    FileList.FileName file = new FileList.FileName();
+                    file.setName( filename );
+
+                    fileList.addConfiguredFile( file );
+
+                    fileSet.createInclude().setName( filename );
+                }
+            }
+
+            if ( pathId != null )
+            {
+                Path path = new Path( getProject() );
+                path.addFilelist( fileList );
+                getProject().addReference( pathId, path );
+            }
+
+            if ( filesetId != null )
+            {
+                getProject().addReference( filesetId, fileSet );
             }
         }
-
-        if ( pathId != null )
+        catch ( BuildException e )
         {
-            Path path = new Path( getProject() );
-            path.addFilelist( fileList );
-            getProject().addReference( pathId, path );
-        }
-
-        if ( filesetId != null )
-        {
-            getProject().addReference( filesetId, fileSet );
+            diagnoseError( e );
+            
+            throw e;
         }
     }
 

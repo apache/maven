@@ -1,4 +1,4 @@
-package org.apache.maven.usability;
+package org.apache.maven.usability.diagnostics;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

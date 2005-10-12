@@ -2,6 +2,8 @@ package org.apache.maven.usability;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginContainerException;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
 public class PluginContainerDiagnoser
     implements ErrorDiagnoser
@@ -31,7 +33,7 @@ public class PluginContainerDiagnoser
         
         if ( originalMessage.startsWith( "Cannot resolve artifact" ) )
         {
-            message.append( DiagnosisUtils.getOfflineWarning() );
+            message.append( SystemWarnings.getOfflineWarning() );
         }
         else
         {

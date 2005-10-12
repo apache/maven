@@ -21,6 +21,8 @@ import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 import org.apache.maven.usability.plugin.Expression;
 import org.apache.maven.usability.plugin.ExpressionDocumentationException;
 import org.apache.maven.usability.plugin.ExpressionDocumenter;

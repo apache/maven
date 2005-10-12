@@ -44,8 +44,8 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.usability.DiagnosisUtils;
-import org.apache.maven.usability.ErrorDiagnoser;
+import org.apache.maven.usability.SystemWarnings;
+import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -66,7 +66,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -89,8 +88,8 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
-
-    protected Map errorDiagnosers;
+    
+    protected ErrorDiagnostics errorDiagnostics;
 
     protected RuntimeInformation runtimeInformation;
 
@@ -109,7 +108,7 @@ public class DefaultMaven
     {
         if ( request.getSettings().isOffline() )
         {
-            getLogger().info( DiagnosisUtils.getOfflineWarning() );
+            getLogger().info( SystemWarnings.getOfflineWarning() );
 
             WagonManager wagonManager = null;
 
@@ -650,20 +649,9 @@ public class DefaultMaven
     private void diagnoseError( Throwable error )
     {
         String message = null;
-        if ( errorDiagnosers != null )
+        if ( errorDiagnostics != null )
         {
-            for ( Iterator it = errorDiagnosers.values().iterator(); it.hasNext(); )
-            {
-                ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
-
-                if ( diagnoser.canDiagnose( error ) )
-                {
-                    message = diagnoser.diagnose( error );
-
-                    // first one wins.
-                    break;
-                }
-            }
+            message = errorDiagnostics.diagnose( error );
         }
 
         if ( message == null )
@@ -698,20 +686,9 @@ public class DefaultMaven
         line();
 
         String message = null;
-        if ( errorDiagnosers != null )
+        if ( errorDiagnostics != null )
         {
-            for ( Iterator it = errorDiagnosers.values().iterator(); it.hasNext(); )
-            {
-                ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
-
-                if ( diagnoser.canDiagnose( error ) )
-                {
-                    message = diagnoser.diagnose( error );
-
-                    // first one wins.
-                    break;
-                }
-            }
+            message = errorDiagnostics.diagnose( error );
         }
 
         if ( message == null )

@@ -18,6 +18,8 @@ package org.apache.maven.usability;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
 public class ArtifactNotFoundDiagnoser
     implements ErrorDiagnoser
@@ -46,7 +48,7 @@ public class ArtifactNotFoundDiagnoser
 
         if ( !wagonManager.isOnline() )
         {
-            message.append( "\n" ).append( DiagnosisUtils.getOfflineWarning() );
+            message.append( "\n" ).append( SystemWarnings.getOfflineWarning() );
         }
 
         Throwable root = DiagnosisUtils.getRootCause( exception );

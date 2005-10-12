@@ -78,8 +78,7 @@
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.usability.ErrorDiagnoser</role>
-          <field-name>errorDiagnosers</field-name>
+          <role>org.apache.maven.usability.diagnostics.ErrorDiagnostics</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.execution.RuntimeInformation</role>
@@ -97,7 +96,7 @@
     |
     -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>MojoExecutionExceptionDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.MojoExecutionExceptionDiagnoser</implementation>
     </component>
@@ -107,7 +106,7 @@
     |
     -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>ProjectBuildDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ProjectBuildDiagnoser</implementation>
     </component>
@@ -117,7 +116,7 @@
     |
     -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>ProfileActivationDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ProfileActivationDiagnoser</implementation>
     </component>
@@ -127,7 +126,7 @@
     |
     -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>PluginConfigurationDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.PluginConfigurationDiagnoser</implementation>
     </component>
@@ -137,7 +136,7 @@
      |
      -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>PluginContainerDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.PluginContainerDiagnoser</implementation>
     </component>
@@ -147,7 +146,7 @@
     |
     -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>ArtifactNotFoundDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ArtifactNotFoundDiagnoser</implementation>
       <requirements>
@@ -162,7 +161,7 @@
      |
      -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>ArtifactResolverDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
       <requirements>
@@ -177,7 +176,7 @@
      |
      -->
     <component>
-      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
       <role-hint>InvalidArtifactDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.InvalidArtifactDiagnoser</implementation>
     </component>

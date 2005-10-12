@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnostics</role>
+      <implementation>org.apache.maven.usability.diagnostics.ErrorDiagnostics</implementation>
+    </component>
+  </components>
+</component-set>

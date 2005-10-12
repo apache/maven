@@ -1,6 +1,8 @@
 package org.apache.maven.usability;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.usability.diagnostics.DiagnosisUtils;
+import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
 public class MojoExecutionExceptionDiagnoser
     implements ErrorDiagnoser
