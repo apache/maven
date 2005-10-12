@@ -356,10 +356,16 @@ public class RepositoryMetadata
                 w.println( "  <versioning>" );
                 writeLine( w, "    ", "latest", metadata.getLatestVersion() );
                 writeLine( w, "    ", "release", metadata.getReleaseVersion() );
-                writeLine( w, "    ", "lastUpdated", String.valueOf( metadata.getLastUpdated() ) );
+                writeLine( w, "    ", "lastUpdated", metadata.getLastUpdated() );
                 w.println( "    <snapshot>" );
-                writeLine( w, "      ", "localCopy", String.valueOf( metadata.isLocalCopy() ) );
-                writeLine( w, "      ", "buildNumber", String.valueOf( metadata.getSnapshotBuildNumber() ) );
+                if ( metadata.isLocalCopy() )
+                {
+                    writeLine( w, "      ", "localCopy", "true" );
+                }
+                if ( metadata.getSnapshotBuildNumber() > 0 )
+                {
+                    writeLine( w, "      ", "buildNumber", String.valueOf( metadata.getSnapshotBuildNumber() ) );
+                }
                 writeLine( w, "      ", "timestamp", metadata.getSnapshotTimestamp() );
                 w.println( "    </snapshot>" );
                 w.println( "    <versions>" );
