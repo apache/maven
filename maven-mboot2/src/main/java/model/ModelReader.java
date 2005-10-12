@@ -164,8 +164,8 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            List chain = Collections.singletonList(
-                new Dependency( groupId, artifactId, version, packaging, this.chain ) );
+            List chain =
+                Collections.singletonList( new Dependency( groupId, artifactId, version, packaging, this.chain ) );
             currentDependency = new Dependency( chain );
 
             insideDependency = true;
@@ -245,8 +245,8 @@ public class ModelReader
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false,
-                                         excluded, Collections.EMPTY_LIST );
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false, excluded,
+                                         Collections.EMPTY_LIST );
 
             addDependencies( p.getDependencies(), parentDependencies, null, excluded );
 
@@ -473,20 +473,24 @@ public class ModelReader
         {
             Dependency d = (Dependency) i.next();
 
-            // Do we care about runtime here?
-            if ( Dependency.SCOPE_TEST.equals( inheritedScope ) )
+            // skip test deps
+            if ( !Dependency.SCOPE_TEST.equals( d.getScope() ) )
             {
-                d.setScope( Dependency.SCOPE_TEST );
-            }
-
-            if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) )
-            {
-                if ( "plexus".equals( d.getGroupId() ) && ( "plexus-utils".equals( d.getArtifactId() ) ||
-                    "plexus-container-default".equals( d.getArtifactId() ) ) )
+                // Do we care about runtime here?
+                if ( Dependency.SCOPE_TEST.equals( inheritedScope ) )
                 {
-                    throw new IllegalStateException( d.getConflictId() + " found in chain " + d.getChain() );
+                    d.setScope( Dependency.SCOPE_TEST );
                 }
-                target.put( d.getConflictId(), d );
+
+                if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) )
+                {
+                    if ( "plexus".equals( d.getGroupId() ) && ( "plexus-utils".equals( d.getArtifactId() ) ||
+                        "plexus-container-default".equals( d.getArtifactId() ) ) )
+                    {
+                        throw new IllegalStateException( d.getConflictId() + " found in chain " + d.getChain() );
+                    }
+                    target.put( d.getConflictId(), d );
+                }
             }
         }
     }
