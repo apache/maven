@@ -26,6 +26,7 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.List;
@@ -76,5 +77,7 @@ public interface WagonManager
 
     AuthenticationInfo getAuthenticationInfo( String id );
 
+    void addConfiguration( String repositoryId, Xpp3Dom configuration );
+    
     void setInteractive( boolean interactive );
 }

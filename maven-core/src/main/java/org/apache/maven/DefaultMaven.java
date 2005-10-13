@@ -53,6 +53,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
@@ -581,6 +582,11 @@ public class DefaultMaven
 
                 wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
                                                 server.getDirectoryPermissions() );
+
+                if ( server.getConfiguration() != null )
+                {
+                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
+                }
             }
 
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )

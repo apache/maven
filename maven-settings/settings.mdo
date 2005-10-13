@@ -473,6 +473,13 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>configuration</name>
+          <type>DOM</type>
+          <description><![CDATA[
+          	Extra configuration for the transport layer.
+          ]]></description>
+        </field>
       </fields>
     </class>
     <class>

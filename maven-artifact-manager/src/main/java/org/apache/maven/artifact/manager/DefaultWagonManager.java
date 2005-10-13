@@ -37,13 +37,18 @@ import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +73,8 @@ public class DefaultWagonManager
     private Map serverPermissionsMap = new HashMap();
 
     private Map mirrors = new HashMap();
+    
+    private Map serverConfigurationMap = new HashMap();
 
     private TransferListener downloadMonitor;
 
@@ -121,12 +128,14 @@ public class DefaultWagonManager
         try
         {
             wagon = getWagon( protocol );
+            
+            configureWagon( wagon, repository );
         }
         catch ( UnsupportedProtocolException e )
         {
             throw new TransferFailedException( "Unsupported Protocol: ", e );
         }
-
+        
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );
@@ -679,5 +688,70 @@ public class DefaultWagonManager
     public void setInteractive( boolean interactive )
     {
         this.interactive = interactive;
+    }
+    
+
+    /**
+     * Applies the server configuration to the wagon
+     * 
+     * @param wagon the wagon to configure
+     * @param repository the repository that has the configuration
+     * @throws ConfigurationException if the wagon can't be configured
+     */
+    private void configureWagon( Wagon wagon, ArtifactRepository repository )
+        throws WagonConfigurationException
+    {
+
+        final String repositoryId = repository.getId();
+
+        if ( serverConfigurationMap.containsKey( repositoryId ) )
+        {
+            ComponentConfigurator componentConfigurator = null;
+            try
+            {
+                componentConfigurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE );
+                componentConfigurator.configureComponent( wagon, (PlexusConfiguration) serverConfigurationMap
+                    .get( repositoryId ), container.getContainerRealm() );
+                System.out.println( "done" );
+            }
+            catch ( final ComponentLookupException e )
+            {
+                throw new WagonConfigurationException( repositoryId, "Unable to lookup wagon configurator. Wagon configuration cannot be applied.", e );
+            }
+            catch ( ComponentConfigurationException e )
+            {
+                throw new WagonConfigurationException( repositoryId, "Unable to apply wagon configuration.", e );
+            }
+            finally
+            {
+                if ( componentConfigurator != null )
+                {
+                    try
+                    {
+                        container.release( componentConfigurator );
+                    }
+                    catch ( ComponentLifecycleException e )
+                    {
+                        getLogger().error( "Problem releasing configurator - ignoring: " + e.getMessage() );
+                    }
+                }
+
+            }
+        }
+    }
+    
+
+    public void addConfiguration( String repositoryId, Xpp3Dom configuration )
+    {
+
+        if ( repositoryId == null || configuration == null )
+        {
+            throw new IllegalArgumentException( "arguments can't be null" );
+        }
+
+        final XmlPlexusConfiguration xmlConf = ( configuration == null ) ? new XmlPlexusConfiguration( "configuration" )
+                                                                        : new XmlPlexusConfiguration( configuration );
+
+        serverConfigurationMap.put( repositoryId, xmlConf );
     }
 }
