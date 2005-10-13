@@ -98,7 +98,7 @@ public class DefaultArtifactCollector
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
                           ArtifactFilter filter, List listeners )
-        throws CyclicDependencyException, TransitiveArtifactResolutionException, OverConstrainedVersionException
+        throws CyclicDependencyException, ArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
 
@@ -265,8 +265,9 @@ public class DefaultArtifactCollector
                     catch ( ArtifactMetadataRetrievalException e )
                     {
                         artifact.setDependencyTrail( node.getDependencyTrail() );
-                        throw new TransitiveArtifactResolutionException( e.getMessage(), artifact, remoteRepositories,
-                                                                         e );
+                        throw new ArtifactResolutionException(
+                            "Unable to get dependency information: " + e.getMessage(), artifact, remoteRepositories,
+                            e );
                     }
 
                     recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
