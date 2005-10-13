@@ -80,7 +80,7 @@ public class JavadocReport
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
-    
+
     /**
      * @parameter default-value="${settings.offline}"
      * @required
@@ -360,18 +360,18 @@ public class JavadocReport
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#link">link</a>.
      * It is a comma separated String.
      *
-     * @parameter expression="${link}"
+     * @parameter expression="${links}"
      */
-    private String link;
+    private ArrayList links;
 
     /**
      * This option is a variation of -link; they both create links to javadoc-generated documentation for external referenced classes.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#linkoffline">linkoffline</a>.
      * It is a comma separated String.
      *
-     * @parameter expression="${linkoffline}"
+     * @parameter expression="${offlineLinks}"
      */
-    private String linkoffline;
+    private ArrayList offlineLinks;
 
     /**
      * Creates an HTML version of each source file (with line numbers) and adds links to them from the standard HTML documentation.
@@ -805,14 +805,14 @@ public class JavadocReport
             addArgIfNotEmpty( arguments, "-group", quotedArgument( group ), true );
             addArgIfNotEmpty( arguments, "-header", quotedArgument( header ) );
             addArgIfNotEmpty( arguments, "-helpfile", quotedPathArgument( helpfile ) );
-            
+
             if ( !isOffline )
             {
-                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( link ), true );
-                addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( linkoffline ), true );
+                addLinkArguments( arguments );
+                addLinkofflineArguments( arguments );
                 addArgIf( arguments, linksource, "-linksource", 1.4f );
             }
-            
+
             addArgIf( arguments, nodeprecated, "-nodeprecated" );
             addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
             addArgIf( arguments, nocomment, "-nocomment", 1.4f );
@@ -1068,6 +1068,40 @@ public class JavadocReport
         }
 
         return value;
+    }
+
+    /**
+     * Convenience method to process offlineLink values as individual -linkoffline javadoc options
+     *
+     * @param arguments argument list
+     */
+    private void addLinkofflineArguments( List arguments )
+    {
+        if ( offlineLinks != null )
+        {
+            for ( int i = 0; i < offlineLinks.size(); i++ )
+            {
+                OfflineLink offlineLink = (OfflineLink)offlineLinks.get(i);
+                addArgIfNotEmpty( arguments, "-linkoffline",
+                                  quotedPathArgument( offlineLink.getUrl() ) + " " + quotedPathArgument( offlineLink.getLocation().getAbsolutePath() ), true );
+            }
+        }
+    }
+
+    /**
+     * Convenience method to process link values as individual -link javadoc options
+     *
+     * @param arguments argument list
+     */
+    private void addLinkArguments( List arguments )
+    {
+        if ( links != null )
+        {
+            for ( int i = 0; i < links.size(); i++ )
+            {
+                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( (String)links.get(i) ), true );
+            }
+        }
     }
 
     /**
