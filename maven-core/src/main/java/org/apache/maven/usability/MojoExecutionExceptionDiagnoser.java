@@ -55,6 +55,22 @@ public class MojoExecutionExceptionDiagnoser
         {
             message.append( "\n\n" ).append( longMessage );
         }
+        
+        Throwable directCause = mee.getCause();
+        
+        if ( directCause != null )
+        {
+            message.append( "\n" );
+            
+            String directCauseMessage = directCause.getMessage();
+            
+            if ( directCauseMessage != null && mee.getMessage().indexOf( directCauseMessage ) < 0 )
+            {
+                message.append( "\nEmbedded error: " ).append( directCauseMessage );
+            }
+            
+            DiagnosisUtils.appendRootCauseIfPresentAndUnique( directCause, message, false );
+        }
 
         return message.toString();
     }

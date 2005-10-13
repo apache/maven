@@ -21,6 +21,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.usability.diagnostics.DiagnosisUtils;
 import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
+import java.io.IOException;
+
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
 {
@@ -42,6 +44,13 @@ public class ArtifactResolverDiagnoser
         message.append( "Failed to resolve artifact." );
         message.append( "\n\n" );
         message.append( exception.getMessage() );
+        
+        IOException ioe = (IOException) DiagnosisUtils.getFromCausality( exception, IOException.class );
+        
+        if ( ioe != null && exception.getMessage().indexOf( ioe.getMessage() ) < 0 )
+        {
+            message.append( "\n\nCaused by I/O exception: " ).append( ioe.getMessage() );
+        }
 
         if ( !wagonManager.isOnline() )
         {

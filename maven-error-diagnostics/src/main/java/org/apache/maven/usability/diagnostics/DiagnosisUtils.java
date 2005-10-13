@@ -77,4 +77,24 @@ public final class DiagnosisUtils
         
         return null;
     }
+
+    public static void appendRootCauseIfPresentAndUnique( Throwable error, StringBuffer message, boolean includeTypeInfo )
+    {
+        Throwable root = DiagnosisUtils.getRootCause( error );
+        
+        if ( root != null && root != error )
+        {
+            String rootMsg = root.getMessage();
+            
+            if ( rootMsg != null && error.getMessage().indexOf(rootMsg) < 0 )
+            {
+                message.append( "\nRoot message: " ).append( rootMsg );
+                
+                if ( includeTypeInfo )
+                {
+                    message.append( "\nRoot error type: " ).append( root.getClass().getName() );
+                }
+            }
+        }
+    }
 }
