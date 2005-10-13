@@ -461,8 +461,19 @@ public class DefaultLifecycleExecutor
                 }
                 else
                 {
-                    // definitely a CLI goal, can use prefix
-                    MojoDescriptor mojo = getMojoDescriptor( task, session, project, task, true );
+                    MojoDescriptor mojo = null;
+                    try
+                    {
+                        // definitely a CLI goal, can use prefix
+                        mojo = getMojoDescriptor( task, session, project, task, true );
+                    }
+                    catch ( PluginNotFoundException e )
+                    {
+                        // TODO: shouldn't hit this, investigate using the same resolution logic as otheres for plugins in the reactor
+                        getLogger().info(
+                            "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
+                        getLogger().debug( "", e );
+                    }
 
                     // if the mojo descriptor was found, determine aggregator status according to:
                     // 1. whether the mojo declares itself an aggregator
