@@ -51,6 +51,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
@@ -191,7 +192,16 @@ public class DefaultMavenProjectBuilder
 
         ensureMetadataSourceIsInitialized();
 
-        project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+        try
+        {
+            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+        }
+        catch ( InvalidDependencyVersionException e )
+        {
+            throw new ProjectBuildingException( projectId,
+                                                "Unable to build project due to an invalid dependency version: " +
+                                                    e.getMessage(), e );
+        }
 
         if ( transferListener != null )
         {

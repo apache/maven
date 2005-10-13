@@ -45,6 +45,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.overlay.BuildOverlay;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -1405,7 +1406,7 @@ public class MavenProject
      */
     public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                 ArtifactFilter dependencyFilter )
-        throws ProjectBuildingException
+        throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope,
                                                     dependencyFilter, this );

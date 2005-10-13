@@ -32,6 +32,7 @@ import org.apache.maven.artifact.resolver.filter.TypeArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -171,6 +172,10 @@ public class DependenciesTask
         {
             // TODO: improve handling
             throw new BuildException( "Unable to locate artifact", e );
+        }
+        catch ( InvalidDependencyVersionException e )
+        {
+            throw new BuildException( e.getMessage(), e );
         }
 
         if ( pathId != null && getProject().getReference( pathId ) != null )

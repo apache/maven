@@ -18,10 +18,12 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -31,30 +33,41 @@ import java.util.Properties;
  * @version $Id$
  */
 public class DefaultRuntimeInformation
-    implements RuntimeInformation
+    implements RuntimeInformation, Initializable
 {
     private ArtifactVersion applicationVersion;
 
     public ArtifactVersion getApplicationVersion()
-        throws IOException
     {
-        if ( applicationVersion == null )
-        {
-            InputStream resourceAsStream = null;
-            try
-            {
-                Properties properties = new Properties();
-                resourceAsStream = getClass().getClassLoader().getResourceAsStream(
-                    "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
-                properties.load( resourceAsStream );
-
-                applicationVersion = new DefaultArtifactVersion( properties.getProperty( "version" ) );
-            }
-            finally
-            {
-                IOUtil.close( resourceAsStream );
-            }
-        }
         return applicationVersion;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        InputStream resourceAsStream = null;
+        try
+        {
+            Properties properties = new Properties();
+            resourceAsStream = getClass().getClassLoader().getResourceAsStream(
+                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+            properties.load( resourceAsStream );
+
+            String property = properties.getProperty( "version" );
+            if ( property == null )
+            {
+                throw new InitializationException( "maven-core properties did not include the version" );
+            }
+
+            applicationVersion = new DefaultArtifactVersion( property );
+        }
+        catch ( IOException e )
+        {
+            throw new InitializationException( "Unable to read properties file from maven-core", e );
+        }
+        finally
+        {
+            IOUtil.close( resourceAsStream );
+        }
     }
 }

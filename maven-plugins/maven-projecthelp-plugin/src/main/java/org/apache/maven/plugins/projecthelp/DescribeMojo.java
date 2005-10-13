@@ -23,6 +23,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginManager;
@@ -276,15 +277,7 @@ public class DescribeMojo
 
             if ( descriptor == null )
             {
-                try
-                {
-                    forLookup = pluginManager.getPluginDefinitionForPrefix( pi.prefix, session, project );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new MojoExecutionException(
-                        "Cannot resolve plugin-prefix: \'" + pi.prefix + "\' from plugin mappings metadata.", e );
-                }
+                forLookup = pluginManager.getPluginDefinitionForPrefix( pi.prefix, session, project );
             }
         }
         else if ( pi.groupId != null && pi.artifactId != null )
@@ -332,6 +325,11 @@ public class DescribeMojo
                     "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
             }
             catch ( InvalidVersionSpecificationException e )
+            {
+                throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId +
+                    "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
+            }
+            catch ( InvalidPluginException e )
             {
                 throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId +
                     "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );

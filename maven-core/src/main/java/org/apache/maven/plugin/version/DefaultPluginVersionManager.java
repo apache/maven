@@ -696,11 +696,6 @@ public class DefaultPluginVersionManager
             throw new PluginVersionResolutionException( groupId, artifactId,
                                                         "Unable to build resolve plugin project information", e );
         }
-        catch ( IOException e )
-        {
-            throw new PluginVersionResolutionException( groupId, artifactId,
-                                                        "Unable to determine Maven version for comparison", e );
-        }
 
         return version;
     }

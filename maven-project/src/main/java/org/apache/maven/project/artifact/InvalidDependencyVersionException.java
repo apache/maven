@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.project.artifact;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,15 +16,17 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 /**
- * Describes runtime information about the application.
+ * Thrown if a dependency has an invalid version.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface RuntimeInformation
+public class InvalidDependencyVersionException
+    extends Exception
 {
-    ArtifactVersion getApplicationVersion();
+    public InvalidDependencyVersionException( String message, Exception cause )
+    {
+        super( message, cause );
+    }
 }

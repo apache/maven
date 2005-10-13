@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.plugin;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,15 +16,17 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 /**
- * Describes runtime information about the application.
+ * Thrown when a plugin is not internally consistent.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface RuntimeInformation
+public class InvalidPluginException
+    extends Exception
 {
-    ArtifactVersion getApplicationVersion();
+    public InvalidPluginException( String message, Exception e )
+    {
+        super( message, e );
+    }
 }

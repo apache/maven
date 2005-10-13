@@ -17,7 +17,6 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -206,6 +205,10 @@ public class MavenMetadataSource
         {
             throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
+        catch ( InvalidDependencyVersionException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+        }
     }
 
     private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
@@ -259,7 +262,7 @@ public class MavenMetadataSource
      */
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
                                        ArtifactFilter dependencyFilter, MavenProject project )
-        throws ProjectBuildingException
+        throws InvalidDependencyVersionException
     {
         Set projectArtifacts = new HashSet( dependencies.size() );
 
@@ -283,10 +286,7 @@ public class MavenMetadataSource
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                String projectId = project != null ? ArtifactUtils.versionlessKey( project.getGroupId(),
-                                                                                   project.getArtifactId() )
-                    : "unknown";
-                throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
+                throw new InvalidDependencyVersionException( "Unable to parse version '" + d.getVersion() +
                     "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
             }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),

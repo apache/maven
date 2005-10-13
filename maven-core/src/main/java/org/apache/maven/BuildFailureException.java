@@ -23,7 +23,7 @@ package org.apache.maven;
  * @version $Id$
  */
 public class BuildFailureException
-    extends Throwable
+    extends Exception
 {
     public BuildFailureException( String message )
     {

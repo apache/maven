@@ -196,6 +196,10 @@ public class DefaultMaven
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
+        catch ( BuildFailureException e )
+        {
+            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
+        }
 
         ReactorManager rm;
         try
@@ -409,7 +413,7 @@ public class DefaultMaven
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
                                   ProfileManager globalProfileManager, boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
-        MavenExecutionException
+        MavenExecutionException, BuildFailureException
     {
         List projects = new ArrayList( files.size() );
 
@@ -435,17 +439,10 @@ public class DefaultMaven
             if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
-                try
+                if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
-                    if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
-                    {
-                        throw new ProjectBuildingException( project.getId(), "Unable to build project '" +
-                            project.getFile() + "; it requires Maven version " + version.toString() );
-                    }
-                }
-                catch ( IOException e )
-                {
-                    throw new MavenExecutionException( "Unable to get Maven application version", e );
+                    throw new BuildFailureException( "Unable to build project '" + project.getFile() +
+                        "; it requires Maven version " + version.toString() );
                 }
             }
 
