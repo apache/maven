@@ -162,8 +162,9 @@ public class DefaultArtifactResolver
                         }
                         catch ( IOException e )
                         {
-                            throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use",
-                                                                   artifact, remoteRepositories, e );
+                            throw new ArtifactResolutionException(
+                                "Unable to copy resolved artifact for local use: " + e.getMessage(), artifact,
+                                remoteRepositories, e );
                         }
                     }
                     artifact.setFile( copy );

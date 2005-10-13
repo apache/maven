@@ -408,7 +408,8 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new ProjectBuildingException( projectId, "Error getting the POM in the repository", e );
+                throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId +
+                    "' from the repository: " + e.getMessage(), e );
             }
             catch ( ArtifactNotFoundException e )
             {
@@ -419,7 +420,8 @@ public class DefaultMavenProjectBuilder
                 }
                 else
                 {
-                    throw new ProjectBuildingException( projectId, "POM not found in repository", e );
+                    throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " +
+                        e.getMessage(), e );
                 }
             }
         }
