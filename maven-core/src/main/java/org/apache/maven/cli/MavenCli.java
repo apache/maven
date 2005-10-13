@@ -33,7 +33,6 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
@@ -218,7 +217,7 @@ public class MavenCli
             }
 
             request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager,
-                                     executionProperties );
+                                     executionProperties, showErrors );
 
             setProjectFileOptions( commandLine, request );
 
@@ -245,30 +244,16 @@ public class MavenCli
             }
         }
 
-        MavenExecutionResponse response;
         try
         {
-            response = maven.execute( request );
+            maven.execute( request );
         }
         catch ( MavenExecutionException e )
         {
-            showFatalError( "Error executing Maven for a project", e, showErrors );
-            return 1;
-        }
-        catch ( SettingsConfigurationException e )
-        {
-            showError( e.getMessage(), e, showErrors );
             return 1;
         }
 
-        if ( response != null && response.isExecutionFailure() )
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     private static Settings buildSettings( CommandLine commandLine )
@@ -382,7 +367,8 @@ public class MavenCli
 
     private static MavenExecutionRequest createRequest( CommandLine commandLine, Settings settings,
                                                         EventDispatcher eventDispatcher, LoggerManager loggerManager,
-                                                        ProfileManager profileManager, Properties executionProperties )
+                                                        ProfileManager profileManager, Properties executionProperties,
+                                                        boolean showErrors )
         throws ComponentLookupException
     {
         MavenExecutionRequest request;
@@ -393,7 +379,7 @@ public class MavenCli
 
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                     commandLine.getArgList(), userDir.getPath(), profileManager,
-                                                    executionProperties );
+                                                    executionProperties, showErrors );
 
         // TODO [BP]: do we set one per mojo? where to do it?
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );

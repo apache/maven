@@ -45,6 +45,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.version.PluginVersionManager;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -147,7 +148,8 @@ public class DefaultPluginManager
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException
     {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
@@ -238,7 +240,7 @@ public class DefaultPluginManager
      * manager which executes before the plugin is instantiated
      */
     private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
-        throws PluginVersionResolutionException
+        throws PluginVersionResolutionException, InvalidPluginException
     {
         try
         {
@@ -260,8 +262,8 @@ public class DefaultPluginManager
         }
         catch ( ProjectBuildingException e )
         {
-            throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
-                                                        "Unable to build project for plugin", e );
+            throw new InvalidPluginException(
+                "Unable to build project for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
         }
     }
 
@@ -313,7 +315,7 @@ public class DefaultPluginManager
 
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws ArtifactResolutionException, MojoExecutionException, MojoFailureException, ArtifactNotFoundException,
-        InvalidDependencyVersionException, PluginManagerException
+        InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -359,28 +361,20 @@ public class DefaultPluginManager
 
         Mojo plugin;
 
-        try
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+        String goalId = mojoDescriptor.getGoal();
+        String groupId = pluginDescriptor.getGroupId();
+        String artifactId = pluginDescriptor.getArtifactId();
+        String executionId = mojoExecution.getExecutionId();
+        Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
+        Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
+        dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
+        if ( mojoExecution.getConfiguration() != null )
         {
-            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            String goalId = mojoDescriptor.getGoal();
-            String groupId = pluginDescriptor.getGroupId();
-            String artifactId = pluginDescriptor.getArtifactId();
-            String executionId = mojoExecution.getExecutionId();
-            Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
-            Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
-            dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
-            if ( mojoExecution.getConfiguration() != null )
-            {
-                dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
-            }
+            dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
+        }
 
-            plugin = getConfiguredMojo( session, dom, project, false, mojoExecution );
-        }
-        catch ( PluginConfigurationException e )
-        {
-            String msg = "Error configuring plugin for execution of '" + goalName + "'.";
-            throw new MojoExecutionException( msg, e );
-        }
+        plugin = getConfiguredMojo( session, dom, project, false, mojoExecution );
 
         // Event monitoring.
         String event = MavenEvents.MOJO_EXECUTION;
@@ -457,7 +451,8 @@ public class DefaultPluginManager
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException
     {
         String version = reportPlugin.getVersion();
 

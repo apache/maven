@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.plugin.version;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,17 +16,29 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-/**
- * Exception indicating there were no goals given.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
-public class NoGoalsSpecifiedException
+public class PluginVersionNotFoundException
     extends Exception
 {
-    public NoGoalsSpecifiedException( String message )
+    private final String groupId;
+
+    private final String artifactId;
+
+    public PluginVersionNotFoundException( String groupId, String artifactId, String baseMessage )
     {
-        super( message );
+        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
     }
+
+    public String getGroupId()
+    {
+        return groupId;
+    }
+
+    public String getArtifactId()
+    {
+        return artifactId;
+    }
+
 }

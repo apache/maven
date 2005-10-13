@@ -69,4 +69,6 @@ public interface MavenExecutionRequest
     Properties getExecutionProperties();
 
     Date getStartTime();
+
+    boolean isShowErrors();
 }

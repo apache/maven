@@ -16,7 +16,7 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -29,7 +29,7 @@ public interface LifecycleExecutor
 {
     String ROLE = LifecycleExecutor.class.getName();
 
-    MavenExecutionResponse execute( MavenSession session, ReactorManager rpm, EventDispatcher dispatcher )
-        throws LifecycleExecutionException;
+    void execute( MavenSession session, ReactorManager rpm, EventDispatcher dispatcher )
+        throws LifecycleExecutionException, BuildFailureException;
 
 }

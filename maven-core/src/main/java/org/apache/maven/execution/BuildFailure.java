@@ -37,12 +37,12 @@ public class BuildFailure
         this.time = time;
     }
 
-    String getTask()
+    public String getTask()
     {
         return task;
     }
 
-    Exception getCause()
+    public Exception getCause()
     {
         return cause;
     }

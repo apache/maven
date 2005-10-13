@@ -18,11 +18,10 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
@@ -31,8 +30,6 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.MavenProject;
@@ -71,14 +68,11 @@ import java.util.TimeZone;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
- * @todo unify error reporting. We should return one response, always - and let the CLI decide how to render it. The reactor response should contain individual project responses
  */
 public class DefaultMaven
     extends AbstractLogEnabled
     implements Maven, Contextualizable
 {
-    public static File userDir = new File( System.getProperty( "user.dir" ) );
-
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -103,8 +97,103 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws SettingsConfigurationException, MavenExecutionException
+    public void execute( MavenExecutionRequest request )
+        throws MavenExecutionException
+    {
+        EventDispatcher dispatcher = request.getEventDispatcher();
+
+        String event = MavenEvents.REACTOR_EXECUTION;
+
+        dispatcher.dispatchStart( event, request.getBaseDirectory() );
+
+        try
+        {
+            ReactorManager rm = doExecute( request, dispatcher );
+
+            // TODO: shoul all the logging be left to the CLI?
+            logReactorSummary( rm );
+
+            if ( rm.hasBuildFailures() )
+            {
+                logErrors( rm, request.isShowErrors() );
+            }
+            else
+            {
+                logSuccess( rm );
+            }
+
+            stats( request.getStartTime() );
+
+            line();
+
+            dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+        }
+        catch ( LifecycleExecutionException e )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            logError( e, request.isShowErrors() );
+
+            stats( request.getStartTime() );
+
+            line();
+
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        catch ( BuildFailureException e )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            logFailure( e, request.isShowErrors() );
+
+            stats( request.getStartTime() );
+
+            line();
+
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        catch ( Throwable t )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory(), t );
+
+            logFatal( t );
+
+            stats( request.getStartTime() );
+
+            line();
+
+            throw new MavenExecutionException( "Error executing project within the reactor", t );
+        }
+    }
+
+    private void logErrors( ReactorManager rm, boolean showErrors )
+    {
+        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
+        {
+            MavenProject project = (MavenProject) it.next();
+
+            if ( rm.hasBuildFailure( project ) )
+            {
+                BuildFailure buildFailure = rm.getBuildFailure( project );
+
+                line();
+
+                getLogger().info(
+                    "Error for project: " + project.getName() + " (during " + buildFailure.getTask() + ")" );
+
+                line();
+
+                logDiagnostics( buildFailure.getCause() );
+
+                logTrace( buildFailure.getCause(), showErrors );
+
+                line();
+            }
+        }
+    }
+
+    private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
+        throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
     {
         if ( request.getSettings().isOffline() )
         {
@@ -147,12 +236,10 @@ public class DefaultMaven
         {
             throw new MavenExecutionException( "Unable to configure Maven for execution", e );
         }
-
-        EventDispatcher dispatcher = request.getEventDispatcher();
-
-        String event = MavenEvents.REACTOR_EXECUTION;
-
-        dispatcher.dispatchStart( event, request.getBaseDirectory() );
+        catch ( SettingsConfigurationException e )
+        {
+            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
+        }
 
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
 
@@ -161,44 +248,11 @@ public class DefaultMaven
         getLogger().info( "Scanning for projects..." );
 
         boolean foundProjects = true;
-        List projects;
-        try
+        List projects = getProjects( request, globalProfileManager );
+        if ( projects.isEmpty() )
         {
-            List files = getProjectFiles( request );
-
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), globalProfileManager, !request.isReactorActive() );
-
-            // the reasoning here is that the list is still unsorted according to dependency, so the first project
-            // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
-
-            if ( projects.isEmpty() )
-            {
-                MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
-                projects.add( superProject );
-
-                foundProjects = false;
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new MavenExecutionException( "Error processing projects for the reactor: ", e );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
-        }
-        catch ( ProfileActivationException e )
-        {
-            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
-        }
-        catch ( BuildFailureException e )
-        {
-            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
+            projects.add( getSuperProject( request ) );
+            foundProjects = false;
         }
 
         ReactorManager rm;
@@ -215,7 +269,8 @@ public class DefaultMaven
         }
         catch ( CycleDetectedException e )
         {
-            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
+            throw new MavenExecutionException(
+                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e );
         }
 
         if ( rm.hasMultipleProjects() )
@@ -233,113 +288,56 @@ public class DefaultMaven
 
         session.setUsingPOMsFromFilesystem( foundProjects );
 
-        try
-        {
-            MavenExecutionResponse response = lifecycleExecutor.execute( session, rm, dispatcher );
+        lifecycleExecutor.execute( session, rm, dispatcher );
 
-            // TODO: is this perhaps more appropriate in the CLI?
-            if ( response.isExecutionFailure() )
-            {
-                dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
-
-                // TODO: yuck! Revisit when cleaning up the exception handling from the top down
-                Throwable exception = response.getException();
-
-                // TODO: replace all handling by buildfailureexception/mavenexecutionexception or lifecycleexecutionexception
-                if ( exception instanceof BuildFailureException )
-                {
-                    logFailure( response, rm, exception, null );
-                }
-                else if ( exception instanceof MojoFailureException )
-                {
-                    MojoFailureException e = (MojoFailureException) exception;
-
-                    logFailure( response, rm, e, e.getLongMessage() );
-                }
-                else if ( exception instanceof MojoExecutionException )
-                {
-                    // TODO: replace by above
-                    if ( exception.getCause() == null )
-                    {
-                        MojoExecutionException e = (MojoExecutionException) exception;
-
-                        logFailure( response, rm, e, e.getLongMessage() );
-                    }
-                    else
-                    {
-                        // TODO: throw exceptions like this, so "failures" are just that
-                        logError( response );
-                    }
-                }
-                else if ( exception instanceof ArtifactNotFoundException )
-                {
-                    logFailure( response, rm, exception, null );
-                }
-                else
-                {
-                    // TODO: this should be a "FATAL" exception, reported to the
-                    // developers - however currently a LOT of
-                    // "user" errors fall through the cracks (like invalid POMs, as
-                    // one example)
-                    logError( response );
-                }
-            }
-            else
-            {
-                logSuccess( response, rm );
-            }
-
-            dispatcher.dispatchEnd( event, request.getBaseDirectory() );
-
-            return response;
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            logFatal( e );
-
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            throw new MavenExecutionException( "Error executing project within the reactor", e );
-        }
+        return rm;
     }
 
-    private void writeReactorSummary( ReactorManager rm )
+    private MavenProject getSuperProject( MavenExecutionRequest request )
+        throws MavenExecutionException
     {
-        // -------------------------
-        // Reactor Summary:
-        // -------------------------
-        // o project-name...........FAILED
-        // o project2-name..........SKIPPED (dependency build failed or was skipped)
-        // o project-3-name.........SUCCESS
-
-        line();
-        getLogger().info( "Reactor Summary:" );
-        line();
-
-        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
+        MavenProject superProject;
+        try
         {
-            MavenProject project = (MavenProject) it.next();
+            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
 
-            if ( rm.hasBuildFailure( project ) )
-            {
-                logReactorSummaryLine( project.getName(), "FAILED", rm.getBuildFailure( project ).getTime() );
-            }
-            else if ( rm.isBlackListed( project ) )
-            {
-                logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
-            }
-            else if ( rm.hasBuildSuccess( project ) )
-            {
-                logReactorSummaryLine( project.getName(), "SUCCESS", rm.getBuildSuccess( project ).getTime() );
-            }
-            else
-            {
-                logReactorSummaryLine( project.getName(), "NOT BUILT" );
-            }
         }
+        catch ( ProjectBuildingException e )
+        {
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        return superProject;
+    }
 
-        getLogger().info( "" );
-        getLogger().info( "" );
+    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
+        throws MavenExecutionException, BuildFailureException
+    {
+        List projects;
+        try
+        {
+            List files = getProjectFiles( request );
+
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
+                                        request.getSettings(), globalProfileManager, !request.isReactorActive() );
+
+        }
+        catch ( IOException e )
+        {
+            throw new MavenExecutionException( "Error processing projects for the reactor: " + e.getMessage(), e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new MavenExecutionException( e.getMessage(), e );
+        }
+        return projects;
     }
 
     private void logReactorSummaryLine( String name, String status )
@@ -394,20 +392,6 @@ public class DefaultMaven
         DateFormat fmt = new SimpleDateFormat( pattern );
         fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
         return fmt.format( new Date( time ) );
-    }
-
-    private MavenExecutionResponse dispatchErrorResponse( EventDispatcher dispatcher, String event,
-                                                          String baseDirectory, Exception e )
-    {
-        dispatcher.dispatchError( event, baseDirectory, e );
-
-        MavenExecutionResponse response = new MavenExecutionResponse();
-        response.setStart( new Date() );
-        response.setFinish( new Date() );
-        response.setException( e );
-        logError( response );
-
-        return response;
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
@@ -606,134 +590,141 @@ public class DefaultMaven
     {
         line();
 
-        getLogger().error( "FATAL ERROR" );
+        getLogger().info( "FATAL ERROR" );
 
         line();
 
-        diagnoseError( error );
+        logDiagnostics( error );
 
-        line();
-
-        getLogger().error( "FATAL ERROR" );
-
-        line();
+        logTrace( error, true );
     }
 
-    protected void logError( MavenExecutionResponse r )
+    protected void logError( Exception e, boolean showErrors )
     {
         line();
 
-        getLogger().error( "BUILD ERROR" );
+        getLogger().info( "BUILD ERROR" );
 
         line();
 
-        diagnoseError( r.getException() );
+        logDiagnostics( e );
 
-        line();
-
-        getLogger().error( "BUILD ERROR" );
-
-        line();
-
-        stats( r.getStart(), r.getFinish() );
-
-        line();
+        logTrace( e, showErrors );
     }
 
-    private void diagnoseError( Throwable error )
+    protected void logFailure( BuildFailureException e, boolean showErrors )
     {
-        String message = null;
-        if ( errorDiagnostics != null )
-        {
-            message = errorDiagnostics.diagnose( error );
-        }
-
-        if ( message == null )
-        {
-            message = error.getMessage();
-        }
-
-        getLogger().info( "Diagnosis: " + message );
-
-        line();
-
-        // TODO: needs to honour -e
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Trace:\n", error );
-
-            line();
-        }
-
-    }
-
-    protected void logFailure( MavenExecutionResponse r, ReactorManager rm, Throwable error, String longMessage )
-    {
-        if ( rm.hasMultipleProjects() && r.executedMultipleProjects() )
-        {
-            writeReactorSummary( rm );
-        }
         line();
 
         getLogger().info( "BUILD FAILURE" );
 
         line();
 
+        logDiagnostics( e );
+
+        if ( e.getLongMessage() != null )
+        {
+            getLogger().info( e.getLongMessage() );
+
+            line();
+        }
+
+        logTrace( e, showErrors );
+    }
+
+    private void logTrace( Throwable t, boolean showErrors )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Trace", t );
+
+            line();
+        }
+        else if ( showErrors )
+        {
+            getLogger().error( "Trace", t );
+
+            line();
+        }
+        else
+        {
+            getLogger().info( "For more information, run Maven with the -e switch" );
+        }
+    }
+
+    private void logDiagnostics( Throwable t )
+    {
         String message = null;
         if ( errorDiagnostics != null )
         {
-            message = errorDiagnostics.diagnose( error );
+            message = errorDiagnostics.diagnose( t );
         }
 
         if ( message == null )
         {
-            message = "Reason: " + error.getMessage();
+            message = t.getMessage();
         }
 
-        getLogger().info( message );
-
-        line();
-
-        if ( longMessage != null )
-        {
-            getLogger().info( longMessage );
-
-            line();
-        }
-
-        // TODO: needs to honour -e
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Trace", error );
-
-            line();
-        }
-
-        stats( r.getStart(), r.getFinish() );
+        getLogger().error( message );
 
         line();
     }
 
-    protected void logSuccess( MavenExecutionResponse r, ReactorManager rm )
+    protected void logSuccess( ReactorManager rm )
     {
-        if ( rm.hasMultipleProjects() && r.executedMultipleProjects() )
-        {
-            writeReactorSummary( rm );
-        }
-
         line();
 
         getLogger().info( "BUILD SUCCESSFUL" );
 
         line();
-
-        stats( r.getStart(), r.getFinish() );
-
-        line();
     }
 
-    protected void stats( Date start, Date finish )
+    private void logReactorSummary( ReactorManager rm )
     {
+        if ( rm.hasMultipleProjects() && rm.executedMultipleProjects() )
+        {
+            // -------------------------
+            // Reactor Summary:
+            // -------------------------
+            // o project-name...........FAILED
+            // o project2-name..........SKIPPED (dependency build failed or was skipped)
+            // o project-3-name.........SUCCESS
+
+            line();
+            getLogger().info( "Reactor Summary:" );
+            line();
+
+            for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
+            {
+                MavenProject project = (MavenProject) it.next();
+
+                if ( rm.hasBuildFailure( project ) )
+                {
+                    logReactorSummaryLine( project.getName(), "FAILED", rm.getBuildFailure( project ).getTime() );
+                }
+                else if ( rm.isBlackListed( project ) )
+                {
+                    logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
+                }
+                else if ( rm.hasBuildSuccess( project ) )
+                {
+                    logReactorSummaryLine( project.getName(), "SUCCESS", rm.getBuildSuccess( project ).getTime() );
+                }
+                else
+                {
+                    logReactorSummaryLine( project.getName(), "NOT BUILT" );
+                }
+            }
+
+            getLogger().info( "" );
+            getLogger().info( "" );
+        }
+    }
+
+    protected void stats( Date start )
+    {
+        Date finish = new Date();
+
         long time = finish.getTime() - start.getTime();
 
         getLogger().info( "Total time: " + formatTime( time ) );
@@ -793,6 +784,7 @@ public class DefaultMaven
     {
         List files = Collections.EMPTY_LIST;
 
+        File userDir = new File( System.getProperty( "user.dir" ) );
         if ( request.isReactorActive() )
         {
             // TODO: should we now include the pom.xml in the current directory?

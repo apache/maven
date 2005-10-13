@@ -50,7 +50,7 @@ public class MavenSession
 
     private final String executionRootDir;
 
-    private boolean usingPOMsFromFilesystem;
+    private boolean usingPOMsFromFilesystem = true;
 
     private final Properties executionProperties;
 

@@ -17,7 +17,6 @@ package org.apache.maven;
  */
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.reactor.MavenExecutionException;
 
 /**
@@ -32,6 +31,6 @@ public interface Maven
 
     String RELEASE_POMv4 = "release-pom.xml";
 
-    MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws MavenExecutionException, SettingsConfigurationException;
+    void execute( MavenExecutionRequest request )
+        throws MavenExecutionException;
 }

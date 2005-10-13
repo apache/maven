@@ -32,6 +32,7 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -336,7 +337,13 @@ public class DescribeMojo
             }
             catch ( PluginNotFoundException e )
             {
-                throw new MojoExecutionException( "Plugin does not exist: " + e.getMessage(), e );
+                getLog().debug( "Unable to find plugin", e );
+                throw new MojoFailureException( "Plugin does not exist: " + e.getMessage() );
+            }
+            catch ( PluginVersionNotFoundException e )
+            {
+                getLog().debug( "Unable to find plugin version", e );
+                throw new MojoFailureException( e.getMessage() );
             }
         }
 

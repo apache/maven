@@ -24,6 +24,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -43,7 +44,7 @@ public interface PluginManager
 
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
-        InvalidDependencyVersionException, PluginManagerException;
+        InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
 
     MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
@@ -56,11 +57,13 @@ public interface PluginManager
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException;
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException;
 
     PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException;
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException;
 
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws PluginManagerException, ComponentLookupException;

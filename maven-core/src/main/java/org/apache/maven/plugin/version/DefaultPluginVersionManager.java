@@ -27,6 +27,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.registry.MavenPluginRegistryBuilder;
 import org.apache.maven.plugin.registry.PluginRegistry;
 import org.apache.maven.plugin.registry.PluginRegistryUtils;
@@ -74,21 +75,21 @@ public class DefaultPluginVersionManager
 
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                         ArtifactRepository localRepository )
-        throws PluginVersionResolutionException
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
     }
 
     public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project,
                                               Settings settings, ArtifactRepository localRepository )
-        throws PluginVersionResolutionException
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
     }
 
     private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                          ArtifactRepository localRepository, boolean resolveAsReportPlugin )
-        throws PluginVersionResolutionException
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
@@ -214,8 +215,8 @@ public class DefaultPluginVersionManager
         // if we still haven't found a version, then fail early before we get into the update goop.
         if ( StringUtils.isEmpty( version ) )
         {
-            throw new PluginVersionResolutionException( groupId, artifactId,
-                                                        "Failed to resolve a valid version for this plugin" );
+            throw new PluginVersionNotFoundException( groupId, artifactId,
+                                                      "Failed to resolve a valid version for this plugin" );
         }
 
         // if the plugin registry is inactive, then the rest of this goop is useless...
@@ -625,7 +626,7 @@ public class DefaultPluginVersionManager
             catch ( IOException e )
             {
                 throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Error readin plugin registry: " + e.getMessage(), e );
+                                                            "Error reading plugin registry: " + e.getMessage(), e );
             }
             catch ( XmlPullParserException e )
             {
@@ -644,7 +645,7 @@ public class DefaultPluginVersionManager
 
     private String resolveMetaVersion( String groupId, String artifactId, MavenProject project,
                                        ArtifactRepository localRepository, String metaVersionId )
-        throws PluginVersionResolutionException
+        throws PluginVersionResolutionException, InvalidPluginException
     {
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
@@ -677,8 +678,8 @@ public class DefaultPluginVersionManager
             }
             catch ( ProjectBuildingException e )
             {
-                throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Unable to build resolve plugin project information", e );
+                throw new InvalidPluginException( "Unable to build project information for plugin '" +
+                    ArtifactUtils.versionlessKey( groupId, artifactId ) + "': " + e.getMessage(), e );
             }
 
             boolean pluginValid = true;

@@ -32,9 +32,11 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.version.PluginVersionManager;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugins.release.helpers.ProjectScmRewriter;
 import org.apache.maven.plugins.release.helpers.ProjectVersionResolver;
@@ -940,9 +942,17 @@ public class PrepareReleaseMojo
                         }
                         catch ( PluginVersionResolutionException e )
                         {
-                            getLog().debug( "Error resolving plugin version", e );
-                            throw new MojoFailureException(
-                                "Cannot resolve version for plugin '" + plugin.getKey() + "': " + e.getMessage() );
+                            throw new MojoExecutionException(
+                                "Cannot resolve version for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
+                        }
+                        catch ( InvalidPluginException e )
+                        {
+                            throw new MojoExecutionException(
+                                "Cannot resolve version for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
+                        }
+                        catch ( PluginVersionNotFoundException e )
+                        {
+                            throw new MojoFailureException( e.getMessage() );
                         }
 
                         if ( ArtifactUtils.isSnapshot( version ) )
@@ -977,9 +987,17 @@ public class PrepareReleaseMojo
                         }
                         catch ( PluginVersionResolutionException e )
                         {
-                            getLog().debug( "Error resolving report version", e );
-                            throw new MojoFailureException(
-                                "Cannot resolve version for report '" + plugin.getKey() + "': " + e.getMessage() );
+                            throw new MojoExecutionException(
+                                "Cannot resolve version for report '" + plugin.getKey() + "': " + e.getMessage(), e );
+                        }
+                        catch ( InvalidPluginException e )
+                        {
+                            throw new MojoExecutionException(
+                                "Cannot resolve version for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
+                        }
+                        catch ( PluginVersionNotFoundException e )
+                        {
+                            throw new MojoFailureException( e.getMessage() );
                         }
 
                         if ( ArtifactUtils.isSnapshot( version ) )

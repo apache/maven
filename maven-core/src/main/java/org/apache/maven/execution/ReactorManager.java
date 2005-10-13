@@ -183,4 +183,8 @@ public class ReactorManager
         return (BuildSuccess) buildSuccessesByProject.get( getProjectKey( project ) );
     }
 
+    public boolean executedMultipleProjects()
+    {
+        return buildFailuresByProject.size() + buildSuccessesByProject.size() > 1;
+    }
 }
