@@ -56,11 +56,11 @@ public interface PluginManager
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException;
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException;
 
     PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException;
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException;
 
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws PluginManagerException, ComponentLookupException;

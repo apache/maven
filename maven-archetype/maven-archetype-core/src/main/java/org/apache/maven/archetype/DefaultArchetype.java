@@ -102,11 +102,11 @@ public class DefaultArchetype
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ArchetypeDescriptorException( "Cannot download archetype.", e );
+            throw new ArchetypeDescriptorException( "Error attempting to download archetype: " + e.getMessage(), e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
+            throw new ArchetypeNotFoundException( "Archetype does not exist: " + e.getMessage(), e );
         }
 
         // ---------------------------------------------------------------------

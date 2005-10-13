@@ -147,7 +147,7 @@ public class DefaultPluginManager
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
@@ -164,7 +164,7 @@ public class DefaultPluginManager
     private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project,
                                                     ArtifactRepository localRepository )
         throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
@@ -457,7 +457,7 @@ public class DefaultPluginManager
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         String version = reportPlugin.getVersion();
 

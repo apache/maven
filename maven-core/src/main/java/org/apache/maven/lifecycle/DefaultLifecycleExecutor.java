@@ -42,6 +42,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
@@ -168,6 +169,10 @@ public class DefaultLifecycleExecutor
         {
             response.setException( e );
         }
+        catch ( PluginNotFoundException e )
+        {
+            response.setException( e );
+        }
         finally
         {
             response.setFinish( new Date() );
@@ -177,7 +182,8 @@ public class DefaultLifecycleExecutor
     }
 
     private void findExtensions( MavenSession session )
-        throws ArtifactNotFoundException, ArtifactResolutionException, LifecycleExecutionException
+        throws ArtifactNotFoundException, ArtifactResolutionException, LifecycleExecutionException,
+        PluginNotFoundException
     {
         for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
         {
@@ -205,7 +211,7 @@ public class DefaultLifecycleExecutor
                                       MavenProject rootProject, EventDispatcher dispatcher,
                                       MavenExecutionResponse response )
         throws ArtifactNotFoundException, MojoExecutionException, LifecycleExecutionException, MojoFailureException,
-        ArtifactResolutionException
+        ArtifactResolutionException, PluginNotFoundException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
         {
@@ -341,7 +347,7 @@ public class DefaultLifecycleExecutor
                                                MavenExecutionResponse response, EventDispatcher dispatcher,
                                                String event, ReactorManager rm, long buildStartTime, String target )
         throws LifecycleExecutionException, MojoExecutionException, MojoFailureException, ArtifactNotFoundException,
-        ArtifactResolutionException
+        ArtifactResolutionException, PluginNotFoundException
     {
         try
         {
@@ -423,7 +429,8 @@ public class DefaultLifecycleExecutor
     }
 
     private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException
+        throws LifecycleExecutionException, ArtifactNotFoundException, PluginNotFoundException,
+        ArtifactResolutionException
     {
         List segments = new ArrayList();
 
@@ -454,24 +461,8 @@ public class DefaultLifecycleExecutor
                 }
                 else
                 {
-                    MojoDescriptor mojo = null;
-                    try
-                    {
-                        // definitely a CLI goal, can use prefix
-                        mojo = getMojoDescriptor( task, session, project, task, true );
-                    }
-                    catch ( ArtifactResolutionException e )
-                    {
-                        getLogger().info(
-                            "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
-                        getLogger().debug( "", e );
-                    }
-                    catch ( ArtifactNotFoundException e )
-                    {
-                        getLogger().info(
-                            "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
-                        getLogger().debug( "", e );
-                    }
+                    // definitely a CLI goal, can use prefix
+                    MojoDescriptor mojo = getMojoDescriptor( task, session, project, task, true );
 
                     // if the mojo descriptor was found, determine aggregator status according to:
                     // 1. whether the mojo declares itself an aggregator
@@ -526,7 +517,7 @@ public class DefaultLifecycleExecutor
 
     private void executeGoal( String task, MavenSession session, MavenProject project, MavenExecutionResponse response )
         throws LifecycleExecutionException, ArtifactNotFoundException, MojoExecutionException,
-        ArtifactResolutionException, MojoFailureException, InvalidDependencyVersionException
+        ArtifactResolutionException, MojoFailureException, InvalidDependencyVersionException, PluginNotFoundException
     {
         if ( getPhaseToLifecycleMap().containsKey( task ) )
         {
@@ -545,7 +536,7 @@ public class DefaultLifecycleExecutor
     private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings,
                                            MavenProject project, MavenExecutionResponse response, Lifecycle lifecycle )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginNotFoundException
     {
         List goals = processGoalChain( task, lifecycleMappings, lifecycle );
 
@@ -562,7 +553,7 @@ public class DefaultLifecycleExecutor
     private void executeStandaloneGoal( String task, MavenSession session, MavenProject project,
                                         MavenExecutionResponse response )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginNotFoundException
     {
         // guaranteed to come from the CLI and not be part of a phase
         MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true );
@@ -571,7 +562,7 @@ public class DefaultLifecycleExecutor
 
     private void executeGoals( List goals, MavenSession session, MavenProject project, MavenExecutionResponse response )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginNotFoundException
     {
         for ( Iterator i = goals.iterator(); i.hasNext(); )
         {
@@ -615,7 +606,8 @@ public class DefaultLifecycleExecutor
     }
 
     private List getReports( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         List reportPlugins = project.getReportPlugins();
 
@@ -701,7 +693,8 @@ public class DefaultLifecycleExecutor
 
     private List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
                              MojoExecution mojoExecution )
-        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException,
+        PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = verifyReportPlugin( reportPlugin, project, session );
 
@@ -751,7 +744,7 @@ public class DefaultLifecycleExecutor
     private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project,
                                 MavenExecutionResponse response )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
@@ -782,7 +775,7 @@ public class DefaultLifecycleExecutor
     private void forkProjectLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project,
                                        MavenExecutionResponse response )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
@@ -918,7 +911,8 @@ public class DefaultLifecycleExecutor
 
     private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project,
                                             Lifecycle lifecycle )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         // first, bind those associated with the packaging
         Map lifecycleMappings = bindLifecycleForPackaging( session, selectedPhase, project, lifecycle );
@@ -936,7 +930,8 @@ public class DefaultLifecycleExecutor
 
     private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project,
                                            Lifecycle lifecycle )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         Map mappings = findMappingsForLifecycle( session, project, lifecycle );
 
@@ -979,7 +974,8 @@ public class DefaultLifecycleExecutor
     }
 
     private Map findMappingsForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         String packaging = project.getPackaging();
         Map mappings = null;
@@ -1028,7 +1024,8 @@ public class DefaultLifecycleExecutor
 
     private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
                                   ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException,
+        PluginNotFoundException
     {
         Object pluginComponent = null;
 
@@ -1064,7 +1061,8 @@ public class DefaultLifecycleExecutor
      * lookup directly, or have them passed in
      */
     private Map findArtifactTypeHandlers( MavenProject project, Settings settings, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException,
+        PluginNotFoundException
     {
         Map map = new HashMap();
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
@@ -1114,7 +1112,8 @@ public class DefaultLifecycleExecutor
      * @param session
      */
     private void bindPluginToLifecycle( Plugin plugin, MavenSession session, Map phaseMap, MavenProject project )
-        throws LifecycleExecutionException, ArtifactResolutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException, ArtifactResolutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
         Settings settings = session.getSettings();
@@ -1149,7 +1148,8 @@ public class DefaultLifecycleExecutor
 
     private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                            ArtifactRepository localRepository )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
         try
@@ -1177,7 +1177,8 @@ public class DefaultLifecycleExecutor
     }
 
     private PluginDescriptor verifyReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException,
+        PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
         try
@@ -1291,7 +1292,8 @@ public class DefaultLifecycleExecutor
 
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
                                               String invokedVia, boolean canUsePrefix )
-        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException, ArtifactNotFoundException, PluginNotFoundException,
+        ArtifactResolutionException
     {
         String goal;
         Plugin plugin;

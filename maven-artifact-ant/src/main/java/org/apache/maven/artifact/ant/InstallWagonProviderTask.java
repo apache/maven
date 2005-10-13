@@ -103,11 +103,12 @@ public class InstallWagonProviderTask
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            throw new BuildException( "Error downloading wagon provider from the remote repository: " + e.getMessage(),
+                                      e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+            throw new BuildException( "Unable to locate wagon provider in remote repository: " + e.getMessage(), e );
         }
 
         log( "Installing provider: " + providerArtifact );

@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 
 /**
@@ -25,11 +26,11 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
  * @version $Id$
  */
 public class PluginNotFoundException
-    extends ArtifactNotFoundException
+    extends AbstractArtifactResolutionException
 {
     public PluginNotFoundException( ArtifactNotFoundException e )
     {
-        super( "Plugin could not be found - check that the goal name is correct", e.getGroupId(), e.getArtifactId(),
-               e.getVersion(), "maven-plugin", e.getRemoteRepositories(), e.getDownloadUrl(), e.getCause() );
+        super( "Plugin could not be found - check that the goal name is correct: " + e.getMessage(), e.getGroupId(),
+               e.getArtifactId(), e.getVersion(), "maven-plugin", e.getRemoteRepositories(), null, e.getCause() );
     }
 }

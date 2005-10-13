@@ -28,6 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -321,8 +322,7 @@ public class DescribeMojo
             }
             catch ( ArtifactNotFoundException e )
             {
-                throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId +
-                    "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
+                throw new MojoExecutionException( "Plugin dependency does not exist: " + e.getMessage(), e );
             }
             catch ( InvalidVersionSpecificationException e )
             {
@@ -333,6 +333,10 @@ public class DescribeMojo
             {
                 throw new MojoExecutionException( "Error retrieving plugin descriptor for:\n\ngroupId: \'" + groupId +
                     "\'\nartifactId: \'" + artifactId + "\'\nversion: \'" + version + "\'\n\n", e );
+            }
+            catch ( PluginNotFoundException e )
+            {
+                throw new MojoExecutionException( "Plugin does not exist: " + e.getMessage(), e );
             }
         }
 

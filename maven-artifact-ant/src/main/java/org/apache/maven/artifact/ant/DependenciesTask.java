@@ -166,12 +166,11 @@ public class DependenciesTask
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new BuildException( "Unable to resolve artifact", e );
+            throw new BuildException( "Unable to resolve artifact: " + e.getMessage(), e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            // TODO: improve handling
-            throw new BuildException( "Unable to locate artifact", e );
+            throw new BuildException( "Dependency not found: " + e.getMessage(), e );
         }
         catch ( InvalidDependencyVersionException e )
         {

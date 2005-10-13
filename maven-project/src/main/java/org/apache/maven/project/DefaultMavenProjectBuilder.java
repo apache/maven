@@ -380,73 +380,30 @@ public class DefaultMavenProjectBuilder
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
                 File file = projectArtifact.getFile();
-                // TODO: how can this not be true?
-                if ( projectArtifact.isResolved() )
+                model = readModel( projectId, file );
+
+                String downloadUrl = null;
+                ArtifactStatus status = ArtifactStatus.NONE;
+
+                DistributionManagement distributionManagement = model.getDistributionManagement();
+                if ( distributionManagement != null )
                 {
-                    model = readModel( projectId, file );
+                    downloadUrl = distributionManagement.getDownloadUrl();
 
-                    String downloadUrl = null;
-                    ArtifactStatus status = ArtifactStatus.NONE;
-
-                    DistributionManagement distributionManagement = model.getDistributionManagement();
-                    if ( distributionManagement != null )
-                    {
-                        downloadUrl = distributionManagement.getDownloadUrl();
-
-                        status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
-                    }
-
-                    // TODO: configurable actions dependant on status
-                    if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
-                    {
-                        // use default policy (enabled, daily update, warn on bad checksum)
-                        ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
-                        // TODO: re-enable [MNG-798/865]
-                        policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-
-                        if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
-                        {
-                            getLogger().info( projectArtifact.getArtifactId() +
-                                ": updating metadata due to status of '" + status + "'" );
-                            try
-                            {
-                                projectArtifact.setResolved( false );
-                                artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories,
-                                                                localRepository );
-                            }
-                            catch ( ArtifactResolutionException e )
-                            {
-                                getLogger().warn( "Error updating POM - using existing version" );
-                                getLogger().debug( "Cause", e );
-                            }
-                            catch ( ArtifactNotFoundException e )
-                            {
-                                getLogger().warn( "Error updating POM - not found. Removing local copy." );
-                                getLogger().debug( "Cause", e );
-                                file.delete();
-                                throw e;
-                            }
-                        }
-                    }
-
-                    // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
-                    // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
-                    if ( downloadUrl != null )
-                    {
-                        projectArtifact.setDownloadUrl( downloadUrl );
-                    }
-                    else
-                    {
-                        projectArtifact.setDownloadUrl( model.getUrl() );
-                    }
+                    status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
                 }
-                else if ( allowStubModel )
+
+                checkStatusAndUpdate( projectArtifact, status, file, remoteArtifactRepositories, localRepository );
+
+                // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
+                // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
+                if ( downloadUrl != null )
                 {
-                    model = createStubModel( projectArtifact );
+                    projectArtifact.setDownloadUrl( downloadUrl );
                 }
                 else
                 {
-                    throw new ProjectBuildingException( projectId, "POM could not be resolved from the repository" );
+                    projectArtifact.setDownloadUrl( model.getUrl() );
                 }
             }
             catch ( ArtifactResolutionException e )
@@ -457,6 +414,7 @@ public class DefaultMavenProjectBuilder
             {
                 if ( allowStubModel )
                 {
+                    getLogger().debug( "Artifact not found - using stub model: " + e.getMessage() );
                     model = createStubModel( projectArtifact );
                 }
                 else
@@ -471,6 +429,43 @@ public class DefaultMavenProjectBuilder
         }
 
         return model;
+    }
+
+    private void checkStatusAndUpdate( Artifact projectArtifact, ArtifactStatus status, File file,
+                                       List remoteArtifactRepositories, ArtifactRepository localRepository )
+        throws ArtifactNotFoundException
+    {
+        // TODO: configurable actions dependant on status
+        if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
+        {
+            // use default policy (enabled, daily update, warn on bad checksum)
+            ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
+            // TODO: re-enable [MNG-798/865]
+            policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
+
+            if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
+            {
+                getLogger().info(
+                    projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
+                try
+                {
+                    projectArtifact.setResolved( false );
+                    artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories, localRepository );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    getLogger().warn( "Error updating POM - using existing version" );
+                    getLogger().debug( "Cause", e );
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    getLogger().warn( "Error updating POM - not found. Removing local copy." );
+                    getLogger().debug( "Cause", e );
+                    file.delete();
+                    throw e;
+                }
+            }
+        }
     }
 
     private Model createStubModel( Artifact projectArtifact )
