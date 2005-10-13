@@ -24,7 +24,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Extension;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusConstants;
@@ -53,8 +52,7 @@ public class DefaultExtensionManager
     private PlexusContainer container;
 
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, InvalidVersionSpecificationException,
-        ArtifactNotFoundException
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
 

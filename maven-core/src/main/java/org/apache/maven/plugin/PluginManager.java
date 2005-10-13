@@ -19,6 +19,7 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -54,11 +55,11 @@ public interface PluginManager
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException,
-        ArtifactNotFoundException;
+        ArtifactNotFoundException, InvalidVersionSpecificationException;
 
     PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, PluginManagerException,
-        ArtifactNotFoundException;
+        ArtifactNotFoundException, InvalidVersionSpecificationException;
 
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws ComponentLookupException, PluginManagerException;

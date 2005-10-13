@@ -38,7 +38,7 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -88,7 +88,7 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
-    
+
     protected ErrorDiagnostics errorDiagnostics;
 
     protected RuntimeInformation runtimeInformation;
@@ -104,7 +104,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws ReactorException, SettingsConfigurationException
+        throws SettingsConfigurationException, MavenExecutionException
     {
         if ( request.getSettings().isOffline() )
         {
@@ -120,7 +120,7 @@ public class DefaultMaven
             }
             catch ( ComponentLookupException e )
             {
-                throw new ReactorException( "Cannot retrieve WagonManager in order to set offline mode.", e );
+                throw new MavenExecutionException( "Cannot retrieve WagonManager in order to set offline mode.", e );
             }
             finally
             {
@@ -141,11 +141,11 @@ public class DefaultMaven
         }
         catch ( ComponentLookupException e )
         {
-            throw new ReactorException( "Unable to configure Maven for execution", e );
+            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
         }
         catch ( ComponentLifecycleException e )
         {
-            throw new ReactorException( "Unable to configure Maven for execution", e );
+            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
         }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
@@ -182,7 +182,7 @@ public class DefaultMaven
         }
         catch ( IOException e )
         {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
+            throw new MavenExecutionException( "Error processing projects for the reactor: ", e );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -225,87 +225,77 @@ public class DefaultMaven
             }
         }
 
+        MavenSession session = createSession( request, rm );
+
+        session.setUsingPOMsFromFilesystem( foundProjects );
+
         try
         {
-            MavenSession session = createSession( request, rm );
+            MavenExecutionResponse response = lifecycleExecutor.execute( session, rm, dispatcher );
 
-            session.setUsingPOMsFromFilesystem( foundProjects );
-
-            try
+            // TODO: is this perhaps more appropriate in the CLI?
+            if ( response.isExecutionFailure() )
             {
-                MavenExecutionResponse response = lifecycleExecutor.execute( session, rm, dispatcher );
+                dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
 
-                // TODO: is this perhaps more appropriate in the CLI?
-                if ( response.isExecutionFailure() )
+                // TODO: yuck! Revisit when cleaning up the exception handling from the top down
+                Throwable exception = response.getException();
+
+                // TODO: replace all handling by buildfailureexception/mavenexecutionexception or lifecycleexecutionexception
+                if ( exception instanceof BuildFailureException )
                 {
-                    dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
+                    logFailure( response, rm, exception, null );
+                }
+                else if ( exception instanceof MojoFailureException )
+                {
+                    MojoFailureException e = (MojoFailureException) exception;
 
-                    // TODO: yuck! Revisit when cleaning up the exception handling from the top down
-                    Throwable exception = response.getException();
-
-                    if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) &&
-                        exception instanceof ReactorException )
+                    logFailure( response, rm, e, e.getLongMessage() );
+                }
+                else if ( exception instanceof MojoExecutionException )
+                {
+                    // TODO: replace by above
+                    if ( exception.getCause() == null )
                     {
-                        logFailure( response, rm, exception, null );
-                    }
-                    else if ( exception instanceof MojoFailureException )
-                    {
-                        MojoFailureException e = (MojoFailureException) exception;
+                        MojoExecutionException e = (MojoExecutionException) exception;
 
                         logFailure( response, rm, e, e.getLongMessage() );
                     }
-                    else if ( exception instanceof MojoExecutionException )
-                    {
-                        // TODO: replace by above
-                        if ( exception.getCause() == null )
-                        {
-                            MojoExecutionException e = (MojoExecutionException) exception;
-
-                            logFailure( response, rm, e, e.getLongMessage() );
-                        }
-                        else
-                        {
-                            // TODO: throw exceptions like this, so "failures" are just that
-                            logError( response );
-                        }
-                    }
-                    else if ( exception instanceof ArtifactNotFoundException )
-                    {
-                        logFailure( response, rm, exception, null );
-                    }
                     else
                     {
-                        // TODO: this should be a "FATAL" exception, reported to the
-                        // developers - however currently a LOT of
-                        // "user" errors fall through the cracks (like invalid POMs, as
-                        // one example)
+                        // TODO: throw exceptions like this, so "failures" are just that
                         logError( response );
                     }
-
-                    return response;
+                }
+                else if ( exception instanceof ArtifactNotFoundException )
+                {
+                    logFailure( response, rm, exception, null );
                 }
                 else
                 {
-                    logSuccess( response, rm );
+                    // TODO: this should be a "FATAL" exception, reported to the
+                    // developers - however currently a LOT of
+                    // "user" errors fall through the cracks (like invalid POMs, as
+                    // one example)
+                    logError( response );
                 }
             }
-            catch ( LifecycleExecutionException e )
+            else
             {
-                logFatal( e );
-
-                throw new ReactorException( "Error executing project within the reactor", e );
+                logSuccess( response, rm );
             }
 
             dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
-            // TODO: not really satisfactory
-            return null;
+            return response;
         }
-        catch ( ReactorException e )
+        catch ( LifecycleExecutionException e )
         {
+            logFatal( e );
+
             dispatcher.dispatchError( event, request.getBaseDirectory(), e );
 
-            throw e;
+            throw new MavenExecutionException( "Error executing project within the reactor", e );
         }
     }
 
@@ -418,8 +408,8 @@ public class DefaultMaven
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
                                   ProfileManager globalProfileManager, boolean isRoot )
-        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException,
-        ProfileActivationException
+        throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
+        MavenExecutionException
     {
         List projects = new ArrayList( files.size() );
 
@@ -445,10 +435,17 @@ public class DefaultMaven
             if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
-                if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
+                try
                 {
-                    throw new ProjectBuildingException( project.getId(), "Unable to build project '" + project.getFile() +
-                        "; it requires Maven version " + version.toString() );
+                    if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
+                    {
+                        throw new ProjectBuildingException( project.getId(), "Unable to build project '" +
+                            project.getFile() + "; it requires Maven version " + version.toString() );
+                    }
+                }
+                catch ( IOException e )
+                {
+                    throw new MavenExecutionException( "Unable to get Maven application version", e );
                 }
             }
 
@@ -479,8 +476,8 @@ public class DefaultMaven
                     moduleFiles.add( moduleFile );
                 }
 
-                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings,
-                                                          globalProfileManager, false );
+                List collectedProjects =
+                    collectProjects( moduleFiles, localRepository, recursive, settings, globalProfileManager, false );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -498,8 +495,8 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException(
-                    "unknown", "The file " + pom.getAbsolutePath() + " you specified has zero length." );
+                throw new ProjectBuildingException( "unknown", "The file " + pom.getAbsolutePath() +
+                    " you specified has zero length." );
             }
         }
 

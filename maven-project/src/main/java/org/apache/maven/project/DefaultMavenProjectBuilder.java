@@ -191,14 +191,7 @@ public class DefaultMavenProjectBuilder
 
         ensureMetadataSourceIsInitialized();
 
-        try
-        {
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new ProjectBuildingException( projectId, "Error in dependency version", e );
-        }
+        project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
 
         if ( transferListener != null )
         {
@@ -254,7 +247,8 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse dependency version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
+                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
                 }
             }
         }
@@ -1154,7 +1148,9 @@ public class DefaultMavenProjectBuilder
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new ProjectBuildingException( projectId, "Unable to parse plugin version", e );
+                throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
+                    "' for plugin '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
+                    e.getMessage(), e );
             }
 
             if ( artifact != null )
@@ -1196,7 +1192,9 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse plugin version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
+                        "' for report '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
+                        e.getMessage(), e );
                 }
 
                 if ( artifact != null )
@@ -1234,12 +1232,15 @@ public class DefaultMavenProjectBuilder
                 Artifact artifact;
                 try
                 {
-                    artifact = artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(),
-                                                                        VersionRange.createFromVersionSpec( version ) );
+                    VersionRange versionRange = VersionRange.createFromVersionSpec( version );
+                    artifact =
+                        artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), versionRange );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse extension version", e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
+                        "' for extension '" + ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() ) +
+                        "': " + e.getMessage(), e );
                 }
 
                 if ( artifact != null )

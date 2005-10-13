@@ -17,6 +17,7 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -110,7 +111,8 @@ public class MavenMetadataSource
                 catch ( InvalidProjectModelException e )
                 {
                     getLogger().warn( "POM for: \'" + pomArtifact +
-                        "\' does not appear to be valid. Its will be ignored for artifact resolution.\n\nReason: " + e.getMessage() + "\n\n" );
+                        "\' does not appear to be valid. Its will be ignored for artifact resolution.\n\nReason: " +
+                        e.getMessage() + "\n\n" );
 
                     project = null;
                 }
@@ -188,21 +190,17 @@ public class MavenMetadataSource
                 {
                     // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
                     // or used the inherited scope (should that be passed to the buildFromRepository method above?)
-                    artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
-                                                         artifact.getDependencyFilter() );
+                    artifacts =
+                        project.createArtifacts( artifactFactory, artifact.getScope(), artifact.getDependencyFilter() );
                 }
 
-                List repositories = aggregateRepositoryLists( remoteRepositories,
-                                                              project.getRemoteArtifactRepositories() );
+                List repositories =
+                    aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
 
                 result = new ResolutionGroup( pomArtifact, artifacts, repositories );
             }
 
             return result;
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
         catch ( ProjectBuildingException e )
         {
@@ -256,9 +254,12 @@ public class MavenMetadataSource
         return repositories;
     }
 
+    /**
+     * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
+     */
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
                                        ArtifactFilter dependencyFilter, MavenProject project )
-        throws InvalidVersionSpecificationException
+        throws ProjectBuildingException
     {
         Set projectArtifacts = new HashSet( dependencies.size() );
 
@@ -275,7 +276,19 @@ public class MavenMetadataSource
                 d.setScope( scope );
             }
 
-            VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+            VersionRange versionRange;
+            try
+            {
+                versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                String projectId = project != null ? ArtifactUtils.versionlessKey( project.getGroupId(),
+                                                                                   project.getArtifactId() )
+                    : "unknown";
+                throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
+                    "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
+            }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
                                                                           scope, inheritedScope, d.isOptional() );

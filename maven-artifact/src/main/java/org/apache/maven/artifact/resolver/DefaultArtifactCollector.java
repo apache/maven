@@ -258,11 +258,9 @@ public class DefaultArtifactCollector
                     catch ( CyclicDependencyException e )
                     {
                         // would like to throw this, but we have crappy stuff in the repo
-                        // no logger to use here either just now
 
-                        // TODO: should the remoteRepositories list be null here?!
                         fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
-                                   new ResolutionNode( e.getArtifact(), null, child ) );
+                                   new ResolutionNode( e.getArtifact(), remoteRepositories, child ) );
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {

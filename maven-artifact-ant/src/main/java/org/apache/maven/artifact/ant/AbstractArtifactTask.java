@@ -75,8 +75,8 @@ public abstract class AbstractArtifactTask
             localRepository = getDefaultLocalRepository();
         }
 
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       localRepository.getLayout() );
+        ArtifactRepositoryLayout repositoryLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, localRepository.getLayout() );
 
         CustomWagonManager manager = (CustomWagonManager) lookup( WagonManager.ROLE );
         manager.setLocalRepository( localRepository.getLocation() );
@@ -86,8 +86,8 @@ public abstract class AbstractArtifactTask
 
     protected ArtifactRepository createRemoteArtifactRepository( RemoteRepository repository )
     {
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       repository.getLayout() );
+        ArtifactRepositoryLayout repositoryLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, repository.getLayout() );
 
         WagonManager manager = (WagonManager) lookup( WagonManager.ROLE );
 
@@ -367,22 +367,22 @@ public abstract class AbstractArtifactTask
 
         return pom;
     }
-    
+
     public void diagnoseError( Throwable error )
     {
         try
         {
             ErrorDiagnostics diagnostics = (ErrorDiagnostics) embedder.lookup( ErrorDiagnostics.ROLE );
-            
+
             StringBuffer message = new StringBuffer();
 
             message.append( "An error has occurred while processing the Maven artifact tasks.\n" );
             message.append( " Diagnosis:\n\n" );
 
             message.append( diagnostics.diagnose( error ) );
-            
+
             message.append( "\n\n" );
-            
+
             log( message.toString(), Project.MSG_INFO );
         }
         catch ( ComponentLookupException e )
@@ -440,4 +440,23 @@ public abstract class AbstractArtifactTask
         policy.setUpdatePolicy( pomRepoPolicy.getUpdatePolicy() );
         return policy;
     }
+
+    /**
+     * @noinspection RefusedBequest
+     */
+    public void execute()
+    {
+        try
+        {
+            doExecute();
+        }
+        catch ( BuildException e )
+        {
+            diagnoseError( e );
+
+            throw e;
+        }
+    }
+
+    protected abstract void doExecute();
 }

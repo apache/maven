@@ -33,6 +33,7 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugins.release.helpers.ProjectScmRewriter;
@@ -176,8 +177,8 @@ public class PrepareReleaseMojo
 
     private ProjectScmRewriter scmRewriter;
 
-    protected void executeTask()
-        throws MojoExecutionException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         try
         {
@@ -818,7 +819,7 @@ public class PrepareReleaseMojo
     }
 
     private void generateReleasePoms()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_GENERATED_RELEASE_POM ) )
         {
@@ -939,12 +940,14 @@ public class PrepareReleaseMojo
                         }
                         catch ( PluginVersionResolutionException e )
                         {
-                            throw new MojoExecutionException( "Cannot resolve version for plugin: " + plugin, e );
+                            getLog().debug( "Error resolving plugin version", e );
+                            throw new MojoFailureException(
+                                "Cannot resolve version for plugin '" + plugin.getKey() + "': " + e.getMessage() );
                         }
 
                         if ( ArtifactUtils.isSnapshot( version ) )
                         {
-                            throw new MojoExecutionException(
+                            throw new MojoFailureException(
                                 "Resolved version of plugin is a snapshot. Please release this plugin before releasing this project.\n\nGroupId: " +
                                     plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() +
                                     "\nResolved Version: " + version + "\n\n" );
@@ -974,14 +977,15 @@ public class PrepareReleaseMojo
                         }
                         catch ( PluginVersionResolutionException e )
                         {
-                            throw new MojoExecutionException( "Cannot resolve version for report plugin: " + plugin,
-                                                              e );
+                            getLog().debug( "Error resolving report version", e );
+                            throw new MojoFailureException(
+                                "Cannot resolve version for report '" + plugin.getKey() + "': " + e.getMessage() );
                         }
 
                         if ( ArtifactUtils.isSnapshot( version ) )
                         {
-                            throw new MojoExecutionException(
-                                "Resolved version of plugin is a snapshot. Please release this report plugin before releasing this project.\n\nGroupId: " +
+                            throw new MojoFailureException(
+                                "Resolved version of report is a snapshot. Please release this report plugin before releasing this project.\n\nGroupId: " +
                                     plugin.getGroupId() + "\nArtifactId: " + plugin.getArtifactId() +
                                     "\nResolved Version: " + version + "\n\n" );
                         }

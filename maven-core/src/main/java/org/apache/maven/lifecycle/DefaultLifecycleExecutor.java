@@ -16,6 +16,7 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
+import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -45,7 +46,6 @@ import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainerException;
@@ -129,31 +129,20 @@ public class DefaultLifecycleExecutor
         {
             if ( goals.isEmpty() )
             {
+                // TODO: delete
                 throw new NoGoalsSpecifiedException( "You must specify at least one goal. Try 'install'" );
             }
 
             List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
 
             // TODO: probably don't want to do all this up front
-            for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
-            {
-                MavenProject project = (MavenProject) i.next();
-
-                for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
-                {
-                    Extension extension = (Extension) j.next();
-                    extensionManager.addExtension( extension, project, session.getLocalRepository() );
-                }
-
-                Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
-                artifactHandlerManager.addHandlers( handlers );
-            }
+            findExtensions( session );
 
             executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher, response );
 
             if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && rm.hasBuildFailures() )
             {
-                response.setException( new ReactorException( "One or more projects failed to build." ) );
+                response.setException( new BuildFailureException( "One or more projects failed to build." ) );
             }
         }
         catch ( MojoExecutionException e )
@@ -167,22 +156,6 @@ public class DefaultLifecycleExecutor
         catch ( ArtifactResolutionException e )
         {
             response.setException( e );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
         }
         catch ( NoGoalsSpecifiedException e )
         {
@@ -198,6 +171,31 @@ public class DefaultLifecycleExecutor
         }
 
         return response;
+    }
+
+    private void findExtensions( MavenSession session )
+        throws ArtifactNotFoundException, ArtifactResolutionException, LifecycleExecutionException
+    {
+        for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
+        {
+            MavenProject project = (MavenProject) i.next();
+
+            for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
+            {
+                Extension extension = (Extension) j.next();
+                try
+                {
+                    extensionManager.addExtension( extension, project, session.getLocalRepository() );
+                }
+                catch ( PlexusContainerException e )
+                {
+                    throw new LifecycleExecutionException( "Unable to initialise extensions", e );
+                }
+            }
+
+            Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
+            artifactHandlerManager.addHandlers( handlers );
+        }
     }
 
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
@@ -228,7 +226,8 @@ public class DefaultLifecycleExecutor
 
                     long buildStartTime = System.currentTimeMillis();
 
-                    dispatcher.dispatchStart( event, rootProject.getId() + " ( " + segment + " )" );
+                    String target = rootProject.getId() + " ( " + segment + " )";
+                    dispatcher.dispatchStart( event, target );
 
                     try
                     {
@@ -237,37 +236,17 @@ public class DefaultLifecycleExecutor
                         {
                             String task = (String) goalIterator.next();
 
-                            try
-                            {
-                                executeGoal( task, session, rootProject, response );
-                            }
-                            catch ( MojoExecutionException e )
-                            {
-                                // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
-                            }
-                            catch ( ArtifactResolutionException e )
-                            {
-                                // TODO: should this be removed?
-                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
-                            }
-                            catch ( MojoFailureException e )
-                            {
-                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
-                            }
-                            catch ( ArtifactNotFoundException e )
-                            {
-                                handleExecutionFailure( rm, rootProject, e, task, buildStartTime );
-                            }
+                            executeGoalAndHandleFailures( task, session, rootProject, response, dispatcher, event, rm,
+                                                          buildStartTime, target );
                         }
 
                         rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
 
-                        dispatcher.dispatchEnd( event, rootProject.getId() + " ( " + segment + " )" );
+                        dispatcher.dispatchEnd( event, target );
                     }
                     catch ( LifecycleExecutionException e )
                     {
-                        dispatcher.dispatchError( event, rootProject.getId() + " ( " + segment + " )", e );
+                        dispatcher.dispatchError( event, target, e );
 
                         throw e;
                     }
@@ -313,7 +292,8 @@ public class DefaultLifecycleExecutor
 
                         long buildStartTime = System.currentTimeMillis();
 
-                        dispatcher.dispatchStart( event, currentProject.getId() + " ( " + segment + " )" );
+                        String target = currentProject.getId() + " ( " + segment + " )";
+                        dispatcher.dispatchStart( event, target );
 
                         try
                         {
@@ -321,37 +301,17 @@ public class DefaultLifecycleExecutor
                             {
                                 String task = (String) goalIterator.next();
 
-                                try
-                                {
-                                    executeGoal( task, session, currentProject, response );
-                                }
-                                catch ( MojoExecutionException e )
-                                {
-                                    // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
-                                }
-                                catch ( ArtifactResolutionException e )
-                                {
-                                    // TODO: should this be removed?
-                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
-                                }
-                                catch ( MojoFailureException e )
-                                {
-                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
-                                }
-                                catch ( ArtifactNotFoundException e )
-                                {
-                                    handleExecutionFailure( rm, currentProject, e, task, buildStartTime );
-                                }
+                                executeGoalAndHandleFailures( task, session, currentProject, response, dispatcher,
+                                                              event, rm, buildStartTime, target );
                             }
 
                             rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
 
-                            dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
+                            dispatcher.dispatchEnd( event, target );
                         }
                         catch ( LifecycleExecutionException e )
                         {
-                            dispatcher.dispatchError( event, currentProject.getId() + " ( " + segment + " )", e );
+                            dispatcher.dispatchError( event, target, e );
 
                             throw e;
                         }
@@ -371,6 +331,44 @@ public class DefaultLifecycleExecutor
                     }
                 }
             }
+        }
+    }
+
+    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project,
+                                               MavenExecutionResponse response, EventDispatcher dispatcher,
+                                               String event, ReactorManager rm, long buildStartTime, String target )
+        throws LifecycleExecutionException, MojoExecutionException, MojoFailureException, ArtifactNotFoundException,
+        ArtifactResolutionException
+    {
+        try
+        {
+            executeGoal( task, session, project, response );
+        }
+        catch ( MojoExecutionException e )
+        {
+            dispatcher.dispatchError( event, target, e );
+
+            handleExecutionFailure( rm, project, e, task, buildStartTime );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            dispatcher.dispatchError( event, target, e );
+
+            handleExecutionFailure( rm, project, e, task, buildStartTime );
+        }
+        catch ( MojoFailureException e )
+        {
+            // TODO: should be dispatchFailure?
+            dispatcher.dispatchError( event, target, e );
+
+            handleExecutionFailure( rm, project, e, task, buildStartTime );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            // TODO: should be dispatchFailure?
+            dispatcher.dispatchError( event, target, e );
+
+            handleExecutionFailure( rm, project, e, task, buildStartTime );
         }
     }
 
@@ -600,7 +598,8 @@ public class DefaultLifecycleExecutor
             }
             catch ( PluginManagerException e )
             {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+                throw new LifecycleExecutionException(
+                    "Internal error in the plugin manager executing goal '" + mojoDescriptor.getId(), e );
             }
         }
     }
@@ -672,29 +671,18 @@ public class DefaultLifecycleExecutor
 
                 List reportSets = reportPlugin.getReportSets();
 
-                try
+                if ( reportSets == null || reportSets.isEmpty() )
                 {
-                    if ( reportSets == null || reportSets.isEmpty() )
+                    reports.addAll( getReports( reportPlugin, null, project, session, mojoExecution ) );
+                }
+                else
+                {
+                    for ( Iterator j = reportSets.iterator(); j.hasNext(); )
                     {
-                        reports.addAll( getReports( reportPlugin, null, project, session, mojoExecution ) );
-                    }
-                    else
-                    {
-                        for ( Iterator j = reportSets.iterator(); j.hasNext(); )
-                        {
-                            ReportSet reportSet = (ReportSet) j.next();
+                        ReportSet reportSet = (ReportSet) j.next();
 
-                            reports.addAll( getReports( reportPlugin, reportSet, project, session, mojoExecution ) );
-                        }
+                        reports.addAll( getReports( reportPlugin, reportSet, project, session, mojoExecution ) );
                     }
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new LifecycleExecutionException( "Error getting reports", e );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new LifecycleExecutionException( "Error getting reports", e );
                 }
             }
         }
@@ -703,10 +691,9 @@ public class DefaultLifecycleExecutor
 
     private List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
                              MojoExecution mojoExecution )
-        throws PluginManagerException, PluginVersionResolutionException, ArtifactResolutionException,
-        ArtifactNotFoundException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
     {
-        PluginDescriptor pluginDescriptor = pluginManager.verifyReportPlugin( reportPlugin, project, session );
+        PluginDescriptor pluginDescriptor = verifyReportPlugin( reportPlugin, project, session );
 
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
@@ -725,13 +712,21 @@ public class DefaultLifecycleExecutor
 
                 MojoExecution reportExecution = new MojoExecution( mojoDescriptor, id );
 
-                MavenReport reportMojo = pluginManager.getReport( project, reportExecution, session );
-
-                // Comes back null if it was a plugin, not a report - these are mojos in the reporting plugins that are not reports
-                if ( reportMojo != null )
+                try
                 {
-                    reports.add( reportMojo );
-                    mojoExecution.addMojoExecution( reportExecution );
+                    MavenReport reportMojo = pluginManager.getReport( project, reportExecution, session );
+
+                    // Comes back null if it was a plugin, not a report - these are mojos in the reporting plugins that are not reports
+                    if ( reportMojo != null )
+                    {
+                        reports.add( reportMojo );
+                        mojoExecution.addMojoExecution( reportExecution );
+                    }
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException(
+                        "Error getting reports from the plugin '" + reportPlugin.getKey() + "'", e );
                 }
             }
         }
@@ -796,11 +791,13 @@ public class DefaultLifecycleExecutor
                 }
                 catch ( IOException e )
                 {
-                    throw new LifecycleExecutionException( "Unable to read lifecycle mapping file", e );
+                    throw new LifecycleExecutionException( "Unable to read lifecycle mapping file: " + e.getMessage(),
+                                                           e );
                 }
                 catch ( XmlPullParserException e )
                 {
-                    throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file", e );
+                    throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file: " + e.getMessage(),
+                                                           e );
                 }
 
                 if ( lifecycleOverlay == null )
@@ -866,8 +863,8 @@ public class DefaultLifecycleExecutor
 
         if ( desc == null )
         {
-            String message = "Required goal '" + goal + "' not found in plugin '" + pluginDescriptor.getGoalPrefix() +
-                "'";
+            String message =
+                "Required goal '" + goal + "' not found in plugin '" + pluginDescriptor.getGoalPrefix() + "'";
             int index = goal.indexOf( ':' );
             if ( index >= 0 )
             {
@@ -889,8 +886,8 @@ public class DefaultLifecycleExecutor
         String mojoIdWithVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" +
             pluginDescriptor.getVersion() + ":" + mojoDescriptor.getGoal();
 
-        String mojoIdWithoutVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" +
-            mojoDescriptor.getGoal();
+        String mojoIdWithoutVersion =
+            pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" + mojoDescriptor.getGoal();
 
         for ( Iterator it = lifecycleMappings.values().iterator(); it.hasNext(); )
         {
@@ -972,25 +969,11 @@ public class DefaultLifecycleExecutor
         String packaging = project.getPackaging();
         Map mappings = null;
 
-        try
+        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging,
+                                                               session.getSettings(), session.getLocalRepository() );
+        if ( m != null )
         {
-            LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging,
-                                                                   session.getSettings(),
-                                                                   session.getLocalRepository() );
-            if ( m != null )
-            {
-                mappings = m.getPhases( lifecycle.getId() );
-            }
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new LifecycleExecutionException(
-                "Cannot load extension plugin obtaining lifecycle mappings for: \'" + packaging + "\'.", e );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new LifecycleExecutionException(
-                "Cannot load extension plugin obtaining lifecycle mappings for: \'" + packaging + "\'.", e );
+            mappings = m.getPhases( lifecycle.getId() );
         }
 
         Map defaultMappings = lifecycle.getDefaultPhases();
@@ -999,7 +982,7 @@ public class DefaultLifecycleExecutor
         {
             try
             {
-                LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
                 mappings = m.getPhases( lifecycle.getId() );
             }
             catch ( ComponentLookupException e )
@@ -1030,8 +1013,7 @@ public class DefaultLifecycleExecutor
 
     private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
                                   ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException,
-        ArtifactNotFoundException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
     {
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
         {
@@ -1039,7 +1021,7 @@ public class DefaultLifecycleExecutor
 
             if ( plugin.isExtensions() )
             {
-                pluginManager.verifyPlugin( plugin, project, settings, localRepository );
+                verifyPlugin( plugin, project, settings, localRepository );
 
                 // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
                 try
@@ -1049,6 +1031,11 @@ public class DefaultLifecycleExecutor
                 catch ( ComponentLookupException e )
                 {
                     getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException(
+                        "Error getting extensions from the plugin '" + plugin.getKey() + "'", e );
                 }
             }
         }
@@ -1060,8 +1047,7 @@ public class DefaultLifecycleExecutor
      * lookup directly, or have them passed in
      */
     private Map findArtifactTypeHandlers( MavenProject project, Settings settings, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException,
-        ArtifactNotFoundException
+        throws ArtifactResolutionException, ArtifactNotFoundException, LifecycleExecutionException
     {
         Map map = new HashMap();
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
@@ -1070,27 +1056,31 @@ public class DefaultLifecycleExecutor
 
             if ( plugin.isExtensions() )
             {
-                pluginManager.verifyPlugin( plugin, project, settings, localRepository );
+                verifyPlugin( plugin, project, settings, localRepository );
 
                 // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
                 try
                 {
                     Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
                     map.putAll( components );
-
-                    // shudder...
-                    for ( Iterator j = map.values().iterator(); j.hasNext(); )
-                    {
-                        ArtifactHandler handler = (ArtifactHandler) j.next();
-                        if ( project.getPackaging().equals( handler.getPackaging() ) )
-                        {
-                            project.getArtifact().setArtifactHandler( handler );
-                        }
-                    }
                 }
                 catch ( ComponentLookupException e )
                 {
                     getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException( "Error looking up available components from a plugin", e );
+                }
+
+                // shudder...
+                for ( Iterator j = map.values().iterator(); j.hasNext(); )
+                {
+                    ArtifactHandler handler = (ArtifactHandler) j.next();
+                    if ( project.getPackaging().equals( handler.getPackaging() ) )
+                    {
+                        project.getArtifact().setArtifactHandler( handler );
+                    }
                 }
             }
         }
@@ -1111,7 +1101,7 @@ public class DefaultLifecycleExecutor
         PluginDescriptor pluginDescriptor;
         Settings settings = session.getSettings();
 
-        pluginDescriptor = verifyPlugin( plugin, session, project );
+        pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
 
         if ( pluginDescriptor.getMojos() != null && !pluginDescriptor.getMojos().isEmpty() )
         {
@@ -1139,20 +1129,47 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private PluginDescriptor verifyPlugin( Plugin plugin, MavenSession session, MavenProject project )
+    private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
+                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
     {
         PluginDescriptor pluginDescriptor;
         try
         {
-            ArtifactRepository localRepository = session.getLocalRepository();
-            pluginDescriptor = pluginManager.verifyPlugin( plugin, project, session.getSettings(), localRepository );
+            pluginDescriptor = pluginManager.verifyPlugin( plugin, project, settings, localRepository );
         }
         catch ( PluginManagerException e )
         {
             throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
         }
         catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Error resolving plugin version", e );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new LifecycleExecutionException( "Error resolving plugin version", e );
+        }
+        return pluginDescriptor;
+    }
+
+    private PluginDescriptor verifyReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, LifecycleExecutionException, ArtifactNotFoundException
+    {
+        PluginDescriptor pluginDescriptor;
+        try
+        {
+            pluginDescriptor = pluginManager.verifyReportPlugin( plugin, project, session );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+        }
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Error resolving plugin version", e );
+        }
+        catch ( InvalidVersionSpecificationException e )
         {
             throw new LifecycleExecutionException( "Error resolving plugin version", e );
         }
@@ -1302,22 +1319,11 @@ public class DefaultLifecycleExecutor
                 {
                     Plugin buildPlugin = (Plugin) i.next();
 
-                    try
+                    PluginDescriptor desc =
+                        verifyPlugin( buildPlugin, project, session.getSettings(), session.getLocalRepository() );
+                    if ( prefix.equals( desc.getGoalPrefix() ) )
                     {
-                        PluginDescriptor desc = pluginManager.verifyPlugin( buildPlugin, project, session.getSettings(),
-                                                                            session.getLocalRepository() );
-                        if ( prefix.equals( desc.getGoalPrefix() ) )
-                        {
-                            plugin = buildPlugin;
-                        }
-                    }
-                    catch ( PluginManagerException e )
-                    {
-                        throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
-                    }
-                    catch ( PluginVersionResolutionException e )
-                    {
-                        throw new LifecycleExecutionException( "Error resolving plugin version", e );
+                        plugin = buildPlugin;
                     }
                 }
             }
@@ -1364,19 +1370,7 @@ public class DefaultLifecycleExecutor
 
         if ( pluginDescriptor == null )
         {
-            try
-            {
-                pluginDescriptor = pluginManager.verifyPlugin( plugin, project, session.getSettings(),
-                                                               session.getLocalRepository() );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
-            }
-            catch ( PluginVersionResolutionException e )
-            {
-                throw new LifecycleExecutionException( "Error resolving plugin version", e );
-            }
+            pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
         }
 
         // this has been simplified from the old code that injected the plugin management stuff, since

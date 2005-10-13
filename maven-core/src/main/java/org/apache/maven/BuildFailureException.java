@@ -1,4 +1,4 @@
-package org.apache.maven.reactor;
+package org.apache.maven;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -17,28 +17,16 @@ package org.apache.maven.reactor;
  */
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * One or more builds failed.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ReactorException
-    extends Exception
+public class BuildFailureException
+    extends Throwable
 {
-    public ReactorException()
-    {
-    }
-
-    public ReactorException( String message )
+    public BuildFailureException( String message )
     {
         super( message );
-    }
-
-    public ReactorException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public ReactorException( String message, Throwable cause )
-    {
-        super( message, cause );
     }
 }

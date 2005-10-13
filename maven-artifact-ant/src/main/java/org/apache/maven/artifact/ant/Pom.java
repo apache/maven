@@ -268,7 +268,7 @@ public class Pom
     /**
      * Registers POMPropertyHelper as a property interceptor
      */
-    public void execute()
+    protected void doExecute()
     {
         ArtifactRepository localRepo = createLocalArtifactRepository();
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );

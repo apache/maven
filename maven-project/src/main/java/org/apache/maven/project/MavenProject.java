@@ -22,7 +22,6 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -1406,7 +1405,7 @@ public class MavenProject
      */
     public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                 ArtifactFilter dependencyFilter )
-        throws InvalidVersionSpecificationException
+        throws ProjectBuildingException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope,
                                                     dependencyFilter, this );

@@ -77,7 +77,7 @@ public class PerformReleaseMojo
 
     private ReleaseProgressTracker releaseProgress;
 
-    protected void executeTask()
+    public void execute()
         throws MojoExecutionException
     {
         checkout();

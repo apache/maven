@@ -33,6 +33,12 @@ public class ArtifactResolutionException
         super( message, groupId, artifactId, version, type, remoteRepositories, path, t );
     }
 
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        Throwable t )
+    {
+        super( message, groupId, artifactId, version, type, null, null, t );
+    }
+
     public ArtifactResolutionException( String message, Artifact artifact )
     {
         super( message, artifact );

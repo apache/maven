@@ -66,14 +66,4 @@ public abstract class AbstractReleaseMojo
 
         return scmHelper;
     }
-
-    public void execute()
-        throws MojoExecutionException
-    {
-        executeTask();
-    }
-
-    protected abstract void executeTask()
-        throws MojoExecutionException;
-
 }

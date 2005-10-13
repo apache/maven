@@ -19,7 +19,6 @@ package org.apache.maven.plugin.version;
 public class PluginVersionResolutionException
     extends Exception
 {
-
     private final String groupId;
 
     private final String artifactId;

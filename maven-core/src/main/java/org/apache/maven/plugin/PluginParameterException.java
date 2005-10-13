@@ -17,7 +17,10 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.codehaus.plexus.util.StringUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class PluginParameterException
@@ -30,7 +33,8 @@ public class PluginParameterException
 
     public PluginParameterException( MojoDescriptor mojo, List parameters )
     {
-        super( mojo.getPluginDescriptor(), "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
+        super( mojo.getPluginDescriptor(),
+               "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
 
         this.mojo = mojo;
 
@@ -39,7 +43,8 @@ public class PluginParameterException
 
     public PluginParameterException( MojoDescriptor mojo, List parameters, Throwable cause )
     {
-        super( mojo.getPluginDescriptor(), "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
+        super( mojo.getPluginDescriptor(),
+               "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
 
         this.mojo = mojo;
 
@@ -56,4 +61,63 @@ public class PluginParameterException
         return parameters;
     }
 
+    private static void decomposeParameterIntoUserInstructions( MojoDescriptor mojo, Parameter param,
+                                                                StringBuffer messageBuffer )
+    {
+        String expression = param.getExpression();
+
+        if ( param.isEditable() )
+        {
+            messageBuffer.append( "inside the definition for plugin: \'" + mojo.getPluginDescriptor().getArtifactId() +
+                "\'specify the following:\n\n<configuration>\n  ...\n  <" + param.getName() + ">VALUE</" +
+                param.getName() + ">\n</configuration>" );
+
+            String alias = param.getAlias();
+            if ( StringUtils.isNotEmpty( alias ) )
+            {
+                messageBuffer.append(
+                    "\n\n-OR-\n\n<configuration>\n  ...\n  <" + alias + ">VALUE</" + alias + ">\n</configuration>\n" );
+            }
+        }
+
+        if ( StringUtils.isEmpty( expression ) )
+        {
+            messageBuffer.append( "." );
+        }
+        else
+        {
+            if ( param.isEditable() )
+            {
+                messageBuffer.append( "\n\n-OR-\n\n" );
+            }
+
+            addParameterUsageInfo( expression, messageBuffer );
+        }
+    }
+
+    public String buildDiagnosticMessage()
+    {
+        StringBuffer messageBuffer = new StringBuffer();
+
+        List params = getParameters();
+        MojoDescriptor mojo = getMojoDescriptor();
+
+        messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" )
+            .append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ":" ).append( mojo.getGoal() )
+            .append( "\'\n" );
+
+        int idx = 0;
+        for ( Iterator it = params.iterator(); it.hasNext(); idx++ )
+        {
+            Parameter param = (Parameter) it.next();
+
+            messageBuffer.append( "\n[" ).append( idx ).append( "] " );
+
+            decomposeParameterIntoUserInstructions( mojo, param, messageBuffer );
+
+            messageBuffer.append( "\n" );
+        }
+
+        return messageBuffer.toString();
+    }
 }

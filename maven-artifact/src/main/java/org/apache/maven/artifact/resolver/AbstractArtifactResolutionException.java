@@ -133,10 +133,10 @@ public class AbstractArtifactResolutionException
             sb.append( "Path to dependency: " );
             sb.append( LS );
             int num = 1;
-            for ( Iterator i = path.iterator(); i.hasNext(); )
+            for ( Iterator i = path.iterator(); i.hasNext(); num++ )
             {
                 sb.append( "\t" );
-                sb.append( num++ );
+                sb.append( num );
                 sb.append( ") " );
                 sb.append( i.next() );
                 sb.append( LS );

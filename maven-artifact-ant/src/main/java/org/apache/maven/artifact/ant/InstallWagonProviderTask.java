@@ -17,6 +17,7 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -47,6 +48,8 @@ public class InstallWagonProviderTask
 
     private String version;
 
+    private static final String WAGON_GROUP_ID = "org.apache.maven.wagon";
+
     public String getArtifactId()
     {
         return artifactId;
@@ -67,59 +70,60 @@ public class InstallWagonProviderTask
         this.version = version;
     }
 
-    public void execute()
+    public void doExecute()
         throws BuildException
     {
+        MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
+
+        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+        ArtifactRepository artifactRepository = createRemoteArtifactRepository( getDefaultRemoteRepository() );
+        List remoteRepositories = Collections.singletonList( artifactRepository );
+
+        VersionRange versionRange;
         try
         {
-            MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
-
-            ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
-            ArtifactRepository artifactRepository = createRemoteArtifactRepository( getDefaultRemoteRepository() );
-            List remoteRepositories = Collections.singletonList( artifactRepository );
-            try
-            {
-                ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-                VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-                Artifact providerArtifact = factory.createExtensionArtifact( "org.apache.maven.wagon", artifactId,
-                                                                             versionRange );
-                ArtifactResolutionResult result = resolver.resolveTransitively( Collections
-                    .singleton( providerArtifact ), createArtifact( createDummyPom() ),
-                                                                                createLocalArtifactRepository(),
-                                                                                remoteRepositories, metadataSource,
-                                                                                null );
-
-                log( "Installing provider: " + providerArtifact );
-
-                for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
-                {
-                    Artifact a = (Artifact) i.next();
-                    getEmbedder().getContainer().addJarResource( a.getFile() );
-                }
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-            }
-            catch ( PlexusContainerException e )
-            {
-                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-            }
-            catch ( InvalidVersionSpecificationException e )
-            {
-                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new BuildException( "Unable to locate wagon provider in remote repository", e );
-            }
+            versionRange = VersionRange.createFromVersionSpec( version );
         }
-        catch ( BuildException e )
+        catch ( InvalidVersionSpecificationException e )
         {
-            diagnoseError( e );
-            
-            throw e;
+            throw new BuildException( "Unable to get extension '" +
+                ArtifactUtils.versionlessKey( WAGON_GROUP_ID, artifactId ) + "' because version '" + version +
+                " is invalid: " + e.getMessage(), e );
         }
 
+        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        Artifact providerArtifact = factory.createExtensionArtifact( WAGON_GROUP_ID, artifactId, versionRange );
+
+        ArtifactResolutionResult result;
+        try
+        {
+            result = resolver.resolveTransitively( Collections.singleton( providerArtifact ),
+                                                   createArtifact( createDummyPom() ), createLocalArtifactRepository(),
+                                                   remoteRepositories, metadataSource, null );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+        }
+
+        log( "Installing provider: " + providerArtifact );
+
+        try
+        {
+            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            {
+                Artifact a = (Artifact) i.next();
+                getEmbedder().getContainer().addJarResource( a.getFile() );
+            }
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new BuildException( "Unable to locate wagon provider in remote repository", e );
+        }
     }
+
 }

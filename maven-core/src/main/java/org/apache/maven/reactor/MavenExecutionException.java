@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.reactor;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,22 +16,29 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.reactor.MavenExecutionException;
-
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public interface Maven
+public class MavenExecutionException
+    extends Exception
 {
-    static String ROLE = Maven.class.getName();
+    public MavenExecutionException()
+    {
+    }
 
-    String POMv4 = "pom.xml";
+    public MavenExecutionException( String message )
+    {
+        super( message );
+    }
 
-    String RELEASE_POMv4 = "release-pom.xml";
+    public MavenExecutionException( Throwable cause )
+    {
+        super( cause );
+    }
 
-    MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws MavenExecutionException, SettingsConfigurationException;
+    public MavenExecutionException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

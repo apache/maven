@@ -41,7 +41,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
@@ -250,7 +250,7 @@ public class MavenCli
         {
             response = maven.execute( request );
         }
-        catch ( ReactorException e )
+        catch ( MavenExecutionException e )
         {
             showFatalError( "Error executing Maven for a project", e, showErrors );
             return 1;
@@ -461,11 +461,11 @@ public class MavenCli
     {
         // TODO: release
         // TODO: something in plexus to show all active hooks?
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup(
-            ArtifactRepositoryLayout.ROLE, "default" );
+        ArtifactRepositoryLayout repositoryLayout =
+            (ArtifactRepositoryLayout) embedder.lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
-            ArtifactRepositoryFactory.ROLE );
+        ArtifactRepositoryFactory artifactRepositoryFactory =
+            (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
 
         String url = settings.getLocalRepository();
 
@@ -677,7 +677,7 @@ public class MavenCli
                 "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
             options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
                 "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
-            
+
             options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
                 "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
 
