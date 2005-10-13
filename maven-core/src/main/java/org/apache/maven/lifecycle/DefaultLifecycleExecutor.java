@@ -333,6 +333,7 @@ public class DefaultLifecycleExecutor
         {
             rm.blackList( project );
         }
+        // if NEVER, don't blacklist
         return false;
     }
 

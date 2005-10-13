@@ -106,27 +106,10 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
+        ReactorManager rm;
         try
         {
-            ReactorManager rm = doExecute( request, dispatcher );
-
-            // TODO: shoul all the logging be left to the CLI?
-            logReactorSummary( rm );
-
-            if ( rm.hasBuildFailures() )
-            {
-                logErrors( rm, request.isShowErrors() );
-            }
-            else
-            {
-                logSuccess( rm );
-            }
-
-            stats( request.getStartTime() );
-
-            line();
-
-            dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+            rm = doExecute( request, dispatcher );
         }
         catch ( LifecycleExecutionException e )
         {
@@ -164,6 +147,43 @@ public class DefaultMaven
 
             throw new MavenExecutionException( "Error executing project within the reactor", t );
         }
+
+        // Either the build was successful, or it was a fail_at_end/fail_never reactor build
+
+        // TODO: should all the logging be left to the CLI?
+        logReactorSummary( rm );
+
+        if ( rm.hasBuildFailures() )
+        {
+            logErrors( rm, request.isShowErrors() );
+
+            if ( !ReactorManager.FAIL_NEVER.equals( rm.getFailureBehavior() ) )
+            {
+                dispatcher.dispatchError( event, request.getBaseDirectory(), null );
+
+                getLogger().info( "BUILD ERRORS" );
+
+                line();
+
+                stats( request.getStartTime() );
+
+                line();
+
+                throw new MavenExecutionException( "Some builds failed" );
+            }
+            else
+            {
+                getLogger().info( " + Ignoring failures" );
+            }
+        }
+
+        logSuccess( rm );
+
+        stats( request.getStartTime() );
+
+        line();
+
+        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
     }
 
     private void logErrors( ReactorManager rm, boolean showErrors )
@@ -590,7 +610,7 @@ public class DefaultMaven
     {
         line();
 
-        getLogger().info( "FATAL ERROR" );
+        getLogger().error( "FATAL ERROR" );
 
         line();
 
@@ -603,7 +623,7 @@ public class DefaultMaven
     {
         line();
 
-        getLogger().info( "BUILD ERROR" );
+        getLogger().error( "BUILD ERROR" );
 
         line();
 
@@ -616,7 +636,7 @@ public class DefaultMaven
     {
         line();
 
-        getLogger().info( "BUILD FAILURE" );
+        getLogger().error( "BUILD FAILURE" );
 
         line();
 
@@ -636,13 +656,13 @@ public class DefaultMaven
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Trace", t );
+            getLogger().info( "Trace", t );
 
             line();
         }
         else if ( showErrors )
         {
-            getLogger().error( "Trace", t );
+            getLogger().info( "Trace", t );
 
             line();
         }
@@ -665,7 +685,7 @@ public class DefaultMaven
             message = t.getMessage();
         }
 
-        getLogger().error( message );
+        getLogger().info( message );
 
         line();
     }
