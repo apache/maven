@@ -20,8 +20,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -73,7 +73,7 @@ public class ProjectArtifactMetadata
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException
+        throws RepositoryMetadataStoreException
     {
         File destination = new File( localRepository.getBasedir(),
                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
@@ -104,15 +104,15 @@ public class ProjectArtifactMetadata
         }
         catch ( FileNotFoundException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
         }
         catch ( IOException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
         }
         finally
         {

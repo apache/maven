@@ -17,7 +17,6 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.List;
@@ -25,11 +24,11 @@ import java.util.List;
 public interface RepositoryMetadataManager
 {
     void resolve( RepositoryMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws RepositoryMetadataResolutionException;
 
     void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
                         ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws RepositoryMetadataResolutionException;
 
     /**
      * Deploy metadata to the remote repository.
@@ -40,7 +39,7 @@ public interface RepositoryMetadataManager
      */
     void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
                  ArtifactRepository deploymentRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws RepositoryMetadataDeploymentException;
 
     /**
      * Install the metadata in the local repository.
@@ -49,5 +48,5 @@ public interface RepositoryMetadataManager
      * @param localRepository the local repository
      */
     void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws RepositoryMetadataInstallationException;
 }

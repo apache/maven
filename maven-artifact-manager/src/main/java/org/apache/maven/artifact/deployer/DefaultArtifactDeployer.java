@@ -19,8 +19,8 @@ package org.apache.maven.artifact.deployer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.TransferFailedException;
@@ -88,15 +88,15 @@ public class DefaultArtifactDeployer
         }
         catch ( TransferFailedException e )
         {
-            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
-        }
-        catch ( ArtifactMetadataRetrievalException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
+            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
         }
         catch ( IOException e )
         {
-            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
+            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
+        }
+        catch ( RepositoryMetadataDeploymentException e )
+        {
+            throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
         }
     }
 }

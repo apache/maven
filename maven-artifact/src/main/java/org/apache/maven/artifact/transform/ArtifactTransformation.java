@@ -17,8 +17,10 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
+import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ public interface ArtifactTransformation
      * @param localRepository the local repository
      */
     void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws ArtifactResolutionException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no
@@ -50,7 +52,7 @@ public interface ArtifactTransformation
      * @param localRepository the local repository it will be stored in
      */
     void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws ArtifactInstallationException;
 
     /**
      * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no
@@ -62,6 +64,6 @@ public interface ArtifactTransformation
      */
     void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                  ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws ArtifactDeploymentException;
 
 }

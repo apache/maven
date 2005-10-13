@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 
 /**
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
@@ -77,7 +78,7 @@ public interface ArtifactMetadata
      * @todo this should only be needed on the repository metadata
      */
     void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException;
-    
+        throws RepositoryMetadataStoreException;
+
     String extendedToString();
 }

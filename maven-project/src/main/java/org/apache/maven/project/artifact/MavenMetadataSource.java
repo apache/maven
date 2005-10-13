@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -343,7 +344,14 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
-        repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
+        try
+        {
+            repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
+        }
+        catch ( RepositoryMetadataResolutionException e )
+        {
+            throw new ArtifactMetadataRetrievalException( e.getMessage(), e );
+        }
 
         List versions;
         Metadata repoMetadata = metadata.getMetadata();

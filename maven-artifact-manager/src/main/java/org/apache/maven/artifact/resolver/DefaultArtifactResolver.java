@@ -19,7 +19,6 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -102,14 +101,7 @@ public class DefaultArtifactResolver
 
                 artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
-                try
-                {
-                    transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
-                }
-                catch ( ArtifactMetadataRetrievalException e )
-                {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                }
+                transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
                 File destination = artifact.getFile();
                 boolean resolved = false;

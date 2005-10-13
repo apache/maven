@@ -44,9 +44,14 @@ public class ArtifactResolutionException
         super( message, artifact );
     }
 
-    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
+    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
+    }
+
+    public ArtifactResolutionException( String message, Artifact artifact, Throwable t )
+    {
+        super( message, artifact, null, t );
     }
 
     protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )

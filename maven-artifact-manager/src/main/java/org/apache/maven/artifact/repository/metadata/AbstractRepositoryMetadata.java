@@ -18,7 +18,6 @@ package org.apache.maven.artifact.repository.metadata;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -59,7 +58,7 @@ public abstract class AbstractRepositoryMetadata
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException
+        throws RepositoryMetadataStoreException
     {
         try
         {
@@ -67,11 +66,11 @@ public abstract class AbstractRepositoryMetadata
         }
         catch ( IOException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Error updating group repository metadata", e );
+            throw new RepositoryMetadataStoreException( "Error updating group repository metadata", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ArtifactMetadataRetrievalException( "Error updating group repository metadata", e );
+            throw new RepositoryMetadataStoreException( "Error updating group repository metadata", e );
         }
     }
 

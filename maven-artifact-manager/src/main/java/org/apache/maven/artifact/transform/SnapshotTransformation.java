@@ -17,13 +17,15 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.text.DateFormat;
@@ -48,18 +50,24 @@ public class SnapshotTransformation
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
+        throws ArtifactResolutionException
     {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
         if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) )
         {
-            String version = resolveVersion( artifact, localRepository, remoteRepositories );
-            artifact.updateVersion( version, localRepository );
+            try
+            {
+                String version = resolveVersion( artifact, localRepository, remoteRepositories );
+                artifact.updateVersion( version, localRepository );
+            }
+            catch ( RepositoryMetadataResolutionException e )
+            {
+                throw new ArtifactResolutionException( e.getMessage(), artifact, e );
+            }
         }
     }
 
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
     {
         if ( artifact.isSnapshot() )
         {
@@ -73,7 +81,7 @@ public class SnapshotTransformation
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
+        throws ArtifactDeploymentException
     {
         if ( artifact.isSnapshot() )
         {
@@ -84,9 +92,17 @@ public class SnapshotTransformation
             }
 
             // we update the build number anyway so that it doesn't get lost. It requires the timestamp to take effect
-            int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
+            try
+            {
+                int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
 
-            snapshot.setBuildNumber( buildNumber + 1 );
+                snapshot.setBuildNumber( buildNumber + 1 );
+            }
+            catch ( RepositoryMetadataResolutionException e )
+            {
+                throw new ArtifactDeploymentException( "Error retrieving previous build number for artifact '" +
+                    artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+            }
 
             RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
@@ -127,14 +143,14 @@ public class SnapshotTransformation
 
     private int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
                                                   ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException
+        throws RepositoryMetadataResolutionException
     {
         RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
         if ( !wagonManager.isOnline() )
         {
             // build number is a required feature for metadata consistency
-            throw new ArtifactMetadataRetrievalException(
+            throw new RepositoryMetadataResolutionException(
                 "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
         }
 

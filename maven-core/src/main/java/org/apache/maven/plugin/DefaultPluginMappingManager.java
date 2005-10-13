@@ -16,13 +16,13 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class DefaultPluginMappingManager
             {
                 loadPluginMappings( groupId, pluginRepositories, localRepository );
             }
-            catch ( ArtifactMetadataRetrievalException e )
+            catch ( RepositoryMetadataResolutionException e )
             {
                 getLogger().warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
 
@@ -91,7 +91,7 @@ public class DefaultPluginMappingManager
     }
 
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
+        throws RepositoryMetadataResolutionException
     {
         RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 

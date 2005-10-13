@@ -18,8 +18,8 @@ package org.apache.maven.artifact.installer;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataInstallationException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -81,11 +81,11 @@ public class DefaultArtifactInstaller
         }
         catch ( IOException e )
         {
-            throw new ArtifactInstallationException( "Error installing artifact: ", e );
+            throw new ArtifactInstallationException( "Error installing artifact: " + e.getMessage(), e );
         }
-        catch ( ArtifactMetadataRetrievalException e )
+        catch ( RepositoryMetadataInstallationException e )
         {
-            throw new ArtifactInstallationException( "Error installing artifact: ", e );
+            throw new ArtifactInstallationException( "Error installing artifact's metadata: " + e.getMessage(), e );
         }
     }
 }

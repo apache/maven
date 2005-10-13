@@ -18,10 +18,11 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
 
@@ -35,25 +36,30 @@ public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
+        throws ArtifactResolutionException
     {
         if ( Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
-            String version = resolveVersion( artifact, localRepository, remoteRepositories );
-
-            if ( Artifact.RELEASE_VERSION.equals( version ) )
+            try
             {
-                throw new ArtifactMetadataRetrievalException(
-                    "Unable to determine the release version for artifact " + artifact );
-            }
+                String version = resolveVersion( artifact, localRepository, remoteRepositories );
 
-            artifact.setBaseVersion( version );
-            artifact.updateVersion( version, localRepository );
+                if ( Artifact.RELEASE_VERSION.equals( version ) )
+                {
+                    throw new ArtifactResolutionException( "Unable to determine the release version", artifact );
+                }
+
+                artifact.setBaseVersion( version );
+                artifact.updateVersion( version, localRepository );
+            }
+            catch ( RepositoryMetadataResolutionException e )
+            {
+                throw new ArtifactResolutionException( e.getMessage(), artifact, e );
+            }
         }
     }
 
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
     {
         ArtifactMetadata metadata = createMetadata( artifact );
 
@@ -62,7 +68,6 @@ public class ReleaseArtifactTransformation
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
     {
         ArtifactMetadata metadata = createMetadata( artifact );
 
