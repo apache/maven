@@ -18,7 +18,8 @@
     <menu name="Installing">
       <item name="Download" href="/download.html"/>
       <item name="Install" href="/download.html#installation"/>
-      <item name="Configuration" href="/configuration.html"/>
+      <item name="Getting Started" href="/guides/getting-started/index.html"/>
+      <item name="Documentation" href="/guides/toc.html"/>
       <item name="Release Notes" href="/release-notes.html"/>
     </menu>
 
@@ -30,6 +31,8 @@
       <item name="Road Map" href="/roadmap.html"/>
       <item name="Powered By" href="/powered-by-m2.html"/>      
     </menu>
+
+    <!--
     <menu name="User's Guide">
       <item name="Getting Started" href="/getting-started.html"/>
       <item name="Build Lifecycle" href="/lifecycle.html"/>
@@ -37,6 +40,8 @@
       <item name="Dependency Mechanism" href="/dependency-mechanism.html"/>
       <item name="Creating a Site" href="/site.html"/>
     </menu>
+    -->
+
     <menu name="Plugin Developers">
       <item name="Plugin Development Guide" href="/developers/plugin-development-guide.html"/>
     </menu>

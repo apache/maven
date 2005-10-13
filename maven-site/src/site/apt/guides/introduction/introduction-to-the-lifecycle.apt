@@ -1,13 +1,386 @@
  ------
- Introduction to the Lifecycle
+ Introduction to the Build Lifecycle
  ------
- Jason van Zyl
+ Brett Porter
  ------
- 12 October 2005
+ 16 June 2005
  ------
 
-Introduction to the Lifecycle
+Introduction to the Build Lifecycle
 
-The content from the current lifecycle document will be incorporated here.
+* Build Lifecycle Basics
 
-~~How do I make my own lifecycle
+  Maven 2.0 is based around the central concept of a build lifecycle. What this means is that the process for building
+  and distributing a particular artifact is clearly defined.
+
+  For the person building a project, this means that it is only necessary to learn a small set of commands to build any
+  Maven project, and the POM will ensure they get the results they desired.
+
+   The most common lifecycle phases that would be executed on a project are the following (a complete list of the lifecycle phases is given below):
+
+    * <<<validate>>> - validate the project is correct and all necessary information is available
+
+    * <<<compile>>> - compile the source code of the project
+
+    * <<<test>>> - test the compiled source code using a suitable unit testing framework. These tests should not
+      require the code be packaged or deployed
+
+    * <<<package>>> - take the compiled code and package it in its distributable format, such as a JAR.
+
+    * <<<integration-test>>> - process and deploy the package if necessary into an environment where integration tests
+      can be run
+
+    * <<<verify>>> - run any checks to verify the package is valid and meets quality criteria
+
+    * <<<install>>> - install the package into the local repository, for use as a dependency in other projects locally
+
+    * <<<deploy>>> - done in an integration or release environment, copies the final package to the remote repository
+      for sharing with other developers and projects.
+
+  Note that for each of these steps, all previous steps are always executed, so you only need to specify the last one
+  you desire on the command line. For example:
+
+-------
+m2 install
+-------
+
+  This command will compile, test, package, verify and install the package into the local repository when run.
+
+  There are more commands that are part of the lifecycle, which will be discussed in the following sections.
+
+  It should also be noted that the same command can be used in a multi-module scenario. For example;
+
+------
+m2 clean:clean install
+------
+
+  This command will traverse into all of the subprojects and run <<<clean:clean>>>, then <<<install>>> (including all of
+  the prior steps).
+
+* Setting up your Project to Use the Build Lifecycle
+
+ The build lifecycle is simple enough to use, but when you are constructing a Maven build for a project, how do you go
+ about assigning tasks to each of those build phases?
+
+** Packaging
+
+ The first, and most common way, is to set the <<<packaging>>> for your project. This defaults to <<<jar>>>, so whether
+ you have specifically done it or not, this has already happened. Each packaging contains a list of goals to bind to
+ a particular phase. For example, a JAR will add the following bindings to the lifecycle:
+
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<process-resources>>>      | <<<resources:resources>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<compile>>>                | <<<compiler:compile>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<process-test-resources>>> | <<<resources:testResources>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<test-compile>>>           | <<<compiler:testCompile>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<test>>>                   | <<<surefire:test>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<package>>>                | <<<jar:jar>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<install>>>                | <<<install:install>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<deploy>>>                 | <<<deploy:deploy>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+
+  This is an almost standard set of bindings; however, some packages handle them differently. For example, a project
+  that is purely metadata (packaging <<<pom>>>) only binds the <<<install>>> and <<<deploy>>> phases.
+
+  Note that for some packaging tpyes to be available, you may also need to include a particular plugin in your
+  <<<build>>> section (as described in the next section). One example of a plugin that requires this is the Plexus plugin,
+  which provides a <<<plexus-application>>> and <<<plexus-service>>> packaging.
+
+** Plugins
+
+  The second way to add goals to phases is to configure plugins in your project. As you will see in the later sections,
+  plugins contain information that indicate which lifecycle phase to bind each goal to. Note that adding the plugin on its own is not
+  enough information - you must also specify the goals you want run as part of your build.
+
+  The goals that are configured will be added to the goals already bound to the lifecycle from the packaging selected.
+  If more than one goal is bound to a particular phase, the order used is that those from the packaging are executed
+  first, followed by those configured in the POM. Note that you can use the <<<executions>>> element to gain more
+  control over the order of particular goals.
+
+  For example, the Modello plugin always binds <<<modello:java>>> to the <<<generate-sources>>> phase. So to use the
+  Modello plugin and have it generate sources from a model and incorporate that into the build, you would add the
+  following to your POM in the <<<plugins>>> section of <<<build>>>:
+
+----
+...
+ <plugin>
+   <groupId>org.codehaus.modello</groupId>
+   <artifactId>modello-maven-plugin</artifactId>
+   <executions>
+     <execution>
+       <configuration>
+         <model>maven.mdo</model>
+         <modelVersion>4.0.0</modelVersion>
+       </configuration>
+       <goals>
+         <goal>java</goal>
+       </goals>
+     </execution>
+   </executions>
+ </plugin>
+...
+----
+
+  You might be wondering why that executions element is there. That is so that you can run the same goal multiple times
+  with different configuration if needed. Separate executions can also be given an ID so that during inheritence or the
+  application of profiles you can control whether goal configuration is merged or turned into an additional execution.
+
+  When multiple executions are given that match a particular phase, they are executed in the order specified in the POM,
+  with inherited executions running first.
+
+  Now, in the case of <<<modello:java>>>, it only makes sense in the <<<generate-sources>>> phase. But some goals can be
+  used in more than one phase, and there may not be a sensible default. For those, you can specify the phase yourself.
+  For example, let's say you have a goal <<<touch:timestamp>>> that echos the current time to a file, and you want it to
+  run in the <<<process-test-resources>>> phase to indicate when the tests were started. This would be configured like
+  so:
+
+----
+...
+ <plugin>
+   <groupId>com.mycompany.example</groupId>
+   <artifactId>touch-maven-plugin</artifactId>
+   <executions>
+     <execution>
+       <phase>process-test-resources</phase>
+       <configuration>
+         <file>${project.output.directory}/timestamp.txt</file>
+       </configuration>
+       <goals>
+         <goal>timestamp</goal>
+       </goals>
+     </execution>
+   </executions>
+ </plugin>
+...
+----
+
+* Build Lifecycle Phase Reference
+
+  The following lists all build lifecycle phases, which are executed in the order given up to the point of the one specified.
+
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<validate>>>                | validate the project is correct and all necessary information is available.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-sources>>>        | generate any source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-sources>>>         | process the source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-resources>>>      | generate resources for inclusion in the package.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-resources>>>       | copy and process the resources into the destination directory, ready for packaging.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<compile>>>                 | compile the source code of the project.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-classes>>>         | post-process the generated files from compilation, for example to do bytecode enhancement on Java classes.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-sources>>>   | generate any test source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-sources>>>    | process the test source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-resources>>> | create resources for testing.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-resources>>>  | copy and process the resources into the test destination directory.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test-compile>>>            | compile the test source code into the test destination directory
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test>>>                    | run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<package>>>                 | take the compiled code and package it in its distributable format, such as a JAR.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<integration-test>>>        | process and deploy the package if necessary into an environment where integration tests can be run.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<verify>>>                  | run any checks to verify the package is valid and meets quality criteria.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<install>>>                 | install the package into the local repository, for use as a dependency in other projects locally.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<deploy>>>                  | done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.
+*-------------------------------+--------------------------------------------------------------------------------------+
+
+* How the Build Lifecycle Affects Plugin Developers
+
+  The build lifecycle ensures that plugin developers only need to make their individual goal (a "mojo") perform a single
+  task with a simple set of inputs and outputs, and then have that goal bound to the appropriate stage of the build.
+
+  Information is passed between goals only through the project object - for example by adding new compile source roots,
+  changing the location of the classes directory after processing, and so on.
+
+  There are 3 ways that a plugin can interact with the build lifecycle: by binding a mojo to a particular phase, by
+  specifying an alternate packaging and appropriate lifecycle bindings, or by forking a parallel lifecycle.
+
+** Binding a Mojo to a Phase
+
+  If the mojo is participating in a part of the normal build, usually the plugin developer will bind that mojo to a
+  particular phase, using the following syntax in the mojo level declaration:
+
+----
+@phase generate-sources
+----
+
+  <<Note:>> <Some plugin languages have different ways of specifying mojo level declarations.
+  Please refer to the specific plugin development documentation for more information.>
+
+  Once this is specified, it will automatically be registered when the goal is listed in the project POM, as described
+  previously.
+
+** Specifying a New Packaging
+
+  If your plugin is intended to provide a unique artifact type, then you will need to provide not only the goal to
+  package it with, but also a mapping of how the default lifecycle should behave.
+
+  This is currently achieved by adding a Plexus descriptor to your plugin (or modifying it if it already exists).
+  This file is <<<META-INF/plexus/components.xml>>> in the plugin JAR. The following is an example of configuring a
+  set of phases for the Plexus plugin itself to register the <<<plexus-application>>> type:
+
+----
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>plexus:app</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>
+----
+
+  In this example, the <<<role-hint>>> is used to specify the packaging, and the <<<role>>> of
+  <<<org.apache.maven.lifecycle.mapping.LifecycleMapping>>> indicates this is a lifecycle mapping for that packaging.
+  <<<implementation>>> is required, and while you can provide your own, the default given above should suit the standard case.
+
+  The phases to bind are listed in the configuration element, and each that is given can have one goal associated with
+  that phase for that particular packaging.
+
+  Once this is included in the JAR, the plugin needs to be added to the project to make the packaging available from
+  that project. In addition to listing the plugin, you must specify that it provides extensions:
+
+----
+...
+ <packaging>plexus-application</packaging>
+...
+ <plugin>
+   <groupId>org.codehaus.plexus</groupId>
+   <artifactId>plexus-maven-plugin</artifactId>
+   <extensions>true</extensions>
+ </plugin>
+...
+----
+
+  Setting the extensions flag is also necessary if you provide custom artifact type handlers (closely related to
+  providing a packaging).
+
+** Forking a Parallel Lifecycle
+
+  While lots of mojos will participate in the standard lifecycle, there are just as many that are used in other
+  scenarios. These are mojos that are executed standalone from the command line (such as <<<idea:idea>>>), or individual
+  reports in the site building process.
+
+  However, sometimes these goals require that a particular task has already been performed - for instance, the IDEA
+  plugin must ensure sources have been generated to properly construct its module files. If the goal were participating
+  in the lifecycle, it would easily do this by ensuring it occurred after the phase it depended on having run. Since
+  this isn't the case, it must have a way to first execute that task.
+
+  Additionally, even goals participating in the build lifecycle might need to perform a task with different parameters
+  to what was already used, and does not want the output to affect the current build (for example, running
+  <<<clover:check>>> to run tests with modified sources and fail if a certain coverage ratio is not achieved).
+
+  For these reasons, mojos are capable of forking a new lifecycle. The lifecycle will be a normal build lifecycle,
+  a clone of the one currently being used (including any additional bindings from the POM), executed up until the point
+  specified by the mojo.
+
+  For example, the <<<idea:idea>>> mojo specifies the following in the mojo level declarations to call the source
+  generation:
+
+----
+@execute phase="generate-sources"
+----
+
+  But what happens if <<<generate-sources>>> has already been run in this build? In the current version of Maven, there
+  is no way to tell if the previous execution used the same input and outputs as the current mojo requires, so the task
+  (and any preceding ones if from the lifecycle) must be run again.
+
+  For this reason, it is important that if your plugin does any intensive work, you should first check whether it is
+  necessary to perform the tasks again, perhaps by using timestamp checking or a similar technique. As an example,
+  the compiler plugin will only recompile changed source files so can very efficiently be run multiple times in a build
+  if necessary.
+
+  When the lifecycle is forked, the project object being used is also cloned. In this way, modifications made to the
+  project as part of the execution, such as the addition of a new source root, will not affect the original build.
+  When the lifecycle finishes executing and control is passed to the original mojo, it can access that project using
+  the expression <<<${executedProject}>>>. For example:
+
+----
+/**
+ * @parameter expression="${executedProject}"
+ */
+private MavenProject executedProject;
+----
+
+  This project instance can be used by the mojo to obtain results, and propogate any changes it sees fit into the
+  original build.
+
+  Finally, when forking the new lifecycle, it is possible to augment it on top of the changes already made by the
+  packaging and the plugins in the POM.
+
+  For example, consider the Clover plugin. If <<<clover:check>>> were to be run from the command line, the plugin
+  would need to fork the lifecycle, executing the <<<test>>> phase. But, it would also need to add some configuration
+  and bind the <<<clover:compiler>>> goal to the <<<generate-sources>>> phase.
+
+  This can be achieved by including the following file as <<<META-INF/maven/lifecycle.xml>>> in the plugin JAR:
+
+----
+<lifecycles>
+  <lifecycle>
+    <id>clover</id>
+    <phases>
+      <phase>
+        <id>generate-sources</id>
+        <executions>
+          <execution>
+            <configuration>
+              <debug>true</debug>
+            </configuration>
+              <goals>
+                <goal>compiler</goal>
+              </goals>
+          </execution>
+        </executions>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>
+----
+
+  Here, the <<<executions>>> element is present in a similar way to a plugin declaration in the POM. This can be used
+  to bind a goal one or more times to a particular phase, as well as specifying configuration. Note that configuration
+  already provided in the POM to that plugin that is not part of a specific execution will also be applied.
+
+  The lifecycle ID given here (<<<clover>>>) can then be used in the mojo to specify what to overlay on the forked
+  lifecycle when executing it, using the following mojo level declaration:
+
+----
+@execute phase="test" lifecycle="clover"
+----
+
+  For more information about plugin development in general, see the
+  {{{developers/plugin-overview.html} Developer's Section}}.
+
+

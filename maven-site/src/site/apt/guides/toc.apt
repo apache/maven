@@ -21,6 +21,8 @@ Documentation
 
 * Mini Guides
 
+ * {{{mini/guide-apt-format.html}Guide to the APT Format}}
+
  * {{{mini/guide-assemblies.html}Guide to Creating Assemblies}}
 
  * {{{mini/guide-bash-m2-completion.html}Guide to Maven 2.x auto completion using BASH}}
@@ -28,6 +30,8 @@ Documentation
  * {{{mini/guide-configuring-plugins.html}Guide to Configuring Plug-ins}}
 
  * {{{mini/guide-coping-with-sun-jars.html}Guide to Coping with Sun JARs}}
+
+ * {{{mini/guide-creating-archetypes.html}Guide to Creating Archetypes}}
 
  * {{{mini/guide-deploy-ftp.html}Guide to deploying with FTP}}
 
@@ -55,6 +59,8 @@ Documentation
 
  * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 
+ * {{{mini/guide-pom-properties.html}Guide to using POM properties}}
+
  * {{{mini/guide-proxies.html}Guide to using proxies}}
 
  * {{{mini/guide-test-customization.html}Guide to test customization}}
@@ -70,9 +76,11 @@ Documentation
 
  * {{{introduction/introduction-to-dependency-management.html}Introduction to Dependency Management}}
 
+ * {{{introduction/introduction-to-dependency-mechanism.html}Introduction to the Dependency Mechanism}}
+
  * {{{introduction/introduction-to-repositories.html}Introduction to Repositories}}
 
- * {{{introduction/introduction-to-the-lifecycle.html}Introduction to the Lifecycle}}
+ * {{{introduction/introduction-to-the-lifecycle.html}Introduction to the Build Lifecycle}}
 
  * {{{introduction/introduction-to-the-pom.html}Introduction to the POM}}
 
