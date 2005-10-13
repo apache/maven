@@ -12,148 +12,99 @@ Introduction to the Dependency Mechanism
  There are many aspects to working with dependencies in Maven. While it is not the sole focus of Maven, it
  does comprise a large and important part of the system. Learn more about:
 
-        <ul>
-          <li>
-            <a href="#transitive_dependencies">Transitive Dependencies</a>
-          </li>
-          <li>
-            <a href="#dependency_scope">Dependency Scope</a>
-          </li>
-          <li>
-            <a href="#dependency_management">Dependency Management</a>
-          </li>
-        </ul>
-      </p>
-      <p>
-        <i>This document is currently in the process of being written, so not all facets are covered.</i>
-      </p>
-      <a name="transitive_dependencies"/>
-      <subsection name="Transitive Dependencies">
-        <p>
-          Transitive dependencies are a new feature in Maven 2.0. This allows you to avoid needing to discover and
-          specify the libraries that your own dependencies require, and including them automatically.
-        </p>
-        <p>
-          This feature is facilitated by reading the project files of your dependencies from the remote repositories
-          specified. In general, all dependencies of those projects are used in your project, as are any that the
-          project inherits from its parents, or from its dependencies, and so on.
-        </p>
-        <p>
-          There is no limit to the number of levels that dependencies can be gathered from, and will only cause a
-          problem
-          if a cyclic dependency is discovered.
-        </p>
-        <p>
-          With transitive dependencies, the graph of included libraries can quickly grow quite large. For this reason,
-          there are some additional features that will limit which dependencies are included:
-        </p>
-        <ul>
-          <li>
-            <i>Dependency mediation</i>
-            - this determines what version of a dependency will be used when multiple
-            versions of an artifact are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
-            you can always guarantee a version by declaring it explicitly in your project's POM.
-          </li>
-          <li>
-            <i>Dependency scope</i>
-            - this allows you to only include dependencies appropriate for the current stage
-            of the build. This is described in more detail below.
-          </li>
-        </ul>
-      </subsection>
-      <subsection name="Dependency Scope">
-        <a name="dependency_scope"/>
-        <p>
-          Dependency scope is used to limit the transitivity of a depedency, and also to affect the classpath used for
-          various build tasks.
-        </p>
-        <p>
-          There are 4 scopes available:
-        </p>
-        <ul>
-          <li>
-            <b>compile</b>
-            - this is the default scope, used if none is specified. Compile dependencies are available
-            in all classpaths.
-          </li>
-          <li>
-            <b>provided</b>
-            - this is much like compile, but indicates you expect the JDK or a container to provide it.
-            It is only available on the compilation classpath, and is not transitive.
-          </li>
-          <li>
-            <b>runtime</b>
-            - this scope indicates that the dependency is not required for compilation, but is for
-            execution.
-            It is in the runtime and test classpaths, but not the compile classpath.
-          </li>
-          <li>
-            <b>test</b>
-            - this scope indicates that the dependency is not required for normal use of the application, and
-            is only available for the test compilation and execution phases.
-          </li>
-        </ul>
-        <p>
-          Each of the scopes affects transitive dependencies in different ways, as is demonstrated in the table below.
-          If a dependency is set to the scope in the left column, dependencies with the scope across the top row will
-          result in a dependency in the main project with the scope listed at the intersection. If no scope is listed,
-          it means the dependency will be omitted.
-        </p>
-        <table>
-          <tr>
-            <th></th>
-            <th>compile</th>
-            <th>provided</th>
-            <th>runtime</th>
-            <th>test</th>
-          </tr>
-          <tr>
-            <th>compile</th>
-            <td>compile (*)</td>
-            <td>-</td>
-            <td>runtime</td>
-            <td>-</td>
-          </tr>
-          <tr>
-            <th>provided</th>
-            <td>provided</td>
-            <td>provided</td>
-            <td>provided</td>
-            <td>-</td>
-          </tr>
-          <tr>
-            <th>runtime</th>
-            <td>runtime</td>
-            <td>-</td>
-            <td>runtime</td>
-            <td>-</td>
-          </tr>
-          <tr>
-            <th>test</th>
-            <td>test</td>
-            <td>-</td>
-            <td>test</td>
-            <td>-</td>
-          </tr>
-        </table>
-        <p>
-          <b>(*) Note:</b>
-          it is intended that this should be runtime instead, so that all compile dependencies must
-          be explicitly listed - however, there is the case where the library you depend on extends a class from another
-          library, forcing you to have available at compile time. For this reason, compile time dependencies remain
-          as compile scope even when they are transitive.
-        </p>
-      </subsection>
-      <a name="dependency_management"/>
-      <subsection name="Dependency Management">
-        <p>
-          The dependency management section is a mechanism for centralizing dependency information. When you have
-          a set of projects that inherits a common parent it's possible to put all information about the dependency
-          in the common POM and have simpler references to the artifacts in the child POMs. The mechanism is best
-          illustrated through some examples. Given these two POMs which extend the same parent:
-        </p>
-        <p>
-          Project A:
+ * Transitive Dependencies
+
+ * Dependency Scope
+
+ * Dependency Management
+
+ []
+
+ <<NOTE:>> <This document is currently in the process of being written, so not all facets are covered.>
+
+* Transitive Dependencies">
+
+ Transitive dependencies are a new feature in Maven 2.0. This allows you to avoid needing to discover and
+ specify the libraries that your own dependencies require, and including them automatically.
+
+ This feature is facilitated by reading the project files of your dependencies from the remote repositories
+ specified. In general, all dependencies of those projects are used in your project, as are any that the
+ project inherits from its parents, or from its dependencies, and so on.
+
+ There is no limit to the number of levels that dependencies can be gathered from, and will only cause a
+ problem if a cyclic dependency is discovered.
+
+ With transitive dependencies, the graph of included libraries can quickly grow quite large. For this reason,
+ there are some additional features that will limit which dependencies are included:
+
+ * <Dependency mediation>
+   - this determines what version of a dependency will be used when multiple
+     versions of an artifact are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
+     you can always guarantee a version by declaring it explicitly in your project's POM.
+
+ * <Dependency scope>
+   - this allows you to only include dependencies appropriate for the current stage
+     of the build. This is described in more detail below.
+
+ []
+
+* Dependency Scope
+
+ Dependency scope is used to limit the transitivity of a depedency, and also to affect the classpath used for
+ various build tasks.
+
+ There are 4 scopes available:
+
+ * <<compile>>
+   - this is the default scope, used if none is specified. Compile dependencies are available
+     in all classpaths.
+
+ * <<provided>>
+   - this is much like compile, but indicates you expect the JDK or a container to provide it.
+     It is only available on the compilation classpath, and is not transitive.
+
+ * <<runtime>>
+   - this scope indicates that the dependency is not required for compilation, but is for
+     execution. It is in the runtime and test classpaths, but not the compile classpath.
+
+ * <<test>>
+   - this scope indicates that the dependency is not required for normal use of the application, and
+     is only available for the test compilation and execution phases.
+
+ []
+
+ Each of the scopes affects transitive dependencies in different ways, as is demonstrated in the table below.
+ If a dependency is set to the scope in the left column, dependencies with the scope across the top row will
+ result in a dependency in the main project with the scope listed at the intersection. If no scope is listed,
+ it means the dependency will be omitted.
+
+*----------+------------+----------+----------+------+
+|          | compile    | provided | runtime  | test
+*----------+------------+----------+----------+------+
+| compile  | compile(*) |    -     | runtime  |  -
+*----------+------------+----------+----------+------+
+| provided | provided   | provided | provided |  -
+*----------+------------+----------+----------+------+
+| runtime  | runtime    |    -     | runtime  |  _
+*----------+------------+----------+----------+------+
+| test     | test       |    -     | test     |  -
+*----------+------------+----------+----------+------+
+
+ <<(*) Note:>>
+ it is intended that this should be runtime instead, so that all compile dependencies must
+ be explicitly listed - however, there is the case where the library you depend on extends a class from another
+ library, forcing you to have available at compile time. For this reason, compile time dependencies remain
+ as compile scope even when they are transitive.
+
+* Dependency Management
+
+ The dependency management section is a mechanism for centralizing dependency information. When you have
+ a set of projects that inherits a common parent it's possible to put all information about the dependency
+ in the common POM and have simpler references to the artifacts in the child POMs. The mechanism is best
+ illustrated through some examples. Given these two POMs which extend the same parent:
+
+ Project A:
+
 +----+
 
 <project>
@@ -207,8 +158,9 @@ Introduction to the Dependency Mechanism
 </project>
 
 +----+
-          These two example POMs share a common dependency and each has one non-trivial dependency. This information
-          can be put in the parent POM like this:
+
+ These two example POMs share a common dependency and each has one non-trivial dependency. This information
+ can be put in the parent POM like this:
 
 +----+
 
