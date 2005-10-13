@@ -769,8 +769,7 @@ public class JavadocReport
         addArgIf( arguments, quiet, "-quiet", 1.4f );
         addArgIfNotEmpty( arguments, "-source", quotedArgument( source ), 1.4f );
         addArgIf( arguments, verbose, "-verbose" );
-        addArgIfNotEmpty( arguments, "-additionalparam", quotedArgument( additionalparam ) );
-
+        addArgIfNotEmpty( arguments, null, quotedArgument( additionalparam ) );
         addArgIfNotEmpty( arguments, "-sourcePath", quotedPathArgument( sourcePath.toString() ) );
 
         // javadoc arguments for default doclet
@@ -980,7 +979,10 @@ public class JavadocReport
     {
         if ( !StringUtils.isEmpty( value ) )
         {
-            arguments.add( key );
+            if ( !StringUtils.isEmpty( key ) )
+            {
+                arguments.add( key );
+            }
 
             StringTokenizer token = new StringTokenizer( value, "," );
             while ( token.hasMoreTokens() )
