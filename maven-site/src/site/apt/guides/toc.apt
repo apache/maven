@@ -76,8 +76,6 @@ Documentation
 
  * {{{introduction/introduction-to-dependency-management.html}Introduction to Dependency Management}}
 
- * {{{introduction/introduction-to-dependency-mechanism.html}Introduction to the Dependency Mechanism}}
-
  * {{{introduction/introduction-to-repositories.html}Introduction to Repositories}}
 
  * {{{introduction/introduction-to-the-lifecycle.html}Introduction to the Build Lifecycle}}

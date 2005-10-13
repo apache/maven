@@ -1,14 +1,17 @@
-<document>
-  <properties>
-    <title>Dependency Mechanism</title>
-    <author email="brett@apache.org">Brett Porter</author>
-    <author email="trygvis@apache.org">Trygve Laugstol</author>
-  </properties>
-  <body>
-    <section name="Dependency Mechanism">
-      <p>
-        There are many aspects to working with dependencies in Maven. While it is not the sole focus of Maven, it
-        does comprise a large and important part of the system. Learn more about:
+ ------
+ Introduction to the Dependency Mechanism
+ ------
+ Brett Porter
+ Trygve Laugstol
+ ------
+ 12 October 2005
+ ------
+
+Introduction to the Dependency Mechanism
+
+ There are many aspects to working with dependencies in Maven. While it is not the sole focus of Maven, it
+ does comprise a large and important part of the system. Learn more about:
+
         <ul>
           <li>
             <a href="#transitive_dependencies">Transitive Dependencies</a>
@@ -151,7 +154,8 @@
         </p>
         <p>
           Project A:
-          <source><![CDATA[
++----+
+
 <project>
   ...
   <dependencies>
@@ -174,9 +178,14 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-</project>]]></source>
-          Project B:
-          <source><![CDATA[
+</project>
+
++----+
+
+ Project B:
+
++----+
+
 <project>
   ...
   <dependencies>
@@ -195,12 +204,14 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-</project>]]></source>
-        </p>
-        <p>
+</project>
+
++----+
           These two example POMs share a common dependency and each has one non-trivial dependency. This information
           can be put in the parent POM like this:
-          <source><![CDATA[
+
++----+
+
 <project>
   ...
   <dependencyManagement>
@@ -232,11 +243,14 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-</project>]]></source>
-          And then the two child poms would become much simpler:
-        </p>
-        <p>
-          <source><![CDATA[
+</project>
+
++----+
+
+ And then the two child poms would become much simpler:
+
++----+
+
 <project>
   ...
   <dependencies>
@@ -249,8 +263,12 @@
       <artifactId>artifact-b</artifactId>
     </dependency>
   </dependencies>
-</project>]]></source>
-          <source><![CDATA[
+</project>
+
++----+
+
++----+
+
 <project>
   ...
   <dependencies>
@@ -263,14 +281,9 @@
       <artifactId>artifact-b</artifactId>
     </dependency>
   </dependencies>
-</project>]]></source>
-        </p>
-        <p>
-          The reference information about the dependency management tags is available from the
-          <a href="maven-model/maven.html#class_DependencyManagement">project descriptor reference</a>
-          .
-        </p>
-      </subsection>
-    </section>
-  </body>
-</document>
+</project>
+
++----+
+
+ The reference information about the dependency management tags is available from the
+ {{{maven-model/maven.html#class_DependencyManagement}project descriptor reference}}.
