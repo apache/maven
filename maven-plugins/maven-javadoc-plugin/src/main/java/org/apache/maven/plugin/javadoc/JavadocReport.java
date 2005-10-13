@@ -479,6 +479,18 @@ public class JavadocReport
     private String stylesheetfile;
 
     /**
+     * Contains a list of tag names, which will result in conversion to support the following, from the javadoc
+     * API:
+     * <br/>
+     * Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments.
+     * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tag">tag</a>.
+     * It is a comma separated String.
+     *
+     * @parameter expression="${tags}"
+     */
+    private ArrayList tags;
+
+    /**
      * Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments.
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tag">tag</a>.
      * It is a comma separated String.
@@ -824,7 +836,19 @@ public class JavadocReport
             addArgIf( arguments, serialwarn, "-serialwarn" );
             addArgIf( arguments, splitindex, "-splitindex" );
             addArgIfNotEmpty( arguments, "-stylesheetfile", quotedPathArgument( stylesheetfile ) );
+            
             addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
+            
+            if ( tags != null && !tags.isEmpty() )
+            {
+                for ( Iterator it = tags.iterator(); it.hasNext(); )
+                {
+                    String tag = (String) it.next();
+                    
+                    addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
+                }
+            }
+            
             addArgIfNotEmpty( arguments, "-taglet", quotedArgument( taglet ), 1.4f );
             addArgIfNotEmpty( arguments, "-tagletpath", quotedPathArgument( tagletpath ), 1.4f );
             addArgIf( arguments, use, "-use" );
