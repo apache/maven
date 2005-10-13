@@ -127,7 +127,7 @@ public class EclipseClasspathWriter
         // The dependencies
         // ----------------------------------------------------------------------
 
-        Set artifacts = project.getArtifacts();
+        List artifacts = project.getTestArtifacts();
 
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
