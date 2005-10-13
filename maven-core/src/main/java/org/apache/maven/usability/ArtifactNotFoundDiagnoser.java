@@ -34,8 +34,8 @@ public class ArtifactNotFoundDiagnoser
 
     public String diagnose( Throwable error )
     {
-        ArtifactNotFoundException exception = (ArtifactNotFoundException) DiagnosisUtils.getFromCausality( error,
-                                                                                                           ArtifactNotFoundException.class );
+        ArtifactNotFoundException exception =
+            (ArtifactNotFoundException) DiagnosisUtils.getFromCausality( error, ArtifactNotFoundException.class );
 
         StringBuffer message = new StringBuffer();
 
@@ -49,13 +49,6 @@ public class ArtifactNotFoundDiagnoser
         if ( !wagonManager.isOnline() )
         {
             message.append( "\n" ).append( SystemWarnings.getOfflineWarning() );
-        }
-
-        Throwable root = DiagnosisUtils.getRootCause( exception );
-
-        if ( root != null )
-        {
-            message.append( "\nRoot Cause: " ).append( root.getMessage() );
         }
 
         message.append( "\n" );

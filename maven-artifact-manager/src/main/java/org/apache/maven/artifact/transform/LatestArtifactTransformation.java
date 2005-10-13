@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
@@ -37,7 +38,7 @@ public class LatestArtifactTransformation
                 String version = resolveVersion( artifact, localRepository, remoteRepositories );
                 if ( Artifact.LATEST_VERSION.equals( version ) )
                 {
-                    throw new ArtifactResolutionException( "Unable to determine the latest version", artifact );
+                    throw new ArtifactNotFoundException( "Unable to determine the latest version", artifact );
                 }
 
                 artifact.setBaseVersion( version );

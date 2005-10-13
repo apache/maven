@@ -16,41 +16,39 @@ package org.apache.maven.usability;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.usability.diagnostics.DiagnosisUtils;
 import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
 
-public class MojoExecutionExceptionDiagnoser
+public class MojoFailureExceptionDiagnoser
     implements ErrorDiagnoser
 {
 
     public boolean canDiagnose( Throwable error )
     {
-        return DiagnosisUtils.containsInCausality( error, MojoExecutionException.class );
+        return DiagnosisUtils.containsInCausality( error, MojoFailureExceptionDiagnoser.class );
     }
 
     public String diagnose( Throwable error )
     {
-        MojoExecutionException mee =
-            (MojoExecutionException) DiagnosisUtils.getFromCausality( error, MojoExecutionException.class );
+        MojoFailureException mfe =
+            (MojoFailureException) DiagnosisUtils.getFromCausality( error, MojoFailureException.class );
 
         StringBuffer message = new StringBuffer();
 
-        message.append( "Error executing mojo" );
-
-        Object source = mee.getSource();
+        Object source = mfe.getSource();
         if ( source != null )
         {
-            message.append( ": " ).append( mee.getSource() ).append( "\n" );
+            message.append( ": " ).append( mfe.getSource() ).append( "\n" );
         }
         else
         {
             message.append( ".\n" );
         }
 
-        message.append( "\n" ).append( mee.getMessage() );
+        message.append( "\n" ).append( mfe.getMessage() );
 
-        String longMessage = mee.getLongMessage();
+        String longMessage = mfe.getLongMessage();
         if ( longMessage != null )
         {
             message.append( "\n\n" ).append( longMessage );

@@ -156,8 +156,7 @@ public class DeployMojo
         }
         catch ( ArtifactDeploymentException e )
         {
-            throw new MojoExecutionException(
-                "Error deploying artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+            throw new MojoExecutionException( e.getMessage(), e );
         }
     }
 }

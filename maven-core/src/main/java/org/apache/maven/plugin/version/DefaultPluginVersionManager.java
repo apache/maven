@@ -215,8 +215,7 @@ public class DefaultPluginVersionManager
         // if we still haven't found a version, then fail early before we get into the update goop.
         if ( StringUtils.isEmpty( version ) )
         {
-            throw new PluginVersionNotFoundException( groupId, artifactId,
-                                                      "Failed to resolve a valid version for this plugin" );
+            throw new PluginVersionNotFoundException( groupId, artifactId );
         }
 
         // if the plugin registry is inactive, then the rest of this goop is useless...

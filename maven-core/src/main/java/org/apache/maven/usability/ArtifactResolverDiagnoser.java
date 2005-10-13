@@ -34,8 +34,8 @@ public class ArtifactResolverDiagnoser
 
     public String diagnose( Throwable error )
     {
-        ArtifactResolutionException exception = (ArtifactResolutionException) DiagnosisUtils.getFromCausality( error,
-                                                                                                               ArtifactResolutionException.class );
+        ArtifactResolutionException exception =
+            (ArtifactResolutionException) DiagnosisUtils.getFromCausality( error, ArtifactResolutionException.class );
 
         StringBuffer message = new StringBuffer();
 
@@ -46,13 +46,6 @@ public class ArtifactResolverDiagnoser
         if ( !wagonManager.isOnline() )
         {
             message.append( "\n" ).append( SystemWarnings.getOfflineWarning() );
-        }
-
-        Throwable root = DiagnosisUtils.getRootCause( exception );
-
-        if ( root != null )
-        {
-            message.append( "\nRoot Cause: " ).append( root.getMessage() );
         }
 
         message.append( "\n" );

@@ -472,7 +472,7 @@ public class DefaultMavenProjectBuilder
 
     private Model createStubModel( Artifact projectArtifact )
     {
-        getLogger().warn( "\n  ***** Using defaults for missing POM " + projectArtifact + " *****\n" );
+        getLogger().debug( "Using defaults for missing POM " + projectArtifact );
 
         Model model = new Model();
         model.setModelVersion( "4.0.0" );

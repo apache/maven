@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public interface ArtifactTransformation
      * @param localRepository the local repository
      */
     void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no

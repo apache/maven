@@ -17,7 +17,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.usability.diagnostics.DiagnosisUtils;
 import org.apache.maven.usability.plugin.Expression;
 import org.apache.maven.usability.plugin.ExpressionDocumentationException;
 import org.apache.maven.usability.plugin.ExpressionDocumenter;
@@ -273,11 +272,7 @@ public class PluginConfigurationException
             addParameterUsageInfo( value, message );
         }
 
-        message.append( "Reason: " ).append( cce.getMessage() ).append( "\n" );
-
-        Throwable root = DiagnosisUtils.getRootCause( cce );
-
-        message.append( "Root Cause: " ).append( root.getMessage() ).append( "\n\n" );
+        message.append( "\n\nCause: " ).append( cce.getMessage() );
 
         return message.toString();
     }

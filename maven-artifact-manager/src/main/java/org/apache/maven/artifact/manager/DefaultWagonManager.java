@@ -133,7 +133,7 @@ public class DefaultWagonManager
         }
         catch ( UnsupportedProtocolException e )
         {
-            throw new TransferFailedException( "Unsupported Protocol: ", e );
+            throw new TransferFailedException( "Unsupported Protocol: '" + protocol + "': " + e.getMessage(), e );
         }
         
         if ( downloadMonitor != null )
@@ -156,7 +156,7 @@ public class DefaultWagonManager
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw new TransferFailedException( "Unable to add checksum methods", e );
+            throw new TransferFailedException( "Unable to add checksum methods: " + e.getMessage(), e );
         }
 
         try
@@ -204,23 +204,23 @@ public class DefaultWagonManager
         }
         catch ( ConnectionException e )
         {
-            throw new TransferFailedException( "Connection failed: ", e );
+            throw new TransferFailedException( "Connection failed: " + e.getMessage(), e );
         }
         catch ( AuthenticationException e )
         {
-            throw new TransferFailedException( "Authentication failed: ", e );
+            throw new TransferFailedException( "Authentication failed: " + e.getMessage(), e );
         }
         catch ( AuthorizationException e )
         {
-            throw new TransferFailedException( "Authorization failed: ", e );
+            throw new TransferFailedException( "Authorization failed: " + e.getMessage(), e );
         }
         catch ( ResourceDoesNotExistException e )
         {
-            throw new TransferFailedException( "Resource to deploy not found: ", e );
+            throw new TransferFailedException( "Resource to deploy not found: " + e.getMessage(), e );
         }
         catch ( IOException e )
         {
-            throw new TransferFailedException( "Error creating temporary file for deployment: ", e );
+            throw new TransferFailedException( "Error creating temporary file for deployment: " + e.getMessage(), e );
         }
         finally
         {
@@ -320,7 +320,7 @@ public class DefaultWagonManager
         }
         catch ( UnsupportedProtocolException e )
         {
-            throw new TransferFailedException( "Unsupported Protocol: ", e );
+            throw new TransferFailedException( "Unsupported Protocol: '" + protocol + "': " + e.getMessage(), e );
         }
 
         if ( downloadMonitor != null )
@@ -341,7 +341,7 @@ public class DefaultWagonManager
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw new TransferFailedException( "Unable to add checksum methods", e );
+            throw new TransferFailedException( "Unable to add checksum methods: " + e.getMessage(), e );
         }
 
         File temp = new File( destination + ".tmp" );
@@ -436,15 +436,15 @@ public class DefaultWagonManager
         }
         catch ( ConnectionException e )
         {
-            throw new TransferFailedException( "Connection failed: ", e );
+            throw new TransferFailedException( "Connection failed: " + e.getMessage(), e );
         }
         catch ( AuthenticationException e )
         {
-            throw new TransferFailedException( "Authentication failed: ", e );
+            throw new TransferFailedException( "Authentication failed: " + e.getMessage(), e );
         }
         catch ( AuthorizationException e )
         {
-            throw new TransferFailedException( "Authorization failed: ", e );
+            throw new TransferFailedException( "Authorization failed: " + e.getMessage(), e );
         }
         finally
         {
@@ -474,7 +474,8 @@ public class DefaultWagonManager
             }
             catch ( IOException e )
             {
-                throw new TransferFailedException( "Error copying temporary file to the final destination: ", e );
+                throw new TransferFailedException(
+                    "Error copying temporary file to the final destination: " + e.getMessage(), e );
             }
         }
     }

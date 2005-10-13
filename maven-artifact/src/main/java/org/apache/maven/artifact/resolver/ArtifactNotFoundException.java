@@ -29,7 +29,7 @@ public class ArtifactNotFoundException
 {
     private String downloadUrl;
 
-    protected ArtifactNotFoundException( String message, Artifact artifact )
+    public ArtifactNotFoundException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
               null );

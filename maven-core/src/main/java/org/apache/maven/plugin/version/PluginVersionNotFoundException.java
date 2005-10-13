@@ -23,9 +23,9 @@ public class PluginVersionNotFoundException
 
     private final String artifactId;
 
-    public PluginVersionNotFoundException( String groupId, String artifactId, String baseMessage )
+    public PluginVersionNotFoundException( String groupId, String artifactId )
     {
-        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage );
+        super( "The plugin \'" + groupId + ":" + artifactId + "\' does not exist or no valid version could be found" );
 
         this.groupId = groupId;
         this.artifactId = artifactId;

@@ -125,8 +125,7 @@ public class InstallMojo
         }
         catch ( ArtifactInstallationException e )
         {
-            throw new MojoExecutionException(
-                "Error installing artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+            throw new MojoExecutionException( e.getMessage(), e );
         }
     }
 }

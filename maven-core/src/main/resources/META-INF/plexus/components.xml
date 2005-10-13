@@ -102,6 +102,16 @@
     </component>
     <!--
     |
+    |MojoFailureExceptionDiagnoser
+    |
+    -->
+    <component>
+      <role>org.apache.maven.usability.diagnostics.ErrorDiagnoser</role>
+      <role-hint>MojoFailureExceptionDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.MojoFailureExceptionDiagnoser</implementation>
+    </component>
+    <!--
+    |
     |ProjectBuildDiagnoser
     |
     -->

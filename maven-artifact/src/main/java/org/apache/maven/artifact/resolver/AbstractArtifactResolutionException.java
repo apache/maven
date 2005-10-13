@@ -19,6 +19,7 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -161,7 +162,7 @@ public class AbstractArtifactResolutionException
             sb.append( "from the specified remote repositories:" );
             sb.append( LS + "  " );
 
-            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+            for ( Iterator i = new HashSet( remoteRepositories ).iterator(); i.hasNext(); )
             {
                 ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
