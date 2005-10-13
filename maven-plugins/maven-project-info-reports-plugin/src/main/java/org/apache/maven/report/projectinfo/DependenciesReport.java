@@ -359,8 +359,8 @@ public class DependenciesReport
             }
 
             // TODO: we should use the MavenMetadataSource instead
-            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRepositories(), localRepository,
-                                                            allowStubModel );
+            return mavenProjectBuilder.buildFromRepository( projectArtifact, project.getRemoteArtifactRepositories(),
+                                                            localRepository, allowStubModel );
         }
     }
 
