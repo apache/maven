@@ -19,12 +19,11 @@ package org.apache.maven.plugin.antrun.components;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.RuntimeConfigurable;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.UnknownElement;
-
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.AbstractConfigurationConverter;
 import org.codehaus.plexus.component.configurator.converters.ConfigurationConverter;
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
@@ -35,7 +34,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
  * Plexus ConfigurationConverter to set up Ant Target component fields.
- * 
+ *
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  */
 public class AntTargetConverter
@@ -48,11 +47,9 @@ public class AntTargetConverter
         return Target.class.isAssignableFrom( type );
     }
 
-    public Object fromConfiguration(
-        ConverterLookup converterLookup, PlexusConfiguration configuration,
-        Class type, Class baseType, ClassLoader classLoader,
-        ExpressionEvaluator expressionEvaluator
-    )
+    public Object fromConfiguration( ConverterLookup converterLookup, PlexusConfiguration configuration, Class type,
+                                     Class baseType, ClassLoader classLoader, ExpressionEvaluator expressionEvaluator,
+                                     ConfigurationListener listener )
         throws ComponentConfigurationException
     {
         Object retValue = fromExpression( configuration, expressionEvaluator, type );
@@ -65,64 +62,49 @@ public class AntTargetConverter
 
         retValue = instantiateObject( implementation );
 
-        processConfiguration(
-            (Target) retValue, classLoader, configuration, expressionEvaluator
-        );
+        processConfiguration( (Target) retValue, configuration, expressionEvaluator );
 
         return retValue;
     }
 
 
-    private void processConfiguration(
-        Target target, ClassLoader classLoader,
-        PlexusConfiguration configuration,
-        ExpressionEvaluator expressionEvaluator
-    )
+    private void processConfiguration( Target target, PlexusConfiguration configuration,
+                                       ExpressionEvaluator expressionEvaluator )
         throws ComponentConfigurationException
     {
         Project project = new Project();
         project.setName( "DummyProject" );
-        
+
         target.setName( "" );
         target.setProject( project );
         project.addTarget( target );
-        
+
         initDefinitions( project, target );
-        
-        processConfiguration(
-            null, project, target, configuration, expressionEvaluator
-        );
+
+        processConfiguration( null, project, target, configuration, expressionEvaluator );
     }
 
-        
-    private void processConfiguration(
-        RuntimeConfigurable parentWrapper, Project project, Target target,
-        PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator
-    )
+
+    private void processConfiguration( RuntimeConfigurable parentWrapper, Project project, Target target,
+                                       PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
         throws ComponentConfigurationException
     {
         int items = configuration.getChildCount();
-    
+
         Object parent = parentWrapper == null ? null : parentWrapper.getProxy();
-        
+
         for ( int i = 0; i < items; i++ )
-        {			
+        {
             PlexusConfiguration childConfiguration = configuration.getChild( i );
-            UnknownElement task = new UnknownElement(
-                childConfiguration.getName()
-            );
+            UnknownElement task = new UnknownElement( childConfiguration.getName() );
             task.setProject( project );
             task.setNamespace( "" );
             task.setQName( childConfiguration.getName() );
-            task.setTaskType(
-                ProjectHelper.genComponentName(
-                    task.getNamespace(), childConfiguration.getName()
-                    )
-            );
+            task.setTaskType( ProjectHelper.genComponentName( task.getNamespace(), childConfiguration.getName() ) );
             task.setTaskName( childConfiguration.getName() );
             task.setOwningTarget( target );
             task.init();
-            
+
             if ( parent != null )
             {
                 ( (UnknownElement) parent ).addChild( task );
@@ -131,11 +113,9 @@ public class AntTargetConverter
             {
                 target.addTask( task );
             }
-            
-            RuntimeConfigurable wrapper = new RuntimeConfigurable(
-                task, task.getTaskName()
-            );
-    
+
+            RuntimeConfigurable wrapper = new RuntimeConfigurable( task, task.getTaskName() );
+
             try
             {
                 if ( childConfiguration.getValue() != null )
@@ -146,11 +126,9 @@ public class AntTargetConverter
             catch ( PlexusConfigurationException e )
             {
                 throw new ComponentConfigurationException(
-                    "Error reading text value from element '" +
-                    childConfiguration.getName() + "'", e
-                );
+                    "Error reading text value from element '" + childConfiguration.getName() + "'", e );
             }
-            
+
             String [] attrNames = childConfiguration.getAttributeNames();
 
             for ( int a = 0; a < attrNames.length; a++ )
@@ -158,7 +136,7 @@ public class AntTargetConverter
                 try
                 {
                     String v = childConfiguration.getAttribute( attrNames[a] );
-                    
+
                     try
                     {
                         Object evaluatedExpr = expressionEvaluator.evaluate( v );
@@ -166,42 +144,33 @@ public class AntTargetConverter
                     }
                     catch ( ExpressionEvaluationException e )
                     {
-                        throw new ComponentConfigurationException
-                        (
-                            "Error evaluating value '" + v + "' of attribute '" + attrNames[a] + 
-                            "' of tag '" + childConfiguration.getName() + "'", e
-                        );
+                        throw new ComponentConfigurationException( "Error evaluating value '" + v + "' of attribute '" +
+                            attrNames[a] + "' of tag '" + childConfiguration.getName() + "'", e );
                     }
-                    
+
                     wrapper.setAttribute( attrNames[a], v );
                 }
                 catch ( PlexusConfigurationException e )
                 {
                     throw new ComponentConfigurationException(
-                        "Error getting attribute '" + attrNames[a] + 
-                        "' of tag '" + childConfiguration.getName() + "'", e
-                    );
+                        "Error getting attribute '" + attrNames[a] + "' of tag '" + childConfiguration.getName() + "'",
+                        e );
                 }
             }
-            
+
             if ( parentWrapper != null )
             {
                 parentWrapper.addChild( wrapper );
             }
-            
-            processConfiguration(
-                wrapper, project, target,
-                childConfiguration, expressionEvaluator
-            );
+
+            processConfiguration( wrapper, project, target, childConfiguration, expressionEvaluator );
         }
     }
-    
-    
+
+
     protected void initDefinitions( Project project, Target target )
     {
-        ComponentHelper componentHelper = ComponentHelper.getComponentHelper(
-            project
-        );
+        ComponentHelper componentHelper = ComponentHelper.getComponentHelper( project );
 
         componentHelper.initDefaultDefinitions();
     }
