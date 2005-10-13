@@ -156,8 +156,8 @@ public class DeployMojo
         }
         catch ( ArtifactDeploymentException e )
         {
-            // TODO: deployment exception that does not give a trace
-            throw new MojoExecutionException( "Error deploying artifact", e );
+            throw new MojoExecutionException(
+                "Error deploying artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
         }
     }
 }

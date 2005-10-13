@@ -46,7 +46,8 @@ public interface PluginManager
         InvalidDependencyVersionException, PluginManagerException;
 
     MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException;
+        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException;
 
     PluginDescriptor getPluginDescriptorForPrefix( String prefix );
 

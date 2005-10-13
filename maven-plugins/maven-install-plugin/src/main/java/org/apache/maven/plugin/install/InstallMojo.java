@@ -125,8 +125,8 @@ public class InstallMojo
         }
         catch ( ArtifactInstallationException e )
         {
-            // TODO: install exception that does not give a trace
-            throw new MojoExecutionException( "Error installing artifact", e );
+            throw new MojoExecutionException(
+                "Error installing artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
         }
     }
 }

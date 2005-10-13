@@ -69,8 +69,8 @@ public class InstallTask
         }
         catch ( ArtifactInstallationException e )
         {
-            // TODO: install exception that does not give a trace
-            throw new BuildException( "Error installing artifact", e );
+            throw new BuildException(
+                "Error installing artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
         }
     }
 

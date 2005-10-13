@@ -30,7 +30,7 @@ import java.io.File;
  * @version $Id$
  * @goal install-file
  * @requiresProject false
- * @aggregator 
+ * @aggregator
  */
 public class InstallFileMojo
     extends AbstractInstallMojo
@@ -90,8 +90,8 @@ public class InstallFileMojo
         }
         catch ( ArtifactInstallationException e )
         {
-            // TODO: install exception that does not give a trace
-            throw new MojoExecutionException( "Error installing artifact", e );
+            throw new MojoExecutionException(
+                "Error installing artifact '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
         }
     }
 }

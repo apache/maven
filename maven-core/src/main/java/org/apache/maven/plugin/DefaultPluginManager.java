@@ -440,7 +440,8 @@ public class DefaultPluginManager
     }
 
     public MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException
+        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
@@ -495,7 +496,8 @@ public class DefaultPluginManager
 
     private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report,
                                     MojoExecution mojoExecution )
-        throws PluginConfigurationException, ArtifactNotFoundException, PluginManagerException
+        throws PluginConfigurationException, ArtifactNotFoundException, PluginManagerException,
+        ArtifactResolutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -570,7 +572,7 @@ public class DefaultPluginManager
 
     private void ensurePluginContainerIsComplete( PluginDescriptor pluginDescriptor, PlexusContainer pluginContainer,
                                                   MavenProject project, MavenSession session )
-        throws PluginConfigurationException, ArtifactNotFoundException
+        throws ArtifactNotFoundException, PluginManagerException, ArtifactResolutionException
     {
         // if the plugin's already been used once, don't re-do this step...
         // otherwise, we have to finish resolving the plugin's classpath and start the container.
@@ -578,64 +580,66 @@ public class DefaultPluginManager
         {
             Artifact pluginArtifact = (Artifact) pluginDescriptor.getArtifacts().get( 0 );
 
+            ArtifactRepository localRepository = session.getLocalRepository();
+
+            ResolutionGroup resolutionGroup;
             try
             {
-                ArtifactRepository localRepository = session.getLocalRepository();
-
-                ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
-                                                                                   project.getPluginArtifactRepositories() );
-
-                Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
-
-                dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
-
-                ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
-                                                                                        localRepository,
-                                                                                        resolutionGroup.getResolutionRepositories(),
-                                                                                        artifactMetadataSource,
-                                                                                        artifactFilter );
-
-                Set resolved = result.getArtifacts();
-
-                for ( Iterator it = resolved.iterator(); it.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) it.next();
-
-                    if ( !artifact.equals( pluginArtifact ) )
-                    {
-                        artifact = project.replaceWithActiveArtifact( artifact );
-
-                        pluginContainer.addJarResource( artifact.getFile() );
-                    }
-                }
-
-                pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
-
-                List unresolved = new ArrayList( dependencies );
-
-                unresolved.removeAll( resolved );
-
-                resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
-
-                List allResolved = new ArrayList( resolved.size() + unresolved.size() );
-
-                allResolved.addAll( resolved );
-                allResolved.addAll( unresolved );
-
-                pluginDescriptor.setArtifacts( allResolved );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new PluginConfigurationException( pluginDescriptor, "Cannot resolve plugin dependencies", e );
-            }
-            catch ( PlexusContainerException e )
-            {
-                throw new PluginConfigurationException( pluginDescriptor, "Cannot start plugin container", e );
+                resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
+                                                                   project.getPluginArtifactRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new PluginConfigurationException( pluginDescriptor, "Cannot resolve plugin dependencies", e );
+                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
+                    pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
             }
+
+            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+
+            dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
+
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
+                                                                                    localRepository,
+                                                                                    resolutionGroup.getResolutionRepositories(),
+                                                                                    artifactMetadataSource,
+                                                                                    artifactFilter );
+
+            Set resolved = result.getArtifacts();
+
+            for ( Iterator it = resolved.iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
+
+                if ( !artifact.equals( pluginArtifact ) )
+                {
+                    artifact = project.replaceWithActiveArtifact( artifact );
+
+                    try
+                    {
+                        pluginContainer.addJarResource( artifact.getFile() );
+                    }
+                    catch ( PlexusContainerException e )
+                    {
+                        throw new PluginManagerException( "Error adding plugin dependency '" +
+                            artifact.getDependencyConflictId() + "' into plugin manager: " + e.getMessage(), e );
+                    }
+                }
+            }
+
+            pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
+
+            List unresolved = new ArrayList( dependencies );
+
+            unresolved.removeAll( resolved );
+
+            resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
+
+            List allResolved = new ArrayList( resolved.size() + unresolved.size() );
+
+            allResolved.addAll( resolved );
+            allResolved.addAll( unresolved );
+
+            pluginDescriptor.setArtifacts( allResolved );
         }
     }
 

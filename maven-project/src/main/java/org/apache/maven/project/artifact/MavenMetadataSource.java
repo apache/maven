@@ -27,7 +27,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -43,15 +42,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -118,7 +111,8 @@ public class MavenMetadataSource
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
+                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
                 }
 
                 if ( project != null )
@@ -172,52 +166,56 @@ public class MavenMetadataSource
         // TODO: this could come straight from the project, negating the need to set it in the project itself?
         artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
 
-        try
-        {
-            ResolutionGroup result;
+        ResolutionGroup result;
 
-            if ( project == null )
+        if ( project == null )
+        {
+            // if the project is null, we encountered an invalid model (read: m1 POM)
+            // we'll just return an empty resolution group.
+            // or used the inherited scope (should that be passed to the buildFromRepository method above?)
+            result = new ResolutionGroup( pomArtifact, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+        }
+        else
+        {
+            Set artifacts = Collections.EMPTY_SET;
+            if ( !artifact.getArtifactHandler().isIncludesDependencies() )
             {
-                // if the project is null, we encountered an invalid model (read: m1 POM)
-                // we'll just return an empty resolution group.
+                // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
                 // or used the inherited scope (should that be passed to the buildFromRepository method above?)
-                result = new ResolutionGroup( pomArtifact, Collections.EMPTY_SET, Collections.EMPTY_LIST );
-            }
-            else
-            {
-                Set artifacts = Collections.EMPTY_SET;
-                if ( !artifact.getArtifactHandler().isIncludesDependencies() )
+                try
                 {
-                    // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
-                    // or used the inherited scope (should that be passed to the buildFromRepository method above?)
                     artifacts =
                         project.createArtifacts( artifactFactory, artifact.getScope(), artifact.getDependencyFilter() );
                 }
-
-                List repositories =
-                    aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
-
-                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
+                catch ( InvalidDependencyVersionException e )
+                {
+                    throw new ArtifactMetadataRetrievalException( "Error in metadata for artifact '" +
+                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+                }
             }
 
-            return result;
+            List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
+
+            result = new ResolutionGroup( pomArtifact, artifacts, repositories );
         }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-        }
-        catch ( InvalidDependencyVersionException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-        }
+
+        return result;
     }
 
     private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
-        throws ProjectBuildingException
+        throws ArtifactMetadataRetrievalException
     {
         if ( superProject == null )
         {
-            superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
+            try
+            {
+                superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ArtifactMetadataRetrievalException(
+                    "Unable to parse the Maven built-in model: " + e.getMessage(), e );
+            }
         }
 
         List repositories = new ArrayList();
@@ -371,41 +369,5 @@ public class MavenMetadataSource
         }
 
         return versions;
-    }
-
-    /**
-     * @todo share with DefaultPluginMappingManager.
-     */
-    private static Metadata readMetadata( File mappingFile )
-        throws ArtifactMetadataRetrievalException
-    {
-        Metadata result;
-
-        Reader fileReader = null;
-        try
-        {
-            fileReader = new FileReader( mappingFile );
-
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read( fileReader );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot parse version information from: " + mappingFile, e );
-        }
-        finally
-        {
-            IOUtil.close( fileReader );
-        }
-        return result;
     }
 }

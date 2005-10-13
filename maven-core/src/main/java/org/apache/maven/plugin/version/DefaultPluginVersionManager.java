@@ -624,11 +624,13 @@ public class DefaultPluginVersionManager
             }
             catch ( IOException e )
             {
-                throw new PluginVersionResolutionException( groupId, artifactId, "Cannot read plugin registry", e );
+                throw new PluginVersionResolutionException( groupId, artifactId,
+                                                            "Error readin plugin registry: " + e.getMessage(), e );
             }
             catch ( XmlPullParserException e )
             {
-                throw new PluginVersionResolutionException( groupId, artifactId, "Cannot parse plugin registry", e );
+                throw new PluginVersionResolutionException( groupId, artifactId,
+                                                            "Error parsing plugin registry: " + e.getMessage(), e );
             }
 
             if ( pluginRegistry == null )
@@ -648,6 +650,7 @@ public class DefaultPluginVersionManager
 
         String version = null;
 
+        // This takes the spec version and resolves a real version
         try
         {
             ResolutionGroup resolutionGroup =
@@ -656,45 +659,50 @@ public class DefaultPluginVersionManager
             // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
             // artifact.
             artifact = resolutionGroup.getPomArtifact();
-
-            // make sure this artifact was actually resolved to a file in the repo...
-            if ( artifact.getFile() != null )
-            {
-                MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project
-                    .getPluginArtifactRepositories(), localRepository, false );
-
-                boolean pluginValid = true;
-
-                // if we don't have the required Maven version, then ignore an update
-                if ( pluginProject.getPrerequisites() != null && pluginProject.getPrerequisites().getMaven() != null )
-                {
-                    DefaultArtifactVersion requiredVersion =
-                        new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
-
-                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
-                    {
-                        getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
-                            " as it requires Maven version " + requiredVersion );
-                        pluginValid = false;
-                    }
-                }
-
-                String artifactVersion = artifact.getVersion();
-
-                if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
-                {
-                    version = artifactVersion;
-                }
-            }
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
-            getLogger().debug( "Failed to resolve " + metaVersionId + " version", e );
+            throw new PluginVersionResolutionException( groupId, artifactId, e.getMessage(), e );
         }
-        catch ( ProjectBuildingException e )
+
+        // make sure this artifact was actually resolved to a file in the repo...
+        if ( artifact.getFile() != null )
         {
-            throw new PluginVersionResolutionException( groupId, artifactId,
-                                                        "Unable to build resolve plugin project information", e );
+            MavenProject pluginProject;
+            try
+            {
+                pluginProject = mavenProjectBuilder.buildFromRepository( artifact,
+                                                                         project.getPluginArtifactRepositories(),
+                                                                         localRepository, false );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new PluginVersionResolutionException( groupId, artifactId,
+                                                            "Unable to build resolve plugin project information", e );
+            }
+
+            boolean pluginValid = true;
+
+            // if we don't have the required Maven version, then ignore an update
+            if ( pluginProject.getPrerequisites() != null && pluginProject.getPrerequisites().getMaven() != null )
+            {
+                DefaultArtifactVersion requiredVersion =
+                    new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
+
+                if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                {
+                    getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
+                        " as it requires Maven version " + requiredVersion );
+                    pluginValid = false;
+                }
+            }
+
+            String artifactVersion = artifact.getVersion();
+
+            if ( pluginValid && !metaVersionId.equals( artifactVersion ) )
+            {
+                version = artifactVersion;
+            }
         }
 
         return version;
