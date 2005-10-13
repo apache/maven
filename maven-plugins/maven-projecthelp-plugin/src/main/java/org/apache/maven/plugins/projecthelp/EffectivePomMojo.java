@@ -35,7 +35,7 @@ import java.util.List;
  * @goal effective-pom
  * @aggregator
  */
-public class EffectivePomPlugin
+public class EffectivePomMojo
     extends AbstractMojo
 {
 

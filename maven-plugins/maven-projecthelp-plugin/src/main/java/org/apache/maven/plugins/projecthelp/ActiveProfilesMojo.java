@@ -35,7 +35,7 @@ import java.util.List;
  * @goal active-profiles
  * @aggregator
  */
-public class ActiveProfilesPlugin extends AbstractMojo
+public class ActiveProfilesMojo extends AbstractMojo
 {
     
     /**
