@@ -196,8 +196,6 @@ public class DefaultMaven
             {
                 BuildFailure buildFailure = rm.getBuildFailure( project );
 
-                line();
-
                 getLogger().info(
                     "Error for project: " + project.getName() + " (during " + buildFailure.getTask() + ")" );
 
@@ -206,10 +204,16 @@ public class DefaultMaven
                 logDiagnostics( buildFailure.getCause() );
 
                 logTrace( buildFailure.getCause(), showErrors );
-
-                line();
             }
         }
+
+        if ( !showErrors )
+        {
+            getLogger().info( "For more information, run Maven with the -e switch" );
+
+            line();
+        }
+
     }
 
     private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
@@ -630,6 +634,13 @@ public class DefaultMaven
         logDiagnostics( e );
 
         logTrace( e, showErrors );
+
+        if ( !showErrors )
+        {
+            getLogger().info( "For more information, run Maven with the -e switch" );
+
+            line();
+        }
     }
 
     protected void logFailure( BuildFailureException e, boolean showErrors )
@@ -650,13 +661,20 @@ public class DefaultMaven
         }
 
         logTrace( e, showErrors );
+
+        if ( !showErrors )
+        {
+            getLogger().info( "For more information, run Maven with the -e switch" );
+
+            line();
+        }
     }
 
     private void logTrace( Throwable t, boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().info( "Trace", t );
+            getLogger().debug( "Trace", t );
 
             line();
         }
@@ -665,10 +683,6 @@ public class DefaultMaven
             getLogger().info( "Trace", t );
 
             line();
-        }
-        else
-        {
-            getLogger().info( "For more information, run Maven with the -e switch" );
         }
     }
 
@@ -703,6 +717,9 @@ public class DefaultMaven
     {
         if ( rm.hasMultipleProjects() && rm.executedMultipleProjects() )
         {
+            getLogger().info( "" );
+            getLogger().info( "" );
+
             // -------------------------
             // Reactor Summary:
             // -------------------------
@@ -735,9 +752,7 @@ public class DefaultMaven
                     logReactorSummaryLine( project.getName(), "NOT BUILT" );
                 }
             }
-
-            getLogger().info( "" );
-            getLogger().info( "" );
+            line();
         }
     }
 
