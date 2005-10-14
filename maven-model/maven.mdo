@@ -2971,7 +2971,7 @@
           <name>maven</name>
           <version>4.0.0</version>
           <type>String</type>
-          <defaultValue>2.0-beta</defaultValue>
+          <defaultValue>2.0</defaultValue>
           <description>The minimum version of Maven required</description>
           <required>false</required>
         </field>
