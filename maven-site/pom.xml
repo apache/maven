@@ -18,8 +18,8 @@
     </site>
     -->
     <site>
-      <id>website</id>
-      <url>scp://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
+      <id>beaver</id>
+      <url>scp://beaver.codehaus.org/home/users/jvanzyl/public_html/maven2/</url>
     </site>    
   </distributionManagement>
   <reporting>
