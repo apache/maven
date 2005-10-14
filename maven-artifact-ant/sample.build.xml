@@ -102,6 +102,11 @@
       <fileset refid="my.compile.dependency.fileset"/>
     </copy>
 
+    <copy todir="target/my-compile-dependencies/WEB-INF/lib">
+      <fileset refid="my.compile.dependency.fileset"/>
+      <mapper type="flatten" />
+    </copy>
+
     <antcall target="test-deploy" />
 
     <antcall target="test-legacy-pom" />

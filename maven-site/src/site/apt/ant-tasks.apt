@@ -102,6 +102,7 @@ Using the Antlib
 -----
 <copy todir="${webapp.output}/WEB-INF/lib">
   <fileset refid="depdendency.fileset" />
+  <mapper type="flatten" />
 </copy>
 -----
 
