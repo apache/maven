@@ -1,5 +1,5 @@
 
-toc=`pwd`/toc.apt
+toc=`pwd`/index.apt
 
 cp header.apt $toc
 
