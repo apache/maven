@@ -3,9 +3,9 @@
   <groupId>org.apache.maven</groupId>
   <artifactId>maven</artifactId>
   <packaging>pom</packaging>
-  <name>Maven Project</name>
+  <name>Maven</name>
   <version>2.0-beta-4-SNAPSHOT</version>
-  <description>Maven components parent</description>
+  <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</description>
   <url>http://maven.apache.org/maven2/</url>
   <issueManagement>
     <system>jira</system>
@@ -16,7 +16,7 @@
     <notifiers>
       <notifier>
         <configuration>
-          <address>dev@maven.apache.org</address>
+          <address>commits@maven.apache.org</address>
         </configuration>
       </notifier>
     </notifiers>
@@ -37,11 +37,18 @@
       <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
     </mailingList>
     <mailingList>
+      <name>Maven Commits List</name>
+      <subscribe>commits-subscribe@maven.apache.org</subscribe>
+      <unsubscribe>commits-unsubscribe@maven.apache.org</unsubscribe>
+      <post>commits@maven.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
+    </mailingList>
+    <mailingList>
       <name>Apache Announce List</name>
       <subscribe>announce-subscribe@apache.org</subscribe>
       <unsubscribe>announce-unsubscribe@apache.org</unsubscribe>
       <post>announce@apache.org</post>
-      <archive>mail-archives.apache.org/mod_mbox/www-announce/</archive>
+      <archive>http://mail-archives.apache.org/mod_mbox/www-announce/</archive>
     </mailingList>
   </mailingLists>
   <developers>
@@ -49,10 +56,9 @@
       <id>jvanzyl</id>
       <name>Jason van Zyl</name>
       <email>jason@maven.org</email>
-      <organization>Maven</organization>
+      <organization>ASF</organization>
       <roles>
-        <role>Architect</role>
-        <role>Release Manager</role>
+        <role>PMC Chair</role>
       </roles>
       <timezone>-5</timezone>
     </developer>
@@ -62,7 +68,6 @@
       <email>brett@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+10</timezone>
@@ -73,7 +78,6 @@
       <email>evenisse@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
@@ -84,7 +88,6 @@
       <email>jdcasey@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>-5</timezone>
@@ -95,7 +98,6 @@
       <email>kenney@apache.org</email>
       <organization>Neonics</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
@@ -104,9 +106,8 @@
       <id>trygvis</id>
       <name>Trygve Laugstol</name>
       <email>trygvis@apache.org</email>
-      <organization>Apache</organization>
+      <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
@@ -117,10 +118,19 @@
       <email>vmassol@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>vsiveton</id>
+      <name>Vincent Siveton</name>
+      <email>vsiveton@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Committer</role>
+      </roles>
+      <timezone>-5</timezone>
     </developer>
   </developers>
   <licenses>
@@ -140,14 +150,16 @@
     <url>http://www.apache.org/</url>
   </organization>
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <modules>
     <module>maven-archiver</module>
