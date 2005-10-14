@@ -128,10 +128,8 @@ public class ErrorDiagnostics
             StringBuffer message = new StringBuffer();
 
             message.append( error.getMessage() );
-            
-            message.append( "\nError type: " ).append( error.getClass().getName() );
-            
-            DiagnosisUtils.appendRootCauseIfPresentAndUnique( error, message, true );
+
+            DiagnosisUtils.appendRootCauseIfPresentAndUnique( error, message, false );
 
             return message.toString();
         }
