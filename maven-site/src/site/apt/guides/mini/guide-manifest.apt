@@ -127,5 +127,4 @@ url: http://maven.apache.org
 ~~ 1.2 ==> 1.2
 ~~ 1.2.1 ==> 1.2
 ~~ 1.2-SNAPSHOT ==> 1.2
-
-for the javaapp-plugin I did something like this in Jelly ...
+~~ for the javaapp-plugin I did something like this in Jelly ...
