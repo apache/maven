@@ -60,8 +60,10 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal sayhi
  * @description Says "Hi" to the user
  */
-public class GreetingMojo extends AbstractMojo {
-    public void execute() throws MojoExecutionException {
+public class GreetingMojo extends AbstractMojo 
+{
+    public void execute() throws MojoExecutionException 
+    {
         getLog().info("Hello, world.");
     }
 }
