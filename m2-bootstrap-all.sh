@@ -47,14 +47,21 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
+echo "-----------------------------------------------------------------------"
+echo " Rebuilding maven2 plugins ... "
+echo "-----------------------------------------------------------------------"  
+
 # I Really Don't want to be rebuilding these (Especially the reports) every time, but
 # until we regularly push them to the repository and the integration tests rely on
 # some of these plugins, there is no choice
 (
-  echo "-----------------------------------------------------------------------"
-  echo " Rebuilding maven2 plugins ... "
-  echo "-----------------------------------------------------------------------"  
+  # Build plugin plugin first, it seems to choke on the version built by the bootstrap
+  cd maven-plugins/maven-plugin-plugin
 
+  m2 --no-plugin-registry --batch-mode --fail-at-end -e $ARGS clean:clean install
+)
+
+(
   cd maven-plugins
   # update the release info to ensure these versions get used in the integration tests
   m2 --no-plugin-registry --batch-mode --fail-at-end -e $ARGS clean:clean install
