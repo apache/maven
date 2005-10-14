@@ -4,7 +4,7 @@
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-plugin-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0-beta-4-SNAPSHOT</version>
+  <version>2.0.1-SNAPSHOT</version>
   <name>Maven Plugins</name>
   <description>Maven plugin parent</description>
   <url>http://maven.apache.org/maven2/plugins/</url>
@@ -18,7 +18,7 @@
       <notifier>
         <type>mail</type>
         <configuration>
-          <address>dev@maven.apache.org</address>
+          <address>commits@maven.apache.org</address>
         </configuration>
       </notifier>
     </notifiers>
@@ -30,8 +30,7 @@
       <email>jason@maven.org</email>
       <organization>Maven</organization>
       <roles>
-        <role>Architect</role>
-        <role>Release Manager</role>
+        <role>PMC Chair</role>
       </roles>
     </developer>
     <developer>
@@ -40,7 +39,6 @@
       <email>brett@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+10</timezone>
@@ -51,7 +49,7 @@
       <email>evenisse@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -60,7 +58,7 @@
       <email>kenney@apache.org</email>
       <organization>Neonics</organization>
       <roles>
-        <role>Java Developer</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -69,7 +67,7 @@
       <email>snicoll@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
+        <role>Committer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -79,7 +77,6 @@
       <email>vmassol@apache.org</email>
       <organization>ASF</organization>
       <roles>
-        <role>Java Developer</role>
         <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
@@ -95,7 +92,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>2.0-beta-4-SNAPSHOT</version>
+      <version>2.0</version>
     </dependency>
   </dependencies>
   <organization>
@@ -143,7 +140,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-project</artifactId>
-        <version>2.0-beta-4-SNAPSHOT</version>
+        <version>2.0</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
