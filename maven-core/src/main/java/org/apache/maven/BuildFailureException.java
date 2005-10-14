@@ -25,27 +25,13 @@ package org.apache.maven;
 public class BuildFailureException
     extends Exception
 {
-    private String longMessage;
-
     public BuildFailureException( String message )
     {
         super( message );
     }
 
-    public BuildFailureException( String message, String longMessage )
-    {
-        super( message );
-        this.longMessage = longMessage;
-    }
-
-    public BuildFailureException( String message, String longMessage, Throwable cause )
+    public BuildFailureException( String message, Throwable cause )
     {
         super( message, cause );
-        this.longMessage = longMessage;
-    }
-
-    public String getLongMessage()
-    {
-        return longMessage;
     }
 }

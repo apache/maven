@@ -36,39 +36,33 @@ public class MojoExecutionExceptionDiagnoser
 
         StringBuffer message = new StringBuffer();
 
-        message.append( "Error executing mojo" );
-
         Object source = mee.getSource();
         if ( source != null )
         {
             message.append( ": " ).append( mee.getSource() ).append( "\n" );
         }
-        else
-        {
-            message.append( ".\n" );
-        }
 
-        message.append( "\n" ).append( mee.getMessage() );
+        message.append( mee.getMessage() );
 
         String longMessage = mee.getLongMessage();
         if ( longMessage != null )
         {
             message.append( "\n\n" ).append( longMessage );
         }
-        
+
         Throwable directCause = mee.getCause();
-        
+
         if ( directCause != null )
         {
             message.append( "\n" );
-            
+
             String directCauseMessage = directCause.getMessage();
-            
+
             if ( directCauseMessage != null && mee.getMessage().indexOf( directCauseMessage ) < 0 )
             {
                 message.append( "\nEmbedded error: " ).append( directCauseMessage );
             }
-            
+
             DiagnosisUtils.appendRootCauseIfPresentAndUnique( directCause, message, false );
         }
 

@@ -659,13 +659,6 @@ public class DefaultMaven
 
         logDiagnostics( e );
 
-        if ( e.getLongMessage() != null )
-        {
-            getLogger().info( e.getLongMessage() );
-
-            line();
-        }
-
         logTrace( e, showErrors );
 
         if ( !showErrors )

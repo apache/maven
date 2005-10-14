@@ -26,7 +26,7 @@ public class MojoFailureExceptionDiagnoser
 
     public boolean canDiagnose( Throwable error )
     {
-        return DiagnosisUtils.containsInCausality( error, MojoFailureExceptionDiagnoser.class );
+        return DiagnosisUtils.containsInCausality( error, MojoFailureException.class );
     }
 
     public String diagnose( Throwable error )
@@ -41,12 +41,8 @@ public class MojoFailureExceptionDiagnoser
         {
             message.append( ": " ).append( mfe.getSource() ).append( "\n" );
         }
-        else
-        {
-            message.append( ".\n" );
-        }
 
-        message.append( "\n" ).append( mfe.getMessage() );
+        message.append( mfe.getMessage() );
 
         String longMessage = mfe.getLongMessage();
         if ( longMessage != null )

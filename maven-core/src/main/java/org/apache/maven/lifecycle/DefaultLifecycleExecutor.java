@@ -454,7 +454,7 @@ public class DefaultLifecycleExecutor
         }
         catch ( PluginNotFoundException e )
         {
-            throw new BuildFailureException( "A required plugin was not found", e.getMessage(), e );
+            throw new BuildFailureException( "A required plugin was not found: " + e.getMessage(), e );
         }
     }
 
@@ -537,7 +537,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( MojoFailureException e )
             {
-                throw new BuildFailureException( e.getMessage(), e.getLongMessage(), e );
+                throw new BuildFailureException( e.getMessage(), e );
             }
             catch ( MojoExecutionException e )
             {
