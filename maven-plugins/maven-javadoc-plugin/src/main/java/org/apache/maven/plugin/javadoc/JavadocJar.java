@@ -16,8 +16,11 @@ package org.apache.maven.plugin.javadoc;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
@@ -27,7 +30,7 @@ import java.io.IOException;
 /**
  * @goal jar
  * @phase package
- * @execute phase="javadoc:javadoc"
+ * @execute goal="javadoc"
  */
 public class JavadocJar
     extends AbstractMojo
@@ -42,12 +45,47 @@ public class JavadocJar
      */
     private String finalName;
 
+    /**
+     * @parameter expression="${project}"
+     * @readonly
+     * @required
+     */
+    private MavenProject project;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}
+     */
+    private MavenProjectHelper projectHelper;
+
+    /**
+     * @parameter expression="${attach}" default-value="true"
+     */
+    private boolean attach = true;
+
     public void execute()
         throws MojoExecutionException
     {
+        ArtifactHandler artifactHandler = project.getArtifact().getArtifactHandler();
+        if ( !"java".equals( artifactHandler.getLanguage() ) || !artifactHandler.isAddedToClasspath() )
+        {
+            getLog().info( "Not executing Javadoc as the project is not a Java classpath-capable package" );
+        }
+
         try
         {
-            generateArchive( outputDirectory + "/javadoc", finalName + "-javadoc.jar" );
+            File outputFile = generateArchive( outputDirectory + "/javadoc", finalName + "-javadoc.jar" );
+
+            if ( !attach )
+            {
+                getLog().info( "NOT adding javadoc to attached artifacts list." );
+
+            }
+            else
+            {
+                // TODO: these introduced dependencies on the project are going to become problematic - can we export it
+                //  through metadata instead?
+                projectHelper.attachArtifact( project, "javadoc", "javadoc", outputFile );
+            }
         }
         catch ( ArchiverException e )
         {
@@ -59,7 +97,7 @@ public class JavadocJar
         }
     }
 
-    private void generateArchive( String source, String target )
+    private File generateArchive( String source, String target )
         throws MojoExecutionException, ArchiverException, IOException
     {
         File javadocFiles = new File( source );
@@ -83,5 +121,7 @@ public class JavadocJar
         archiver.setDestFile( javadocJar );
 
         archiver.createArchive();
+
+        return javadocJar;
     }
 }

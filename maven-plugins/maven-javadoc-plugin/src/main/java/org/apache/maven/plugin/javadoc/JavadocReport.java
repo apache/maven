@@ -20,6 +20,7 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
@@ -600,6 +601,13 @@ public class JavadocReport
     protected void executeReport( Locale locale )
         throws MavenReportException
     {
+        ArtifactHandler artifactHandler = project.getArtifact().getArtifactHandler();
+        if ( !"java".equals( artifactHandler.getLanguage() ) || !artifactHandler.isAddedToClasspath() )
+        {
+            getLog().info( "Not executing Javadoc as the project is not a Java classpath-capable package" );
+            return;
+        }
+
         int actualYear = Calendar.getInstance().get( Calendar.YEAR );
         String year = String.valueOf( actualYear );
 
@@ -836,19 +844,19 @@ public class JavadocReport
             addArgIf( arguments, serialwarn, "-serialwarn" );
             addArgIf( arguments, splitindex, "-splitindex" );
             addArgIfNotEmpty( arguments, "-stylesheetfile", quotedPathArgument( stylesheetfile ) );
-            
+
             addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
-            
+
             if ( tags != null && !tags.isEmpty() )
             {
                 for ( Iterator it = tags.iterator(); it.hasNext(); )
                 {
                     String tag = (String) it.next();
-                    
+
                     addArgIfNotEmpty( arguments, "-tag", quotedArgument( tag ), 1.4f, true );
                 }
             }
-            
+
             addArgIfNotEmpty( arguments, "-taglet", quotedArgument( taglet ), 1.4f );
             addArgIfNotEmpty( arguments, "-tagletpath", quotedPathArgument( tagletpath ), 1.4f );
             addArgIf( arguments, use, "-use" );
@@ -1107,9 +1115,9 @@ public class JavadocReport
         {
             for ( int i = 0; i < offlineLinks.size(); i++ )
             {
-                OfflineLink offlineLink = (OfflineLink)offlineLinks.get(i);
-                addArgIfNotEmpty( arguments, "-linkoffline",
-                                  quotedPathArgument( offlineLink.getUrl() ) + " " + quotedPathArgument( offlineLink.getLocation().getAbsolutePath() ), true );
+                OfflineLink offlineLink = (OfflineLink) offlineLinks.get( i );
+                addArgIfNotEmpty( arguments, "-linkoffline", quotedPathArgument( offlineLink.getUrl() ) + " " +
+                    quotedPathArgument( offlineLink.getLocation().getAbsolutePath() ), true );
             }
         }
     }
@@ -1125,7 +1133,7 @@ public class JavadocReport
         {
             for ( int i = 0; i < links.size(); i++ )
             {
-                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( (String)links.get(i) ), true );
+                addArgIfNotEmpty( arguments, "-link", quotedPathArgument( (String) links.get( i ) ), true );
             }
         }
     }
