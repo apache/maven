@@ -17,7 +17,9 @@ package org.apache.maven.archiver;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +41,8 @@ public class MavenArchiveConfiguration
 
     private Map manifestEntries = new HashMap();
 
+    private List manifestSections = new ArrayList();
+    
     public boolean isCompress()
     {
         return compress;
@@ -101,5 +105,21 @@ public class MavenArchiveConfiguration
     public Map getManifestEntries()
     {
         return manifestEntries;
+    }
+    
+    public void addManifestSection( ManifestSection section ) {
+    	manifestSections.add( section );
+    }
+    
+    public void addManifestSections( List list ) {
+    	manifestSections.addAll( list );
+    }
+    
+    public boolean isManifestSectionsEmpty() {
+    	return manifestSections.isEmpty();
+    }
+    
+    public List getManifestSections() {
+    	return manifestSections;
     }
 }
