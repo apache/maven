@@ -1101,7 +1101,7 @@ public class DefaultLifecycleExecutor
         }
         catch ( PluginVersionResolutionException e )
         {
-            throw new LifecycleExecutionException( "Error resolving plugin version: " + e.getMessage(), e );
+            throw new LifecycleExecutionException( e.getMessage(), e );
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -1141,7 +1141,7 @@ public class DefaultLifecycleExecutor
         }
         catch ( PluginVersionResolutionException e )
         {
-            throw new LifecycleExecutionException( "Error resolving plugin version: " + e.getMessage(), e );
+            throw new LifecycleExecutionException( e.getMessage(), e );
         }
         catch ( InvalidVersionSpecificationException e )
         {
