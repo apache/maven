@@ -96,15 +96,22 @@ Using the Antlib
 -----
 
   Another option you can use is <<<filesetId>>>, which will give you a fileset reference that can be used to copy
-  files into a particular location. For example, to populate <<<WEB-INF/lib>>> with your dependencies, and assuming
-  you passed <<<filesetId="dependeny.fileset">>> to the <<<dependencies>>> task, you could use the following:
+  files into a particular location. For example, to populate <<<WEB-INF/lib>>> with your dependencies
+  you could use the following:
 
 -----
+<dependencies filesetId="dependency.fileset" useScope="runtime">
+  ...
+</dependencies>
 <copy todir="${webapp.output}/WEB-INF/lib">
-  <fileset refid="depdendency.fileset" />
+  <fileset refid="dependency.fileset" />
   <mapper type="flatten" />
 </copy>
 -----
+
+  Note the <<<useScope>>> attribute in this call. This ensures that your web application only includes your compile
+  and runtime dependencies, excluding those that are only for testing or are expected to already be provided in
+  the servlet container.
 
   You can also specify a <<<scope>>> parameter on each dependency. This changes the behaviour of
   transitive dependencies and is useful for building different types of classpaths. To see how it affects
