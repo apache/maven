@@ -12,16 +12,6 @@ Documentation
 
  * {{{getting-started/index.html}Getting Started Guide}}
 
-* Developer Guides 
-
- * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
- 
- * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
-
-* Plug-in Guides
-
- * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
-
 * Mini Guides
 
  * {{{mini/guide-apt-format.html}Guide to the APT Format}}
@@ -91,3 +81,14 @@ Documentation
 
  * {{{introduction/introduction-to-the-standard-directory-layout.html}Introduction to the Standard Directory Layout}}
 
+
+* Plugin Guides
+
+ * {{{plugin/guide-java-plugin-development.html}Guide to Developing Java Plugins}}
+
+
+* Developer Guides 
+
+ * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
+ 
+ * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
