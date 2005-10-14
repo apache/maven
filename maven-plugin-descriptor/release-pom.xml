@@ -1,12 +1,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven</artifactId>
-  <packaging>pom</packaging>
-  <name>Maven</name>
+  <artifactId>maven-plugin-descriptor</artifactId>
+  <name>Maven Plugin Descriptor Model</name>
   <version>2.0</version>
   <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</description>
-  <url>http://maven.apache.org/maven2/</url>
+  <url>http://maven.apache.org/maven2/maven-plugin-descriptor</url>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
@@ -141,48 +140,52 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugin-descriptor</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-plugin-descriptor</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk/maven-plugin-descriptor</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+    <directory>target</directory>
+    <finalName>maven-plugin-descriptor-2.0</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <model>src/main/mdo/lifecycle.mdo</model>
+          <version>1.0.0</version>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
-  <modules>
-    <module>maven-archiver</module>
-    <module>maven-artifact</module>
-    <module>maven-artifact-manager</module>
-    <module>maven-artifact-ant</module>
-    <module>maven-artifact-test</module>
-    <module>maven-core</module>
-    <module>maven-error-diagnostics</module>
-    <module>maven-model</module>
-    <module>maven-monitor</module>
-    <module>maven-plugin-api</module>
-    <module>maven-plugin-descriptor</module>
-    <module>maven-plugin-parameter-documenter</module>
-    <module>maven-plugin-registry</module>
-    <module>maven-plugin-tools</module>
-    <module>maven-profile</module>
-    <module>maven-project</module>
-    <module>maven-reporting</module>
-    <module>maven-repository-metadata</module>
-    <module>maven-script</module>
-    <module>maven-settings</module>
-  </modules>
   <repositories>
     <repository>
       <releases>
@@ -191,6 +194,14 @@
       <id>snapshots</id>
       <name>Maven Central Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://www.ibiblio.org/maven2</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -202,49 +213,56 @@
       <name>Maven Central Plugins Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://www.ibiblio.org/maven2</url>
+    </pluginRepository>
   </pluginRepositories>
   <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-8</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>classworlds</groupId>
+      <artifactId>classworlds</artifactId>
+      <version>1.1-alpha-2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-8</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.0.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-file</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <reporting>
+    <outputDirectory>target/site</outputDirectory>
+  </reporting>
   <distributionManagement>
     <repository>
       <id>repo1</id>
@@ -258,7 +276,7 @@
     </snapshotRepository>
     <site>
       <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/maven-plugin-descriptor</url>
     </site>
   </distributionManagement>
 </project>

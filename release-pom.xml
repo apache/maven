@@ -141,25 +141,41 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
   </organization>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+    <directory>target</directory>
+    <finalName>maven-2.0</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0-beta-3-SNAPSHOT</version>
+        <configuration>
+          <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
   <modules>
     <module>maven-archiver</module>
@@ -192,6 +208,14 @@
       <name>Maven Central Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://www.ibiblio.org/maven2</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -202,6 +226,14 @@
       <name>Maven Central Plugins Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </pluginRepository>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://www.ibiblio.org/maven2</url>
+    </pluginRepository>
   </pluginRepositories>
   <dependencies>
     <dependency>
@@ -211,40 +243,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-8</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.0.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-file</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-alpha-5</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <reporting>
+    <outputDirectory>target/site</outputDirectory>
+  </reporting>
   <distributionManagement>
     <repository>
       <id>repo1</id>
