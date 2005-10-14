@@ -156,6 +156,7 @@
     <module>maven-artifact-ant</module>
     <module>maven-artifact-test</module>
     <module>maven-core</module>
+    <module>maven-error-diagnostics</module>
     <module>maven-model</module>
     <module>maven-monitor</module>
     <module>maven-plugin-api</module>
