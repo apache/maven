@@ -13,61 +13,11 @@
    We might want to do something where we say it is a best practice to
    specify a ${user} and take it from the environment and allow an override.
 
-* Guide to using project properties
-
-Actually, no. It's *like* the properties defined in profiles in syntax,
-but this is a properties section that is specified as a direct child of
-the <project> element. So:
-
 - testing a plugin
-
 - How to get started behind an NTLM proxy.
-
 - How snapshots works
-
 - How do i use the lifecycle provided by a plugin:
-
-make sure you turn on the extension option
-
-<packaging>nbm</packaging>, <build><plugins><plugin><groupId/><artifactId/><extensions>true</extensions></plugin></plugins></build>
-
-==
-
-What expressions are available for use in the mojos?
-
-           <jason> maybe i can generate doco from @tags in the expression evaluator or something
-<jason> that's where it's localized right?
-<jdcasey> um, sort of
-<jdcasey> we have the roots there, but we're using the ReflectionValueExtractor from there
-<jdcasey> it can easily get pretty ugly
-<jason> i'll make a list of those
-<jdcasey> I'm thinking of making a mapping resource for expressions, for use in the error diagnoser...maybe we can reuse that?
-<jason> of the ones that are not referenced in the plugin expression evaluator where can i find them?
-<jason> sure
-<jason> a single place would be nice
-<jdcasey> they're (a) listed in the expression evaluator, (b) available as POM properties, (c) available as system properties, or (d) available reflectively from the api rooted in one of the four or five data objects
-<jdcasey> yup, I think we need that
-
-note from andy
-
-             Jason,
-
-Follow up to our irc chat about suggesting that windows m2 users move their
-repos to a location without embedded spaces. I think it would be helpful to
-people if we were to place a notification about this in a prominent place
-on the M2 site and in the getting started guide.  Parting of the marketing
-chat could be "Windows M2 Users Prepare for surefire and Java compiler
-forking by moving your M2 repository to a file system location that doesn't
-contain embedded spaces!"
-
-The default user.home on windows is c:\documents and settings\<username>\
-
-The repo location can be changed in the settings.xml file located at
-${user.home}/.m2/settings.xml
-
-I've pasted an example of a trivial modified settings.xml file below.
-
-<settings>
-   <localRepository>F:\m2-repository\repository</localRepository>
-</settings>
-
+- How do i disable ibiblio
+- using version ranges
+- plugin expressions (look at bob allison's work)
+- overriding the central repository (use central)

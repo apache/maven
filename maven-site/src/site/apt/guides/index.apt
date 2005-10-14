@@ -40,7 +40,7 @@ Documentation
 
  * {{{mini/guide-ide-idea.html}Guide to using IDEA with Maven 2.x}}
 
- * {{{mini/guide-ide-netbeans.html}Guide to using Netbeans with Maven 2.x}}
+ * {{{mini/guide-ide-netbeans/guide-ide-netbeans.html}Guide to Using maven 2 in Netbeans 4.0 (4.1 and 5.0)}}
 
  * {{{mini/guide-m1-m2.html}Guide to Moving From Maven 1.x to Maven 2.x}}
 
@@ -49,6 +49,10 @@ Documentation
  * {{{mini/guide-maven-classloading.html}Guide to Maven Classloading}}
 
  * {{{mini/guide-mirror-settings.html}Guide to Mirror Settings}}
+
+ * {{{mini/guide-multi-module.html}Guide to creating a multi-module build}}
+
+ * {{{mini/guide-multi-module.html~}Guide to creating a multi-module build}}
 
  * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 

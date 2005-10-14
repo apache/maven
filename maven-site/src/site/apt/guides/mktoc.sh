@@ -30,11 +30,22 @@ echo >> $toc
 (
   cd mini
 
-  for i in `ls guide-*.apt`
+  for i in `ls -d guide-*`
   do
-   title=`grep "^ Guide" $i | sed 's/^ *//'`
-   i=`echo $i | sed 's/\.apt/\.html/'`
-   [ ! -z "$title" ] && echo " * {{{mini/$i}$title}}" >> $toc && echo >> $toc
+   if [ -d $i ]
+   then
+     (
+       cd $i
+       title=`grep "^ *Guide" ${i}.apt | sed 's/^ *//'`
+       i=`echo $i | sed 's/\.apt/\.html/'`
+       [ ! -z "$title" ] && echo " * {{{mini/$i/$i.html}$title}}" >> $toc && echo >> $toc
+     )
+   else
+     title=`grep "^ Guide" $i | sed 's/^ *//'`
+     i=`echo $i | sed 's/\.apt/\.html/'`
+     [ ! -z "$title" ] && echo " * {{{mini/$i}$title}}" >> $toc && echo >> $toc
+   fi
+  
   done       
 )       
 
