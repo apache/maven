@@ -1,0 +1,14 @@
+
+* Reference
+
+ * {{{../maven-model/maven.html}Project Descriptor}}
+ 
+ * {{{../maven-settings/settings.html}Settings Descriptor}}
+ 
+ * {{{../plugins/index.html}Available Plug-ins}}
+ 
+ * {{{../developers/mojo-api-specification.html}Mojo API}}
+  
+ * {{{../ant-tasks}Ant Tasks}}
+ 
+ []

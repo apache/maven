@@ -15,6 +15,11 @@ echo " ------ " >> $toc
 echo >> $toc
 echo "Documentation" >> $toc
 echo >> $toc
+
+#
+# Getting started guide
+#
+
 echo "* Getting Started Guide" >> $toc
 echo >> $toc
 echo " * {{{getting-started/index.html}Getting Started Guide}}" >> $toc
@@ -97,3 +102,5 @@ echo "" >> $toc
 echo " * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}" >> $toc
 echo " " >> $toc
 echo " * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}" >> $toc
+
+cat tail.apt >> $toc

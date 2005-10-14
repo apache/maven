@@ -96,3 +96,17 @@ Documentation
  * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
  
  * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
+
+* Reference
+
+ * {{{../maven-model/maven.html}Project Descriptor}}
+ 
+ * {{{../maven-settings/settings.html}Settings Descriptor}}
+ 
+ * {{{../plugins/index.html}Available Plug-ins}}
+ 
+ * {{{../developers/mojo-api-specification.html}Mojo API}}
+  
+ * {{{../ant-tasks}Ant Tasks}}
+ 
+ []

@@ -53,6 +53,7 @@
     </menu>
     -->
     
+    <!--
     <menu name="Reference">
       <item name="Project Descriptor" href="/maven-model/maven.html"/>
       <item name="Settings Descriptor" href="/maven-settings/settings.html"/>
@@ -61,6 +62,8 @@
       <item name="Ant Tasks" href="/ant-tasks.html"/>
       <item name="APT Reference" href="/apt-format.html"/>
     </menu>
+    -->
+    
     ${reports}
   </body>
 </project>
