@@ -4,16 +4,16 @@ Installing Maven 2
 The following instructions show how to install Maven 2:
 
 1) Unpack the archive where you would like to store the binaries, eg:
-  tar zxvf maven-2.0-SNAPSHOT.tar.gz
+  tar zxvf maven-2.0.tar.gz
 or
-  unzip maven-2.0-SNAPSHOT.zip
+  unzip maven-2.0.zip
 
-2) A directory called "maven-2.0-SNAPSHOT" will be created.
+2) A directory called "maven-2.0" will be created.
 
 3) Add the bin directory to your PATH, eg:
-  export PATH=/usr/local/maven-2.0-SNAPSHOT/bin:$PATH
+  export PATH=/usr/local/maven-2.0/bin:$PATH
 or
-  set PATH="c:\program files\maven-2.0-SNAPSHOT\bin";%PATH%
+  set PATH="c:\program files\maven-2.0\bin";%PATH%
 
 4) Make sure JAVA_HOME is set to the location of your JDK
 
