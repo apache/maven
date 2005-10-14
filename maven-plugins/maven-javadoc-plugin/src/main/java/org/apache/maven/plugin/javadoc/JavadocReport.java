@@ -725,7 +725,7 @@ public class JavadocReport
         if ( !StringUtils.isEmpty( doclet ) )
         {
             addArgIfNotEmpty( arguments, "-doclet", quotedArgument( doclet ) );
-            addArgIfNotEmpty( arguments, "-docletPath", quotedPathArgument( docletPath ) );
+            addArgIfNotEmpty( arguments, "-docletpath", quotedPathArgument( docletPath ) );
         }
         addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
         addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
