@@ -1,0 +1,395 @@
+ ------
+ Guide to Developing Java Plugins
+ ------
+ Bob Allison
+ ------
+ 12 October 2005
+ ------
+
+~~ Copyright 2001-2005 The Apache Software Foundation.
+~~ 
+~~ Licensed under the Apache License, Version 2.0 (the "License");
+~~ you may not use this file except in compliance with the License.
+~~ You may obtain a copy of the License at
+~~ 
+~~      http://www.apache.org/licenses/LICENSE-2.0
+~~ 
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Introduction
+
+  This guide is intended to assist users in developing Java plugins for
+  Maven 2.0.
+
+* Your First Plugin
+
+  In this section we will build a simple plugin which takes no parameters
+  and simply displays a message on the screen when run.  Along the way, we
+  will cover the basics of setting up a project to create a plugin, the
+  minimal contents of a Java mojo, and a couple ways to execute the mojo.
+
+** Your First Mojo
+
+  At its simplest, a Java mojo consists simply of a single class.  There is
+  no requirement for multiple classes like EJBs, although a plugin which
+  contains a number of similar mojos is likely to use an abstract
+  superclass for the mojos to consolidate code common to all mojos.
+
+  When processing the source tree to find mojos, the class
+  <<<org.apache.maven.tools.plugin.extractor.java.JavaMojoDescriptorExtractor>>>
+  looks for classes with a "<<<goal>>>" annotation on the class.  Any class
+  with this annotation are included in the plugin configuration file.
+
+*** A Simple Mojo
+
+  Listed below is a simple mojo class which has no parameters.  This is
+  about as simple as a mojo can be.  After the listing is a description
+  of the various parts of the source.
+
++---+
+package sample.plugin;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
+/**
+ * @goal sayhi
+ * @description Says "Hi" to the user
+ */
+public class GreetingMojo extends AbstractMojo {
+    public void execute() throws MojoExecutionException {
+        getLog().info("Hello, world.");
+    }
+}
++---+
+
+  * The class <<<org.apache.maven.plugin.AbstractMojo>>> provides most of the
+    infrastructure required to implement a mojo except for the
+    <<<execute>>> method.
+
+  * The comment lines starting with "<<<@goal>>>" and "<<<@description>>>"
+    are examples of annotations.  These two annotations are required, but
+    there are a number of annotations which can be used to control how and
+    when the mojo is executed.
+
+  * The <<<execute>>> method can throw two exceptions:
+
+    * <<<org.apache.maven.plugin.MojoExecutionException>>> if an unexpected
+      problem occurs.  Throwing this exception causes a "BUILD ERROR" message
+      to be displayed.
+
+    * <<<org.apache.maven.plugin.MojoFailureException>>> if an expected
+      problem (such as a compilation failure) occurs.  Throwing this exception
+      causes a "BUILD FAILURE" message to be displayed.
+
+  * The <<<getLog>>> method (defined in <<<AbstractMojo>>>) returns a
+    log4j-like logger object which allows plugins to create messages at levels
+    of "debug", "info", "warn", and "error".  This logger is the accepted means
+    to display information to the user.
+
+** Project Definition
+
+  Once the mojos have been written for the plugin, it is time to
+  build the plugin.  To do this properly, the project's descriptor
+  needs to have a number of settings set properly:
+
+*------------------+----------------------------------------------------------+
+|<<<groupId>>>     |This is the group ID for the plugin, and should match the |
+|                  |common prefix to the packages used by the mojos           |
+*------------------+----------------------------------------------------------+
+|<<<artifactId>>>  |This is the name of the plugin                            |
+*------------------+----------------------------------------------------------+
+|<<<version>>>     |This is the version of the plugin                         |
+*------------------+----------------------------------------------------------+
+|<<<packaging>>>   |This should be set to "<<<maven-plugin>>>"                |
+*------------------+----------------------------------------------------------+
+|<<<dependencies>>>|A dependency must be declared to the Maven Plugin Tools   |
+|                  |API to resolve "<<<AbstractMojo>>>" and related classes   |
+*------------------+----------------------------------------------------------+
+
+  Listed below is a POM for a plugin which uses the simple sample mojo:
+
++----+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>sample.plugin</groupId>
+  <artifactId>maven-hello-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Sample Parameter-less Maven Plugin</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-tools-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+</project>
++----+
+
+** Build Goals
+
+  There are a few goals which are defined with the Maven plugin
+  packaging as part of a standard build lifecycle:
+
+*-------------+----------------------------------------------------+
+|<<<compile>>>|Compiles the Java code for the plugin and builds the|
+|             |plugin descriptor                                   |
+*-------------+----------------------------------------------------+
+|<<<test>>>   |Runs the plugin's unit tests                        |
+*-------------+----------------------------------------------------+
+|<<<package>>>|Builds the plugin jar                               |
+*-------------+----------------------------------------------------+
+|<<<install>>>|Installs the plugin jar in the local repository     |
+*-------------+----------------------------------------------------+
+|<<<deploy>>> |Deploys the plugin jar to the remote repository     |
+*-------------+----------------------------------------------------+
+
+** Executing Your First Mojo
+
+  The most direct means of executing your new plugin is to specify the
+  plugin goal directly on the command line.  To do this, you need to
+  specify a fully-qualified goal in the form of:
+
++----+
+groupID:artifactID:version:goal
++----+
+
+  For example, to run the simple mojo in the sample plugin, you would enter
+  "<<<m2 sample.plugin:maven-hello-plugin:1.0-SNAPSHOT:sayhi>>>" on the
+  command line.
+
+*** Shortening the Command Line
+
+  It is possible to shorten the amount of typing needed on the command
+  line.  To do this, you need to install the plugin with the
+  <<<updateReleaseInfo>>> option set to true; for example:
+
++----+
+m2 -DupdateReleaseInfo=true install
++----+
+
+  You also need to add your plugin's group ID to the list of group IDs
+  searched by default.  To do this, you need to add the following to
+  your <<<settings.xml>>> file:
+
++----+
+<pluginGroups>
+  <pluginGroup>sample.plugin</pluginGroup>
+</pluginGroups>
++----+
+
+  At this point, you can run the mojo with "<<<m2 hello:sayhi>>>".
+
+
+*** Attaching the Mojo to the Build Lifecycle
+
+  You can also configure your plugin to attach specific goals to a particular
+  phase of the build lifecycle.  Here is an example:
+
++-----+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>sample.plugin</groupId>
+        <artifactId>maven-hello-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>sayhi</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
++-----+
+
+  This causes the simple mojo to be executed whenever Java code is compiled.
+  For more information on binding a mojo to phases in the lifecycle, please
+  refer to the {{{/maven2/lifecycle.html}Build Lifecycle}} document.
+
+
+* Parameters
+
+  It is unlikely that a mojo will be very useful without parameters.
+  Parameters provide a few very important functions:
+
+  * It provides hooks to allow the user to adjust the operation of the
+    plugin to suit their needs.
+
+  * It provides a means to easily extract the value of elements from
+    the POM without the need to navigate the objects.
+
+** Defining Parameters Within a Mojo
+
+  Defining a parameter is as simple as creating an instance variable
+  in the mojo and adding the proper annotations.  Listed below is an
+  example of a parameter for the simple mojo:
+
++-----+
+    /**
+     * The greeting to display.
+     * @parameter expression="Hello"
+     */
+    private String greeting;
++-----+
+
+  The portion before the annotations is the description of the
+  parameter.  The "<<<parameter>>>" annotation identifies
+  the variable as a mojo parameter.  The "<<<expression>>>"
+  parameter defines the default value for the variable.  This value can
+  include expressions which reference the project, such as
+  "<<<${project.version}>>>" (more can be found in the
+  "Parameter Expressions" document).  The name of the variable is used
+  as the name of the parameter.
+
+** Configuring Parameters in a Project
+
+  Configuring the parameter values for a plugin is done in a Maven 2
+  project within the <<<pom.xml>>> file as part of defining the
+  plugin in the project.  An example of configuring a plugin:
+
++-----+
+<plugin>
+  <groupId>sample.plugin</groupId>
+  <artifactId>maven-hello-plugin</artifactId>
+  <configuration>
+    <greeting>Welcome</greeting>
+  </configuration>
+</plugin>
++-----+
+
+  In the configuration section, the element name
+  ("<<<greeting>>>") is the parameter name and the contents of
+  the element ("<<<Welcome>>>") is the value to be assigned to
+  the parameter.  More details can be found in the
+  {{{../mini/guide-configuring-plugins.html}Guide to Configuring Plugins}}.
+
+** Parameter Types With One Value
+
+  Listed below are the various types of simple variables which can be used as
+  parameters in your mojos, along with any rules on how the values in the
+  POM are interpreted.
+
+*** Boolean
+
+  This includes variables typed <<<boolean>>> and <<<Boolean>>>.  When reading
+  the configuration, the text "<<<true>>>" causes the parameter to be set to
+  true and all other text causes the parameter to be set to false.
+
+*** Fixed-Point Numbers
+
+  This includes variables typed <<<byte>>>, <<<Byte>>>, <<<int>>>,
+  <<<Integer>>>, <<<long>>>, <<<Long>>>, <<<short>>>, and <<<Short>>>.  When
+  reading the configuration, the text in the XML file is converted to an
+  integer value using either <<<Integer.parseInt()>>> or the <<<valueOf()>>>
+  method of the appropriate class.  This means that the strings must be valid
+  decimal integer values, consisting only of the digits 0 to 9 with an optional
+  <<<->>> in front for a negative value.
+
+*** Floating-Point Numbers
+
+  This includes variables typed <<<double>>>, <<<Double>>>, <<<float>>>, and
+  <<<Float>>>.  When reading the configuration, the text in the XML file is
+  converted to binary form using the <<<valueOf()>>> method for the appropriate
+  class.  This means that the strings can take on any format specified in
+  section 3.10.2 of the Java Language Specification.  Some samples of valid
+  values are <<<1.0>>> and <<<6.02E+23>>>.
+
+*** Dates
+
+  This includes variables typed <<<Date>>>.  When reading the configuration,
+  the text in the XML file is converted using one of the following date
+  formats: "<<<yyyy-MM-dd HH:mm:ss.S a>>>" (a sample date is "2005-10-06
+  2:22:55.1 PM") or "<<<yyyy-MM-dd HH:mm:ssa>>>" (a sample date is "2005-10-06
+  2:22:55PM").  Note that parsing is done using <<<DateFormat.parse()>>> which
+  allows some leniency in formatting.  If the method can parse a date and time
+  out of what is specified it will do so even if it doesn't exactly match the
+  patterns above.
+
+*** Files and Directories
+
+  This includes variables typed <<<File>>>.  When reading the configuration,
+  the text in the XML file is used as the path to the desired file or
+  directory.  If the path is relative (does not start with <<</>>> or a drive
+  letter like <<<C:>>>), the path is relative to the directory containing
+  the POM.
+
+*** URLs
+
+  This includes variables typed <<<URL>>>.  When reading the configuration, the
+  text in the XML file is used as the URL.  The format must follow the RFC 2396
+  guidelines, and looks like any web browser URL
+  (<<<scheme://host:port/path/to/file>>>).  No restrictions are placed on the
+  content of any of the parts of the URL while converting the URL.
+
+*** Plain Text
+
+  This includes variables typed <<<char>>>, <<<Character>>>, <<<StringBuffer>>>,
+  and <<<String>>>.  When reading the configuration, the text in the XML file is
+  used as the value to be assigned to the parameter.  For <<<char>>> and
+  <<<Character>>> parameters, only the first character of the text is used.
+
+** Parameter Types With Multiple Values
+
+  Listed below are the various types of composite objects which can be used as
+  parameters in your mojos, along with any rules on how the values in the
+  POM are interpreted.  In general, the class of the object created to hold the
+  parameter value (as well as the class for each element within the parameter
+  value) is determined as follows (the first step which yields a valid class
+  is used):
+
+  [[1]] If the XML contains an <<<implementation>>> hint, that is used
+
+  [[2]] If the XML tag contains a <<<.>>>, try that as a class name
+
+  [[3]] Try the XML tag as a class in the same package as the object being
+        configured
+
+  [[4]] For arrays, use the class of the array (for example, use <<<String>>>
+        for a <<<String[]>>> parameter); for collections and maps, use the
+        class specified in the mojo configuration for the collection or map;
+        use <<<String>>> for entries in a collection and values in a map
+
+  Once the type for the element is defined, the text in the XML file is
+  converted to the appropriate type of object
+
+*** Arrays
+
+  Array type parameters are configured by specifying the parameter multiple
+  times (for example, "<<< <param>value1</param> <param>value2</param> >>>").
+
+*** Collections
+
+  This category covers any class which implements <<<java.util.Collection>>>
+  such as <<<ArrayList>>> or <<<HashSet>>>.  These parameters are configured by
+  specifying the parameter multiple times just like an array.
+
+*** Maps
+
+  This category covers any class which implements <<<java.util.Map>>>
+  such as <<<HashMap>>> but does <<not>> implement <<<java.util.Properties>>>.
+  These parameters are configured by including XML tags in the form
+  <<< <key>value</key> >>> in the parameter configuration.
+
+*** Properties
+
+  This category covers any map which implements <<<java.util.Properties>>>.
+  These parameters are configured by including XML tags in the form
+  <<< <key>value</key> >>> in the parameter configuration.
+
+*** Other Object Classes
+
+  This category covers any class which does not implement <<<java.util.Map>>>,
+  <<<java.util.Collection>>>, or <<<java.util.Dictionary>>>.
+
+* Resources
+
+    [[1]] {{{developers/mojo-api-specification.html}Mojo API specification}}
+          
