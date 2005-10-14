@@ -42,13 +42,13 @@ public class JarSourceMojo
      * @deprecated ICK! This needs to be generalized OUTSIDE of this mojo!
      */
     private static final List BANNED_PACKAGINGS;
-    
+
     static
     {
         List banned = new ArrayList();
-        
+
         banned.add( "pom" );
-        
+
         BANNED_PACKAGINGS = banned;
     }
 
@@ -63,7 +63,7 @@ public class JarSourceMojo
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}
      */
     private MavenProjectHelper projectHelper;
-    
+
     /**
      * @parameter expression="${project.packaging}"
      * @readonly
@@ -76,7 +76,7 @@ public class JarSourceMojo
      * @required
      */
     private String finalName;
-    
+
     /**
      * @parameter expression="${attach}" default-value="true"
      */
@@ -93,23 +93,17 @@ public class JarSourceMojo
      * @required
      */
     private File outputDirectory;
-    
+
     public void execute()
         throws MojoExecutionException
     {
-        if ( !attach )
-        {
-            getLog().info( "NOT adding java-sources to attached artifacts list." );
-            
-            return;
-        }
-        else if ( BANNED_PACKAGINGS.contains( packaging ) )
+        if ( BANNED_PACKAGINGS.contains( packaging ) )
         {
             getLog().info( "NOT adding java-sources to attached artifacts for packaging: \'" + packaging + "\'." );
-            
+
             return;
         }
-        
+
         // TODO: use a component lookup?
         JarArchiver archiver = new JarArchiver();
 
@@ -133,8 +127,16 @@ public class JarSourceMojo
             throw new MojoExecutionException( "Error building source JAR", e );
         }
 
-        // TODO: these introduced dependencies on the project are going to become problematic - can we export it
-        //  through metadata instead?
-        projectHelper.attachArtifact( project, "java-source", "sources", outputFile );
+        if ( !attach )
+        {
+            getLog().info( "NOT adding java-sources to attached artifacts list." );
+
+        }
+        else
+        {
+            // TODO: these introduced dependencies on the project are going to become problematic - can we export it
+            //  through metadata instead?
+            projectHelper.attachArtifact( project, "java-source", "sources", outputFile );
+        }
     }
 }

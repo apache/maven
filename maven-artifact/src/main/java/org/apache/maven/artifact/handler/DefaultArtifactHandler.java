@@ -35,6 +35,10 @@ public class DefaultArtifactHandler
 
     private boolean includesDependencies;
 
+    private String language;
+
+    private boolean addedToClasspath;
+
     public DefaultArtifactHandler()
     {
     }
@@ -84,5 +88,20 @@ public class DefaultArtifactHandler
     public boolean isIncludesDependencies()
     {
         return includesDependencies;
+    }
+
+    public String getLanguage()
+    {
+        if ( language == null )
+        {
+            language = "none";
+        }
+
+        return language;
+    }
+
+    public boolean isAddedToClasspath()
+    {
+        return addedToClasspath;
     }
 }

@@ -35,6 +35,8 @@
       <configuration>
         <type>ejb</type>
         <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -44,6 +46,8 @@
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>jar</type>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -56,6 +60,8 @@
         <extension>jar</extension>
         <type>test-jar</type>
         <packaging>jar</packaging>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -66,6 +72,8 @@
       <configuration>
         <type>maven-plugin</type>
         <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -85,6 +93,20 @@
       <configuration>
         <type>java-source</type>
         <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>false</addedToClasspath>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>javadoc</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>javadoc</type>
+        <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -95,6 +117,8 @@
       <configuration>
         <type>war</type>
         <includesDependencies>true</includesDependencies>
+        <language>java</language>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -105,6 +129,8 @@
       <configuration>
         <type>ear</type>
         <includesDependencies>true</includesDependencies>
+        <language>java</language>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -117,6 +143,8 @@
         <extension>jar</extension>
         <packaging>ejb</packaging>
         <classifier>client</classifier>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 

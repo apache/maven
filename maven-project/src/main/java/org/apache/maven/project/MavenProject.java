@@ -348,7 +348,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
@@ -384,7 +384,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
@@ -442,7 +442,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 // NOTE: [jc] scope == 'test' is the widest possible scope, so we don't really need to perform
@@ -471,7 +471,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 // NOTE: [jc] scope == 'test' is the widest possible scope, so we don't really need to perform
@@ -536,7 +536,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
@@ -562,7 +562,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
@@ -618,7 +618,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
@@ -653,7 +653,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( isAddedToClasspath( a ) )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
@@ -696,14 +696,6 @@ public class MavenProject
             }
         }
         return list;
-    }
-
-    private static boolean isAddedToClasspath( Artifact artifact )
-    {
-        String type = artifact.getType();
-
-        // TODO: utilise type handler
-        return "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) || "test-jar".equals( type );
     }
 
     // ----------------------------------------------------------------------

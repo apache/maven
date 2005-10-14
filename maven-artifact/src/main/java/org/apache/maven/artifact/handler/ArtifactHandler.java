@@ -33,4 +33,8 @@ public interface ArtifactHandler
     String getPackaging();
 
     boolean isIncludesDependencies();
+
+    String getLanguage();
+
+    boolean isAddedToClasspath();
 }
