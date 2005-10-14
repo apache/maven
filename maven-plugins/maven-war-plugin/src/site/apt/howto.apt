@@ -4,7 +4,7 @@
  Stephane Nicoll
  <snicoll@apache.org>
  ------
- September 23, 2005
+ October 14, 2005
 
 Introduction
 
@@ -14,22 +14,12 @@ Introduction
 
    * inplace: package the web application in the source tree
 
-   * exploded (<<deprecated>>): package an exploded web application
+   * exploded : package an exploded web application
 
-  The packaging's mode is to be set in the plugin's configuration. For instance,
-  to use the <inplace> mode configure your project as follows:
+  Each mode is materialized by a goal. For instance, to generate an exploded
+  web application from the current project, one would type
 
 +--------
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-           <mode>inplace</mode>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  m2 war:exploded
 +---------
 
