@@ -22,6 +22,7 @@
     <filters>
       <filter>src/main/filters/filters.properties</filter>
     </filters>
+    <outputDirectory>${pom.build.directory}</outputDirectory>
     <resources>
       <resource>
         <directory>src/main/resources</directory>

@@ -8,16 +8,19 @@
 
 Documentation
 
-
-* Guides
+* Getting Started Guide
 
  * {{{getting-started/index.html}Getting Started Guide}}
 
- * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
+* Developer Guides 
 
  * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
  
  * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
+
+* Plug-in Guides
+
+ * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
 
 * Mini Guides
 
@@ -63,6 +66,10 @@ Documentation
 
  * {{{mini/guide-proxies.html}Guide to using proxies}}
 
+ * {{{mini/guide-releasing.html}Guide to Releasing}}
+
+ * {{{mini/guide-site.html}Guide to creating a site}}
+
  * {{{mini/guide-test-customization.html}Guide to test customization}}
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
@@ -74,7 +81,7 @@ Documentation
 
  * {{{introduction/introduction-to-archetypes.html}Introduction to Archetypes}}
 
- * {{{introduction/introduction-to-dependency-management.html}Introduction to Dependency Management}}
+ * {{{introduction/introduction-to-dependency-management.html}Introduction to dependency management}}
 
  * {{{introduction/introduction-to-repositories.html}Introduction to Repositories}}
 

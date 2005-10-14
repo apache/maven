@@ -6,6 +6,8 @@
  12 October 2005
  -----
 
+~~ integrate releasing document
+
 Releasing
 
  The  release plugin provides some basic functionality for making releases, and updating 

@@ -8,14 +8,17 @@
 
 Documentation
 
-
-* Guides
+* Getting Started Guide
 
  * {{{getting-started/index.html}Getting Started Guide}}
 
- * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
+* Developer Guides 
 
  * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
  
  * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
+
+* Plug-in Guides
+
+ * {{{plugin/guide-plugin-development.html}Plug-in Developer's Guide}}
 

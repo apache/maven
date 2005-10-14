@@ -42,6 +42,7 @@
     </menu>
     -->
 
+    <!--
     <menu name="Plugin Developers">
       <item name="Plugin Development Guide" href="/developers/plugin-development-guide.html"/>
     </menu>
@@ -50,6 +51,8 @@
       <item name="Documentation Needed" href="/docs-required.html"/>
       <item name="Building Maven 2.0" href="/developers/building.html"/>
     </menu>
+    -->
+    
     <menu name="Reference">
       <item name="Project Descriptor" href="/maven-model/maven.html"/>
       <item name="Settings Descriptor" href="/maven-settings/settings.html"/>
