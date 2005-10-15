@@ -52,8 +52,6 @@ Documentation
 
  * {{{mini/guide-multi-module.html}Guide to creating a multi-module build}}
 
- * {{{mini/guide-multi-module.html~}Guide to creating a multi-module build}}
-
  * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 
  * {{{mini/guide-pom-properties.html}Guide to using POM properties}}

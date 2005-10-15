@@ -33,10 +33,10 @@ Sections
  * {{{index.html#How do I compile my test sources and run my unit tests?}How do I compile my test sources and run my unit tests?}}
 
  * {{{index.html#How do I create a JAR and install it in my local repository?}How do I create a JAR and install it in my local repository?}}
+ 
+ * {{{index.html#How do add resources to my JAR?}How do add resources to my JAR?}}
 
- * {{{index.html#How do I filter resources against my POM?}How do I filter resources against my POM?}}
-
- * {{{index.html#How do I filter resources against a properties file?}How do I filter resources against a properties file?}}
+ * {{{index.html#How do I filter resource files?}How do I filter resource files?}}
 
  * {{{index.html#How do I use external dependencies?}How do I use external dependencies?}}
 
@@ -48,7 +48,9 @@ Sections
 
  * {{{index.html#How do I use plug-ins?}How do I use plug-ins?}}
 
- * {{{index.html#How do I control what version of plug-in I use?}How do I control what version of plug-in I use?}}
+ * {{{index.html#How do I control what version of a plug-in I use?}How do I control what version of a plug-in I use?}}
+ 
+ * {{{index.html#How do I build more than one project at once?}How do I build more than one project at once?}}
 
  []
 
@@ -255,8 +257,11 @@ Compiling 1 source file to <dir>/my-app/target/classes
 
 +-----+
 
-~~DJ  When they run this the first time, it will take a LONG time because of downloading all the dependencies.
-~~DJ  You really should say something about that here so they understand what's going on and don't get scared.
+ The first time you execute this (or any other) command, Maven will need to download all the plugins and related
+ dependencies it needs to fulfill the command.  From a clean installation of Maven this can take quite a while (in
+ the output above, it took almost 4 minutes).  If you execute the command again, Maven will now have what it needs,
+ so it won't need to download anything new and will be able to execute the command much quicker.
+
  As you can see from the output, the compiled classes were placed in <<<$\{basedir\}/target/classes>>>, which is
  another standard convention employed by Maven. So, if you're a keen observer you'll notice that using the
  standard conventions the POM above is very small and you haven't explicity had to tell Maven where any of
@@ -269,8 +274,8 @@ Compiling 1 source file to <dir>/my-app/target/classes
 
 * {How do I compile my test sources and run my unit tests?}
 
- So you can now compile your applications sources and now you've got some unit tests that you want to compile
- and execute because every programmer always writes and executes their unit tests (nudge nudge wink wink).
+ Now you're successfully compiling your application's sources and now you've got some unit tests that you want to compile
+ and execute (because every programmer always writes and executes their unit tests *nudge nudge wink wink*).
 
  Execute the following command:
 
@@ -288,20 +293,23 @@ m2 test
 [INFO] Building Maven Quick Start Archetype
 [INFO]    task-segment: [test]
 [INFO] ----------------------------------------------------------------------------
+[INFO] artifact org.apache.maven.plugins:maven-surefire-plugin: checking for updates from central
+...
 [INFO] [resources:resources]
 [INFO] [compiler:compile]
-Compiling 1 source file to <dir>/my-app/target/classes
+[INFO] Nothing to compile - all classes are up to date
 [INFO] [resources:testResources]
 [INFO] [compiler:testCompile]
-Compiling 1 source file to <dir>/my-app/target/test-classes
+Compiling 1 source file to C:\Test\Maven2\test\my-app\target\test-classes
+...
 [INFO] [surefire:test]
-[INFO] Setting reports dir: <dir>/my-app/target/surefire-reports
+[INFO] Setting reports dir: C:\Test\Maven2\test\my-app\target/surefire-reports
 
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
 [surefire] Running com.mycompany.app.AppTest
-[surefire] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.005 sec
+[surefire] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0 sec
 
 Results :
 [surefire] Tests run: 1, Failures: 0, Errors: 0
@@ -309,14 +317,21 @@ Results :
 [INFO] ----------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ----------------------------------------------------------------------------
-[INFO] Total time: 2 seconds
-[INFO] Finished at: Mon Oct 03 15:06:22 GMT-05:00 2005
-[INFO] Final Memory: 2M/6M
+[INFO] Total time: 15 seconds
+[INFO] Finished at: Thu Oct 06 08:12:17 MDT 2005
+[INFO] Final Memory: 2M/8M
 [INFO] ----------------------------------------------------------------------------
-
 +----+
 
- If you simply want to compile your test sources you can execute the following which does not run your unit tests:
+ Some things to notice about the output:
+ 
+    * Maven downloads more dependencies this time. These are the dependencies and plugins necessary for executing the tests
+      (it already has the dependencies it needs for compiling and won't download them again).
+    
+    * Before compiling and executing the tests Maven compiles the main code (all these classes are up to date because
+      we haven't changed anything since we compiled last).
+ 
+ If you simply want to compile your test sources (but not execute the tests), you can execute the following:
 
 +----+
 
@@ -324,7 +339,7 @@ Results :
 
 +----+
 
- Now that you can compile your application sources and compile your tests and execute them you'll want to move
+ Now that you can compile your application sources, compile your tests, and execute the tests, you'll want to move
  on to the next logical step so you'll be asking ...
 
 * {How do I create a JAR and install it in my local repository?}
@@ -337,13 +352,13 @@ m2 package
 
 +----+
 
- If you take a look at the POM for this project you will notice the <<<packaging>>> element is set to <<<jar>>>.
- This is how Maven knows to produce a JAR file from the above command and we'll talk more about this later.
- You can now take a look in the the <<<${basedir}/target>>> directory and you will see the generated JAR file.
+ If you take a look at the POM for your project you will notice the <<<packaging>>> element is set to <<<jar>>>.
+ This is how Maven knows to produce a JAR file from the above command (we'll talk more about this later).
+ You can now take a look in the the <<<$\{basedir\}/target>>> directory and you will see the generated JAR file.
 
- Now you'll want to install the artifact you've generated, the JAR file, in your local repository
- (<<<~/.m2/repository>>> is the default value). For more information on repositories you can refer to our
- {{{introduction-to-archetypes.html}Introduction to Repositories}} but now on to installing our artifact!
+ Now you'll want to install the artifact you've generated (the JAR file) in your local repository
+ (<<<~/.m2/repository>>> is the default location). For more information on repositories you can refer to our
+ {{{introduction-to-repositories.html}Introduction to Repositories}} but let's move on to installing our artifact!
  To do so execute the following command:
 
 +----+
@@ -392,7 +407,7 @@ Results :
 
 +----+
 
- Note that the surefire plugin looks for tests contained in files with a particular naming convention. By default
+ Note that the surefire plugin (which executes the test) looks for tests contained in files with a particular naming convention. By default
  the tests included are:
 
  * <<<\*\*/\*Test.java>>>
@@ -405,25 +420,25 @@ Results :
 
  And the default excludes are:
 
- * <<<\*\*/Abstract\\*Test.java>>>
+ * <<<\*\*/Abstract\*Test.java>>>
 
  * <<<\*\*/Abstract\*TestCase.java>>>
 
  []
 
- Now you have walked through setting up setting up a typical Maven project, building, testing, packaging and installing.
- This is likely the vast majority of what you will be doing with Maven and if you'ved noticed everything you've been
- able to do up to this point has been driven by an 18 line file, namely the project's model or POM. If you look at
+ You have walked through the process for setting up, building, testing, packaging, and installing a typical Maven project.
+ This is likely the vast majority of what projects will be doing with Maven and if you'ved noticed, everything you've been
+ able to do up to this point has been driven by an 18-line file, namely the project's model or POM. If you look at
  a typical Ant {{{../../ant/build-a1.xml}build file}} that provides the same functionality that we've achieved thus
  far you'll notice it's already twice the size of the POM and we're just getting started! There is far more
- functionality available to you as a user of Maven without requiring any additions to our POM as it is currently. To
- get any more functionality out of our example Ant build file you must keep making error prone additions.
+ functionality available to you from Maven without requiring any additions to our POM as it currently stands. To
+ get any more functionality out of our example Ant build file you must keep making error-prone additions.
 
  So what else can you get for free? There are a great number of Maven plug-ins that work out of the box with
  even a simple POM like we have above. We'll mention one here specifically as it is one of the highly
  prized features of Maven: without any work on your part this POM has enough information to generate
  a web site for your project! You will most likely want to customize your Maven site but if you're pressed for
- time all you need to do to provide basic information about your project is execution the following command:
+ time all you need to do to provide basic information about your project is execute the following command:
 
 +----+
 
@@ -431,16 +446,18 @@ m2 site:site
 
 +----+
 
- We'll touch on one more common usecase that can be satisfied which requires no changes to the POM that we have
- above which is packaging resources in JAR files. For this common task Maven again relies on the
- {{{introduction-to-the-standard-directory-layout.html}Standard Directory Layout}} which means by using
- standard Maven coventions you can package resources within JARs simply by placing resources in a standard
+* {How do add resources to my JAR?}
+
+ Another common usecase that can be satisfied which requires no changes to the POM that we have
+ above is packaging resources in the JAR file. For this common task, Maven again relies on the
+ {{{introduction-to-the-standard-directory-layout.html}Standard Directory Layout}}, which means by using
+ standard Maven coventions you can package resources within JARs simply by placing those resources in a standard
  directory structure.
 
- You see below in our example we have added the directory <<<${basedir}/src/main/resources>>> into which we place
+ You see below in our example we have added the directory <<<$\{basedir\}/src/main/resources>>> into which we place
  any resources we wish to package in our JAR. The simple rule employed by Maven is this: any directories or files
- placed within the <<<${basedir}/src/main/resources>>> directory are packaged in your JAR with the exact same
- structure starting at the base of the JAR
+ placed within the <<<$\{basedir\}/src/main/resources>>> directory are packaged in your JAR with the exact same
+ structure starting at the base of the JAR.
 
 +----+
 
@@ -485,16 +502,16 @@ my-app
 
 +----+
 
- As you can see the contents of <<<${basedir}/src/main/resources>>> can be found starting at the base of the
- JAR and you will see our <<<application.properties>>> file. You will also notice some other files there
- like <<<META-INF/MANIFEST.MF>>> and a <<<pom.xml>>> and <<<pom.properties>>> file. These come standard with
- generation of a JAR in Maven. You create your own manifest if you choose, but Maven will generate one by
- default for you if you don't. You may also modify the entries in the default manifest which we will touch on
- later. The <<<pom.xml>>> and <<<pom.properties>>> files are packaged up in the JAR so that each artifact
- produced by Maven is self-describing and it also allows you to utilize the metadata in your own application
+ As you can see, the contents of <<<$\{basedir\}/src/main/resources>>> can be found starting at the base of the
+ JAR and our <<<application.properties>>> file is there in the <<<META-INF>>> directory. You will also notice some other files there
+ like <<<META-INF/MANIFEST.MF>>> as well as a <<<pom.xml>>> and <<<pom.properties>>> file. These come standard with
+ generation of a JAR in Maven. You can create your own manifest if you choose, but Maven will generate one by
+ default if you don't. (You can also modify the entries in the default manifest. We will touch on this
+ later.) The <<<pom.xml>>> and <<<pom.properties>>> files are packaged up in the JAR so that each artifact
+ produced by Maven is self-describing and also allows you to utilize the metadata in your own application
  if the need arises. One simple use might be to retrieve the version of your application. Operating on the POM
  file would require you to use some Maven utilities but the properties can be utilized using the standard
- Java API and looks like the following:
+ Java API and look like the following:
 
 +----+
 
@@ -506,8 +523,8 @@ artifactId=my-app
 
 +----+
 
- To use resources with your unit tests you follow the same pattern except the directory you place resources in
- is ${basedir}/src/test/resources which are then availabe to you at the base of the classpath. So you would have a
+ To add resources to the classpath for your unit tests, you follow the same pattern as you do for adding resources to the JAR
+ except the directory you place resources in is $\{basedir\}/src/test/resources. At this point you would have a
  project directory structure that would look like the following:
 
 +---+
@@ -535,7 +552,7 @@ my-app
             `-- test.properties
 +---+
 
- So in a unit test you could use a simple snippet of code like the following to access the resource required for
+ In a unit test you could use a simple snippet of code like the following to access the resource required for
  testing:
 
 +----+
@@ -551,7 +568,14 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
 
 +----+
 
-* {How do I filter resources against my POM?}
+* {How do I filter resource files?}
+
+ Sometimes a resource file will need to contain a value that can only be supplied at build time.  To accomplish this in
+ Maven, put a reference to the property that will contain the value into your resource file using the syntax <<<$\{<property name}>\}>>>.
+ The property can be one of the values defined in your pom.xml, a value defined in the user's settings.xml, a property
+ defined in an external properties file, or a system property.
+ 
+ To have Maven filter resources when copying, simply set <<<filtering>>> to true for the resource directory in your pom.xml:
 
 +----+
 
@@ -564,7 +588,6 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
-  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -585,16 +608,60 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
 
 +----+
 
+ You'll notice that we had to add the <<<build>>>, <<<resources>>>, and <<<resource>>> elements which weren't there before.
+ In addition, we had to explicitly state that the resources are located in the src/main/resources directory.  All of this
+ information was provided as default values previously, but because the default value for <<<filtering>>> is false, we had
+ to add this to our pom.xml in order to override that default value and set <<<filtering>>> to true.
+ 
+ To reference a property defined in your pom.xml, the property name uses the names of the XML elements that define the value,
+ with "pom" being allowed as an alias for the project (root) element.  So $\{pom.name\} refers to the name of the project,
+ $\{pom.version\} refers to the version of the project, $\{pom.build.finalName\} refers to the final name of the file created
+ when the built project is packaged, etc.  Note that some elements of the POM have default values, so don't need to be explicitly
+ defined in your pom.xml for the values to be available here.  Similarly, values in the user's settings.xml can be referenced
+ using property names beginning with "settings" (for example, $\{settings.localRepository\} refers to the path of the user's
+ local repository).
+ 
+ To continue our example, let's add a couple of properties to the application.properties file (which we put in the 
+ src/main/resources directory) whose values will be supplied when the resource is filtered:
+
 +----+
 
 # application.properties
-
 application.name=${pom.name}
 application.version=${pom.version}
 
 +----+
 
-* {How do I filter resources against a properties file?}
+ With that in place, you can execute the following command (process-resources is the build lifecycle phase where the resources are
+ copied and filtered):
+
++----+
+
+m2 process-resources
+
++----+
+
+ and the application.properties file under target/classes (and will eventually go into the jar) looks like this:
+
++----+
+
+# application.properties
+application.name=Maven Quick Start Archetype
+application.version=1.0-SNAPSHOT
+
++----+
+
+ To reference a property defined in an external file, all you need to do is add a reference to this external file in your pom.xml.
+ First, let's create our external properties file and call it src/main/filters/filter.properties:
+
++----+
+
+# filter.properties
+my.filter.value=hello!
+
++----+
+
+ Next, we'll add a reference to this new file in the pom.xml: 
 
 +----+
 
@@ -607,7 +674,6 @@ application.version=${pom.version}
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
-  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -618,7 +684,7 @@ application.version=${pom.version}
   </dependencies>
   <build>
     <filters>
-      <filter>src/main/filters/filters.properties</filter>
+      <filter>src/main/filters/filter.properties</filter>
     </filters>
     <resources>
       <resource>
@@ -631,48 +697,87 @@ application.version=${pom.version}
 
 +----+
 
-+----+
-
-# filtering.properties
-
-environment=development
-
-+----+
+ Then, if we add a reference to this property in the application.properties file:
 
 +----+
 
 # application.properties
-
 application.name=${pom.name}
 application.version=${pom.version}
+message=${my.filter.value}
 
-environment=${environment}
++----+
+ 
+ the next execution of the <<<m2 process-resources>>> command will put our new property value into application.properties.
+ As an alternative to defining the my.filter.value property in an external file, you could also have defined it in the <<<properties>>>
+ section of your pom.xml and you'd get the same effect (notice I don't need the references to src/main/filters/filter.properties either):
 
 +----+
 
-* How do I filter against system properties
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Maven Quick Start Archetype</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+  <properties>
+    <my.filter.value>hello</my.filter.value>
+  </properties>
+</project>
 
- You simply specify the system property using the standard variable notion as show below:
++----+
 
+ Filtering resources can also get values from system properties; either the system properties built into Java (like java.version or
+ user.home) or properties defined on the command line using the standard Java -D parameter.  To continue the example, let's change
+ our application.properties file to look like this:
+ 
 +----+
 
 # application.properties
-
-application.name=${pom.name}
-application.version=${pom.version}
-
-environment=${environment}
-
 java.version=${java.version}
+command.line.prop=${command.line.prop}
 
 +----+
+
+ Now, when you execute the following command (note the definition of the command.line.prop property on the command line), the
+ application.properties file will contain the values from the system properties.
+
++----+
+
+m2 process-resources "-Dcommand.line.prop=hello again"
+
++----+
+ 
 
 * {How do I use external dependencies?}
 
- You probably already noticed a <<<dependencies>>> element in the POM we've been using as an example
- so you have in fact been using an external dependency but we'll here we'll go more in depth about how Maven's
- dependency management system works. For a thorough introduction please refer to our
- {{{introduction-to-archetypes.html}Introduction to Dependency Management}}.
+ You've probably already noticed a <<<dependencies>>> element in the POM we've been using as an example.
+ You have, in fact, been using an external dependency all this time, but here we'll talk about how this
+ works in a bit more detail. For a more thorough introduction, please refer to our
+ {{{introduction-to-dependency-management.html}Introduction to Dependency Management}}.
+ 
+ The <<<dependencies>>> section of the pom.xml lists all of the external dependencies that particular needs
+ in order to build (whether it needs that dependency at compile time, test time, run time, or whatever).  Right
+ now, our project is depending on JUnit only (I took out all of the resource filtering stuff for clarity):
 
 +----+
 
@@ -685,7 +790,6 @@ java.version=${java.version}
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
-  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -693,31 +797,122 @@ java.version=${java.version}
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <!--
-     |
-     | New external dependency
-     |
-     -->
-    <dependency>
-      <groupId>org.apache.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.0.4</version>
-    </dependency>
   </dependencies>
-  <build>
-    <filters>
-      <filter>src/main/filters/filters.properties</filter>
-    </filters>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
 </project>
 
 +----+
+
+ For each external dependency, you'll need to define at least 4 things: groupId, artifactId, version, and scope.  The groupId,
+ artifactId, and version are the same as those given in the pom.xml for the project that built that dependency.  The scope
+ element indicates how your project uses that dependency, and can be values like <<<compile>>>, <<<test>>>, and <<<runtime>>>.
+ For more information on everything you can specify for a dependency, see the {{{../../../maven-model/maven.html}Project Descriptor Reference}}.
+ ~~DJ: Does this link work? I can't find the document.
+ For more information about the dependency mechanism as a whole, see {{{../../dependency-mechanism.html}Dependency Mechanism}}.
+ 
+ With this information about a dependency, Maven will be able to reference the dependency when it builds the project.  Where does
+ Maven reference the dependency from?  Maven looks in your local repository (<<<~/.m2/repository>>> is the default location) to find
+ all dependencies.  In a {{{How do I create a JAR and install it in my local repository?}previous section}}, we installed the artifact
+ from our project (my-app-1.0-SNAPSHOT.jar) into the local repository.  Once it's installed there, another project can reference that jar
+ as a dependency simply by adding the dependency information to its pom.xml:
+ 
++----+
+
+<project>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-other-app</artifactId>
+  ...
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>com.mycompany.app</groupId>
+      <artifactId>my-app</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
+
++----+
+ 
+ What about dependencies built somewhere else?  How do they get into my local repository?  Whenever a project references a dependency
+ that isn't available in the local repository, Maven will download the dependency from a remote repository into the local repository.  You
+ probably noticed Maven downloading a lot of things when you built your very first project (these downloads were dependencies for the
+ various plugins used to build the project).  By default, the remote repository Maven uses can be found (and browsed) at
+ {{http://www.ibiblio.org/Maven2}}.  You can also set up your own remote repository (maybe a central repository for your company) to
+ use instead of or in addition to ibiblio.  For more information on repositories you can refer to the
+ {{{introduction-to-repositories.html}Introduction to Repositories}}.
+
+ Let's add another dependency to our project.  Let's say we've added some logging to the code and need to add log4j as a dependency.
+ First, we need to know what the groupId, artifactId, and version are for log4j.  We can browse ibiblio and look for it, or use Google
+ to help by searching for "site:www.ibiblio.org maven2 log4j".  The search shows a directory called /maven2/log4j/log4j (or
+ /pub/packages/maven2/log4j/log4j).  In that directory is a file called maven-metadata.xml.  Here's what the maven-metadata.xml for
+ log4j looks like:
+
++----+
+
+<metadata>
+  <groupId>log4j</groupId>
+  <artifactId>log4j</artifactId>
+  <version>1.1.3</version>
+  <versioning>
+    <versions>
+      <version>1.1.3</version>
+      <version>1.2.4</version>
+      <version>1.2.5</version>
+      <version>1.2.6</version>
+      <version>1.2.7</version>
+      <version>1.2.8</version>
+      <version>1.2.11</version>
+      <version>1.2.9</version>
+      <version>1.2.12</version>
+    </versions>
+  </versioning>
+</metadata>
+
++----+
+
+ From this file, we can see that the groupId we want is "log4j" and the artifactId is "log4j".  We see lots of different version values
+ to choose from; for now, we'll just use the latest version, 1.2.12 (some maven-metadata.xml files may also specify which version is
+ the current release version).  Alongside the maven-metadata.xml file, we can see a directory corresponding to each version of the
+ log4j library.  Inside each of these, we'll find the actual jar file (e.g. log4j-1.2.12.jar) as well as a pom file (this is the pom.xml
+ for the dependency, indicating any further dependencies it might have and other information) and another maven-metadata.xml file.
+ There's also an md5 file corresponding to each of these, which contains an MD5 hash for these files.  You can use this to authenticate 
+ the library or to figure out which version of a particular library you may be using already.
+ 
+ Now that we know the information we need, we can add the dependency to our pom.xml:
+ 
++----+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Maven Quick Start Archetype</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
+
++----+
+ 
+ Now, when we compile the project (<<<m2 compile>>>), we'll see Maven download the log4j dependency for us.
+ 
+~~DJ: Current
 
 * {How do I deploy my jar in my remote repository?}
 
@@ -732,7 +927,6 @@ java.version=${java.version}
   <version>1.0-SNAPSHOT</version>
   <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
-  <description>Killer App</description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -1047,8 +1241,9 @@ m2 site:site site:deploy
 
 * {How do I use plug-ins?}
 
-* {How do I control what version of plug-in I use?}
+* {How do I control what version of a plug-in I use?}
 
 ~~http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix
 
+* {How do I build more than one project at once?}
 

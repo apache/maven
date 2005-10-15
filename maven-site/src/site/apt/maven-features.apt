@@ -1,0 +1,44 @@
+ ------
+ Maven Features
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Feature Summary
+
+ The following are the key features of Maven in a nutshell:
+
+ * Model based builds:
+   Maven is able to build any number of projects into predefined output types
+   such as a JAR, WAR, or distribution based on metadata about the project, without
+   any need to do any scripting in most cases.
+
+ * Coherent site of project information:
+   Using the same metadata as for the build process, Maven is able to generate a
+   web site or PDF including any documentation you care to add, and adds to that
+   standard reports about the state of development of the project.
+   Examples of this information can be seen at the bottom of the left-hand navigation of
+   this site under the "Project Information" and "Project Reports" submenus.
+
+ * Release management and distribution publication:
+   Without much additional configuration, Maven will integrate with your source control
+   system such as CVS and manage the release of a project based on a certain tag.
+   It can also publish this to a distribution location for use by other projects.
+   Maven is able to publish individual outputs such as a JAR, an archive including other
+   dependencies and documentation, or as a source distribution.
+
+ * Dependency management:
+   Maven encourages the use of a central repository of JARs and other dependencies. Maven
+   comes with a mechanism that your project's clients can use to
+   download any JARs required for building your project from a
+   central JAR repository much like Perl's CPAN. This allows users
+   of Maven to reuse JARs across projects and encourages communication
+   between projects to ensure backward compatibility issues are
+   dealt with. We are collaborating with the folks at {{{http://www.ibiblio.org}Ibiblio}} who have graciously
+   allowed the central repository to live on their servers.
+
+ []
+
+~~ this needs to be greatly expanded and is too detailed here ... jvz

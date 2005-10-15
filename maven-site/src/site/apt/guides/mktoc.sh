@@ -1,5 +1,8 @@
+#!/bin/sh
 
 toc=`pwd`/index.apt
+
+find . -name '*~' -exec rm -rf {} \;
 
 #
 # Top matter
@@ -103,4 +106,4 @@ echo " * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}
 echo " " >> $toc
 echo " * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}" >> $toc
 
-cat tail.apt >> $toc
+cat tail.txt >> $toc
