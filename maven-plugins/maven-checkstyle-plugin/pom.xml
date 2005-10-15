@@ -8,11 +8,8 @@
   <artifactId>maven-checkstyle-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Checkstyle Plugin</name>
-  <version>2.0-alpha-3-SNAPSHOT</version>
+  <version>2.0-beta-1</version>
   <inceptionYear>2005</inceptionYear>
-  <prerequisites>
-    <maven>2.0</maven>
-  </prerequisites>
   <developers>
     <developer>
       <id>vsiveton</id>
@@ -62,13 +59,13 @@
       <version>2.7.2</version>
     </dependency>
     <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>checkstyle</groupId>
       <artifactId>checkstyle-optional</artifactId>
       <version>3.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
     </dependency>
   </dependencies>
 </project>
