@@ -9,14 +9,17 @@
   <artifactId>maven-eclipse-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Eclipse Plugin</name>
-  <version>2.0-beta-2-SNAPSHOT</version>
-  <prerequisites>
-    <maven>2.0</maven>
-  </prerequisites>
+  <version>2.0-beta-2</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>
+      <version>2.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -26,12 +29,6 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
