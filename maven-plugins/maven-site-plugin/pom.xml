@@ -32,17 +32,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-site-renderer</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
