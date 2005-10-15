@@ -15,6 +15,7 @@
 @REM ----------------------------------------------------------------------------
 @REM 
 
+@ECHO OFF
 echo.
 echo THE m2 COMMMAND IS DEPRECATED - PLEASE RUN mvn INSTEAD
 echo.
