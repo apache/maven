@@ -8,10 +8,7 @@
   <artifactId>maven-assembly-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Assembly Plugin</name>
-  <version>2.0-beta-2-SNAPSHOT</version>
-  <prerequisites>
-    <maven>2.0</maven>
-  </prerequisites>
+  <version>2.0-beta-2</version>
   <developers>
     <developer>
       <id>vsiveton</id>
@@ -51,18 +48,18 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
       <version>1.0-alpha-3</version>
       <exclusions>
         <exclusion>
-          <groupId>plexus</groupId>
           <artifactId>plexus-utils</artifactId>
+          <groupId>plexus</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
