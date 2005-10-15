@@ -132,8 +132,11 @@ public class EclipseClasspathWriter
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            addDependency( writer, artifact, referencedReactorArtifacts, localRepository, artifactResolver,
-                           artifactFactory, remoteArtifactRepositories, downloadSources );
+            if ( artifact.getArtifactHandler().isAddedToClasspath() )
+            {
+                addDependency( writer, artifact, referencedReactorArtifacts, localRepository, artifactResolver,
+                               artifactFactory, remoteArtifactRepositories, downloadSources );
+            }
         }
 
         // ----------------------------------------------------------------------
