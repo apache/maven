@@ -753,6 +753,10 @@ public class Verifier
 
                 settingsFile = args[i];
             }
+            else if ( args[i].startsWith( "-" ) )
+            {
+                System.out.println( "skipping unrecognised argument: " + args[i] );
+            }
             else
             {
                 argsList.add( args[i] );
