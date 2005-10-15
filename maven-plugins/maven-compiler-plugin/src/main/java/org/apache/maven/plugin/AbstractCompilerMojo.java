@@ -61,6 +61,13 @@ public abstract class AbstractCompilerMojo
      * @parameter expression="${maven.compiler.debug}" default-value="true"
      */
     private boolean debug;
+    
+    /**
+     * Whether to output messages about what the compiler is doing
+     *
+     * @parameter default-value="false"
+     */
+    private boolean verbose;
 
     /**
      * Output source locations where deprecated APIs are used
@@ -247,6 +254,8 @@ public abstract class AbstractCompilerMojo
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
         compilerConfiguration.setDebug( debug );
+        
+        compilerConfiguration.setVerbose( verbose );
 
         compilerConfiguration.setShowWarnings( showWarnings );
 
