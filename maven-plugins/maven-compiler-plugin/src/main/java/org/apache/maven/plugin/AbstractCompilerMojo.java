@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -157,7 +158,7 @@ public abstract class AbstractCompilerMojo
      *
      * @parameter
      */
-    private LinkedHashMap compilerArguments;
+    private Map compilerArguments;
 
     /**
      * Used to control the name of the output file when compiling a set of
@@ -276,7 +277,8 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setSourceEncoding( encoding );
 
-        compilerConfiguration.setCustomCompilerArguments( compilerArguments );
+        compilerConfiguration
+            .setCustomCompilerArguments( compilerArguments == null ? null : new LinkedHashMap( compilerArguments ) );
 
         compilerConfiguration.setFork( fork );
 
