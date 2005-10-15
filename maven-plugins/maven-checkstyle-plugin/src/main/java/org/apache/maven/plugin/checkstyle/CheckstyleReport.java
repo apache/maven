@@ -110,7 +110,7 @@ public class CheckstyleReport
      *
      * @parameter expression="${basedir}/LICENSE.txt"
      */
-    private String headerFile;
+    private File headerFile;
 
     /**
      * Specifies the cache file used to speed up Checkstyle on successive runs.
@@ -442,7 +442,7 @@ public class CheckstyleReport
 
             if ( headerFile != null )
             {
-                p.setProperty( "checkstyle.header.file", headerFile );
+                p.setProperty( "checkstyle.header.file", headerFile.getAbsolutePath() );
             }
 
             if ( cacheFile != null )
