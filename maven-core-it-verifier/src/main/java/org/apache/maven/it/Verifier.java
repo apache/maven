@@ -406,62 +406,36 @@ public class Verifier
         }
     }
 
-    private static String retrieveLocalRepo( String[] args )
+    private static String retrieveLocalRepo( String settingsXmlPath )
+        throws VerificationException
     {
-        String repo = System.getProperty( "maven.repo.local" );
+        UserModelReader userModelReader = new UserModelReader();
 
-        if ( repo == null )
+        String userHome = System.getProperty( "user.home" );
+
+        File userXml;
+
+        String repo = null;
+
+        if ( settingsXmlPath != null )
         {
-            UserModelReader userModelReader = new UserModelReader();
-
-            try
-            {
-                String userHome = System.getProperty( "user.home" );
-
-                String settingsXmlPath = getSettingsPath( args );
-
-                File userXml;
-
-                if ( settingsXmlPath != null )
-                {
-                     System.out.println( "Using settings from " + settingsXmlPath );
-                     userXml = new File( settingsXmlPath );
-                } else
-                {
-                     userXml = new File( userHome, ".m2/settings.xml" );
-                }
-
-                if ( userXml.exists() )
-                {
-                    userModelReader.parse( userXml );
-
-                    String localRepository = userModelReader.getLocalRepository();
-                    if ( localRepository != null )
-                    {
-                        repo = new File( localRepository ).getAbsolutePath();
-                    }
-                }
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-            }
+            System.out.println( "Using settings from " + settingsXmlPath );
+            userXml = new File( settingsXmlPath );
+        }
+        else
+        {
+            userXml = new File( userHome, ".m2/settings.xml" );
         }
 
-        if ( repo == null )
+        if ( userXml.exists() )
         {
-            String userHome = System.getProperty( "user.home" );
-            String m2LocalRepoPath = "/.m2/repository";
+            userModelReader.parse( userXml );
 
-            File repoDir = new File( userHome, m2LocalRepoPath );
-            if ( !repoDir.exists() )
+            String localRepository = userModelReader.getLocalRepository();
+            if ( localRepository != null )
             {
-                repoDir.mkdirs();
+                repo = new File( localRepository ).getAbsolutePath();
             }
-
-            repo = repoDir.getAbsolutePath();
-
-            System.out.println( "Using default local repository: " + repoDir.getAbsolutePath() );
         }
 
         return repo;
@@ -534,11 +508,11 @@ public class Verifier
             {
                 expectedFile = new File( basedir, line );
             }
-            
+
             if ( line.indexOf( '*' ) > -1 )
             {
                 File parent = expectedFile.getParentFile();
-                
+
                 if ( !parent.exists() )
                 {
                     if ( wanted )
@@ -551,9 +525,9 @@ public class Verifier
                     String shortNamePattern = expectedFile.getName().replaceAll( "\\*", ".*" );
 
                     String[] candidates = parent.list();
-                    
+
                     boolean found = false;
-                    
+
                     if ( candidates != null )
                     {
                         for ( int i = 0; i < candidates.length; i++ )
@@ -565,10 +539,11 @@ public class Verifier
                             }
                         }
                     }
-                    
+
                     if ( !found && wanted )
                     {
-                        throw new VerificationException( "Expected file pattern was not found: " + expectedFile.getPath() );
+                        throw new VerificationException(
+                            "Expected file pattern was not found: " + expectedFile.getPath() );
                     }
                     else if ( found && !wanted )
                     {
@@ -643,9 +618,9 @@ public class Verifier
             for ( Iterator it = cliOptions.iterator(); it.hasNext(); )
             {
                 String key = (String) it.next();
-                
+
                 String resolvedArg = resolveCommandLineArg( key );
-                
+
                 cli.createArgument().setLine( resolvedArg );
             }
 
@@ -661,7 +636,8 @@ public class Verifier
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
 
-            boolean useMavenRepoLocal = Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+            boolean useMavenRepoLocal =
+                Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
             if ( useMavenRepoLocal )
             {
                 // Note: Make sure that the repo is surrounded by quotes as it can possibly have
@@ -708,7 +684,7 @@ public class Verifier
         String result = key.replaceAll( "\\$\\{basedir\\}", basedir );
         result = result.replaceAll( "\\\\", "\\" );
         result = result.replaceAll( "\\/\\/", "\\/" );
-        
+
         return result;
     }
 
@@ -736,52 +712,71 @@ public class Verifier
         }
     }
 
-
-    private static String getSettingsPath( String[] args )
-        throws Exception
-    {
-        for ( int i = 0; i < args.length; i++ ) {
-            if ( args[ i ].equals( "-s" ) )
-            {
-                if ( i == args.length - 1 )
-                {
-                    throw new Exception( "missing argument to -s" );
-                }
-                return args[ i + 1 ];
-            }
-        }
-        return null;
-    }
-
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
     public static void main( String args[] )
+        throws VerificationException
     {
         String basedir = System.getProperty( "user.dir" );
-
-        localRepo = retrieveLocalRepo( args );
 
         List tests = null;
 
         List argsList = new ArrayList();
 
+        String settingsFile = null;
+
         // skip options
-        for ( int i = 0; i < args.length; i++ ) {
-            if ( args[ i ].equals( "-s" ) )
+        for ( int i = 0; i < args.length; i++ )
+        {
+            if ( args[i].startsWith( "-D" ) )
+            {
+                int index = args[i].indexOf( "=" );
+                if ( index >= 0 )
+                {
+                    System.setProperty( args[i].substring( 2, index ), args[i].substring( index + 1 ) );
+                }
+                else
+                {
+                    System.setProperty( args[i].substring( 2 ), "true" );
+                }
+            }
+            else if ( "-s".equals( args[i] ) || "--settings".equals( args[i] ) )
             {
                 if ( i == args.length - 1 )
                 {
                     // should have been detected before
                     throw new IllegalStateException( "missing argument to -s" );
                 }
-                i +=1;
-                continue;
+                i += 1;
+
+                settingsFile = args[i];
             }
-            argsList.add( args[ i ] );
+            else
+            {
+                argsList.add( args[i] );
+            }
         }
-        
+
+        if ( localRepo == null )
+        {
+            localRepo = retrieveLocalRepo( settingsFile );
+        }
+
+        if ( localRepo == null )
+        {
+            localRepo = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        }
+
+        File repoDir = new File( localRepo );
+        if ( !repoDir.exists() )
+        {
+            repoDir.mkdirs();
+        }
+
+        System.out.println( "Using default local repository: " + localRepo );
+
         if ( argsList.size() == 0 )
         {
             try
@@ -853,8 +848,8 @@ public class Verifier
 
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
-                boolean chokeOnErrorOutput = Boolean.valueOf(
-                    controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
+                boolean chokeOnErrorOutput =
+                    Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
 
                 verifier.executeGoals( properties, controlProperties, "goals.txt" );
 
