@@ -25,6 +25,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -153,7 +154,7 @@ public abstract class AbstractWarMojo
      */
     protected String[] getExcludes()
     {
-        List excludeList = FileUtils.getDefaultExcludesAsList();
+        List excludeList = new ArrayList( FileUtils.getDefaultExcludesAsList() );
         if ( warSourceExcludes != null && !"".equals( warSourceExcludes ) )
         {
             excludeList.add( warSourceExcludes );
