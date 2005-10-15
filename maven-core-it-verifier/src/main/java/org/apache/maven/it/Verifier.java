@@ -406,7 +406,7 @@ public class Verifier
         }
     }
 
-    private static String retrieveLocalRepo()
+    private static String retrieveLocalRepo( String[] args )
     {
         String repo = System.getProperty( "maven.repo.local" );
 
@@ -418,7 +418,18 @@ public class Verifier
             {
                 String userHome = System.getProperty( "user.home" );
 
-                File userXml = new File( userHome, ".m2/settings.xml" );
+                String settingsXmlPath = getSettingsPath( args );
+
+                File userXml;
+
+                if ( settingsXmlPath != null )
+                {
+                     System.out.println( "Using settings from " + settingsXmlPath );
+                     userXml = new File( settingsXmlPath );
+                } else
+                {
+                     userXml = new File( userHome, ".m2/settings.xml" );
+                }
 
                 if ( userXml.exists() )
                 {
@@ -725,6 +736,23 @@ public class Verifier
         }
     }
 
+
+    private static String getSettingsPath( String[] args )
+        throws Exception
+    {
+        for ( int i = 0; i < args.length; i++ ) {
+            if ( args[ i ].equals( "-s" ) )
+            {
+                if ( i == args.length - 1 )
+                {
+                    throw new Exception( "missing argument to -s" );
+                }
+                return args[ i + 1 ];
+            }
+        }
+        return null;
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -733,11 +761,28 @@ public class Verifier
     {
         String basedir = System.getProperty( "user.dir" );
 
-        localRepo = retrieveLocalRepo();
+        localRepo = retrieveLocalRepo( args );
 
         List tests = null;
 
-        if ( args.length == 0 )
+        List argsList = new ArrayList();
+
+        // skip options
+        for ( int i = 0; i < args.length; i++ ) {
+            if ( args[ i ].equals( "-s" ) )
+            {
+                if ( i == args.length - 1 )
+                {
+                    // should have been detected before
+                    throw new IllegalStateException( "missing argument to -s" );
+                }
+                i +=1;
+                continue;
+            }
+            argsList.add( args[ i ] );
+        }
+        
+        if ( argsList.size() == 0 )
         {
             try
             {
@@ -754,11 +799,11 @@ public class Verifier
         }
         else
         {
-            tests = new ArrayList( args.length );
+            tests = new ArrayList( argsList.size() );
             NumberFormat fmt = new DecimalFormat( "0000" );
-            for ( int i = 0; i < args.length; i++ )
+            for ( int i = 0; i < argsList.size(); i++ )
             {
-                String test = args[i];
+                String test = (String) argsList.get( i );
                 if ( test.endsWith( "," ) )
                 {
                     test = test.substring( 0, test.length() - 1 );

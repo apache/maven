@@ -130,7 +130,7 @@ echo -----------------------------------------------------------------------
 echo Running integration tests
 echo -----------------------------------------------------------------------
 cd maven-core-it
-call maven-core-it
+call maven-core-it %MAVEN_CMD_LINE_ARGS%
 cd ..
 
 :end
