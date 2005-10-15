@@ -456,6 +456,8 @@ public class MBoot
 
             cli.createArgument().setValue( "+x" );
 
+            cli.createArgument().setValue( new File( dist, "bin/mvn" ).getAbsolutePath() );
+
             cli.createArgument().setValue( new File( dist, "bin/m2" ).getAbsolutePath() );
 
             cli.execute().waitFor();
