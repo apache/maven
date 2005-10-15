@@ -22,6 +22,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -64,23 +65,42 @@ public class EclipseSettingsWriter
         {
             coreSettings.put( "org.eclipse.jdt.core.compiler.codegen.targetPlatform", target ); //$NON-NLS-1$
         }
-
+              
         // write the settings, if needed
         if ( !coreSettings.isEmpty() )
         {
             File settingsDir = new File( outputDir, "/.settings" ); //$NON-NLS-1$
-
+                                  
             settingsDir.mkdirs();
 
             coreSettings.put( "eclipse.preferences.version", "1" ); //$NON-NLS-1$ //$NON-NLS-2$
 
             try
             {
+                File oldCoreSettingsFile;
+                
                 File coreSettingsFile = new File( settingsDir, "org.eclipse.jdt.core.prefs" ); //$NON-NLS-1$
-                coreSettings.store( new FileOutputStream( coreSettingsFile ), null );
+                
+                if( coreSettingsFile.exists() )
+                {
+                    oldCoreSettingsFile = coreSettingsFile;
+                    
+                    Properties props = new Properties();
+                    
+                    props.load( new FileInputStream( oldCoreSettingsFile ) );
+                    
+                    if( !props.equals( coreSettings ) )
+                    {
+                        coreSettings.store( new FileOutputStream( coreSettingsFile ), null );
+                    }
+                }
+                else
+                {
+                    coreSettings.store( new FileOutputStream( coreSettingsFile ), null );
 
-                log.info( Messages.getString( "EclipseSettingsWriter.wrotesettings", //$NON-NLS-1$
-                                              coreSettingsFile.getAbsolutePath() ) );
+                    log.info( Messages.getString( "EclipseSettingsWriter.wrotesettings", //$NON-NLS-1$
+                                                  coreSettingsFile.getAbsolutePath() ) );
+                }
             }
             catch ( FileNotFoundException e )
             {
