@@ -30,7 +30,6 @@ import java.util.StringTokenizer;
 /**
  * @goal generate
  * @phase generate-sources
- * @requiresDependencyResolution compile
  * @description Antlr plugin
  */
 public class AntlrPlugin
