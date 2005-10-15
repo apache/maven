@@ -38,7 +38,7 @@ public class AddMavenRepoMojo extends AbstractMojo
      *     installation. For example, if you installed eclipse into <code>c:\eclipse</code>, the
      *     workspace is <code>c:\eclipse\workspace</code>.
      *
-     * @parameter
+     * @parameter expression="${eclipse.workspace}"
      * @required
      */
     private String workspace;
@@ -64,7 +64,7 @@ public class AddMavenRepoMojo extends AbstractMojo
         {
             FileWriter fWriter = new FileWriter( f );
         
-            fWriter.write( "\norg.eclipse.jdt.core.classpathVariable.MAVEN_REPO=" + localRepository.getBasedir() );
+            fWriter.write( "\norg.eclipse.jdt.core.classpathVariable.M2_REPO=" + localRepository.getBasedir() );
 
             fWriter.flush();
 
