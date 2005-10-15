@@ -36,6 +36,8 @@ Documentation
 
  * {{{mini/guide-generating-sources.html}Guide to Generating Sources}}
 
+ * {{{mini/guide-ibiblio-upload.html}Guide to uploading artifacts to Ibiblio}}
+
  * {{{mini/guide-ide-eclipse.html}Guide to using Eclipse with Maven 2.x}}
 
  * {{{mini/guide-ide-idea.html}Guide to using IDEA with Maven 2.x}}
@@ -89,11 +91,14 @@ Documentation
  * {{{plugin/guide-java-plugin-development.html}Guide to Developing Java Plugins}}
 
 
-* Developer Guides 
+* Development Guides
 
- * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}
- 
- * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}
+ * {{{development/guide-building-m2.html}Guide to Building Maven 2.0}}
+
+ * {{{development/guide-helping.html}Guide to helping with Maven}}
+
+ * {{{development/guide-m2-development.html}Guide to Developing Maven}}
+
 
 * Reference
 

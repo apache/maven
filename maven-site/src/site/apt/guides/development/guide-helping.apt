@@ -1,0 +1,45 @@
+ ------
+ Guide to helping with Maven
+ ------
+ Brett Porter
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Guide to helping with Maven
+
+ As with any open source project, there are several ways you can help:
+
+ * Join the {{{../../mail-lists.html}mailing list}} and answer other user's questions
+
+ * Report bugs, feature requests and other issues in the {{{../issue-tracking.html}issue tracking}} application.
+
+ * {{{guide-m2-development.html#Creating and submitting a patch}Submit patches}} to reported issues (both those you find, or that others have filed)
+
+ []
+
+ Your participation in the community is much appreciated!
+
+Why Would I Want to Help?
+
+ There are several reasons these are good things.
+
+  * By answering other people's questions, you can learn more for yourself</li>
+
+  * By submitting your own fixes, they get incorporated faster</li>
+
+  * By reporting issues, you ensure that bugs don't get missed, or forgotten</li>
+
+  * You are giving back to a community that has given you software for free</li>
+
+How do I Join the Project?
+
+ Projects at Apache operate under a meritocracy, meaning those that the developers notice participating to a
+ high extent will be invited to join the project as a committer.
+
+ This is as much based on personality and ability to work with other developers and the community as it is with
+ proven technical ability. Being unhelpful to other users, or obviously looking to become a committer for bragging
+ rights and nothing else is frowned upon, as is asking to be made a committer without having contributed
+ sufficiently to be invited.
+

@@ -50,7 +50,7 @@ Developing Maven 2
  When you find a issue you would like to work on add a comment in the issue log so the core developers and other
  people looking for work know that someone is already working on it.
 
-* Creating and submitting a patch
+* {{Creating and submitting a patch}}
 
  When you have either completed an issue or just want some feedback on the work you have done, create a patch
  and attach the patch to the issue in question. We have a couple of guidelines when creating patches:

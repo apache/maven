@@ -99,11 +99,19 @@ echo >> $toc
 # Developer Guides
 #
 
-echo "" >> $toc
-echo "* Developer Guides " >> $toc
-echo "" >> $toc
-echo " * {{{development/guide-m2-development.html}Guide to Developing Maven 2.x}}" >> $toc
-echo " " >> $toc
-echo " * {{{development/guide-building-m2.html}Guide to Building Maven 2.x}}" >> $toc
+echo >> $toc
+echo "* Development Guides" >> $toc
+echo >> $toc
+
+(
+  cd development
+
+  for i in `ls guide-*.apt`
+  do
+   title=`grep "^ Guide" $i | sed 's/^ *//'`
+   i=`echo $i | sed 's/\.apt/\.html/'`
+   [ ! -z "$title" ] && echo " * {{{development/$i}$title}}" >> $toc && echo >> $toc
+  done       
+)       
 
 cat tail.txt >> $toc
