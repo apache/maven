@@ -167,6 +167,11 @@ public class PrepareReleaseMojo
     private boolean resume;
 
     /**
+     * @parameter default-value="false"
+     */
+    private boolean generateReleasePoms;
+
+    /**
      * @component
      */
     private PathTranslator pathTranslator;
@@ -231,7 +236,10 @@ public class PrepareReleaseMojo
 
             }
 
-            generateReleasePoms();
+            if ( generateReleasePoms )
+            {
+                generateReleasePoms();
+            }
 
             checkInRelease();
 
@@ -264,7 +272,10 @@ public class PrepareReleaseMojo
                 }
             }
 
-            removeReleasePoms();
+            if ( generateReleasePoms )
+            {
+                removeReleasePoms();
+            }
 
             checkInNextSnapshot();
 
