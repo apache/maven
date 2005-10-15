@@ -186,7 +186,7 @@ public class CheckstyleReportGenerator
             sink.tableRow();
             
             sink.tableCell();
-            sink.link( "#" + filename );
+            sink.link( "#" + filename.replace( '/', '.' ) );
             sink.text( filename );
             sink.link_();
             sink.tableCell_();
@@ -221,7 +221,7 @@ public class CheckstyleReportGenerator
             
             sink.section1();
             sink.sectionTitle1();
-            sink.anchor( file );
+            sink.anchor( file.replace( '/', '.' ) );
             sink.text( file );
             sink.anchor_();
             sink.sectionTitle1_();
