@@ -60,9 +60,10 @@ public abstract class AbstractCompilerMojo
      * The default value is true.
      *
      * @parameter expression="${maven.compiler.debug}" default-value="true"
+     * @deprecated
      */
     private boolean debug;
-    
+
     /**
      * Whether to output messages about what the compiler is doing
      *
@@ -83,7 +84,7 @@ public abstract class AbstractCompilerMojo
      * @parameter default-value="false"
      */
     private boolean optimize;
-    
+
     /**
      * Output warnings
      *
@@ -260,11 +261,11 @@ public abstract class AbstractCompilerMojo
         compilerConfiguration.setClasspathEntries( getClasspathElements() );
 
         compilerConfiguration.setSourceLocations( compileSourceRoots );
-        
+
         compilerConfiguration.setOptimize( optimize );
 
         compilerConfiguration.setDebug( debug );
-        
+
         compilerConfiguration.setVerbose( verbose );
 
         compilerConfiguration.setShowWarnings( showWarnings );
@@ -389,6 +390,15 @@ public abstract class AbstractCompilerMojo
         if ( compilationError )
         {
             throw new CompilationFailureException( messages );
+        }
+        else
+        {
+            for ( Iterator i = messages.iterator(); i.hasNext(); )
+            {
+                CompilerError message = (CompilerError) i.next();
+
+                getLog().warn( message.toString() );
+            }
         }
     }
 
