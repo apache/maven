@@ -300,8 +300,8 @@ public abstract class AbstractCompilerMojo
 
         try
         {
-            staleSources = computeStaleSources( compilerConfiguration, compiler,
-                                                getSourceInclusionScanner( staleMillis ) );
+            staleSources =
+                computeStaleSources( compilerConfiguration, compiler, getSourceInclusionScanner( staleMillis ) );
 
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
@@ -356,6 +356,30 @@ public abstract class AbstractCompilerMojo
                 String root = (String) it.next();
 
                 getLog().debug( " " + root );
+            }
+
+            if ( fork )
+            {
+                try
+                {
+                    String[] cl = compiler.createCommandLine( compilerConfiguration );
+                    if ( cl != null && cl.length > 0 )
+                    {
+                        StringBuffer sb = new StringBuffer();
+                        sb.append( cl[0] );
+                        for ( int i = 1; i < cl.length; i++ )
+                        {
+                            sb.append( " " );
+                            sb.append( cl[i] );
+                        }
+                        getLog().debug( "Command line options:" );
+                        getLog().debug( sb );
+                    }
+                }
+                catch ( CompilerException ce )
+                {
+                    getLog().debug( ce );
+                }
             }
         }
 
