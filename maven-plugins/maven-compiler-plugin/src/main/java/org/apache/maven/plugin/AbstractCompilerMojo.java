@@ -77,6 +77,13 @@ public abstract class AbstractCompilerMojo
     private boolean showDeprecation;
 
     /**
+     * Optimize compiled code using the compiler's optimization methods
+     *
+     * @parameter default-value="false"
+     */
+    private boolean optimize;
+    
+    /**
      * Output warnings
      *
      * @parameter
@@ -252,6 +259,8 @@ public abstract class AbstractCompilerMojo
         compilerConfiguration.setClasspathEntries( getClasspathElements() );
 
         compilerConfiguration.setSourceLocations( compileSourceRoots );
+        
+        compilerConfiguration.setOptimize( optimize );
 
         compilerConfiguration.setDebug( debug );
         
