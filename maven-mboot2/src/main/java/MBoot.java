@@ -438,6 +438,10 @@ public class MBoot
 
         FileUtils.mkdir( new File( bin ).getPath() );
 
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/mvn" ).getAbsolutePath(), bin );
+
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/mvn.bat" ).getAbsolutePath(), bin );
+
         FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2" ).getAbsolutePath(), bin );
 
         FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2.bat" ).getAbsolutePath(), bin );
