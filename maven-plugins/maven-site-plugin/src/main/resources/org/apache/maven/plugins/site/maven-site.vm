@@ -83,7 +83,6 @@
     #else
       <a href="$currentItemHref">$item.getAttribute( "name" )</a>
     #end
-  </li>
   #if ( $item && $item.getChildren() && $item.getChildCount() > 0 )
     #set ( $display = false )
     #set ( $itemTmp = $item )
@@ -97,6 +96,7 @@
       </ul>
     #end
   #end
+  </li>
 #end
 
 #macro ( mainMenu )
