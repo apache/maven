@@ -8,10 +8,7 @@
   <artifactId>maven-release-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Release plugin</name>
-  <version>2.0-beta-3-SNAPSHOT</version>
-  <prerequisites>
-    <maven>2.0</maven>
-  </prerequisites>
+  <version>2.0-beta-3</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
@@ -33,12 +30,12 @@
       <version>1.0-alpha-4</version>
       <exclusions>
         <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
+          <groupId>org.codehaus.plexus</groupId>
         </exclusion>
         <exclusion>
-          <groupId>plexus</groupId>
           <artifactId>plexus-utils</artifactId>
+          <groupId>plexus</groupId>
         </exclusion>
       </exclusions>
     </dependency>
