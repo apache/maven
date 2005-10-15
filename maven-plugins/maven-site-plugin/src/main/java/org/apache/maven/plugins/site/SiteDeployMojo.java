@@ -50,7 +50,9 @@ public class SiteDeployMojo
     extends AbstractMojo
 {
     /**
-     * @parameter alias="siteDirectory" expression="${project.reporting.outputDirectory}"
+     * Directory containing the generated project sites and report distributions.
+     * 
+     * @parameter alias="outputDirectory" expression="${project.reporting.outputDirectory}"
      * @required
      */
     private File inputDirectory;
