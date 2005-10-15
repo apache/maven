@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.1</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -25,12 +25,12 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-manager</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.1</version>
     </dependency>
   </dependencies>
 </project>
