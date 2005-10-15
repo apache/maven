@@ -39,6 +39,10 @@ public interface MavenProjectBuilder
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
+    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager,
+                        boolean checkDistributionManagementStatus )
+        throws ProjectBuildingException;
+
     // ----------------------------------------------------------------------
     // These methods are used by the MavenEmbedder
     // ----------------------------------------------------------------------
