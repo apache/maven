@@ -278,8 +278,21 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setSourceEncoding( encoding );
 
-        compilerConfiguration
-            .setCustomCompilerArguments( compilerArguments == null ? null : new LinkedHashMap( compilerArguments ) );
+        if ( compilerArguments != null )
+        {
+            LinkedHashMap cplrArgsCopy = new LinkedHashMap();
+            for ( Iterator i = compilerArguments.entrySet().iterator(); i.hasNext(); )
+            {
+                Map.Entry me = (Map.Entry) i.next();
+                String key = (String) me.getKey();
+                if ( !key.startsWith( "-" ))
+                {
+                    key = "-" + key;
+                }
+                cplrArgsCopy.put( key, me.getValue() );
+            }
+            compilerConfiguration.setCustomCompilerArguments( cplrArgsCopy );
+        }
 
         compilerConfiguration.setFork( fork );
 
