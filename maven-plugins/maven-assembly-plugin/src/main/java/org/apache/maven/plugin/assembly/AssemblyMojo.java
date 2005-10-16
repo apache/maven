@@ -37,6 +37,7 @@ import org.codehaus.plexus.archiver.tar.TarArchiver;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -147,7 +148,7 @@ public class AssemblyMojo
         // TODO: how, might we plug this into an installer, such as NSIS?
         // TODO: allow file mode specifications?
 
-        String fullName = finalName + "-" + assembly.getId();
+        String fullName = getDistributionName( assembly );
 
         for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
         {
@@ -168,15 +169,31 @@ public class AssemblyMojo
             }
             catch ( ArchiverException e )
             {
-                throw new MojoExecutionException( "Error creating assembly", e );
+                throw new MojoExecutionException( "Error creating assembly: " + e.getMessage(), e );
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Error creating assembly", e );
+                throw new MojoExecutionException( "Error creating assembly: " + e.getMessage(), e );
             }
 
             projectHelper.attachArtifact( project, format, assembly.getId(), destFile );
         }
+    }
+
+    /**
+     * Get the full name of the distribution artifact
+     *
+     * @param assembly
+     * @return the distribution name
+     */
+    protected String getDistributionName( Assembly assembly )
+    {
+        if ( StringUtils.isEmpty( assembly.getId() ) )
+        {
+            return finalName;
+        }
+
+        return finalName + "-" + assembly.getId();
     }
 
     protected File createArchive( Archiver archiver, Assembly assembly, String filename )
@@ -270,9 +287,10 @@ public class AssemblyMojo
 
             archiver.setDefaultFileMode( Integer.parseInt( dependencySet.getFileMode(), 8 ) );
 
-            getLog().debug( "DependencySet[" + output + "]" + " dir perms: " +
-                Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
-                Integer.toString( archiver.getDefaultFileMode(), 8 ) );
+            getLog().debug(
+                            "DependencySet[" + output + "]" + " dir perms: "
+                                + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: "
+                                + Integer.toString( archiver.getDefaultFileMode(), 8 ) );
 
             AndArtifactFilter filter = new AndArtifactFilter();
             filter.add( new ScopeArtifactFilter( dependencySet.getScope() ) );
@@ -298,7 +316,7 @@ public class AssemblyMojo
                     if ( dependencySet.isUnpack() )
                     {
                         // TODO: something like zipfileset in plexus-archiver
-//                        archiver.addJar(  )
+                        //                        archiver.addJar(  )
 
                         // TODO is the extension always 3 characters long?
                         File tempLocation = new File( workDirectory, name.substring( 0, name.length() - 4 ) );
@@ -321,16 +339,16 @@ public class AssemblyMojo
                             }
                             catch ( NoSuchArchiverException e )
                             {
-                                throw new MojoExecutionException(
-                                    "Unable to obtain unarchiver for file '" + artifact.getFile() + "'" );
+                                throw new MojoExecutionException( "Unable to obtain unarchiver for file '"
+                                    + artifact.getFile() + "'" );
                             }
                         }
                         archiver.addDirectory( tempLocation, output, null, FileUtils.getDefaultExcludes() );
                     }
                     else
                     {
-                        archiver.addFile( artifact.getFile(), output +
-                            evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
+                        archiver.addFile( artifact.getFile(), output
+                            + evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
                     }
                 }
             }
@@ -368,10 +386,12 @@ public class AssemblyMojo
 
             archiver.setDefaultFileMode( Integer.parseInt( fileSet.getFileMode(), 8 ) );
 
-            getLog().debug( "FileSet[" + output + "]" + " dir perms: " +
-                Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
-                Integer.toString( archiver.getDefaultFileMode(), 8 ) +
-                ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
+            getLog()
+                .debug(
+                        "FileSet[" + output + "]" + " dir perms: "
+                            + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: "
+                            + Integer.toString( archiver.getDefaultFileMode(), 8 )
+                            + ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
 
             if ( directory == null )
             {
@@ -420,6 +440,7 @@ public class AssemblyMojo
      * @param expression
      * @param artifact
      * @return expression
+     * @throws MojoExecutionException
      */
     private static String evaluateFileNameMapping( String expression, Artifact artifact )
         throws MojoExecutionException
@@ -511,6 +532,7 @@ public class AssemblyMojo
      * @param format Archive format
      * @return archiver  Archiver generated
      * @throws ArchiverException
+     * @throws NoSuchArchiverException
      */
     private Archiver createArchiver( String format )
         throws ArchiverException, NoSuchArchiverException
@@ -569,9 +591,8 @@ public class AssemblyMojo
         out.close();
     }
 
-
     private void copySetReplacingLineEndings( File archiveBaseDir, File tmpDir, String[] includes, String[] excludes,
-                                              String lineEnding )
+                                             String lineEnding )
         throws ArchiverException
     {
         DirectoryScanner scanner = new DirectoryScanner();
@@ -580,16 +601,16 @@ public class AssemblyMojo
         scanner.setExcludes( excludes );
         scanner.scan();
 
-        String [] dirs = scanner.getIncludedDirectories();
+        String[] dirs = scanner.getIncludedDirectories();
 
-        for ( int j = 0; j < dirs.length; j ++ )
+        for ( int j = 0; j < dirs.length; j++ )
         {
             new File( tempRoot, dirs[j] ).mkdirs();
         }
 
-        String [] files = scanner.getIncludedFiles();
+        String[] files = scanner.getIncludedFiles();
 
-        for ( int j = 0; j < files.length; j ++ )
+        for ( int j = 0; j < files.length; j++ )
         {
             File targetFile = new File( tmpDir, files[j] );
 
@@ -639,7 +660,7 @@ public class AssemblyMojo
         if ( !siteDirectory.exists() )
         {
             throw new MojoExecutionException(
-                "site did not exist in the target directory - please run site:site before creating the assembly" );
+                                              "site did not exist in the target directory - please run site:site before creating the assembly" );
         }
 
         getLog().info( "Adding site directory to assembly : " + siteDirectory );

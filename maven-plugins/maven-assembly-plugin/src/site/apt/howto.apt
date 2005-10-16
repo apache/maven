@@ -1,31 +1,31 @@
  ------
- Maven 2 Assembly Plugin 
+ Maven 2 Assembly Plugin
  ------
  Johnny R. Ruiz III
  <jruiz@exist.com>
  ------
- September 20, 2005
+ October 16, 2005
 
 How to Use
 
-  These is a brief example on how to use the assembly:assembly goal and assembly:unpack goal.  
-  
-  To use the assembly:assembly goal, you must define the descriptor file that you are going to use or 
-  define the descriptorId from the predefined {{{descriptor.html}descriptor ids}}.  
+  These is a brief example on how to use the assembly:assembly goal and assembly:unpack goal.
+
+  To use the assembly:assembly goal, you must define the descriptor file that you are going to use or
+  define the descriptorId from the predefined {{{descriptor.html}descriptor ids}}.
 
 
-* How To use assembly:assembly using a customized descriptor file.  
+* How To use assembly:assembly using a customized descriptor file.
 
 -----
   m2 assembly:assembly -Dmaven.assembly.descriptor=path/to/descriptor.xml
 -----
 
- 
+
 * How to use assembly:assembly using predefined descriptor ids.
 
 ----
 
-  m2 assembly:assembly -Dmaven.assembly.descriptorId=bin      
+  m2 assembly:assembly -Dmaven.assembly.descriptorId=bin
 
   or  m2 assembly:assembly -Dmaven.assembly.descriptorId=jar-with-dependencies
 
@@ -69,4 +69,28 @@ How to Use
 -----
 
   For full documentation, click {{{index.html}here}}.
- 
+
+* How to generate Download Report
+
+  In your project pom.xml, add the assembly plugin in <reporting> section.
+
+-------------------
+  <project>
+      ...
+      <reporting>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
+              </plugin>
+          </plugins>
+      </reporting>
+      ...
+  </project>
+-------------------
+
+  Execute the site plugin to generate the report distribution.
+
+-------------------
+  m2 site:site
+-------------------
