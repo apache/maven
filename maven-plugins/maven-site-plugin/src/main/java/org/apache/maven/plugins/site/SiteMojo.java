@@ -404,8 +404,21 @@ public class SiteMojo
         for ( Iterator i = reports.iterator(); i.hasNext(); )
         {
             MavenReport report = (MavenReport) i.next();
-            if ( report.canGenerateReport() )
+            try
             {
+                if ( report.canGenerateReport() )
+                {
+                    filteredReports.add( report );
+                }
+            }
+            // the canGenerateReport() has been added just before the 2.0 release and will cause all the reporting 
+            // plugins with an earlier version to fail (most of the codehaus mojo now fails)
+            // be nice with them, output a warning and don't let them break anything
+            catch ( AbstractMethodError e )
+            {
+                getLog().warn(
+                              "Error loading report " + report.getClass().getName()
+                                  + " - AbstractMethodError: canGenerateReport()" );
                 filteredReports.add( report );
             }
         }
