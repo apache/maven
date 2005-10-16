@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
+ * Generates the Mailing List report.
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter </a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
