@@ -30,7 +30,6 @@ import java.io.IOException;
  *
  * @goal directory
  * @requiresDependencyResolution test
- * @requiresDirectInvocation
  * @execute phase="package"
  */
 public class DirectoryMojo

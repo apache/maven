@@ -64,7 +64,6 @@ import java.util.regex.Pattern;
  * @version $Id$
  * @goal assembly
  * @requiresDependencyResolution test
- * @requiresDirectInvocation
  * @execute phase="package"
  * @aggregator
  */
