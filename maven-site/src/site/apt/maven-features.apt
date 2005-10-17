@@ -10,6 +10,23 @@ Feature Summary
 
  The following are the key features of Maven in a nutshell:
 
+ * Simple project setup that follows best practices - get a new project or module started in seconds
+ 
+ * Consistent usage across all projects means no ramp up time for new developers coming onto a project
+
+ * Superior dependency management including automatic updating, dependency closures (also known as transitive dependencies)
+
+ * Able to easily work with multiple projects at a time
+ 
+ * A large and growing repository of libraries and metadata to use out of the box, and arrangements in place with the largest Open Source projects for
+   real-time availability of their latest releases
+ 
+ * Extensible, with the ability to easily write plugins in Java or other scripting languages
+
+ * Instant access to new features with little or no extra configuration
+ 
+ * Ant tasks for dependency management and deployment outside of Maven
+
  * Model based builds:
    Maven is able to build any number of projects into predefined output types
    such as a JAR, WAR, or distribution based on metadata about the project, without

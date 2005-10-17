@@ -33,7 +33,7 @@ Sections
  * {{{index.html#How do I compile my test sources and run my unit tests?}How do I compile my test sources and run my unit tests?}}
 
  * {{{index.html#How do I create a JAR and install it in my local repository?}How do I create a JAR and install it in my local repository?}}
- 
+
  * {{{index.html#How do add resources to my JAR?}How do add resources to my JAR?}}
 
  * {{{index.html#How do I filter resource files?}How do I filter resource files?}}
@@ -49,7 +49,7 @@ Sections
  * {{{index.html#How do I use plug-ins?}How do I use plug-ins?}}
 
  * {{{index.html#How do I control what version of a plug-in I use?}How do I control what version of a plug-in I use?}}
- 
+
  * {{{index.html#How do I build more than one project at once?}How do I build more than one project at once?}}
 
  []
@@ -324,13 +324,13 @@ Results :
 +----+
 
  Some things to notice about the output:
- 
+
     * Maven downloads more dependencies this time. These are the dependencies and plugins necessary for executing the tests
       (it already has the dependencies it needs for compiling and won't download them again).
-    
+
     * Before compiling and executing the tests Maven compiles the main code (all these classes are up to date because
       we haven't changed anything since we compiled last).
- 
+
  If you simply want to compile your test sources (but not execute the tests), you can execute the following:
 
 +----+
@@ -345,6 +345,8 @@ Results :
 * {How do I create a JAR and install it in my local repository?}
 
  Making a JAR file is straight forward enough and can be accomplished by executing the following command:
+
+~~ How to skip tests ... jvz
 
 +----+
 
@@ -574,7 +576,7 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
  Maven, put a reference to the property that will contain the value into your resource file using the syntax <<<$\{<property name}>\}>>>.
  The property can be one of the values defined in your pom.xml, a value defined in the user's settings.xml, a property
  defined in an external properties file, or a system property.
- 
+
  To have Maven filter resources when copying, simply set <<<filtering>>> to true for the resource directory in your pom.xml:
 
 +----+
@@ -612,7 +614,7 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
  In addition, we had to explicitly state that the resources are located in the src/main/resources directory.  All of this
  information was provided as default values previously, but because the default value for <<<filtering>>> is false, we had
  to add this to our pom.xml in order to override that default value and set <<<filtering>>> to true.
- 
+
  To reference a property defined in your pom.xml, the property name uses the names of the XML elements that define the value,
  with "pom" being allowed as an alias for the project (root) element.  So $\{pom.name\} refers to the name of the project,
  $\{pom.version\} refers to the version of the project, $\{pom.build.finalName\} refers to the final name of the file created
@@ -620,8 +622,8 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
  defined in your pom.xml for the values to be available here.  Similarly, values in the user's settings.xml can be referenced
  using property names beginning with "settings" (for example, $\{settings.localRepository\} refers to the path of the user's
  local repository).
- 
- To continue our example, let's add a couple of properties to the application.properties file (which we put in the 
+
+ To continue our example, let's add a couple of properties to the application.properties file (which we put in the
  src/main/resources directory) whose values will be supplied when the resource is filtered:
 
 +----+
@@ -661,7 +663,7 @@ my.filter.value=hello!
 
 +----+
 
- Next, we'll add a reference to this new file in the pom.xml: 
+ Next, we'll add a reference to this new file in the pom.xml:
 
 +----+
 
@@ -707,7 +709,7 @@ application.version=${pom.version}
 message=${my.filter.value}
 
 +----+
- 
+
  the next execution of the <<<m2 process-resources>>> command will put our new property value into application.properties.
  As an alternative to defining the my.filter.value property in an external file, you could also have defined it in the <<<properties>>>
  section of your pom.xml and you'd get the same effect (notice I don't need the references to src/main/filters/filter.properties either):
@@ -749,7 +751,7 @@ message=${my.filter.value}
  Filtering resources can also get values from system properties; either the system properties built into Java (like java.version or
  user.home) or properties defined on the command line using the standard Java -D parameter.  To continue the example, let's change
  our application.properties file to look like this:
- 
+
 +----+
 
 # application.properties
@@ -766,7 +768,7 @@ command.line.prop=${command.line.prop}
 m2 process-resources "-Dcommand.line.prop=hello again"
 
 +----+
- 
+
 
 * {How do I use external dependencies?}
 
@@ -774,7 +776,7 @@ m2 process-resources "-Dcommand.line.prop=hello again"
  You have, in fact, been using an external dependency all this time, but here we'll talk about how this
  works in a bit more detail. For a more thorough introduction, please refer to our
  {{{introduction-to-dependency-management.html}Introduction to Dependency Management}}.
- 
+
  The <<<dependencies>>> section of the pom.xml lists all of the external dependencies that particular needs
  in order to build (whether it needs that dependency at compile time, test time, run time, or whatever).  Right
  now, our project is depending on JUnit only (I took out all of the resource filtering stuff for clarity):
@@ -808,13 +810,13 @@ m2 process-resources "-Dcommand.line.prop=hello again"
  For more information on everything you can specify for a dependency, see the {{{../../../maven-model/maven.html}Project Descriptor Reference}}.
  ~~DJ: Does this link work? I can't find the document.
  For more information about the dependency mechanism as a whole, see {{{../../dependency-mechanism.html}Dependency Mechanism}}.
- 
+
  With this information about a dependency, Maven will be able to reference the dependency when it builds the project.  Where does
  Maven reference the dependency from?  Maven looks in your local repository (<<<~/.m2/repository>>> is the default location) to find
  all dependencies.  In a {{{How do I create a JAR and install it in my local repository?}previous section}}, we installed the artifact
  from our project (my-app-1.0-SNAPSHOT.jar) into the local repository.  Once it's installed there, another project can reference that jar
  as a dependency simply by adding the dependency information to its pom.xml:
- 
+
 +----+
 
 <project>
@@ -833,7 +835,7 @@ m2 process-resources "-Dcommand.line.prop=hello again"
 </project>
 
 +----+
- 
+
  What about dependencies built somewhere else?  How do they get into my local repository?  Whenever a project references a dependency
  that isn't available in the local repository, Maven will download the dependency from a remote repository into the local repository.  You
  probably noticed Maven downloading a lot of things when you built your very first project (these downloads were dependencies for the
@@ -876,11 +878,11 @@ m2 process-resources "-Dcommand.line.prop=hello again"
  the current release version).  Alongside the maven-metadata.xml file, we can see a directory corresponding to each version of the
  log4j library.  Inside each of these, we'll find the actual jar file (e.g. log4j-1.2.12.jar) as well as a pom file (this is the pom.xml
  for the dependency, indicating any further dependencies it might have and other information) and another maven-metadata.xml file.
- There's also an md5 file corresponding to each of these, which contains an MD5 hash for these files.  You can use this to authenticate 
+ There's also an md5 file corresponding to each of these, which contains an MD5 hash for these files.  You can use this to authenticate
  the library or to figure out which version of a particular library you may be using already.
- 
+
  Now that we know the information we need, we can add the dependency to our pom.xml:
- 
+
 +----+
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -909,9 +911,9 @@ m2 process-resources "-Dcommand.line.prop=hello again"
 </project>
 
 +----+
- 
+
  Now, when we compile the project (<<<m2 compile>>>), we'll see Maven download the log4j dependency for us.
- 
+
 ~~DJ: Current
 
 * {How do I deploy my jar in my remote repository?}

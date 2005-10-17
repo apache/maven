@@ -43,12 +43,12 @@
       <ul>
         <li>
           <i>
-            <a href="about.html#what-is-maven">What is Maven?</a>
+            <a href="what-is-maven.html">What is Maven?</a>
           </i>
         </li>
         <li>
           <i>What are the
-            <a href="about.html#features">features of Maven 2.0</a>
+            <a href="maven-features.html">features of Maven 2.0</a>
             ?
           </i>
         </li>
@@ -122,7 +122,7 @@
       <ul>
         <li>
           <i>
-            <a href="getting-started.html">Getting Started</a>
+            <a href="guides/getting-started/index.html">Getting Started</a>
           </i>
         </li>
         <li>
@@ -130,23 +130,6 @@
             <a href="general.html">General FAQ</a>
           </i>
         </li>
-        <li>
-          <i>
-            <a href="configuration.html">Configuring Maven</a>
-          </i>
-        </li>
-        <li>
-          <i>
-            <a href="dependency-mechanism.html">Dependency Mechanism</a>
-          </i>
-        </li>
-        <!-- TODO
-                <li>
-                  <i>
-                    <a href="archetypes.html">Generating a Template Project: Archetypes</a>
-                  </i>
-                </li>
-        -->
       </ul>
       <p>
         <b>More coming soon -</b>

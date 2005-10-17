@@ -1,0 +1,161 @@
+ ------
+ Guide to the APT Format
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Books on Maven
+
+ * Maven: A Developer's Notebook
+
+  * O'Reilly
+
+  * Vincent Massol, Tim O'Brien
+
+  * July 2005
+
+Maven in the Press
+
+ Have written or would like to write a story on Maven? {{{../../mail-lists.html}Contact us}} on the developers mailing list.
+
+ * {{{http://www.internetnews.com/dev-news/article.php/3381841}Apache's Maven Comes of Age}} (Coverage of the release of Maven 1.0)
+
+  * internetnews.com
+
+  * Sean Michael Kerner
+
+  * 15 July 2004</td>
+
+Articles on Maven
+
+ * {{{http://www.onjava.com/pub/a/onjava/2005/09/07/maven.html}Building J2EE Projects with Maven}}
+
+  * Vincent Massol
+
+  * 7 September 2005
+
+ * {{{https://sydneyjug.dev.java.net/files/documents/922/15554/sjug20050601.pdf}Maven 2.0 and Continuum SJUG Presentation}}
+
+  * Brett Porter
+
+  * 1 June 2005
+
+ * {{{http://www-128.ibm.com/developerworks/opensource/library/os-maven/index.html}Exploiting Maven in Eclipse}}
+
+  * developerWorks
+
+  * Gilles Dodinet
+
+  * 24 May 2005
+
+ * {{{http://www-128.ibm.com/developerworks/websphere/library/techarticles/0503_boog/0503_boog.html?ca=dgr-lnxw09Maven}Managing WebSphere Portal V5.1 projects with Apache Maven and Rational Application Developer 6.0}}
+
+  * developerWorks
+
+  * Hinrich Boog
+
+  * 30 March 205
+
+  * {{{http://www.codehaus.org/~vmassol/blog/Maven%201.0%20-%2020041216.ppt}Maven 1.0 Javapolis Presentation}}
+
+   * Vincent Massol
+
+   * 16 December 2004
+
+  * {{{http://www.oracle.com/technology/pub/articles/masterj2ee/j2ee_wk2.html}Master and Commander by Julien Dubois}}
+
+   * Oracle
+
+   * Julien Dubois
+
+   * November 2004
+
+  * {{{http://www.manfred-wolff.de/Maven-short.pdf}installing and working with Maven (in German)}}
+
+   * Manfred Wolff
+
+   * August 2004
+
+  * {{{http://www.onjava.com/pub/a/onjava/2004/03/17/maven.html}Extending Maven Through Plugins by Eric Pugh}}
+
+   * OnJava
+
+   * Eric Pugh
+
+   * 17 March 2004
+
+  * {{{http://www.theserverside.com/articles/article.tss?l=MavenMagic}Maven Magic - a tutorial on Maven and J2EE projects.}}
+
+   * TheServerSide
+
+   * Srikanth Shenoy
+
+   * November 2003
+
+  * {{{http://www.jdocentral.com/JDO_Articles_20031117.html}JDO Meets Maven}}
+
+   * JDOCentral
+
+   * Andy Jefferson
+
+   * 17 November 2003
+
+  * {{{http://www.onjava.com/pub/a/onjava/2003/10/22/maven.html}Developing with Maven by Rob Herbst}}
+
+   * OnJava
+
+   * Rob Herbst
+
+   * 22 October 2003
+
+  * {{{http://www.devx.com/java/Article/17204}Apache Maven Simplifies the Java Build Process Even More Than Ant}}
+
+   * DevX
+
+   * Dave Ford
+
+   * 2 September 2003
+
+  * {{{http://www.pivolis.com/pdf/J2EE_projects_Maven_V1.1.pdf}Building J2EE applications with Maven (Slides from TheServerSide Symposium)}}
+
+   * TheServerSide
+
+   * Vincent Massol
+
+   * 27 June 2003
+
+  * {{{http://www.javaworld.com/javaworld/jw-10-2002/jw-1011-maven.html}Maven ties together tools for better code management}}
+
+   * JavaWorld
+
+   * Jeff Linwood
+
+   * 11 October 2002
+
+  * {{{http://www.javausergroup.at/events/maven.pdf}The Stairway to Maven}}
+
+   * Siegfried G�SCHL
+
+   * 26 June 2002
+
+  * {{{http://wiki.astrogrid.org/bin/view/Astrogrid/MakingWarWithMaven}How to get Maven to build your web service into a WAR on AstroGrid}}
+
+   * Astrogrid
+
+  * {{{http://wiki.astrogrid.org/bin/view/Astrogrid/MavenFAQ}Some Maven FAQs on AstroGrid}}
+
+   * Astrogrid
+
+  * {{{http://wiki.astrogrid.org/bin/view/Astrogrid/UsefulMavenNotes}Some Useful Maven Notes on AstroGrid}}
+
+   * Astrogrid
+
+  * {{{http://etudiant.univ-mlv.fr/~mvongvil/Maven_Intro.html}An Introduction to Maven</a> (in French).}}
+
+  * {{{http://hotwork.sourceforge.net/hotwork/manual/maven/index.html}A tutorial for Maven, J2EE projects, and MevenIDE}} (in Portuguese).
+
+ If you are writing an article on Maven we suggest contacting the developers on the mailing list as we would be happy
+ to provide feedback to help ensure accuracy in your artiticle. Just ping us on the {{mail-lists.html}dev mailing list}}
+ to get in touch.

@@ -15,7 +15,9 @@
       <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
     </links>
 
-    <menu name="Installing">
+    <menu name="Quick Links">
+      <item name="Features" href="/features.html"/>
+      <item name="What is Maven" href="/what-is-maven.html"/>      
       <item name="Download" href="/download.html"/>
       <item name="Install" href="/download.html#installation"/>
       <item name="Getting Started" href="/guides/getting-started/index.html"/>
@@ -32,38 +34,6 @@
       <item name="Powered By" href="/powered-by-m2.html"/>      
     </menu>
 
-    <!--
-    <menu name="User's Guide">
-      <item name="Getting Started" href="/getting-started.html"/>
-      <item name="Build Lifecycle" href="/lifecycle.html"/>
-      <item name="Plugin Overview" href="/plugin-overview.html"/>
-      <item name="Dependency Mechanism" href="/dependency-mechanism.html"/>
-      <item name="Creating a Site" href="/site.html"/>
-    </menu>
-    -->
-
-    <!--
-    <menu name="Plugin Developers">
-      <item name="Plugin Development Guide" href="/developers/plugin-development-guide.html"/>
-    </menu>
-    <menu name="Developers">
-      <item name="Developers Guide" href="/developers/development-guide.html"/>
-      <item name="Documentation Needed" href="/docs-required.html"/>
-      <item name="Building Maven 2.0" href="/developers/building.html"/>
-    </menu>
-    -->
-    
-    <!--
-    <menu name="Reference">
-      <item name="Project Descriptor" href="/maven-model/maven.html"/>
-      <item name="Settings Descriptor" href="/maven-settings/settings.html"/>
-      <item name="Available Plugins" href="/plugins/index.html"/>
-      <item name="Mojo API" href="/developers/mojo-api-specification.html"/>
-      <item name="Ant Tasks" href="/ant-tasks.html"/>
-      <item name="APT Reference" href="/apt-format.html"/>
-    </menu>
-    -->
-    
     ${reports}
   </body>
 </project>

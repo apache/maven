@@ -1,0 +1,97 @@
+ ----
+ Maven Getting Started Guide
+ -----
+ Jason van Zyl
+ -----
+ 12 October 2005
+ -----
+
+Glossary
+
+ This document describes some of the most common terms encountered while
+ using Maven. These terms, that have an explicit meaning for Maven, can
+ sometimes be confusing for newcomers.
+
+  * Project:
+    Maven thinks in terms of projects. Everything that you will build
+    are projects. Those projects follow a well defined "Project Object
+    Model". Projects can depend on other projects, in which case the
+    latter are called "dependencies". A project may consistent of several
+    subprojects, however these subprojects are still treated equally as
+    projects.
+
+  * Project Object Model (POM):
+    The Project Object Model, almost always referred as the POM for brevity,
+    is the metadata that Maven needs to work with your project. Its name is
+    "project.xml" and it is located in the root directory of each project.
+
+    To learn how to build the POM for your project, please read about the
+    <a href="project-descriptor.html">project descriptor</a>.
+
+  * Artifact:
+    An artifact is something that is either produced or used by a
+    project. Examples of artifacts produced by Maven for a project
+    include: JARs, source and binary distributions, WARs.
+    Each artifact is uniquely identified by a <a href="#GroupId">group ID</a>
+    and an artifact ID which is unique within a group.
+
+  * GroupId:
+    A group ID is a universally unique identifier for a project. While this is often just
+    the project name (eg. <code>commons-collections</code>), it is helpful to use a fully-qualified
+    package name to distinguish it from other projects with a similar name (eg. <code>org.apache.maven</code>).
+
+  * Dependency:
+    A typical Java project relies on libraries to build and/or run.
+    Those are called "dependencies" inside Maven. Those dependencies are
+    usually other projects' JAR artifacts, but are referenced by the POM
+    that describes them.
+
+  * Plugin:
+    Maven is organized in plugins. Every piece of functionality in
+    Maven is provided by a plugin. Plugins provide <a href="#Goal">goals</a> and use the
+    metadata found in the POM to perform their task. Examples of plugins are: jar,
+    eclipse, war. Plugins are written in <a href="http://jakarta.apache.org/jelly/">Jelly</a>
+    and can be added, removed and edited at runtime.
+
+  * Goal:
+    Goals are what are executed to perform an action on the project. For example, the
+    <code>jar:jar</code> will compile the current project and produce a JAR.
+    Each goal exists in a plugin (except for those that you define yourself), and the
+    goal name usually reflects the plugin (eg. <code>java:compile</code> comes from the
+    <code>java</code> plugin).
+
+  * Repository:
+    A repository is a structured storage of project artifacts. Those
+    artifacts are organized under the following structure:
+    <br/>
+    <code>$MAVEN_REPO/group id/artifact type/project-version.extension</code>
+    <br/>
+    For instance, a Maven JAR artifact will be stored in a repository
+    under <code>/repository/maven/jars/maven-1.0-beta-8.jar</code>.
+    <br/>
+    There are different repositories that Maven uses. The "remote
+    repositories" are a list of repositories to download from.
+    This might include an internet repository, its mirrors, and a private company
+    repository. The "central repository" is the one to upload generated artifacts to
+    (for developers of a company for instance). The "local repository" is the one
+    that you will have on your computer. Artifacts are downloaded just once (unless they
+    are a <a href="#Snapshots">SNAPSHOT</a>) from the remote repository to your local
+    repository.
+
+  * Snapshots:
+    Projects can (and should) have a special version including <code>SNAPSHOT</code>
+    to indicate that they are a "work in progress", and are not yet released. When a
+    snapshot dependency is encountered, it is always looked for in all remote repositories,
+    and downloaded again if newer than the local copy.
+    <br/>
+    The version can either be the string <code>SNAPSHOT</code> itself, indicating
+    "the very latest" development version, or something like <code>1.1-SNAPSHOT</code>,
+    indicating development that will be released as 1.1 (i.e. newer than 1.0, but not yet 1.1).
+
+   * XDoc:
+     XDoc is the format of documentation that Maven currently understands. It is quite simple, and
+     allows embedding XHTML within a simple layout that is transformed into a uniform site.
+     <br/>
+     For information on how to create XDoc files, refer to the
+     <a href="../using/site.html">Building a Project Web Site</a> document.
+

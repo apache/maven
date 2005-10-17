@@ -2,62 +2,6 @@
 <faqs title="About Maven 2.0">
 
   <part id="about">
-    <faq id="what-is-maven">
-      <question>What is Maven?</question>
-      <answer>
-        <p>
-          Maven is a tool that is used to process your project information and sources, not only to build it into
-          binary form but also to generate information to help you get a single view of all aspects of your project,
-          and in some cases related projects.
-        </p>
-        <p>
-          For a full description, see the main
-          <a href="http://maven.apache.org/about/whatismaven.html">What is Maven?</a>
-          document.
-        </p>
-        <p>
-          Maven has also grown into a project that is building other products to help in the software development
-          lifecycle<!--,
-          such as the <a href="http://maven.apache.org/continuum">Continuum</a> continuous integration server -->.
-          <a href="http://maven.apache.org/project/index.html">More information about the Maven Project</a>
-          .
-        </p>
-      </answer>
-    </faq>
-
-    <faq id="features">
-      <question>What are the features of Maven 2.0?</question>
-      <answer>
-        <p>
-          Maven 2.0 has the following major features:
-        </p>
-        <ul>
-          <li>Simple project setup that follows best practices - get a new project or module started in seconds</li>
-          <li>Consistent usage across all projects means no ramp up time for new developers coming onto a project</li>
-          <li>Superior dependency management including automatic updating, dependency closures (also known as transitive
-            dependencies)</li>
-          <li>Able to easily work with multiple projects at a time</li>
-          <li>A large and growing repository of libraries and metadata to use out of the box, and arrangements in place
-            with the largest Open Source projects for real-time availability of their latest releases</li>
-          <li>Extensible, with the ability to easily write plugins in Java or other scripting languages</li>
-          <li>Instant access to new features with little or no extra configuration</li>
-          <li>
-            <a href="ant-tasks.html">Ant tasks</a>
-            for dependency management and deployment outside of Maven
-          </li>
-        </ul>
-        <p>
-          The following features are available in Maven 1.0 and will be available and much improved in Maven 2.0 through
-          the coming releases:
-        </p>
-        <ul>
-          <li>Deployment and release management</li>
-          <li>Comprehensive project information and reporting</li>
-          <li>Website and documentation building tools</li>
-        </ul>
-      </answer>
-    </faq>
-
     <faq id="m2-goals">
       <question>Tell me about the goals of Maven 2.0</question>
       <answer>
