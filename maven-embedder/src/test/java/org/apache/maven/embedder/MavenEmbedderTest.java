@@ -113,7 +113,7 @@ public class MavenEmbedderTest
     public void testRetrievingLifecyclePhases()
         throws Exception
     {
-        List phases = maven.getLifecyclePhases();
+        List phases = maven.getLifecyclePhases();       
 
         assertEquals( "validate", (String) phases.get( 0 ) );
 
@@ -129,8 +129,6 @@ public class MavenEmbedderTest
     public void testLocalRepositoryRetrieval()
         throws Exception
     {
-        System.out.println( "maven.getLocalRepository() = " + maven.getLocalRepository() );
-
         assertNotNull( maven.getLocalRepository().getBasedir() );
     }
 
@@ -163,8 +161,6 @@ public class MavenEmbedderTest
         assertEquals( 1, artifacts.size() );
 
         Artifact artifact = (Artifact) artifacts.iterator().next();
-
-        System.out.println( "artifact.getFile().getAbsolutePath() = " + artifact.getFile().getAbsolutePath() );
     }
 
     // ----------------------------------------------------------------------

@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -42,10 +43,10 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.BuildFailureException;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
@@ -71,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.Date;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -286,13 +288,13 @@ public class MavenEmbedder
     }
 
     public MavenProject readProjectWithDependencies( File mavenProject, TransferListener transferListener )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager, transferListener );
     }
 
     public MavenProject readProjectWithDependencies( File mavenProject )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
     }
@@ -378,7 +380,7 @@ public class MavenEmbedder
                          TransferListener transferListener,
                          Properties properties,
                          File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException
     {
         execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, properties, executionRootDirectory );
     }
@@ -389,7 +391,7 @@ public class MavenEmbedder
                          TransferListener transferListener,
                          Properties properties,
                          File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
+        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException
     {
         ReactorManager rm = new ReactorManager( projects );
 
@@ -410,7 +412,8 @@ public class MavenEmbedder
                                                  rm,
                                                  goals,
                                                  executionRootDirectory.getAbsolutePath(),
-                                                 properties);
+                                                 properties,
+                                                 new Date() );
 
         session.setUsingPOMsFromFilesystem( true );
 
@@ -438,14 +441,7 @@ public class MavenEmbedder
             }
         }
 
-        MavenExecutionResponse response = lifecycleExecutor.execute( session,
-                                                                     rm,
-                                                                     session.getEventDispatcher() );
-
-        if ( response.isExecutionFailure() )
-        {
-            throw new MojoExecutionException( "Project failed to build.", response.getException() );
-        }
+        lifecycleExecutor.execute( session, rm, session.getEventDispatcher() );
     }
 
     // ----------------------------------------------------------------------
@@ -461,7 +457,7 @@ public class MavenEmbedder
 
         PlexusConfiguration configuration = descriptor.getConfiguration();
 
-        PlexusConfiguration[] phasesConfigurations = configuration.getChild( "phases" ).getChildren( "phase" );
+        PlexusConfiguration[] phasesConfigurations = configuration.getChild( "lifecycles" ).getChild( 0 ).getChild( "phases" ).getChildren( "phase" );        
 
         try
         {
@@ -526,15 +522,6 @@ public class MavenEmbedder
         else
         {
             runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
-        }
-
-        if ( checkLatestPluginVersion )
-        {
-            runtimeInfo.setCheckLatestPluginVersion( Boolean.TRUE );
-        }
-        else
-        {
-            runtimeInfo.setCheckLatestPluginVersion( Boolean.FALSE );
         }
 
         return runtimeInfo;

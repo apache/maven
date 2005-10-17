@@ -614,6 +614,7 @@
       <implementation>org.apache.maven.usability.InvalidArtifactDiagnoser</implementation>
     </component>
 
+
     <!--
      |
      | Lifecycle executor
@@ -629,50 +630,74 @@
         <requirement>
           <role>org.apache.maven.extension.ExtensionManager</role>
         </requirement>
-        <!--
-        <requirement>
-          <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
-        </requirement>
-        -->
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
       </requirements>
       <configuration>
-        <!-- START SNIPPET: lifecyle -->
-        <phases>
-          <phase implementation="java.lang.String">validate</phase>
-          <phase implementation="java.lang.String">initialize</phase>
-          <phase implementation="java.lang.String">generate-sources</phase>
-          <phase implementation="java.lang.String">process-sources</phase>
-          <phase implementation="java.lang.String">generate-resources</phase>
-          <phase implementation="java.lang.String">process-resources</phase>
-          <phase implementation="java.lang.String">compile</phase>
-          <phase implementation="java.lang.String">process-classes</phase>
-          <phase implementation="java.lang.String">generate-test-sources</phase>
-          <phase implementation="java.lang.String">process-test-sources</phase>
-          <phase implementation="java.lang.String">generate-test-resources</phase>
-          <phase implementation="java.lang.String">process-test-resources</phase>
-          <phase implementation="java.lang.String">test-compile</phase>
-          <phase implementation="java.lang.String">test</phase>
-          <phase implementation="java.lang.String">package</phase>
-          <phase implementation="java.lang.String">integration-test</phase>
-          <phase implementation="java.lang.String">verify</phase>
-          <phase implementation="java.lang.String">install</phase>
-          <phase implementation="java.lang.String">deploy</phase>
-        </phases>
-        <!-- END SNIPPET: lifecycle -->
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: lifecycle -->
+            <phases>
+              <phase>validate</phase>
+              <phase>initialize</phase>
+              <phase>generate-sources</phase>
+              <phase>process-sources</phase>
+              <phase>generate-resources</phase>
+              <phase>process-resources</phase>
+              <phase>compile</phase>
+              <phase>process-classes</phase>
+              <phase>generate-test-sources</phase>
+              <phase>process-test-sources</phase>
+              <phase>generate-test-resources</phase>
+              <phase>process-test-resources</phase>
+              <phase>test-compile</phase>
+              <phase>test</phase>
+              <phase>package</phase>
+              <phase>integration-test</phase>
+              <phase>verify</phase>
+              <phase>install</phase>
+              <phase>deploy</phase>
+            </phases>
+            <!-- END SNIPPET: lifecycle -->
+          </lifecycle>
+          <lifecycle>
+            <id>clean</id>
+            <phases>
+              <phase>pre-clean</phase>
+              <phase>clean</phase>
+              <phase>post-clean</phase>
+            </phases>
+            <default-phases>
+              <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
+            </default-phases>
+          </lifecycle>
+          <lifecycle>
+            <id>site</id>
+            <phases>
+              <phase>pre-site</phase>
+              <phase>site</phase>
+              <phase>post-site</phase>
+              <phase>site-deploy</phase>
+            </phases>
+            <default-phases>
+              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
+              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
+            </default-phases>
+          </lifecycle>
+        </lifecycles>
         <!-- START SNIPPET: default-reports -->
         <defaultReports>
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-project-info-reports-plugin</report>
+          <report>org.apache.maven.plugins:maven-project-info-reports-plugin</report>
           <!-- TODO: currently in mojo - should they be defaults any more?
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-checkstyle-plugin</report>
-          <report implementation="java.lang.String">org.apache.maven.plugins:maven-javadoc-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-changelog-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-surefire-report-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-jdepend-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-jxr-plugin</report>
-                    <report implementation="java.lang.String">org.apache.maven.plugins:maven-taglist-plugin</report>
+          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
+          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
+                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
+                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
+                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
           -->
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
@@ -856,9 +881,6 @@
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
-          <role>org.codehaus.plexus.components.inputhandler.InputHandler</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
@@ -886,7 +908,6 @@
       <implementation>org.codehaus.plexus.components.inputhandler.DefaultInputHandler</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
-    
 
   </components>
 </component-set>
