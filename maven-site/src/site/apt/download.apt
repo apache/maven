@@ -6,8 +6,7 @@ Brett Porter
 4 October 2005
  ------
 
-
-Download Maven 2.0 Beta 3
+Download Maven 2.0
 
   Maven is distributed in several formats for your convenience.
 
@@ -16,17 +15,17 @@ Download Maven 2.0 Beta 3
 
   Maven 2.0 is distributed under the {{{http://maven.apache.org/license.html} Apache License, version 2.0}}.
 
-  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-3-bin.tar.bz2} <<<.tar.bz2>>> archive}}
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.tar.bz2.md5} checksum}})
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.tar.bz2.asc} signature}})
+  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.bz2} <<<.tar.bz2>>> archive}}
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.md5} checksum}})
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.asc} signature}})
 
-  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-3-bin.tar.gz} <<<.tar.gz>>> archive}}
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.tar.gz.md5} checksum}})
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.tar.gz.asc} signature}})
+  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.gz} <<<.tar.gz>>> archive}}
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.md5} checksum}})
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.asc} signature}})
 
-  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-beta-3-bin.zip} <<<.zip>>> archive}}
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.zip.md5} checksum}})
-    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-beta-3-bin.zip.asc} signature}})
+  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.zip} <<<.zip>>> archive}}
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.md5} checksum}})
+    ({{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.asc} signature}})
 
 * {Ant Tasks}
 
@@ -34,9 +33,9 @@ Download Maven 2.0 Beta 3
   management (including transitive dependencies), repository and artifact deployment support.
   See {{{ant-tasks.html} Ant Tasks}} for more information and installation instructions.
 
-  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-beta-3-dep.jar} <<<.jar>>> archive}}
-    ({{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-3-dep.jar.md5} checksum}})
-    ({{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-beta-3-dep.jar.asc} signature}})
+  * {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-dep.jar} <<<.jar>>> archive}}
+    ({{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.md5} checksum}})
+    ({{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.asc} signature}})
 
 * System {Requirements}
 
@@ -54,7 +53,7 @@ Download Maven 2.0 Beta 3
 
 ** Windows 2000/XP
 
-  [[1]] Unzip <<<maven-2.0-beta-3-bin.zip>>> to the directory you wish to install Maven 2.0. These instructions
+  [[1]] Unzip <<<maven-2.0-bin.zip>>> to the directory you wish to install Maven 2.0. These instructions
         assume you chose <<<C:\Program Files\Apache Software Foundation\maven-2.0-beta-3>>>
 
   [[2]] Add the <<<bin>>> directory to your path, by opening up the system properties (WinKey + Pause),
