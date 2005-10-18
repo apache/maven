@@ -68,8 +68,8 @@ m2 deploy
   ...
   <dependencies>
     <dependency>
-      <groupId></groupId>
-      <artifactId></artifactId>
+      <groupId>com.myco.app</groupId>
+      <artifactId>foo</artifactId>
       <version>1.0-SNAPSHOT</version>
       <type>tests</type>
     </dependency>
