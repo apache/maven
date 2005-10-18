@@ -40,7 +40,7 @@ Guide to deploying with an external SSH command
   <distributionManagement>
     <repository>
       <id>ssh-repository</id>
-      <url>scp://repository.mycompany.com/repository</url>
+      <url>scpexe://repository.mycompany.com/repository</url>
     </repository>
   </distributionManagement>
 
