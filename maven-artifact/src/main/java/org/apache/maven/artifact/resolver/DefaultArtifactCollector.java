@@ -157,6 +157,21 @@ public class DefaultArtifactCollector
                         }
                         previous.getArtifact().setVersionRange( newRange );
                         node.getArtifact().setVersionRange( currentRange.restrict( previousRange ) );
+
+                        //Select an appropriate available version from the (now restricted) range
+                        //Note this version was selected before to get the appropriate POM
+                        //But it was reset by the call to setVersionRange on restricting the version
+                        ResolutionNode[] resetNodes = {previous, node};
+                        for ( int j = 0; j < 2; j++ )
+                        {
+                            Artifact resetArtifact = resetNodes[j].getArtifact();
+                            if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null && resetArtifact.getAvailableVersions() != null )
+                            {
+
+                                resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() ).toString() );
+                                fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
+                            }
+                        }
                     }
 
                     // Conflict Resolution
@@ -225,6 +240,7 @@ public class DefaultArtifactCollector
                                 }
 
                                 VersionRange versionRange = artifact.getVersionRange();
+
                                 version = versionRange.matchVersion( versions );
 
                                 if ( version == null )
