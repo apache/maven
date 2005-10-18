@@ -34,6 +34,13 @@
         (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
       </p>
       <p>
+        <h4>Maven 2.x Documentation</h4>
+      </p>
+      <p>
+        All the Maven documentation for Maven 2.x is in the form of guides
+        which can all be found <a href="http://people.apache.org/~jvanzyl/maven2/guides/index.html">here</a>.
+      </p>            
+      <p>
         <h4>About Maven 2.0</h4>
       </p>
       <p>
