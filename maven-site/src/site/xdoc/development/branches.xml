@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!-- 
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ -->
+
+
+<document>
+
+  <properties>
+    <title>CVS Branches</title>
+    <author email="rafal@apache.org">Rafal Krzewski</author>
+    <author email="jason@zenplex.com">Jason van Zyl</author>
+  </properties>
+
+  <body>
+
+  <section name="CVS Branches">
+    <p>
+      The branches are a feature of CVS that allows the development to be partitioned
+      so that one stream does not affect the other. They prove to be useful, when
+      there is a need to perform modifications that are hard to perform as a
+      consecutive gradual transitions that work well in the usual course of
+      development. When files that are depended upon by numerous other files need to
+      be substantially changed all the other would have to be modified along with
+      them. That would require that a lone developer performs all these changes in his
+      own snapshot and then checks them all in, causing the sources to leap forward.
+      As your project grows, situations arise that this is no longer possible. It's good to
+      have version control on the gradual changes as opposed to quantum-leap changes.
+      It's also important to have the larges set of eyes possible looking at the code
+      as soon as possible. On the other hand, we strive to keep Turbine CVS tree
+      compilable and working at all times. This calls for usage of branches whenever
+      vast modifications of the sources are needed.
+    </p>
+
+    <p>
+      The <a href="http://cvsbook.red-bean.com/">CVS book</a> describes multiple
+      approaches to performing development using branches. We decided that the
+      simplest approach called <em>Flying Fish technique</em> will fit our needs best.
+      It involves creating a branch when there is a need for a separate thread of
+      development, and abandoning the branch once all the changes are merged with the
+      trunk. If need arises for separated development on the same subject, a brand new
+      branch is created. This saves us the additional complexity of merging changes
+      back and forth between the trunk and the branches and keeping track of what was
+      merged into where. We want the things to be as simple as possible.
+    </p>
+
+    <p>
+      The naming scheme used for the branches is as following: The name of the branch
+      is composed of a name describing the subject being worked on, followed by an
+      underscore and a two digit number used to distinguish multiple branches  for the
+      same subject.<br/>
+
+      Actual tag names are then:<br/>
+      <em>subject</em>_<em>number</em>-sprout for marking the revision of the  trunk
+      where the branch diverged <br/>
+      <em>subject</em>_<em>number</em>-branch for the branch itself <br/>
+      <em>subject</em>_<em>number</em>-before-merge for marking the last revision of
+      files before merging in the branch <br/>
+      <em>subject</em>_<em>number</em>-merge for marking the revision of the trunk
+      with changes made on the branch merged in <br/>
+    </p>
+
+    <p>
+      Below, you can find a list of branches that were used during the development of
+      ${project.name}. The 'coordinating person' is responsible for exchange of information
+      between developers, maintaining the branches and timely merging the changes
+      into the trunk (closing the branch). The shorter a branch stays outside the
+      trunk, the better, because that decreases the number of conflict that will arise
+      while merging back. Developers that are working on the trunk of the  CVS should
+      not make modifications to the code named in 'affected sources' to prevent
+      merging  conflicts. Instead, they should direct all requests / patches to the
+      coordinating person. Developers wishing to join the development of the branching
+      code, should contact the coordinating person.
+    </p>
+
+    <p>
+      If you wish to learn more about branches, download the CVS book at
+      <a href="http://cvsbook.red-bean.com/">Red Bean.com</a>, or browse a
+      <a href="http://www.durak.org/cvswebsites/doc/cvs_5.php3#SEC54">CVS manual</a>
+      online.
+    </p>
+
+  </section>
+
+  <!-- Incorporate branch information stored in the project descriptor -->
+
+</body>
+</document>

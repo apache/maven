@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!-- 
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ -->
+
+
+<document>
+
+  <properties>
+    <title>Development Process</title>
+    <author email="pete-apache-dev@kazmier.com">Pete Kazmier</author>
+  </properties>
+
+  <body>
+    <section name="Development Process">
+      <p>
+        One goal of Maven is to help disseminate information regarding
+        the best-practices used in the development process.  This page
+        is linked to every Maven-generated site in the hope that all
+        Maven projects will participate in these best-practices.  The
+        following documents are currently available:
+      </p>
+      <subsection name="Best-Practice Documents">
+        <table>
+          <tr><th>Document</th><th>Overview</th></tr>
+          <tr>
+            <td><a href="development/branches.html">Branches</a></td>
+            <td>
+              Provides some guidelines to use when creating branches.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="development/deprecation.html">Deprecation</a></td>
+            <td>
+              Provides some guidelines to use when deprecating elements
+              of an API.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="development/distributions.html">Distributions</a></td>
+            <td>
+              Provides some guidelines to use when creating distributions
+              for release.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="development/release-process.html">Release Process</a></td>
+            <td>
+              Provides some guidelines to use when releasing new
+              versions of a project.  This includes instructions on how
+              to tag and branch your project.
+            </td>
+          </tr>
+        </table>
+      </subsection>
+    </section>
+  </body>
+</document>
