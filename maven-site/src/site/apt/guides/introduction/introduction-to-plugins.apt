@@ -26,7 +26,7 @@ Introduction to Maven 2.0 Plugin Development
   capabilities and build-process management, and a host of plugins which are
   used to execute the actual build tasks.  
   
-** What is a Plugin?
+* What is a Plugin?
 
   "Maven" is really just a core framework for a collection of 
   Maven Plugins.  In other words, plugins are where much of the real action is 
@@ -52,7 +52,7 @@ Introduction to Maven 2.0 Plugin Development
   a parameter}} which can be used to customize plugin behavior, this parameter is 
   called outputDirectory and it defaults to ${project.build.directory}.    
 
-** What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
+* What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
 
   A Mojo is really just a goal in Maven 2, and plug-ins consist of 
   any number of goals (Mojos).  Mojos can be defined as annotated Java classes or
@@ -67,13 +67,13 @@ Introduction to Maven 2.0 Plugin Development
   Such bags were thought to have supernatural powers, such as protecting from evil, 
   bringing good luck, etc."
 
-** What is the Build Lifecycle? (Overview)
+* What is the Build Lifecycle? (Overview)
 
   The build lifecycle is a series of common stages through which all project
   builds naturally progress.  Plugin goals are bound to specific stages in the 
   lifecycle.
 
-* Resources
+Resources
 
     [[1]] {{{developers/plugin-development-guide.html}Plugin development guide}}
 
@@ -82,9 +82,9 @@ Introduction to Maven 2.0 Plugin Development
 
     [[3]] {{{getting-started.html#configuring_plugins}Configuring plugins}}
   
-* Comparison to Maven 1.x Plugins
+Comparison to Maven 1.x Plugins
 
-** Similarities to Maven 1.x
+* Similarities to Maven 1.x
 
   Maven 2.0 is similar to its predecessor in that it has two main 
   functions. First, it organizes project data into a coherent whole, 
@@ -110,7 +110,7 @@ Introduction to Maven 2.0 Plugin Development
   As such, it has a much different and more evolved architecture - at least to 
   our minds. <<;-)>>
   
-** Differences from Maven 1.x
+* Differences from Maven 1.x
 
   However similar the architectures may seem, Maven 2 offers a much 
   richer environment for its plugins than Maven 1 ever did. The new 
@@ -157,7 +157,7 @@ Introduction to Maven 2.0 Plugin Development
   multi-project build process into the maven core conceptual 
   framework.
   
-** Why Change the Plugin Architecture?
+* Why Change the Plugin Architecture?
 
   See the previous section for the long version, but the short version can
   be summed up by the following list of benefits.

@@ -1,0 +1,82 @@
+ -----
+ Documentation Required
+ -----
+ Jason van Zyl
+ -----
+ 12 October 2005
+ -----
+
+Documentation Required
+
+ This page lists some of the most pressing documentation needs. If you feel something is missing, please be sure
+ to let us know at the {{{/mail-lists.html}>Maven Users Mailing List}}.
+
+* Documentation for users
+
+ * New SNAPSHOT handling
+
+ * Guide to dependencies, including:
+
+ * Dependency scoping - <especially system scope>
+
+ * Version range specifications
+
+ * Conflict resolution>
+
+ * Deployment mechanism
+
+ * Dependency management
+
+ * Plugin management - <in progress by J Matthew Pryor and John Casey>
+
+ * Plugin configuration
+
+ * Plugin downloading
+
+ * Report generation
+
+ * Project inheritence and company wide strategy
+
+ * Plugin documentation
+
+ * Using POM-properties in conjunction with plugin configuration to abstract child-POM configs
+
+ * Archetypes - writing and using
+
+ * Plugin usage guide/summary for core plugins - <esp. release plugin</i>
+
+ * Strategy for migrating from Ant builds
+
+ * Strategy for migrating from Maven 1.x builds - <esp. plugins that don't convert directly>
+
+ []
+
+* Documentation for plugin authors
+
+ * Beanshell examples
+
+ * Plugin writing guide
+
+ * Report writing guide
+
+ * Site customisation guide
+
+ * Common tips and tricks for accessing project/build data
+
+ * Guide to available parameter expressions
+
+ * List of standards for submitting new plugins (minimum documentation, test coverage?)
+
+ []
+
+* Documentation for Maven developers
+
+ * Lifecycle architecture</li>
+
+ * High level architecture, components explanation</li>
+
+ * Intro to Plexus</li>
+
+ * Contributors guide (add to current and consolidate, walk through some first steps)
+
+[]
