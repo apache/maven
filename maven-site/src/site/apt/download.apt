@@ -54,12 +54,12 @@ Download Maven 2.0
 ** Windows 2000/XP
 
   [[1]] Unzip <<<maven-2.0-bin.zip>>> to the directory you wish to install Maven 2.0. These instructions
-        assume you chose <<<C:\Program Files\Apache Software Foundation\maven-2.0-beta-3>>>
+        assume you chose <<<C:\Program Files\Apache Software Foundation\maven-2.0>>>
 
   [[2]] Add the <<<bin>>> directory to your path, by opening up the system properties (WinKey + Pause),
         selecting the "Advanced" tab, and the "Environment Variables" button, then editing the <<<PATH>>>
         variable in the user variables. eg.
-        <<<"C:\Program Files\Apache Software Foundation\maven-2.0-beta-3\bin";%PATH%>>>
+        <<<"C:\Program Files\Apache Software Foundation\maven-2.0\bin";%PATH%>>>
 
   [[3]] In the same dialog, make sure that <<<JAVA_HOME>>> is set to the location of your JDK,
         eg. <<<C:\Program Files\Java\jdk1.5.0_02>>>
@@ -69,10 +69,10 @@ Download Maven 2.0
 ** Unix-based Operating Systems (Linux, Solaris and Mac OS X)
 
   [[1]] Extract the distribution archive to the directory you wish to install Maven 2.0. These instructions
-        assume you chose <<</usr/local/maven-2.0-beta-3>>>. The directory <<<maven-2.0-beta-3>>> will be created from
+        assume you chose <<</usr/local/maven-2.0>>>. The directory <<<maven-2.0>>> will be created from
         the archive.
 
-  [[2]] Add the <<<bin>>> directory to your path, eg. <<<export PATH=/usr/local/maven-2.0-beta-3/bin:$PATH>>>
+  [[2]] Add the <<<bin>>> directory to your path, eg. <<<export PATH=/usr/local/maven-2.0/bin:$PATH>>>
 
   [[3]] Make sure that <<<JAVA_HOME>>> is set to the location of your JDK, eg.
         <<<export JAVA_HOME=/usr/java/jdk1.5.0_02>>>
