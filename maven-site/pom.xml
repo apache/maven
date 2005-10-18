@@ -13,12 +13,12 @@
   <distributionManagement>
     <site>
       <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2</url>
+      <url>scpexe://minotaur.apache.org/www/maven.apache.org/maven2</url>
     </site>
     <!--
     <stagingSite>
-      <id>beaver</id>
-      <url>scp://beaver.codehaus.org/home/users/jvanzyl/public_html/maven2/</url>
+      <id>website</id>
+      <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
     </stagingSite>
     -->
   </distributionManagement>

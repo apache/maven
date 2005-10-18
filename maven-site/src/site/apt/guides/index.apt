@@ -18,6 +18,8 @@ Documentation
 
  * {{{mini/guide-assemblies.html}Guide to Creating Assemblies}}
 
+ * {{{mini/guide-attached-tests.html}Guide to using attached tests}}
+
  * {{{mini/guide-bash-m2-completion.html}Guide to Maven 2.x auto completion using BASH}}
 
  * {{{mini/guide-configuring-plugins.html}Guide to Configuring Plug-ins}}
@@ -29,6 +31,8 @@ Documentation
  * {{{mini/guide-deploy-ftp.html}Guide to deploying with FTP}}
 
  * {{{mini/guide-deployment-security-settings.html}Guide to Deployment and Security Settings}}
+
+ * {{{mini/guide-deploy-ssh-external.html}Guide to deploying with an external SSH command}}
 
  * {{{mini/guide-ear.html}Guide to EARs}}
 
