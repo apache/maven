@@ -13,14 +13,11 @@
   <distributionManagement>
     <site>
       <id>website</id>
+      <!--
+      <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
+      -->
       <url>scpexe://minotaur.apache.org/www/maven.apache.org/maven2</url>
     </site>
-    <!--    
-    <site>
-      <id>website</id>
-      <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
-    </site>
-    -->
   </distributionManagement>
   
    <build>
