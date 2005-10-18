@@ -1,12 +1,12 @@
  ------
- Guide to deploying with FTP
+ Guide to deploying with an external SSH command
  ------
  Jason van Zyl
  ------
  12 October 2005
  ------
 
-Guide to deploying with FTP
+Guide to deploying with an external SSH command
 
  In order to deploy artifacts using FTP you must first specify the use of an FTP server in the
  <<distributionManagement>> element of your POM as well as specifying an <<<extension>>> in your
@@ -39,8 +39,8 @@ Guide to deploying with FTP
   <!-- Enabling the use of FTP -->
   <distributionManagement>
     <repository>
-    <id>ftp-repository</id>
-    <url>ftp://repository.mycompany.com/repository</url>
+      <id>ssh-repository</id>
+      <url>scp://repository.mycompany.com/repository</url>
     </repository>
   </distributionManagement>
 
@@ -48,8 +48,8 @@ Guide to deploying with FTP
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ftp</artifactId>
-         <version>1.0-alpha-3</version>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-alpha-4</version>
       </extension>
     </extensions>
   </build>
@@ -58,31 +58,10 @@ Guide to deploying with FTP
 
 +----+
 
- Your <<<settings.xml>>> would contain a <<<server>>> element where the <<<id>>> of that element matches <<<id>>> of the
- FTP repository specified in the POM above:
+ Using the external ssh command means you don't need any additional configuration in your <<<settings.xml>>>
+ file as everything will be taken from the environment.
 
-+----+
-
-<settings>
-
-  ...
-
-  <servers>
-    <server>
-      <id>ftp-repository</id>
-      <username>user</username>
-      <password>pass</password>
-    </server>
-
-  </servers>
-
-  ...
-
-</settings>
-
-+----+
-
- You should, of course, make sure that you can login into the specified FTP server by hand before attempting the
+ You should, of course, make sure that you can login into the specified SSH server by hand before attempting the
  deployment with Maven. Once you have verified that everything is setup correctly you can now deploy your artifacts
  using Maven:
 
