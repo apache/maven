@@ -1,14 +1,12 @@
-  ---
-  Plugin Registry Overview
-  ---
-  John Casey
-  ---
-  29-July-2005
-  ---
+ ---
+ Introduction to the Plugin Registry
+ ---
+ John Casey
+ ---
+ 29-July-2005
+ ---
 
-Plugin Registry Overview
-
-* Introduction
+Introduction to the Plugin Registry
 
   The Maven 2 plugin registry (~/.m2/plugin-registry.xml) is a mechanism to 
   help the user exert some control over their build environment. Rather than

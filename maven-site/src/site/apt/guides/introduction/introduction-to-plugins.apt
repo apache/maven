@@ -1,9 +1,9 @@
  ------
-Maven 2.0 Plugin Development
+ Introduction to Maven 2.0 Plugin Development
  ------
-John Casey
+ John Casey
  ------
-24 June 2005
+ 24 June 2005
  ------
 
 ~~ Copyright 2001-2004 The Apache Software Foundation.
@@ -20,9 +20,7 @@ John Casey
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
-Plugin Overview
-
-* Introduction
+Introduction to Maven 2.0 Plugin Development
 
   Maven consists of a core engine which provides basic project-processing
   capabilities and build-process management, and a host of plugins which are

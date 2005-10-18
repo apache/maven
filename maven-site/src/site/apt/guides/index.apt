@@ -75,7 +75,17 @@ Documentation
 
  * {{{introduction/introduction-to-archetypes.html}Introduction to Archetypes}}
 
+ * {{{introduction/introduction-to-artifact-resolution.html}Introduction to repository definitions and artifact resolution}}
+
  * {{{introduction/introduction-to-dependency-management.html}Introduction to dependency management}}
+
+ * {{{introduction/introduction-to-plugin-prefix-mapping.html}Introduction to Plugin Prefix Resolution}}
+
+ * {{{introduction/introduction-to-plugin-registry.html}Introduction to the Plugin Registry}}
+
+ * {{{introduction/introduction-to-plugins.html}Introduction to Maven 2.0 Plugin Development}}
+
+ * {{{introduction/introduction-to-profiles.html}Introduction to build profiles}}
 
  * {{{introduction/introduction-to-repositories.html}Introduction to Repositories}}
 

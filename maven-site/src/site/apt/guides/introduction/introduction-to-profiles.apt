@@ -1,14 +1,12 @@
-  ---
-  Introduction to build profiles
-  ---
-  30-July-2005
-  ---
-  John Casey
-  ---
+ ---
+ Introduction to build profiles
+ ---
+ 30-July-2005
+ ---
+ John Casey
+ ---
 
-Build Profiles
-
-* Introduction
+Introduction to Build Profiles
 
   Maven 2.0 goes to great lengths to ensure that builds are portable. Among
   other things, this means allowing build configuration inside the POM, 

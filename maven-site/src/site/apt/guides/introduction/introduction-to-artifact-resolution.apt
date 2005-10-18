@@ -1,14 +1,12 @@
-  ---
-  Introduction to repository definitions and artifact resolution
-  ---
-  John Casey
-  ---
-  23-August-2005
-  ---
+ ---
+ Introduction to repository definitions and artifact resolution
+ ---
+ John Casey
+ ---
+ 23-August-2005
+ ---
   
 Introduction to Repository definitions and artifact resolution
-
-*Introduction
 
   As you no doubt know by now, artifacts are a central concept to Maven. Since
   artifacts are referenced in abstract terms (groupId/artifactId rather than

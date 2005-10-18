@@ -1,14 +1,12 @@
-  ---
-  Plugin Prefix Resolution
-  ---
-  John Casey
-  ---
-  30-July-2005
-  ---
+ ---
+ Introduction to Plugin Prefix Resolution
+ ---
+ John Casey
+ ---
+ 30-July-2005
+ ---
 
-Plugin Prefix Resolution
-
-* Introduction
+Introduction to Plugin Prefix Resolution
 
   When you execute Maven using a standard lifecycle phase, resolving the
   plugins that participate in that lifecycle is a relatively simple process.
