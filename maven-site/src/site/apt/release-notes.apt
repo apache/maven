@@ -1,40 +1,48 @@
  ------
-Release Notes - Maven 2.0 Beta 3
+Release Notes - Maven 2.0
  ------
 Brett Porter
  ------
-4 October 2005
+18 October 2005
  ------
 
-  The Apache Maven team are proud to announce the third beta release of Maven 2.0.
+  The Apache Maven team would like to announce the release of Maven 2.0.
 
-  Download it from {{http://maven.apache.org/maven2/download.html}}
+  Maven 2.0 is available for download from {{http://maven.apache.org/maven2/download.html}}
 
   Maven is a software project management and comprehension tool. Based on the concept of a project object model
-  (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
-
-  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=12015} a number of bug fixes and improvements}}>> since the previous release on 27 September.
+  (POM), Maven can manage a project's build, reporting and documentation from a central place.
 
   Maven 2.0 is a rewrite of the popular Maven application to achieve a number of new goals, and to provide a stable
-  basis to take it into the future.
+  basis for future development.
 
-  Also now available are beta versions of the following plugins from our friends at the mojo.codehaus.org project:
+  This release includes the following new features and changes since Maven 1.0:
 
-    * Changelog
+   * Significantly faster and smaller than previous releases.
 
-    * Changes (including JIRA and Announcement)
+   * Improved dependency management including dependency closures (transitive dependencies), version ranges, automatic
+     build numbering, and automatic updating on a configurable interval.
 
-    * XMLBeans
+   * Defined build lifecycle. Any type of project can be built using standard commands such as compile, test and
+     install.
 
-    * Taglist (formerly tasklist)
+   * Improved reactor operation. Built in support for multiple projects and without the need to perform a full install
+     cycle to compile all projects. Includes support for project aggregation.
 
-    * JXR
+   * Improved plugin architecture, with plugins that can be written in Java and scripting languages such as Beanshell.
 
-    * Surefire Report (formerly junit report)
+   * Unified project definition. All information required to build is contained in a single POM, including project
+     information, dependencies and plugin configuration.
+
+   * Improved repository support, including separated snapshot repositories, a new more managable layout and per-project
+     definitions of new repositories.
+
+   * New site management tools that support multiple input and output formats. New input formats include wiki-like
+     APT format, docbook while continuing to support traditional Maven XDoc and FAQ format.
+
+   * Reporting API for producing project information and reports in a standard way.
 
   This release is considered stable with a feature set that encompasses and supersedes Maven 1.0.
-  The final release is expected to be backwards compatible, with a primary goal of bugfixes, usability improvements,
-  and documentation.
 
   This core release is independent of the plugins available. Further releases of plugins will be made separately.
   See {{{http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix} Maven Plugin Matrix}} for more information.
