@@ -60,15 +60,11 @@ Documentation
 
  * {{{mini/guide-multiple-repositories.html}Guide to using Multiple Repositories}}
 
- * {{{mini/guide-pom-properties.html}Guide to using POM properties}}
-
  * {{{mini/guide-proxies.html}Guide to using proxies}}
 
  * {{{mini/guide-releasing.html}Guide to Releasing}}
 
  * {{{mini/guide-site.html}Guide to creating a site}}
-
- * {{{mini/guide-test-customization.html}Guide to test customization}}
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
