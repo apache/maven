@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>test-components</artifactId>
+		<groupId>test</groupId>
+		<version>0.1</version>
+	</parent>
+
+  <groupId>test</groupId>
+  <artifactId>test-component-a</artifactId>
+  <version>0.1</version>
+  <name>Test Component A</name>
+  <packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core-it-support</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+</project>
