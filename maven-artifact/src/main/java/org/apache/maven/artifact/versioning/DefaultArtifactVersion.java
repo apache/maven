@@ -99,17 +99,18 @@ public class DefaultArtifactVersion
 
     private int compareIntegers( Integer i1, Integer i2 )
     {
+        // treat null as 0 in comparison
         if ( i1 == null ? i2 == null : i1.equals( i2 ) )
         {
             return 0;
         }
         else if ( i1 == null )
         {
-            return -1;
+            return -i2.intValue();
         }
         else if ( i2 == null )
         {
-            return 1;
+            return i1.intValue();
         }
         else
         {

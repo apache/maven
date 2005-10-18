@@ -126,6 +126,14 @@ public class DefaultArtifactVersionTest
         assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
         assertEquals( "check build number", 0, version.getBuildNumber() );
         assertEquals( "check qualifier", "PATCH-1193602", version.getQualifier() );
+
+        version = new DefaultArtifactVersion( "2.0-1" );
+        assertEquals( "check major version", 2, version.getMajorVersion() );
+        assertEquals( "check minor version", 0, version.getMinorVersion() );
+        assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
+        assertEquals( "check build number", 1, version.getBuildNumber() );
+        assertEquals( "check qualifier", null, version.getQualifier() );
+        assertEquals( "check string value", "2.0-1", version.toString() );
     }
 
     public void testVersionComparing()
@@ -146,10 +154,10 @@ public class DefaultArtifactVersionTest
         assertTrue( version.compareTo( new DefaultArtifactVersion( "1" ) ) > 0 );
 
         version = new DefaultArtifactVersion( "1.0" );
-        assertTrue( version.compareTo( new DefaultArtifactVersion( "1" ) ) > 0 );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1" ) ) == 0 );
 
         version = new DefaultArtifactVersion( "1.0.0" );
-        assertTrue( version.compareTo( new DefaultArtifactVersion( "1" ) ) > 0 );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1" ) ) == 0 );
 
         version = new DefaultArtifactVersion( "1.0" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "1.1" ) ) < 0 );
@@ -210,5 +218,17 @@ public class DefaultArtifactVersionTest
 
         version = new DefaultArtifactVersion( "1.0-2" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-1" ) ) > 0 );
+
+        version = new DefaultArtifactVersion( "2.0-0" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0" ) ) == 0 );
+
+        version = new DefaultArtifactVersion( "2.0-1" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0" ) ) > 0 );
+
+        version = new DefaultArtifactVersion( "2.0-1" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.0" ) ) > 0 );
+
+        version = new DefaultArtifactVersion( "2.0-1" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1" ) ) < 0 );
     }
 }
