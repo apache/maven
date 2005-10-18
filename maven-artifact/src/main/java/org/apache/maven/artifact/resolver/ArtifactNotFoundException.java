@@ -32,13 +32,13 @@ public class ArtifactNotFoundException
     public ArtifactNotFoundException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
-              null );
+              artifact.getDownloadUrl() );
     }
 
     protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories, Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              remoteRepositories, null, t );
+              remoteRepositories, artifact.getDownloadUrl(), t );
     }
 
     public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
