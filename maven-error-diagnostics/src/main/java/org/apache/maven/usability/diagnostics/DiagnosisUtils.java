@@ -86,7 +86,7 @@ public final class DiagnosisUtils
         {
             String rootMsg = root.getMessage();
 
-            if ( rootMsg != null && error.getMessage().indexOf( rootMsg ) < 0 )
+            if ( rootMsg != null && ( error.getMessage() == null || error.getMessage().indexOf( rootMsg ) < 0 ) )
             {
                 message.append( "\n" ).append( rootMsg );
 
