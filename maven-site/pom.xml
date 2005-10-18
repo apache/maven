@@ -11,17 +11,28 @@
   <url>http://maven.apache.org/maven2</url>
   <inceptionYear>2001</inceptionYear>
   <distributionManagement>
+    <!--
     <site>
       <id>website</id>
       <url>scpexe://minotaur.apache.org/www/maven.apache.org/maven2</url>
     </site>
-    <!--
-    <stagingSite>
+    -->
+    <site>
       <id>website</id>
       <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
-    </stagingSite>
-    -->
+    </site>
   </distributionManagement>
+  
+   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-alpha-5</version>
+      </extension>
+    </extensions>
+  </build>
+  
   <reporting>
     <excludeDefaults>true</excludeDefaults>
     <!-- TODO: disable dependencies -->
