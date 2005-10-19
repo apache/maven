@@ -49,7 +49,7 @@ Creating a site
   Generating the site is very simple, and fast!
 
 ---------------
-mvn site:site
+mvn site
 ---------------
 
   The resulting site will be in <<<target/site/...>>>
@@ -74,11 +74,8 @@ mvn site:site
   file in the same way as you would for any other repository. The URL gives the location to deploy to. Currently,
   only SSH is supported, as above which copies to the host <<<www.mycompany.com>>> in the path <<</www/docs/project/>>>.
 
-  Deploying the site is done with the <<<site:deploy>>> goal. Note that you cannot just call the deployment goal on its own, however.
-  You must presently run the <<<site:site>>> goal as well.
-
 ---------------
-mvn site:site site:deploy
+mvn site-deploy
 ---------------
 
   <<Note:>> the trailing slash in the URL above indicates that any subprojects that inherit this value should append their artifact ID to
