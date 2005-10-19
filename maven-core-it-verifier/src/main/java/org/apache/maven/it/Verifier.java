@@ -222,64 +222,62 @@ public class Verifier
             newLine += convertArtifact( artifact );
             newLine += line.substring( index + 1 );
 
-            index = newLine.lastIndexOf( "SNAPSHOT" );
-            if ( index >= 0 )
+            List l = new ArrayList();
+            l.add( newLine );
+
+            int endIndex = newLine.lastIndexOf( '/' );
+
+            String command = null;
+            String filespec;
+            if ( hasCommand )
             {
-                List l = new ArrayList();
-                l.add( newLine );
+                int startIndex = newLine.indexOf( ' ' );
 
-                int endIndex = newLine.lastIndexOf( '/' );
+                command = newLine.substring( 0, startIndex );
 
-                String command = null;
-                String filespec;
-                if ( hasCommand )
-                {
-                    int startIndex = newLine.indexOf( ' ' );
-
-                    command = newLine.substring( 0, startIndex );
-
-                    filespec = newLine.substring( startIndex + 1, endIndex );
-                }
-                else
-                {
-                    filespec = newLine;
-                }
-
-                File dir = new File( filespec );
-                if ( dir.exists() && dir.isDirectory() )
-                {
-                    String[] files = dir.list( new FilenameFilter()
-                    {
-                        public boolean accept( File dir, String name )
-                        {
-                            return name.startsWith( "maven-metadata" ) && name.endsWith( ".xml" );
-
-                        }
-                    } );
-
-                    for ( int i = 0; i < files.length; i++ )
-                    {
-                        if ( hasCommand )
-                        {
-                            l.add( command + " " + new File( dir, files[i] ).getPath() );
-                        }
-                        else
-                        {
-                            l.add( new File( dir, files[i] ).getPath() );
-                        }
-                    }
-                }
-
-                return l;
+                filespec = newLine.substring( startIndex + 1, endIndex );
             }
             else
             {
-                return Collections.singletonList( newLine );
+                filespec = newLine;
             }
+
+            File dir = new File( filespec );
+            addMetadataToList( dir, hasCommand, l, command );
+            addMetadataToList( dir.getParentFile(), hasCommand, l, command );
+
+            return l;
         }
         else
         {
             return Collections.singletonList( line );
+        }
+    }
+
+    private static void addMetadataToList( File dir, boolean hasCommand, List l, String command )
+    {
+        if ( dir.exists() && dir.isDirectory() )
+        {
+            String[] files = dir.list( new FilenameFilter()
+            {
+                public boolean accept( File dir, String name )
+                {
+                    return name.startsWith( "maven-metadata" ) && name.endsWith( ".xml" );
+
+                }
+            } );
+
+            for ( int i = 0; i < files.length; i++ )
+            {
+                if ( hasCommand )
+                {
+                    l.add( command + " " + new File( dir, files[i] ).getPath() );
+                }
+                else
+                {
+                    l.add( new File( dir, files[i] ).getPath() );
+                }
+            }
         }
     }
 
@@ -636,8 +634,8 @@ public class Verifier
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
 
-            boolean useMavenRepoLocal =
-                Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+            boolean useMavenRepoLocal = Boolean.valueOf(
+                controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
             if ( useMavenRepoLocal )
             {
                 // Note: Make sure that the repo is surrounded by quotes as it can possibly have
@@ -852,8 +850,8 @@ public class Verifier
 
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
-                boolean chokeOnErrorOutput =
-                    Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
+                boolean chokeOnErrorOutput = Boolean.valueOf(
+                    controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
 
                 verifier.executeGoals( properties, controlProperties, "goals.txt" );
 
