@@ -155,22 +155,22 @@
       <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
     </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataBuilder</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
   </components>
-
-  <component>
-    <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataBuilder</role>
-    <role-hint>default</role-hint>
-    <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataBuilder</implementation>
-    <requirements>
-      <requirement>
-        <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
-      </requirement>
-    </requirements>
-  </component>
-
-  <component>
-    <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-    <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
-  </component>
 
 </component-set>

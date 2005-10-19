@@ -46,13 +46,14 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
+        boolean blacklisted = false;
         if ( artifactRepositories.containsKey( id ) )
         {
             ArtifactRepository repository = (ArtifactRepository) artifactRepositories.get( id );
             // TODO: this should be an if there are duplicates?
             if ( repository.getUrl().equals( url ) )
             {
-                return repository;
+                blacklisted = repository.isBlacklisted();
             }
         }
 
@@ -80,6 +81,7 @@ public class DefaultArtifactRepositoryFactory
 
         DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots,
                                                                               releases );
+        repository.setBlacklisted( blacklisted );
 
         artifactRepositories.put( id, repository );
 
