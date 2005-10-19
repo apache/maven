@@ -12,6 +12,6 @@ Guide to using IDEA with Maven 2.x
 
 +----+
 
-m2 idea:idea
+mvn idea:idea
 
 +----+

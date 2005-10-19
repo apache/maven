@@ -49,7 +49,7 @@ Creating a site
   Generating the site is very simple, and fast!
 
 ---------------
-m2 site:site
+mvn site:site
 ---------------
 
   The resulting site will be in <<<target/site/...>>>
@@ -78,7 +78,7 @@ m2 site:site
   You must presently run the <<<site:site>>> goal as well.
 
 ---------------
-m2 site:site site:deploy
+mvn site:site site:deploy
 ---------------
 
   <<Note:>> the trailing slash in the URL above indicates that any subprojects that inherit this value should append their artifact ID to

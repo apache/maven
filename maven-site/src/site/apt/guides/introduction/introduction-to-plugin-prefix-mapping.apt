@@ -67,7 +67,7 @@ Introduction to Plugin Prefix Resolution
   from the model:
 
 +---+
-m2 -Dversion=4.0.0 -Dmodel=maven.mdo modello:java
+mvn -Dversion=4.0.0 -Dmodel=maven.mdo modello:java
 +---+
 
   Adding <<org.codehaus.modello>> to the list of groupIds searched for plugin

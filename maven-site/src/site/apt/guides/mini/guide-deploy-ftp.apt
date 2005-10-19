@@ -88,6 +88,6 @@ Guide to deploying with FTP
 
 +----+
 
-m2 deploy
+mvn deploy
 
 +----+

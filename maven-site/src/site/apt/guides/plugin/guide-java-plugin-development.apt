@@ -162,7 +162,7 @@ groupID:artifactID:version:goal
 +----+
 
   For example, to run the simple mojo in the sample plugin, you would enter
-  "<<<m2 sample.plugin:maven-hello-plugin:1.0-SNAPSHOT:sayhi>>>" on the
+  "<<<mvn sample.plugin:maven-hello-plugin:1.0-SNAPSHOT:sayhi>>>" on the
   command line.
 
 *** Shortening the Command Line
@@ -172,7 +172,7 @@ groupID:artifactID:version:goal
   <<<updateReleaseInfo>>> option set to true; for example:
 
 +----+
-m2 -DupdateReleaseInfo=true install
+mvn -DupdateReleaseInfo=true install
 +----+
 
   You also need to add your plugin's group ID to the list of group IDs
@@ -185,7 +185,7 @@ m2 -DupdateReleaseInfo=true install
 </pluginGroups>
 +----+
 
-  At this point, you can run the mojo with "<<<m2 hello:sayhi>>>".
+  At this point, you can run the mojo with "<<<mvn hello:sayhi>>>".
 
 
 *** Attaching the Mojo to the Build Lifecycle

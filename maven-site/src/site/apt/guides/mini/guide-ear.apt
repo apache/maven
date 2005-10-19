@@ -8,7 +8,7 @@
 
 +----+
 
-m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-webapp -DarchetypeArtifactId=maven-archetype-ear
+mvn archetype:create -DgroupId=com.mycompany.app -DartifactId=my-webapp -DarchetypeArtifactId=maven-archetype-ear
 
 +----+
 
@@ -39,7 +39,7 @@ m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-webapp -Darchety
 
 +----+
 
-m2 clean package
+mvn clean package
 
 +----+
 

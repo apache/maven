@@ -41,7 +41,7 @@ Introduction to the Build Lifecycle
   you desire on the command line. For example:
 
 -------
-m2 install
+mvn install
 -------
 
   This command will compile, test, package, verify and install the package into the local repository when run.
@@ -51,7 +51,7 @@ m2 install
   It should also be noted that the same command can be used in a multi-module scenario. For example;
 
 ------
-m2 clean:clean install
+mvn clean:clean install
 ------
 
   This command will traverse into all of the subprojects and run <<<clean:clean>>>, then <<<install>>> (including all of

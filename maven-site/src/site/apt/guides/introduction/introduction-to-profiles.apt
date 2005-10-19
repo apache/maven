@@ -288,13 +288,13 @@ Introduction to Build Profiles
   system properties contain "env=dev". So, executing:
 
 +---+
-m2 -Denv=dev integration-test
+mvn -Denv=dev integration-test
 +---+
 
   should result in a successful build. However, this won't:
 
 +---+
-m2 -Denv=production integration-test
+mvn -Denv=production integration-test
 +---+
 
   Why? Because, the resulting non-interpolated literal value of $\{appserver.home\}
@@ -334,7 +334,7 @@ m2 -Denv=production integration-test
   you need to activate <<env-test>> by issuing:
 
 +---+
-m2 -Denv=test <phase>
+mvn -Denv=test <phase>
 +---+
 
   The right command-line option can be had by simply substituting "=" for "-" in
@@ -348,7 +348,7 @@ m2 -Denv=test <phase>
   To see the list of active profiles, issue:
 
 +---+
-m2 projecthelp:active-profiles -Denv=test
+mvn projecthelp:active-profiles -Denv=test
 +---+
 
   This should render a bulleted list of the profiles (hopefully including one
@@ -358,7 +358,7 @@ m2 projecthelp:active-profiles -Denv=test
   POM, issue:
 
 +---+
-m2 projecthelp:effective-pom -Denv=test
+mvn projecthelp:effective-pom -Denv=test
 +---+
 
   This will print the effective POM for this build configuration out to the 

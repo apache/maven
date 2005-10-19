@@ -68,7 +68,7 @@ artifact project.
 3. I ran the install phase as follows:
 
  > cd com/acme
- > m2 install
+ > mvn install
 
 which caused the target directories to be generated also at the same  
 level as each pom - for example com/acme/util/target and com/acme/gui/ 
@@ -90,7 +90,7 @@ com/acme/gui/Main.class
 gui.properties
 META-INF/maven/com.acme/gui/pom.properties
 
-which looks fine. I also ran "m2 site:site" as a random goal and that  
+which looks fine. I also ran "mvn site:site" as a random goal and that
 seemed to work too, ie a target/site directory was created with all  
 the files correctly generated underneath.
 

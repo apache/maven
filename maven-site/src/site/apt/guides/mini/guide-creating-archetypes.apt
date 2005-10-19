@@ -56,7 +56,7 @@ archetype
 
 +----+
 
-m2 install
+mvn install
 
 +----+
 
@@ -64,7 +64,7 @@ m2 install
 
 +----+
 
-m2 archetype:create -DgroupId=com.mycompany.app \
+mvn archetype:create -DgroupId=com.mycompany.app \
     -DartifactId=my-archetype -DarchetypeGroupId=<artifact-group-id> -DarchetypeArtifactId=<archetype-artifact-id>
 
 +----+

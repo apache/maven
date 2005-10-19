@@ -142,7 +142,7 @@ Guide to creating assemblies
 
 +----+
 
-m2 assembly:assembly
+mvn assembly:assembly
 
 +----+
 

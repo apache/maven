@@ -46,7 +46,7 @@ Guide to generating sources
 
 +----+
 
- If you then type "m2 compile" m2 will walk through the {{{../introduction/introduction-to-the-lifecycle.html}lifecycle}}
+ If you then type "mvn compile" m2 will walk through the {{{../introduction/introduction-to-the-lifecycle.html}lifecycle}}
  and will eventually hit the <<<generate-sources>>> phase and see you have a plugin configured that
  wants to participate in that phase and the antlr plugin is executed with
  your given configuration.

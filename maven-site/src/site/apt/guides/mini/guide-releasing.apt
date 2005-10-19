@@ -34,7 +34,7 @@ Preparing the release
    []
 
 -----
-m2 release:prepare -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm/tags
+mvn release:prepare -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm/tags
 -----
 
  When this operation is over, your source control has the released code tagged and ready to deploy.
@@ -42,7 +42,7 @@ m2 release:prepare -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm
 Performing the release
 
 -----
-m2 release:perform -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm
+mvn release:perform -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm
 -----
 
 ~~ -----

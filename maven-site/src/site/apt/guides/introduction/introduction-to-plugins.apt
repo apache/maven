@@ -45,7 +45,7 @@ Introduction to Maven 2.0 Plugin Development
   One of the simplest plugins in Maven 2.0 is the Clean Plugin.  The 
   {{{http://maven.apache.org/maven2/plugins/maven-clean-plugin/}Maven
   Clean plugin}} (maven-clean-plugin) is responsible for removing the target 
-  directory of a Maven 2 project.  When you run "m2 clean:clean", Maven 2 executes
+  directory of a Maven 2 project.  When you run "mvn clean:clean", Maven 2 executes
   the "clean:clean" goal as defined in the Clean plug-in, and the target directory
   is removed.  The Clean plugin 
   {{{http://maven.apache.org/maven2/plugins/maven-clean-plugin/clean-mojo.html}defines 

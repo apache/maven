@@ -105,7 +105,7 @@ Sections
 
 +-----+
 
-m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
+mvn archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
 
 +-----+
 
@@ -227,7 +227,7 @@ my-app
 
 +-----+
 
-m2 compile
+mvn compile
 
 +-----+
 
@@ -281,7 +281,7 @@ Compiling 1 source file to <dir>/my-app/target/classes
 
 +----+
 
-m2 test
+mvn test
 
 +----+
 
@@ -335,7 +335,7 @@ Results :
 
 +----+
 
- m2 test-compile
+ mvn test-compile
 
 +----+
 
@@ -350,7 +350,7 @@ Results :
 
 +----+
 
-m2 package
+mvn package
 
 +----+
 
@@ -365,7 +365,7 @@ m2 package
 
 +----+
 
-m2 install
+mvn install
 
 +----+
 
@@ -444,7 +444,7 @@ Results :
 
 +----+
 
-m2 site
+mvn site
 
 +----+
 
@@ -639,7 +639,7 @@ application.version=${pom.version}
 
 +----+
 
-m2 process-resources
+mvn process-resources
 
 +----+
 
@@ -710,7 +710,7 @@ message=${my.filter.value}
 
 +----+
 
- the next execution of the <<<m2 process-resources>>> command will put our new property value into application.properties.
+ the next execution of the <<<mvn process-resources>>> command will put our new property value into application.properties.
  As an alternative to defining the my.filter.value property in an external file, you could also have defined it in the <<<properties>>>
  section of your pom.xml and you'd get the same effect (notice I don't need the references to src/main/filters/filter.properties either):
 
@@ -765,7 +765,7 @@ command.line.prop=${command.line.prop}
 
 +----+
 
-m2 process-resources "-Dcommand.line.prop=hello again"
+mvn process-resources "-Dcommand.line.prop=hello again"
 
 +----+
 
@@ -912,7 +912,7 @@ m2 process-resources "-Dcommand.line.prop=hello again"
 
 +----+
 
- Now, when we compile the project (<<<m2 compile>>>), we'll see Maven download the log4j dependency for us.
+ Now, when we compile the project (<<<mvn compile>>>), we'll see Maven download the log4j dependency for us.
 
 ~~DJ: Current
 
@@ -996,7 +996,7 @@ m2 process-resources "-Dcommand.line.prop=hello again"
 
 +----+
 
-m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-site
+mvn archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-site
 
 +----+
 
@@ -1070,7 +1070,7 @@ my-app
  Generating the site is very simple, and fast!
 
 ---------------
-m2 site
+mvn site
 ---------------
 
  The resulting site will be in <<<target/site/...>>>
@@ -1097,7 +1097,7 @@ m2 site
   You must presently run the <<<site:site>>> goal independantly.
 
 ---------------
-m2 site-deploy
+mvn site-deploy
 ---------------
 
   <<Note:>> the trailing slash in the URL above indicates that any subprojects that inherit this value should append their artifact ID to

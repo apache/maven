@@ -99,7 +99,7 @@ Introduction to Repositories
 
 +---+
 
- m2 -o package
+ mvn -o package
 
 +---+
 

@@ -45,7 +45,7 @@ _m2_complete()
   COMPREPLY=($(compgen -W "${goals}" ${cur} | sed 's/\\\\//g') )
 }
 
-complete -F _m2_complete -o filenames m2
+complete -F _m2_complete -o filenames mvn
 
 +----+
 

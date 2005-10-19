@@ -29,10 +29,10 @@ you declare profile in your pom like this :
      </profile>
    </profiles>
 
-and you can run m2 with one of profiles like :
-m2 -P env-production clean:clean install ==> we use the profile id
+and you can run mvn with one of profiles like :
+mvn -P env-production clean:clean install ==> we use the profile id
 or
-m2 -Denv=test clean:clean install ==> we use the property env define in 
+mvn -Denv=test clean:clean install ==> we use the property env define in
 <activation>
 
 Emmanuel

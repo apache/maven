@@ -12,6 +12,6 @@ Guide to using Eclipse with Maven 2.x
 
 +----+
 
-m2 eclipse:eclipse
+mvn eclipse:eclipse
 
 +----+

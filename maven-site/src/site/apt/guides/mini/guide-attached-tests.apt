@@ -42,7 +42,7 @@ Guide to using attached tests
 
 +----+
 
-m2 install
+mvn install
 
 +----+
 
@@ -53,7 +53,7 @@ m2 install
 
 +----+
 
-m2 deploy
+mvn deploy
 
 +----+
 

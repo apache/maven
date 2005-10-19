@@ -1,7 +1,7 @@
     ------
     Guide to Using maven 2 in Netbeans 4.0 (4.1 and 5.0)
     ------
-    Raphaël Piéroni
+    Raphaï¿½l Piï¿½roni
     ------
     Mon Aug 9 2005
     ------
@@ -34,7 +34,7 @@ Using maven 2 in Netbeans 4.0 (4.1 and 5.0)
     You can also checkout the Maven 2 project using your versionning system.
 
 -------------------
-[maven-user@mini-guide examples]$ m2 archetype:create -DarchetypeArtifactId=maven-archetype-quickstart -DartifactId=demoquickstart -DgroupId=demoquickstart
+[maven-user@mini-guide examples]$ mvn archetype:create -DarchetypeArtifactId=maven-archetype-quickstart -DartifactId=demoquickstart -DgroupId=demoquickstart
 
 [INFO] Searching repository for plugin with prefix: 'archetype'.
 [INFO] ----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ Using maven 2 in Netbeans 4.0 (4.1 and 5.0)
     To eneable the project, use the netbeans-freeform plugin for Maven 2.
 
 -------------------
-[maven-user@mini-guide demoquickstart]$ m2 netbeans-freeform:generate-netbeans-project
+[maven-user@mini-guide demoquickstart]$ mvn netbeans-freeform:generate-netbeans-project
 [INFO] Searching repository for plugin with prefix: 'netbeans-freeform'.
 [INFO] ----------------------------------------------------------------------------
 [INFO] Building Maven Quick Start Archetype

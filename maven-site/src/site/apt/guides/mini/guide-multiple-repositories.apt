@@ -78,7 +78,7 @@ Setting up Multiple Repositories
 
 +----+
 
-m2 -Pmyprofile ...
+mvn -Pmyprofile ...
 
 +----+
 

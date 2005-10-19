@@ -67,6 +67,6 @@ Guide to deploying with an external SSH command
 
 +----+
 
-m2 deploy
+mvn deploy
 
 +----+
