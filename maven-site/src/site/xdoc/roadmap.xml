@@ -4,60 +4,15 @@
     <author email="brett@apache.org">Brett Porter</author>
   </properties>
   <body>
-    <section name="Development Road Map for Maven 2.0">
+    <section name="Development Road Map">
       <p>
-        This document discusses the release plans and current roadmap for Maven 2.0.
+        This document discusses the release plans and current roadmap for Maven.
       </p>
       <p>
         Note that we will continue with the successful technique from Maven 1.0 of making plugins available on a
         separate
         release schedule so that new features can be obtained as they are ready and tested.
       </p>
-      <subsection name="Maven 2.0 beta 3">
-        <p>
-          <i>Released:</i>
-          4 October 2005
-        </p>
-        <p>
-          <i>Aims and features:</i>
-          Completion of all major work on the core engine.
-        </p>
-        <ul>
-          <li>Bugfixes</li>
-          <li>Cosmetic enhancements</li>
-        </ul>
-      </subsection>
-      <subsection name="Maven 2.0 beta 4">
-        <p>
-          <i>Expected Release:</i>
-          11 October 2005
-        </p>
-        <p>
-          <i>Aims and features:</i>
-          Completion of all outstanding work on the core engine.
-        </p>
-        <ul>
-          <li>Bugfixes</li>
-          <li>Cosmetic enhancements</li>
-          <li>Initial plugin releases</li>
-        </ul>
-      </subsection>
-      <subsection name="Maven 2.0 Final">
-        <p>
-          <i>Expected Release:</i>
-          October 2005, following a release candidate
-        </p>
-        <p>
-          <i>Aims and features:</i>
-          Final release, a suitable replacement for Maven 1.1 as the stable release for new
-          projects.
-        </p>
-        <ul>
-          <li>Documentation</li>
-          <li>Final plugin releases</li>
-          <li>Bugfixes</li>
-        </ul>
-      </subsection>
       <subsection name="Maven 2.0.x">
         <p>
           <i>Aims and features:</i>
