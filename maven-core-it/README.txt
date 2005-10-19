@@ -225,6 +225,10 @@ it0081: Test per-plugin dependencies.
 it0082: Test that the reactor can establish the artifact location of known projects for dependencies
         using process-sources to see that it works even when they aren't compiled
 
+it0083: Verify that overriding a compile time dependency as provided in a WAR ensures it is not included.
+
+it0084: Verify that the collector selecting a particular version gets the correct subtree
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -1,2 +1,2 @@
 ${artifact:junit:junit:3.8:jar}
-${artifact:org.apache.maven:maven-core-it-support:1.2:jar}
+${artifact:org.apache.maven:maven-core-it-support:1.4:jar}

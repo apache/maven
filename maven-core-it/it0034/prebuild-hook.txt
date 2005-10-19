@@ -1,2 +1,2 @@
-rm ${artifact:org.apache.maven:maven-core-it-support:1.2:jar}
+rm ${artifact:org.apache.maven:maven-core-it-support:1.4:jar}
 rm ${artifact:junit:junit:3.8:jar}
