@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- START SNIPPET: modello-model -->
+ <!-- START SNIPPET: modello-model -->
 
 <model>
   <id>archetype</id>
@@ -75,4 +75,5 @@
   </classes>
 </model>
 
-<!-- END SNIPPET: modello-model -->
+ <!-- END SNIPPET: modello-model -->
+
