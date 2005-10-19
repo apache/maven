@@ -8,4 +8,127 @@
 
 Guide to uploading artifacts to Ibiblio
 
- In progress.
+ In order for users of Maven to utilize artifacts produced by your project you must deploy them to
+ a remote repository. Many open source projects want to allow users of their projects who build with
+ Maven to have transparent access to their project's artifacts. In order to allow for this a project
+ must have their artifacts deployed the Ibiblio which acts as Maven's central global repostory.
+
+* Step 1: Create an upload bundle
+
+ Use the repository plugin provided with the standard Maven distribution to create an upload bundle:
+
++----+
+
+ mvn repository:create-bundle
+
++----+
+
+ The bundle will be created in your <<<target>>> directory of the form:
+ <<<${pom.artifactId}-${pom.currentVersion}-bundle.jar>>>
+
+ If you are not using maven as your build system but want something
+ uploaded to Ibiblio then you just need to make a JAR (using the <<<jar>>> executable,
+ not <<<zip>>>, <<<pkzip>>> or equivalent) with the following format:
+
++----+
+
+LICENSE.txt
+pom.xml
+foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
+
++----+
+
+ Note that the bundle will be read by a script, so it must follow the above format. Also,
+ the <<<pom.xml>>> should at least contain the following elements:
+
+ * groupId
+
+ * artifactId
+
+ * packaging
+
+ * name
+
+ * version
+
+ * url
+
+ * scm url
+
+ * description
+
+ * dependencies
+
+ []
+
+ Some considerations about the <<groupId>>: it will identify your project uniquely across all
+ projects, so we need to enforce a naming schema. For projects with artifacts already uploaded to ibiblio it can
+ be equal to the previous used, but for new projects it has to follow the package name rules, what
+ means that has to be at least as a domain name you control, and you can create as many subgroups
+ as you want. Look at {{{http://java.sun.com/docs/books/jls/third_edition/html/packages.html#7.7">
+ More information about package names}}}.
+
+ Examples:
+
+ * www.springframework.org -> org.springframework
+
+ * oness.sf.net -> net.sf.oness
+
+ []
+
+* Step 2: Posting the request">
+
+ Post your request to {{{http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&amp;issuetype=3}JIRA}}.
+ In the description you should write the URL of the upload bundle
+ (if you're uploading more than one bundle please add all the urls under the same issue),
+ then leave a blank line and provide the following:
+
+ * a url where the project can be found.</li>
+
+ * if you are one of its developers, a url where your name or email can be found inside the project site.</li>
+
+ This will speed up the uploading process.
+
+ You can place any additional comments you wish in the following paragraph. So the description field might look like:
+
++----+
+
+http://wiggle.sourceforge.net/downloads/wiggle-1.0-bundle.jar
+
+http://wiggle.sourceforge.net
+http://wiggle.sourceforge.net/team-list.html
+
+Wiggle is a fantastic new piece of software for automating the
+clipping of nose hairs. Please upload!
+
++----+
+
+* Explanation
+
+ Some folks have asked why do we require the POM and license each time an artifact is deployed so here's a small explanation. The POM
+ being deployed with the artifact is part of the process to make transitive dependencies a reality in Maven. The logic for getting
+ transitive dependencies working is really not that hard, the problem is getting the data. So we have changed the process of uploading
+ artifacts to include the POM in an attempt to get transitive dependencies working as quickly as possible. The other applications
+ that may be possible having all the POMs available for artifacts are vast, so by placing them into the repository as part of the
+ process we open up the doors to new ideas that involve unified
+ access to project POMs.
+
+ We also ask for a license now because it is possible that your project's license may change in the course of
+ its life time and we are trying create tools to help normal people sort out licensing issues. For example, knowing all the licenses
+ for a particular graph of artifacts we could have some strategies that would identify potential licensing problems.
+
+* Maven partners
+
+ The following sites sync automatically their project repository with the central one.
+ If you want a project from any of this sites to be uploaded to ibiblio you'll have to
+ contact the project maintainers.
+
+ * {{{http://www.apache.org}The Apache Software Foundation}}
+
+ * {{{http://www.codehaus.org}Codehaus}}
+
+ * {{{http://jetty.mortbay.org}MortBay Jetty}}
+
+ * {{{http://www.opensymphony.com/}OpenSymphony}}
+
+ * {{{http://www.osjava.org}OS Java}}
