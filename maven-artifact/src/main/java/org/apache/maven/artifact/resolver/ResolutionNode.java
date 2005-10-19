@@ -19,7 +19,6 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +42,8 @@ public class ResolutionNode
     private final List remoteRepositories;
 
     private boolean active = true;
+
+    private List trail;
 
     public ResolutionNode( Artifact artifact, List remoteRepositories )
     {
@@ -85,45 +86,60 @@ public class ResolutionNode
             {
                 Artifact a = (Artifact) i.next();
 
-                if ( filter == null || filter.include( a ) )
+                if ( parents.contains( a.getDependencyConflictId() ) )
                 {
-                    if ( parents.contains( a.getDependencyConflictId() ) )
-                    {
-                        a.setDependencyTrail( getDependencyTrail() );
+                    a.setDependencyTrail( getDependencyTrail() );
 
-                        throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
-                    }
-
-                    children.add( new ResolutionNode( a, remoteRepositories, this ) );
+                    throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
                 }
+
+                children.add( new ResolutionNode( a, remoteRepositories, this ) );
             }
         }
         else
         {
             children = Collections.EMPTY_LIST;
         }
+        trail = null;
     }
 
     public List getDependencyTrail()
         throws OverConstrainedVersionException
     {
-        List path = new LinkedList();
-        ResolutionNode node = this;
-        while ( node != null )
-        {
-            Artifact artifact = node.getArtifact();
-            if ( artifact.getVersion() == null )
-            {
-                // set the recommended version
-                VersionRange versionRange = artifact.getVersionRange();
-                String version = artifact.getSelectedVersion().toString();
-                artifact.selectVersion( version );
-            }
+        List trial = getTrail();
 
-            path.add( 0, artifact.getId() );
-            node = node.parent;
+        List ret = new ArrayList( trial.size() );
+        for ( Iterator i = trial.iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+            ret.add( artifact.getId() );
         }
-        return path;
+        return ret;
+    }
+
+    private List getTrail()
+        throws OverConstrainedVersionException
+    {
+        if ( trail == null )
+        {
+            List ids = new LinkedList();
+            ResolutionNode node = this;
+            while ( node != null )
+            {
+                Artifact artifact = node.getArtifact();
+                if ( artifact.getVersion() == null )
+                {
+                    // set the recommended version
+                    String version = artifact.getSelectedVersion().toString();
+                    artifact.selectVersion( version );
+                }
+
+                ids.add( 0, artifact );
+                node = node.parent;
+            }
+            trail = ids;
+        }
+        return trail;
     }
 
     public boolean isResolved()
@@ -176,5 +192,23 @@ public class ResolutionNode
                 node.disable();
             }
         }
+    }
+
+    public boolean filterTrail( ArtifactFilter filter )
+        throws OverConstrainedVersionException
+    {
+        boolean success = true;
+        if ( filter != null )
+        {
+            for ( Iterator i = getTrail().iterator(); i.hasNext() && success; )
+            {
+                Artifact artifact = (Artifact) i.next();
+                if ( !filter.include( artifact ) )
+                {
+                    success = false;
+                }
+            }
+        }
+        return success;
     }
 }

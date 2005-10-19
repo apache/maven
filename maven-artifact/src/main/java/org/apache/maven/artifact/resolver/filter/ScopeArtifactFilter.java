@@ -35,7 +35,7 @@ public class ScopeArtifactFilter
     private final boolean testScope;
 
     private final boolean providedScope;
-    
+
     private final boolean systemScope;
 
     public ScopeArtifactFilter( String scope )
@@ -98,8 +98,7 @@ public class ScopeArtifactFilter
         }
         else
         {
-            // TODO: should this be true? Does it even happen?
-            return false;
+            return true;
         }
     }
 }

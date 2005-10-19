@@ -79,12 +79,15 @@ public class DefaultArtifactCollector
                 {
                     Artifact artifact = node.getArtifact();
 
-                    // If it was optional, we don't add it or its children, just allow the update of the version and scope
-                    if ( !node.getArtifact().isOptional() )
+                    if ( node.filterTrail( filter ) )
                     {
-                        artifact.setDependencyTrail( node.getDependencyTrail() );
+                        // If it was optional, we don't add it or its children, just allow the update of the version and scope
+                        if ( !artifact.isOptional() )
+                        {
+                            artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                        set.add( node );
+                            set.add( node );
+                        }
                     }
                 }
             }
@@ -165,10 +168,12 @@ public class DefaultArtifactCollector
                         for ( int j = 0; j < 2; j++ )
                         {
                             Artifact resetArtifact = resetNodes[j].getArtifact();
-                            if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null && resetArtifact.getAvailableVersions() != null )
+                            if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null &&
+                                resetArtifact.getAvailableVersions() != null )
                             {
 
-                                resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() ).toString() );
+                                resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion(
+                                    resetArtifact.getAvailableVersions() ).toString() );
                                 fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
                             }
                         }
