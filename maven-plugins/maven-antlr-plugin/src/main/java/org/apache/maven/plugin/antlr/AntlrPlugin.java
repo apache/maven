@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.security.Permission;
 import java.util.StringTokenizer;
 
+// START SNIPPET: generate-sources-0
 /**
  * @goal generate
  * @phase generate-sources
@@ -124,13 +125,15 @@ public class AntlrPlugin
                 System.setSecurityManager( oldSm );
             }
         }
-
+        
         if ( project != null )
         {
             project.addCompileSourceRoot( outputDirectory );
         }
     }
-
+    
+    // END SNIPPET: generate-sources-0
+    
     protected File getGeneratedFile( String grammar, String outputDirectory )
         throws Exception
     {
