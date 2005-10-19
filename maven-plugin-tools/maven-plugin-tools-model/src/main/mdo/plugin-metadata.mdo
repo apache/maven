@@ -11,7 +11,7 @@
             requiresDirectInvocation="true"
             aggregator="true">
   
-        <execute phase="initialize" lifecycle="mine"/>
+        <execute phase="initialize" lifecycle="mine" goal="some:goal"/>
         <components>
           <component role="stuff" hint="more"/>
         </components>
@@ -20,7 +20,8 @@
                      property="prop" 
                      required="true" 
                      readonly="true" 
-                     expression="${project}" 
+                     expression="${my.property}" 
+                     defaultValue="${project.artifactId}"
                      type="org.apache.maven.project.MavenProject"
                      alias="otherProp">
             <description>Test parameter</description>
@@ -70,56 +71,56 @@
       <version>1.0.0</version>
       <description>Mojo descriptor definition.</description>
       <fields>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>goal</name>
           <type>String</type>
           <required>true</required>
           <description>The name of the goal used to invoke this mojo.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>phase</name>
           <type>String</type>
           <description>The phase to which this mojo should be bound by default.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>aggregator</name>
           <type>boolean</type>
           <description>Whether this mojo operates as an aggregator when the reactor is run. That is, only runs once.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>requiresDependencyResolution</name>
           <type>String</type>
           <description>The scope of dependencies that this mojo requires to have resolved.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>requiresProject</name>
           <type>boolean</type>
           <description>Whether this mojo requires a project instance in order to execute.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>requiresReports</name>
           <type>boolean</type>
           <description>Whether this mojo requires a reports section in the POM.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>requiresOnline</name>
           <type>boolean</type>
           <description>Whether this mojo requires online mode to operate normally.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>inheritByDefault</name>
           <type>boolean</type>
           <description>Whether this mojo's configuration should propagate down the POM inheritance chain by default.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>requiresDirectInvocation</name>
           <type>boolean</type>
@@ -163,7 +164,7 @@
           <description>A deprecation message for this mojo parameter.</description>
           <type>String</type>
         </field>
-        <field xml.attribute="true">
+        <field>
           <version>1.0.0</version>
           <name>call</name>
           <type>String</type>
@@ -178,16 +179,22 @@
       	A sub-process execution of a lifecycle to satisfy the needs of a mojo.
       ]]></description>
       <fields>
-        <field xml.attribute="true">
+        <field>
           <name>lifecycle</name>
           <version>1.0.0</version>
           <type>String</type>
           <description>The name of the overlay to apply to the sub-lifecycle before executing it. If specified, this lifecycle overlay definition will be bundled with the plugin.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>phase</name>
           <version>1.0.0</version>
           <description>The phase in the sub-lifecycle.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>goal</name>
+          <version>1.0.0</version>
+          <description>A goal, not attached to a lifecycle phase, which should be executed ahead of this mojo.</description>
           <type>String</type>
         </field>
       </fields>
@@ -199,14 +206,14 @@
       	A reference to a plexus component, assumed to be available to the plugin container.
       ]]></description>
       <fields>
-        <field xml.attribute="true">
+        <field>
           <name>role</name>
           <version>1.0.0</version>
           <description>The component role to lookup.</description>
           <required>true</required>
           <type>String</type>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>hint</name>
           <version>1.0.0</version>
           <type>String</type>
@@ -221,32 +228,32 @@
       	A parameter used by a mojo, and configurable from the command line or POM configuration sections.
       ]]></description>
       <fields>
-        <field xml.attribute="true">
+        <field>
           <name>name</name>
           <version>1.0.0</version>
           <description>The parameter name</description>
           <required>true</required>
           <type>String</type>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>alias</name>
           <version>1.0.0</version>
           <type>String</type>
           <description>An alternate name for the parameter.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>property</name>
           <version>1.0.0</version>
           <type>String</type>
           <description>The JavaBeans property name to use to configure the mojo with this parameter.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>required</name>
           <version>1.0.0</version>
           <type>boolean</type>
           <description>Whether this parameter is required.</description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>readonly</name>
           <version>1.0.0</version>
           <type>boolean</type>
@@ -254,8 +261,16 @@
             Whether this parameter can be directly edited. If false, this param is either derived from another POM element, or refers to a runtime instance of the build system.
           ]]></description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>expression</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            The command-line reference to this parameter.
+          ]]></description>
+        </field>
+        <field>
+          <name>defaultValue</name>
           <version>1.0.0</version>
           <type>String</type>
           <description><![CDATA[
@@ -264,7 +279,7 @@
             project.getBuild().getDirectory())
           ]]></description>
         </field>
-        <field xml.attribute="true">
+        <field>
           <name>type</name>
           <version>1.0.0</version>
           <type>String</type>

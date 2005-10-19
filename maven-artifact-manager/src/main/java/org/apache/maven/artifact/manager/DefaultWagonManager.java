@@ -697,7 +697,7 @@ public class DefaultWagonManager
      * 
      * @param wagon the wagon to configure
      * @param repository the repository that has the configuration
-     * @throws ConfigurationException if the wagon can't be configured
+     * @throws WagonConfigurationException wraps any error given during configuration of the wagon instance
      */
     private void configureWagon( Wagon wagon, ArtifactRepository repository )
         throws WagonConfigurationException

@@ -6,6 +6,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,17 +27,31 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
         throws ExtractionException, InvalidPluginDescriptorException
     {
+        String metadataExtension = getMetadataFileExtension();
+        String scriptExtension = getScriptFileExtension();
+        
         Map scriptFilesKeyedByBasedir =
-            gatherScriptSourcesByBasedir( project.getScriptSourceRoots(), getScriptFileExtension() );
+            gatherFilesByBasedir( project.getScriptSourceRoots(), scriptExtension );
 
-        List mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
+        List mojoDescriptors;
+        if ( !StringUtils.isEmpty( metadataExtension ) )
+        {
+            Map metadataFilesKeyedByBasedir =
+                gatherFilesByBasedir( project.getScriptSourceRoots(), metadataExtension );
+            
+            mojoDescriptors = extractMojoDescriptorsFromMetadata( metadataFilesKeyedByBasedir, pluginDescriptor );
+        }
+        else
+        {
+            mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
+        }
 
         copyScriptsToOutputDirectory( scriptFilesKeyedByBasedir, project.getBuild().getOutputDirectory() );
 
         return mojoDescriptors;
     }
 
-    private void copyScriptsToOutputDirectory( Map scriptFilesKeyedByBasedir, String outputDirectory )
+    protected void copyScriptsToOutputDirectory( Map scriptFilesKeyedByBasedir, String outputDirectory )
         throws ExtractionException
     {
         File outputDir = new File( outputDirectory );
@@ -85,12 +100,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
         }
     }
 
-    protected abstract List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
-        throws ExtractionException, InvalidPluginDescriptorException;
-
-    protected abstract String getScriptFileExtension();
-
-    protected Map gatherScriptSourcesByBasedir( List directories, String scriptFileExtension )
+    protected Map gatherFilesByBasedir( List directories, String scriptFileExtension )
     {
         Map sourcesByBasedir = new TreeMap();
 
@@ -130,5 +140,24 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
 
         return sourcesByBasedir;
     }
+
+    protected List extractMojoDescriptorsFromMetadata( Map metadataFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+        throws ExtractionException, InvalidPluginDescriptorException
+    {
+        return null;
+    }
+
+    protected String getMetadataFileExtension()
+    {
+        return null;
+    }
+
+    protected List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+        throws ExtractionException, InvalidPluginDescriptorException
+    {
+        return null;
+    }
+
+    protected abstract String getScriptFileExtension();
 
 }

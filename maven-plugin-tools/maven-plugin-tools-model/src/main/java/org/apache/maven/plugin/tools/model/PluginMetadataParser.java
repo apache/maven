@@ -20,6 +20,7 @@ import java.util.Set;
 
 public class PluginMetadataParser
 {
+    public static final String IMPL_BASE_PLACEHOLDER = "<REPLACE-WITH-MOJO-PATH>";
     
     public Set parseMojoDescriptors( File metadataFile )
         throws PluginMetadataParseException
@@ -71,7 +72,7 @@ public class PluginMetadataParser
     {
         MojoDescriptor descriptor = new MojoDescriptor();
         
-        descriptor.setImplementation( mojo.getCall() );
+        descriptor.setImplementation( IMPL_BASE_PLACEHOLDER + ":" + mojo.getCall() );
         
         descriptor.setGoal( mojo.getGoal() );
         descriptor.setPhase( mojo.getPhase() );
@@ -106,6 +107,7 @@ public class PluginMetadataParser
                 dParam.setDescription( param.getDescription() );
                 dParam.setEditable( !param.isReadonly() );
                 dParam.setExpression( param.getExpression() );
+                dParam.setDefaultValue( param.getDefaultValue() );
                 
                 String property = param.getProperty();
                 if ( StringUtils.isNotEmpty( property ) )

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ../../../../maven-site/target/site/maven-v4_0_0.xsd ">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.ant.it</groupId>
+    <artifactId>simpleUsage-root</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>simpleUsage-usage</artifactId>
+  <name>Simple Ant-Mojo Usage Case</name>
+  <description>Tests the simplest case of using an Ant script to drive a mojo.</description>
+  
+  <dependencies>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.ant.it</groupId>
+        <artifactId>simpleUsage-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-ant-factory</artifactId>
+            <version>1.0-alpha-1-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+
+        <!-- configuration>
+          <name>Hani</name>
+        </configuration -->
+
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>install</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

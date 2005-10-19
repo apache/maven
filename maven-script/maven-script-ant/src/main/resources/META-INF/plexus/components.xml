@@ -1,0 +1,9 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.component.factory.ComponentFactory</role>
+      <implementation>org.apache.maven.script.ant.AntMojoComponentFactory</implementation>
+      <role-hint>ant-mojo</role-hint>
+    </component>
+  </components>
+</component-set>
