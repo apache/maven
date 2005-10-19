@@ -29,3 +29,10 @@ Brett Porter wrote:
 - plugin expressions (look at bob allison's work)
 - overriding the central repository (use central)
 - description of what packagings are available and how they work
+- creating upload bundles
+- modello example
+- changing the snapshot policy frequency
+- overriding central repo
+- using POM info in applications: the POM is packaged so there is acccess
+  continuum example to get the version.
+- quick description of scm,wagon,continuum
