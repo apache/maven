@@ -44,7 +44,7 @@
       </p>
       <p>
         All the documentation for Maven 2.x is in the form of guides
-        which can all be found <a href="http://people.apache.org/~jvanzyl/maven2/guides/index.html">here</a>.
+        which can all be found <a href="guides/index.html">here</a>.
       </p>            
       <p>
         <h4>About Maven 2.0</h4>
