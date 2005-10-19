@@ -38,7 +38,7 @@ Documentation
 
  * {{{mini/guide-embedding-m2.html}Guide to Embedding Maven 2.x}}
 
- * {{{mini/guide-generating-sources.html}Guide to Generating Sources}}
+ * {{{mini/guide-generating-sources.html}Guide to generating Sources}}
 
  * {{{mini/guide-ibiblio-upload.html}Guide to uploading artifacts to Ibiblio}}
 
@@ -65,6 +65,8 @@ Documentation
  * {{{mini/guide-releasing.html}Guide to Releasing}}
 
  * {{{mini/guide-site.html}Guide to creating a site}}
+
+ * {{{mini/guide-using-ant.html}Guide to using Ant with Maven}}
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
