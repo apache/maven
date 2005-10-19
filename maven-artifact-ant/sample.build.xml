@@ -23,7 +23,7 @@
   <target name="initTaskDefs">
     <!-- don't forget to update the version! -->
     <path id="maven.classpath">
-      <pathelement location="c:/home/brett/releases/maven-2.0/maven-artifact-ant-2.0-dep.jar"/>
+      <pathelement location="target/maven-artifact-ant-2.0.1-SNAPSHOT-dep.jar" />
     </path>
 
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
@@ -113,7 +113,7 @@
   </target>
 
   <target name="test-deploy-spaces" depends="initTaskDefs">
-    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5-SNAPSHOT"/>
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5"/>
 
     <echo file="target/test file.txt">dummy</echo>
     <artifact:deploy file="target/test file.txt">
@@ -135,7 +135,7 @@
       <pom refid="maven.project"/>
     </artifact:deploy>
 
-    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5-SNAPSHOT"/>
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5"/>
 
     <artifact:deploy file="${outJar}">
       <remoteRepository url="scp://localhost/tmp/deployment-repo">
