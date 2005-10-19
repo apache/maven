@@ -1,24 +1,17 @@
  ------
- Guide to Generating Sources
+ Guide to generating Sources
  ------
  Jason van Zyl
  ------
  12 October 2005
  ------
 
+Guide to generating sources
+
  Let's run though a short example to try and help. To generate sources you must first have a plugin that
  participates in the generate-sources phase like the Antlr plugin:
 
-+----+
-
-/**
- * @goal generate
- * @phase generate-sources
- * @requiresDependencyResolution compile
- * @description Antlr plugin
- */
-
-+----+
+%{snippet|id=generate-sources-0|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-antlr-plugin/src/main/java/org/apache/maven/plugin/antlr/AntlrPlugin.java}
 
  The first two lines say "I want to be fit into the generate-sources
  phase and my 'handle' is generate".
