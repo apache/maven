@@ -70,7 +70,7 @@ Documentation
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
- * {{{mini/guide-using-modello.htmlt}Guide to using Modello}}
+ * {{{mini/guide-using-modello.html}Guide to using Modello}}
 
  * {{{mini/guide-webapp.html}Guide to Webapps}}
 
@@ -123,7 +123,13 @@ Documentation
  * {{{../plugins/index.html}Available Plug-ins}}
  
  * {{{../developers/mojo-api-specification.html}Mojo API}}
+ 
+ * {{{..//mojo-api-specification.html}Mojo API}}
   
  * {{{../ant-tasks.html}Ant Tasks}}
+ 
+ * {{{../glossary.html}Glossary}}
+ 
+ * {{{../maven-conventions.html}Maven Conventions}}
  
  []
