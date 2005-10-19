@@ -16,7 +16,7 @@
     </links>
 
     <menu name="Quick Links">
-      <item name="Features" href="/features.html"/>
+      <item name="Features" href="/maven-features.html"/>
       <item name="Download" href="/download.html"/>
       <item name="Installation Instructions" href="/download.html#installation"/>
       <item name="Getting Started" href="/guides/getting-started/index.html"/>
