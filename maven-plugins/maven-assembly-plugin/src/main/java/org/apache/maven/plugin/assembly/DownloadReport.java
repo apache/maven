@@ -41,10 +41,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 /**
  * Generates the Download report.
  *
- * @goal download
- *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id $
+ * @goal download
  */
 public class DownloadReport
     extends AbstractMavenReport
@@ -56,9 +55,7 @@ public class DownloadReport
     private String outputDirectory;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * @component
      */
     private SiteRenderer siteRenderer;
 
@@ -218,15 +215,14 @@ public class DownloadReport
                 if ( o.getChild( "finalName" ) == null )
                 {
                     throw new IllegalArgumentException(
-                                                        "The 'finalName' parameter is required for the configuration of the maven-assembly-plugin." );
+                        "The 'finalName' parameter is required for the configuration of the maven-assembly-plugin." );
                 }
-                String finalName = o.getChild( "finalName" ).getValue();
-                assemblyMojo.finalName = finalName;
+                assemblyMojo.finalName = o.getChild( "finalName" ).getValue();
 
                 if ( ( o.getChild( "descriptor" ) == null ) && ( o.getChild( "descriptorId" ) == null ) )
                 {
-                    throw new IllegalArgumentException( "The 'descriptor' or the 'descriptorId' parameter is "
-                        + "required for the configuration of the maven-assembly-plugin." );
+                    throw new IllegalArgumentException( "The 'descriptor' or the 'descriptorId' parameter is " +
+                        "required for the configuration of the maven-assembly-plugin." );
                 }
                 if ( o.getChild( "descriptor" ) != null )
                 {
@@ -239,11 +235,10 @@ public class DownloadReport
                 }
                 if ( o.getChild( "descriptorId" ) != null )
                 {
-                    String descriptorId = o.getChild( "descriptorId" ).getValue();
-                    assemblyMojo.descriptorId = descriptorId;
+                    assemblyMojo.descriptorId = o.getChild( "descriptorId" ).getValue();
                 }
 
-                Assembly assembly = null;
+                Assembly assembly;
                 try
                 {
                     assembly = assemblyMojo.readAssembly();
@@ -291,9 +286,8 @@ public class DownloadReport
 
         StringBuffer sb = null;
 
-        getLog().info(
-                       "The property distributionManagement.downloadUrl is not set in the pom.xml. "
-                           + "Copying distribution files in a relative directory ('" + downloadDirectory + "')." );
+        getLog().info( "The property distributionManagement.downloadUrl is not set in the pom.xml. " +
+            "Copying distribution files in a relative directory ('" + downloadDirectory + "')." );
 
         for ( Iterator it2 = distributionFileNames.iterator(); it2.hasNext(); )
         {
@@ -316,10 +310,8 @@ public class DownloadReport
 
         if ( sb != null )
         {
-            getLog().warn(
-                           "The " + ( distributionFileNames.size() > 1 ? "files" : "file" ) + " "
-                               + sb.substring( 0, sb.length() - 2 )
-                               + " did not exist. - Please run assembly:assembly before." );
+            getLog().warn( "The " + ( distributionFileNames.size() > 1 ? "files" : "file" ) + " " +
+                sb.substring( 0, sb.length() - 2 ) + " did not exist. - Please run assembly:assembly before." );
             distributionFileNames = null;
         }
     }
@@ -336,7 +328,6 @@ public class DownloadReport
         private List distributionFileNames = null;
 
         /**
-         *
          * @param sink
          * @param project
          * @param locale
@@ -344,7 +335,7 @@ public class DownloadReport
          * @param distributionFileNames
          */
         public DownloadRenderer( Sink sink, MavenProject project, Locale locale, String downloadUrl,
-                                List distributionFileNames )
+                                 List distributionFileNames )
         {
             super( sink );
 
@@ -362,11 +353,10 @@ public class DownloadReport
          */
         public String getTitle()
         {
-            return getBundle( locale ).getString( "report.download.title" )
-                + " "
-                + ( StringUtils.isEmpty( project.getName() ) ? project.getGroupId() + ":" + project.getArtifactId()
-                                                            : project.getName() ) + " "
-                + ( StringUtils.isEmpty( project.getVersion() ) ? "" : project.getVersion() );
+            return getBundle( locale ).getString( "report.download.title" ) + " " + (
+                StringUtils.isEmpty( project.getName() ) ? project.getGroupId() + ":" + project.getArtifactId()
+                    : project.getName() ) + " " +
+                ( StringUtils.isEmpty( project.getVersion() ) ? "" : project.getVersion() );
         }
 
         /**

@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -133,6 +134,8 @@ public class AssemblyMojo
      */
     private boolean includeSite;
 
+    private ComponentsXmlArchiverFileFilter componentsXmlFilter = new ComponentsXmlArchiverFileFilter();
+
     /**
      * Create the binary distribution.
      *
@@ -145,7 +148,6 @@ public class AssemblyMojo
 
         // TODO: include dependencies marked for distribution under certain formats
         // TODO: how, might we plug this into an installer, such as NSIS?
-        // TODO: allow file mode specifications?
 
         String fullName = getDistributionName( assembly );
 
@@ -174,6 +176,10 @@ public class AssemblyMojo
             {
                 throw new MojoExecutionException( "Error creating assembly: " + e.getMessage(), e );
             }
+            catch ( XmlPullParserException e )
+            {
+                throw new MojoExecutionException( "Error creating assembly: " + e.getMessage(), e );
+            }
 
             projectHelper.attachArtifact( project, format, assembly.getId(), destFile );
         }
@@ -196,11 +202,13 @@ public class AssemblyMojo
     }
 
     protected File createArchive( Archiver archiver, Assembly assembly, String filename )
-        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException
+        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException, XmlPullParserException
     {
         File destFile;
         processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
         processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
+
+        componentsXmlFilter.addToArchive( archiver );
 
         destFile = new File( outputDirectory, filename );
         archiver.setDestFile( destFile );
@@ -274,7 +282,7 @@ public class AssemblyMojo
      * @param includeBaseDirectory
      */
     protected void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
-        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException
+        throws ArchiverException, IOException, MojoExecutionException, MojoFailureException, XmlPullParserException
     {
         for ( Iterator i = dependencySets.iterator(); i.hasNext(); )
         {
@@ -286,10 +294,9 @@ public class AssemblyMojo
 
             archiver.setDefaultFileMode( Integer.parseInt( dependencySet.getFileMode(), 8 ) );
 
-            getLog().debug(
-                            "DependencySet[" + output + "]" + " dir perms: "
-                                + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: "
-                                + Integer.toString( archiver.getDefaultFileMode(), 8 ) );
+            getLog().debug( "DependencySet[" + output + "]" + " dir perms: " +
+                Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
+                Integer.toString( archiver.getDefaultFileMode(), 8 ) );
 
             AndArtifactFilter filter = new AndArtifactFilter();
             filter.add( new ScopeArtifactFilter( dependencySet.getScope() ) );
@@ -338,20 +345,36 @@ public class AssemblyMojo
                             }
                             catch ( NoSuchArchiverException e )
                             {
-                                throw new MojoExecutionException( "Unable to obtain unarchiver for file '"
-                                    + artifact.getFile() + "'" );
+                                throw new MojoExecutionException(
+                                    "Unable to obtain unarchiver for file '" + artifact.getFile() + "'" );
                             }
                         }
-                        archiver.addDirectory( tempLocation, output, null, FileUtils.getDefaultExcludes() );
+
+                        addDirectory( archiver, tempLocation, output, null, FileUtils.getDefaultExcludesAsList() );
                     }
                     else
                     {
-                        archiver.addFile( artifact.getFile(), output
-                            + evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
+                        archiver.addFile( artifact.getFile(), output +
+                            evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
                     }
                 }
             }
         }
+    }
+
+    private void addDirectory( Archiver archiver, File directory, String output, String[] includes, List excludes )
+        throws IOException, XmlPullParserException, ArchiverException
+    {
+        // TODO: more robust set of filters on added files in the archiver
+        File componentsXml = new File( directory, ComponentsXmlArchiverFileFilter.COMPONENTS_XML_PATH );
+        if ( componentsXml.exists() )
+        {
+            componentsXmlFilter.addComponentsXml( componentsXml );
+            excludes = new ArrayList( excludes );
+            excludes.add( ComponentsXmlArchiverFileFilter.COMPONENTS_XML_PATH );
+        }
+
+        archiver.addDirectory( directory, output, includes, (String[]) excludes.toArray( EMPTY_STRING_ARRAY ) );
     }
 
     /**
@@ -363,7 +386,7 @@ public class AssemblyMojo
      * @throws ArchiverException
      */
     protected void processFileSets( Archiver archiver, List fileSets, boolean includeBaseDirecetory )
-        throws ArchiverException
+        throws ArchiverException, IOException, XmlPullParserException
     {
         for ( Iterator i = fileSets.iterator(); i.hasNext(); )
         {
@@ -386,11 +409,10 @@ public class AssemblyMojo
             archiver.setDefaultFileMode( Integer.parseInt( fileSet.getFileMode(), 8 ) );
 
             getLog()
-                .debug(
-                        "FileSet[" + output + "]" + " dir perms: "
-                            + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: "
-                            + Integer.toString( archiver.getDefaultFileMode(), 8 )
-                            + ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
+                .debug( "FileSet[" + output + "]" + " dir perms: " +
+                    Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) + " file perms: " +
+                    Integer.toString( archiver.getDefaultFileMode(), 8 ) +
+                    ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
 
             if ( directory == null )
             {
@@ -429,7 +451,7 @@ public class AssemblyMojo
                 archiveBaseDir = tmpDir;
             }
 
-            archiver.addDirectory( archiveBaseDir, output, includes, excludes );
+            addDirectory( archiver, archiveBaseDir, output, includes, excludesList );
         }
     }
 
@@ -489,7 +511,7 @@ public class AssemblyMojo
     /**
      * Get the Output Directory by parsing the String output directory.
      *
-     * @param output The string representation of the output directory.
+     * @param output               The string representation of the output directory.
      * @param includeBaseDirectory True if base directory is to be included in the assembled file.
      */
     private String getOutputDirectory( String output, boolean includeBaseDirectory )
@@ -591,7 +613,7 @@ public class AssemblyMojo
     }
 
     private void copySetReplacingLineEndings( File archiveBaseDir, File tmpDir, String[] includes, String[] excludes,
-                                             String lineEnding )
+                                              String lineEnding )
         throws ArchiverException
     {
         DirectoryScanner scanner = new DirectoryScanner();
@@ -659,7 +681,7 @@ public class AssemblyMojo
         if ( !siteDirectory.exists() )
         {
             throw new MojoExecutionException(
-                                              "site did not exist in the target directory - please run site:site before creating the assembly" );
+                "site did not exist in the target directory - please run site:site before creating the assembly" );
         }
 
         getLog().info( "Adding site directory to assembly : " + siteDirectory );

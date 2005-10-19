@@ -22,6 +22,7 @@ import org.apache.maven.plugin.assembly.archiver.DirectoryArchiver;
 import org.apache.maven.plugins.assembly.model.Assembly;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 
@@ -53,6 +54,10 @@ public class DirectoryMojo
             throw new MojoExecutionException( "Error creating assembly", e );
         }
         catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error creating assembly", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new MojoExecutionException( "Error creating assembly", e );
         }
