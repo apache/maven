@@ -85,7 +85,10 @@
       <question>How do I ensure my latest releases automatically appear in the Maven repository?</question>
       <answer>
         <p>
-          Content coming...
+          If you able to publish your releases to a Maven2 style repository and make it available over rsync,
+          we can automatically publish them to ibiblio when released. This procedure requires that you take full
+          responsibility for your metadata, but also ensures the best service for your users. If this is interesting
+          to your project, contact dev@maven.apache.org.
         </p>
       </answer>
     </faq>
