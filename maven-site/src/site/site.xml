@@ -17,15 +17,15 @@
 
     <menu name="Quick Links">
       <item name="Features" href="/features.html"/>
-      <item name="What is Maven" href="/what-is-maven.html"/>      
       <item name="Download" href="/download.html"/>
-      <item name="Install" href="/download.html#installation"/>
+      <item name="Installation Instructions" href="/download.html#installation"/>
       <item name="Getting Started" href="/guides/getting-started/index.html"/>
       <item name="Documentation" href="/guides/index.html"/>
     </menu>
 
     <menu name="About Maven 2.0">
       <item name="Introduction" href="/index.html"/>
+      <item name="What is Maven" href="/what-is-maven.html"/>                  
       <item name="General Information" href="/about.html"/>
       <item name="For Maven 1.0 Users" href="/maven1.html"/>
       <item name="FAQ" href="/general.html"/>
