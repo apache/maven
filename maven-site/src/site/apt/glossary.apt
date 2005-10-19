@@ -64,16 +64,16 @@ Glossary
     "the very latest" development version, or something like <<<1.1-SNAPSHOT>>>,
     indicating development that will be released as 1.1 (i.e. newer than 1.0, but not yet 1.1).
 
-   * {<<APT>>}:
-     APT is a wiki-like format of documentation that Maven currently understands.
+  * {<<APT>>}:
+    APT is a wiki-like format of documentation that Maven currently understands.
 
-     For information on how to create APT files, refer to the
-     {{{guides/mini/guide-site.html}Guide to creating a site}} document.
+    For information on how to create APT files, refer to the
+    {{{guides/mini/guide-site.html}Guide to creating a site}} document.
 
-   * {<<XDoc>>}:
-     XDoc is the format of documentation that Maven currently understands. It is quite simple, and
-     allows embedding XHTML within a simple layout that is transformed into a uniform site.
+  * {<<XDoc>>}:
+    XDoc is the format of documentation that Maven currently understands. It is quite simple, and
+    allows embedding XHTML within a simple layout that is transformed into a uniform site.
 
-     For information on how to create XDoc files, refer to the
-     {{{guides/mini/guide-site.html}Guide to creating a site}} document.
+    For information on how to create XDoc files, refer to the
+    {{{guides/mini/guide-site.html}Guide to creating a site}} document.
 
