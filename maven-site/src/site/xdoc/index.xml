@@ -15,7 +15,6 @@
           </a>
           Maven 2.0
           <small>(1.1Mb)</small>
-          <br/>
         </p>
         <ul>
           <li>
@@ -34,6 +33,20 @@
             <a href="guides/index.html">Documentation</a>
           </li>          
         </ul>
+        <p>
+          <a href="download.html">
+            <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download"/>
+            Download
+          </a>
+          Maven 2.0 Tasks for Ant
+          <small>(868k)</small>
+        </p>
+        <ul>
+          <li>
+            <a href="/ant-tasks.html">Documentation</a>
+          </li>
+        </ul>
+
       </div>
       <p>
         Maven is a software project management and comprehension tool. Based on the concept of a project object model

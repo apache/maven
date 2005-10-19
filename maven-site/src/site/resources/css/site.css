@@ -26,11 +26,13 @@ body ul {
 }
 
 #downloadbox p {
-  font-size: smaller;
+  margin-top: 1em;
+  margin-bottom: 0;
 }
 
 #downloadbox ul {
   margin-top: 0;
+  margin-bottom: 1em;
   list-style-type: disc;
 }
 
