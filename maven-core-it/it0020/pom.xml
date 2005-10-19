@@ -8,10 +8,22 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-script-beanshell</artifactId>
-      <version>2.0-beta-1</version>
+      <version>2.0</version>
     </dependency>
   </dependencies>
   <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-tools-beanshell</artifactId>
+            <version>2.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
     <resources>
       <resource>
         <directory>src/main/scripts</directory>
