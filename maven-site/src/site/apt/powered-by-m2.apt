@@ -8,6 +8,8 @@
 
 Powered by Maven 2.x
 
+ * {{{http://maven.apache.org}Maven}}
+ 
  * {{{http://plexus.codehaus.org}Plexus}}
  
  * {{{http://maven.apache.org/continuum}Continuum}}
