@@ -78,7 +78,7 @@ public class DefaultRepositoryMetadataManager
                     File file = new File( localRepository.getBasedir(),
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
-                    boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) );
+                    boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
                     if ( checkForUpdates )
                     {
