@@ -29,7 +29,8 @@
       <item name="For Maven 1.0 Users" href="/maven1.html"/>
       <item name="FAQ" href="/general.html"/>
       <item name="Road Map" href="/roadmap.html"/>
-      <item name="Powered By" href="/powered-by-m2.html"/>      
+      <item name="Powered By" href="/powered-by-m2.html"/>
+      <item name="FAQ for Other Projects" href="/project-faq.html"/>
     </menu>
 
     ${reports}
