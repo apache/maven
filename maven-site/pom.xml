@@ -14,9 +14,9 @@
     <site>
       <id>website</id>
       <!--
-      <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/maven2</url>
+      <url>scpexe://minotaur.apache.org/x1/home/jvanzyl/public_html/</url>
       -->
-      <url>scpexe://minotaur.apache.org/www/maven.apache.org/maven2</url>
+      <url>scpexe://minotaur.apache.org/www/maven.apache.org/</url>
     </site>
   </distributionManagement>
   
