@@ -21,6 +21,9 @@
         of this directory.
       </p>
       <p>
+        There are also many plug-ins available at the <a href="http://mojo.apache.org">Mojo</a> project at Codehaus.
+      </p>      
+      <p>
         Full documentation on each of these plugins is still in the works - contributions are welcome!
       </p>
       <table>
