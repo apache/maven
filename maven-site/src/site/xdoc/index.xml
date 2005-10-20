@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <document>
   <properties>
-    <title>Welcome to Maven 2.x</title>
+    <title>Welcome to Maven</title>
     <author email="brett@apache.org">Brett Porter</author>
   </properties>
   <body>
-    <section name="Welcome to Maven 2">
+    <section name="Welcome to Maven">
       <div id="downloadbox">
         <h5>Get Maven 2.0</h5>
         <p>
