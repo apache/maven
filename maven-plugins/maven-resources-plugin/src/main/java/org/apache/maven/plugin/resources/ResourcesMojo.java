@@ -182,13 +182,20 @@ public class ResourcesMojo
     private void initializeFiltering()
         throws MojoExecutionException
     {
+        // System properties
         filterProperties = new Properties( System.getProperties() );
+        
+        // Project properties
+        filterProperties.putAll( project.getProperties() );
+        
         for ( Iterator i = filters.iterator(); i.hasNext(); )
         {
             String filtersfile = (String) i.next();
+            
             try
             {
                 Properties properties = PropertyUtils.loadPropertyFile( new File( filtersfile ), true, true );
+                
                 filterProperties.putAll( properties );
             }
             catch ( IOException e )
@@ -223,9 +230,11 @@ public class ResourcesMojo
                 else
                 {
                     FileInputStream instream = new FileInputStream( from );
+                    
                     FileOutputStream outstream = new FileOutputStream( to );
                     
                     fileReader = new BufferedReader( new InputStreamReader( instream, encoding ) );
+                    
                     fileWriter = new OutputStreamWriter( outstream, encoding );
                 }
                 
