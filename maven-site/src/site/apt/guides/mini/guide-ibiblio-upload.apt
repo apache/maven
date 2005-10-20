@@ -65,7 +65,7 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
  projects, so we need to enforce a naming schema. For projects with artifacts already uploaded to ibiblio it can
  be equal to the previous used, but for new projects it has to follow the package name rules, what
  means that has to be at least as a domain name you control, and you can create as many subgroups
- as you want. Look at {{{http://java.sun.com/docs/books/jls/third_edition/html/packages.html#7.7">
+ as you want. Look at {{{http://java.sun.com/docs/books/jls/third_edition/html/packages.html#7.7}
  More information about package names}}}.
 
  Examples:
