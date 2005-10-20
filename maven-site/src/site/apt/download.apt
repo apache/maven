@@ -19,17 +19,17 @@ Download Maven 2.0
   management (including transitive dependencies), repository and artifact deployment support.
   See {{{ant-tasks.html} Ant Tasks}} for more information and installation instructions.
 
-*-------------------------+----------+---------+----------+-----------+
-|                         | Official | Mirrors | Checksum | Signature |
-*-------------------------+----------+---------+----------+-----------+
-| Maven 2.0 (tar.bz2)     | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2} maven-2.0-bin.tar.bz2}} | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.bz2} maven-2.0-bin.tar.bz2}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.md5} maven-2.0-bin.tar.bz2.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.asc} maven-2.0-bin.tar.bz2.asc}} |
-*-------------------------+----------+---------+----------+-----------+
-| Maven 2.0 (tar.gz)      | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz} maven-2.0-bin.tar.gz}} | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.gz} maven-2.0-bin.tar.gz}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.md5} maven-2.0-bin.tar.gz.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.asc} maven-2.0-bin.tar.gz.asc}} |
-*-------------------------+----------+---------+----------+-----------+
-| Maven 2.0 (zip)         | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip} maven-2.0-bin.zip}} | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.zip} maven-2.0-bin.zip}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.md5} maven-2.0-bin.zip.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.asc} maven-2.0-bin.zip.asc}} |
-*-------------------------+----------+---------+----------+-----------+
-| Maven 2.0 Tasks for Ant | {{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar} maven-artifact-ant-2.0-dep.jar}} | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-dep.jar} maven-artifact-ant-2.0-dep.jar}} | {{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.md5} maven-artifact-ant-2.0-dep.jar.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.asc} maven-artifact-ant-2.0-dep.jar.asc}} |
-*-------------------------+----------+---------+----------+-----------+
+*-------------------------+---------+----------+-----------+
+|                         | Mirrors | Checksum | Signature |
+*-------------------------+---------+----------+-----------+
+| Maven 2.0 (tar.bz2)     | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.bz2?update=200510191232} maven-2.0-bin.tar.bz2}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.md5} maven-2.0-bin.tar.bz2.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.bz2.asc} maven-2.0-bin.tar.bz2.asc}} |
+*-------------------------+---------+----------+-----------+
+| Maven 2.0 (tar.gz)      | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.tar.gz?update=200510191232} maven-2.0-bin.tar.gz}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.md5} maven-2.0-bin.tar.gz.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.tar.gz.asc} maven-2.0-bin.tar.gz.asc}} |
+*-------------------------+---------+----------+-----------+
+| Maven 2.0 (zip)         | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-bin.zip?update=200510191232} maven-2.0-bin.zip}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.md5} maven-2.0-bin.zip.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-2.0-bin.zip.asc} maven-2.0-bin.zip.asc}} |
+*-------------------------+---------+----------+-----------+
+| Maven 2.0 Tasks for Ant | {{{http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-dep.jar?update=200510191232} maven-artifact-ant-2.0-dep.jar}} | {{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.md5} maven-artifact-ant-2.0-dep.jar.md5}} | {{{http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-dep.jar.asc} maven-artifact-ant-2.0-dep.jar.asc}} |
+*-------------------------+---------+----------+-----------+
 
 * System {Requirements}
 
