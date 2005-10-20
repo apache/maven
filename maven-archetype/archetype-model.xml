@@ -76,7 +76,7 @@
     <parameter>
       <name></name>
       <type></type>
-      <required></requrired>
+      <required></required>
       <!-- This will get farmed out to a resource bundle -->
       <descriptionKey></descriptionKey>
     </parameter>
