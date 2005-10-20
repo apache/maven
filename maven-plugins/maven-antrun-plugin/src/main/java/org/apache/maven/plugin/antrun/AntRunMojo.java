@@ -63,6 +63,10 @@ public class AntRunMojo
      */
     private File sourceRoot;
 
+    /**
+     * @parameter expression="${testSourceRoot}"
+     */
+    private File testSourceRoot;
 
     /**
      */
@@ -76,5 +80,12 @@ public class AntRunMojo
             getLog().info( "Registering compile source root " + sourceRoot );
             project.addCompileSourceRoot( sourceRoot.toString() );
         }
+
+        if ( testSourceRoot != null )
+        {
+            getLog().info( "Registering compile test source root " + testSourceRoot );
+            project.addTestCompileSourceRoot( testSourceRoot.toString() );
+        }
+
     }
 }
