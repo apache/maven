@@ -53,10 +53,10 @@
         (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
       </p>
       <p>
-        <h4>Maven 2.x Documentation</h4>
+        <h4>Maven Documentation</h4>
       </p>
       <p>
-        All the documentation for Maven 2.x is in the form of guides
+        All the documentation for Maven is in the form of guides
         which can all be found <a href="guides/index.html">here</a>.
       </p>            
       <p>
@@ -96,7 +96,7 @@
           </i>
         </li>
         <li>
-          <i>How often will Maven 2.0 be
+          <i>How often will Maven be
             <a href="about.html#release-schedule">released</a>
             ?
           </i>
