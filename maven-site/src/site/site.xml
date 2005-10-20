@@ -21,6 +21,7 @@
       <item name="Installation Instructions" href="/download.html#installation"/>
       <item name="Getting Started" href="/guides/getting-started/index.html"/>
       <item name="Documentation" href="/guides/index.html"/>
+      <item name="Available Plug-ins" href="/plugins/index.html"/>      
     </menu>
 
     <menu name="About Maven 2.0">

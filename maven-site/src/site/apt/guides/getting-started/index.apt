@@ -573,7 +573,7 @@ InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStr
 * {How do I filter resource files?}
 
  Sometimes a resource file will need to contain a value that can only be supplied at build time.  To accomplish this in
- Maven, put a reference to the property that will contain the value into your resource file using the syntax <<<$\{<property name}>\}>>>.
+ Maven, put a reference to the property that will contain the value into your resource file using the syntax <<<$\{<property name\}>>>.
  The property can be one of the values defined in your pom.xml, a value defined in the user's settings.xml, a property
  defined in an external properties file, or a system property.
 
