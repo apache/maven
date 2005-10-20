@@ -16,17 +16,14 @@ package org.apache.maven.plugins.repository;
  * limitations under the License.
  */
 
+import java.io.File;
+
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * Goal which touches a timestamp file.
@@ -119,13 +116,15 @@ public class BundleCreateMojo
             throw new MojoExecutionException( LICENSE + " file is missing. Cannot create upload bundle." );
         }
 
-        String finalName =  project.getBuild().getFinalName();
+        String finalName = project.getBuild().getFinalName();
 
         String outputDirectory = project.getBuild().getDirectory();
 
         String extension = artifactHandlerManager.getArtifactHandler( project.getPackaging() ).getExtension();
 
         File artifact = new File( outputDirectory, finalName + "." + extension );
+
+        File sourceArtifact = new File( outputDirectory, finalName + "-sources." + extension );
 
         File bundle = new File( outputDirectory, finalName + "-bundle.jar" );
 
@@ -136,6 +135,17 @@ public class BundleCreateMojo
             jarArchiver.addFile( license, LICENSE );
 
             jarArchiver.addFile( artifact, artifact.getName() );
+
+            if ( sourceArtifact.exists() )
+            {
+                jarArchiver.addFile( sourceArtifact, sourceArtifact.getName() );
+            }
+            else
+            {
+                getLog()
+                    .warn(
+                           "Sources not included in upload bundle. In order to add sources please run \"mvn source:jar repository:bundle-create\"" );
+            }
 
             jarArchiver.setDestFile( bundle );
 
