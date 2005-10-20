@@ -221,8 +221,6 @@ public class SiteMojo
         List reports = filterReports( this.reports );
 
         Map categories = categorizeReports( reports );
-
-        Comparator reportComparator = new ReportComparator();
         List projectInfos = (List) categories.get( MavenReport.CATEGORY_PROJECT_INFORMATION );
         List projectReports = (List) categories.get( MavenReport.CATEGORY_PROJECT_REPORTS );
 
@@ -236,9 +234,6 @@ public class SiteMojo
             projectReports = Collections.EMPTY_LIST;
         }
 
-        Collections.sort( projectInfos, reportComparator );
-        Collections.sort( projectReports, reportComparator );
-
         try
         {
             List localesList = initLocalesList();
@@ -250,6 +245,12 @@ public class SiteMojo
             // Default is first in the list
             Locale defaultLocale = (Locale) localesList.get( 0 );
             Locale.setDefault( defaultLocale );
+
+            // Sort projectInfos and projectReports with the default locale setted
+            // TODO Beautify the output by sorting with each current locale
+            Comparator reportComparator = new ReportComparator();
+            Collections.sort( projectInfos, reportComparator );
+            Collections.sort( projectReports, reportComparator );
 
             for ( Iterator iterator = localesList.iterator(); iterator.hasNext(); )
             {
@@ -411,7 +412,7 @@ public class SiteMojo
                     filteredReports.add( report );
                 }
             }
-            // the canGenerateReport() has been added just before the 2.0 release and will cause all the reporting 
+            // the canGenerateReport() has been added just before the 2.0 release and will cause all the reporting
             // plugins with an earlier version to fail (most of the codehaus mojo now fails)
             // be nice with them, output a warning and don't let them break anything
             catch ( AbstractMethodError e )
