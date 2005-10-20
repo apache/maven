@@ -103,12 +103,12 @@
     <snapshotRepository>
       <id>snapshots</id>
       <name>Maven Central Plugins Development Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
+      <url>scpexe://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
     </snapshotRepository>
     <repository>
       <id>repo1</id>
       <name>Maven Central Plugins Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
+      <url>scpexe://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
     <site>
       <id>website</id>
@@ -176,6 +176,7 @@
     <module>maven-project-info-reports-plugin</module>
     <module>maven-rar-plugin</module>
     <module>maven-release-plugin</module>
+    <module>maven-repository-plugin</module>    
     <module>maven-resources-plugin</module>
     <module>maven-site-plugin</module>
     <module>maven-source-plugin</module>
@@ -199,6 +200,13 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-alpha-5</version>
+      </extension>
+    </extensions>
   </build>
   <reporting>
     <plugins>
