@@ -19,7 +19,7 @@ Guide to uploading artifacts to Ibiblio
 
 +----+
 
- mvn repository:create-bundle
+ mvn repository:bundle-create
 
 +----+
 
