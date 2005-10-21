@@ -76,7 +76,7 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
 
  []
 
-* Step 2: Posting the request">
+* Step 2: Posting the request
 
  Post your request to {{{http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&amp;issuetype=3}JIRA}}.
  In the description you should write the URL of the upload bundle
@@ -107,8 +107,7 @@ clipping of nose hairs. Please upload!
 
  Some folks have asked why do we require the POM and license each time an artifact is deployed so here's a small explanation. The POM
  being deployed with the artifact is part of the process to make transitive dependencies a reality in Maven. The logic for getting
- transitive dependencies working is really not that hard, the problem is getting the data. So we have changed the process of uploading
- artifacts to include the POM in an attempt to get transitive dependencies working as quickly as possible. The other applications
+ transitive dependencies working is really not that hard, the problem is getting the data. The other applications
  that may be possible having all the POMs available for artifacts are vast, so by placing them into the repository as part of the
  process we open up the doors to new ideas that involve unified
  access to project POMs.
