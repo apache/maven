@@ -10,7 +10,7 @@ History of Maven by Jason van Zyl
 
  Maven began its life in the {{{http://jakarta.apache.org}Jakarta}} {{{ http://jakarta.apache.org/alexandria/legacy/}Alexandria}}
  project. The Alexandria project is now defunct but was the breeding ground for not only Maven, but for the
- {{{http://gump.apache.org}Gump}} and {{http://forrest.apache.org}Forrest}} projects as well. From the old
+ {{{http://gump.apache.org}Gump}} and {{{http://forrest.apache.org}Forrest}} projects as well. From the old
  {{{http://cvs.apache.org/viewcvs.cgi/jakarta-alexandria/proposal/maven/?hideattic=0}CVS}} archive
  you can see that as of the date of this document Maven was removed from Alexandria about 3 years, 7 months ago
  making Maven about 4 years old! Maven spent about 5 months as part of the Alexandria before moving on to its next home
