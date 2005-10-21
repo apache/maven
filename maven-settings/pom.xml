@@ -14,6 +14,10 @@
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.0-alpha-6</version>
+        <configuration>
+          <version>1.0.0</version>
+          <model>settings.mdo</model>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -21,10 +25,6 @@
               <goal>java</goal>
               <goal>xpp3-reader</goal>
             </goals>
-            <configuration>
-              <version>1.0.0</version>
-              <model>settings.mdo</model>
-            </configuration>
           </execution>
         </executions>
       </plugin>
