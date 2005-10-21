@@ -28,7 +28,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Generate a Clover report.
+ * Generate a <a href="http://cenqua.com/clover">Clover</a> report.
+ * The generated report is an external report generated  by Clover itself.
  *
  * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
  * @version $Id$
@@ -39,12 +40,16 @@ public class CloverReportMojo
     extends AbstractMavenReport
 {
     /**
+     * The location of the <a href="http://cenqua.com/clover/doc/adv/database.html">Clover database</a>.
+     * 
      * @parameter expression="${project.build.directory}/clover/clover.db"
      * @required
      */
     private String cloverDatabase;
 
     /**
+     * The directory where the Clover report will be generated.
+     * 
      * @parameter expression="${project.reporting.outputDirectory}/clover"
      * @required
      */
@@ -56,6 +61,8 @@ public class CloverReportMojo
     private SiteRenderer siteRenderer;
 
     /**
+     * The Maven project. 
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
