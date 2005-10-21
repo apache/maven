@@ -23,6 +23,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -149,11 +150,47 @@ public class CloverInstrumentMojo
      * @return the CLI args to be passed to CloverInstr
      * @todo handle multiple source roots. At the moment only the first source root is instrumented
      */
-    private String[] createCliArgs()
+    private String[] createCliArgs() throws MojoExecutionException
     {
-        // TODO: Temporary while we wait for surefire to be able to fork unit tests. See
-        // http://jira.codehaus.org/browse/MNG-441
-        return new String[]{"-p", "threaded", "-f", "100", "-i", this.cloverDatabase, "-s",
-            (String) this.project.getCompileSourceRoots().get( 0 ), "-d", this.cloverOutputSourceDirectory};
+        List parameters = new ArrayList();
+     
+        // TODO: The usage of the threaded flushpolicy model and a flush policy is temporary while 
+        // we wait for surefire to be able to fork unit tests. See http://jira.codehaus.org/browse/MNG-441
+
+        parameters.add( "-p" );
+        parameters.add( "threaded" );
+        parameters.add( "-f" );
+        parameters.add( "100" );
+
+        parameters.add( "-i" );
+        parameters.add( this.cloverDatabase );
+        parameters.add( "-s" );
+
+        // TODO: Allow support for several source roots in the future.
+        parameters.add( (String) this.project.getCompileSourceRoots().get( 0 ) );
+
+        parameters.add( "-d" );
+        parameters.add( this.cloverOutputSourceDirectory );
+
+        if ( this.jdk != null )
+        {
+            if ( this.jdk.equals( "1.4" ) )
+            {
+                parameters.add( "-jdk14" );
+            }
+            else if ( this.jdk.equals( "1.5" ) )
+            {
+                parameters.add( "-jdk15" );
+            }
+            else
+            {
+                throw new MojoExecutionException("Unsupported jdk version [" + this.jdk 
+                    + "]. Valid values are [1.4] and [1.5]");
+            }
+        }
+        
+        getLog().debug( "Instrumenting using parameters [" + parameters.toString() + "]");
+        
+        return (String[]) parameters.toArray(new String[0]);
     }
 }

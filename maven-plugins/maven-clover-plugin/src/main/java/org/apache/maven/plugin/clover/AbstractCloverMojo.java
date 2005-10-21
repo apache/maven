@@ -27,6 +27,14 @@ public abstract class AbstractCloverMojo extends AbstractMojo
     private String licenseFile;
 
     /**
+     * Whether the Clover instrumentation should use the Clover <code>jdk14</code> or
+     * <code>jdk15<code> flags to parse sources.
+     *
+     * @parameter
+     */
+    protected String jdk;
+    
+    /**
      * Registers the license file for Clover runtime by setting the
      * <code>clover.license.path</code> system property. If the <code>licenseFile</code>
      * property has not been defined by the user we look it up in the classpath in

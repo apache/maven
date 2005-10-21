@@ -39,13 +39,13 @@ public class CloverCheckMojo
      * @parameter expression="${project.build.directory}/clover/clover.db"
      * @required
      */
-    protected String cloverDatabase;
+    private String cloverDatabase;
 
     /**
      * @parameter default-value="70%"
      * @required
      */
-    protected String targetPercentage;
+    private String targetPercentage;
 
     public void execute()
         throws MojoExecutionException
