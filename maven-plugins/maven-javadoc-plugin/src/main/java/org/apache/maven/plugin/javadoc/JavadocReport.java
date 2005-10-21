@@ -602,7 +602,7 @@ public class JavadocReport
         throws MavenReportException
     {
         ArtifactHandler artifactHandler = project.getArtifact().getArtifactHandler();
-        if ( !"java".equals( artifactHandler.getLanguage() ) || !artifactHandler.isAddedToClasspath() )
+        if ( !"java".equals( artifactHandler.getLanguage() ) )
         {
             getLog().info( "Not executing Javadoc as the project is not a Java classpath-capable package" );
             return;
@@ -947,8 +947,8 @@ public class JavadocReport
      * conditionally based on the given flag.
      *
      * @param arguments
-     * @param b the flag which controls if the argument is added or not.
-     * @param value the argument value to be added.
+     * @param b         the flag which controls if the argument is added or not.
+     * @param value     the argument value to be added.
      */
     private void addArgIf( List arguments, boolean b, String value )
     {
@@ -962,8 +962,8 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      *
-     * @param b the flag which controls if the argument is added or not.
-     * @param value the argument value to be added.
+     * @param b                   the flag which controls if the argument is added or not.
+     * @param value               the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      * @see #addArgIf(java.util.List,boolean,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
@@ -983,12 +983,12 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * if the the value is not null or empty.
-     * <p>
+     * <p/>
      * Moreover, the value could be comma separated.
      *
      * @param arguments
-     * @param key the argument name.
-     * @param value the argument value to be added.
+     * @param key       the argument name.
+     * @param value     the argument value to be added.
      * @see #addArgIfNotEmpty(java.util.List,String,String,boolean)
      */
     private void addArgIfNotEmpty( List arguments, String key, String value )
@@ -999,12 +999,12 @@ public class JavadocReport
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * if the the value is not null or empty.
-     * <p>
+     * <p/>
      * Moreover, the value could be comma separated.
      *
      * @param arguments
-     * @param key the argument name.
-     * @param value the argument value to be added.
+     * @param key       the argument name.
+     * @param value     the argument value to be added.
      * @param repeatKey repeat or not the key in the command line
      */
     private void addArgIfNotEmpty( List arguments, String key, String value, boolean repeatKey )
@@ -1039,8 +1039,8 @@ public class JavadocReport
      * regarding the requested Java version.
      *
      * @param arguments
-     * @param key the argument name.
-     * @param value the argument value to be added.
+     * @param key                 the argument name.
+     * @param value               the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      * @see #addArgIfNotEmpty(List, String, String, float, boolean)
      */
@@ -1053,10 +1053,10 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      *
-     * @param key the argument name.
-     * @param value the argument value to be added.
+     * @param key                 the argument name.
+     * @param value               the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
-     * @param repeatKey repeat or not the key in the command line
+     * @param repeatKey           repeat or not the key in the command line
      * @see #addArgIfNotEmpty(java.util.List,String,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
      */

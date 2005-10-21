@@ -66,7 +66,7 @@ public class JavadocJar
         throws MojoExecutionException
     {
         ArtifactHandler artifactHandler = project.getArtifact().getArtifactHandler();
-        if ( !"java".equals( artifactHandler.getLanguage() ) || !artifactHandler.isAddedToClasspath() )
+        if ( !"java".equals( artifactHandler.getLanguage() ) )
         {
             getLog().info( "Not executing Javadoc as the project is not a Java classpath-capable package" );
         }
