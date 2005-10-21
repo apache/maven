@@ -20,9 +20,9 @@
   </developers>
   <dependencies>
     <dependency>
-      <groupId>doxia</groupId>
+      <groupId>org.codehaus.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-6-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <artifactId>plexus-container-default</artifactId>

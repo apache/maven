@@ -55,9 +55,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>doxia</groupId>
+      <groupId>org.codehaus.doxia</groupId>
       <artifactId>doxia-core</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-6-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <artifactId>plexus-container-default</artifactId>
