@@ -111,7 +111,7 @@ public class PerformReleaseMojo
 
         Commandline cl = new Commandline();
 
-        cl.setExecutable( "m2" );
+        cl.setExecutable( "mvn" );
 
         cl.setWorkingDirectory( workingDirectory );
 
@@ -154,7 +154,7 @@ public class PerformReleaseMojo
 
             if ( result != 0 )
             {
-                throw new MojoExecutionException( "Result of m2 execution is: \'" + result + "\'. Release failed." );
+                throw new MojoExecutionException( "Result of mvn execution is: \'" + result + "\'. Release failed." );
             }
         }
         catch ( CommandLineException e )
