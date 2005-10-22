@@ -44,6 +44,14 @@ public final class EarModuleFactory
         {
             return new EjbModule( artifact );
         }
+        else if ( "ejb3".equals( artifact.getType() ) )
+        {
+            return new EjbModule( artifact );
+        }
+        else if ( "par".equals( artifact.getType() ) )
+        {
+            return new EjbModule( artifact );
+        }
         else if ( "ejb-client".equals( artifact.getType() ) )
         {
             return new EjbClientModule( artifact );
