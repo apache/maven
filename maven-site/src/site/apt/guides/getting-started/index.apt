@@ -98,7 +98,7 @@ Sections
  <an original pattern or model from which all other things of the same kind are made>. In Maven, an archetype is a template
  of a project which is combined with some user input to produce a working Maven project that has been tailored to the
  user's requirements. We are going to show you how the archetype mechanism works now, but if you would to know more about
- archetypes please refer to our {{{introduction-to-archetypes.html}Introduction to Archetypes}}.
+ archetypes please refer to our {{{../introduction/introduction-to-archetypes.html}Introduction to Archetypes}}.
 
  On to creating your first project! In order to create the simplest of Maven projects, execute the following from
  the command line:
@@ -140,7 +140,7 @@ mvn archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app
  of work in Maven. This is important to remember because Maven is inherently project-centric in that everything revolves
  around the notion of a project. In short, the POM contains every important piece of information about your project and
  is essentially one-stop-shopping for finding anything related to your project. Understanding the POM is important and
- new users are encouraged to refer to the {{{introduction-to-the-pom.html}Introduction to the POM}}.
+ new users are encouraged to refer to the {{{../introduction/introduction-to-the-pom.html}Introduction to the POM}}.
 
   This is a very simple POM but still displays the key elements every POM contains, so let's walk through each of them
   to familiarize you with the POM essentials:
@@ -217,7 +217,7 @@ my-app
 
  If you were to create a Maven project by hand this is the directory structure that we recommend using. This is a
  Maven convention and to learn more about it you can read our
- {{{introduction-to-the-standard-directory-layout.html}Introduction to the Standard Directory Layout}}.
+ {{{../introduction/introduction-to-the-standard-directory-layout.html}Introduction to the Standard Directory Layout}}.
 
  Now that we have a POM, some application sources, and some test sources you are probably asking ...
 
@@ -360,7 +360,7 @@ mvn package
 
  Now you'll want to install the artifact you've generated (the JAR file) in your local repository
  (<<<~/.m2/repository>>> is the default location). For more information on repositories you can refer to our
- {{{introduction-to-repositories.html}Introduction to Repositories}} but let's move on to installing our artifact!
+ {{{../introduction/introduction-to-repositories.html}Introduction to Repositories}} but let's move on to installing our artifact!
  To do so execute the following command:
 
 +----+
@@ -452,7 +452,7 @@ mvn site
 
  Another common usecase that can be satisfied which requires no changes to the POM that we have
  above is packaging resources in the JAR file. For this common task, Maven again relies on the
- {{{introduction-to-the-standard-directory-layout.html}Standard Directory Layout}}, which means by using
+ {{{../introduction/introduction-to-the-standard-directory-layout.html}Standard Directory Layout}}, which means by using
  standard Maven coventions you can package resources within JARs simply by placing those resources in a standard
  directory structure.
 
@@ -775,7 +775,7 @@ mvn process-resources "-Dcommand.line.prop=hello again"
  You've probably already noticed a <<<dependencies>>> element in the POM we've been using as an example.
  You have, in fact, been using an external dependency all this time, but here we'll talk about how this
  works in a bit more detail. For a more thorough introduction, please refer to our
- {{{introduction-to-dependency-management.html}Introduction to Dependency Management}}.
+ {{{../introduction/introduction-to-dependency-management.html}Introduction to Dependency Management}}.
 
  The <<<dependencies>>> section of the pom.xml lists all of the external dependencies that particular needs
  in order to build (whether it needs that dependency at compile time, test time, run time, or whatever).  Right
@@ -842,7 +842,7 @@ mvn process-resources "-Dcommand.line.prop=hello again"
  various plugins used to build the project).  By default, the remote repository Maven uses can be found (and browsed) at
  {{http://www.ibiblio.org/Maven2}}.  You can also set up your own remote repository (maybe a central repository for your company) to
  use instead of or in addition to ibiblio.  For more information on repositories you can refer to the
- {{{introduction-to-repositories.html}Introduction to Repositories}}.
+ {{{../introduction/introduction-to-repositories.html}Introduction to Repositories}}.
 
  Let's add another dependency to our project.  Let's say we've added some logging to the code and need to add log4j as a dependency.
  First, we need to know what the groupId, artifactId, and version are for log4j.  We can browse ibiblio and look for it, or use Google
