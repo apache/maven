@@ -3,6 +3,6 @@
   <classpathentry kind="src" path="src/main/resources" output="target/main-resources"/>
   <classpathentry kind="src" path="src/test/resources" output="target/test-output-dir"/>
   <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="var" rootpath="JRE_SRCROOT" path="JRE_LIB" sourcepath="JRE_SRC"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="var" path="M2_REPO/junit/jars/junit-2.0.jar"/>
 </classpath>

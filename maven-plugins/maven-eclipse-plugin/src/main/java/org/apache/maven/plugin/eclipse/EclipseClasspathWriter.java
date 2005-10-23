@@ -116,10 +116,8 @@ public class EclipseClasspathWriter
         // ----------------------------------------------------------------------
 
         writer.startElement( "classpathentry" ); //$NON-NLS-1$
-        writer.addAttribute( "kind", "var" ); //$NON-NLS-1$ //$NON-NLS-2$
-        writer.addAttribute( "rootpath", "JRE_SRCROOT" ); //$NON-NLS-1$ //$NON-NLS-2$
-        writer.addAttribute( "path", "JRE_LIB" ); //$NON-NLS-1$ //$NON-NLS-2$
-        writer.addAttribute( "sourcepath", "JRE_SRC" ); //$NON-NLS-1$ //$NON-NLS-2$
+        writer.addAttribute( "kind", "con" ); //$NON-NLS-1$ //$NON-NLS-2$
+        writer.addAttribute( "path", "org.eclipse.jdt.launching.JRE_CONTAINER" ); //$NON-NLS-1$ //$NON-NLS-2$
         writer.endElement();
 
         // ----------------------------------------------------------------------
