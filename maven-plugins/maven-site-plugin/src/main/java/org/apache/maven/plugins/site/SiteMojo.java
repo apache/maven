@@ -70,6 +70,9 @@ public class SiteMojo
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
+    /** The locale by default for all default bundles */
+    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
     /**
      * Directory containing source for apt, fml and xdoc docs.
      *
@@ -136,6 +139,8 @@ public class SiteMojo
     private boolean addModules;
 
     /**
+     * Specifies the output encoding.
+     *
      * @parameter expression="${outputEncoding}"
      * default-value="ISO-8859-1"
      */
@@ -239,7 +244,7 @@ public class SiteMojo
             List localesList = initLocalesList();
             if ( localesList.isEmpty() )
             {
-                localesList = Collections.singletonList( Locale.ENGLISH );
+                localesList = Collections.singletonList( DEFAULT_LOCALE );
             }
 
             // Default is first in the list
@@ -456,6 +461,8 @@ public class SiteMojo
      * Init the <code>localesList</code> variable.
      * <p>If <code>locales</code> variable is available, the first valid token will be the <code>defaultLocale</code>
      * for this instance of the Java Virtual Machine.</p>
+     *
+     * @return a list of <code>Locale</code>
      */
     private List initLocalesList()
     {
@@ -480,23 +487,27 @@ public class SiteMojo
                     continue;
                 }
 
-                if ( !i18n.getBundle( "site-plugin", locale ).getLocale().getLanguage().equals( locale.getLanguage() ) )
+                // Default bundles are in English
+                if ( !locale.getLanguage().equals( DEFAULT_LOCALE.getLanguage() ) )
                 {
-                    StringBuffer sb = new StringBuffer();
+                    if ( !i18n.getBundle( "site-plugin", locale ).getLocale().getLanguage().equals( locale.getLanguage() ) )
+                    {
+                        StringBuffer sb = new StringBuffer();
 
-                    sb.append( "The locale '" ).append( locale ).append( "' (" );
-                    sb.append( locale.getDisplayName( Locale.ENGLISH ) );
-                    sb.append( ") is not currently support by Maven - IGNORING. " );
-                    sb.append( "\n" );
-                    sb.append( "Contribution are welcome and greatly appreciated! " );
-                    sb.append( "\n" );
-                    sb.append( "If you want to contribute a new translation, please visit " );
-                    sb.append( "http://maven.apache.org/maven2/plugins/maven-site-plugin/i18n.html " );
-                    sb.append( "for detailed instructions." );
+                        sb.append( "The locale '" ).append( locale ).append( "' (" );
+                        sb.append( locale.getDisplayName( Locale.ENGLISH ) );
+                        sb.append( ") is not currently support by Maven - IGNORING. " );
+                        sb.append( "\n" );
+                        sb.append( "Contribution are welcome and greatly appreciated! " );
+                        sb.append( "\n" );
+                        sb.append( "If you want to contribute a new translation, please visit " );
+                        sb.append( "http://maven.apache.org/plugins/maven-site-plugin/i18n.html " );
+                        sb.append( "for detailed instructions." );
 
-                    getLog().warn( sb.toString() );
+                        getLog().warn( sb.toString() );
 
-                    continue;
+                        continue;
+                    }
                 }
 
                 localesList.add( locale );
