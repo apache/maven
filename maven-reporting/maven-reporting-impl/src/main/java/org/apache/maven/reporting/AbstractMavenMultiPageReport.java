@@ -108,13 +108,13 @@ public abstract class AbstractMavenMultiPageReport
                 MultiPageSink currentSink = (MultiPageSink) i.next();
 
                 currentSink.paragraph();
-                for ( Iterator j = sinks.iterator(); i.hasNext(); )
+                for ( Iterator j = sinks.iterator(); j.hasNext(); )
                 {
                     if ( counter > 1 )
                     {
                         currentSink.text( "&nbsp;" );
                     }
-                    MultiPageSink sink = (MultiPageSink) i.next();
+                    MultiPageSink sink = (MultiPageSink) j.next();
                     sink.link( sink.getOutputName() + ".html" );
                     sink.text( String.valueOf( counter++ ) );
                     sink.link_();
