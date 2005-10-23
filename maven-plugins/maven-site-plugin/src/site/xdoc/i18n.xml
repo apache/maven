@@ -39,9 +39,9 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td>English</td>
+                                <td>English (Default)</td>
                                 <td>
-                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-site-plugin/src/main/resources/site-plugin_en.properties">
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-site-plugin/src/main/resources/site-plugin.properties">
                                         See
                                     </a>
                                 </td>
@@ -50,6 +50,14 @@
                                 <td>French</td>
                                 <td>
                                     <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-site-plugin/src/main/resources/site-plugin_fr.properties">
+                                        See
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Japanese</td>
+                                <td>
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-site-plugin/src/main/resources/site-plugin_ja.properties">
                                         See
                                     </a>
                                 </td>
@@ -69,9 +77,9 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td>English</td>
+                                <td>English (Default)</td>
                                 <td>
-                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report_en.properties">
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report.properties">
                                         See
                                     </a>
                                 </td>
@@ -80,6 +88,14 @@
                                 <td>French</td>
                                 <td>
                                     <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report_fr.properties">
+                                        See
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Japanese</td>
+                                <td>
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report_ja.properties">
                                         See
                                     </a>
                                 </td>
@@ -113,8 +129,8 @@
                     </li>
                     <li>
                         Translate the file contents using your preferred
-                        text editor. Make sure you save the file with
-                        UTF-8 encoding.
+                        text editor. <b>Make sure you save the file with
+                        UTF-8 encoding</b>.
                     </li>
                     <li>
                         Send the file to

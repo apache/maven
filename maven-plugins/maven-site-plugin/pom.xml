@@ -21,6 +21,15 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
+  <contributors>
+    <contributor>
+      <name>Naoki Nose</name>
+      <email>ikkoan@mail.goo.ne.jp</email>
+      <roles>
+        <role>Japanese translator</role>
+      </roles>
+    </contributor>
+  </contributors>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
