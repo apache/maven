@@ -19,10 +19,14 @@ public class JavaExtractorTestTwo
     private String[] project;
 
     public JavaExtractorTestTwo()
-    {
+    {        
     }
 
     public void execute()
     {
+        if ( getLog() != null )
+        {
+            getLog().info( "projects: " + project );
+        }
     }
 }
