@@ -34,7 +34,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
  * Goal for generating IDEA files from a POM.
@@ -284,8 +289,7 @@ public class IdeaMojo
 
             removeOldDependencies( component );
 
-            // Must loop artifacts, not dependencies to resolve transitivity
-            for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
+            for ( Iterator i = getRuntimeClasspathArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
                 Xpp3Dom dep = createElement( component, "orderEntry" );
@@ -329,6 +333,34 @@ public class IdeaMojo
         {
             throw new MojoExecutionException( "Error parsing existing IML file " + moduleFile.getAbsolutePath(), e );
         }
+    }
+    
+    /**
+     * Get the list of Classpath Artifacts
+     *
+     * @return List of artifacts that are Classpath Elements
+     */
+    private List getRuntimeClasspathArtifacts()
+    {
+        Set artifacts = project.getArtifacts();
+        
+        if ( artifacts == null ||  artifacts.isEmpty() ) return Collections.EMPTY_LIST;
+        
+        ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+        
+        List list = new ArrayList();
+        
+        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+            
+            if ( artifact.getArtifactHandler().isAddedToClasspath() && scopeFilter.include( artifact ) )
+            {
+                list.add( artifact );
+            }
+        }
+        
+        return list;
     }
 
     /**
