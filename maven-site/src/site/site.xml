@@ -11,8 +11,8 @@
   <body>
     <links>
       <item name="Apache" href="http://www.apache.org/"/>
-      <item name="Maven 1.0" href="http://maven.apache.org/"/>
-      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+      <item name="Maven 1.0" href="http://maven.apache.org/maven-1.x"/>
+      <item name="Maven 2" href="http://maven.apache.org/"/>
     </links>
 
     <menu name="Quick Links">
