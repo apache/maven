@@ -40,11 +40,6 @@ public class BundleCreateMojo
     public static final String LICENSE = "LICENSE.txt";
 
     /**
-     * @parameter expression="${project.build.directory}"
-     */
-    private File outputDirectory;
-
-    /**
      * @parameter expression="${basedir}"
      */
     private String basedir;

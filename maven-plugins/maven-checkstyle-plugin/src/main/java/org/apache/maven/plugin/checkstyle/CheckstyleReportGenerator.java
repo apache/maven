@@ -20,7 +20,6 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Map;
@@ -287,20 +286,6 @@ public class CheckstyleReportGenerator
         }
     }
     
-    private Iterator getCheckstyleEvents( Iterator events, SeverityLevel level )
-    {
-        LinkedList filtered = new LinkedList();
-        
-        while( events.hasNext() )
-        {
-            AuditEvent event = (AuditEvent) events.next();
-            
-            if ( event.getSeverityLevel().equals( level ) ) filtered.add( event );
-        }
-        
-        return filtered.iterator();
-    }
-
     public SeverityLevel getSeverityLevel()
     {
         return severityLevel;

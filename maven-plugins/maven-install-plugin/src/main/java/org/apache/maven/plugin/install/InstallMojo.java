@@ -52,19 +52,6 @@ public class InstallMojo
     private File pomFile;
 
     /**
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
-     */
-    private String buildDirectory;
-
-    /**
-     * @parameter alias="archiveName" expression="${project.build.finalName}"
-     * @required
-     */
-    private String finalName;
-
-    /**
      * @parameter expression="${updateReleaseInfo}"
      */
     private boolean updateReleaseInfo = false;

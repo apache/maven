@@ -64,19 +64,6 @@ public class DeployMojo
     private File pomFile;
 
     /**
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
-     */
-    private String buildDirectory;
-
-    /**
-     * @parameter alias="archiveName" expression="${project.build.finalName}"
-     * @required
-     */
-    private String finalName;
-
-    /**
      * @parameter expression="${component.org.apache.maven.artifact.deployer.ArtifactDeployer}"
      * @required
      * @readonly

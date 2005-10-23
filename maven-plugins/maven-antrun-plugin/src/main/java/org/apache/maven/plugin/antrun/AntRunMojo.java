@@ -16,14 +16,11 @@ package org.apache.maven.plugin.antrun;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractMojo;
+import java.io.File;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.DefaultLogger;
-import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Target;
-
-import java.io.File;
 
 /**
  * Maven AntRun Mojo.
