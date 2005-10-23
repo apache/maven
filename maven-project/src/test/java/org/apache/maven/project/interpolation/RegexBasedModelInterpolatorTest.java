@@ -17,6 +17,7 @@ package org.apache.maven.project.interpolation;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;

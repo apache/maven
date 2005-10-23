@@ -16,7 +16,6 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;

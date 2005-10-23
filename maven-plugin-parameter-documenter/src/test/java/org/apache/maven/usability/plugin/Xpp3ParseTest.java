@@ -1,5 +1,7 @@
 package org.apache.maven.usability.plugin;
 
+import junit.framework.TestCase;
+
 import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -8,8 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 public class Xpp3ParseTest
     extends TestCase

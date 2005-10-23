@@ -1,6 +1,7 @@
 package org.apache.maven.project.injection;
 
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;

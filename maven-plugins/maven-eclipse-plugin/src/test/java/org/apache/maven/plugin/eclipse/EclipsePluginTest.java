@@ -180,7 +180,7 @@ public class EclipsePluginTest
             // replace some vars in the expected line, to account
             // for absolute paths that are different on each installation.
 
-            expected = StringUtils.replace( expected, "${basedir}", basedir.replace( '\\', '/' ) );
+            expected = StringUtils.replace( expected, "${basedir}", getBasedir().replace( '\\', '/' ) );
 
             if ( actualLines.size() <= i )
             {

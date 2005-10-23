@@ -1,9 +1,9 @@
 package org.apache.maven.plugin.version;
 
+import junit.framework.TestCase;
+
 import java.util.Calendar;
 import java.util.Date;
-
-import junit.framework.TestCase;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

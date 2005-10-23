@@ -17,6 +17,7 @@ package org.apache.maven.project.inheritance;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;

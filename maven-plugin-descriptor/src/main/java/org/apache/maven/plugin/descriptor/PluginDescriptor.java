@@ -49,8 +49,6 @@ public class PluginDescriptor
 
     private String version;
 
-    private List dependencies;
-
     private String goalPrefix;
 
     private String source;

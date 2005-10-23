@@ -31,7 +31,7 @@ public class RuntimeInfo
     // using Boolean for 3VL (null, true-to-all, false-to-all)
     private Boolean applyToAllPluginUpdates;
     
-    private boolean pluginRegistryActive = true;
+//    private boolean pluginRegistryActive = true;
     
     // using Boolean for 3VL (null for not-set, otherwise override with value)
 //    private Boolean checkLatest;

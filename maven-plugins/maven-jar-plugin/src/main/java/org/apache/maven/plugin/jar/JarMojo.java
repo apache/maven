@@ -16,8 +16,6 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.File;
 
 /**

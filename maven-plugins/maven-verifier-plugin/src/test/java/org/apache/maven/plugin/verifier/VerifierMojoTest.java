@@ -17,6 +17,7 @@ package org.apache.maven.plugin.verifier;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;

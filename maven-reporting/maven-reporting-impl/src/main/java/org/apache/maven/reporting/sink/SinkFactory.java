@@ -16,12 +16,12 @@ package org.apache.maven.reporting.sink;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.InputStream;
-
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringInputStream;
+
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>

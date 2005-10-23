@@ -25,7 +25,6 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

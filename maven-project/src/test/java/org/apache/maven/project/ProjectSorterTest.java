@@ -17,6 +17,7 @@ package org.apache.maven.project;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.dag.CycleDetectedException;

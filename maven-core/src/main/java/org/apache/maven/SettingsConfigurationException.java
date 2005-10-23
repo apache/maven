@@ -46,4 +46,16 @@ public class SettingsConfigurationException
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
+
+    public int getColumnNumber()
+    {
+        return columnNumber;
+    }
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+    
+
 }

@@ -1,6 +1,7 @@
 package org.apache.maven.project;
 
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 
