@@ -19,6 +19,7 @@ package org.apache.maven.tools.repoclean.discover;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -41,7 +42,7 @@ public class LegacyArtifactDiscoverer
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
                                    PathLister excludeLister, PathLister kickoutLister, boolean includeSnapshots )
-        throws Exception
+        throws ReportWriteException
     {
         List artifacts = new ArrayList();
 
@@ -65,7 +66,7 @@ public class LegacyArtifactDiscoverer
     }
 
     private Artifact buildArtifact( String path, PathLister kickoutLister )
-        throws Exception
+        throws ReportWriteException
     {
         try
         {
@@ -288,8 +289,7 @@ public class LegacyArtifactDiscoverer
             {
                 getLogger().debug( "Creating artifact with classifier." );
 
-                result = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version,
-                                                                       Artifact.SCOPE_RUNTIME, type,
+                result = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
                                                                        classifierBuffer.toString() );
             }
             else

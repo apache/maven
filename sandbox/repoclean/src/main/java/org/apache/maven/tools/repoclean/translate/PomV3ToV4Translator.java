@@ -20,6 +20,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.IssueManagement;
@@ -31,7 +32,6 @@ import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
@@ -426,13 +426,13 @@ public class PomV3ToV4Translator
 
         String distributionDirectory = v3Model.getDistributionDirectory();
 
-        Repository repository = null;
+        DeploymentRepository repository = null;
 
         if ( StringUtils.isEmpty( distributionSite ) )
         {
             if ( !StringUtils.isEmpty( distributionDirectory ) )
             {
-                repository = new Repository();
+                repository = new DeploymentRepository();
 
                 repository.setId( "default" );
 
@@ -451,7 +451,7 @@ public class PomV3ToV4Translator
                                                    "Missing 'distributionDirectory': must be set is 'distributionSite' is set." );
             }
 
-            repository = new Repository();
+            repository = new DeploymentRepository();
 
             repository.setId( "default" );
 
