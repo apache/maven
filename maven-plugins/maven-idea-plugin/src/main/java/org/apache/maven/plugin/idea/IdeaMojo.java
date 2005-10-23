@@ -88,9 +88,12 @@ public class IdeaMojo
 
         rewriteModule();
 
-        rewriteProject();
+        if ( project.isExecutionRoot() ) 
+        {
+            rewriteProject();
 
-        rewriteWorkspace();
+            rewriteWorkspace();
+        }
     }
 
     /**
