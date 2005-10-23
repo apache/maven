@@ -78,9 +78,6 @@ public abstract class AbstractArtifactTask
         ArtifactRepositoryLayout repositoryLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, localRepository.getLayout() );
 
-        CustomWagonManager manager = (CustomWagonManager) lookup( WagonManager.ROLE );
-        manager.setLocalRepository( localRepository.getLocation() );
-
         return new DefaultArtifactRepository( "local", "file://" + localRepository.getLocation(), repositoryLayout );
     }
 

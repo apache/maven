@@ -119,7 +119,7 @@ public class DependenciesTask
         Set artifacts;
         try
         {
-            artifacts = metadataSource.createArtifacts( artifactFactory, dependencies, null, null, null );
+            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, null );
 
             Artifact pomArtifact = artifactFactory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(), pom
                 .getVersion(), pom.getPackaging() );
