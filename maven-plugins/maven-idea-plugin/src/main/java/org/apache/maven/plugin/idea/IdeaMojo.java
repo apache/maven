@@ -77,6 +77,13 @@ public class IdeaMojo
      */
     private String jdkName;
 
+    /**
+     * Specify the version of the JDK to use for the project for the purpose of enabled assertions and 5.0 language features.
+     * The default value is the specification version of the executing JVM.
+     * @parameter expression="${jdkLevel}"
+     */
+    private String jdkLevel;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -438,6 +445,27 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
     {
         Xpp3Dom component = findComponent( content, "ProjectRootManager" );
         component.setAttribute( "project-jdk-name", jdkName );
+        
+        String jdkLevel = this.jdkLevel;
+        if ( jdkLevel == null )
+        {
+            jdkLevel = System.getProperty( "java.specification.version" );
+        }
+               
+        if ( jdkLevel.startsWith( "1.4" ) )
+        {
+            component.setAttribute( "assert-keyword", "true" );
+            component.setAttribute( "jdk-15", "false" );
+        }
+        else if ( jdkLevel.compareTo( "1.5" ) >= 0 )
+        {
+            component.setAttribute( "assert-keyword", "true" );
+            component.setAttribute( "jdk-15", "true" );
+        }
+        else
+        {
+            component.setAttribute( "assert-keyword", "false" );
+        }
     }
 
     /**
