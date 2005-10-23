@@ -714,6 +714,48 @@ public class JavadocReport
 
         Commandline cmd = new Commandline();
 
+        if ( !StringUtils.isEmpty( maxmemory ) )
+        {
+            // Allow '128' or '128m'
+            if ( NumberUtils.isDigits( maxmemory ) )
+            {
+                cmd.createArgument().setValue( "-J-Xmx" + maxmemory + "m" );
+            }
+            else
+            {
+                if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) ) &&
+                    ( maxmemory.toLowerCase().endsWith( "m" ) ) )
+                {
+                    cmd.createArgument().setValue( "-J-Xmx" + maxmemory );
+                }
+                else
+                {
+                    getLog().error( "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty( minmemory ) )
+        {
+            // Allow '128' or '128m'
+            if ( NumberUtils.isDigits( minmemory ) )
+            {
+                cmd.createArgument().setValue( "-J-Xms" + minmemory + "m" );
+            }
+            else
+            {
+                if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) &&
+                    ( minmemory.toLowerCase().endsWith( "m" ) ) )
+                {
+                    cmd.createArgument().setValue( "-J-Xms" + minmemory );
+                }
+                else
+                {
+                    getLog().error( "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
+                }
+            }
+        }
+
         List arguments = new ArrayList();
 
         cmd.setWorkingDirectory( javadocDirectory.getAbsolutePath() );
@@ -730,47 +772,6 @@ public class JavadocReport
         addArgIfNotEmpty( arguments, "-encoding", quotedArgument( encoding ) );
         addArgIfNotEmpty( arguments, "-extdirs", quotedPathArgument( extdirs ) );
         addArgIfNotEmpty( arguments, "-exclude", quotedArgument( excludePackageNames ), 1.4f );
-        if ( !StringUtils.isEmpty( maxmemory ) )
-        {
-            // Allow '128' or '128m'
-            if ( NumberUtils.isDigits( maxmemory ) )
-            {
-                addArgIf( arguments, true, "-J-Xmx" + maxmemory + "m" );
-            }
-            else
-            {
-                if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) ) &&
-                    ( maxmemory.toLowerCase().endsWith( "m" ) ) )
-                {
-                    addArgIf( arguments, true, "-J-Xmx" + maxmemory );
-                }
-                else
-                {
-                    getLog().error( "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
-                }
-            }
-        }
-
-        if ( !StringUtils.isEmpty( minmemory ) )
-        {
-            // Allow '128' or '128m'
-            if ( NumberUtils.isDigits( minmemory ) )
-            {
-                addArgIf( arguments, true, "-J-Xms" + minmemory + "m" );
-            }
-            else
-            {
-                if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) &&
-                    ( minmemory.toLowerCase().endsWith( "m" ) ) )
-                {
-                    addArgIf( arguments, true, "-J-Xms" + minmemory );
-                }
-                else
-                {
-                    getLog().error( "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
-                }
-            }
-        }
 
         if ( old && SystemUtils.isJavaVersionAtLeast( 1.4f ) )
         {
