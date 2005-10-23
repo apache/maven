@@ -81,6 +81,7 @@ public class IdeaMojo
      * Specify the version of the JDK to use for the project for the purpose of enabled assertions and 5.0 language features.
      * The default value is the specification version of the executing JVM.
      * @parameter expression="${jdkLevel}"
+     * @todo would be good to use the compilation source if possible
      */
     private String jdkLevel;
 
