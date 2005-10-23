@@ -1,3 +1,5 @@
+package org.apache.maven.plugin.clover;
+
 /*
  * Copyright 2005 The Apache Software Foundation.
  *
@@ -13,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.maven.plugin.clover;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -29,7 +30,7 @@ public class CloverMojoTest extends TestCase
 {
 	public void testExecution() throws MojoExecutionException
 	{
-		CloverInstrumentMojo mojo = new CloverInstrumentMojo();
+//		CloverInstrumentMojo mojo = new CloverInstrumentMojo();
         //TODO: write a test here...
 	}
 }

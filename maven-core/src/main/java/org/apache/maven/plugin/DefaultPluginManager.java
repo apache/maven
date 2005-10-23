@@ -964,26 +964,6 @@ public class DefaultPluginManager
         return result;
     }
 
-    private PlexusConfiguration mergeConfiguration( PlexusConfiguration dominant, PlexusConfiguration configuration )
-    {
-        // TODO: share with mergeXpp3Dom
-        PlexusConfiguration[] children = configuration.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            PlexusConfiguration child = children[i];
-            PlexusConfiguration childDom = dominant.getChild( child.getName(), false );
-            if ( childDom != null )
-            {
-                mergeConfiguration( childDom, child );
-            }
-            else
-            {
-                dominant.addChild( copyConfiguration( child ) );
-            }
-        }
-        return dominant;
-    }
-
     public static PlexusConfiguration copyConfiguration( PlexusConfiguration src )
     {
         // TODO: shouldn't be necessary

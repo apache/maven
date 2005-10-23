@@ -199,7 +199,6 @@ public class LicenseReport
 
                 String name = license.getName();
                 String url = license.getUrl();
-                String distribution = license.getDistribution();
                 String comments = license.getComments();
 
                 String licenseContent = null;

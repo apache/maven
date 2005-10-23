@@ -585,7 +585,7 @@ public class SiteMojo
      * @param locale the locale wanted
      * @return a XML menu for modules
      */
-    private String getModulesMenu( Locale locale )
+/*    private String getModulesMenu( Locale locale )
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"" );
@@ -611,14 +611,14 @@ public class SiteMojo
 
         return buffer.toString();
     }
-
+*/
     /**
      * Generate a menu for the parent project
      *
      * @param locale the locale wanted
      * @return a XML menu for the parent project
      */
-    private String getProjectParentMenu( Locale locale )
+/*    private String getProjectParentMenu( Locale locale )
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"" );
@@ -633,7 +633,7 @@ public class SiteMojo
 
         return buffer.toString();
     }
-
+*/
     /**
      * @param reports a list of reports
      * @param locale the current locale
