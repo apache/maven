@@ -14,6 +14,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core-it-support</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
 			<groupId>test</groupId>
 			<artifactId>test-component-a</artifactId>
 			<version>0.1</version>
