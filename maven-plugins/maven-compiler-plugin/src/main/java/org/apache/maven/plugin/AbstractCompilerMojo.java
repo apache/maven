@@ -28,6 +28,7 @@ import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -143,6 +144,20 @@ public abstract class AbstractCompilerMojo
      * @parameter default-value="false"
      */
     private boolean fork;
+
+    /**
+     * Initial size, in megabytes, of the memory allocation pool, ex. "64", "64m".
+     *
+     * @parameter
+     */
+    private String meminitial;
+
+    /**
+     * maximum size, in megabytes, of the memory allocation pool, ex. "128", "128m".
+     *
+     * @parameter
+     */
+    private String maxmem;
 
     /**
      * The executable of the compiler to use.
@@ -296,6 +311,37 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setFork( fork );
 
+        if( fork )
+        {
+            if ( !StringUtils.isEmpty( meminitial ) )
+            {
+                String value = getMemoryValue( meminitial );
+                
+                if ( value != null )
+                {
+                    compilerConfiguration.setMeminitial( value );
+                }
+                else
+                {
+                    getLog().info( "Invalid value for meminitial '" + meminitial + "'. Ignoring this option." );                    
+                }
+            }
+
+            if ( !StringUtils.isEmpty( maxmem ) )
+            {
+                String value = getMemoryValue( maxmem );
+                
+                if ( value != null )
+                {
+                    compilerConfiguration.setMaxmem( value );
+                }
+                else
+                {
+                    getLog().info( "Invalid value for maxmem '" + maxmem + "'. Ignoring this option." );                    
+                }
+            }
+        }
+
         compilerConfiguration.setExecutable( executable );
 
         compilerConfiguration.setWorkingDirectory( basedir );
@@ -437,6 +483,38 @@ public abstract class AbstractCompilerMojo
                 getLog().warn( message.toString() );
             }
         }
+    }
+
+    private String getMemoryValue( String setting )
+    {
+        String value = null;
+        
+        // Allow '128' or '128m'
+        if ( isDigits( setting ) )
+        {
+            value = setting + "m";
+        }
+        else
+        {
+            if ( ( isDigits( setting.substring( 0, setting.length() - 1 ) ) ) &&
+                ( setting.toLowerCase().endsWith( "m" ) ) )
+            {
+                value = setting;
+            }
+        }
+        return value;
+    }
+
+    private boolean isDigits( String string )
+    {
+        for ( int i = 0; i < string.length(); i++ )
+        {
+            if ( !Character.isDigit( string.charAt( i ) ) )
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Set computeStaleSources( CompilerConfiguration compilerConfiguration, Compiler compiler,
