@@ -17,7 +17,7 @@ How to Use
 * How To use assembly:assembly using a customized descriptor file.
 
 -----
-  m2 assembly:assembly -Dmaven.assembly.descriptor=path/to/descriptor.xml
+  m2 assembly:assembly -Ddescriptor=path/to/descriptor.xml
 -----
 
 
@@ -25,11 +25,11 @@ How to Use
 
 ----
 
-  m2 assembly:assembly -Dmaven.assembly.descriptorId=bin
+  m2 assembly:assembly -DdescriptorId=bin
 
-  or  m2 assembly:assembly -Dmaven.assembly.descriptorId=jar-with-dependencies
+  or  m2 assembly:assembly -DdescriptorId=jar-with-dependencies
 
-  or  m2 assembly:assembly -Dmaven.assembly.descriptorId=src
+  or  m2 assembly:assembly -DdescriptorId=src
 
 -----
 
@@ -44,13 +44,13 @@ How to Use
          ...
         <plugins>
             <plugin>
-                 <artifactId>maven-assembly-plugin</artifactId>
-                 <version>2.0-beta-1</version>
+             <artifactId>maven-assembly-plugin</artifactId>
+             <version>2.0-beta-1</version>
                  <configuration>
-                   <descriptor>path/to/descriptor.xml</descriptor>
-                   <finalName>final_name</finalName>
-                   <outputDirectory>output/directory</outputDirectory>
-                   <workDirectory>target/assembly/work</workDirectory>
+                       <descriptor>path/to/descriptor.xml</descriptor>
+                       <finalName>final_name</finalName>
+                       <outputDirectory>output/directory</outputDirectory>
+                       <workDirectory>target/assembly/work</workDirectory>
                  </configuration>
             </plugin>
          </plugins>
@@ -65,15 +65,46 @@ How to Use
   After running this goal, all dependencies will be extracted at the specified "\<workDirectory\>".
 
 -----
- m2 assembly:unpack
+ m2 assembly:unpack 
 -----
 
-  For full documentation, click {{{index.html}here}}.
 
-* How to generate Download Report
 
-  In your project pom.xml, add the assembly plugin in <reporting> section.
+* How to generate Assembly Download Report
 
+  To generate the Download report, maven-assembly-plugin must be configured in \<plugin\> section of your pom.xml.
+  Take note that the parameter \<finalName\> and \<descriptorId\>/\<descriptor\> are required parameters.
+  
+  You could generate the Download report by using this command: "m2 assembly:download". 
+  
+  Here's a sample configuration.
+  
+------------
+<project>
+   ...
+      <build>
+         ...
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <finalName>finalName-2.1-SNAPSHOT</finalName>
+                    <descriptorId>bin</descriptorId>
+                </configuration>
+            </plugin>
+         </plugins>
+         ...
+      </build>
+   ...
+</project>
+-------------  
+  
+  Or in your project pom.xml, add the assembly plugin in \<reporting\> section.  
+  Take note, that maven-assembly-plugin must also be configured in \<plugin\> section your pom.xml.
+  
+  And also the parameter \<finalName\> and \<descriptorId\>/\<descriptor\> are required parameters.
+  
 -------------------
   <project>
       ...
@@ -94,3 +125,5 @@ How to Use
 -------------------
   m2 site:site
 -------------------
+
+  For full documentation of plugin's goals and parameters, click {{{index.html}here}}.
