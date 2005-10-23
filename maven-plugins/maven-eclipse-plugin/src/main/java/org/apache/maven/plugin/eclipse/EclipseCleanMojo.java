@@ -31,7 +31,7 @@ public class EclipseCleanMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project.basedir}"
+     * @parameter expression="${basedir}"
      */
     private File basedir;
 
