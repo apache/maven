@@ -16,6 +16,7 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -32,6 +33,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -294,8 +296,12 @@ public class DefaultMaven
         }
         catch ( CycleDetectedException e )
         {
-            throw new MavenExecutionException(
+            throw new BuildFailureException(
                 "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e );
+        }
+        catch ( DuplicateProjectException e )
+        {
+            throw new BuildFailureException( e.getMessage(), e );
         }
 
         if ( rm.hasMultipleProjects() )

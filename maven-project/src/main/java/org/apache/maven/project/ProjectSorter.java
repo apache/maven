@@ -56,9 +56,10 @@ public class ProjectSorter
      * we are trying to build. we assume a closed set.</li>
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
+     * @throws DuplicateProjectException if any projects are duplicated by id
      */
     public ProjectSorter( List projects )
-        throws CycleDetectedException
+        throws CycleDetectedException, DuplicateProjectException
     {
         dag = new DAG();
 
@@ -70,6 +71,11 @@ public class ProjectSorter
 
             String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
+            if ( dag.getVertex( id ) != null )
+            {
+                throw new DuplicateProjectException( "Project '" + id + "' is duplicated in the reactor" );
+            }
+            
             dag.addVertex( id );
 
             projectMap.put( id, project );

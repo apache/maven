@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,6 +29,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
@@ -141,7 +143,7 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
-        throws CycleDetectedException
+        throws CycleDetectedException, DuplicateProjectException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
                                  new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".",

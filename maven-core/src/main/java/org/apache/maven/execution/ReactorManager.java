@@ -16,8 +16,10 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -49,7 +51,7 @@ public class ReactorManager
     private Map buildSuccessesByProject = new HashMap();
 
     public ReactorManager( List projects )
-        throws CycleDetectedException
+        throws CycleDetectedException, DuplicateProjectException
     {
         this.sorter = new ProjectSorter( projects );
     }

@@ -34,7 +34,7 @@ public class ProjectSorterTest
     extends TestCase
 {
     public void testMatchingArtifactIdsDifferentGroupIds()
-        throws CycleDetectedException
+        throws CycleDetectedException, DuplicateProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId1", "artifactId", "1.0" );
@@ -50,7 +50,7 @@ public class ProjectSorterTest
     }
 
     public void testMatchingGroupIdsDifferentArtifactIds()
-        throws CycleDetectedException
+        throws CycleDetectedException, DuplicateProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId", "artifactId1", "1.0" );
@@ -63,6 +63,48 @@ public class ProjectSorterTest
 
         assertEquals( project2, projects.get( 0 ) );
         assertEquals( project1, projects.get( 1 ) );
+    }
+
+    public void testMatchingIdsAndVersions()
+        throws CycleDetectedException
+    {
+        List projects = new ArrayList();
+        MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );
+        projects.add( project1 );
+        MavenProject project2 = createProject( "groupId", "artifactId", "1.0" );
+        projects.add( project2 );
+
+        try 
+        {
+            projects = new ProjectSorter( projects ).getSortedProjects();
+            fail( "Duplicate projects should fail" );
+        }
+        catch ( DuplicateProjectException e )
+        {
+            // expected
+            assertTrue( true );
+        }
+    }
+
+    public void testMatchingIdsAndDifferentVersions()
+        throws CycleDetectedException
+    {
+        List projects = new ArrayList();
+        MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );
+        projects.add( project1 );
+        MavenProject project2 = createProject( "groupId", "artifactId", "2.0" );
+        projects.add( project2 );
+
+        try 
+        {
+            projects = new ProjectSorter( projects ).getSortedProjects();
+            fail( "Duplicate projects should fail" );
+        }
+        catch ( DuplicateProjectException e )
+        {
+            // expected
+            assertTrue( true );
+        }
     }
 
     private Dependency createDependency( MavenProject project )
