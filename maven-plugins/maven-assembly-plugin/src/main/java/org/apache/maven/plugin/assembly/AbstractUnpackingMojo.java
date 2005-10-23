@@ -26,7 +26,14 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Base routines for assembly and unpack goals.
@@ -55,21 +62,12 @@ public abstract class AbstractUnpackingMojo
     protected String finalName;
 
     /**
-     * Project dependencies.
-     *
-     * @parameter expression="${project.artifacts}"
-     * @readonly
-     */
-    protected Set dependencies;
-
-    /**
      * Directory to unpack JARs into if needed
      *
      * @parameter expression="${project.build.directory}/assembly/work"
      * @required
      */
     protected File workDirectory;
-
 
     /**
      * To look up Archiver/UnArchiver implementations
@@ -80,6 +78,67 @@ public abstract class AbstractUnpackingMojo
 
     protected ArchiverManager archiverManager;
 
+    /**
+     * Contains the full list of projects in the reactor.
+     *
+     * @parameter expression="${reactorProjects}"
+     * @required
+     * @readonly
+     */
+    private List reactorProjects;
+
+    /**
+     * Creates a Map of artifacts within the reactor using the groupId:artifactId:version as key
+     *
+     * @return a HashMap of all artifacts available in the reactor
+     */
+    protected Map getMappedReactorArtifacts()
+    {
+        Map mappedReactorArtifacts = new HashMap();
+
+        for ( Iterator i = reactorProjects.iterator(); i.hasNext(); )
+        {
+            MavenProject reactorProject = (MavenProject) i.next();
+
+            String key = reactorProject.getGroupId() + ":" + reactorProject.getArtifactId() + ":"
+                + reactorProject.getVersion();
+
+            mappedReactorArtifacts.put( key, reactorProject.getArtifact() );
+        }
+
+        return mappedReactorArtifacts;
+    }
+
+    /**
+     * Retrieves all artifact dependencies within the reactor
+     *
+     * @return A HashSet of artifacts
+     */
+    protected Set getDependencies()
+    {
+        Map reactorArtifacts = getMappedReactorArtifacts();
+
+        Map dependencies = new HashMap();
+
+        for ( Iterator i = reactorProjects.iterator(); i.hasNext(); )
+        {
+            MavenProject reactorProject = (MavenProject) i.next();
+
+            for ( Iterator j = reactorProject.getArtifacts().iterator(); j.hasNext(); )
+            {
+                Artifact artifact = (Artifact) j.next();
+
+                String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+
+                if ( !reactorArtifacts.containsKey( key ) && !dependencies.containsKey( key ) )
+                {
+                    dependencies.put( key, artifact );
+                }
+            }
+        }
+
+        return new HashSet( dependencies.values() );
+    }
 
     /**
      * Unpacks the archive file.
@@ -87,7 +146,6 @@ public abstract class AbstractUnpackingMojo
      * @param file File to be unpacked.
      * @param location Location where to put the unpacked files.
      */
-
     protected void unpack( File file, File location )
         throws MojoExecutionException, NoSuchArchiverException
     {

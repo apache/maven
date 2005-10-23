@@ -42,7 +42,7 @@ public class UnpackMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        for ( Iterator j = dependencies.iterator(); j.hasNext(); )
+        for ( Iterator j = getDependencies().iterator(); j.hasNext(); )
         {
             Artifact artifact = (Artifact) j.next();
 
