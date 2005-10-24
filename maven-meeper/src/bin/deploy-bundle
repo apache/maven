@@ -36,11 +36,11 @@ echo $BUNDLE
     POM=pom.xml
   fi
 
+  [ ! -f ${POM} ] && echo && echo "Cannot deploy without the pom.xml or project.xml file!" && echo && exit
+
   less $POM
 
   ../d2u ${POM}
-
-  [ ! -f ${POM} ] && echo && echo "Cannot deploy without the pom.xml or project.xml file!" && echo && exit
 
   if [ ! -z $VERSION ]
   then
