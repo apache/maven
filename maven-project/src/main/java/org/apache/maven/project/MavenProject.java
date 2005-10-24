@@ -438,6 +438,8 @@ public class MavenProject
 
         list.add( getBuild().getOutputDirectory() );
 
+        list.add( getBuild().getTestOutputDirectory() );
+        
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
