@@ -46,9 +46,8 @@ public abstract class AbstractJarMojo
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
-     * @todo Change type to File
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * Name of the generated JAR.
@@ -97,21 +96,18 @@ public abstract class AbstractJarMojo
         return project;
     }
 
+    protected final File getBaseDir()
+    {
+        return basedir;
+    }
+
     /**
      * Overload this to produce a test-jar, for example.
      */
     protected abstract String getClassifier();
 
-    /**
-     * Generates the JAR.
-     *
-     * @todo Add license files in META-INF directory.
-     */
-    public File createArchive()
-        throws MojoExecutionException
+    protected static File getJarFile( File basedir, String finalName, String classifier )
     {
-        String classifier = getClassifier();
-
         if ( classifier == null )
         {
             classifier = "";
@@ -121,7 +117,18 @@ public abstract class AbstractJarMojo
             classifier = "-" + classifier;
         }
 
-        File jarFile = new File( basedir, finalName + classifier + ".jar" );
+        return new File( basedir, finalName + classifier + ".jar" );
+    }
+
+    /**
+     * Generates the JAR.
+     *
+     * @todo Add license files in META-INF directory.
+     */
+    public File createArchive()
+        throws MojoExecutionException
+    {
+        File jarFile = getJarFile( basedir, finalName, getClassifier() );
 
         MavenArchiver archiver = new MavenArchiver();
 

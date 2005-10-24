@@ -1,0 +1,13 @@
+ ------
+ Maven 2 JAR Plugin
+ ------
+
+Maven 2 JAR Plugin
+
+  This plugin provides the capability to manipulate jars. Currently it can create jars for your project sources or tests classes. To achieve this use
+"jar:jar" or "jar:test-jar".
+
+  It also provides the capability to sign a jar file with the goal "jar:sign".
+
+  To learn how to use the plugin, click {{{howto.html}here}}.
+

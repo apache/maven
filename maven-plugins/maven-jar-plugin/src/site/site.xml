@@ -13,7 +13,8 @@
     </links>
 
     <menu name="Maven JAR Quickstart">
-      <item name="Overview" href="howto.html"/>
+      <item name="Introduction" href="introduction.html"/>
+      <item name="How to use" href="howto.html"/>
     </menu>
     ${reports}
   </body>

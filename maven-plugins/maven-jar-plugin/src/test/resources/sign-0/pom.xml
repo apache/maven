@@ -1,0 +1,31 @@
+<!-- Test project which creates and signs a jar artifact -->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>jar-mng-1130-0</artifactId>
+  <groupId>org.apache.maven.plugins</groupId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Test Case for MNG-1130</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+           <execution>
+              <goals>
+                 <goal>sign</goal>
+              </goals>
+           </execution>
+        </executions>
+        <configuration>
+           <keystore>keystore</keystore>
+           <alias>m2</alias>
+           <storepass>m2m2m2</storepass>
+           <!--signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar-->
+           <!--type></type-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

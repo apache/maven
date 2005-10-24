@@ -2,11 +2,11 @@
  Maven 2 JAR Plugin
  ------
 
-Maven 2 JAR Plugin
+How to use
 
- Builds your project into a jar
+ Brief examples on how to use the jar:jar and jar:sign goals.
  
-*How to Use
+* How to use jar:jar
 
   If the packaging of your project is set to 'jar', this plugin is executed
   whenever it passes the "package" phase. Have it executed
@@ -18,3 +18,45 @@ Maven 2 JAR Plugin
 
   From your project's target directory you'll able to see the generated jar file.
 
+
+* How to configure jar:sign using pom.xml
+
+  If you need to sign a jar, when using the 'jar' packaging, you just need to configure
+  the sign goal appropriately for the signing to occur automatically during the package phase.
+
+-------------------
+<project>
+  ...
+  <packaging>jar</packaging>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+           <execution>
+              <goals>
+                 <goal>sign</goal>
+              </goals>
+           </execution>
+        </executions>
+        <configuration>
+           <keystore>/path/to/your/keystore</keystore>
+           <alias>youralias</alias>
+           <storepass>yourstorepassword</storepass>
+           <!--signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+-------------------
+
+* How to use jar:sign specifying parameters on the command line
+
+-------------------
+  m2 jar:sign -Dkeystore=/path/to/your/keystore -Dstorepass=yourstorepassword -Dalias=youralias
+-------------------
+
+  For full documentation, click {{{index.html}here}}.
