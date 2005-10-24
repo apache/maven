@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.doxia.module.xdoc.XdocSiteModule;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -80,6 +81,14 @@ public class SiteMojo
      * @required
      */
     private File siteDirectory;
+    
+    /**
+     * Alternative directory for xdoc source, useful for m1 to m2 migration
+     *
+     * @parameter expression="${basedir}/xdocs"
+     * @required
+     */
+    private File xdocDirectory;
 
     /**
      * Directory containing generated documentation.
@@ -271,9 +280,12 @@ public class SiteMojo
 
                 // Generate static site
                 File siteDirectoryFile = siteDirectory;
+                File xdocDirectoryFile = xdocDirectory;
                 if ( !locale.getLanguage().equals( defaultLocale.getLanguage() ) )
                 {
                     siteDirectoryFile = new File( siteDirectory, locale.getLanguage() );
+                    
+                    xdocDirectoryFile = new File( xdocDirectory, locale.getLanguage() );
                 }
 
                 // Try to find duplicate files
@@ -345,6 +357,20 @@ public class SiteMojo
 
                 siteRenderer.render( siteDirectoryFile, outputDirectory, siteDescriptor, template, attributes, locale );
 
+                // Check if ${basedir}/xdocs is existing
+                if( xdocDirectory.exists() )
+                {
+                    File[] fileNames = xdocDirectoryFile.listFiles();
+                    
+                    if( fileNames.length > 0 )
+                    {
+                        XdocSiteModule xdoc = new XdocSiteModule();
+                    
+                        siteRenderer.render( xdocDirectoryFile, outputDirectory, xdoc.getSourceDirectory(), xdoc.getExtension(), xdoc.getParserId(), 
+                                         siteDescriptor, template, attributes, locale, "UTF-8" );
+                    }
+                }
+                
                 copyResources( outputDirectory );
 
                 // Copy site resources
@@ -387,6 +413,8 @@ public class SiteMojo
                 {
                     siteRenderer.render( generatedSiteDirectory, outputDirectory, siteDescriptor, template, attributes,
                                          locale );
+                    
+                   
                 }
             }
         }
