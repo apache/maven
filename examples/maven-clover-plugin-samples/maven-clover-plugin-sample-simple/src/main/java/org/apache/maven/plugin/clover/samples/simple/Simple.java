@@ -19,7 +19,7 @@ public class Simple
 {
     public void someMethod()
     {
-        assert (true == true);
+        assert true == true : "true was not true";
         
         int i = 0;
         if (i > 0)

@@ -40,6 +40,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
+        <configuration>
+          <jdk>1.4</jdk>
+        </configuration>
         <executions>
           <execution>
             <configuration>
