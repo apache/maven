@@ -133,14 +133,13 @@
                         UTF-8 encoding</b>.
                     </li>
                     <li>
-                        Send the file to
-                        <a href="mailto:dev@maven.apache.org?subject=[M2] Translation proposal">
-                            dev@maven.apache.org
-                        </a>
-                        or post it in the tracker at
-                        <a href="http://jira.codehaus.org/browse/MNG">
-                            http://jira.codehaus.org/browse/MNG
-                        </a>.
+                    	To test the translation, checkout the site plugin, include it in <code>src/main/resources</code>, 
+                    	and run <code>mvn install</code> on the plugin, then <code>mvn site</code> on a project to test
+                    	it.
+                    </li>
+                    <li>
+						When happy with it, create a new issue in <a href="http://jira.codehaus.org/browse/MNG">JIRA</a> 
+						and attach the file there.
                     </li>
                 </ol>
             </p>
