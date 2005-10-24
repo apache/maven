@@ -156,6 +156,10 @@ Using the Antlib
   placing them in your local repository for access as dependencies in other scripts, and <<<deploy>>> for
   deploying them to an remote location you have set up to serve as a repository in your organisation.
 
+  Note that the installation and deployment require that you have a Maven 2.0 POM file to deploy along with it.
+  These are required for the transitive dependency mechanism to work effectively, and can be quite simple to
+  create.
+
 -----
 ...
   <artifact:pom id="maven.project" file="pom.xml" />
@@ -165,6 +169,20 @@ Using the Antlib
   </artifact:install>
 
   <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <remoteRepository url="file://localhost/www/repository"/>
+    <pom refid="maven.project"/>
+  </artifact:deploy>
+...
+-----
+
+  For deploying using a protocol other than local file system, you need to register a provider to make the other
+  protocols available. For example:
+
+-----
+...
+  <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-5"/>
+  
+  <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
     <remoteRepository url="scp://localhost/www/repository">
       <authentication username="${repository.username}" privateKey="${user.home}/.ssh/id_dsa"/>
     </remoteRepository>
@@ -173,9 +191,19 @@ Using the Antlib
 ...
 -----
 
-  Note that the installation and deployment require that you have a Maven 2.0 POM file to deploy along with it.
-  These are required for the transitive dependency mechanism to work effectively, and can be quite simple to
-  create.
+  The currently available providers are:
+
+*--------------+--------------------------+-------------------+
+| Protocol     | Artifact ID              | Version           |
+*--------------+--------------------------+-------------------+
+| <<<file>>>   | <<<wagon-file>>>         | <<<1.0-alpha-5>>> |
+*--------------+--------------------------+-------------------+
+| <<<scp>>>    | <<<wagon-ssh>>>          | <<<1.0-alpha-5>>> |
+*--------------+--------------------------+-------------------+
+| <<<scpexe>>> | <<<wagon-ssh-external>>> | <<<1.0-alpha-5>>> |
+*--------------+--------------------------+-------------------+
+| <<<ftp>>>    | <<<wagon-ftp>>>          | <<<1.0-alpha-5>>> |
+*--------------+--------------------------+-------------------+
 
 * Using a Maven {POM} File
 
