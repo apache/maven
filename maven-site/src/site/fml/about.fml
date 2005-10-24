@@ -26,55 +26,6 @@
       </answer>
     </faq>
 
-    <faq id="tech-review">
-      <question>What does "beta release" mean?</question>
-      <answer>
-        <p>
-          Maven 2.0 is now in beta testing. We believe it is equally functional to Maven 1.0, however there are still
-          some bugs and usabilities issues including documentation to be resolved.
-        </p>
-        <p>
-          While some minor features may be added, the key goal is to retain backwards compatibility so this will be
-          limited.
-        </p>
-        <p>
-          This release is being made available so that people who are interested in using Maven 2 when it is released
-          can test and provide feedback, and those interested can get involved in the development and
-          direction of the project.
-        </p>
-        <p>
-          For more information on whether this release of Maven 2.0 should be used in your environment, please consult
-          <a href="maven1.html#m1-or-m2">this topic</a>
-          .
-        </p>
-      </answer>
-    </faq>
-
-    <faq id="release-schedule">
-      <question>How often will Maven 2.0 be released?</question>
-      <answer>
-        <p>
-          We are working to a fortnightly release cycle until the final release.
-        </p>
-        <p>
-          The first releases such as the technology preview were designated "alpha" releases, indicating that
-          they were not yet feature complete and there were outstanding bugs. Following that, "beta" releases are being
-          made available where introduction of new features will be restricted and the focus on improving usability and
-          stability. Finally, one or more release candidates will be distributed for testing that are genuinely believed
-          to be final, with the expectation that a final release would be available shortly afterwards.
-        </p>
-        <p>
-          We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
-          release schedule so that new features can be obtained as they are ready and tested.
-        </p>
-        <p>
-          For more information, consult the
-          <a href="roadmap.html">Road Map</a>
-          .
-        </p>
-      </answer>
-    </faq>
-
     <faq id="get-involved">
       <question>Can I get involved?</question>
       <answer>
