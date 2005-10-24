@@ -25,10 +25,12 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
 
+# get poms from svn and generate checksums
 (
   cd /home/projects/maven/repository-staging/to-ibiblio/maven2
   svn export --force svn://svn.codehaus.org/maven/scm/repository/ .
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
+  for f in `svn list -R svn://svn.codehaus.org/maven/scm/repository/ | grep .pom` ; do openssl md5 $f > $f.md5 ; openssl sha1 $f > $f.sha1; done
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
