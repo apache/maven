@@ -95,7 +95,7 @@ echo $BUNDLE
 
   [ ! -f $LIC ] && echo && echo "Cannot deploy without the $LIC file!" && echo && exit
 
-  cp project.xml ${artifactId}-${version}.pom
+  cp ${POM} ${artifactId}-${version}.pom
 
   ../d2u $LIC
 
