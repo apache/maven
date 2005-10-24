@@ -26,6 +26,14 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
 
 (
+  cd /home/projects/maven/repository-staging/to-ibiblio/maven2
+  svn export --force svn://svn.codehaus.org/maven/scm/repository/ .
+  retval=$?; if [ $retval != 0 ]; then exit $retval; fi
+)
+retval=$?; if [ $retval != 0 ]; then exit $retval; fi
+
+
+(
   cd $TOOLS_BASE/ibiblio-sync
   ./synchronize-codehaus-to-ibiblio.sh
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
