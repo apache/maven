@@ -1194,6 +1194,6 @@ public class JavadocReport
 
     public boolean isExternalReport()
     {
-        return true && super.isExternalReport();
+        return true;
     }
 }
