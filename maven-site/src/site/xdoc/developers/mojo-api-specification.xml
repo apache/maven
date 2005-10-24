@@ -449,7 +449,7 @@
               <code>${executedProject}</code>
               expression if required. An alternate lifecycle can also be provided: for more information see the
               documentation on the
-              <a href="/lifecycle.html">build lifecycle</a>
+              <a href="../guides/introduction/introduction-to-the-lifecycle.html">build lifecycle</a>
               .
             </td>
           </tr>
