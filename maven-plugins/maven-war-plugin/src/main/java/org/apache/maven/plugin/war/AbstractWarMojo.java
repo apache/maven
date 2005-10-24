@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 public abstract class AbstractWarMojo
     extends AbstractMojo
@@ -274,10 +275,8 @@ public abstract class AbstractWarMojo
             Artifact artifact = (Artifact) iter.next();
 
             // TODO: utilise appropriate methods from project builder
-            // TODO: scope handler
-            // Include runtime and compile time libraries
-            if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) &&
-                !Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+            ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+            if ( !artifact.isOptional() && filter.include( artifact ) )
             {
                 String type = artifact.getType();
                 if ( "tld".equals( type ) )

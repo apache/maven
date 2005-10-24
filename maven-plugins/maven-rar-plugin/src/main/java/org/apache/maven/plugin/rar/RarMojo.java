@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
  * Builds J2EE Resource Adapter Archive (RAR) files.
@@ -164,8 +165,9 @@ public class RarMojo
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
-                if ( !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
-                    !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                
+                ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+                if ( !artifact.isOptional() && filter.include( artifact ) )
                 {
                     getLog().info("Copying artifact[" + artifact.getGroupId() + ", " + artifact.getId() + ", " +
                         artifact.getScope() + "]");

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
  * A base class for EAR-processing related tasks.
@@ -102,9 +103,9 @@ public abstract class AbstractEarMojo
             Artifact artifact = (Artifact) iter.next();
 
             // Artifact is not yet registered and it has neither test, nor a
-            // provided scope
-            if ( !isArtifactRegistered( artifact, allModules ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
-                !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            // provided scope, not is it optional
+            ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+            if ( !isArtifactRegistered( artifact, allModules ) && !artifact.isOptional() && filter.include( artifact ) )
             {
                 EarModule module = EarModuleFactory.newEarModule( artifact );
                 allModules.add( module );
