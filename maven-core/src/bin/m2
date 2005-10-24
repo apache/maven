@@ -22,4 +22,4 @@ echo ""
 echo THE m2 COMMMAND IS DEPRECATED - PLEASE RUN mvn INSTEAD
 echo ""
 
-exec `dirname $0`/mvn $@
+exec "`dirname $0`/mvn" $@
