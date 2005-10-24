@@ -19,6 +19,8 @@ public class Simple
 {
     public void someMethod()
     {
+        assert (true == true);
+        
         int i = 0;
         if (i > 0)
         {
