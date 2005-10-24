@@ -17,11 +17,18 @@ package org.apache.maven.plugin.install;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.artifact.ProjectArtifactMetadata;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Installs a file in local repository.
@@ -71,6 +78,12 @@ public class InstallFileMojo
     private File file;
 
     /**
+     * @parameter expression="${generatePom}"
+     * @readonly
+     */
+    private boolean generatePom = false;
+
+    /**
      * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
      * @required
      * @readonly
@@ -80,10 +93,42 @@ public class InstallFileMojo
     public void execute()
         throws MojoExecutionException
     {
-        // TODO: validate
-        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
 
+        // TODO: check if it exists first, and default to true if not
+        if ( generatePom )
+        {
+            FileWriter fw = null;
+            try
+            {
+                File tempFile = File.createTempFile( "mvninstall", ".pom" );
+                tempFile.deleteOnExit();
+
+                Model model = new Model();
+                model.setGroupId( groupId );
+                model.setArtifactId( artifactId );
+                model.setVersion( version );
+                model.setPackaging( packaging );
+                model.setDescription( "POM was created from install:install-file" );
+                fw = new FileWriter( tempFile );
+                tempFile.deleteOnExit();
+                new MavenXpp3Writer().write( fw, model );
+                ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, tempFile );
+                artifact.addMetadata( metadata );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error writing temporary pom file: "
+                    + e.getMessage(), e );
+            }
+            finally
+            {
+                IOUtil.close( fw );
+            }
+        }
+
+        // TODO: validate
+        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         try
         {
             installer.install( file, artifact, localRepository );
