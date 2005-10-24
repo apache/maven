@@ -462,6 +462,8 @@ public class PomV3ToV4Translator
 
         distributionManagement.setRepository( repository );
 
+        distributionManagement.setStatus("converted");
+
         if ( site == null && repository == null )
         {
             return null;
@@ -648,7 +650,7 @@ public class PomV3ToV4Translator
                 {
                     Plugin plugin = new Plugin();
                     plugin.setGroupId( "org.apache.maven.plugins" );
-                    plugin.setArtifactId( "surefire" );
+                    plugin.setArtifactId( "maven-surefire-plugin" );
 
                     Xpp3Dom config = new Xpp3Dom( "configuration" );
 
