@@ -168,6 +168,9 @@
         <artifactId>maven-clover-plugin</artifactId>
       </plugin>
       <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
