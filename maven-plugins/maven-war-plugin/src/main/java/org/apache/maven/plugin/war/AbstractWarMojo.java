@@ -262,7 +262,7 @@ public abstract class AbstractWarMojo
 
         File webappClassesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
 
-        if ( getClassesDirectory().exists() )
+        if ( getClassesDirectory().exists() && (!getClassesDirectory().equals(webappClassesDirectory)))
         {
             FileUtils.copyDirectoryStructure( getClassesDirectory(), webappClassesDirectory );
         }
