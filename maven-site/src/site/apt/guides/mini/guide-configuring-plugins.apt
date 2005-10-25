@@ -132,7 +132,7 @@ public class MyQueryMojo
 public class MyAnimalMojo
     extends AbstractMojo
 {
-    private List people;
+    private List animals;
 
     public void execute()
         throws MojoExecutionException
