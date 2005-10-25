@@ -219,3 +219,24 @@ mvn site-deploy
 
   With one site descriptor per language, the translated site(s) can evolve independently.
 
+Using standard reports
+
+ There are many standard reports that are available by gleaning information from the POM. Currently
+ what is provided by default are:
+
+ * Dependencies Report
+
+ * Mailing Lists
+
+ * Continous Integration
+
+ * Source Repository
+
+ * Issue Tracking
+
+ * Project Team
+
+ * License
+ 
+ To find out more please refer to the
+ {{{http://maven.apache.org/plugins/maven-project-info-reports-plugin/howto.html}Project Info Reports Plug-in}}.
