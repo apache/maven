@@ -168,7 +168,8 @@ public class MyAnimalMojo
 
 +----+
 
- Where each of the animals listed would be entries in the <<<animals>>> field.
+ Where each of the animals listed would be entries in the <<<animals>>> field. If there is no <<<Animal>>> class
+ present then the field is assume to be of type <<<java.lang.String>>>.
 
 ** Mapping maps
 
