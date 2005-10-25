@@ -43,7 +43,7 @@ public class MyQueryMojo
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-myquery-plugin</artifactId>
         <configuration>
           <url>http://www.foobar.com/query</url>
           <timeout>10</timeout>
@@ -123,6 +123,52 @@ public class MyQueryMojo
  to show you how it's done:
 
 ** Mapping lists
+
+ Mapping lists works in much the same way as mapping to arrays where you a list of elements will be
+ mapped to the List. So if you have a mojo like the following:
+
++----+
+
+public class MyAnimalMojo
+    extends AbstractMojo
+{
+    private List people;
+
+    public void execute()
+        throws MojoExecutionException
+    {
+        ...
+    }
+}
+
++----+
+
+ Where you have a field named <<<animals>>> then your configuration for the plug-in would look like the following:
+
++----+
+
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-myanimal-plugin</artifactId>
+        <configuration>
+          <animals>
+            <animal>cat</animal>
+            <animal>dog</animal>
+            <animal>aardvark</animal>
+          </options>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
+
++----+
+
+ Where each of the animals listed would be entries in the <<<animals>>> field.
 
 ** Mapping maps
 
