@@ -81,7 +81,7 @@ public class SiteMojo
      * @required
      */
     private File siteDirectory;
-    
+
     /**
      * Alternative directory for xdoc source, useful for m1 to m2 migration
      *
@@ -284,7 +284,7 @@ public class SiteMojo
                 if ( !locale.getLanguage().equals( defaultLocale.getLanguage() ) )
                 {
                     siteDirectoryFile = new File( siteDirectory, locale.getLanguage() );
-                    
+
                     xdocDirectoryFile = new File( xdocDirectory, locale.getLanguage() );
                 }
 
@@ -361,16 +361,16 @@ public class SiteMojo
                 if( xdocDirectory.exists() )
                 {
                     File[] fileNames = xdocDirectoryFile.listFiles();
-                    
+
                     if( fileNames.length > 0 )
                     {
                         XdocSiteModule xdoc = new XdocSiteModule();
-                    
-                        siteRenderer.render( xdocDirectoryFile, outputDirectory, xdoc.getSourceDirectory(), xdoc.getExtension(), xdoc.getParserId(), 
-                                         siteDescriptor, template, attributes, locale, "UTF-8" );
+
+                        siteRenderer.render( xdocDirectoryFile, outputDirectory, xdoc.getSourceDirectory(), xdoc.getExtension(), xdoc.getParserId(),
+                                         siteDescriptor, template, attributes, locale, outputEncoding );
                     }
                 }
-                
+
                 copyResources( outputDirectory );
 
                 // Copy site resources
@@ -413,8 +413,6 @@ public class SiteMojo
                 {
                     siteRenderer.render( generatedSiteDirectory, outputDirectory, siteDescriptor, template, attributes,
                                          locale );
-                    
-                   
                 }
             }
         }
