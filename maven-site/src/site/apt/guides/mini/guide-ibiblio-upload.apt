@@ -83,7 +83,7 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
  (if you're uploading more than one bundle please add all the urls under the same issue),
  then leave a blank line and provide the following:
 
- * a url where the project can be found.</li>
+ * a url where the project can be found.
 
  * if you are one of its developers, a url where your name or email can be found inside the project site.
  
