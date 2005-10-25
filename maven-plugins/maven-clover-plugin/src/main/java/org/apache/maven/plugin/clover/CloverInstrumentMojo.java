@@ -154,13 +154,10 @@ public class CloverInstrumentMojo
     {
         List parameters = new ArrayList();
      
-        // TODO: The usage of the threaded flushpolicy model and a flush policy is temporary while 
-        // we wait for surefire to be able to fork unit tests. See http://jira.codehaus.org/browse/MNG-441
-
         parameters.add( "-p" );
-        parameters.add( "threaded" );
+        parameters.add( this.flushPolicy );
         parameters.add( "-f" );
-        parameters.add( "100" );
+        parameters.add( "" + this.flushInterval );
 
         parameters.add( "-i" );
         parameters.add( this.cloverDatabase );
