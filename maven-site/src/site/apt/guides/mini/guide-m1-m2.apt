@@ -1,25 +1,175 @@
- ------
+ -----
  Guide to Moving From Maven 1.x to Maven 2.x
- ------
- Jason van Zyl
- ------
+ ---	
+ Jay H. Hartley
+ -----
  12 October 2005
- ------
+ -----
 
-~~ merge in the m1 FAQ
-~~ repoclean
+Guide to Moving from Maven 1.x to Maven 2.x
 
- ** Projects using multiproject or project properties
+ This document is intended to be continously updated from the mail list archives.
+ For an only slightly out-of-date reference with concrete examples,
+ check out Vincent Massol's
+ {{{http://blogs.codehaus.org/people/vmassol/archives/001170_javazone_2005.html}JavaZone2005 presentation}}.
 
- Maven 1.x POMs that use multiproject and/or project.properties must be deployed by version 1.5 or later of the
- Artifact plugin for repoclean to  successfully convert them.  This ensures that any parent POMs and/or POM
- properties are fully resolved by Maven before deploying the POM.
+* Parallel Builds
 
- * planned tools
+ It is possible to establish parallel Maven builds, one using the old M1 settings,
+ and a second using M2. The Maven 2 configuration file names and uses have been modified,
+ so the two builds should not conflict.
+	
+ A Maven 1.x build is configured with the following files:
+	
+ * [project.xml] Project Object Model (POM) definition
+	
+ * [maven.xml] Custom build scripts
+	
+ * [project.properties] general build settings
+	
+ * [build.properties] local build settings
 
- No there isn't something yet but it's planned. I have presented some slides at javaZone 2005 about "From m1 to m2".
- Maybe that could help you in the meantime:
+ A Maven 2 build is configured with a different file set:
+	
+ * [pom.xml] POM definition
+		
+ * [settings.xml] local configuration
+			
+* Migrating the POM
 
- http://blogs.codehaus.org/people/vmassol/archives/001170_javazone_2005.html
+ The Project Object Model (POM) has moved from the project.xml file to pom.xml.
+ The XML schema has also changed, from {{{http://maven.apache.org/maven-v3_0_0.xsd}Version 3}} to
+ {{{http://maven.apache.org/maven-v4_0_0.xsd}Version 4}}.
 
-~~ doco coming from jay hartley
+ The new POM is nominally a superset of the old, so the first step in creating a
+ pom.xml is to copy over project.xml. Then start tweaking.
+ There are several new elements that can be added to a POM, but all are optional so
+ should not cause a problem with an initial build.
+
+ project.xml:
+	    
++----+
+
+<project>
+  <pomVersion>3</pomVersion>
+  <id>util</id>
+  <name>Generic utility code</name>
+  <groupId>project</groupId>
+  <currentVersion>1.1</currentVersion>
+  <package>org.apache.project.util</package>
+  <dependencies>
+    ...
+  </dependencies>
+  <build>
+    ...
+  </build>
+	...
+</project>
+
++----+
+
+ pom.xml:
+	
++----+
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>util</artifactId>
+  <name>Generic Utility Code</name>
+  <groupId>org.apache.project.util</groupId>
+  <version>1.1</version>
+  <packaging>jar</packaging>
+  <dependencies>
+  ...
+  </dependencies>
+  <build>
+  ...
+  </build>
+	...
+</project>
+
++----+
+
+ For more details, check out the
+ {{{http://maven.apache.org/maven2/guides/introduction/introduction-to-the-pom.html}POM Guide}}.
+	
+* build.properties and project.properties
+
+ These files have been replaced with
+ {{{http://maven.apache.org/maven2/maven-settings/settings.html}settings.xml}}.
+ Like with the POM, you can establish a parallel build environment, so the m1 build
+ never breaks while the m2 build is being debugged.
+	
+ Additional local build customization options can also be created using
+ {{{http://maven.apache.org/maven2/guides/introduction/introduction-to-profiles.html}profiles}}.
+	    
+* What to do with maven.xml?
+
+ See {{http://maven.apache.org/maven2/maven1.html#m1-maven-xml}} for an explanation of
+ why maven.xml was discarded, and
+ {{http://maven.apache.org/maven2/guides/introduction/introduction-to-plugins.html}} for
+ a guide to writing your own plug-ins.
+
+* Directory Structure
+
+ The POM allows customization of the directory structure in both Maven 1 and Maven 2
+ using the <<<\<build\>>>> tag. For simplicity, it would be ideal to move source to the
+ {{{http://maven.apache.org/maven2/guides/introduction/introduction-to-the-standard-directory-layout.html}Maven 2 default structure}},
+ but it is not required. You can begin by customizing the
+ directories in Maven 2, then when satisfied that both build paths are working, move
+ to the Maven 2 structure and customize the settings in Maven 1.
+	
+* Migrating Plug-ins
+
+ The main conceptual change in plugins and their use has to do with the concept of
+ a build cycle in Maven 2. Instead of using <<<preGoal>>> and <<<postGoal>>> tags
+ in <<<maven.xml>>> to tie plugin goals into the build process, the goals of a
+ plugin are associated with the pre-defined stages of the build cycle. See the
+ {{{http://maven.apache.org/maven2/guides/introduction/introduction-to-the-lifecycle.html}Introduction to the Build Lifecycle}}
+ for more on how plugins relate.
+	
+** Re-use Ant Tasks
+
+ See the {{{http://maven.apache.org/maven2/general.html#using-ant-tasks}Ant Script FAQ}}.
+
+** Replace scripts with Mojos
+
+	The new plugin architecture does not specify a specific language implementation, so
+	Jelly scripts and other such artifacts should be re-usable with wrappers. It is recommended
+	that you look into moving to 
+	{{{http://maven.apache.org/maven2/guides/plugin/guide-java-plugin-development.html}Mojos}}.
+
+** Utilize built-in Maven 2 capabilities
+
+*** Resource filtering to inject POM variables into application
+
+ You can turn on {{{http://maven.apache.org/maven2/guides/getting-started/index.html#How do I filter resource files?}resource filtering}}
+ in your POM. Tokens of the form <<<$\{pom.variable\}>>> in resource files will be replaced with the  corresponding POM property.
+	
++----+
+
+<project>
+  ...
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+</project>
+
++----+
+
+*** Multiproject Builds
+
+ The old reactor+multiproject plugin combination was established more as an afterthought
+ of the core development. In Maven 2, multiproject support is included in the core, so
+ any scripts required in the past to work around problems with the multiproject plugin
+ should be unnecessary.
+
+* Migrating repositories
+
+ Every four hours the Maven 1.x repository is converted over to a Maven 2.x repository and we plan to release
+ a plug-in based on our conversion tool but currently

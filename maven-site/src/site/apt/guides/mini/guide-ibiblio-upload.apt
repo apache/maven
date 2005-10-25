@@ -85,7 +85,9 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
 
  * a url where the project can be found.</li>
 
- * if you are one of its developers, a url where your name or email can be found inside the project site.</li>
+ * if you are one of its developers, a url where your name or email can be found inside the project site.
+ 
+ []
 
  This will speed up the uploading process.
 
