@@ -6,5 +6,5 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-archetype-site</artifactId>
-  <version>1.0-alpha-4</version>
+  <version>1.0-alpha-5-SNAPSHOT</version>
 </project>
