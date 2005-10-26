@@ -11,8 +11,11 @@
   <body>
     <links>
       <item name="Apache" href="http://www.apache.org/"/>
-      <item name="Maven 1.0" href="http://maven.apache.org/maven-1.x"/>
-      <item name="Maven 2" href="http://maven.apache.org/"/>
+      <item name="Maven 1.x" href="http://maven.apache.org/maven-1.x"/>
+      <item name="Maven 2.x" href="http://maven.apache.org/"/>
+      <item name="Continuum" href="http://maven.apache.org/continuum"/>
+      <item name="Maven SCM" href="http://maven.apache.org/scm"/>
+      <item name="Maven Wagon" href="http://maven.apache.org/wagon"/>
     </links>
 
     <menu name="Quick Links">
