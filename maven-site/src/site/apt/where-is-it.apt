@@ -1,0 +1,28 @@
+ ------
+ Where the $%#@!! is it!
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Where the $%#@!! is it!
+
+ As we have moved toward the release of Maven 2.0 we have built up a vast
+ store of knowledge that is sometimes hard to communicate with users because
+ there is just so much to communicate and limits of resources. Here are a few
+ quick references in an attempt to help.
+ 
+* POM references
+
+ * {{{/maven-model/maven.html}Project Descriptor}}
+ 
+* Settings references
+ 
+ * {{{../maven-settings/settings.html}Settings Descriptor}}
+  
+* Mailing list archives
+
+ * {{{http://www.nabble.com/Maven---Users-f178.html}Nabble}}
+ 
+ * {{{http://mail-archives.apache.org/mod_mbox/maven-users/}Apache Archives}}
