@@ -100,9 +100,10 @@ public class CloverInstrumentMojo
 
         // Explicitely set the output directory to be the Clover one so that all other plugins executing
         // thereafter output files in the Clover output directory and not in the main output directory.
+        this.project.getBuild().setDirectory( this.cloverOutputDirectory );
+
         // TODO: Ulgy hack below. Changing the directory should be enough for changing the values of all other
         // properties depending on it!
-        this.project.getBuild().setDirectory( this.cloverOutputDirectory );
         this.project.getBuild().setOutputDirectory( new File( this.cloverOutputDirectory, "classes" ).getPath() );
         this.project.getBuild().setTestOutputDirectory(
             new File( this.cloverOutputDirectory, "test-classes" ).getPath() );
