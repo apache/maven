@@ -141,9 +141,9 @@ public class CloverInstrumentMojo
                                                  cloverArtifact.getType() );
 
         // TODO: use addArtifacts
-        Set set = new HashSet( project.getDependencyArtifacts() );
+        Set set = new HashSet( this.project.getDependencyArtifacts() );
         set.add( cloverArtifact );
-        project.setDependencyArtifacts( set );
+        this.project.setDependencyArtifacts( set );
     }
 
     /**

@@ -50,6 +50,8 @@ public class CloverCheckMojo
     public void execute()
         throws MojoExecutionException
     {
+        waitForFlush();
+
         Project antProject = registerCloverAntTasks();
 
         getLog().info( "Checking for coverage of " + targetPercentage);

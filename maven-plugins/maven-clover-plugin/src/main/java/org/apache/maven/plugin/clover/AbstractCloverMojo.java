@@ -38,9 +38,23 @@ public abstract class AbstractCloverMojo extends AbstractMojo
      * When the Clover Flush Policy is set to "interval" or threaded this value is the minimum 
      * period between flush operations (in milliseconds).
      *
-     * @parameter default-value="5000"
+     * @parameter default-value="500"
      */
     protected int flushInterval;
+
+    /**
+     * If true we'll wait 2*flushInterval to ensure coverage data is flushed to the Clover 
+     * database before running any query on it. 
+     * 
+     * Note: The only use case where you would want to turn this off is if you're running your 
+     * tests in a separate JVM. In that case the coverage data will be flushed by default upon
+     * the JVM shutdown and there would be no need to wait for the data to be flushed. As we
+     * can't control whether users want to fork their tests or not, we're offering this parameter
+     * to them.  
+     * 
+     * @parameter default-value="true"
+     */
+    protected boolean waitForFlush;
     
     /**
      * Whether the Clover instrumentation should use the Clover <code>jdk14</code> or
@@ -80,4 +94,21 @@ public abstract class AbstractCloverMojo extends AbstractMojo
         return antProject;
     }
 
+    /**
+     * Wait 2*'flush interval' milliseconds to ensure that the coverage data have been flushed.
+     */
+    protected void waitForFlush()
+    {
+        if ( this.waitForFlush )
+        {
+            try
+            {
+                Thread.sleep( 2 * this.flushInterval );
+            }
+            catch ( InterruptedException e )
+            {
+                // Nothing to do... Just go on and try to check for coverage.
+            }
+        }
+    }
 }
