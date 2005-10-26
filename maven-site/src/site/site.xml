@@ -25,6 +25,7 @@
       <item name="Getting Started" href="/guides/getting-started/index.html"/>
       <item name="Documentation" href="/guides/index.html"/>
       <item name="Available Plug-ins" href="/plugins/index.html"/> 
+      <item name="Plug-in Matrix" href="http://docs.codehaus.org/display/MAVEN/Maven+Plugin+Matrix"/>
       <item name="Where the $%#@!! is it!" href="/where-is-it.html"/>
     </menu>
 
