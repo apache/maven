@@ -75,12 +75,9 @@ Introduction to Maven 2.0 Plugin Development
 
 Resources
 
-    [[1]] {{{developers/plugin-development-guide.html}Plugin development guide}}
+    [[1]] {{{../plugin/guide-java-plugin-development.html}Plugin development guide}}
 
-    [[2]] {{{plugin-management.html}Managing plugin configuration in large 
-          projects}}
-
-    [[3]] {{{getting-started.html#configuring_plugins}Configuring plugins}}
+    [[2]] {{{../mini/guide-configuring-plugins.html}Configuring plugins}}
   
 Comparison to Maven 1.x Plugins
 

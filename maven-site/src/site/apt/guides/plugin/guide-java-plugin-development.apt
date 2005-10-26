@@ -393,5 +393,5 @@ mvn -DupdateReleaseInfo=true install
 
 * Resources
 
-    [[1]] {{{developers/mojo-api-specification.html}Mojo API specification}}
+    [[1]] {{{../../developers/mojo-api-specification.html}Mojo API specification}}
           
