@@ -56,7 +56,7 @@ public class DefaultMojoScanner
     {
         Logger logger = getLogger();
 
-        logger.debug( "Using " + mojoDescriptorExtractors.size() + " extractors." );
+        logger.info( "Using " + mojoDescriptorExtractors.size() + " extractors." );
 
         for ( Iterator it = mojoDescriptorExtractors.entrySet().iterator(); it.hasNext(); )
         {
@@ -64,11 +64,11 @@ public class DefaultMojoScanner
             String language = (String) entry.getKey();
             MojoDescriptorExtractor extractor = (MojoDescriptorExtractor) entry.getValue();
 
-            logger.debug( "Applying extractor for language: " + language );
+            logger.info( "Applying extractor for language: " + language );
 
             List extractorDescriptors = extractor.execute( project, pluginDescriptor );
 
-            logger.debug( "Extractor for language: " + language + " found " + extractorDescriptors.size()
+            logger.info( "Extractor for language: " + language + " found " + extractorDescriptors.size()
                 + " mojo descriptors." );
 
             for ( Iterator descriptorIt = extractorDescriptors.iterator(); descriptorIt.hasNext(); )
