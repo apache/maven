@@ -18,10 +18,19 @@ Guide to Configuring Plug-ins
 public class MyQueryMojo
     extends AbstractMojo
 {
+    /**
+     * @parameter
+     */
     private String url;
 
+    /**
+     * @parameter
+     */
     private int timeout;
 
+    /**
+     * @parameter
+     */
     private String[] options;
 
     public void execute()
@@ -132,6 +141,9 @@ public class MyQueryMojo
 public class MyAnimalMojo
     extends AbstractMojo
 {
+    /**
+     * @parameter
+     */
     private List animals;
 
     public void execute()
@@ -187,10 +199,19 @@ public class MyAnimalMojo
 public class MyQueryMojo
     extends AbstractMojo
 {
+    /**
+     * @parameter property="url"
+     */
     private String _url;
 
+    /**
+     * @parameter property="timeout"
+     */
     private int _timeout;
 
+    /**
+     * @parameter property="options"
+     */
     private String[] _options;
 
     public void setUrl( String url ){ _url = url; }
@@ -207,3 +228,6 @@ public class MyQueryMojo
 }
 
 +----+
+
+ Note the specification of the property name which tells Maven what setter and getter to use when the field
+ is not accessed directly.
