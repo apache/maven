@@ -18,20 +18,20 @@ package org.apache.maven.tools.plugin.extractor.beanshell;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+
 import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
+import org.apache.maven.tools.plugin.extractor.ExtractionException;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @todo share constants
@@ -40,10 +40,9 @@ import java.util.List;
  * get validation directives to help users in IDEs.
  */
 public class BeanshellMojoDescriptorExtractor
-    extends AbstractLogEnabled
-    implements MojoDescriptorExtractor
+    extends AbstractScriptedMojoDescriptorExtractor
 {
-    private MojoDescriptor createMojoDescriptor( File basedir, String resource, PluginDescriptor pluginDescriptor )
+    private MojoDescriptor createMojoDescriptor( String basedir, String resource, PluginDescriptor pluginDescriptor )
         throws InvalidPluginDescriptorException
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
@@ -72,37 +71,43 @@ public class BeanshellMojoDescriptorExtractor
         return mojoDescriptor;
     }
 
-    public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
-        throws InvalidPluginDescriptorException
+    protected String getScriptFileExtension()
+    {
+        return ".bsh";
+    }
+
+    protected List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+        throws ExtractionException, InvalidPluginDescriptorException
     {
         List descriptors = new ArrayList();
 
-        for ( Iterator i = project.getScriptSourceRoots().iterator(); i.hasNext(); )
+        for ( Iterator mapIterator = scriptFilesKeyedByBasedir.entrySet().iterator(); mapIterator.hasNext(); )
         {
-            try
-            {
-                File basedir = new File( (String) i.next() );
+            Map.Entry entry = (Map.Entry) mapIterator.next();
 
-                if ( basedir.exists() )
+            String basedir = (String) entry.getKey();
+            Set metadataFiles = (Set) entry.getValue();
+
+            for ( Iterator it = metadataFiles.iterator(); it.hasNext(); )
+            {
+                File scriptFile = (File) it.next();
+
+                String relativePath = null;
+
+                if ( basedir.endsWith( "/" ) )
                 {
-                    List files = FileUtils.getFiles( basedir, "**/*.bsh", null, false );
-
-                    for ( Iterator j = files.iterator(); j.hasNext(); )
-                    {
-                        File resource = (File) j.next();
-                        String resourcePath = "/" + resource.getPath().replace( '\\', '/' );
-                        MojoDescriptor mojoDescriptor = createMojoDescriptor( basedir, resourcePath, pluginDescriptor );
-                        descriptors.add( mojoDescriptor );
-                    }
+                    basedir = basedir.substring( 0, basedir.length() - 2 );
                 }
-            }
-            catch ( IOException e )
-            {
-                throw new InvalidPluginDescriptorException( "Unable to locate files to process", e );
+
+                relativePath = scriptFile.getPath().substring( basedir.length() );
+
+                relativePath = relativePath.replace( '\\', '/' );
+
+                MojoDescriptor mojoDescriptor = createMojoDescriptor( basedir, relativePath, pluginDescriptor );
+                descriptors.add( mojoDescriptor );
             }
         }
 
         return descriptors;
     }
-
 }
