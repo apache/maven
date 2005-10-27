@@ -166,13 +166,13 @@
     <module>maven-eclipse-plugin</module>
     <module>maven-ear-plugin</module>
     <module>maven-ejb-plugin</module>
+    <module>maven-help-plugin</module>
     <module>maven-idea-plugin</module>
     <module>maven-install-plugin</module>
     <module>maven-jar-plugin</module>
     <module>maven-javadoc-plugin</module>
     <module>maven-plugin-plugin</module>
     <module>maven-pmd-plugin</module>
-    <module>maven-projecthelp-plugin</module>
     <module>maven-project-info-reports-plugin</module>
     <module>maven-rar-plugin</module>
     <module>maven-release-plugin</module>
