@@ -6,7 +6,8 @@
   <description><![CDATA[
     User-specific configuration for maven. Includes things that should not 
     be distributed with the pom.xml file, such as developer identity, along with 
-    local settings, like proxy information.]]></description>
+    local settings, like proxy information. The default location for the
+    settings file is ~/.m2/settings.xml]]></description>
   <defaults>
     <default>
       <key>package</key>
