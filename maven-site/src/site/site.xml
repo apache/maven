@@ -14,8 +14,9 @@
       <item name="Maven 1.x" href="http://maven.apache.org/maven-1.x"/>
       <item name="Maven 2.x" href="http://maven.apache.org/"/>
       <item name="Continuum" href="http://maven.apache.org/continuum"/>
-      <item name="Maven SCM" href="http://maven.apache.org/scm"/>
-      <item name="Maven Wagon" href="http://maven.apache.org/wagon"/>
+      <item name="SCM" href="http://maven.apache.org/scm"/>
+      <item name="Wagon" href="http://maven.apache.org/wagon"/>
+      <item name="JXR" href="http://maven.apache.org/jxr"/>
     </links>
 
     <menu name="Quick Links">
