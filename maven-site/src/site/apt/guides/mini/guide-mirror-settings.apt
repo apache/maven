@@ -43,3 +43,5 @@ Using Mirrors for Repositories
 </settings>
 
 +-----+
+
+ <<Note>>: the settings descriptor documentation can be found {{{../../maven-settings/settings.html}here}}.

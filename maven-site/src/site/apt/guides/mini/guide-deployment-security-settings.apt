@@ -40,3 +40,5 @@ Security and Deployment Settings
 </settings>
 
 +-----+
+
+ <<Note>>: the settings descriptor documentation can be found {{{../../maven-settings/settings.html}here}}.

@@ -39,3 +39,5 @@ the JDK configuration equivalent.
 +----+
 
  Please note that urrently NTML proxies are not supported as they have not been tested.
+
+ <<Note>>: the settings descriptor documentation can be found {{{../../maven-settings/settings.html}here}}.

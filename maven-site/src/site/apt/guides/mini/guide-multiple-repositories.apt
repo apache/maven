@@ -84,3 +84,5 @@ mvn -Pmyprofile ...
 
  In fact the <<<-P>>> option will take a CSV list of profiles to activate if you wish to
  activate multiple profiles simultaneously.
+ 
+ <<Note>>: the settings descriptor documentation can be found {{{../../maven-settings/settings.html}here}}.
