@@ -175,11 +175,14 @@ public class ProjectSorter
         project.addProjectReference( extProject );
 
         MavenProject extParent = extProject.getParent();
-        String parentId = ArtifactUtils.versionlessKey( extParent.getGroupId(), extParent.getArtifactId() );
-        // Don't add edge from parent to extension if a reverse edge already exists
-        if ( !dag.hasEdge( extensionId, id ) || !parentId.equals( id ) )
+        if ( extParent != null )
         {
-            dag.addEdge( id, extensionId );
+            String parentId = ArtifactUtils.versionlessKey( extParent.getGroupId(), extParent.getArtifactId() );
+            // Don't add edge from parent to extension if a reverse edge already exists
+            if ( !dag.hasEdge( extensionId, id ) || !parentId.equals( id ) )
+            {
+                dag.addEdge( id, extensionId );
+            }
         }
     }
 
