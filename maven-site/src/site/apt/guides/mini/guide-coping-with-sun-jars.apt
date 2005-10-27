@@ -65,11 +65,6 @@ Coping with SUN JARs
  location and retrieval information.
 
  Once you have downloaded a particular SUN JAR to your system you can install the JAR
- in your local repository using a the install plug-in:
+ in your local repository. Please refer to our {{{guide-installing-3rd-party-jars.html}Guide to installing 3rd party JARs}}
+ for instructions on how to accomplish this.
 
-+----+
-
-mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> \
-    -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
-
-+----+

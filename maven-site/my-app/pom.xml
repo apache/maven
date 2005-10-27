@@ -13,6 +13,7 @@
 
   <properties>
     <pkey>pvalue</pkey>
+    <target>${pom.build.directory}</target>
   </properties>
 
   <dependencies>
@@ -48,7 +49,7 @@
             </manifest>
             <manifestEntries>
               <mode>development</mode>
-              <url>${pom.url}</url>
+              <url>${target}</url>
             </manifestEntries>
           </archive>
         </configuration>

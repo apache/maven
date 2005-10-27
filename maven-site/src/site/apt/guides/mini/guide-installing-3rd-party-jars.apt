@@ -1,0 +1,22 @@
+ ------
+ Guide to installing 3rd party JARs
+ ------
+ Jason van Zyl
+ ------
+ 12 October 2005
+ ------
+
+Guide to installing 3rd party JARs
+
+ Often times you will have 3rd party JARs that you need to put in your local repository for use in your
+ builds. The JARs must be placed in the local repository in the correct place in order for it to be correctly
+ picked up by Maven. To make this easier, and then error prone, we have provide a goal in the install plug-in
+ which should make this relatively painless. To install a JAR in the local repository use the following
+ command:
+
++----+
+
+mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> \
+    -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
+
++----+
