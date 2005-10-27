@@ -224,10 +224,31 @@ public class DefaultArtifactResolver
                                                               localRepository, remoteRepositories, source, filter,
                                                               listeners );
 
+        List missingArtifacts = new ArrayList();
         for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
             ResolutionNode node = (ResolutionNode) i.next();
-            resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+            try
+            {
+                resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+            }
+            catch ( ArtifactNotFoundException anfe )
+            {
+                getLogger().debug( anfe.getMessage() );
+                missingArtifacts.add( node.getArtifact() );
+            }
+        }
+        
+        if ( missingArtifacts.size() > 0 )
+        {
+            String message = "required artifacts missing:\n";
+            for( Iterator i=missingArtifacts.iterator(); i.hasNext(); )
+            {
+                Artifact missingArtifact = (Artifact) i.next();
+                message += "  " + missingArtifact.getId() + "\n";
+            }
+            message += "\nfor the artifact:";
+            throw new ArtifactResolutionException( message, originatingArtifact, remoteRepositories );
         }
 
         return artifactResolutionResult;
