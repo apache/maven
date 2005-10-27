@@ -72,6 +72,8 @@ Documentation
 
  * {{{mini/guide-using-extensions.html}Guide to using Extensions}}
 
+ * {{{mini/guide-using-m1-repos-with-m2.html}Guide to using Maven 1.x repositories with Maven 2.x}}
+
  * {{{mini/guide-using-modello.html}Guide to using Modello}}
 
  * {{{mini/guide-webapp.html}Guide to Webapps}}
