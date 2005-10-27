@@ -73,6 +73,59 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
+    public void testEscapedVariablePassthrough()
+        throws Exception
+    {
+        String var = "${var}";
+
+        Model model = new Model();
+        model.setVersion( "1" );
+
+        MavenProject project = new MavenProject( model );
+
+        ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
+
+        Object value = ee.evaluate( "$" + var );
+
+        assertEquals( var, value );
+    }
+
+    public void testEscapedVariablePassthroughInLargerExpression()
+        throws Exception
+    {
+        String var = "${var}";
+        String key = var + " with version: ${project.version}";
+
+        Model model = new Model();
+        model.setVersion( "1" );
+
+        MavenProject project = new MavenProject( model );
+
+        ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
+
+        Object value = ee.evaluate( "$" + key );
+
+        assertEquals( "${var} with version: 1", value );
+    }
+
+    public void testMultipleSubExpressionsInLargerExpression()
+        throws Exception
+    {
+        String key = "${project.artifactId} with version: ${project.version}";
+
+        Model model = new Model();
+        model.setArtifactId( "test" );
+        model.setVersion( "1" );
+
+        MavenProject project = new MavenProject( model );
+
+        ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
+
+        Object value = ee.evaluate( key );
+
+        assertEquals( "test with version: 1", value );
+    }
+
     public void testPOMPropertyExtractionWithMissingProject_WithDotNotation()
         throws Exception
     {

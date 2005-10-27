@@ -115,7 +115,7 @@ public class PluginParameterExpressionEvaluator
         {
             return null;
         }
-
+        
         String expression = stripTokens( expr );
         if ( expression.equals( expr ) )
         {
@@ -126,14 +126,23 @@ public class PluginParameterExpressionEvaluator
                 if ( lastIndex >= 0 )
                 {
                     String retVal = expr.substring( 0, index );
-                    retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                    
+                    if ( index > 0 && expr.charAt( index - 1 ) == '$' )
+                    {
+                        retVal += expr.substring( index + 1, lastIndex + 1 );
+                    }
+                    else
+                    {
+                        retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                    }
+                    
                     retVal += evaluate( expr.substring( lastIndex + 1 ) );
                     return retVal;
                 }
             }
 
             // Was not an expression
-            return expression;
+            return expression.replaceAll( "\\$\\$", "$" );
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
