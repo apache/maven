@@ -38,7 +38,7 @@ import java.util.Map;
  * too complex with very few benefits.
  * 
  * @author Jerome Lacoste <jerome@coffeebreaks.org>
- * @version $Id:$
+ * @version $Id$
  */
 public class JarSignMojoTest
     extends TestCase
