@@ -298,9 +298,22 @@ public class DefaultPluginManager
 
         try
         {
+            // the only Plugin instance which will have dependencies is the one specified in the project.
+            // We need to look for a Plugin instance there, in case the instance we're using didn't come from
+            // the project.
+            Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
+            
+            if ( projectPlugin == null )
+            {
+                projectPlugin = plugin;
+            }
+            
             Set artifacts =
-                MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null, project );
+                MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null, null, project );
 
+//            Set artifacts =
+//                MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null, project );
+            
             addedPlugin.setIntroducedDependencyArtifacts( artifacts );
         }
         catch ( InvalidDependencyVersionException e )
