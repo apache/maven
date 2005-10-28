@@ -27,10 +27,13 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
 # get poms from svn and generate checksums
 (
-  cd /home/projects/maven/repository-staging/to-ibiblio/maven2
-  svn export --force svn://svn.codehaus.org/maven/scm/repository/ .
+  src=/home/projects/maven/repository-staging/pom-svn-repository
+  dest=/home/projects/maven/repository-staging/to-ibiblio/maven2
+  cd $src
+  svn update
+  rsync -e ssh -v -rpt --exclude=.svn --exclude=updated-poms.log $src/ $dest/ > updated-poms.log
+  for f in `grep .pom updated-poms.log` ; do openssl md5 $dest/$f > $dest/$f.md5 ; openssl sha1 $dest/$f > $dest/$f.sha1; done
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
-  for f in `svn list -R svn://svn.codehaus.org/maven/scm/repository/ | grep .pom` ; do openssl md5 $f > $f.md5 ; openssl sha1 $f > $f.sha1; done
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
