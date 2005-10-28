@@ -9,6 +9,12 @@
       <groupId>marmalade</groupId>
       <artifactId>marmalade-el-commons</artifactId>
       <version>1.0-alpha-2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>servletapi</groupId>
+          <artifactId>servletapi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
