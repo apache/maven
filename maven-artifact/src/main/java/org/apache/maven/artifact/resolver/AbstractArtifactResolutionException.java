@@ -154,7 +154,7 @@ public class AbstractArtifactResolutionException
 
         sb.append( message );
         sb.append( LS );
-        sb.append( "  " + groupId + ":" + artifactId + ":" + version + ":" + type );
+        sb.append( "  " + groupId + ":" + artifactId + ":" + type + ":" + version );
         sb.append( LS );
         if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
