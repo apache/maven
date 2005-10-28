@@ -70,6 +70,8 @@ public class PackagingMojo
             // TODO: improve error handling
             throw new MojoExecutionException( "Error assembling JAR", e );
         }
+        
+        project.getArtifact().setFile( jarFile );
     }
 
 }
