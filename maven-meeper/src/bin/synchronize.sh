@@ -32,7 +32,7 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
   cd $src
   svn update
   rsync -e ssh -v -rpt --exclude=.svn --exclude=updated-poms.log $src/ $dest/ > updated-poms.log
-  for f in `grep .pom updated-poms.log` ; do openssl md5 $dest/$f > $dest/$f.md5 ; openssl sha1 $dest/$f > $dest/$f.sha1; done
+  for f in `grep .pom updated-poms.log` ; do md5sum $dest/$f > $dest/$f.md5 ; sha1sum $dest/$f > $dest/$f.sha1; done
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
