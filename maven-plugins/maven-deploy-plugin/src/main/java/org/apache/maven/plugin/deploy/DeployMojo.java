@@ -104,7 +104,19 @@ public class DeployMojo
                 " distributionManagement element";
             throw new MojoExecutionException( msg );
         }
+        
+        String protocol = deploymentRepository.getProtocol();
+        
+        if( protocol.equals( "scp" ) )
+        {
+                File sshFile = new File( System.getProperty( "user.home" ), ".ssh" );
 
+                if( !sshFile.exists() )
+                {
+                        sshFile.mkdirs();
+                }	
+        }
+        
         // Deploy the POM
         boolean isPomArtifact = "pom".equals( packaging );
         if ( !isPomArtifact )
