@@ -76,6 +76,12 @@ public class LicenseReport
     private MavenProject project;
 
     /**
+     * Whether the system is currently offline.
+     * @parameter expression="${settings.offline}"
+     */
+    private boolean offline;
+
+    /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
     public String getName( Locale locale )
@@ -128,9 +134,16 @@ public class LicenseReport
      */
     public void executeReport( Locale locale )
     {
-        LicenseRenderer r = new LicenseRenderer( getSink(), getProject(), locale );
+        if ( !offline )
+        {
+            LicenseRenderer r = new LicenseRenderer( getSink(), getProject(), locale );
 
-        r.render();
+            r.render();
+        }
+        else
+        {
+            getLog().info( "Not generating license report while offline." );
+        }
     }
 
     /**
