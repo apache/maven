@@ -33,6 +33,12 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </model>
