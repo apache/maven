@@ -65,9 +65,9 @@ public class DefaultModelValidator
 
             validateId( "dependencies.dependency.groupId", result, d.getGroupId() );
 
-            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType() );
+            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType(), dependencySourceHint( d ) );
 
-            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion() );
+            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(), dependencySourceHint( d ) );
 
             if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
             {
@@ -212,8 +212,28 @@ public class DefaultModelValidator
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Field validator
+
+    // ----------------------------------------------------------------------
+    // Field validation
+    // ----------------------------------------------------------------------
+
+    /**
+     * Create a hint string consisting of the groupId and artifactId for user validation
+     * messages. For example when the version or type information is missing from a
+     * dependency.
+     *
+     * @param d The dependency from which to make the hint.
+     * @return String of the form g:a.
+     */
+    private String dependencySourceHint( Dependency d )
+    {
+        return d.getGroupId() + ":" + d.getArtifactId();
+    }
+
+    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
+    {
+        return validateStringNotEmpty( fieldName, result, string, null );
+    }
 
     /**
      * Asserts:
@@ -223,9 +243,9 @@ public class DefaultModelValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
+    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string, String sourceHint )
     {
-        if ( !validateNotNull( fieldName, result, string ) )
+        if ( !validateNotNull( fieldName, result, string, sourceHint ) )
         {
             return false;
         }
@@ -235,7 +255,15 @@ public class DefaultModelValidator
             return true;
         }
 
-        result.addMessage( "'" + fieldName + "' is missing." );
+        if ( sourceHint != null )
+        {
+            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+        }
+        else
+        {
+            result.addMessage( "'" + fieldName + "' is missing." );
+        }
+
 
         return false;
     }
@@ -273,14 +301,21 @@ public class DefaultModelValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateNotNull( String fieldName, ModelValidationResult result, Object object )
+    private boolean validateNotNull( String fieldName, ModelValidationResult result, Object object, String sourceHint )
     {
         if ( object != null )
         {
             return true;
         }
 
-        result.addMessage( "'" + fieldName + "' is missing." );
+        if ( sourceHint != null )
+        {
+            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+        }
+        else
+        {
+            result.addMessage( "'" + fieldName + "' is missing." );
+        }
 
         return false;
     }

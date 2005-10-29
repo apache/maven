@@ -124,7 +124,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.version' is missing." ) > -1 );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.version' is missing" ) > -1 );
     }
 
     public void testMissingDependencyManagementArtifactId()
