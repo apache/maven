@@ -176,6 +176,13 @@ public class SurefirePlugin
             return;
         }
 
+        if ( !testClassesDirectory.exists() )
+        {
+            getLog().info( "No tests to run." );
+
+            return;
+        }
+
         // ----------------------------------------------------------------------
         // Setup the surefire booter
         // ----------------------------------------------------------------------
