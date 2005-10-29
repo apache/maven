@@ -58,6 +58,14 @@
           <descriptor>src/assembly/bin.xml</descriptor>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/TestSupport.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <repositories>
