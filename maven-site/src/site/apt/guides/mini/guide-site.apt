@@ -54,7 +54,7 @@ mvn site
 
   The resulting site will be in <<<target/site/...>>>
 
-  For more information on the site plugin, see the {{{plugins/maven-site-plugin/} plugin reference}}.
+  For more information on the site plugin, see the {{{../../plugins/maven-site-plugin/} plugin reference}}.
 
 * Deploying The Site
 
