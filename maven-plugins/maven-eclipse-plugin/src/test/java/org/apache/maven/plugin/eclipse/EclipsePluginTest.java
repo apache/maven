@@ -78,6 +78,19 @@ public class EclipsePluginTest
         testProject( "project-6", null );
     }
 
+    public void testProject7()
+        throws Exception
+    {
+        testProject( "project-7", null );
+    }
+
+    // @todo testcase for MNG-1324 "System" dependencies path non correctly added to eclipse buildpath
+    //    public void testProject8()
+    //        throws Exception
+    //    {
+    //        testProject( "project-8", null );
+    //    }
+
     private void testProject( String projectName, File outputDir )
         throws Exception
     {
@@ -90,13 +103,14 @@ public class EclipsePluginTest
         File repo = getTestFile( "src/test/repository" );
 
         ArtifactRepositoryLayout localRepositoryLayout = (ArtifactRepositoryLayout) lookup(
-            ArtifactRepositoryLayout.ROLE, "legacy" );
+                                                                                            ArtifactRepositoryLayout.ROLE,
+                                                                                            "legacy" );
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + repo.getAbsolutePath(),
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local",
+                                                                            "file://" + repo.getAbsolutePath(),
                                                                             localRepositoryLayout );
 
-        MavenProject project = builder
-            .buildWithDependencies( new File( basedir, "project.xml" ), localRepository, null );
+        MavenProject project = builder.buildWithDependencies( new File( basedir, "pom.xml" ), localRepository, null );
 
         File projectOutputDir = basedir;
 
@@ -150,14 +164,14 @@ public class EclipsePluginTest
 
         plugin.execute();
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ),
-                          new File( projectOutputDir, ".project" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( projectOutputDir,
+                                                                                                  ".project" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ),
-                          new File( projectOutputDir, ".classpath" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( projectOutputDir,
+                                                                                                    ".classpath" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "wtpmodules" ),
-                          new File( projectOutputDir, ".wtpmodules" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "wtpmodules" ), new File( projectOutputDir,
+                                                                                                     ".wtpmodules" ) );
 
         if ( new File( basedir, "settings" ).exists() )
         {
@@ -184,8 +198,8 @@ public class EclipsePluginTest
 
             if ( actualLines.size() <= i )
             {
-                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: " +
-                    expectedLines.size() );
+                fail( "Too few lines in the actual file. Was " + actualLines.size() + ", expected: "
+                    + expectedLines.size() );
             }
 
             String actual = actualLines.get( i ).toString();
@@ -213,8 +227,7 @@ public class EclipsePluginTest
 
         while ( ( line = reader.readLine() ) != null )
         {
-            lines.add(
-                line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
+            lines.add( line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
         }
 
         return lines;

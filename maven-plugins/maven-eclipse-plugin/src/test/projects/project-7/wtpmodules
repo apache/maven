@@ -1,0 +1,15 @@
+<project-modules id="moduleCoreId">
+  <wb-module deploy-name="maven-eclipse-plugin-test-project-7">
+    <module-type module-type-id="jst.web">
+      <version>2.4</version>
+      <property name="context-root" value="maven-eclipse-plugin-test-project-7"/>
+    </module-type>
+    <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/maven/jars/maven-core-98.0-tests.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/maven/jars/maven-core-98.0.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
+  </wb-module>
+</project-modules>

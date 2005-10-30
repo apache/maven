@@ -1,0 +1,6 @@
+<classpath>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/maven/jars/maven-core-98.0-tests.jar" sourcepath="M2_REPO/maven/java-sources/maven-core-98.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/maven/jars/maven-core-98.0.jar" sourcepath="M2_REPO/maven/java-sources/maven-core-98.0-sources.jar"/>
+</classpath>

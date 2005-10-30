@@ -13,9 +13,9 @@
   </natures>
   <linkedResources>
     <link>
-      <name>project.xml</name>
+      <name>pom.xml</name>
       <type>1</type>
-      <location>${basedir}/src/test/projects/project-4/project.xml</location>
+      <location>${basedir}/src/test/projects/project-4/pom.xml</location>
     </link>
     <link>
       <name>src-main-java</name>
