@@ -76,20 +76,18 @@ public class EclipsePlugin
     /**
      * Artifact resolver, needed to download source jars for inclusion in classpath.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.resolver.ArtifactResolver}"
+     * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
      * @required
      * @readonly
-     * @todo waiting for the component tag
      */
     private ArtifactResolver artifactResolver;
 
     /**
      * Artifact factory, needed to download source jars for inclusion in classpath.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @component role="org.apache.maven.artifact.factory.ArtifactFactory"
      * @required
      * @readonly
-     * @todo waiting for the component tag
      */
     private ArtifactFactory artifactFactory;
 
