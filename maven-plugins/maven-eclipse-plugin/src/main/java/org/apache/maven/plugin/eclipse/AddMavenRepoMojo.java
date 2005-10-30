@@ -52,7 +52,6 @@ public class AddMavenRepoMojo extends AbstractMojo
 
     public void execute() throws MojoExecutionException
     {
-        workspace += "X";
         
         File workDir = new File( workspace, ".metadata/.plugins/org.eclipse.core.runtime/.settings" );
         
