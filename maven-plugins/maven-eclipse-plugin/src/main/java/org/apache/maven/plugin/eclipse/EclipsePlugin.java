@@ -350,9 +350,9 @@ public class EclipsePlugin
         new EclipseProjectWriter( getLog() ).write( projectBaseDir, outputDir, project, executedProject,
                                                     reactorArtifacts, projectnatures, buildcommands );
 
-        new EclipseSettingsWriter( getLog() ).write( projectBaseDir, outputDir, executedProject );
+        new EclipseSettingsWriter( getLog() ).write( projectBaseDir, outputDir, project );
 
-        new EclipseWtpmodulesWriter( getLog() ).write( outputDir, executedProject, reactorArtifacts, sourceDirs,
+        new EclipseWtpmodulesWriter( getLog() ).write( outputDir, project, reactorArtifacts, sourceDirs,
                                                        localRepository );
 
         getLog().info( Messages.getString( "EclipsePlugin.wrote", //$NON-NLS-1$

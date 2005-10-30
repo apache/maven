@@ -29,15 +29,21 @@
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
           <projectnatures>
-            org.eclipse.jdt.core.javanature, org.eclipse.wst.common.modulecore.ModuleCoreNature
+            <java.lang.String>org.eclipse.jdt.core.javanature</java.lang.String>
+            <java.lang.String>org.eclipse.wst.common.modulecore.ModuleCoreNature</java.lang.String>
           </projectnatures>
           <buildcommands>
-            org.eclipse.wst.common.modulecore.ComponentStructuralBuilder, org.eclipse.jdt.core.javabuilder,
-            org.eclipse.wst.common.modulecore.ComponentStructuralBuilderDependencyResolver
+            <java.lang.String>org.eclipse.wst.common.modulecore.ComponentStructuralBuilder</java.lang.String>
+            <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
+            <java.lang.String>
+              org.eclipse.wst.common.modulecore.ComponentStructuralBuilderDependencyResolver
+            </java.lang.String>
           </buildcommands>
           <classpathContainers>
-            org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v5.5,
-            org.eclipse.jst.j2ee.internal.web.container/wtptest
+            <java.lang.String>
+              org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v5.5
+            </java.lang.String>
+            <java.lang.String>org.eclipse.jst.j2ee.internal.web.container/wtptest</java.lang.String>
           </classpathContainers>
         </configuration>
       </plugin>
