@@ -37,7 +37,7 @@ Setting up Multiple Repositories
  inheritance chain.
 
  <<NOTE:>> You will also get the standard set of repositories as defined in the 
- {{{../getting-started/introduction-to-the-pom.html#Super POM}Super POM}}.
+ {{{../introduction/introduction-to-the-pom.html#Super POM}Super POM}}.
 
  The other way you can specify the use of multiple repositories by creating a profile in
  your <<<~/.m2/settings.xml>>> file like the following:
