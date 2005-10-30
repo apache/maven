@@ -16,10 +16,14 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
-
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Properties;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,7 +33,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  *
  * @goal add-maven-repo
  */
-public class AddMavenRepoMojo extends AbstractMojo
+public class AddMavenRepoMojo
+    extends AbstractMojo
 {
     /**
      * Location of the <code>Eclipse</code> workspace that holds your configuration and source.
@@ -42,7 +47,7 @@ public class AddMavenRepoMojo extends AbstractMojo
      * @required
      */
     private String workspace;
-    
+
     /**
      * @parameter expression="${localRepository}"
      * @required
@@ -50,28 +55,48 @@ public class AddMavenRepoMojo extends AbstractMojo
      */
     private ArtifactRepository localRepository;
 
-    public void execute() throws MojoExecutionException
+    public void execute()
+        throws MojoExecutionException
     {
-        
-        File workDir = new File( workspace, ".metadata/.plugins/org.eclipse.core.runtime/.settings" );
-        
+
+        File workDir = new File( workspace, ".metadata/.plugins/org.eclipse.core.runtime/.settings" ); //$NON-NLS-1$
         workDir.mkdirs();
-        
-        File f = new File( workDir.getAbsolutePath(), "org.eclipse.jdt.core.prefs" );
-        
+
+        Properties props = new Properties();
+
+        File f = new File( workDir.getAbsolutePath(), "org.eclipse.jdt.core.prefs" ); //$NON-NLS-1$
+
+        // preserve old settings
+        if ( f.exists() )
+        {
+            try
+            {
+                props.load( new FileInputStream( f ) );
+            }
+            catch ( FileNotFoundException e )
+            {
+                throw new MojoExecutionException( Messages
+                    .getString( "EclipsePlugin.cantreadfile", f.getAbsolutePath() ), e ); //$NON-NLS-1$
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( Messages
+                    .getString( "EclipsePlugin.cantreadfile", f.getAbsolutePath() ), e ); //$NON-NLS-1$
+            }
+        }
+
+        props.put( "\norg.eclipse.jdt.core.classpathVariable.M2_REPO", localRepository.getBasedir() ); //$NON-NLS-1$
+
         try
         {
-            FileWriter fWriter = new FileWriter( f );
-        
-            fWriter.write( "\norg.eclipse.jdt.core.classpathVariable.M2_REPO=" + localRepository.getBasedir() );
-
-            fWriter.flush();
-
-            fWriter.close();
+            OutputStream os = new FileOutputStream( f );
+            props.store( os, null );
+            os.close();
         }
-        catch( IOException ioe )
+        catch ( IOException ioe )
         {
-            throw new MojoExecutionException( "Unable to write to file: " + f.getAbsolutePath() );
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.cantwritetofile", //$NON-NLS-1$
+                                                                  f.getAbsolutePath() ) );
         }
     }
 }
