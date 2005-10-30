@@ -1,0 +1,5 @@
+<classpath>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="lib" path="${basedir}/sysdep.jar"/>
+</classpath>

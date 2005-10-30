@@ -1,0 +1,7 @@
+<project-modules id="moduleCoreId">
+  <wb-module deploy-name="maven-eclipse-plugin-test-project-8">
+    <module-type module-type-id="jst.utility">
+      <property name="java-output-path" value="/target/classes"/>
+    </module-type>
+  </wb-module>
+</project-modules>
