@@ -60,7 +60,7 @@ mvn deploy
 * Using the attached test JAR
 
  In order to use the attached test JAR that was created above you simply specify a dependency on the main
- artifact with a specified type of <<<tests>>>:
+ artifact with a specified type of <<<test-jar>>>:
 
 +----+
 
@@ -71,7 +71,7 @@ mvn deploy
       <groupId>com.myco.app</groupId>
       <artifactId>foo</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <type>tests</type>
+      <type>test-jar</type>
     </dependency>
   </depdendnecies>
   ...
