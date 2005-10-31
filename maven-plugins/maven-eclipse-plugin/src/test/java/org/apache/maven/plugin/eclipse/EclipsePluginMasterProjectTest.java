@@ -73,12 +73,18 @@ public class EclipsePluginMasterProjectTest
         executeMaven2CommandLine( basedir );
 
         assertFileEquals( null, new File( basedir, "module-1/project" ), new File( basedir, "module-1/.project" ) );
+
+        // @fixme missing direct optional dependency
         assertFileEquals( null, new File( basedir, "module-1/classpath" ), new File( basedir, "module-1/.classpath" ) );
         assertFileEquals( null, new File( basedir, "module-1/wtpmodules" ), new File( basedir, "module-1/.wtpmodules" ) );
 
         // the real test: this should include any sort of direct/transitive dependency handled by mvn
         assertFileEquals( null, new File( basedir, "module-2/project" ), new File( basedir, "module-2/.project" ) );
+
+        // @fixme missing direct optional dependency + unneeded transitive dependencies
         assertFileEquals( null, new File( basedir, "module-2/classpath" ), new File( basedir, "module-2/.classpath" ) );
+
+        // @fixme the list of dependencies in .wtpmodules should be the same added by the war plugin
         assertFileEquals( null, new File( basedir, "module-2/wtpmodules" ), new File( basedir, "module-2/.wtpmodules" ) );
 
     }

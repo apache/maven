@@ -5,25 +5,28 @@
       <property name="context-root" value="module-2"/>
     </module-type>
     <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/direct-provided/1.0/direct-provided-1.0.jar">
-      <dependency-type>uses</dependency-type>
-    </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/D:/apps/maven-2/maven-plugins/maven-eclipse-plugin/src/test/projects/master-test/module-2/direct-sysdep.jar">
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/${basedir}/src/test/projects/master-test/module-2/direct-sysdep.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
     <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/refproject-compile/1.0/refproject-compile-1.0.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/direct-test/1.0/direct-test-1.0.jar">
-      <dependency-type>uses</dependency-type>
-    </dependent-module>
-    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/D:/apps/maven-2/maven-plugins/maven-eclipse-plugin/src/test/projects/master-test/module-1/refproject-sysdep.jar">
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/${basedir}/src/test/projects/master-test/module-1/refproject-sysdep.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
     <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/module-1/module-1">
       <dependency-type>uses</dependency-type>
     </dependent-module>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/deps-direct-compile/1.0/deps-direct-compile-1.0.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/deps-refproject-compile/1.0/deps-refproject-compile-1.0.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
     <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/direct-compile/1.0/direct-compile-1.0.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
+    <dependent-module deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/eclipsetest/direct-optional/1.0/direct-optional-1.0.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
     <wb-resource deploy-path="/WEB-INF/classes" source-path="src/main/java"/>
