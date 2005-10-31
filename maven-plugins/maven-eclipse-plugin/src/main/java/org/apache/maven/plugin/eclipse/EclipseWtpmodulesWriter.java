@@ -16,6 +16,13 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,12 +32,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Writes eclipse .wtpmodules file.
@@ -49,7 +50,7 @@ public class EclipseWtpmodulesWriter
     }
 
     protected void write( File basedir, MavenProject project, List referencedReactorArtifacts,
-                          EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository )
+                         EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository )
         throws MojoExecutionException
     {
         FileWriter w;
@@ -60,8 +61,7 @@ public class EclipseWtpmodulesWriter
         }
         catch ( IOException ex )
         {
-            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
-                                              ex ); //$NON-NLS-1$
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );
@@ -176,7 +176,7 @@ public class EclipseWtpmodulesWriter
     }
 
     private void writeWarSpecificResources( XMLWriter writer, File basedir, MavenProject project,
-                                            List referencedReactorArtifacts, ArtifactRepository localRepository )
+                                           List referencedReactorArtifacts, ArtifactRepository localRepository )
     {
 
         String warSourceDirectory = EclipseUtils.getPluginSetting( project, "maven-war-plugin", //$NON-NLS-1$
@@ -189,16 +189,24 @@ public class EclipseWtpmodulesWriter
                              EclipseUtils.toRelativeAndFixSeparator( basedir, warSourceDirectory, false ) );
         writer.endElement();
 
+        Set artifacts = project.getArtifacts();
+        EclipseUtils.fixSystemScopeArtifacts( artifacts, project.getDependencies() );
+
         // dependencies
-        for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
+        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            addDependency( writer, artifact, referencedReactorArtifacts, localRepository );
+            String type = artifact.getType();
+
+            if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) )
+            {
+                addDependency( writer, artifact, referencedReactorArtifacts, localRepository );
+            }
         }
     }
 
     private void addDependency( XMLWriter writer, Artifact artifact, List referencedReactorProjects,
-                                ArtifactRepository localRepository )
+                               ArtifactRepository localRepository )
     {
         String handle;
 
@@ -208,8 +216,7 @@ public class EclipseWtpmodulesWriter
             //    <dependency-type>uses</dependency-type>
             //  </dependent-module>
 
-            handle = "module:/resource/" + artifact.getArtifactId() + "/" +
-                artifact.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$
+            handle = "module:/resource/" + artifact.getArtifactId() + "/" + artifact.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$
         }
         else
         {
@@ -226,10 +233,19 @@ public class EclipseWtpmodulesWriter
             }
 
             String fullPath = artifactPath.getPath();
-            File localRepositoryFile = new File( localRepository.getBasedir() );
 
-            handle = "module:/classpath/var/M2_REPO/" //$NON-NLS-1$
-                + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, fullPath, false );
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+            {
+                handle = "module:/classpath/lib/" //$NON-NLS-1$
+                    + StringUtils.replace( fullPath, "\\", "/" );
+            }
+            else
+            {
+                File localRepositoryFile = new File( localRepository.getBasedir() );
+
+                handle = "module:/classpath/var/M2_REPO/" //$NON-NLS-1$
+                    + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, fullPath, false );
+            }
         }
 
         writer.startElement( "dependent-module" ); //$NON-NLS-1$

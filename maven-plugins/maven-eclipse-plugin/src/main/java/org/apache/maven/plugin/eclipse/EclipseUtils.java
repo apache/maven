@@ -18,12 +18,14 @@ package org.apache.maven.plugin.eclipse;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;
@@ -94,39 +96,36 @@ public class EclipseUtils
 
         return defaultValue;
     }
-    
-    
 
-    public static EclipseSourceDir[] buildDirectoryList( MavenProject project, File basedir, Log log, String outputDirectory )
+    public static EclipseSourceDir[] buildDirectoryList( MavenProject project, File basedir, Log log,
+                                                        String outputDirectory )
     {
         File projectBaseDir = project.getFile().getParentFile();
 
         // avoid duplicated entries
         Set directories = new TreeSet();
 
-        EclipseUtils.extractSourceDirs( directories, project.getCompileSourceRoots(), basedir, projectBaseDir, false, null );
+        EclipseUtils.extractSourceDirs( directories, project.getCompileSourceRoots(), basedir, projectBaseDir, false,
+                                        null );
 
-        EclipseUtils.extractResourceDirs( directories, project.getBuild().getResources(), project, basedir, projectBaseDir, false,
-                             null, log );
+        EclipseUtils.extractResourceDirs( directories, project.getBuild().getResources(), project, basedir,
+                                          projectBaseDir, false, null, log );
 
         // If using the standard output location, don't mix the test output into it.
-        String testOutput = outputDirectory.equals( project.getBuild().getOutputDirectory() ) ?  
-                EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, project.getBuild().getTestOutputDirectory(), false ) :
-                null;
-        
-        EclipseUtils.extractSourceDirs( directories, project.getTestCompileSourceRoots(), basedir, projectBaseDir, true,
-                testOutput );
+        String testOutput = outputDirectory.equals( project.getBuild().getOutputDirectory() ) ? EclipseUtils
+            .toRelativeAndFixSeparator( projectBaseDir, project.getBuild().getTestOutputDirectory(), false ) : null;
 
-        EclipseUtils.extractResourceDirs( directories, project.getBuild().getTestResources(), project, basedir, projectBaseDir,
-                             true, testOutput, log );
+        EclipseUtils.extractSourceDirs( directories, project.getTestCompileSourceRoots(), basedir, projectBaseDir,
+                                        true, testOutput );
+
+        EclipseUtils.extractResourceDirs( directories, project.getBuild().getTestResources(), project, basedir,
+                                          projectBaseDir, true, testOutput, log );
 
         return (EclipseSourceDir[]) directories.toArray( new EclipseSourceDir[directories.size()] );
     }
 
-
-
-    private static void extractSourceDirs( Set directories, List sourceRoots, File basedir, File projectBaseDir, boolean test,
-                                   String output )
+    private static void extractSourceDirs( Set directories, List sourceRoots, File basedir, File projectBaseDir,
+                                          boolean test, String output )
     {
         for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
         {
@@ -143,7 +142,7 @@ public class EclipseUtils
     }
 
     private static void extractResourceDirs( Set directories, List resources, MavenProject project, File basedir,
-                                     File projectBaseDir, boolean test, String output, Log log )
+                                            File projectBaseDir, boolean test, String output, Log log )
     {
         for ( Iterator it = resources.iterator(); it.hasNext(); )
         {
@@ -209,7 +208,6 @@ public class EclipseUtils
         }
     }
 
-    
     /**
      * Utility method that locates a project producing the given artifact.
      *
@@ -238,9 +236,7 @@ public class EclipseUtils
 
         return null;
     }
-    
 
-    
     /**
      * Returns the list of referenced artifacts produced by reactor projects.
      * @return List of Artifacts
@@ -264,6 +260,31 @@ public class EclipseUtils
         }
 
         return referencedProjects;
+    }
+
+    public static void fixSystemScopeArtifacts( Collection artifacts, Collection dependencies )
+    {
+        // fix path for system dependencies.Artifact.getFile() returns a wrong path in mvn 2.0
+        for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+            {
+                String groupid = artifact.getGroupId();
+                String artifactId = artifact.getArtifactId();
+
+                for ( Iterator depIt = dependencies.iterator(); depIt.hasNext(); )
+                {
+                    Dependency dep = (Dependency) depIt.next();
+                    if ( Artifact.SCOPE_SYSTEM.equals( dep.getScope() ) && groupid.equals( dep.getGroupId() )
+                        && artifactId.equals( dep.getArtifactId() ) )
+                    {
+                        artifact.setFile( new File( dep.getSystemPath() ) );
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 }

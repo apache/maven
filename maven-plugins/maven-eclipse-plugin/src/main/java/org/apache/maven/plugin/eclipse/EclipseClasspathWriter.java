@@ -16,6 +16,12 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -26,14 +32,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Writes eclipse .classpath file.
@@ -58,9 +59,9 @@ public class EclipseClasspathWriter
      * @todo the list of needed parameters is really long, maybe this should become a Plexus component
      */
     protected void write( File projectBaseDir, File basedir, MavenProject project, List referencedReactorArtifacts,
-                          EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
-                          ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
-                          List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
+                         EclipseSourceDir[] sourceDirs, List classpathContainers, ArtifactRepository localRepository,
+                         ArtifactResolver artifactResolver, ArtifactFactory artifactFactory,
+                         List remoteArtifactRepositories, boolean downloadSources, String outputDirectory )
         throws MojoExecutionException
     {
 
@@ -72,8 +73,7 @@ public class EclipseClasspathWriter
         }
         catch ( IOException ex )
         {
-            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
-                                              ex ); //$NON-NLS-1$
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );
@@ -107,7 +107,7 @@ public class EclipseClasspathWriter
 
         writer.startElement( "classpathentry" ); //$NON-NLS-1$
         writer.addAttribute( "kind", "output" ); //$NON-NLS-1$ //$NON-NLS-2$
-        writer.addAttribute( "path", EclipseUtils.toRelativeAndFixSeparator( projectBaseDir,  //$NON-NLS-1$  
+        writer.addAttribute( "path", EclipseUtils.toRelativeAndFixSeparator( projectBaseDir, //$NON-NLS-1$  
                                                                              outputDirectory, false ) );
         writer.endElement();
 
@@ -125,6 +125,8 @@ public class EclipseClasspathWriter
         // ----------------------------------------------------------------------
 
         List artifacts = project.getTestArtifacts();
+
+        EclipseUtils.fixSystemScopeArtifacts( artifacts, project.getDependencies() );
 
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
@@ -154,9 +156,8 @@ public class EclipseClasspathWriter
     }
 
     private void addDependency( XMLWriter writer, Artifact artifact, List referencedReactorArtifacts,
-                                ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                                ArtifactFactory artifactFactory, List remoteArtifactRepositories,
-                                boolean downloadSources )
+                               ArtifactRepository localRepository, ArtifactResolver artifactResolver,
+                               ArtifactFactory artifactFactory, List remoteArtifactRepositories, boolean downloadSources )
         throws MojoExecutionException
     {
 
@@ -183,18 +184,18 @@ public class EclipseClasspathWriter
             {
                 try
                 {
-                    path = artifactPath.getCanonicalPath();
+                    path = StringUtils.replace( artifactPath.getCanonicalPath(), "\\", "/" );
                 }
                 catch ( IOException e )
                 {
                     String message = Messages.getString( "EclipsePlugin.cantcanonicalize", artifactPath );
-                    
+
                     throw new MojoExecutionException( message, e );
                 }
-                
+
                 log.info( Messages.getString( "EclipsePlugin.artifactissystemscoped", //$NON-NLS-1$
                                               new Object[] { artifact.getArtifactId(), path } ) );
-                                
+
                 log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
                                               artifact.getArtifactId() ) );
 
@@ -211,8 +212,9 @@ public class EclipseClasspathWriter
 
                 if ( downloadSources )
                 {
-                    Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories, localRepository,
-                                                                      artifactResolver, artifactFactory );
+                    Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories,
+                                                                      localRepository, artifactResolver,
+                                                                      artifactFactory );
 
                     if ( !sourceArtifact.isResolved() )
                     {
@@ -222,12 +224,13 @@ public class EclipseClasspathWriter
                     else
                     {
                         log.debug( Messages.getString( "EclipseClasspathWriter.sourcesavailable", //$NON-NLS-1$
-                                                       new Object[]{sourceArtifact.getArtifactId(),
-                                                           sourceArtifact.getFile().getAbsolutePath()} ) );
+                                                       new Object[] {
+                                                           sourceArtifact.getArtifactId(),
+                                                           sourceArtifact.getFile().getAbsolutePath() } ) );
 
                         sourcepath = "M2_REPO/" //$NON-NLS-1$
-                            + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile,
-                                                                      sourceArtifact.getFile().getAbsolutePath(), false );
+                            + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifact.getFile()
+                                .getAbsolutePath(), false );
                     }
 
                 }
@@ -249,17 +252,14 @@ public class EclipseClasspathWriter
 
     }
 
-
     private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories,
-                                             ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                                             ArtifactFactory artifactFactory )
+                                            ArtifactRepository localRepository, ArtifactResolver artifactResolver,
+                                            ArtifactFactory artifactFactory )
         throws MojoExecutionException
     {
         // source artifact: use the "sources" classifier added by the source plugin
-        Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(),
-                                                                                artifact.getArtifactId(),
-                                                                                artifact.getVersion(), "java-source",
-                                                                                "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
+        Artifact sourceArtifact = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact
+            .getArtifactId(), artifact.getVersion(), "java-source", "sources" ); //$NON-NLS-1$ //$NON-NLS-2$
 
         try
         {
@@ -275,19 +275,18 @@ public class EclipseClasspathWriter
             {
                 String message = Messages.getString( "EclipseClasspathWriter.cantresolvesources", //$NON-NLS-1$
                                                      new Object[] { sourceArtifact.getArtifactId(), e.getMessage() } );
-                
-                log.debug( message , e );
+
+                log.debug( message, e );
             }
         }
         catch ( ArtifactResolutionException e )
         {
             String message = Messages.getString( "EclipseClasspathWriter.errorresolvingsources", //$NON-NLS-1$
                                                  new Object[] { sourceArtifact.getArtifactId(), e.getMessage() } );
-            
+
             throw new MojoExecutionException( message, e );
         }
 
         return sourceArtifact;
     }
 }
-

@@ -65,11 +65,10 @@ public class EclipsePluginTest
         testProject( "project-7", null );
     }
 
-    // @todo testcase for MNG-1324 "System" dependencies path non correctly added to eclipse buildpath
-    //    public void testProject8()
-    //        throws Exception
-    //    {
-    //        testProject( "project-8", null );
-    //    }
+    public void testProject8()
+        throws Exception
+    {
+        testProject( "project-8", null );
+    }
 
 }
