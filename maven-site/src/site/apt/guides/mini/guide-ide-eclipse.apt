@@ -1,17 +1,233 @@
  ------
  Guide to using Eclipse with Maven 2.x
  ------
- Jason van Zyl
+ Bernd Mau, mau@hhla.de
  ------
- 12 October 2005
+ 28 October 2005
  ------
  
 Guide to using Eclipse with Maven 2.x
 
- To generate the Eclipse project files from your POM you execute the following command:
+ This mini guide explains howto use Maven 2 in Eclipse IDE.
+
+ * {{{#Maven 2 repository}Maven 2 repository}}
+
+ * {{{#Maven as an external tool}Maven as an external tool}}
+
+ * {{{#Simple Project}Simple Project}}
+
+ * {{{#Multiple Module Project}Multiple Module Project}}
+
+* {Maven 2 repository}
+
+ Eclipse needs to know the path to the local maven
+repository. Therefore the classpath variable <M2_REPO> has to be
+set. Execute the following command:
+
++----+
+
+mvn -Declipse.workspace=<path-to-eclipse-workspace> eclipse:add-maven-repo 
+
++----+
+
+ You can also define a new classpath variable inside eclipse: From the
+menu bar, select Window > Preferences.  Select the Java > Build Path >
+Classpath Variables page.
+
+ <<Issue:>> The command does not work. Aside from it should not require a POM.
+
+* {Maven as an external tool}
+
+ You might want to execute some maven goals from inside eclipse. This
+is possible by configuring an external launcher. It is best practice
+to prepare eclipse by adding a variable, which points to your local
+maven excutable (mvn.bat/mvn). From the menu bar, select Window >
+Preferences.  Select the Run/Debug > String Substitution. Add a new
+variable e.g.  <maven_exec>. When you set up a new external launcher
+(from the menu bar, select Run > External Tools. Select Program) you
+can refer to <maven_exec> in the location field. Furhtermore refer to
+<project_loc> as the working directory and specify the maven goals of
+your choice as arguments, e.g. <eclipse:eclipse>. For further
+information please refer to the eclipse help.
+
+ <<Issue:>> Would be nice, if the plugin generates the variable and a runner.
+
+
+* {Simple Project}
+
+ If you have a simple java project which is made up of only one
+module, using eclipse is very simple. To generate the eclipse project
+files from your POM you execute the following command:
 
 +----+
 
 mvn eclipse:eclipse
 
 +----+
+
+ If you have created or checked out the project with eclipse, you only
+have to refresh the project in your workspace. Otherwise you have to
+import the project into your eclipse workspace (From the menu bar,
+select File >Import >Existing Projects into Workspace). In the
+latter case the project (directory) should not be located in your
+workspace, because eclipse might come into trouble, especially if you
+want to use eclipse as the scm client.
+
+* {Multiple Module Project}
+
+ Due to the workspace idea many eclipse users are used to a flat
+layout and therefore want to keep this structure, which is possible
+but not recommended.  Actually, the only reason for a {{{#Flat Project
+Layout}flat multiple module project layout}} is the possibility to
+checkout and edit the parent POM without checking out the whole
+project. The following sample shows how to handle maven multiple
+module projects with eclipse while keeping the
+{{{http://maven.apache.org/guides/mini/guide-multi-module.html}recommended
+hierachical project layout}}.
+
+
+** {Step by Step from Scratch}
+
+ Supposing eclipse is your favorite SCM client, this step by step
+example shows how to set up a new mutiple module project.
+
+ [[1]] Set up a new eclipse workspace called <step-by-step> and add
+the <M2_REPO> classpath variable as {{{#Maven 2 repository}described
+above}}.
+
+ [[1]] Open the command line shell and change to the newly created workspace directory.
+
+ [[1]] From the command line change to newly created <step-by-step>
+workspace and create a new maven project using the archetype plugin.
+
++----+
+mvn archetype:create -DgroupId=guide.ide.eclipse -DartifactId=guide-ide-eclipse
++----+
+
+ [[1]] Create a new simple project <guide-ide-eclipse> inside the
+<step-by-step> workspace with eclipse (From the menu bar, select
+File >New >Project. Select Simple >Project). Eclipse will
+create a simple <.project>-file for your <guide-ide-eclipse>-project
+and you should be able to see the <pom.xml>-file.
+
+ [[1]] Delete the <src>-folder and open the <pom.xml>-file to change
+the packaging of your parent project to <pom>
+
++----+
+  <packaging>pom</packaging>
++----+
+
+ <<Issue:>> mvn eclipse:eclipse may should generate a simple
+<.project>-file for pom types.
+
+ [[1]] From the command line change to the <guide-ide-eclipse> project
+directory and create some modules.
+
++----+
+cd guide-ide-eclipse
+mvn archetype:create -DgroupId=guide.ide.eclipse -DartifactId=guide-ide-eclipse-site
+mvn archetype:create -DgroupId=guide.ide.eclipse.core -DartifactId=guide-ide-eclipse-core
+mvn archetype:create -DgroupId=guide.ide.eclipse.module1 -DartifactId=guide-ide-eclipse-module1
++----+
+
+ [[1]] Add the newly created modules to your parent pom.
+
++----+
+  <modules>
+    <module>guide-ide-eclipse-site</module>
+    <module>guide-ide-eclipse-core</module>
+    <module>guide-ide-eclipse-module1</module>
+  </modules>
++----+
+
+ [[1]] Add the parent to the POMs of the new modules:
+
++----+
+  <parent>
+	<groupId>guide.ide.eclipse</groupId>
+	<artifactId>guide-ide-eclipse</artifactId>
+	<version>1.0-SNAPSHOT</version>
+  </parent>
++----+
+
+ [[1]] Add dependency from <module1> to the <core>-module:
+
++----+
+    <dependency>
+      <groupId>guide.ide.eclipse.core</groupId>
+      <artifactId>guide-ide-eclipse-core</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
++----+
+
+ [[1]] Install the project in your local repository and generate the eclipse files:
+
++----+
+mvn install
+mvn eclipse:eclipse
++----+
+
+ [[1]] Check in your project using the eclipse team support (select
+from the context menu Team >Share Project). <Note:> Don not check
+in the generated eclipse files. If you use CVS you should have a
+<.cvsignore>-file with the following entries for each module:
+
++----+
+target
+.classpath
+.project
+.wtpmodules
++----+
+
+ Even the parent project should have this <.cvsignore>-file. Eclipse
+will automatically generate a new simple <.project>-file when you
+check out the project from the repository.
+
+ <<Issue:>> Plugin should optionally generate the <.cvsignore>-files.
+
+ []
+
+ From now on you have different options to proceed. If you are working
+on all modules simultanously and you rather have eclipse project
+dependencies than binary dependencies, you should set up a new workspace
+and import all projects form <step-by-step/guide-ide-eclipse>. Note,
+you have to delete the <.project>-file of your parent project
+before. The result is equals to checking out the whole project from
+the command line, running <mvn eclipse:eclipse> and finally importing
+the projects into your eclipse workspace. In both cases you will be
+able to synchronize your changes using eclipse.
+
+ In case of large projects whith many people it can be quite tedious
+to check out all modules and keep them up to date. Especially if you
+are only interested in one or two modules. In this case using binary
+dependencies is much more comfortable. Just check out the modules you
+want to work on with eclipse and run <mvn eclipse:eclipse> for each
+module (see also {{{#Maven as an external tool}Maven as an external
+tool}}). Of course all referenced artifacts have to be available from
+your maven repository.
+
+ <<Issue:>> The maven-eclipse-plugin should optionally generate
+project dependencies for those modules which are available in the
+workspace.
+ 
+** {Flat Project Layout}
+
+ It is possible to move the parent POM in its own directory on the
+same level with the referenced modules.
+
+ [[1]] Create a new directory under <guide-ide-eclipse> called
+<guide-ide-eclipse-project> and move the parent POM to it.
+
+ [[1]] Change the module references in the parent POM to:
+
++----+
+  <modules>
+    <module>../guide-ide-eclipse-site</module>
+    <module>../guide-ide-eclipse-core</module>
+    <module>../guide-ide-eclipse-module1</module>
+  </modules>
++----+
+ []
+
+ <<Issue:>> The release plugin does not support the flat structure
+({{{http://jira.codehaus.org/browse/MNG-1263}MNG-1263}})
