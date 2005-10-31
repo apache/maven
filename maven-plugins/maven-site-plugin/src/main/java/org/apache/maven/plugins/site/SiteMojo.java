@@ -291,6 +291,14 @@ public class SiteMojo
                 // Try to find duplicate files
                 Map duplicate = new LinkedHashMap();
                 String defaultExcludes = StringUtils.join( FileUtils.getDefaultExcludes(), "," );
+                if ( locale.getLanguage().equals( defaultLocale.getLanguage() ) )
+                {
+                    for (Iterator it = localesList.iterator(); it.hasNext();)
+                    {
+                        Locale l = (Locale) it.next();
+                        defaultExcludes += "," + l.getLanguage() + "/**";
+                    }
+                }
 
                 if ( siteDirectoryFile.exists() )
                 {
