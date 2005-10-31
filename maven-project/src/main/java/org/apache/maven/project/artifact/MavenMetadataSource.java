@@ -41,6 +41,7 @@ import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -106,6 +107,20 @@ public class MavenMetadataSource
                     getLogger().warn( "POM for: \'" + pomArtifact +
                         "\' does not appear to be valid. Its will be ignored for artifact resolution.\n\nReason: " +
                         e.getMessage() + "\n\n" );
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        ModelValidationResult validationResult = e.getValidationResult();
+
+                        if ( validationResult != null )
+                        {
+                            for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
+                            {
+                                getLogger().debug( i.next().toString() );
+                            }
+                            getLogger().debug( "\n\n" );
+                        }
+                    }
 
                     project = null;
                 }
