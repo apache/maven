@@ -1,0 +1,10 @@
+<classpath>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/eclipsetest/refproject-compile/1.0/refproject-compile-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/eclipsetest/refproject-test/1.0/refproject-test-1.0.jar"/>
+  <classpathentry kind="lib" path="${basedir}/module-1/refproject-sysdep.jar"/>
+  <classpathentry kind="var" path="M2_REPO/eclipsetest/refproject-provided/1.0/refproject-provided-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/eclipsetest/refproject-optional/1.0/refproject-optional-1.0.jar"/>
+</classpath>

@@ -1,0 +1,32 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>eclipsetest</groupId>
+  <artifactId>refproject-compile</artifactId>
+  <version>1.0</version>
+  <distributionManagement>
+    <status>verified</status>
+  </distributionManagement>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-refproject-compile</artifactId>
+    <version>1.0</version>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-refproject-test</artifactId>
+    <version>1.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-refproject-provided</artifactId>
+    <version>1.0</version>
+    <scope>provided</scope>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-refproject-optional</artifactId>
+    <version>1.0</version>
+    <optional>true</optional>
+  </dependency>
+</project>

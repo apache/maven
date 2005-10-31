@@ -1,0 +1,16 @@
+<projectDescription>
+  <name>module-2</name>
+  <comment/>
+  <projects>
+    <project>module-1</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+      <arguments/>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

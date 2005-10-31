@@ -1,0 +1,32 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>eclipsetest</groupId>
+  <artifactId>direct-compile</artifactId>
+  <version>1.0</version>
+  <distributionManagement>
+    <status>verified</status>
+  </distributionManagement>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-direct-compile</artifactId>
+    <version>1.0</version>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-direct-test</artifactId>
+    <version>1.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-direct-provided</artifactId>
+    <version>1.0</version>
+    <scope>provided</scope>
+  </dependency>
+  <dependency>
+    <groupId>eclipsetest</groupId>
+    <artifactId>deps-direct-optional</artifactId>
+    <version>1.0</version>
+    <optional>true</optional>
+  </dependency>
+</project>
