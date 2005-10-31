@@ -198,7 +198,8 @@ public class EclipseWtpmodulesWriter
             Artifact artifact = (Artifact) it.next();
             String type = artifact.getType();
 
-            if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) )
+            if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type )
+                && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {
                 addDependency( writer, artifact, referencedReactorArtifacts, localRepository );
             }
