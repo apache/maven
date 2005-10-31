@@ -41,6 +41,8 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
  Note that the bundle will be read by a script, so it must follow the above format. Also,
  the <<<pom.xml>>> should at least contain the following elements:
 
+ * modelVersion
+
  * groupId
 
  * artifactId
@@ -58,6 +60,35 @@ foo-1.0.jar (or whatever artifact is referred to in the pom.xml)
  * description
 
  * dependencies
+
+
+ A basic sample:
+
++----+
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven</artifactId>
+  <version>2.0</version>
+  <packaging>jar</packaging>
+  <name>Maven core</name>
+  <url>http://maven.apache.org</url>
+  <description>The maven main core project description</description>
+  <scm>
+    <url>http://svn.apache.org/viewcvs.cgi/maven</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>...</groupId>
+      <artifactId>...</artifactId>
+      <version>...</version>
+    </dependency>
+    ...
+  <dependencies>
+</project> 
+
++----+
 
  []
 
