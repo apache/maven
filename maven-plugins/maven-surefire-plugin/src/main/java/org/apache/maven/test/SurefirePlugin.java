@@ -100,6 +100,8 @@ public class SurefirePlugin
 
     /**
      * Specify this parameter if you want to use the test regex notation to select tests to run.
+     * The regular expression will be used to create an include pattern formatted like <code>**&#47;${test}.java</code>
+     * When used, the <code>includes</code> and <code>excludes</code> patterns parameters are ignored
      *
      * @parameter expression="${test}"
      */
@@ -107,6 +109,8 @@ public class SurefirePlugin
 
     /**
      * List of patterns (separated by commas) used to specify the tests that should be included in testing.
+     * When not specified and whent the <code>test</code> parameter is not specified, the default includes will be
+     * <code>**&#47;Test*.java   **&#47;*Test.java   **&#47;*TestCase.java</code>
      *
      * @parameter
      */
@@ -114,6 +118,8 @@ public class SurefirePlugin
 
     /**
      * List of patterns (separated by commas) used to specify the tests that should be excluded in testing.
+     * When not specified and whent the <code>test</code> parameter is not specified, the default excludes will be
+     * <code>**&#47;Abstract*Test.java  **&#47;Abstract*TestCase.java</code>
      *
      * @parameter
      */
