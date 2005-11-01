@@ -205,8 +205,6 @@ public class EclipseWtpmodulesWriter
                 && ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) ) )
             {
                 addDependency( writer, artifact, referencedReactorArtifacts, localRepository );
-
-                log.info( "Adding artifact " + artifact.getId() + " optional=" + artifact.isOptional() );
             }
         }
     }
