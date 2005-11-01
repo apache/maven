@@ -32,35 +32,35 @@ public class ArtifactNotFoundException
     public ArtifactNotFoundException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
-              artifact.getDownloadUrl() );
+              artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
     protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories, Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              remoteRepositories, artifact.getDownloadUrl(), t );
+              remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), t );
     }
 
     public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                      List remoteRepositories, String downloadUrl, Throwable t )
+                                      List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl ), groupId, artifactId,
+        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
                version, type, remoteRepositories, null, t );
 
         this.downloadUrl = downloadUrl;
     }
 
     private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                       List remoteRepositories, String downloadUrl )
+                                       List remoteRepositories, String downloadUrl, List path )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl ), groupId, artifactId,
+        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
                version, type, remoteRepositories, null );
 
         this.downloadUrl = downloadUrl;
     }
 
     private static String constructMessage( String message, String groupId, String artifactId, String version,
-                                            String type, String downloadUrl )
+                                            String type, String downloadUrl, List path )
     {
         StringBuffer sb = new StringBuffer( message );
 
@@ -85,7 +85,9 @@ public class ArtifactNotFoundException
             sb.append( type );
             sb.append( " -Dfile=/path/to/file" );
         }
-
+        
+        sb.append( constructArtifactPath( path ) );
+        sb.append( LS );
         return sb.toString();
     }
 
