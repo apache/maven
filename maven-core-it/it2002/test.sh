@@ -22,13 +22,14 @@ cd target/project.checkout
 
 cat pom.xml | sed "s#\${project.file.parentFile.parentFile}#$dir#g" >tmp
 mv tmp pom.xml
+
 svn ci -m 'update scm' pom.xml
 
 rm -Rf target
 
-m2 -e release:prepare -Denv=test -B -Dtag=test-tag
+mvn -DgenerateReleasePoms=true -e release:prepare -Denv=test -B -Dtag=test-tag
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-m2 -e release:perform -Denv=test
+mvn -DreleasePom=release-pom.xml -e release:perform -Denv=test
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 

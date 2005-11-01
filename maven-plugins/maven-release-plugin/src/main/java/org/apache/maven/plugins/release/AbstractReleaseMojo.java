@@ -21,6 +21,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
 import org.apache.maven.plugins.release.helpers.ScmHelper;
 import org.apache.maven.scm.manager.ScmManager;
+import org.codehaus.plexus.components.interactivity.InputHandler;
 
 /**
  * @author <a href="mailto:jdcasey@apache.org">John Casey</a>
@@ -35,10 +36,20 @@ public abstract class AbstractReleaseMojo
      */
     private ScmManager scmManager;
 
+    /**
+     * @component
+     */
+    private InputHandler inputHandler;
+
     private ScmHelper scmHelper;
 
     protected abstract ReleaseProgressTracker getReleaseProgress()
         throws MojoExecutionException;
+    
+    protected InputHandler getInputHandler()
+    {
+        return inputHandler;
+    }
 
     protected ScmHelper getScm( String directory )
         throws MojoExecutionException

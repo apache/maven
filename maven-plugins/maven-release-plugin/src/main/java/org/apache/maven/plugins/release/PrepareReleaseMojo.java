@@ -48,7 +48,6 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -58,6 +57,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +66,10 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Prepare for a release in SCM
+ * Prepare for a release in SCM.
+ * <br/>
+ * NOTE: This will cause the 'install' phase to be executed...if we cannot
+ * at least install the project, we shouldn't start the release process.
  *
  * @author <a href="mailto:jdcasey@apache.org">John Casey</a>
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -74,6 +77,7 @@ import java.util.Set;
  * @version $Id$
  * @aggregator
  * @goal prepare
+ * @execute phase="install"
  * @requiresDependencyResolution test
  * @todo check how this works with version ranges
  */
@@ -107,11 +111,6 @@ public class PrepareReleaseMojo
      * @component
      */
     private PluginVersionManager pluginVersionManager;
-
-    /**
-     * @component
-     */
-    private InputHandler inputHandler;
 
     /**
      * @parameter expression="${localRepository}"
@@ -167,7 +166,7 @@ public class PrepareReleaseMojo
     private boolean resume;
 
     /**
-     * @parameter default-value="false"
+     * @parameter default-value="false" expression="${generateReleasePoms}"
      */
     private boolean generateReleasePoms;
 
@@ -477,7 +476,7 @@ public class PrepareReleaseMojo
     {
         if ( versionResolver == null )
         {
-            versionResolver = new ProjectVersionResolver( getLog(), inputHandler, interactive );
+            versionResolver = new ProjectVersionResolver( getLog(), getInputHandler(), interactive );
         }
 
         return versionResolver;
@@ -894,15 +893,30 @@ public class PrepareReleaseMojo
                 releaseModel.setParent( null );
 
                 Set artifacts = releaseProject.getArtifacts();
-
+                
                 if ( artifacts != null )
                 {
                     //Rewrite dependencies section
                     List newdeps = new ArrayList();
 
+                    Map oldDeps = new HashMap();
+                    
+                    List deps = releaseProject.getDependencies();
+                    if ( deps != null )
+                    {
+                        for ( Iterator depIterator = deps.iterator(); depIterator.hasNext(); )
+                        {
+                            Dependency dep = (Dependency) depIterator.next();
+                            
+                            oldDeps.put( ArtifactUtils.artifactId( dep.getGroupId(), dep.getArtifactId(), dep.getType(), dep.getVersion() ), dep );
+                        }
+                    }
+
                     for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
                     {
                         Artifact artifact = (Artifact) i.next();
+                        
+                        String key = artifact.getId();
 
                         Dependency newdep = new Dependency();
 
@@ -926,6 +940,15 @@ public class PrepareReleaseMojo
                         newdep.setType( artifact.getType() );
                         newdep.setScope( artifact.getScope() );
                         newdep.setClassifier( artifact.getClassifier() );
+                        
+                        Dependency old = (Dependency) oldDeps.get( key );
+                        
+                        if ( old != null )
+                        {
+                            newdep.setSystemPath( old.getSystemPath() );
+                            newdep.setExclusions( old.getExclusions() );
+                            newdep.setOptional( old.isOptional() );
+                        }
 
                         newdeps.add( newdep );
                     }
@@ -1350,7 +1373,7 @@ public class PrepareReleaseMojo
                 {
                     getLog().info( "What tag name should be used? " );
 
-                    String inputTag = inputHandler.readLine();
+                    String inputTag = getInputHandler().readLine();
 
                     if ( !StringUtils.isEmpty( inputTag ) )
                     {
@@ -1364,7 +1387,7 @@ public class PrepareReleaseMojo
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "An error is occurred in the tag process.", e );
+                throw new MojoExecutionException( "An error has occurred in the tag process.", e );
             }
         }
 
