@@ -7,6 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-reporting-api</artifactId>
   <version>2.0.1-SNAPSHOT</version>
+  <name>Maven Reporting API</name>
   <developers>
     <developer>
       <id>vsiveton</id>
@@ -23,16 +24,6 @@
       <groupId>org.codehaus.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
       <version>1.0-alpha-6-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>plexus</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>plexus-utils</artifactId>
-          <groupId>plexus</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>
