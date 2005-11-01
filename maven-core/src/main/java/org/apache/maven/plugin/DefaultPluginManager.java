@@ -337,7 +337,7 @@ public class DefaultPluginManager
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
             throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() +
-                ". It requires a project, but the build is not using one." );
+                ". It requires a project with an existing pom.xml, but the build is not using one." );
         }
 
         if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
