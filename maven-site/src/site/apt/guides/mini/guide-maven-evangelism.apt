@@ -1,0 +1,62 @@
+ ------
+ Guide to Maven Evangelism
+ ------
+ Carlos Sanchez
+ ------
+ 31 October 2005
+ ------
+
+Guide to add, improve or fix metadata in the ibiblio maven 2 repository
+
+ Checkout with subversion the poms you need from
+ <<<svn://svn.codehaus.org/maven/scm/repository>>>
+ (note that this subversion repo has a lot of files and folders)
+
+ Fix the poms and open an issue at {{{http://jira.codehaus.org/browse/MEV}JIRA}} with
+ a patch file from subversion in unified diff format, explaining the reasons why
+ it needs to be changed (there were no dependencies, wrong info,...).
+
+
+
+Developers information
+
+ The canonical repository is at <<<beaver.codehaus.org>>>, under <<</home/projects/maven>>>
+
+ * repository-staging/to-ibiblio/maven  - maven 1 repo
+
+ * repository-staging/to-ibiblio/maven2 - maven 2 repo
+
+
+
+ Every 4 hours a crontab runs
+
+  <<<$HOME/repository-tools/synchronize.sh 2>&1 | tee $HOME/repository-tools/last-sync-results.txt>>>
+
+
+
+ Folder contents:
+
+ * <<<components>>> - svn checkout from maven/components svn
+
+ * <<<components/maven-meeper/src/bin/deploy-bundle>>> script to deploy an upload bundle from JIRA MAVENUPLOAD
+
+ * <<<components/maven-meeper/src/bin/syncopate/>>> scripts to rsync from partner repos
+
+ * <<<components/maven-meeper/src/bin/syncopate/conf/>>> syncopate configuration for each of the partners
+
+ * <<<components/maven-meeper/src/bin/ibiblio-sync/>>> scripts to rsync to and from ibiblio
+
+ * <<<repository-tools/ibiblio-sync/>>> link to components/maven-meeper/src/bin/ibiblio-sync/
+
+ * <<<repository-tools/synchronize.sh>>> link to components/maven-meeper/src/bin/synchronize.sh
+
+ * <<<repository-tools/repoclean>>> snapshot of the repoclean tool
+    <<<https://svn.apache.org/repos/asf/maven/components/trunk/sandbox/repoclean>>>
+
+
+
+ The developer connection to the subversion pom repository is at 
+
+  <<<svn+ssh://[username]@svn.codehaus.org/home/projects/maven/scm/repository>>>
+
+ It only contains m2 poms (manually added), and this poms will overwrite everything in the maven2 repo.

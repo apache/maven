@@ -42,6 +42,8 @@ Documentation
 
  * {{{mini/guide-ibiblio-upload.html}Guide to uploading artifacts to Ibiblio}}
 
+ * {{{mini/guide-maven-evangelism.html}Guide to maven evangelism, improving metadata in ibiblio}}
+
  * {{{mini/guide-ide-eclipse.html}Guide to using Eclipse with Maven 2.x}}
 
  * {{{mini/guide-ide-idea.html}Guide to using IDEA with Maven 2.x}}
