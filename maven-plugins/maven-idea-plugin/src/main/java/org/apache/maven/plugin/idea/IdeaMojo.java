@@ -85,15 +85,15 @@ public class IdeaMojo
      */
     private String jdkLevel;
 
+    /**
+     * Whether to update the existing project files or overwrite them.
+     * @parameter expression="${overwrite}" default-value="false"
+     */
+    private boolean overwrite;
+
     public void execute()
         throws MojoExecutionException
     {
-        if ( executedProject == null )
-        {
-            // backwards compat with alpha-2 only
-            executedProject = project;
-        }
-
         rewriteModule();
 
         if ( project.isExecutionRoot() ) 
@@ -118,11 +118,11 @@ public class IdeaMojo
 
         Reader reader = null;
 
-        Xpp3Dom module = null;
+        Xpp3Dom module;
         
         try
         {
-            if ( workspaceFile.exists() )
+            if ( workspaceFile.exists() && !overwrite )
             {
                 reader = new FileReader( workspaceFile );
             }
@@ -167,7 +167,7 @@ public class IdeaMojo
         try
         {
             Reader reader;
-            if ( projectFile.exists() )
+            if ( projectFile.exists() && !overwrite )
             {
                 reader = new FileReader( projectFile );
             }
@@ -255,7 +255,7 @@ public class IdeaMojo
         try
         {
             Reader reader;
-            if ( moduleFile.exists() )
+            if ( moduleFile.exists() && !overwrite )
             {
                 reader = new FileReader( moduleFile );
             }
@@ -692,7 +692,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      */
     private void setProjectScmType( Xpp3Dom content )
     { 
-        String scmType = null;
+        String scmType;
 
         scmType = getScmType();
         
@@ -713,7 +713,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      */
     protected String getScmType()
     {
-        String scmType = null;
+        String scmType;
 
         if ( project.getScm() == null )
         {
@@ -732,7 +732,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
     
     protected String getScmType( String connection )
     {
-        String scmType = null;
+        String scmType;
         
         if ( connection != null )
         {
