@@ -63,31 +63,31 @@ Describe Mojo
   plugin by its prefix, like this:
   
 +---+
-  -Dplugin=projecthelp
+  -Dplugin=help
 +---+
 
 *Examples
 
-  [[1]] To display a brief summary of the entire projecthelp plugin, using the
+  [[1]] To display a brief summary of the entire help plugin, using the
         prefix for plugin lookup:
         
 +---+
-        m2 projecthelp:describe -Dplugin=projecthelp
+        mvn help:describe -Dplugin=help
 +---+
 
   [[2]] To display a full summary of only the describe mojo, again using the 
         prefix to lookup the plugin:
         
 +---+
-        m2 projecthelp:describe -Dplugin=projecthelp -Dmojo=describe -Dfull=true
+        mvn help:describe -Dplugin=help -Dmojo=describe -Dfull=true
 +---+
 
-  [[3]] To display the most information available for the entire projecthelp
+  [[3]] To display the most information available for the entire help
         plugin, and avoid any confusion about which plugin might be resolved
         for a particular prefix:
         
 +---+
-        m2 projecthelp:describe -Dfull=true \
+        mvn help:describe -Dfull=true \
                                 -DgroupId=org.apache.maven.plugins \
-                                -DartifactId=maven-projecthelp-plugin
+                                -DartifactId=maven-help-plugin
 +---+

@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.projecthelp;
+package org.apache.maven.plugins.help;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -128,7 +128,7 @@ public class DescribeMojo
     /**
      * The current project, if there is one. This is listed as optional, since
      * <br/>
-     * the projecthelp plugin should be able to function on its own. If this
+     * the help plugin should be able to function on its own. If this
      * <br/>
      * parameter is empty at execution time, this mojo will instead use the
      * <br/>

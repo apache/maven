@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.projecthelp;
+package org.apache.maven.plugins.help;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;

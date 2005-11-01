@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.projecthelp;
+package org.apache.maven.plugins.help;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.AbstractMojo;

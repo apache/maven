@@ -18,9 +18,9 @@
  */
 -->
 
-<project name="Maven Project Help Plugin">
+<project name="Maven Help Plugin">
   <bannerLeft>
-    <name>Maven Project Help</name>
+    <name>Maven Help</name>
     <src>http://maven.apache.org/images/apache-maven-project.png</src>
     <href>http://maven.apache.org/</href>
   </bannerLeft>
