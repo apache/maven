@@ -19,6 +19,7 @@ package org.apache.maven.plugin.eclipse;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -237,28 +238,33 @@ public class EclipseClasspathWriter
                 path = "M2_REPO/" //$NON-NLS-1$
                     + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, fullPath, false );
 
-                if ( downloadSources )
-                {
-                    Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories,
-                                                                      localRepository, artifactResolver,
-                                                                      artifactFactory );
+                Artifact sourceArtifact = retrieveSourceArtifact( artifact, remoteArtifactRepositories,
+                                                                  localRepository, artifactResolver, artifactFactory,
+                                                                  downloadSources );
 
-                    if ( !sourceArtifact.isResolved() )
+                if ( !sourceArtifact.isResolved() )
+                {
+                    if ( downloadSources )
                     {
                         log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
-                                                      sourceArtifact.getArtifactId() ) );
+                                                      sourceArtifact.getId() ) );
                     }
                     else
                     {
-                        log.debug( Messages.getString( "EclipseClasspathWriter.sourcesavailable", //$NON-NLS-1$
-                                                       new Object[] {
-                                                           sourceArtifact.getArtifactId(),
-                                                           sourceArtifact.getFile().getAbsolutePath() } ) );
-
-                        sourcepath = "M2_REPO/" //$NON-NLS-1$
-                            + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifact.getFile()
-                                .getAbsolutePath(), false );
+                        log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotdownloaded", //$NON-NLS-1$
+                                                      sourceArtifact.getId() ) );
                     }
+                }
+                else
+                {
+                    log.debug( Messages.getString( "EclipseClasspathWriter.sourcesavailable", //$NON-NLS-1$
+                                                   new Object[] {
+                                                       sourceArtifact.getId(),
+                                                       sourceArtifact.getFile().getAbsolutePath() } ) );
+
+                    sourcepath = "M2_REPO/" //$NON-NLS-1$
+                        + EclipseUtils.toRelativeAndFixSeparator( localRepositoryFile, sourceArtifact.getFile()
+                            .getAbsolutePath(), false );
 
                 }
 
@@ -281,7 +287,7 @@ public class EclipseClasspathWriter
 
     private Artifact retrieveSourceArtifact( Artifact artifact, List remoteArtifactRepositories,
                                             ArtifactRepository localRepository, ArtifactResolver artifactResolver,
-                                            ArtifactFactory artifactFactory )
+                                            ArtifactFactory artifactFactory, boolean downloadSources )
         throws MojoExecutionException
     {
         // source artifact: use the "sources" classifier added by the source plugin
@@ -293,7 +299,8 @@ public class EclipseClasspathWriter
             log.debug( Messages.getString( "EclipseClasspathWriter.lookingforsources", //$NON-NLS-1$
                                            sourceArtifact.getArtifactId() ) );
 
-            artifactResolver.resolve( sourceArtifact, remoteArtifactRepositories, localRepository );
+            artifactResolver.resolve( sourceArtifact, downloadSources ? remoteArtifactRepositories : new ArrayList(),
+                                      localRepository );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -301,7 +308,7 @@ public class EclipseClasspathWriter
             if ( log.isDebugEnabled() )
             {
                 String message = Messages.getString( "EclipseClasspathWriter.cantresolvesources", //$NON-NLS-1$
-                                                     new Object[] { sourceArtifact.getArtifactId(), e.getMessage() } );
+                                                     new Object[] { sourceArtifact.getId(), e.getMessage() } );
 
                 log.debug( message, e );
             }
@@ -309,7 +316,7 @@ public class EclipseClasspathWriter
         catch ( ArtifactResolutionException e )
         {
             String message = Messages.getString( "EclipseClasspathWriter.errorresolvingsources", //$NON-NLS-1$
-                                                 new Object[] { sourceArtifact.getArtifactId(), e.getMessage() } );
+                                                 new Object[] { sourceArtifact.getId(), e.getMessage() } );
 
             throw new MojoExecutionException( message, e );
         }
