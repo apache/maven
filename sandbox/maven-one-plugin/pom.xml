@@ -39,4 +39,14 @@
       <version>1.0.4</version>
     </dependency>
   </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>maven-one-plugin</goalPrefix>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

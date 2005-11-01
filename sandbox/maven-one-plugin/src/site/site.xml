@@ -1,0 +1,22 @@
+<project name="Maven One plugin">
+  <bannerLeft>
+    <name>Maven One plugin</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="Maven 2" href="http://maven.apache.org"/>
+    </links>
+
+    <menu name="Maven One Plugin">
+      <item name="Introduction" href="introduction.html"/>
+    </menu>
+
+    ${reports}
+  </body>
+</project>
+

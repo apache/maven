@@ -1,0 +1,67 @@
+ ----------
+Maven One Plugin
+ ----------
+Brett Porter
+ ----------
+1 November 2005
+ ----------
+
+Maven One Plugin
+
+  The Maven One Plugin is a plugin for Maven 2.0 that performs some integration tasks with Maven 1.x:
+
+   * Provides a packaging for Maven 1.x plugins, building using Maven 2.0
+
+   * Provides a hook for installation that will copy built artifacts into a local Maven 1.x repository, for
+     concurrent development with Maven 1.x projects
+
+* Maven 1.x Plugin Packaging
+
+  To build a Maven 1.x plugin using Maven 2.x, you need to include this plugin in the build section, and use a
+  <<<packaging>>> of <<<maven-one-plugin>>>. The following is an example of such a POM:
+
+-------
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>maven-site-plugin</artifactId>
+  <packaging>maven-one-plugin</packaging>
+  <version>1.6-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-one-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+-------
+
+* Maven 1.x Local Repository Installation
+
+  To have your artifact installed into a local Maven 1.x repository, add the following lifecycle binding to your POM:
+
+-------
+<project>
+  ...
+      <plugin>
+        <artifactId>maven-one-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install-maven-one-repository</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+   ...
+</project>
+-------
+
+  <<Note:>> The plugin section can be shared with the one above in the case of building a Maven 1.x plugin.
+
+  This will read the local repository location from <<<~/build.properties>>>, defaulting to <<<~/.maven/repository>>>.
+
+  For more information, see the {{{index.html} Goal Reference}}
+

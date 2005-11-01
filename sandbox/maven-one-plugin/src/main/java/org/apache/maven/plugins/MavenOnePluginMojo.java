@@ -105,7 +105,10 @@ public class MavenOnePluginMojo
 
         try
         {
-            archiver.getArchiver().addDirectory( contentDirectory, DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
+            if ( contentDirectory.exists() )
+            {
+                archiver.getArchiver().addDirectory( contentDirectory, DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
+            }
 
             addFile( archiver, new File( "plugin.jelly" ) );
             addFile( archiver, new File( "plugin.properties" ) );
