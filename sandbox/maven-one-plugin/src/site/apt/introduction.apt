@@ -63,5 +63,35 @@ Maven One Plugin
 
   This will read the local repository location from <<<~/build.properties>>>, defaulting to <<<~/.maven/repository>>>.
 
-  For more information, see the {{{index.html} Goal Reference}}
+* Maven 1.x Remote Repository Deployment
+
+  To have your artifact deployed into an additional remote Maven 1.x repository, add the following lifecycle binding to
+  your POM:
+
+-------
+<project>
+  ...
+      <plugin>
+        <artifactId>maven-one-plugin</artifactId>
+        <executions>
+          <execution>
+            <configuration>
+              <remoteRepositoryUrl>scp://cvs.apache.org/repository</remoteRepositoryUrl>
+            </configuration>
+            <goals>
+              <goal>deploy-maven-one-repository</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+   ...
+</project>
+-------
+
+  This will not read any settings from the Maven 1.x properties, so the URL is required.
+
+  If configuring server settings in your local configuration, use the ID of <<<mavenOneRemoteRepository>>>. This can be
+  overridden using the <<<remoteRepositoryId>>> configuration element.
+
+  For more information, see the {{{index.html} Goal Reference}}.
 
