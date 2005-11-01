@@ -50,7 +50,7 @@ Developing Maven 2
  When you find a issue you would like to work on add a comment in the issue log so the core developers and other
  people looking for work know that someone is already working on it.
 
-* {{Creating and submitting a patch}}
+* {Creating and submitting a patch}
 
  When you have either completed an issue or just want some feedback on the work you have done, create a patch
  and attach the patch to the issue in question. We have a couple of guidelines when creating patches:
@@ -206,7 +206,7 @@ Available formats
  {{{http://www.apache.org/dev/version-control.html#https-svn}Committer Subversion Access}}
  document and you must set your svn client with these properties file : {{svn-eol-style.txt}}
 
-* Maven Code Style
+* {Maven Code Style}
 
  The following sections show how to set up the code style for Maven in IDEA and Eclipse.
  It is strongly preferred that patches use this style before they are spplied.
@@ -219,10 +219,26 @@ Available formats
 
  After this, restart IDEA and open the settings to select the new code style.
 
-** Eclipse 3.x">
+** Eclipse 3.x
 
  Download <<<{{{../../maven-eclipse-codestyle.xml}maven-eclipse-codestyle.xml}}>>>.
 
  After this, select Window \> Preferences, and open up the configuration for Java \> Code
  Style \> Code Formatter. Click on the button labeled Import... and select the file you
  downloaded. Give the style a name, and click OK.
+
+* {Commit Message Template}
+
+  Commits should have a message that follows this template:
+
+-----
+PR: issue1, issue2 (using issue keys from JIRA, not URLs)
+Submitted by: (when it was a patch, put that persons name there)
+<< comment >>
+-----
+
+  <<PR>> can be omitted if there was no relevant JIRA issue, though it is strongly encouraged to create one for significant
+  changes.
+
+  <<Submitted by>> only needs to be specified when a patch is being applied for a non-committer.
+  

@@ -43,12 +43,28 @@ How do I Join the Project?
  rights and nothing else is frowned upon, as is asking to be made a committer without having contributed
  sufficiently to be invited.
 
-~~ Resources for committers
-~~<li><a href="http://www.apache.org/dev/">Developer Resources</a></li>
-~~<li><a href="http://www.apache.org/foundation/">About the Apache Software Foundation</a></li>
-~~<li><a href="http://www.apache.org/dev/committers.html">Committer FAQ</a></li>
-~~<li><a href="http://www.apache.org/~vgritsenko/stats/projects/maven.html">Web Stats</a></li>
-~~<li><a href="http://wiki.apache.org">Apache Wiki</a></li>
+Developers Conventions
+
+  There are a number of conventions used in the project, which contributors and developers alike should follow for
+  consistency's sake.
+
+  * {{{guide-m2-development.html#Maven Code Style} Code Style}}
+
+  * {{{guide-m2-development.html#Commit Message Template} Commit Message Template}}
+
+Resources for committers
+
+  * {{{http://www.apache.org/dev/} Developer Resources}}
+
+  * {{{http://www.apache.org/foundation/} About the Apache Software Foundation}}
+
+  * {{{http://www.apache.org/dev/committers.html} Committer FAQ}}
+
+  * {{{http://people.apache.org/~vgritsenko/stats/projects/maven.html} Web Stats}}
+
+  * {{{http://people.apache.org/~coar/mlists.html#maven.apache.org} Mailing List Stats}}
+
+  * {{{http://wiki.apache.org} Apache Wiki}}
 
 
 
