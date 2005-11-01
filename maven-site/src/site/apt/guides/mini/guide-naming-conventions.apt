@@ -1,0 +1,32 @@
+ ------
+ Guide to Naming Conventions
+ ------
+ Carlos Sanchez
+ ------
+ 1 November 2005
+ ------
+
+Guide to naming conventions on groupId, artifactId and version
+
+ []
+
+ * <<groupId>> it will identify your project uniquely in internet
+ so we need to enforce a naming schema. It has to follow the package name rules, what
+ means that has to be at least as a domain name you control, and you can create as many subgroups
+ as you want. Look at {{{http://java.sun.com/docs/books/jls/third_edition/html/packages.html#7.7}
+ More information about package names}}.
+
+ eg. <<<org.apache.maven>>>, <<<org.apache.jakarta.commons>>>
+
+ * <<artifactId>> the name of the jar without version. If you created it then you can choose
+ whatever name you want with lowercase letters and no strange symbols. If it's a third party jar
+ you have to take the name of the jar as it's distributed.
+
+ eg. <<<maven>>>, <<<commons-math>>>
+
+ * <<version>> if you distribute it then you can choose any typical version with numbers and dots
+ (1.0, 1.1, 1.0.1, ...).
+ Don't use dates as they are usually associated with snapshot (nightly) builds. If it's a third
+ party artifact, you have to use their version number whatever it is, and as strange it can look.
+
+ eg. <<<2.0>>>, <<<2.0.1>>>, <<<1.3.1>>>

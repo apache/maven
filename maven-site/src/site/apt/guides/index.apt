@@ -40,6 +40,8 @@ Documentation
 
  * {{{mini/guide-generating-sources.html}Guide to generating Sources}}
 
+ * {{{mini/guide-naming-conventions.html}Guide to naming conventions (groupId, artifactId, version)}}
+
  * {{{mini/guide-ibiblio-upload.html}Guide to uploading artifacts to Ibiblio}}
 
  * {{{mini/guide-maven-evangelism.html}Guide to maven evangelism, improving metadata in ibiblio}}
