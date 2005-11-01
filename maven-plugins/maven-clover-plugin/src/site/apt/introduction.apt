@@ -1,0 +1,18 @@
+ ------
+ Maven 2 Clover Plugin
+ ------
+ Vincent Massol
+ <vmassol@apache.org>
+ ------
+ November 1st, 2005
+
+Introduction
+
+  The Clover plugin is the place where build actions related to 
+  {{{http://www.cenqua.com/clover/}Clover}} are found in Maven.
+
+  Clover is a tool that generates Test Coverage reports. It is free for non-commercial use. 
+  If your project is a commercial project you will need to get a license for the Clover jar 
+  before using this plugin. Please note that a 30 days license is included in this plugin.
+
+  The full description of goals is available {{{index.html}here}}.

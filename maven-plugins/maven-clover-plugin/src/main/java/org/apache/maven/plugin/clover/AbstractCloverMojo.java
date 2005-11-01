@@ -27,8 +27,9 @@ public abstract class AbstractCloverMojo extends AbstractMojo
     private String licenseFile;
 
     /**
-     * The <a href="http://cenqua.com/clover/doc/adv/flushpolicies.html"Clover flush policy</a>
-     * to use. Valid values are "directed", "interval" or "threaded".
+     * The <a href="http://cenqua.com/clover/doc/adv/flushpolicies.html">Clover flush policy</a>
+     * to use. Valid values are <code>directed</code>, <code>interval</code> and
+     * <code>threaded</code>.
      *  
      * @parameter default-value="threaded"
      */
@@ -58,7 +59,7 @@ public abstract class AbstractCloverMojo extends AbstractMojo
     
     /**
      * Whether the Clover instrumentation should use the Clover <code>jdk14</code> or
-     * <code>jdk15<code> flags to parse sources.
+     * <code>jdk15</code> flags to parse sources.
      *
      * @parameter
      */
@@ -68,7 +69,7 @@ public abstract class AbstractCloverMojo extends AbstractMojo
      * Registers the license file for Clover runtime by setting the
      * <code>clover.license.path</code> system property. If the <code>licenseFile</code>
      * property has not been defined by the user we look it up in the classpath in
-     * "/clover.license".
+     * <code>/clover.license</code>.
      */
     protected void registerLicenseFile()
     {

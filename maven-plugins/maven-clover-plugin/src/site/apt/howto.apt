@@ -1,0 +1,110 @@
+ ------
+ Maven 2 Clover Plugin: using
+ ------
+ Vincent Massol
+ <vmassol@apache.org>
+ ------
+ November 1st, 2005
+
+Introduction
+
+  The Clover plugin currently supports 2 features!
+  
+   * Generate a test coverage report by instrumenting your source files and then executing your
+     tests. Your tests exercise your instrumented source code which in turn generate coverage logs
+     to the {{{http://cenqua.com/clover/doc/adv/database.html}Clover database}}. This database
+     is then used to generate a report.
+     
+   * Verify that your source code has a defined test coverage percentage and fail the build if it's
+     below that level. This is the equivalent of the 
+     {{{http://cenqua.com/clover/doc/ant/checktask.html}Clover Check Ant task}}.
+
+  Note that the Clover plugin will <<not>> overwrite your main compiled classes nor your main
+  test compiled tests classes. It creates a parallel directory in <<<target/clover>>> in order not
+  to tamper with your main files.
+
+Generating the Clover report
+
+  Make sure you add the Clover report in your <<<pom.xml>>>:
+
++--------
+<project>
+  [...]
+  <reporting>
+    <plugins>
+      [...]
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
++---------
+
+  Then, to generate the report simply type <<<mvn site:site>>>. 
+  
+Checking test coverage
+
+  In order to check for a test coverage percentage and fail the build in case of non-compliance,
+  you'll need to configure the Clover plugin to tell it what threshold you wish to use:
+  
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <executions>
+          <execution>
+            <configuration>
+              <targetPercentage>50%</targetPercentage>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+  In this example we've also bound the <<<clover:check>>> goal to the <<<check>>> phase which means
+  it will be invoked automatically when calling <<<mvn install>>> on this project.
+
+Using Clover with JDK 1.4 and JDK 1.5 keywords
+
+  If your code is using JDK 1.4 or JDK 1.5 specific keywords, you'll need to configure the Clover
+  plugin. For example:
+  
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <configuration>
+          <jdk>1.4</jdk>
+[...]
++---------
+
+Specifying a Clover flush policy
+
+  If you want to specify the Clover 
+  {{{http://cenqua.com/clover/doc/adv/flushpolicies.html}flush policy}} that the plugin should use,
+  then specify it in the plugin's configuration. Valid policies are <<<threaded>>>, <<<directed>>>
+  and <<<interval>>>.
+  
+  For example to use a <<<threaded>>> policy with a flush interval of <<<5000>>> ms you would write:
+  
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <configuration>
+          <flushPolicy>threaded</flushPolicy>
+          <flushInterval>5000</flushInterval>
+[...]
++---------
