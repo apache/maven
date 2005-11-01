@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Build;
@@ -186,8 +187,7 @@ public class MavenProject
 
         this.executionRoot = project.executionRoot;
 
-        // TODO: need to clone this too?
-        this.artifact = project.artifact;
+        this.artifact = new DefaultArtifactFactory().cloneArtifact( project.artifact );
     }
 
     // ----------------------------------------------------------------------

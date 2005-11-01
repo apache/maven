@@ -22,6 +22,8 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public interface ArtifactFactory
 {
     String ROLE = ArtifactFactory.class.getName();
+    
+    Artifact cloneArtifact( Artifact artifact );
 
     // TODO: deprecate and chase down (probably used for copying only)
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );

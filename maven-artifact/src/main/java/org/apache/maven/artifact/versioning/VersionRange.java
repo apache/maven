@@ -52,6 +52,23 @@ public class VersionRange
     {
         return restrictions;
     }
+    
+    public VersionRange cloneOf()
+    {
+        List copiedRestrictions = null;
+        
+        if ( restrictions != null )
+        {
+            copiedRestrictions = new ArrayList();
+            
+            if ( !restrictions.isEmpty() )
+            {
+                copiedRestrictions.addAll( restrictions );
+            }
+        }
+        
+        return new VersionRange( recommendedVersion, copiedRestrictions );
+    }
 
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException
