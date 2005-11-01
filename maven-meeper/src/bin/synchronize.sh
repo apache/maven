@@ -30,7 +30,7 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
   src=/home/projects/maven/repository-staging/pom-svn-repository
   dest=/home/projects/maven/repository-staging/to-ibiblio/maven2
   cd $src
-  svn update
+  /usr/local/subversion/bin/svn update
   rsync -e ssh -v -rpt --exclude=.svn --exclude=updated-poms.log $src/ $dest/ > updated-poms.log
   for f in `grep .pom updated-poms.log` ; do md5sum $dest/$f > $dest/$f.md5 ; sha1sum $dest/$f > $dest/$f.sha1; done
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
