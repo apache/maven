@@ -173,6 +173,39 @@ public abstract class AbstractEclipsePluginTestCase
         assertTrue( "Unequal number of lines.", expectedLines.size() == actualLines.size() );
     }
 
+    protected void assertContains( String message, String full, String substring )
+    {
+        if ( full == null || full.indexOf( substring ) == -1 )
+        {
+            StringBuffer buf = new StringBuffer();
+            if ( message != null )
+            {
+                buf.append( message );
+            }
+            buf.append( ". " );
+            buf.append( "Expected \"" );
+            buf.append( substring );
+            buf.append( "\" not found" );
+            fail( buf.toString() );
+        }
+    }
+
+    protected void assertDoesNotContain( String message, String full, String substring )
+    {
+        if ( full == null || full.indexOf( substring ) != -1 )
+        {
+            StringBuffer buf = new StringBuffer();
+            if ( message != null )
+            {
+                buf.append( message );
+            }
+            buf.append( ". " );
+            buf.append( "Unexpected \"" );
+            buf.append( substring );
+            buf.append( "\" found" );
+        }
+    }
+
     private List getLines( String mavenRepo, File file )
         throws IOException
     {

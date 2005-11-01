@@ -17,7 +17,9 @@
 package org.apache.maven.plugin.eclipse;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.Writer;
 
 import org.apache.maven.settings.MavenSettingsBuilder;
@@ -73,20 +75,84 @@ public class EclipsePluginMasterProjectTest
         executeMaven2CommandLine( basedir );
 
         assertFileEquals( null, new File( basedir, "module-1/project" ), new File( basedir, "module-1/.project" ) );
-
-        // @fixme missing direct optional dependency
         assertFileEquals( null, new File( basedir, "module-1/classpath" ), new File( basedir, "module-1/.classpath" ) );
         assertFileEquals( null, new File( basedir, "module-1/wtpmodules" ), new File( basedir, "module-1/.wtpmodules" ) );
 
         // the real test: this should include any sort of direct/transitive dependency handled by mvn
         assertFileEquals( null, new File( basedir, "module-2/project" ), new File( basedir, "module-2/.project" ) );
 
-        // @fixme missing direct optional dependency + unneeded transitive dependencies
-        assertFileEquals( null, new File( basedir, "module-2/classpath" ), new File( basedir, "module-2/.classpath" ) );
+        // manual check, easier to handle
+        checkModule2Classpath( new File( basedir, "module-2/.classpath" ) );
 
-        // @fixme the list of dependencies in .wtpmodules should be the same added by the war plugin
-        assertFileEquals( null, new File( basedir, "module-2/wtpmodules" ), new File( basedir, "module-2/.wtpmodules" ) );
+        // manual check, easier to handle
+        checkModule2Wtpmodules( new File( basedir, "module-2/.wtpmodules" ) );
 
+    }
+
+    private void checkModule2Classpath( File file )
+        throws Exception
+    {
+        InputStream fis = new FileInputStream( file );
+        String classpath = IOUtil.toString( fis );
+        IOUtil.close( fis );
+
+        // direct dependencies: include all
+        assertContains( "Invalid classpath", classpath, "/direct-compile" );
+        assertContains( "Invalid classpath", classpath, "/direct-test" );
+        assertContains( "Invalid classpath", classpath, "/direct-sysdep" );
+        assertContains( "Invalid classpath", classpath, "/direct-optional" );
+
+        // referenced project: no deps!
+        assertContains( "Invalid classpath", classpath, "/module-1" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-compile" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-test" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-sysdep" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-optional" );
+
+        // transitive dependencies from referenced projects
+        assertContains( "Invalid classpath", classpath, "/deps-direct-compile" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-test" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-system" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-optional" );
+
+        // transitive dependencies from referenced projects
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-compile" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-test" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-system" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-optional" );
+    }
+
+    private void checkModule2Wtpmodules( File file )
+        throws Exception
+    {
+        InputStream fis = new FileInputStream( file );
+        String classpath = IOUtil.toString( fis );
+        IOUtil.close( fis );
+
+        // direct dependencies: include all
+        assertContains( "Invalid wtpmodules", classpath, "/direct-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/direct-test" );
+        assertContains( "Invalid wtpmodules", classpath, "/direct-system" );
+        assertContains( "Invalid wtpmodules", classpath, "/direct-optional" );
+
+        // referenced project: only runtime deps
+        assertContains( "Invalid wtpmodules", classpath, "/module-1" );
+        assertContains( "Invalid wtpmodules", classpath, "/refproject-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-test" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-system" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-optional" );
+
+        // transitive dependencies from referenced projects
+        assertContains( "Invalid wtpmodules", classpath, "/deps-direct-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-test" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-system" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-optional" );
+
+        // transitive dependencies from referenced projects
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-test" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-system" );
+        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-optional" );
     }
 
     /**

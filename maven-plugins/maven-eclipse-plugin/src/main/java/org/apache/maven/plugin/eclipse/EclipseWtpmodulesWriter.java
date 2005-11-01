@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -192,16 +193,20 @@ public class EclipseWtpmodulesWriter
         Set artifacts = project.getArtifacts();
         EclipseUtils.fixSystemScopeArtifacts( artifacts, project.getDependencies() );
 
+        ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+
         // dependencies
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
             String type = artifact.getType();
 
-            if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type )
-                && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            if ( ( scopeFilter.include( artifact ) || Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+                && ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) ) )
             {
                 addDependency( writer, artifact, referencedReactorArtifacts, localRepository );
+
+                log.info( "Adding artifact " + artifact.getId() + " optional=" + artifact.isOptional() );
             }
         }
     }
