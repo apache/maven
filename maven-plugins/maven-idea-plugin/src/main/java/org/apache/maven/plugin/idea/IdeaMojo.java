@@ -17,6 +17,7 @@ package org.apache.maven.plugin.idea;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,6 +40,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
+
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
@@ -322,7 +325,8 @@ public class IdeaMojo
 
             removeOldDependencies( component );
 
-            for ( Iterator i = getRuntimeClasspathArtifacts().iterator(); i.hasNext(); )
+            List testClasspathElements = project.getTestArtifacts();
+            for ( Iterator i = testClasspathElements.iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
                 Xpp3Dom dep = createElement( component, "orderEntry" );
@@ -368,34 +372,6 @@ public class IdeaMojo
         }
     }
     
-    /**
-     * Get the list of Classpath Artifacts
-     *
-     * @return List of artifacts that are Classpath Elements
-     */
-    private List getRuntimeClasspathArtifacts()
-    {
-        Set artifacts = project.getArtifacts();
-        
-        if ( artifacts == null ||  artifacts.isEmpty() ) return Collections.EMPTY_LIST;
-        
-        ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
-        
-        List list = new ArrayList();
-        
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-        {
-            Artifact artifact = (Artifact) i.next();
-            
-            if ( artifact.getArtifactHandler().isAddedToClasspath() && scopeFilter.include( artifact ) )
-            {
-                list.add( artifact );
-            }
-        }
-        
-        return list;
-    }
-
     /**
      * Adds the Web module to the (.iml) project file.
      *
