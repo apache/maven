@@ -54,6 +54,12 @@ public class DefaultModelValidator
         validateId( "artifactId", result, model.getArtifactId() );
 
         validateStringNotEmpty( "packaging", result, model.getPackaging() );
+        
+        if ( !model.getModules().isEmpty() && !"pom".equals( model.getPackaging() ) )
+        {
+            result.addMessage( "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
+                    "require 'pom' as packaging." );
+        }
 
         validateStringNotEmpty( "version", result, model.getVersion() );
 

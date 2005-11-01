@@ -96,6 +96,16 @@ public class DefaultModelValidatorTest
 
         assertEquals( "'version' is missing.", result.getMessage( 0 ) );
     }
+    
+    public void testInvalidAggregatorPackaging()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "invalid-aggregator-packaging-pom.xml" );
+        
+        assertEquals( 1, result.getMessageCount() );
+        
+        assertTrue( result.getMessage( 0 ).indexOf( "Aggregator projects require 'pom' as packaging." ) > -1 );
+    }
 
     public void testMissingDependencyArtifactId()
         throws Exception
