@@ -25,6 +25,7 @@
   </dependencies>
   
   <build>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>

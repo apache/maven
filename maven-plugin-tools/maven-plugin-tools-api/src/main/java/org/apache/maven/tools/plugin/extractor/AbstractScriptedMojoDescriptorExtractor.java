@@ -31,13 +31,13 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
         String scriptExtension = getScriptFileExtension();
         
         Map scriptFilesKeyedByBasedir =
-            gatherFilesByBasedir( project.getScriptSourceRoots(), scriptExtension );
-
+            gatherFilesByBasedir( project.getBasedir(), project.getScriptSourceRoots(), scriptExtension );
+        
         List mojoDescriptors;
         if ( !StringUtils.isEmpty( metadataExtension ) )
         {
             Map metadataFilesKeyedByBasedir =
-                gatherFilesByBasedir( project.getScriptSourceRoots(), metadataExtension );
+                gatherFilesByBasedir( project.getBasedir(), project.getScriptSourceRoots(), metadataExtension );
             
             mojoDescriptors = extractMojoDescriptorsFromMetadata( metadataFilesKeyedByBasedir, pluginDescriptor );
         }
@@ -100,7 +100,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
         }
     }
 
-    protected Map gatherFilesByBasedir( List directories, String scriptFileExtension )
+    protected Map gatherFilesByBasedir( File basedir, List directories, String scriptFileExtension )
     {
         Map sourcesByBasedir = new TreeMap();
 
@@ -109,7 +109,8 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
             Set sources = new HashSet();
 
             String resourceDir = (String) it.next();
-            File dir = new File( resourceDir ).getAbsoluteFile();
+            
+            File dir = new File( basedir, resourceDir ).getAbsoluteFile();
 
             resourceDir = dir.getPath();
 
@@ -119,6 +120,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
 
                 scanner.setBasedir( dir );
                 scanner.addDefaultExcludes();
+                scanner.setIncludes( new String[] { "**/*" + scriptFileExtension } );
                 scanner.scan();
 
                 String[] relativePaths = scanner.getIncludedFiles();

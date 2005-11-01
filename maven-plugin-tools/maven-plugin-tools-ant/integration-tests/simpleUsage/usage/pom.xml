@@ -32,14 +32,14 @@
           </dependency>
         </dependencies>
 
-        <!-- configuration>
+        <configuration>
           <name>Hani</name>
-        </configuration -->
+        </configuration>
 
         <executions>
           <execution>
             <id>test</id>
-            <phase>install</phase>
+            <phase>package</phase>
             <goals>
               <goal>test</goal>
             </goals>
