@@ -102,6 +102,7 @@
           <name>directory</name>
           <version>1.0.0</version>
           <type>String</type>
+          <description>Absolute or relative from the module's directory.</description>
           <required>true</required>
         </field>
         <field>

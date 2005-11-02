@@ -444,6 +444,11 @@ public class AssemblyMojo
 
             File archiveBaseDir = new File( directory );
 
+            if ( ! archiveBaseDir.isAbsolute() )
+            {
+                archiveBaseDir = new File( basedir, directory );
+            }
+
             if ( lineEnding != null )
             {
                 copySetReplacingLineEndings( archiveBaseDir, tmpDir, includes, excludes, lineEnding );
