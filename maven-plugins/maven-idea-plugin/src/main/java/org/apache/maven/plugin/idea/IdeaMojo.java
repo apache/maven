@@ -241,11 +241,16 @@ public class IdeaMojo
             {
                 removeOldElements( modules, "module" );
 
+                Xpp3Dom m = createElement( modules, "module" );
+                String projectPath = new File( project.getBasedir(),
+                                               project.getArtifactId() + ".iml" ).getAbsolutePath();
+                m.setAttribute( "filepath", "$PROJECT_DIR$/" + toRelative( project.getBasedir(), projectPath ) );
+
                 for ( Iterator i = project.getCollectedProjects().iterator(); i.hasNext(); )
                 {
                     MavenProject p = (MavenProject) i.next();
 
-                    Xpp3Dom m = createElement( modules, "module" );
+                    m = createElement( modules, "module" );
                     String modulePath = new File( p.getBasedir(), p.getArtifactId() + ".iml" ).getAbsolutePath();
                     m.setAttribute( "filepath", "$PROJECT_DIR$/" + toRelative( project.getBasedir(), modulePath ) );
                 }
