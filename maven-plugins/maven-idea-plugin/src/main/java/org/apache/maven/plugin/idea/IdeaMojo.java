@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -306,6 +307,7 @@ public class IdeaMojo
             Xpp3Dom component = findComponent( module, "NewModuleRootManager" );
             Xpp3Dom output = findElement( component, "output" );
             output.setAttribute( "url", getModuleFileUrl( project.getBuild().getOutputDirectory() ) );
+
             Xpp3Dom outputTest = findElement( component, "output-test" );
             outputTest.setAttribute( "url", getModuleFileUrl( project.getBuild().getTestOutputDirectory() ) );
 
@@ -336,6 +338,41 @@ public class IdeaMojo
                 Resource resource = (Resource) i.next();
                 String directory = resource.getDirectory();
                 addSourceFolder( content, directory, true );
+            }
+
+            removeOldElements( content, "excludeFolder" );
+
+            //For excludeFolder
+            File target = new File( project.getBuild().getDirectory() );
+
+            List excludeFolders = new ArrayList();
+            excludeFolders.add( new File( project.getBuild().getOutputDirectory() ).getAbsolutePath() );
+            excludeFolders.add( new File( project.getBuild().getTestOutputDirectory() ).getAbsolutePath() );
+
+            if ( target.exists() )
+            {
+                File[] fileNames = target.listFiles();
+
+                for ( int i = 0; i < fileNames.length; i++ )
+                {
+                    File fileName = fileNames[i];
+                    if ( fileName.isDirectory() )
+                    {
+                        String absolutePath = fileName.getAbsolutePath();
+                        if ( !executedProject.getCompileSourceRoots().contains( absolutePath ) )
+                        {
+                            if ( !excludeFolders.contains( absolutePath ) )
+                            {
+                                excludeFolders.add( absolutePath );
+                            }
+                        }
+                    }
+                }
+
+                for ( Iterator i = excludeFolders.iterator(); i.hasNext(); )
+                {
+                    addExcludeFolder( content, i.next().toString() );
+                }
             }
 
             removeOldDependencies( component );
@@ -496,6 +533,15 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
             Xpp3Dom sourceFolder = createElement( content, "sourceFolder" );
             sourceFolder.setAttribute( "url", getModuleFileUrl( directory ) );
             sourceFolder.setAttribute( "isTestSource", Boolean.toString( isTest ) );
+        }
+    }
+
+    private void addExcludeFolder( Xpp3Dom content, String directory )
+    {
+        if ( !StringUtils.isEmpty( directory ) && new File( directory ).isDirectory() )
+        {
+            Xpp3Dom excludeFolder = createElement( content, "excludeFolder" );
+            excludeFolder.setAttribute( "url", getModuleFileUrl( directory ) );
         }
     }
 
