@@ -16,9 +16,13 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.versioning.VersionRange;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public final class ArtifactUtils
@@ -97,6 +101,44 @@ public final class ArtifactUtils
         }
 
         return artifactMap;
+    }
+
+    public static Artifact copyArtifact( Artifact artifact )
+    {
+        VersionRange range = artifact.getVersionRange();
+        DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range.cloneOf(),
+                                                     artifact.getScope(), artifact.getType(), artifact.getClassifier(),
+                                                     artifact.getArtifactHandler(), artifact.isOptional() );
+        clone.setRelease( artifact.isRelease() );
+        clone.setResolvedVersion( artifact.getVersion() );
+        clone.setResolved( artifact.isResolved() );
+        clone.setFile( artifact.getFile() );
+
+        clone.setAvailableVersions( copyList( artifact.getAvailableVersions() ) );
+        clone.setBaseVersion( artifact.getBaseVersion() );
+        clone.setDependencyFilter( artifact.getDependencyFilter() );
+        clone.setDependencyTrail( copyList( artifact.getDependencyTrail() ) );
+        clone.setDownloadUrl( artifact.getDownloadUrl() );
+        clone.setRepository( artifact.getRepository() );
+
+        return clone;
+    }
+    
+    private static List copyList( List original )
+    {
+        List copy = null;
+        
+        if ( original != null )
+        {
+            copy = new ArrayList();
+            
+            if ( !original.isEmpty() )
+            {
+                copy.addAll( original );
+            }
+        }
+        
+        return copy;
     }
 
 }

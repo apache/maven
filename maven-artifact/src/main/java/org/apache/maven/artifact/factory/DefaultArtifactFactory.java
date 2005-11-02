@@ -22,9 +22,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.versioning.VersionRange;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {
@@ -33,44 +30,6 @@ public class DefaultArtifactFactory
 
     public DefaultArtifactFactory()
     {
-    }
-
-    public Artifact cloneArtifact( Artifact artifact )
-    {
-        VersionRange range = artifact.getVersionRange();
-        DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range.cloneOf(),
-                                                     artifact.getScope(), artifact.getType(), artifact.getClassifier(),
-                                                     artifact.getArtifactHandler(), artifact.isOptional() );
-        clone.setRelease( artifact.isRelease() );
-        clone.setResolvedVersion( artifact.getVersion() );
-        clone.setResolved( artifact.isResolved() );
-        clone.setFile( artifact.getFile() );
-
-        clone.setAvailableVersions( copyList( artifact.getAvailableVersions() ) );
-        clone.setBaseVersion( artifact.getBaseVersion() );
-        clone.setDependencyFilter( artifact.getDependencyFilter() );
-        clone.setDependencyTrail( copyList( artifact.getDependencyTrail() ) );
-        clone.setDownloadUrl( artifact.getDownloadUrl() );
-        clone.setRepository( artifact.getRepository() );
-
-        return clone;
-    }
-    
-    private List copyList( List original )
-    {
-        List copy = null;
-        
-        if ( original != null )
-        {
-            copy = new ArrayList();
-            
-            if ( !original.isEmpty() )
-            {
-                copy.addAll( original );
-            }
-        }
-        
-        return copy;
     }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
