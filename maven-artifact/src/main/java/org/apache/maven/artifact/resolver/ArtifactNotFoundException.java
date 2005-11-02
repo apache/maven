@@ -75,7 +75,7 @@ public class ArtifactNotFoundException
             sb.append( LS );
             sb.append( "and install it using the command: " );
             sb.append( LS );
-            sb.append( "  m2 install:install-file -DgroupId=" );
+            sb.append( "  mvn install:install-file -DgroupId=" );
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
@@ -85,7 +85,7 @@ public class ArtifactNotFoundException
             sb.append( type );
             sb.append( " -Dfile=/path/to/file" );
         }
-        
+
         sb.append( constructArtifactPath( path ) );
         sb.append( LS );
         return sb.toString();
