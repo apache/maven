@@ -17,7 +17,6 @@ package org.apache.maven.plugin.idea;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -35,14 +34,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
-
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
  * Goal for generating IDEA files from a POM.
@@ -83,13 +76,26 @@ public class IdeaMojo
     /**
      * Specify the version of the JDK to use for the project for the purpose of enabled assertions and 5.0 language features.
      * The default value is the specification version of the executing JVM.
+     *
      * @parameter expression="${jdkLevel}"
      * @todo would be good to use the compilation source if possible
      */
     private String jdkLevel;
 
     /**
+     * Specify the version of idea to use.  This is needed to identify the default formatting of
+     * project-jdk-name used by idea.  Currently supports 4.x and 5.x.
+     * <p/>
+     * This will only be used when parameter jdkName is not set.
+     *
+     * @parameter expression="${ideaVersion}"
+     * default-value="5.x"
+     */
+    private String ideaVersion;
+
+    /**
      * Whether to update the existing project files or overwrite them.
+     *
      * @parameter expression="${overwrite}" default-value="false"
      */
     private boolean overwrite;
@@ -99,7 +105,7 @@ public class IdeaMojo
     {
         rewriteModule();
 
-        if ( project.isExecutionRoot() ) 
+        if ( project.isExecutionRoot() )
         {
             rewriteProject();
 
@@ -122,7 +128,7 @@ public class IdeaMojo
         Reader reader = null;
 
         Xpp3Dom module;
-        
+
         try
         {
             if ( workspaceFile.exists() && !overwrite )
@@ -134,11 +140,11 @@ public class IdeaMojo
                 reader = new InputStreamReader( getClass().getResourceAsStream( "/templates/default/workspace.xml" ) );
             }
             module = Xpp3DomBuilder.build( reader );
-            
+
             setProjectScmType( module );
-            
+
             writer = new FileWriter( workspaceFile );
-            
+
             Xpp3DomWriter.write( writer, module );
         }
         catch ( XmlPullParserException e )
@@ -152,7 +158,7 @@ public class IdeaMojo
         }
         finally
         {
-            IOUtil.close(reader);
+            IOUtil.close( reader );
 
             IOUtil.close( writer );
         }
@@ -197,8 +203,17 @@ public class IdeaMojo
             else
             {
                 String javaVersion = System.getProperty( "java.version" );
-                String defaultJdkName = "java version " + javaVersion;
-                getLog().info( "jdkName is not set, using[" + defaultJdkName + "] as default." );
+                String defaultJdkName;
+
+                if ( ideaVersion.startsWith( "4" ) )
+                {
+                    defaultJdkName = "java version &quot;" + javaVersion + "&quot;";
+                }
+                else
+                {
+                    defaultJdkName = javaVersion.substring( 0, 3 );
+                }
+                getLog().info( "jdkName is not set, using [java version" + javaVersion + "] as default." );
                 setJdkName( module, defaultJdkName );
             }
 
@@ -371,7 +386,7 @@ public class IdeaMojo
             throw new MojoExecutionException( "Error parsing existing IML file " + moduleFile.getAbsolutePath(), e );
         }
     }
-    
+
     /**
      * Adds the Web module to the (.iml) project file.
      *
@@ -444,13 +459,13 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
     {
         Xpp3Dom component = findComponent( content, "ProjectRootManager" );
         component.setAttribute( "project-jdk-name", jdkName );
-        
+
         String jdkLevel = this.jdkLevel;
         if ( jdkLevel == null )
         {
             jdkLevel = System.getProperty( "java.specification.version" );
         }
-               
+
         if ( jdkLevel.startsWith( "1.4" ) )
         {
             component.setAttribute( "assert-keyword", "true" );
@@ -470,9 +485,9 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
     /**
      * Adds a sourceFolder element to IDEA (.iml) project file
      *
-     * @param content Xpp3Dom element
+     * @param content   Xpp3Dom element
      * @param directory Directory to set as url.
-     * @param isTest True if directory isTestSource.
+     * @param isTest    True if directory isTestSource.
      */
     private void addSourceFolder( Xpp3Dom content, String directory, boolean isTest )
     {
@@ -489,7 +504,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
     /**
      * Translate the absolutePath into its relative path.
      *
-     * @param basedir The basedir of the project.
+     * @param basedir      The basedir of the project.
      * @param absolutePath The absolute path that must be translated to relative path.
      * @return relative  Relative path of the parameter absolute path.
      */
@@ -528,7 +543,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      * Remove elements from content (Xpp3Dom).
      *
      * @param content Xpp3Dom element
-     * @param name Name of the element to be removed
+     * @param name    Name of the element to be removed
      */
     private void removeOldElements( Xpp3Dom content, String name )
     {
@@ -565,7 +580,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      * Finds element from the module element.
      *
      * @param module Xpp3Dom element
-     * @param name Name attribute to find
+     * @param name   Name attribute to find
      * @return component  Returns the Xpp3Dom element found.
      */
     private Xpp3Dom findComponent( Xpp3Dom module, String name )
@@ -588,7 +603,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      * Returns a an Xpp3Dom element (setting).
      *
      * @param component Xpp3Dom element
-     * @param name Setting attribute to find
+     * @param name      Setting attribute to find
      * @return setting Xpp3Dom element
      */
     private Xpp3Dom findSetting( Xpp3Dom component, String name )
@@ -611,10 +626,10 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      * Returns a an Xpp3Dom element with (child) tag name and (name) attribute name.
      *
      * @param component Xpp3Dom element
-     * @param name Setting attribute to find
+     * @param name      Setting attribute to find
      * @return option Xpp3Dom element
      */
-    private Xpp3Dom findElementName( Xpp3Dom component,  String child, String name )
+    private Xpp3Dom findElementName( Xpp3Dom component, String child, String name )
     {
         Xpp3Dom[] elements = component.getChildren( child );
         for ( int i = 0; i < elements.length; i++ )
@@ -629,12 +644,12 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         element.setAttribute( "name", name );
         return element;
     }
-    
+
     /**
      * Creates an Xpp3Dom element.
      *
      * @param module Xpp3Dom element
-     * @param name Name of the element
+     * @param name   Name of the element
      * @return component Xpp3Dom element
      */
     private static Xpp3Dom createElement( Xpp3Dom module, String name )
@@ -648,7 +663,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
      * Finds an element from Xpp3Dom component.
      *
      * @param component Xpp3Dom component
-     * @param name Name of the element to find.
+     * @param name      Name of the element to find.
      * @return the element
      */
     private Xpp3Dom findElement( Xpp3Dom component, String name )
@@ -661,27 +676,26 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         }
         return element;
     }
-    
+
     /**
      * Sets the SCM type of the project
-     *
      */
     private void setProjectScmType( Xpp3Dom content )
-    { 
+    {
         String scmType;
 
         scmType = getScmType();
-        
+
         if ( scmType != null )
         {
             Xpp3Dom component = findComponent( content, "VcsManagerConfiguration" );
 
-            Xpp3Dom element = findElementName( component, "option" , "ACTIVE_VCS_NAME" );
-            
+            Xpp3Dom element = findElementName( component, "option", "ACTIVE_VCS_NAME" );
+
             element.setAttribute( "value", scmType );
         }
     }
-    
+
     /**
      * used to retrieve the SCM Type
      *
@@ -705,22 +719,22 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
 
         return scmType;
     }
-    
+
     protected String getScmType( String connection )
     {
         String scmType;
-        
+
         if ( connection != null )
         {
             if ( connection.length() > 0 )
             {
                 int startIndex = connection.indexOf( ":" );
-               
-                int endIndex = connection.indexOf( ":", startIndex + 1);
-                
+
+                int endIndex = connection.indexOf( ":", startIndex + 1 );
+
                 if ( startIndex < endIndex )
                 {
-                    scmType = connection.substring( startIndex + 1, endIndex);
+                    scmType = connection.substring( startIndex + 1, endIndex );
 
                     return scmType;
                 }
