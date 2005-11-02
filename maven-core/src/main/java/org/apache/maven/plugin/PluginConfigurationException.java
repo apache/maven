@@ -269,7 +269,10 @@ public class PluginConfigurationException
         if ( failedConfiguration != null )
         {
             String value = failedConfiguration.getValue( null );
-            addParameterUsageInfo( value, message );
+            if ( value != null )
+            {
+                addParameterUsageInfo( value, message );
+            }
         }
 
         message.append( "\n\nCause: " ).append( cce.getMessage() );
