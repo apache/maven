@@ -101,6 +101,22 @@ public class IdeaMojo
      */
     private boolean overwrite;
 
+    /**
+     * Whether to link the reactor projects as dependency modules or as libraries.
+     *
+     * @parameter expression="${linkModules}" default-value="true"
+     */
+    private boolean linkModules;
+
+    /**
+     * The reactor projects in a multi-module build.
+     *
+     * @parameter expression="${reactorProjects}"
+     * @required
+     * @readonly
+     */
+    private List reactorProjects;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -383,7 +399,22 @@ public class IdeaMojo
                 Artifact a = (Artifact) i.next();
                 Xpp3Dom dep = createElement( component, "orderEntry" );
 
-                if ( a.getFile() != null )
+                boolean found = false;
+                if ( reactorProjects != null && linkModules )
+                {
+                    for ( Iterator j = reactorProjects.iterator(); j.hasNext() && !found; )
+                    {
+                        MavenProject p = (MavenProject) j.next();
+                        if ( p.getGroupId().equals( a.getGroupId() ) && p.getArtifactId().equals( a.getArtifactId() ) )
+                        {
+                            dep.setAttribute( "type", "module" );
+                            dep.setAttribute( "module-name", a.getArtifactId() );
+                            found = true;
+                        }
+                    }
+                }
+
+                if ( a.getFile() != null && !found )
                 {
                     dep.setAttribute( "type", "module-library" );
                     dep = createElement( dep, "library" );
@@ -396,11 +427,6 @@ public class IdeaMojo
 
                     createElement( dep, "JAVADOC" );
                     createElement( dep, "SOURCES" );
-                }
-                else
-                {
-                    dep.setAttribute( "type", "module" );
-                    dep.setAttribute( "module-name", a.getArtifactId() );
                 }
             }
 
