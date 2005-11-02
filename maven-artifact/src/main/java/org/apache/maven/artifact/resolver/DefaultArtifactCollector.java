@@ -274,6 +274,15 @@ public class DefaultArtifactCollector
                         }
 
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
+
+                        //TODO might be better to have source.retreive() throw a specific exception for this situation
+                        //and catch here rather than have it return null
+                        if ( rGroup == null )
+                        {
+                            //relocated dependency artifact is declared excluded, no need to add and recurse further
+                            continue;
+                        }
+
                         child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
                     }
                     catch ( CyclicDependencyException e )

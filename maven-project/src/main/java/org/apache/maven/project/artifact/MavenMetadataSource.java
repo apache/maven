@@ -155,6 +155,12 @@ public class MavenMetadataSource
                             artifact.setVersion( relocation.getVersion() );
                         }
 
+                        if ( artifact.getDependencyFilter() != null &&
+                            !artifact.getDependencyFilter().include( artifact ) )
+                        {
+                            return null;
+                        }
+
                         String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
                             artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
@@ -199,8 +205,8 @@ public class MavenMetadataSource
                 // or used the inherited scope (should that be passed to the buildFromRepository method above?)
                 try
                 {
-                    artifacts =
-                        project.createArtifacts( artifactFactory, artifact.getScope(), artifact.getDependencyFilter() );
+                    artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
+                                                         artifact.getDependencyFilter() );
                 }
                 catch ( InvalidDependencyVersionException e )
                 {
