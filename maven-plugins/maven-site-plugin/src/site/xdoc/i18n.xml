@@ -62,6 +62,14 @@
                                     </a>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>German</td>
+                                <td>
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-site-plugin/src/main/resources/site-plugin_de.properties">
+                                        See
+                                    </a>
+                                </td>
+                            </tr>
                         </table>
                         <br />
                     </li>
@@ -96,6 +104,14 @@
                                 <td>Japanese</td>
                                 <td>
                                     <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report_ja.properties">
+                                        See
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>German</td>
+                                <td>
+                                    <a href="http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins/maven-project-info-reports-plugin/src/main/resources/project-info-report_de.properties">
                                         See
                                     </a>
                                 </td>

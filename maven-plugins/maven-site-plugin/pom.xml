@@ -29,6 +29,13 @@
         <role>Japanese translator</role>
       </roles>
     </contributor>
+    <contributor>
+      <name>Michael Wechner</name>
+      <email>michael.wechner@wyona.com</email>
+      <roles>
+        <role>German translator</role>
+      </roles>
+    </contributor>
   </contributors>
   <dependencies>
     <dependency>
