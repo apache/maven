@@ -1,7 +1,0 @@
-<archetype>
-  <id>webapp</id>
-  <resources>
-    <resource>src/main/webapp/index.jsp</resource>
-    <resource>src/main/webapp/WEB-INF/web.xml</resource>
-  </resources>
-</archetype>
