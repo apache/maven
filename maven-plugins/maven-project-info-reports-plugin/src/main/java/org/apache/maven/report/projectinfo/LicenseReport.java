@@ -77,6 +77,7 @@ public class LicenseReport
 
     /**
      * Whether the system is currently offline.
+     *
      * @parameter expression="${settings.offline}"
      */
     private boolean offline;
@@ -218,7 +219,11 @@ public class LicenseReport
 
                 URL licenseUrl = null;
                 UrlValidator urlValidator = new UrlValidator( UrlValidator.ALLOW_ALL_SCHEMES );
-                if ( urlValidator.isValid( url ) )
+                // UrlValidator does not accept file URLs because the file
+                // URLs do not contain a valid authority (no hostname).
+                // As a workaround accept license URLs that start with the 
+                // file scheme.
+                if ( urlValidator.isValid( url ) || url.startsWith( "file://" ) )
                 {
                     try
                     {
@@ -233,6 +238,12 @@ public class LicenseReport
                 else
                 {
                     File licenseFile = new File( project.getBasedir(), url );
+                    if ( !licenseFile.exists() )
+                    {
+                        // Workaround to allow absolute path names while
+                        // staying compatible with the way it was...
+                        licenseFile = new File( url );
+                    }
                     if ( !licenseFile.exists() )
                     {
                         throw new MissingResourceException(
