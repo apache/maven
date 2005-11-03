@@ -169,7 +169,8 @@ public class MavenMetadataSource
                             message += "  " + relocation.getMessage() + "\n";
                         }
 
-                        getLogger().warn( message + "\n" );
+                        getLogger().warn( "While downloading " + pomArtifact.getGroupId() + ":" +
+                            pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
                     }
                     else
                     {
