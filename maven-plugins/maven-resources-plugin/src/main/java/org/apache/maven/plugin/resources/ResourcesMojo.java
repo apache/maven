@@ -127,6 +127,17 @@ public class ResourcesMojo
                 continue;
             }
 
+            // this part is required in case the user specified "../something" as destination
+            // see MNG-1345
+            File outputDir = new File( outputDirectory );
+            if ( !outputDir.exists() )
+            {
+                if ( !outputDir.mkdirs() )
+                {
+                    throw new MojoExecutionException( "Cannot create resource output directory: " + outputDir );
+                }
+            }
+
             DirectoryScanner scanner = new DirectoryScanner();
 
             scanner.setBasedir( resource.getDirectory() );
