@@ -1063,6 +1063,7 @@ public class MBoot
     {
         TimeZone timezone = TimeZone.getTimeZone( "UTC" );
         DateFormat fmt = new SimpleDateFormat( "yyyyMMddHHmmss" );
+        fmt.setTimeZone( timezone );
         return fmt.format( new Date() );
     }
 
