@@ -17,12 +17,12 @@ package org.apache.maven.plugin.install;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -105,6 +105,7 @@ public class InstallFileMojo
                 tempFile.deleteOnExit();
 
                 Model model = new Model();
+                model.setModelVersion( "4.0.0" );
                 model.setGroupId( groupId );
                 model.setArtifactId( artifactId );
                 model.setVersion( version );
@@ -118,8 +119,7 @@ public class InstallFileMojo
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Error writing temporary pom file: "
-                    + e.getMessage(), e );
+                throw new MojoExecutionException( "Error writing temporary pom file: " + e.getMessage(), e );
             }
             finally
             {
