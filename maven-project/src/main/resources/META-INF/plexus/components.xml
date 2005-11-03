@@ -8,6 +8,11 @@
     <component>
       <role>org.apache.maven.project.MavenProjectHelper</role>
       <implementation>org.apache.maven.project.DefaultMavenProjectHelper</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
     </component>
 <!--
      |

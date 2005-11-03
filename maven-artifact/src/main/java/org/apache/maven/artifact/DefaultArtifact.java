@@ -97,7 +97,9 @@ public class DefaultArtifact
 
         this.artifactId = artifactId;
 
-        setVersionRange( versionRange );
+        this.versionRange = versionRange;
+        
+        selectVersionFromNewRangeIfAvailable();
 
         this.artifactHandler = artifactHandler;
 
@@ -425,10 +427,15 @@ public class DefaultArtifact
         return versionRange;
     }
 
-    public final void setVersionRange( VersionRange versionRange )
+    public void setVersionRange( VersionRange versionRange )
     {
         this.versionRange = versionRange;
-
+        
+        selectVersionFromNewRangeIfAvailable();
+    }
+    
+    private void selectVersionFromNewRangeIfAvailable()
+    {
         if ( versionRange != null && versionRange.getRecommendedVersion() != null )
         {
             selectVersion( versionRange.getRecommendedVersion().toString() );

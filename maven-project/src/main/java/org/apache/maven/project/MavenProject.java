@@ -1415,6 +1415,9 @@ public class MavenProject
         return groupId + ":" + artifactId;
     }
 
+    /**
+     * @deprecated Use MavenProjectHelper.attachArtifact(..) instead.
+     */
     public void attachArtifact( String type, String classifier, File file )
     {
     }

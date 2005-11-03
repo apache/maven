@@ -22,7 +22,6 @@ import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.util.Collection;
@@ -35,108 +34,125 @@ public class AttachedArtifact
 
     private final Artifact parent;
 
-    public AttachedArtifact( Artifact parent, String type, String classifier )
+    public AttachedArtifact( Artifact parent, String type, String classifier, ArtifactHandler artifactHandler )
     {
         super( parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), type,
-               classifier, parent.getArtifactHandler(), parent.isOptional() );
+               classifier, artifactHandler, parent.isOptional() );
+        
+        setDependencyTrail( Collections.singletonList( parent.getId() ) );
+        
         this.parent = parent;
-
-        if ( type == null || type.trim().length() < 1 )
+        
+        if ( getId().equals( parent.getId() ) )
         {
-            throw new InvalidArtifactRTException( getGroupId(), getArtifactId(), getVersion(), type,
-                                                  "Attached artifacts must specify a type." );
-        }
-
-        if ( classifier == null || classifier.trim().length() < 1 )
-        {
-            throw new InvalidArtifactRTException( getGroupId(), getArtifactId(), getVersion(), type,
-                                                  "Attached artifacts must specify a classifier." );
+            throw new InvalidArtifactRTException( parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), parent.getType(), "An attached artifact must have a different ID than its corresponding main artifact." );
         }
     }
 
-    public ArtifactHandler getArtifactHandler()
+    public AttachedArtifact( Artifact parent, String type, ArtifactHandler artifactHandler )
     {
-        return parent.getArtifactHandler();
+        this( parent, type, null, artifactHandler );
     }
-
-    public String getArtifactId()
+    
+    public void setArtifactId( String artifactId )
     {
-        return parent.getArtifactId();
+        throw new UnsupportedOperationException( "Cannot change the artifactId for an attached artifact.  It is derived from the main artifact." );
     }
 
     public List getAvailableVersions()
     {
         return parent.getAvailableVersions();
     }
+    
+    public void setAvailableVersions( List availableVersions )
+    {
+        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+    }
 
     public String getBaseVersion()
     {
         return parent.getBaseVersion();
     }
-
-    public ArtifactFilter getDependencyFilter()
+    
+    public void setBaseVersion( String baseVersion )
     {
-        return parent.getDependencyFilter();
-    }
-
-    public List getDependencyTrail()
-    {
-        return parent.getDependencyTrail();
+        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
     }
 
     public String getDownloadUrl()
     {
         return parent.getDownloadUrl();
     }
-
-    public String getGroupId()
+    
+    public void setDownloadUrl( String downloadUrl )
     {
-        return parent.getGroupId();
+        throw new UnsupportedOperationException( "Cannot change the download information for an attached artifact. It is derived from the main artifact." );
+    }
+
+    public void setGroupId( String groupId )
+    {
+        throw new UnsupportedOperationException( "Cannot change the groupId on attached artifacts. It is derived from the main artifact." );
     }
 
     public ArtifactRepository getRepository()
     {
         return parent.getRepository();
     }
+    
+    public void setRepository( ArtifactRepository repository )
+    {
+        throw new UnsupportedOperationException( "Cannot change the repository information for an attached artifact. It is derived from the main artifact." );
+    }
 
     public String getScope()
     {
         return parent.getScope();
     }
-
-    public String getType()
+    
+    public void setScope( String scope )
     {
-        return parent.getType();
+        throw new UnsupportedOperationException( "Cannot change the scoping information for an attached artifact. It is derived from the main artifact." );
     }
 
     public String getVersion()
     {
         return parent.getVersion();
     }
+    
+    public void setVersion( String version )
+    {
+        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+    }
 
     public VersionRange getVersionRange()
     {
         return parent.getVersionRange();
     }
-
-    public boolean isOptional()
+    
+    public void setVersionRange( VersionRange range )
     {
-        return parent.isOptional();
+        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
     }
 
     public boolean isRelease()
     {
         return parent.isRelease();
     }
+    
+    public void setRelease( boolean release )
+    {
+        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+    }
 
     public boolean isSnapshot()
     {
         return parent.isSnapshot();
     }
-
+    
     public void addMetadata( ArtifactMetadata metadata )
     {
         // ignore. The parent artifact will handle metadata.
+        // we must fail silently here to avoid problems with the artifact transformers.
     }
 
     public Collection getMetadataList()
