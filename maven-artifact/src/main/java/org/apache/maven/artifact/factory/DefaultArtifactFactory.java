@@ -127,11 +127,6 @@ public class DefaultArtifactFactory
             // added to retain compile scope. Remove if you want compile inherited as runtime
             desiredScope = Artifact.SCOPE_COMPILE;
         }
-        else if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
-        {
-            // system scopes come through unchanged...
-            desiredScope = Artifact.SCOPE_SYSTEM;
-        }
 
         if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
@@ -143,6 +138,12 @@ public class DefaultArtifactFactory
             desiredScope = Artifact.SCOPE_PROVIDED;
         }
 
+        if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
+        {
+            // system scopes come through unchanged...
+            desiredScope = Artifact.SCOPE_SYSTEM;
+        }
+        
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
 
         return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
