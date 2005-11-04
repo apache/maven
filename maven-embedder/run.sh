@@ -1,8 +1,8 @@
 #!/bin/sh
 
-m2 clean:clean assembly:assembly
+mvn clean:clean assembly:assembly
 
-CLASSPATH=target/maven-embedder-2.0-beta-4-SNAPSHOT-dep.jar
+CLASSPATH=target/maven-embedder-2.0-dep.jar
 
 javac -classpath $CLASSPATH Plugin.java
 
