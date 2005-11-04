@@ -1,0 +1,24 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>it0085-parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>dep</module>
+    <module>war</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.it</groupId>
+        <artifactId>pom-dep</artifactId>
+        <version>1.4.2</version>
+        <scope>system</scope>
+        <systemPath>${basedir}/pom.xml</systemPath>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

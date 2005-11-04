@@ -229,6 +229,11 @@ it0083: Verify that overriding a compile time dependency as provided in a WAR en
 
 it0084: Verify that the collector selecting a particular version gets the correct subtree
 
+it0085: Verify that system-scoped dependencies get resolved with system scope
+        when they are resolved transitively via another (non-system)
+        dependency. Inherited scope should not apply in the case of
+        system-scoped dependencies, no matter where they are.
+
 -------------------------------------------------------------------------------
 
 - generated sources
