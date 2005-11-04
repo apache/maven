@@ -8,12 +8,7 @@
   <groupId>org.apache.maven</groupId>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
-  <version>2.0-SNAPSHOT</version>
-  
-  <properties>
-    <mavenVersion>2.0</mavenVersion>
-  </properties>
-  
+  <version>2.0</version>
   <build>
     <plugins>
       <plugin>
@@ -29,7 +24,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
-    </dependency>    
+    </dependency>
   </dependencies>
   <reporting>
     <plugins>
@@ -47,4 +42,7 @@
       </plugin>
     </plugins>
   </reporting>
+  <properties>
+    <mavenVersion>2.0</mavenVersion>
+  </properties>
 </project>
