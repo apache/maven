@@ -32,6 +32,7 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.RuntimeInfo;
@@ -380,7 +381,7 @@ public class MavenEmbedder
                          TransferListener transferListener,
                          Properties properties,
                          File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException
+        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException, DuplicateProjectException
     {
         execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, properties, executionRootDirectory );
     }
@@ -391,7 +392,7 @@ public class MavenEmbedder
                          TransferListener transferListener,
                          Properties properties,
                          File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException
+        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException, DuplicateProjectException
     {
         ReactorManager rm = new ReactorManager( projects );
 
