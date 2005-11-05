@@ -70,24 +70,14 @@ public final class ApplicationXmlWriter
         if ( GenerateApplicationXmlMojo.VERSION_1_3.equals( version ) )
         {
             writer = initializeRootElementOneDotThree( w );
+            writeDisplayName(displayName, writer);
+            writeDescription(description, writer);
         }
         else if ( GenerateApplicationXmlMojo.VERSION_1_4.equals( version ) )
         {
             writer = initializeRootElementOneDotFour( w );
-        }
-
-        if ( description != null )
-        {
-            writer.startElement( "description" );
-            writer.writeText( description );
-            writer.endElement();
-        }
-
-        if ( displayName != null )
-        {
-            writer.startElement( "display-name" );
-            writer.writeText( displayName );
-            writer.endElement();
+            writeDescription(description, writer);
+            writeDisplayName(displayName, writer);
         }
 
         Iterator i = earModules.iterator();
@@ -99,6 +89,26 @@ public final class ApplicationXmlWriter
         writer.endElement();
 
         close( w );
+    }
+
+    private void writeDescription(String description, XMLWriter writer)
+    {
+        if ( description != null )
+        {
+            writer.startElement( "description" );
+            writer.writeText( description );
+            writer.endElement();
+        }
+    }
+
+    private void writeDisplayName(String displayName, XMLWriter writer)
+    {
+        if ( displayName != null )
+        {
+            writer.startElement( "display-name" );
+            writer.writeText( displayName );
+            writer.endElement();
+        }
     }
 
     private void close( Writer closeable )
