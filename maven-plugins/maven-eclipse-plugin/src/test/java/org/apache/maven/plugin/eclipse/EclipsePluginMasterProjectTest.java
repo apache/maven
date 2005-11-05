@@ -19,9 +19,20 @@ package org.apache.maven.plugin.eclipse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
+import org.apache.maven.cli.ConsoleDownloadMonitor;
+import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
+import org.apache.maven.embedder.PlexusLoggerAdapter;
+import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.IOUtil;
@@ -67,26 +78,76 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 public class EclipsePluginMasterProjectTest
     extends AbstractEclipsePluginTestCase
 {
+
+    protected File basedir;
+
+    protected MavenEmbedder maven;
+
+    protected List projectList = new ArrayList();
+
+    protected void setUp()
+        throws Exception
+    {
+        this.basedir = getTestFile( "src/test/projects/master-test" );
+
+        this.maven = new MavenEmbedder();
+        this.maven.setClassLoader( Thread.currentThread().getContextClassLoader() );
+        this.maven.setLogger( new MavenEmbedderConsoleLogger() );
+        this.maven.start();
+
+        projectList.add( maven.readProjectWithDependencies( new File( basedir, "pom.xml" ) ) );
+
+        super.setUp();
+    }
+
+    protected void tearDown()
+        throws Exception
+    {
+        maven.stop();
+        super.tearDown();
+    }
+
+    /**
+     * Currently disabled because:
+     * <ul>
+     *   <li>the reactor build is not run by the embedder</li>
+     *   <li>the embedder doesn't support custom settings</li>
+     * </ul>
+     * @throws Exception
+     */
+    public void disabledTestMasterProjectWithEmbedder()
+        throws Exception
+    {
+        EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
+
+        this.maven.execute( projectList, Arrays.asList( new String[] {
+            "org.apache.maven.plugins:maven-eclipse-plugin:clean",
+            "org.apache.maven.plugins:maven-eclipse-plugin:eclipse" } ), eventMonitor, new ConsoleDownloadMonitor(),
+                            new Properties(), this.basedir );
+
+        compareFiles();
+    }
+
+    /**
+     * Test using a command line. Should be replaced by the embedder test.
+     */
     public void testMasterProject()
         throws Exception
     {
-        File basedir = getTestFile( "src/test/projects/master-test" );
-
         executeMaven2CommandLine( basedir );
+        compareFiles();
+    }
 
+    private void compareFiles()
+        throws Exception
+    {
         assertFileEquals( null, new File( basedir, "module-1/project" ), new File( basedir, "module-1/.project" ) );
         assertFileEquals( null, new File( basedir, "module-1/classpath" ), new File( basedir, "module-1/.classpath" ) );
         assertFileEquals( null, new File( basedir, "module-1/wtpmodules" ), new File( basedir, "module-1/.wtpmodules" ) );
-
-        // the real test: this should include any sort of direct/transitive dependency handled by mvn
         assertFileEquals( null, new File( basedir, "module-2/project" ), new File( basedir, "module-2/.project" ) );
 
-        // manual check, easier to handle
         checkModule2Classpath( new File( basedir, "module-2/.classpath" ) );
-
-        // manual check, easier to handle
         checkModule2Wtpmodules( new File( basedir, "module-2/.wtpmodules" ) );
-
     }
 
     private void checkModule2Classpath( File file )
@@ -101,58 +162,63 @@ public class EclipsePluginMasterProjectTest
         assertContains( "Invalid classpath", classpath, "/direct-test" );
         assertContains( "Invalid classpath", classpath, "/direct-sysdep" );
         assertContains( "Invalid classpath", classpath, "/direct-optional" );
+        assertContains( "Invalid classpath", classpath, "/direct-provided" );
 
-        // referenced project: no deps!
+        // referenced project: not required, but it's not a problem to have them included
         assertContains( "Invalid classpath", classpath, "/module-1" );
-        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-compile" );
+        // assertDoesNotContain( "Invalid classpath", classpath, "/refproject-compile" );
+        // assertDoesNotContain( "Invalid classpath", classpath, "/refproject-sysdep" );
         assertDoesNotContain( "Invalid classpath", classpath, "/refproject-test" );
-        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-sysdep" );
         assertDoesNotContain( "Invalid classpath", classpath, "/refproject-optional" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/refproject-provided" );
 
         // transitive dependencies from referenced projects
         assertContains( "Invalid classpath", classpath, "/deps-direct-compile" );
         assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-test" );
-        assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-system" );
         assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-optional" );
+        // @todo should this be included? see MNG-514
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-direct-provided" );
 
         // transitive dependencies from referenced projects
-        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-compile" );
+        assertContains( "Invalid classpath", classpath, "/deps-refproject-compile" );
         assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-test" );
-        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-system" );
         assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-optional" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-provided" );
     }
 
     private void checkModule2Wtpmodules( File file )
         throws Exception
     {
         InputStream fis = new FileInputStream( file );
-        String classpath = IOUtil.toString( fis );
+        String wtpmodules = IOUtil.toString( fis );
         IOUtil.close( fis );
 
-        // direct dependencies: include all
-        assertContains( "Invalid wtpmodules", classpath, "/direct-compile" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/direct-test" );
-        assertContains( "Invalid wtpmodules", classpath, "/direct-system" );
-        assertContains( "Invalid wtpmodules", classpath, "/direct-optional" );
+        // direct dependencies: include only runtime (also optional) dependencies
+        assertContains( "Invalid wtpmodules", wtpmodules, "/direct-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/direct-test" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/direct-sysdep" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/direct-optional" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/direct-provided" );
 
         // referenced project: only runtime deps
-        assertContains( "Invalid wtpmodules", classpath, "/module-1" );
-        assertContains( "Invalid wtpmodules", classpath, "/refproject-compile" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-test" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-system" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/refproject-optional" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/module-1" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/refproject-compile" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/refproject-sysdep" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/refproject-test" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/refproject-optional" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/refproject-provided" );
 
         // transitive dependencies from referenced projects
-        assertContains( "Invalid wtpmodules", classpath, "/deps-direct-compile" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-test" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-system" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-direct-optional" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/deps-direct-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-direct-test" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-direct-optional" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-direct-provided" );
 
         // transitive dependencies from referenced projects
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-compile" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-test" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-system" );
-        assertDoesNotContain( "Invalid wtpmodules", classpath, "/deps-refproject-optional" );
+        assertContains( "Invalid wtpmodules", wtpmodules, "/deps-refproject-compile" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-refproject-test" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-refproject-optional" );
+        assertDoesNotContain( "Invalid wtpmodules", wtpmodules, "/deps-refproject-provided" );
     }
 
     /**
@@ -191,6 +257,25 @@ public class EclipsePluginMasterProjectTest
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) lookup( MavenSettingsBuilder.ROLE );
         Settings defaultSettings = settingsBuilder.buildSettings();
 
+        String settingsPath = createTestSettings( defaultSettings );
+
+        Commandline cmd = new Commandline();
+
+        cmd.setWorkingDirectory( workingDir.getAbsolutePath() );
+
+        cmd.setExecutable( "mvn" );
+        cmd.createArgument().setValue( "-s" + settingsPath );
+        cmd.createArgument().setValue( "-e" );
+
+        cmd.createArgument().setValue( "eclipse:clean" );
+        cmd.createArgument().setValue( "eclipse:eclipse" );
+
+        return cmd;
+    }
+
+    private String createTestSettings( Settings defaultSettings )
+        throws IOException
+    {
         // prepare a temporary settings.xml
         File settings = File.createTempFile( "settings", ".xml" );
         settings.deleteOnExit();
@@ -226,19 +311,9 @@ public class EclipsePluginMasterProjectTest
 
         writer.endElement();
         IOUtil.close( w );
+        settings.deleteOnExit();
 
-        Commandline cmd = new Commandline();
-
-        cmd.setWorkingDirectory( workingDir.getAbsolutePath() );
-
-        cmd.setExecutable( "mvn" );
-        cmd.createArgument().setValue( "-s" + settings.getAbsolutePath() );
-        cmd.createArgument().setValue( "-e" );
-
-        cmd.createArgument().setValue( "eclipse:clean" );
-        cmd.createArgument().setValue( "eclipse:eclipse" );
-
-        return cmd;
+        return settings.getAbsolutePath();
     }
 
 }

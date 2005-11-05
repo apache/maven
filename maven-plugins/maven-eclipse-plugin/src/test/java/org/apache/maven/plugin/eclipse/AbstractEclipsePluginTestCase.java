@@ -203,6 +203,7 @@ public abstract class AbstractEclipsePluginTestCase
             buf.append( "Unexpected \"" );
             buf.append( substring );
             buf.append( "\" found" );
+            fail( buf.toString() );
         }
     }
 

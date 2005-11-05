@@ -353,7 +353,8 @@ public class EclipsePlugin
         new EclipseSettingsWriter( getLog() ).write( projectBaseDir, outputDir, project );
 
         new EclipseWtpmodulesWriter( getLog() ).write( outputDir, project, reactorArtifacts, sourceDirs,
-                                                       localRepository );
+                                                       localRepository,artifactResolver,
+                                                       remoteArtifactRepositories );
 
         getLog().info( Messages.getString( "EclipsePlugin.wrote", //$NON-NLS-1$
                                            new Object[]{project.getArtifactId(), outputDir.getAbsolutePath()} ) );

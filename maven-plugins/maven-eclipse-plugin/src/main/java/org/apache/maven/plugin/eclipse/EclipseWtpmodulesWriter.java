@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -51,7 +52,8 @@ public class EclipseWtpmodulesWriter
     }
 
     protected void write( File basedir, MavenProject project, List referencedReactorArtifacts,
-                         EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository )
+                         EclipseSourceDir[] sourceDirs, ArtifactRepository localRepository,
+                         ArtifactResolver artifactResolver, List remoteArtifactRepositories )
         throws MojoExecutionException
     {
         FileWriter w;
@@ -151,7 +153,8 @@ public class EclipseWtpmodulesWriter
         String target = "/"; //$NON-NLS-1$
         if ( "war".equals( project.getPackaging() ) ) //$NON-NLS-1$
         {
-            writeWarSpecificResources( writer, basedir, project, referencedReactorArtifacts, localRepository );
+            writeWarSpecificResources( writer, basedir, project, referencedReactorArtifacts, localRepository,
+                                       artifactResolver, remoteArtifactRepositories );
 
             target = "/WEB-INF/classes"; //$NON-NLS-1$
         }
@@ -177,7 +180,8 @@ public class EclipseWtpmodulesWriter
     }
 
     private void writeWarSpecificResources( XMLWriter writer, File basedir, MavenProject project,
-                                           List referencedReactorArtifacts, ArtifactRepository localRepository )
+                                           List referencedReactorArtifacts, ArtifactRepository localRepository,
+                                           ArtifactResolver artifactResolver, List remoteArtifactRepositories )
     {
 
         String warSourceDirectory = EclipseUtils.getPluginSetting( project, "maven-war-plugin", //$NON-NLS-1$
@@ -191,6 +195,10 @@ public class EclipseWtpmodulesWriter
         writer.endElement();
 
         Set artifacts = project.getArtifacts();
+
+        EclipseUtils.fixMissingOptionalArtifacts( artifacts, project.getDependencyArtifacts(), localRepository,
+                                                  artifactResolver, remoteArtifactRepositories, log );
+
         EclipseUtils.fixSystemScopeArtifacts( artifacts, project.getDependencies() );
 
         ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );

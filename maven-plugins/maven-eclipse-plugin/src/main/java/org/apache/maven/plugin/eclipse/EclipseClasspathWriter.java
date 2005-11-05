@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -128,31 +127,8 @@ public class EclipseClasspathWriter
 
         List artifacts = project.getTestArtifacts();
 
-        // @todo direct optional artifacts are not included in the list returned by project.getTestArtifacts()
-        // .classpath should include ANY direct dependency, and optional dependencies are required to compile
-        Set depArtifacts = project.getDependencyArtifacts();
-        for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
-        {
-            Artifact artifact = (Artifact) it.next();
-            if ( artifact.isOptional() && !artifacts.contains( artifact ) )
-            {
-                try
-                {
-                    artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    log.error( "Unable to resolve optional artifact " + artifact.getId() );
-                    continue;
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    log.error( "Unable to resolve optional artifact " + artifact.getId() );
-                    continue;
-                }
-                artifacts.add( artifact );
-            }
-        }
+        EclipseUtils.fixMissingOptionalArtifacts( artifacts, project.getDependencyArtifacts(), localRepository,
+                                                  artifactResolver, remoteArtifactRepositories, log );
 
         EclipseUtils.fixSystemScopeArtifacts( artifacts, project.getDependencies() );
 

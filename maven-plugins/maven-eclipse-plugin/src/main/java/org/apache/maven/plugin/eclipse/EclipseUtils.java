@@ -25,6 +25,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
@@ -262,6 +266,10 @@ public class EclipseUtils
         return referencedProjects;
     }
 
+    /**
+     * @todo MNG-1379 Wrong path for artifacts with system scope
+     * Artifacts with a system scope have a wrong path in mvn 2.0. This is a temporary workaround.
+     */
     public static void fixSystemScopeArtifacts( Collection artifacts, Collection dependencies )
     {
         // fix path for system dependencies.Artifact.getFile() returns a wrong path in mvn 2.0
@@ -287,4 +295,35 @@ public class EclipseUtils
         }
     }
 
+    /**
+     * @todo MNG-1384 optional dependencies not resolved while compiling from a master project 
+     * Direct optional artifacts are not included in the list returned by project.getTestArtifacts()
+     * .classpath should include ANY direct dependency, and optional dependencies are required to compile
+     */
+    public static void fixMissingOptionalArtifacts(                                                   Collection artifacts, Collection depArtifacts, ArtifactRepository localRepository,
+                                                   ArtifactResolver artifactResolver, List remoteArtifactRepositories,Log log )
+    {
+        for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
+        {
+            Artifact artifact = (Artifact) it.next();
+            if ( artifact.isOptional() && !artifacts.contains( artifact ) )
+            {
+                try
+                {
+                    artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    log.error( "Unable to resolve optional artifact " + artifact.getId() );
+                    continue;
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    log.error( "Unable to resolve optional artifact " + artifact.getId() );
+                    continue;
+                }
+                artifacts.add( artifact );
+            }
+        }
+    }
 }
