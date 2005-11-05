@@ -24,6 +24,8 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -111,6 +113,8 @@ public class MavenEmbedder
     private ProfileManager profileManager;
 
     private PluginDescriptorBuilder pluginDescriptorBuilder;
+
+    private ArtifactFactory artifactFactory;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -325,6 +329,20 @@ public class MavenEmbedder
         }
 
         return projects;
+    }
+
+    // ----------------------------------------------------------------------
+    // Artifacts
+    // ----------------------------------------------------------------------
+
+    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
+    {
+        return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
+    }
+
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
+    {
+        return artifactFactory.createArtifact( groupId, artifactId, version, type, classifier );
     }
 
     // ----------------------------------------------------------------------
@@ -602,6 +620,8 @@ public class MavenEmbedder
             lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
 
             wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
+
+            artifactFactory = (ArtifactFactory) embedder.lookup( ArtifactFactory.ROLE );
 
             // ----------------------------------------------------------------------
             // If an explicit local repository has not been set then we will use the
