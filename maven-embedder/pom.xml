@@ -9,6 +9,9 @@
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
   <version>2.0.1-SNAPSHOT</version>
+  <properties>
+    <mavenVersion>2.0.1-SNAPSHOT</mavenVersion>
+  </properties>  
   <build>
     <plugins>
       <plugin>
@@ -42,7 +45,4 @@
       </plugin>
     </plugins>
   </reporting>
-  <properties>
-    <mavenVersion>2.0</mavenVersion>
-  </properties>
 </project>
