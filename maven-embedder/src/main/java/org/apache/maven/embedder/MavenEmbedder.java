@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.Artifact;
@@ -115,6 +116,8 @@ public class MavenEmbedder
     private PluginDescriptorBuilder pluginDescriptorBuilder;
 
     private ArtifactFactory artifactFactory;
+
+    private ArtifactResolver artifactResolver;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -343,6 +346,12 @@ public class MavenEmbedder
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, type, classifier );
+    }
+
+    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }
 
     // ----------------------------------------------------------------------
@@ -622,6 +631,8 @@ public class MavenEmbedder
             wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 
             artifactFactory = (ArtifactFactory) embedder.lookup( ArtifactFactory.ROLE );
+
+            artifactResolver = (ArtifactResolver) embedder.lookup( ArtifactResolver.ROLE );
 
             // ----------------------------------------------------------------------
             // If an explicit local repository has not been set then we will use the
