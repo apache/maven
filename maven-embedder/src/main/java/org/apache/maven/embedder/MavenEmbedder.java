@@ -345,7 +345,7 @@ public class MavenEmbedder
 
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
-        return artifactFactory.createArtifact( groupId, artifactId, version, type, classifier );
+        return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
 
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
