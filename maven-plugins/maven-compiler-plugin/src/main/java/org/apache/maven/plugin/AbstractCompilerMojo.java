@@ -61,7 +61,6 @@ public abstract class AbstractCompilerMojo
      * The default value is true.
      *
      * @parameter expression="${maven.compiler.debug}" default-value="true"
-     * @deprecated
      */
     private boolean debug;
 
