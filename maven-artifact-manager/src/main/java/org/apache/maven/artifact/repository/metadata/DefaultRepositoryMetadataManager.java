@@ -80,11 +80,23 @@ public class DefaultRepositoryMetadataManager
 
                     boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
+                    boolean metadataIsEmpty = true;
+                    
                     if ( checkForUpdates )
                     {
                         getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
 
-                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
+                        try
+                        {
+                            resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
+                            metadataIsEmpty = false;
+                        }
+                        catch ( TransferFailedException e )
+                        {
+                            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+                            // suppressing logging to avoid logging this error twice.
+                            metadataIsEmpty = true;
+                        }
                     }
 
                     // touch file so that this is not checked again until interval has passed
@@ -92,7 +104,7 @@ public class DefaultRepositoryMetadataManager
                     {
                         file.setLastModified( System.currentTimeMillis() );
                     }
-                    else
+                    else if ( !metadataIsEmpty )
                     {
                         // this ensures that files are not continuously checked when they don't exist remotely
                         try
@@ -293,7 +305,17 @@ public class DefaultRepositoryMetadataManager
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
-        resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
+        try
+        {
+            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
+        }
+        catch ( TransferFailedException e )
+        {
+            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+            // suppressing logging to avoid logging this error twice.
+            // We don't want to interrupt program flow here. Just allow empty metadata instead.
+            // rethrowing this would change behavior.
+        }
 
         try
         {
@@ -311,7 +333,7 @@ public class DefaultRepositoryMetadataManager
 
     private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,
                                 String checksumPolicy, boolean allowBlacklisting )
-        throws RepositoryMetadataResolutionException
+        throws RepositoryMetadataResolutionException, TransferFailedException
     {
         if ( !wagonManager.isOnline() )
         {
@@ -350,6 +372,8 @@ public class DefaultRepositoryMetadataManager
             getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
             repository.setBlacklisted( allowBlacklisting );
+            
+            throw e;
         }
     }
 
@@ -382,6 +406,13 @@ public class DefaultRepositoryMetadataManager
         {
             throw new RepositoryMetadataDeploymentException(
                 "Unable to get previous metadata to update: " + e.getMessage(), e );
+        }
+        catch ( TransferFailedException e )
+        {
+            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+            // suppressing logging to avoid logging this error twice.
+            // We don't want to interrupt program flow here. Just allow empty metadata instead.
+            // rethrowing this would change behavior.
         }
 
         try
