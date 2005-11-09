@@ -43,9 +43,9 @@
       <artifactId>maven-project</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-site-renderer</artifactId>
-      <version>1.0-alpha-4-SNAPSHOT</version>
+      <groupId>org.codehaus.doxia</groupId>
+      <artifactId>doxia-site-renderer</artifactId>
+      <version>1.0-alpha-6-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>

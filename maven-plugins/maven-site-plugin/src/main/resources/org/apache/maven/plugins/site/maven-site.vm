@@ -127,6 +127,45 @@
   #end
 #end
 
+#macro ( publishDate $position)
+  #if ( $siteDescriptor.getChild( "publishDate" ) )
+      
+      #if ( $siteDescriptor.getChild( "publishDate" ).getAttribute( "format" ) ) 
+          #set ( $format = $siteDescriptor.getChild( "publishDate" ).getAttribute( "format" ) )
+      #end
+      
+      #if ( $format )
+          $dateFormat.applyPattern( $format )
+      #end
+          ##$dateFormat.applyPattern( "MM/dd/yyyy" )          
+      ##end    
+      
+      #set ( $dateToday = $dateFormat.format( $currentDate ) )
+      
+      #set ( $datePosition = $siteDescriptor.getChild( "publishDate" ).getAttribute( "position" ) ) 
+      #if ( $datePosition.equalsIgnoreCase( $position ) )
+        
+        #if ( $datePosition.equalsIgnoreCase( "right" ) || $datePosition.equalsIgnoreCase( "bottom" ) )
+          &nbsp;| $i18n.getString( "site-plugin", $locale, "template.lastpublished" ): $dateToday
+        
+        #elseif ( $datePosition.equalsIgnoreCase( "navigation-bottom" ) || $datePosition.equalsIgnoreCase( "navigation-top" ) )
+           <div id="lastPublished">$i18n.getString( "site-plugin", $locale, "template.lastpublished" ): $dateToday</div>
+        
+        #elseif ( $datePosition.equalsIgnoreCase("left") )
+            <div class="xleft">
+              $i18n.getString( "site-plugin", $locale, "template.lastpublished" ): $dateToday &nbsp; | &nbsp; Doc for 
+              #if ( $siteDescriptor.getChild( "version" ))
+                $siteDescriptor.getChild( "version" ).getValue()
+              #else
+                ${project.version}
+              #end
+            </div>
+        #end   
+      #end
+  #end                
+#end
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
@@ -153,16 +192,22 @@
       </div>
     </div>
     <div id="breadcrumbs">
-      <div class="xleft">$i18n.getString( "site-plugin", $locale, "template.lastpublished" ): $currentDate</div>
-      <div class="xright">#links()</div>
+      #publishDate( "left" )
+      <div class="xright">#links()#publishDate( "right" )</div>
       <div class="clear">
         <hr/>
       </div>
     </div>
-    <div id="leftColumn"><div id="navcolumn">#mainMenu()<a href="http://maven.apache.org/" title="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" id="poweredBy">
-              <img alt="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" src="$relativePath/images/logos/maven-feather.png"></img>
-            </a>
-    </div></div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+       #publishDate( "navigation-top" )   
+       #mainMenu()
+        <a href="http://maven.apache.org/" title="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" id="poweredBy">
+          <img alt="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+        </a>
+        #publishDate( "navigation-bottom" )
+      </div>
+    </div>
     <div id="bodyColumn">
       <div id="contentBox">
         $bodyContent
@@ -172,7 +217,7 @@
       <hr/>
     </div>
     <div id="footer">
-      <div class="xright">&#169;#copyright()</div>
+      <div class="xright">&#169;#copyright()#publishDate( "bottom" )</div>
       <div class="clear">
         <hr/>
       </div>

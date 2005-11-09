@@ -51,12 +51,12 @@ div.clear hr{
   padding: 3px 10px 3px 10px;
 }
 #leftColumn {
- width: 150px;
+ width: 170px;
  float:left;
 }
 #bodyColumn {
   margin-right: 1.5em;
-  margin-left: 177px;
+  margin-left: 197px;
 }
 #legend {
   padding: 8px 0 8px 0;
