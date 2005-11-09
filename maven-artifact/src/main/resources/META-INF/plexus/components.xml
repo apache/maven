@@ -149,6 +149,24 @@
     </component>
 
     <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>par</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>par</type>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>ejb3</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>ejb3</type>
+      </configuration>
+    </component>
+
+    <component>
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
       <requirements>
