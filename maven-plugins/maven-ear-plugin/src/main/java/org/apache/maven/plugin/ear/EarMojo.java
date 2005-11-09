@@ -21,11 +21,14 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Builds J2EE Enteprise Archive (EAR) files.
@@ -49,6 +52,23 @@ public class EarMojo
     private File earSourceDirectory;
 
     /**
+     * The comma separated list of tokens to include in the EAR.
+     * Default is '**'.
+     *
+     * @parameter alias="includes"
+     */
+    private String earSourceIncludes = "**";
+
+    /**
+     * The comma separated list of tokens to exclude from the EAR.
+     *
+     * @parameter alias="excludes"
+     */
+    private String earSourceExcludes;
+
+    private static final String[] EMPTY_STRING_ARRAY = {};
+
+    /**
      * The location of the manifest file to be used within the ear file.
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/MANIFEST.MF"
@@ -56,11 +76,12 @@ public class EarMojo
     private File manifestFile;
 
     /**
-     * The location of the application.xml file to be used within the ear file.
+     * The location of a custom application.xml file to be used
+     * within the ear file.
      *
-     * @parameter expression="${basedir}/src/main/application/META-INF/application.xml"
+     * @parameter
      */
-    private File applicationXmlFile;
+    private String applicationXml;
 
     /**
      * The directory for the generated EAR.
@@ -112,7 +133,7 @@ public class EarMojo
         getLog().debug( " ======= EarMojo settings =======" );
         getLog().debug( "earSourceDirectory[" + earSourceDirectory + "]" );
         getLog().debug( "manifestLocation[" + manifestFile + "]" );
-        getLog().debug( "applicationXmlLocation[" + applicationXmlFile + "]" );
+        getLog().debug( "applicationXml[" + getApplicationXml() + "]" );
         getLog().debug( "workDirectory[" + getWorkDirectory() + "]" );
         getLog().debug( "outputDirectory[" + outputDirectory + "]" );
         getLog().debug( "finalName[" + finalName + "]" );
@@ -149,8 +170,22 @@ public class EarMojo
             if ( earSourceDir.exists() )
             {
                 getLog().info( "Copy ear sources to " + getWorkDirectory().getAbsolutePath() );
-                FileUtils.copyDirectoryStructure( earSourceDir, getWorkDirectory() );
+                String[] fileNames = getEarFiles( earSourceDir );
+                for ( int i = 0; i < fileNames.length; i++ )
+                {
+                    FileUtils.copyFile( new File( earSourceDir, fileNames[i] ),
+                                        new File( getWorkDirectory(), fileNames[i] ) );
+                }
             }
+
+            if ( applicationXml != null && !"".equals( applicationXml ) )
+            {
+                //rename to application.xml
+                getLog().info( "Including custom application.xml[" + applicationXml + "]" );
+                File metaInfDir = new File( getWorkDirectory(), META_INF );
+                FileUtils.copyFile( new File( applicationXml ), new File( metaInfDir, "/application.xml" ) );
+            }
+
         }
         catch ( IOException e )
         {
@@ -163,7 +198,12 @@ public class EarMojo
             if ( resourcesDir.exists() )
             {
                 getLog().info( "Copy ear resources to " + getWorkDirectory().getAbsolutePath() );
-                FileUtils.copyDirectoryStructure( resourcesDir, getWorkDirectory() );
+                String[] fileNames = getEarFiles( resourcesDir );
+                for ( int i = 0; i < fileNames.length; i++ )
+                {
+                    FileUtils.copyFile( new File( resourcesDir, fileNames[i] ),
+                                        new File( getWorkDirectory(), fileNames[i] ) );
+                }
             }
         }
         catch ( IOException e )
@@ -200,6 +240,50 @@ public class EarMojo
         }
     }
 
+    public String getApplicationXml()
+    {
+        return applicationXml;
+    }
+
+    public void setApplicationXml( String applicationXml )
+    {
+        this.applicationXml = applicationXml;
+    }
+
+    /**
+     * Returns a string array of the excludes to be used
+     * when assembling/copying the ear.
+     *
+     * @return an array of tokens to exclude
+     */
+    protected String[] getExcludes()
+    {
+        List excludeList = new ArrayList( FileUtils.getDefaultExcludesAsList() );
+        if ( earSourceExcludes != null && !"".equals( earSourceExcludes ) )
+        {
+            excludeList.add( earSourceExcludes );
+        }
+
+        // if applicationXml is specified, omit the one in the source directory
+        if ( getApplicationXml() != null && !"".equals( getApplicationXml() ) )
+        {
+            excludeList.add( "**/" + META_INF + "/application.xml" );
+        }
+
+        return (String[]) excludeList.toArray( EMPTY_STRING_ARRAY );
+    }
+
+    /**
+     * Returns a string array of the includes to be used
+     * when assembling/copying the ear.
+     *
+     * @return an array of tokens to include
+     */
+    protected String[] getIncludes()
+    {
+        return new String[]{earSourceIncludes};
+    }
+
     private static File buildDestinationFile( File buildDir, String uri )
     {
         return new File( buildDir, uri );
@@ -218,5 +302,26 @@ public class EarMojo
             getLog().info( "Including custom manifest file[" + customManifestFile + "]" );
             archive.setManifestFile( customManifestFile );
         }
+    }
+
+    /**
+     * Returns a list of filenames that should be copied
+     * over to the destination directory.
+     *
+     * @param sourceDir the directory to be scanned
+     * @return the array of filenames, relative to the sourceDir
+     */
+    private String[] getEarFiles( File sourceDir )
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( sourceDir );
+        scanner.setExcludes( getExcludes() );
+        scanner.addDefaultExcludes();
+
+        scanner.setIncludes( getIncludes() );
+
+        scanner.scan();
+
+        return scanner.getIncludedFiles();
     }
 }

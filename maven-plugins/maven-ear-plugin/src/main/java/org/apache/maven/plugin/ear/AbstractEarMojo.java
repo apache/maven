@@ -17,6 +17,7 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 
 /**
  * A base class for EAR-processing related tasks.
@@ -40,6 +40,8 @@ public abstract class AbstractEarMojo
 {
 
     public static final String APPLICATION_XML_URI = "META-INF/application.xml";
+
+    public static final String META_INF = "META-INF";
 
     /**
      * The maven project.
