@@ -27,11 +27,13 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A Maven2 plugin to ensure that the classpath variable MAVEN_REPO exists in the Eclipse environment.
  *
  * @goal add-maven-repo
+ * @requiresProject false
  */
 public class AddMavenRepoMojo
     extends AbstractMojo
@@ -85,7 +87,8 @@ public class AddMavenRepoMojo
             }
         }
 
-        props.put( "\norg.eclipse.jdt.core.classpathVariable.M2_REPO", localRepository.getBasedir() ); //$NON-NLS-1$
+        props.put( "org.eclipse.jdt.core.classpathVariable.M2_REPO", //$NON-NLS-1$
+                   StringUtils.replace( localRepository.getBasedir(), ":", "\\:" ) ); //$NON-NLS-1$  //$NON-NLS-2$
 
         try
         {
