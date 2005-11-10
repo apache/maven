@@ -497,9 +497,8 @@ public class DefaultArtifactCollectorTest
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
-        createArtifact( "b", "1.0", true );
 
-        ArtifactSpec b = createArtifact( "b", "1.0" );
+        ArtifactSpec b = createArtifact( "b", "1.0", true );
 
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );

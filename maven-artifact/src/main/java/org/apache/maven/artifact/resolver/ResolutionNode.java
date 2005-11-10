@@ -146,6 +146,11 @@ public class ResolutionNode
     {
         return children != null;
     }
+    
+    public boolean isChildOfRootNode()
+    {
+        return parent != null && parent.parent == null;
+    }
 
     public Iterator getChildrenIterator()
     {
