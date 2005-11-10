@@ -16,6 +16,15 @@ package org.apache.maven.plugin.eclipse;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,12 +33,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Writes eclipse .project file.
@@ -50,19 +56,85 @@ public class EclipseProjectWriter
     }
 
     protected void write( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject,
-                          List reactorArtifacts, List projectnatures, List buildCommands )
+                         List reactorArtifacts, List addedProjectnatures, List addedBuildCommands )
         throws MojoExecutionException
     {
+
+        Set projectnatures = new LinkedHashSet();
+        Set buildCommands = new LinkedHashSet();
+
+        File dotProject = new File( basedir, ".project" );
+
+        if ( dotProject.exists() )
+        {
+
+            log.info( Messages.getString( "EclipsePlugin.keepexisting", dotProject.getAbsolutePath() ) ); //$NON-NLS-1$
+
+            // parse existing file in order to keep manually-added entries
+            FileReader reader = null;
+            try
+            {
+                reader = new FileReader( dotProject );
+                Xpp3Dom dom = Xpp3DomBuilder.build( reader );
+
+                Xpp3Dom naturesElement = dom.getChild( "natures" );
+                if ( naturesElement != null )
+                {
+                    Xpp3Dom[] existingNatures = naturesElement.getChildren( "nature" );
+                    for ( int j = 0; j < existingNatures.length; j++ )
+                    {
+                        // adds all the existing natures
+                        projectnatures.add( existingNatures[j].getValue() );
+                    }
+                }
+
+                Xpp3Dom buildSpec = dom.getChild( "buildSpec" );
+                if ( buildSpec != null )
+                {
+                    Xpp3Dom[] existingBuildCommands = buildSpec.getChildren( "buildCommand" );
+                    for ( int j = 0; j < existingBuildCommands.length; j++ )
+                    {
+                        Xpp3Dom buildCommandName = existingBuildCommands[j].getChild( "name" );
+                        if ( buildCommandName != null )
+                        {
+                            buildCommands.add( buildCommandName.getValue() );
+                        }
+                    }
+                }
+            }
+            catch ( XmlPullParserException e )
+            {
+                log.warn( Messages.getString( "EclipsePlugin.cantparseexisting", dotProject.getAbsolutePath() ) ); //$NON-NLS-1$
+            }
+            catch ( IOException e )
+            {
+                log.warn( Messages.getString( "EclipsePlugin.cantparseexisting", dotProject.getAbsolutePath() ) ); //$NON-NLS-1$
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+        }
+
+        // adds new entries after the existing ones
+        for ( Iterator iter = addedProjectnatures.iterator(); iter.hasNext(); )
+        {
+            projectnatures.add( iter.next() );
+        }
+        for ( Iterator iter = addedBuildCommands.iterator(); iter.hasNext(); )
+        {
+            buildCommands.add( iter.next() );
+        }
+
         FileWriter w;
 
         try
         {
-            w = new FileWriter( new File( basedir, ".project" ) ); //$NON-NLS-1$
+            w = new FileWriter( dotProject ); //$NON-NLS-1$
         }
         catch ( IOException ex )
         {
-            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ),
-                                              ex ); //$NON-NLS-1$
+            throw new MojoExecutionException( Messages.getString( "EclipsePlugin.erroropeningfile" ), ex ); //$NON-NLS-1$
         }
 
         XMLWriter writer = new PrettyPrintXMLWriter( w );

@@ -197,9 +197,11 @@ public class EclipseClasspathWriter
                     throw new MojoExecutionException( message, e );
                 }
 
-                log.info( Messages.getString( "EclipsePlugin.artifactissystemscoped", //$NON-NLS-1$
-                                              new Object[] { artifact.getArtifactId(), path } ) );
-
+                if ( log.isDebugEnabled() )
+                {
+                    log.debug( Messages.getString( "EclipsePlugin.artifactissystemscoped", //$NON-NLS-1$
+                                                   new Object[] { artifact.getArtifactId(), path } ) );
+                }
                 log.info( Messages.getString( "EclipseClasspathWriter.sourcesnotavailable", //$NON-NLS-1$
                                               artifact.getArtifactId() ) );
 
