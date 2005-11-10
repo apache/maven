@@ -299,9 +299,12 @@ public class EclipseUtils
      * @todo MNG-1384 optional dependencies not resolved while compiling from a master project 
      * Direct optional artifacts are not included in the list returned by project.getTestArtifacts()
      * .classpath should include ANY direct dependency, and optional dependencies are required to compile
+     * This is fixed in mvn 2.0.1 but this method is needed for compatibility with the 2.0 release. Do not remove!
      */
-    public static void fixMissingOptionalArtifacts(                                                   Collection artifacts, Collection depArtifacts, ArtifactRepository localRepository,
-                                                   ArtifactResolver artifactResolver, List remoteArtifactRepositories,Log log )
+    public static void fixMissingOptionalArtifacts( Collection artifacts, Collection depArtifacts,
+                                                   ArtifactRepository localRepository,
+                                                   ArtifactResolver artifactResolver, List remoteArtifactRepositories,
+                                                   Log log )
     {
         for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
         {
