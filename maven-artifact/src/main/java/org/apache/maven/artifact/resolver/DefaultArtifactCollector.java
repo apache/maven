@@ -216,7 +216,8 @@ public class DefaultArtifactCollector
 
         fireEvent( ResolutionListener.INCLUDE_ARTIFACT, listeners, node );
 
-        if ( node.isActive() )
+        // don't pull in the transitive deps of a system-scoped dependency.
+        if ( node.isActive() && !Artifact.SCOPE_SYSTEM.equals( node.getArtifact().getScope() ) )
         {
             fireEvent( ResolutionListener.PROCESS_CHILDREN, listeners, node );
 
