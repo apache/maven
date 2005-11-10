@@ -231,67 +231,46 @@ public class DefaultArtifactCollector
                     {
                         if ( artifact.getVersion() == null )
                         {
-                            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+                            // set the recommended version
+                            // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
+                            ArtifactVersion version;
+                            if ( !artifact.isSelectedVersionKnown() )
                             {
-                                String selectedVersion = "unknown";
-                                VersionRange versionRange = artifact.getVersionRange();
-                                
-                                if ( versionRange != null )
+                                List versions = artifact.getAvailableVersions();
+                                if ( versions == null )
                                 {
-                                    ArtifactVersion version = ( versionRange != null ) ? ( versionRange.getRecommendedVersion() ) : null;
-                                    
-                                    if ( version != null )
+                                    versions = source.retrieveAvailableVersions( artifact, localRepository,
+                                                                                 remoteRepositories );
+                                    artifact.setAvailableVersions( versions );
+                                }
+
+                                VersionRange versionRange = artifact.getVersionRange();
+
+                                version = versionRange.matchVersion( versions );
+
+                                if ( version == null )
+                                {
+                                    if ( versions.isEmpty() )
                                     {
-                                        selectedVersion = version.toString();
+                                        throw new OverConstrainedVersionException(
+                                            "No versions are present in the repository for the artifact with a range " +
+                                                versionRange, artifact, remoteRepositories );
+                                    }
+                                    else
+                                    {
+                                        throw new OverConstrainedVersionException( "Couldn't find a version in " +
+                                            versions + " to match range " + versionRange, artifact,
+                                                                                          remoteRepositories );
                                     }
                                 }
-                                
-                                artifact.selectVersion( selectedVersion );
                             }
                             else
                             {
-                                // set the recommended version
-                                // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
-                                ArtifactVersion version;
-                                if ( !artifact.isSelectedVersionKnown() )
-                                {
-                                    List versions = artifact.getAvailableVersions();
-                                    if ( versions == null )
-                                    {
-                                        versions = source.retrieveAvailableVersions( artifact, localRepository,
-                                                                                     remoteRepositories );
-                                        artifact.setAvailableVersions( versions );
-                                    }
-
-                                    VersionRange versionRange = artifact.getVersionRange();
-
-                                    version = versionRange.matchVersion( versions );
-
-                                    if ( version == null )
-                                    {
-                                        if ( versions.isEmpty() )
-                                        {
-                                            throw new OverConstrainedVersionException(
-                                                                                       "No versions are present in the repository for the artifact with a range "
-                                                                                           + versionRange, artifact,
-                                                                                       remoteRepositories );
-                                        }
-                                        else
-                                        {
-                                            throw new OverConstrainedVersionException( "Couldn't find a version in "
-                                                + versions + " to match range " + versionRange, artifact,
-                                                                                       remoteRepositories );
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    version = artifact.getSelectedVersion();
-                                }
-
-                                artifact.selectVersion( version.toString() );
-                                fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
+                                version = artifact.getSelectedVersion();
                             }
+
+                            artifact.selectVersion( version.toString() );
+                            fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                         }
 
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
@@ -321,12 +300,8 @@ public class DefaultArtifactCollector
                             e );
                     }
 
-                    // don't pull in the transitive deps of a system-scoped dependency.
-                    if ( !Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
-                    {
-                        recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories,
-                                 source, filter, listeners );
-                    }
+                    recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
+                             filter, listeners );
                 }
             }
 
