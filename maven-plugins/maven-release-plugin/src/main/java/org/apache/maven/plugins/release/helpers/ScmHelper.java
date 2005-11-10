@@ -27,6 +27,7 @@ import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.command.update.UpdateScmResult;
 import org.apache.maven.scm.manager.ScmManager;
+import org.apache.maven.scm.provider.starteam.repository.StarteamScmProviderRepository;
 import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.codehaus.plexus.util.FileUtils;
@@ -98,6 +99,21 @@ public class ScmHelper
                     svnRepo.setTagBase( tagBase );
                 }
             }
+            
+            if ( repository.getProvider().equals( "starteam" ) )
+            {
+                StarteamScmProviderRepository starteamRepo = (StarteamScmProviderRepository) repository.getProviderRepository();
+
+                if ( username != null && username.length() > 0 )
+                {
+                    starteamRepo.setUser( username );
+                }
+                if ( password != null && password.length() > 0 )
+                {
+                    starteamRepo.setPassword( password );
+                }
+            }
+            
         }
         catch ( Exception e )
         {
