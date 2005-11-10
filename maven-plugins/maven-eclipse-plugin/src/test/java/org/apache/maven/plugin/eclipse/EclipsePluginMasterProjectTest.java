@@ -98,6 +98,8 @@ public class EclipsePluginMasterProjectTest
         projectList.add( maven.readProjectWithDependencies( new File( basedir, "pom.xml" ) ) );
 
         super.setUp();
+
+        executeMaven2CommandLine( basedir );
     }
 
     protected void tearDown()
@@ -115,7 +117,7 @@ public class EclipsePluginMasterProjectTest
      * </ul>
      * @throws Exception
      */
-    public void disabledTestMasterProjectWithEmbedder()
+    public void executeMaven2WithEmbedder()
         throws Exception
     {
         EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
@@ -124,36 +126,53 @@ public class EclipsePluginMasterProjectTest
             "org.apache.maven.plugins:maven-eclipse-plugin:clean",
             "org.apache.maven.plugins:maven-eclipse-plugin:eclipse" } ), eventMonitor, new ConsoleDownloadMonitor(),
                             new Properties(), this.basedir );
-
-        compareFiles();
     }
 
-    /**
-     * Test using a command line. Should be replaced by the embedder test.
-     */
-    public void testMasterProject()
-        throws Exception
-    {
-        executeMaven2CommandLine( basedir );
-        compareFiles();
-    }
-
-    private void compareFiles()
+    public void testModule1Project()
         throws Exception
     {
         assertFileEquals( null, new File( basedir, "module-1/project" ), new File( basedir, "module-1/.project" ) );
-        assertFileEquals( null, new File( basedir, "module-1/classpath" ), new File( basedir, "module-1/.classpath" ) );
-        assertFileEquals( null, new File( basedir, "module-1/wtpmodules" ), new File( basedir, "module-1/.wtpmodules" ) );
-        assertFileEquals( null, new File( basedir, "module-2/project" ), new File( basedir, "module-2/.project" ) );
-
-        checkModule2Classpath( new File( basedir, "module-2/.classpath" ) );
-        checkModule2Wtpmodules( new File( basedir, "module-2/.wtpmodules" ) );
     }
 
-    private void checkModule2Classpath( File file )
+    public void testModule1Classpath()
         throws Exception
     {
-        InputStream fis = new FileInputStream( file );
+
+        InputStream fis = new FileInputStream( new File( basedir, "module-1/.classpath" ) );
+        String classpath = IOUtil.toString( fis );
+        IOUtil.close( fis );
+
+        // direct dependencies, include all
+        assertContains( "Invalid classpath", classpath, "/refproject-compile" );
+        assertContains( "Invalid classpath", classpath, "/refproject-sysdep" );
+        assertContains( "Invalid classpath", classpath, "/refproject-test" );
+        assertContains( "Invalid classpath", classpath, "/refproject-optional" );
+        assertContains( "Invalid classpath", classpath, "/refproject-provided" );
+
+        // transitive dependencies
+        assertContains( "Invalid classpath", classpath, "/deps-refproject-compile" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-test" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-optional" );
+        assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-provided" );
+
+    }
+
+    public void testModule1Wtpmodules()
+        throws Exception
+    {
+        assertFileEquals( null, new File( basedir, "module-1/wtpmodules" ), new File( basedir, "module-1/.wtpmodules" ) );
+    }
+
+    public void testModule2Project()
+        throws Exception
+    {
+        assertFileEquals( null, new File( basedir, "module-2/project" ), new File( basedir, "module-2/.project" ) );
+    }
+
+    public void testModule2Classpath()
+        throws Exception
+    {
+        InputStream fis = new FileInputStream( new File( basedir, "module-2/.classpath" ) );
         String classpath = IOUtil.toString( fis );
         IOUtil.close( fis );
 
@@ -186,10 +205,10 @@ public class EclipsePluginMasterProjectTest
         assertDoesNotContain( "Invalid classpath", classpath, "/deps-refproject-provided" );
     }
 
-    private void checkModule2Wtpmodules( File file )
+    public void testModule2Wtpmodules()
         throws Exception
     {
-        InputStream fis = new FileInputStream( file );
+        InputStream fis = new FileInputStream( new File( basedir, "module-2/.wtpmodules" ) );
         String wtpmodules = IOUtil.toString( fis );
         IOUtil.close( fis );
 
