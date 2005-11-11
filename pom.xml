@@ -169,7 +169,6 @@
     <module>maven-archiver</module>
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
-    <module>maven-artifact-ant</module>
     <module>maven-artifact-test</module>
     <module>maven-core</module>
     <module>maven-error-diagnostics</module>
