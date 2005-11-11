@@ -164,9 +164,9 @@ public class JavacCompiler
     {
         List errors = new ArrayList();
 
-        String line = null;
+        String line;
 
-        StringBuffer buffer = null;
+        StringBuffer buffer;
 
         while ( true )
         {
