@@ -112,7 +112,7 @@
     </repository>
     <site>
       <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/plugins/</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/plugins/</url>
     </site>
   </distributionManagement>
   <repositories>
