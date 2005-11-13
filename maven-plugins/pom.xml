@@ -81,6 +81,16 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>fgiust</id>
+      <name>Fabrizio Giustina</name>
+      <email>fgiust@apache.org</email>
+      <organization>openmind</organization>
+      <roles>
+        <role>Committer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <dependencies>
     <dependency>
