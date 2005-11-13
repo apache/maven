@@ -63,11 +63,11 @@ public class WebModule
         writer.endElement(); // module
     }
 
-    public void resolveArtifact( Set artifacts )
+    public void resolveArtifact( Set artifacts, String defaultJavaBundleDir )
         throws MojoFailureException
     {
         // Let's resolve the artifact
-        super.resolveArtifact( artifacts );
+        super.resolveArtifact( artifacts, defaultJavaBundleDir );
 
         // Context root has not been customized - using default
         if ( contextRoot == null )

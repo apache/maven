@@ -29,16 +29,18 @@ public final class EarModuleFactory
 
     /**
      * Creates a new {@link EarModule} based on the
-     * specified {@link Artifact}.
+     * specified {@link Artifact} and the specified
+     * execution configuration.
      *
-     * @param artifact the artifact
+     * @param artifact             the artifact
+     * @param defaultJavaBundleDir the default bundle dir for {@link JavaModule}
      * @return an ear module for this artifact
      */
-    public static final EarModule newEarModule( Artifact artifact )
+    public static final EarModule newEarModule( Artifact artifact, String defaultJavaBundleDir )
     {
         if ( "jar".equals( artifact.getType() ) )
         {
-            return new JavaModule( artifact );
+            return new JavaModule( artifact, defaultJavaBundleDir );
         }
         else if ( "ejb".equals( artifact.getType() ) )
         {

@@ -16,29 +16,22 @@ package org.apache.maven.plugin.ear;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import junit.framework.TestCase;
 
 /**
- * The {@link EarModule} implementation for an Ejb-client module.
+ * Ear module test case.
  *
  * @author <a href="snicoll@apache.org">Stephane Nicoll</a>
- * @version $Id$
+ * @version $Id: AbstractEarModule.java 314956 2005-10-12 18:27:15 +0200 (Wed, 12 Oct 2005) brett $
  */
-public class EjbClientModule
-    extends JavaModule
+public class EarModuleTest extends TestCase
 {
 
-    public EjbClientModule()
-    {
-    }
-
-    public EjbClientModule( Artifact a )
-    {
-        super( a, null );
-    }
-
-    protected String getType()
-    {
-        return "ejb-client";
+    public void testCleanBuildDir() {
+        assertEquals("APP-INF/lib/", AbstractEarModule.cleanBundleDir( "APP-INF/lib"));
+        assertEquals("APP-INF/lib/", AbstractEarModule.cleanBundleDir( "APP-INF/lib/"));
+        assertEquals("APP-INF/lib/", AbstractEarModule.cleanBundleDir( "/APP-INF/lib"));
+        assertEquals("APP-INF/lib/", AbstractEarModule.cleanBundleDir( "/APP-INF/lib/"));        
+        assertEquals("", AbstractEarModule.cleanBundleDir( "/"));
     }
 }

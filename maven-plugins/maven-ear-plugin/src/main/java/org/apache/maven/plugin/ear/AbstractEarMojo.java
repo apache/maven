@@ -60,6 +60,13 @@ public abstract class AbstractEarMojo
     private EarModule[] modules;
 
     /**
+     * The default bundle dir for Java modules.
+     *
+     * @parameter
+     */
+    private String defaultJavaBundleDir;
+
+    /**
      * Directory that resources are copied to during the build.
      *
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
@@ -88,7 +95,7 @@ public abstract class AbstractEarMojo
                 {
                     module = (EarModule) modules[i];
                     getLog().debug( "Resolving ear module[" + module + "]" );
-                    module.resolveArtifact( project.getArtifacts() );
+                    module.resolveArtifact( project.getArtifacts(), defaultJavaBundleDir );
                     allModules.add( module );
                 }
             }
@@ -109,7 +116,7 @@ public abstract class AbstractEarMojo
             ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
             if ( !isArtifactRegistered( artifact, allModules ) && !artifact.isOptional() && filter.include( artifact ) )
             {
-                EarModule module = EarModuleFactory.newEarModule( artifact );
+                EarModule module = EarModuleFactory.newEarModule( artifact, defaultJavaBundleDir );
                 allModules.add( module );
             }
         }

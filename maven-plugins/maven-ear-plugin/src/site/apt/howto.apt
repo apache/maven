@@ -30,6 +30,8 @@ Introduction
   jar dependency could be included in the generated application.xml by specifying the
   includeInApplicationXml flag.
 
+  It is also possible to specify a default bundle directory for all third party libraries
+
 Customizing the context root
 
   The sample below shows how to customize the context root of an artifact to be placed
@@ -80,6 +82,34 @@ Customizing a module location
     </plugins>
   </build>
 +---------
+
+  Note that it is possible to specify a default bundle directory for all Java modules. If a Java module
+  has not the bundleDir property above, the default one is used. Here is an example of such configuration:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <defaultBundleDir>APP-INF/lib
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <bundleDir>/</bundleDir>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+  In this case, all Java modules will be placed in the APP-INF/lib directory except the specified artifact
+  which will be placed at the root of the EAR structure.
 
 Customizing a module file name
 

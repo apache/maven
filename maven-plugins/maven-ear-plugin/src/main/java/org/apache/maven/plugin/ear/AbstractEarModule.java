@@ -44,11 +44,11 @@ public abstract class AbstractEarModule
 
     private String artifactId;
 
-    private String bundleDir;
+    protected String bundleDir;
 
-    private String bundleFileName;
+    protected String bundleFileName;
 
-    private Boolean excluded = Boolean.FALSE;
+    protected Boolean excluded = Boolean.FALSE;
 
     /**
      * Empty constructor to be used when the module
@@ -71,7 +71,7 @@ public abstract class AbstractEarModule
         this.bundleDir = null;
     }
 
-    public void resolveArtifact( Set artifacts )
+    public void resolveArtifact( Set artifacts, String defaultJavaBundleDir )
         throws MojoFailureException
     {
         if ( artifact == null )
@@ -210,7 +210,7 @@ public abstract class AbstractEarModule
      * @param bundleDir the bundle directory to clean
      * @return the cleaned bundle directory
      */
-    private static String cleanBundleDir( String bundleDir )
+    static String cleanBundleDir( String bundleDir )
     {
         if ( bundleDir == null )
         {
@@ -221,18 +221,16 @@ public abstract class AbstractEarModule
         bundleDir = bundleDir.replace( '\\', '/' );
 
         // Remove '/' prefix if any so that directory is a relative path
-        if ( bundleDir.startsWith( " / " ) )
+        if ( bundleDir.startsWith( "/" ) )
         {
             bundleDir = bundleDir.substring( 1, bundleDir.length() );
         }
 
-        // Adding '/' suffix to specify a directory structure
-        if ( !bundleDir.endsWith( "/" ) )
+        if ( bundleDir.length() > 0 && !bundleDir.endsWith( "/" ) )
         {
+            // Adding '/' suffix to specify a directory structure if it is not empty
             bundleDir = bundleDir + "/";
         }
-
-        System.out.println( "Bundle dir[" + bundleDir + "]" );
 
         return bundleDir;
     }

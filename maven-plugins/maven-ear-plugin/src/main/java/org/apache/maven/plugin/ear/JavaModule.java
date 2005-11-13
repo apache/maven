@@ -17,7 +17,10 @@ package org.apache.maven.plugin.ear;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.xml.XMLWriter;
+
+import java.util.Set;
 
 /**
  * The {@link EarModule} implementation for a J2EE client module.
@@ -34,11 +37,14 @@ public class JavaModule
 
     public JavaModule()
     {
+
     }
 
-    public JavaModule( Artifact a )
+    public JavaModule( Artifact a, String defaultJavaBundleDir )
     {
         super( a );
+        setJavaBundleDir( defaultJavaBundleDir );
+
     }
 
     public void appendModule( XMLWriter writer, String version )
@@ -55,8 +61,27 @@ public class JavaModule
         }
     }
 
+    public void resolveArtifact( Set artifacts, String defaultJavaBundleDir )
+        throws MojoFailureException
+    {
+        // Let's resolve the artifact
+        super.resolveArtifact( artifacts, defaultJavaBundleDir );
+
+        // If the defaultJavaBundleDir is set and no bundle dir is
+        // set, set the default as bundle dir
+        setJavaBundleDir( defaultJavaBundleDir );
+    }
+
     protected String getType()
     {
         return "jar";
+    }
+
+    private void setJavaBundleDir( String defaultJavaBundleDir )
+    {
+        if ( defaultJavaBundleDir != null && bundleDir == null )
+        {
+            this.bundleDir = defaultJavaBundleDir;
+        }
     }
 }
