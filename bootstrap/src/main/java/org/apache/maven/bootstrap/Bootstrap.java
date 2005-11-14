@@ -45,15 +45,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Main class for bootstrap module.
@@ -68,6 +69,8 @@ public class Bootstrap
     private Set inProgress = new HashSet();
 
     private Map modelFileCache = new HashMap();
+
+    private Map modelCache = new HashMap();
 
     public static void main( String[] args )
         throws Exception
@@ -123,7 +126,59 @@ public class Bootstrap
 
         buildProject( new File( basedir ), resolver, true );
 
+        createInstallation( new File( basedir, "target/installation" ), resolver );
+
         stats( fullStart, new Date() );
+    }
+
+    private void createInstallation( File dir, ArtifactResolver resolver )
+        throws IOException
+    {
+        FileUtils.deleteDirectory( dir );
+
+        dir.mkdirs();
+
+        File libDirectory = new File( dir, "lib" );
+        libDirectory.mkdir();
+
+        File binDirectory = new File( dir, "bin" );
+
+        File coreDirectory = new File( dir, "core" );
+        coreDirectory.mkdir();
+
+        File bootDirectory = new File( coreDirectory, "boot" );
+        bootDirectory.mkdir();
+
+        ModelReader reader = (ModelReader) modelCache.get( "org.apache.maven:maven-core" );
+
+        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
+        {
+            Dependency dep = (Dependency) i.next();
+
+            if ( dep.getArtifactId().equals( "classworlds" ) )
+            {
+                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), bootDirectory );
+            }
+            else if ( dep.getArtifactId().equals( "plexus-container-default" ) ||
+                dep.getArtifactId().equals( "plexus-utils" ) )
+            {
+                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), coreDirectory );
+            }
+            else
+            {
+                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), libDirectory );
+            }
+        }
+
+        Dependency coreAsDep = new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
+                                               reader.getPackaging(), Collections.EMPTY_LIST );
+
+        FileUtils.copyFileToDirectory( resolver.getArtifactFile( coreAsDep ), libDirectory );
+
+        File srcBinDirectory = (File) modelFileCache.get( "org.apache.maven:maven-core" );
+        srcBinDirectory = new File( srcBinDirectory.getParentFile(), "src/bin" );
+
+        FileUtils.copyDirectory( srcBinDirectory, binDirectory, null, "**/.svn/**" );
     }
 
     private void cacheModels( File basedir, ArtifactResolver resolver )
@@ -293,7 +348,10 @@ public class Bootstrap
 
         resolver.addBuiltArtifact( reader.getGroupId(), reader.getArtifactId(), "pom", file );
 
-        modelFileCache.put( reader.getGroupId() + ":" + reader.getArtifactId(), file );
+        String id = reader.getGroupId() + ":" + reader.getArtifactId();
+        modelFileCache.put( id, file );
+
+        modelCache.put( id, reader );
 
         return reader;
     }
