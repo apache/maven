@@ -58,6 +58,11 @@ public class ProjectVersionResolver
         //Rewrite project version
         String projectVersion = model.getVersion();
 
+        if ( !projectVersion.endsWith( SNAPSHOT_CLASSIFIER ) )
+        {
+            throw new IllegalArgumentException( "Project version isn't a snapshot, it must ends with '" + SNAPSHOT_CLASSIFIER + "'." );
+        }
+
         projectVersion = projectVersion.substring( 0, projectVersion.length() - SNAPSHOT_CLASSIFIER.length() );
 
         if ( interactive )
