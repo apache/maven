@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -31,9 +32,9 @@ import java.util.Vector;
 
 /**
  * This class provides basic facilities for manipulating files and file paths.
- * <p/>
+ *
  * <h3>Path-related methods</h3>
- * <p/>
+ *
  * <p>Methods exist to retrieve the components of a typical file path. For example
  * <code>/www/hosted/mysite/index.html</code>, can be broken into:
  * <ul>
@@ -45,9 +46,9 @@ import java.util.Vector;
  * There are also methods to {@link #catPath concatenate two paths}, {@link #resolveFile resolve a
  * path relative to a File} and {@link #normalize} a path.
  * </p>
- * <p/>
+ *
  * <h3>File-related methods</h3>
- * <p/>
+ * <p>
  * There are methods to  create a {@link #toFile File from a URL}, copy a
  * {@link #copyFileToDirectory File to a directory},
  * copy a {@link #copyFile File to another File},
@@ -55,9 +56,9 @@ import java.util.Vector;
  * as well as methods to {@link #deleteDirectory(File) delete} and {@link #cleanDirectory(File)
  * clean} a directory.
  * </p>
- * <p/>
+ *
  * Common {@link java.io.File} manipulation routines.
- * <p/>
+ *
  * Taken from the commons-utils repo.
  * Also code from Alexandria's FileUtils.
  * And from Avalon Excalibur's IO.
@@ -87,6 +88,16 @@ public class FileUtils
      * The number of bytes in a gigabyte.
      */
     public static final int ONE_GB = ONE_KB * ONE_MB;
+
+    public static String[] getDefaultExcludes()
+    {
+        return DirectoryScanner.DEFAULTEXCLUDES;
+    }
+
+    public static List getDefaultExcludesAsList()
+    {
+        return Arrays.asList( getDefaultExcludes() );
+    }
 
     /**
      * Returns a human-readable version of the file size (original is in
@@ -233,6 +244,20 @@ public class FileUtils
     }
 
     /**
+     * Appends data to a file. The file will be created if it does not exist.
+     *
+     * @param fileName The name of the file to write.
+     * @param data The content to write to the file.
+     */
+    public static void fileAppend( String fileName, String data )
+        throws IOException
+    {
+        FileOutputStream out = new FileOutputStream( fileName, true );
+        out.write( data.getBytes() );
+        out.close();
+    }
+
+    /**
      * Writes data to a file. The file will be created if it does not exist.
      *
      * @param fileName The name of the file to write.
@@ -307,7 +332,10 @@ public class FileUtils
 
     /**
      * Given a directory and an array of extensions return an array of compliant files.
-     * <p/>
+     *
+     * TODO Should an ignore list be passed in?
+     * TODO Should a recurse flag be passed in?
+     *
      * The given extensions should be like "java" and not like ".java"
      */
     public static String[] getFilesFromExtension( String directory, String[] extensions )
@@ -841,7 +869,7 @@ public class FileUtils
      * <code>/a/b/c</code> + <code>d</code> = <code>/a/b/d</code><br />
      * <code>/a/b/c</code> + <code>../d</code> = <code>/a/d</code><br />
      * </p>
-     * <p/>
+     *
      * Thieved from Tomcat sources...
      *
      * @return The concatenated paths, or null if error occurs
@@ -912,6 +940,8 @@ public class FileUtils
 
             return file;
         }
+        // FIXME: I'm almost certain this // removal is unnecessary, as getAbsoluteFile() strips
+        // them. However, I'm not sure about this UNC stuff. (JT)
         final char[] chars = filename.toCharArray();
         final StringBuffer sb = new StringBuffer();
 
@@ -966,7 +996,7 @@ public class FileUtils
     public static void forceDelete( final File file )
         throws IOException
     {
-        if ( !file.exists() )
+        if ( ! file.exists() )
         {
             return;
         }
@@ -992,7 +1022,7 @@ public class FileUtils
     public static void forceDeleteOnExit( final File file )
         throws IOException
     {
-        if ( !file.exists() )
+        if ( ! file.exists() )
         {
             return;
         }
@@ -1074,8 +1104,8 @@ public class FileUtils
         {
             if ( file.isFile() )
             {
-                final String message = "File " + file + " exists and is " +
-                    "not a directory. Unable to create directory.";
+                final String message =
+                    "File " + file + " exists and is " + "not a directory. Unable to create directory.";
                 throw new IOException( message );
             }
         }
@@ -1238,8 +1268,35 @@ public class FileUtils
 
     public static String FS = System.getProperty( "file.separator" );
 
+    /**
+     * Return a list of files as String depending options.
+     * This method use case sensitive file name.
+     *
+     * @param directory the directory to scan
+     * @param includes the includes pattern, comma separated
+     * @param excludes the excludes pattern, comma separated
+     * @param includeBasedir true to include the base dir in each String of file
+     * @return a list of files as String
+     * @throws IOException
+     */
     public static List getFileNames( File directory, String includes, String excludes, boolean includeBasedir )
         throws IOException
+    {
+        return getFileNames( directory, includes, excludes, includeBasedir, true );
+    }
+
+    /**
+     * Return a list of files as String depending options.
+     *
+     * @param directory the directory to scan
+     * @param includes the includes pattern, comma separated
+     * @param excludes the excludes pattern, comma separated
+     * @param includeBasedir true to include the base dir in each String of file
+     * @param isCaseSensitive true if case sensitive
+     * @return a list of files as String
+     */
+    public static List getFileNames( File directory, String includes, String excludes, boolean includeBasedir,
+                                     boolean isCaseSensitive )
     {
         DirectoryScanner scanner = new DirectoryScanner();
 
@@ -1255,6 +1312,8 @@ public class FileUtils
             scanner.setExcludes( StringUtils.split( excludes, "," ) );
         }
 
+        scanner.setCaseSensitive( isCaseSensitive );
+
         scanner.scan();
 
         String[] files = scanner.getIncludedFiles();
@@ -1265,7 +1324,7 @@ public class FileUtils
         {
             if ( includeBasedir )
             {
-                list.add( directory + FS + files[i] );
+                list.add( directory + FileUtils.FS + files[i] );
             }
             else
             {
@@ -1286,7 +1345,7 @@ public class FileUtils
                                       String excludes )
         throws IOException
     {
-        if ( !sourceDirectory.exists() )
+        if ( ! sourceDirectory.exists() )
         {
             return;
         }
@@ -1303,7 +1362,7 @@ public class FileUtils
 
     /**
      * Copies a entire directory structure.
-     * <p/>
+     *
      * Note:
      * <ul>
      * <li>It will include empty directories.
@@ -1361,7 +1420,7 @@ public class FileUtils
 
     /**
      * Renames a file, even if that involves crossing file system boundaries.
-     * <p/>
+     *
      * <p>This will remove <code>to</code> (if it exists), ensure that
      * <code>to</code>'s parent directory exists and move
      * <code>from</code>, which involves deleting <code>from</code> as
@@ -1399,11 +1458,11 @@ public class FileUtils
 
     /**
      * Create a temporary file in a given directory.
-     * <p/>
+     *
      * <p>The file denoted by the returned abstract pathname did not
      * exist before this method was invoked, any subsequent invocation
      * of this method will yield a different file name.</p>
-     * <p/>
+     * <p>
      * The filename is prefixNNNNNsuffix where NNNN is a random number
      * </p>
      * <p>This method is different to File.createTempFile of JDK 1.2
