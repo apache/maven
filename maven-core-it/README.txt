@@ -328,5 +328,9 @@ it2001: Test that repositories are accumulated as the artifact resolution
 
 it2002: Test the release plugin.
 
+it2003: Test that versions specified in pluginManagement are used when plugins
+        are resolved as direct command-line goals, or as implied lifecycle
+        bindings.
+
 -------------------------------------------------------------------------------
 
