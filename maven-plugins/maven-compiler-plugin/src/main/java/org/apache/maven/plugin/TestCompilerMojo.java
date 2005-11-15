@@ -149,7 +149,7 @@ public class TestCompilerMojo
             {
                 testIncludes.add( "**/*." + inputFileEnding );
             }
-            scanner = new SimpleSourceInclusionScanner( testExcludes, testExcludes );
+            scanner = new SimpleSourceInclusionScanner( testIncludes, testExcludes );
         }
 
         return scanner;
