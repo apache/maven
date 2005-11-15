@@ -34,6 +34,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 /**
  * Attach a POM to an artifact.
@@ -85,10 +87,17 @@ public class ProjectArtifactMetadata
         try
         {
             reader = new FileReader( file );
+            StringWriter sWriter = new StringWriter();
+            IOUtil.copy( reader, sWriter );
+            
+            String modelSrc = sWriter.toString().replaceAll( "\\$\\{(pom\\.|project\\.)?version\\}", artifact.getBaseVersion() );
+            
+            StringReader sReader = new StringReader( modelSrc );
+            
             writer = new FileWriter( destination );
 
             MavenXpp3Reader modelReader = new MavenXpp3Reader();
-            Model model = modelReader.read( reader );
+            Model model = modelReader.read( sReader );
             model.setVersion( artifact.getVersion() );
 
             DistributionManagement distributionManagement = model.getDistributionManagement();
