@@ -6,6 +6,8 @@ use Net::SMTP;
 
 my $configuration = new Config::IniFiles( -file => "syncopate.conf" );
 
+my $globalRepoDirectory = $configuration->val( "syncopate", "repoDirectory" );
+
 my $repoDirectory = $configuration->val( "syncopate", "repoDirectory" );
 
 my $standardOptions = $configuration->val( "syncopate", "options" );
@@ -81,6 +83,8 @@ sub syncSource()
     my $cmd = "rsync $standardOptions $options --rsh=\"ssh -T -l $rsyncUser\" $address:$directory/ $repoDirectory";
     
     runRsync( $cmd, $sourceConfiguration );
+
+    $repoDirectory = $globalRepoDirectory;
 }
 
 # -----------------------------------------------------------------------------
