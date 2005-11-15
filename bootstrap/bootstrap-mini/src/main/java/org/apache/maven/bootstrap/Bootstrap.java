@@ -21,6 +21,7 @@ import org.apache.maven.bootstrap.compile.JavacCompiler;
 import org.apache.maven.bootstrap.download.ArtifactResolver;
 import org.apache.maven.bootstrap.download.OfflineArtifactResolver;
 import org.apache.maven.bootstrap.download.OnlineArtifactDownloader;
+import org.apache.maven.bootstrap.download.RepositoryMetadata;
 import org.apache.maven.bootstrap.model.Dependency;
 import org.apache.maven.bootstrap.model.ModelReader;
 import org.apache.maven.bootstrap.model.Plugin;
@@ -45,7 +46,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Collections;
 
 /**
  * Main class for bootstrap module.
@@ -72,12 +73,45 @@ public class Bootstrap
 
     private Map modelCache = new HashMap();
 
+    private final ArtifactResolver resolver;
+
+    public Bootstrap( String[] args )
+        throws Exception
+    {
+        String userHome = System.getProperty( "user.home" );
+
+        File settingsXml = getSettingsPath( userHome, args );
+
+        System.out.println( "Using settings from " + settingsXml );
+
+        Settings settings = Settings.read( userHome, settingsXml );
+
+        // TODO: have an alternative implementation of ArtifactResolver for source compiles
+        //      - if building from source, checkout and build then resolve to built jar (still download POM?)
+        resolver = setupRepositories( settings );
+    }
+
     public static void main( String[] args )
         throws Exception
     {
-        Bootstrap bootstrap = new Bootstrap();
+        Bootstrap bootstrap = new Bootstrap( args );
 
-        bootstrap.run( args );
+        String goal = null;
+        for ( int i = 0; i < args.length && goal == null; i++ )
+        {
+            if ( args[i].equals( "install" ) || args[i].equals( "package" ) )
+            {
+                goal = args[i];
+            }
+        }
+
+        if ( goal == null )
+        {
+            System.err.println( "Goal 'package' or 'install' must be specified" );
+            return;
+        }
+
+        bootstrap.run( goal );
     }
 
     private static File getSettingsPath( String userHome, String[] args )
@@ -97,88 +131,78 @@ public class Bootstrap
         return new File( userHome, ".m2/settings.xml" );
     }
 
-    private void run( String[] args )
+    private void run( String goal )
         throws Exception
     {
         Date fullStart = new Date();
 
-        String userHome = System.getProperty( "user.home" );
-
-        File settingsXml = getSettingsPath( userHome, args );
-
-        System.out.println( "Using settings from " + settingsXml );
-
-        Settings settings = Settings.read( userHome, settingsXml );
-
-        // TODO: have an alternative implementation of ArtifactDownloader for source compiles
-        //      - if building from source, checkout and build then resolve to built jar (still download POM?)
-        ArtifactResolver resolver = setupRepositories( settings );
-
         String basedir = System.getProperty( "user.dir" );
 
-        // TODO: only build this guy, then move the next part to a new phase using it for resolution
-        // Root POM
-//        buildProject( basedir, "", resolver, false );
-//        buildProject( basedir, "maven-artifact-manager", resolver );
-
-        // Pre-cache models so we know where they are for dependencies
-        cacheModels( new File( basedir ), resolver );
-
-        buildProject( new File( basedir ), resolver, true );
-
-        createInstallation( new File( basedir, "target/installation" ), resolver );
+        if ( "install".equals( goal ) )
+        {
+            File pom = new File( basedir, "pom.xml" );
+            ModelReader reader = readModel( resolver, pom, true );
+            File jar = buildProject( reader );
+            install( reader, pom, jar );
+        }
+        else
+        {
+            buildProject( new File( basedir ), false );
+        }
 
         stats( fullStart, new Date() );
     }
 
-    private void createInstallation( File dir, ArtifactResolver resolver )
+    private void install( ModelReader reader, File pom, File jar )
+        throws Exception
+    {
+        String artifactId = reader.getArtifactId();
+
+        String version = reader.getVersion();
+
+        String groupId = reader.getGroupId();
+
+        String type = reader.getPackaging();
+
+        Repository localRepository = resolver.getLocalRepository();
+        File file = localRepository.getArtifactFile(
+            new Dependency( groupId, artifactId, version, type, Collections.EMPTY_LIST ) );
+
+        System.out.println( "Installing: " + file );
+
+        FileUtils.copyFile( jar, file );
+
+        installPomFile( reader, pom );
+
+        RepositoryMetadata metadata = new RepositoryMetadata();
+        metadata.setReleaseVersion( version );
+        metadata.setLatestVersion( version );
+        file = localRepository.getMetadataFile( groupId, artifactId, null, type, "maven-metadata-local.xml" );
+        metadata.write( file );
+
+        metadata = new RepositoryMetadata();
+        metadata.setLocalCopy( true );
+        metadata.setLastUpdated( getCurrentUtcDate() );
+        file = localRepository.getMetadataFile( groupId, artifactId, version, type, "maven-metadata-local.xml" );
+        metadata.write( file );
+    }
+
+    private void installPomFile( ModelReader reader, File source )
         throws IOException
     {
-        FileUtils.deleteDirectory( dir );
+        String artifactId = reader.getArtifactId();
 
-        dir.mkdirs();
+        String version = reader.getVersion();
 
-        File libDirectory = new File( dir, "lib" );
-        libDirectory.mkdir();
+        String groupId = reader.getGroupId();
 
-        File binDirectory = new File( dir, "bin" );
+        Repository localRepository = resolver.getLocalRepository();
+        File pom = localRepository.getMetadataFile( groupId, artifactId, version, reader.getPackaging(),
+                                                    artifactId + "-" + version + ".pom" );
 
-        File coreDirectory = new File( dir, "core" );
-        coreDirectory.mkdir();
+        System.out.println( "Installing POM: " + pom );
 
-        File bootDirectory = new File( coreDirectory, "boot" );
-        bootDirectory.mkdir();
-
-        ModelReader reader = (ModelReader) modelCache.get( "org.apache.maven:maven-core" );
-
-        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
-        {
-            Dependency dep = (Dependency) i.next();
-
-            if ( dep.getArtifactId().equals( "classworlds" ) )
-            {
-                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), bootDirectory );
-            }
-            else if ( dep.getArtifactId().equals( "plexus-container-default" ) ||
-                dep.getArtifactId().equals( "plexus-utils" ) )
-            {
-                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), coreDirectory );
-            }
-            else
-            {
-                FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), libDirectory );
-            }
-        }
-
-        Dependency coreAsDep = new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
-                                               reader.getPackaging(), Collections.EMPTY_LIST );
-
-        FileUtils.copyFileToDirectory( resolver.getArtifactFile( coreAsDep ), libDirectory );
-
-        File srcBinDirectory = (File) modelFileCache.get( "org.apache.maven:maven-core" );
-        srcBinDirectory = new File( srcBinDirectory.getParentFile(), "src/bin" );
-
-        FileUtils.copyDirectory( srcBinDirectory, binDirectory, null, "**/.svn/**" );
+        FileUtils.copyFile( source, pom );
     }
 
     private void cacheModels( File basedir, ArtifactResolver resolver )
@@ -194,9 +218,15 @@ public class Bootstrap
         }
     }
 
-    private void buildProject( File basedir, ArtifactResolver resolver, boolean buildModules )
+    public void buildProject( File basedir, boolean buildModules )
         throws Exception
     {
+        if ( buildModules )
+        {
+            // Pre-cache models so we know where they are for dependencies
+            cacheModels( basedir, resolver );
+        }
+
         System.setProperty( "basedir", basedir.getAbsolutePath() );
 
         File file = new File( basedir, "pom.xml" );
@@ -217,7 +247,7 @@ public class Bootstrap
                 {
                     String module = (String) i.next();
 
-                    buildProject( new File( basedir, module ), resolver, true );
+                    buildProject( new File( basedir, module ), true );
                 }
             }
 
@@ -230,6 +260,16 @@ public class Bootstrap
         {
             return;
         }
+
+        buildProject( reader );
+
+        inProgress.remove( key );
+    }
+
+    private File buildProject( ModelReader reader )
+        throws Exception
+    {
+        File basedir = reader.getProjectFile().getParentFile();
 
         String sources = new File( basedir, "src/main/java" ).getAbsolutePath();
 
@@ -248,7 +288,7 @@ public class Bootstrap
 
             if ( modelFileCache.containsKey( dep.getId() ) )
             {
-                buildProject( resolver.getArtifactFile( dep.getPomDependency() ).getParentFile(), resolver, false );
+                buildProject( resolver.getArtifactFile( dep.getPomDependency() ).getParentFile(), false );
             }
         }
 
@@ -336,7 +376,7 @@ public class Bootstrap
 
         line();
 
-        inProgress.remove( key );
+        return jarFile;
     }
 
     private ModelReader readModel( ArtifactResolver resolver, File file, boolean resolveTransitiveDependencies )
@@ -528,7 +568,7 @@ public class Bootstrap
         }
     }
 
-    private void stats( Date fullStart, Date fullStop )
+    public static void stats( Date fullStart, Date fullStop )
     {
         long fullDiff = fullStop.getTime() - fullStart.getTime();
 
@@ -695,5 +735,15 @@ public class Bootstrap
         }
 
         return cl;
+    }
+
+    public ModelReader getCachedModel( String groupId, String artifactId )
+    {
+        return (ModelReader) modelCache.get( groupId + ":" + artifactId );
+    }
+
+    public File getArtifactFile( Dependency dep )
+    {
+        return resolver.getArtifactFile( dep );
     }
 }

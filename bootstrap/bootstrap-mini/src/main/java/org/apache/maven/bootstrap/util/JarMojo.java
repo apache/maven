@@ -32,6 +32,8 @@ public class JarMojo
 {
     private byte[] buffer = new byte[4096];
 
+    private static final String MF = "META-INF/MANIFEST.MF";
+
     public void execute( File basedir, File jarFile )
         throws Exception
     {
@@ -46,9 +48,10 @@ public class JarMojo
      * Add all files in the specified directory to the archive.
      *
      * @param includes a map <String, File> of items to be include in the outpur
-     * @param baseDir  the directory to add
+     * @param baseDir the directory to add
      */
-    protected void addDirectory( Map includes, File baseDir ) throws IOException
+    protected void addDirectory( Map includes, File baseDir )
+        throws IOException
     {
         addDirectory( includes, "", baseDir );
     }
@@ -57,10 +60,11 @@ public class JarMojo
      * Add all files in the specified directory to the archive.
      *
      * @param includes a map <String, File> of items to be include in the outpur
-     * @param prefix   value to be added to the front of jar entry names
-     * @param baseDir  the directory to add
+     * @param prefix value to be added to the front of jar entry names
+     * @param baseDir the directory to add
      */
-    protected void addDirectory( Map includes, String prefix, File baseDir ) throws IOException
+    protected void addDirectory( Map includes, String prefix, File baseDir )
+        throws IOException
     {
         addDirectory( includes, null, null, prefix, baseDir );
     }
@@ -68,13 +72,14 @@ public class JarMojo
     /**
      * Add all files in the specified directory to the archive.
      *
-     * @param includes        a map <String, File> of items to be include in the outpur
+     * @param includes a map <String, File> of items to be include in the outpur
      * @param includesPattern Sets the list of include patterns to use
      * @param excludesPattern Sets the list of exclude patterns to use
-     * @param prefix          value to be added to the front of jar entry names
-     * @param baseDir         the directory to add
+     * @param prefix value to be added to the front of jar entry names
+     * @param baseDir the directory to add
      */
-    protected void addDirectory( Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir )
+    protected void addDirectory( Map includes, String includesPattern, String excludesPattern, String prefix,
+                                 File baseDir )
         throws IOException
     {
         if ( !baseDir.exists() )
@@ -106,18 +111,19 @@ public class JarMojo
     /**
      * Create the jar file specified and include the listed files.
      *
-     * @param jarFile  the jar file to create
+     * @param jarFile the jar file to create
      * @param includes a Map<String, File>of items to include; the key is the jar entry name
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void createJar( File jarFile, Map includes ) throws IOException
+    protected void createJar( File jarFile, Map includes )
+        throws IOException
     {
         File parentJarFile = jarFile.getParentFile();
         if ( !parentJarFile.exists() )
         {
             parentJarFile.mkdirs();
         }
-        JarOutputStream jos = createJar( jarFile, createManifest() );
+        JarOutputStream jos = createJar( jarFile, includes.containsKey( "META-INF/MANIFEST.MF" ) );
         try
         {
             addEntries( jos, includes );
@@ -138,7 +144,7 @@ public class JarMojo
         Manifest mf = new Manifest();
         Attributes attrs = mf.getMainAttributes();
         attrs.putValue( Attributes.Name.MANIFEST_VERSION.toString(), "1.0" );
-        attrs.putValue( "Created-By", "2.0 (Apache Maven)" );
+        attrs.putValue( "Created-By", "Apache Maven Bootstrap Mini" );
         return mf;
     }
 
@@ -146,17 +152,25 @@ public class JarMojo
      * Create the specified jar file and return a JarOutputStream to it
      *
      * @param jarFile the jar file to create
-     * @param mf      the manifest to use
+     * @param manifestIncluded if the manifest is included
      * @return a JarOutputStream that can be used to write to that file
      * @throws IOException if there was a problem opening the file
      */
-    protected JarOutputStream createJar( File jarFile, Manifest mf ) throws IOException
+    protected JarOutputStream createJar( File jarFile, boolean manifestIncluded )
+        throws IOException
     {
         jarFile.getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream( jarFile );
         try
         {
-            return new JarOutputStream( fos, mf );
+            if ( manifestIncluded )
+            {
+                return new JarOutputStream( fos );
+            }
+            else
+            {
+                return new JarOutputStream( fos, createManifest() );
+            }
         }
         catch ( IOException e )
         {
@@ -176,11 +190,12 @@ public class JarMojo
     /**
      * Add all entries in the supplied Map to the jar
      *
-     * @param jos      a JarOutputStream that can be used to write to the jar
+     * @param jos a JarOutputStream that can be used to write to the jar
      * @param includes a Map<String, File> of entries to add
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void addEntries( JarOutputStream jos, Map includes ) throws IOException
+    protected void addEntries( JarOutputStream jos, Map includes )
+        throws IOException
     {
         for ( Iterator i = includes.entrySet().iterator(); i.hasNext(); )
         {
@@ -194,12 +209,13 @@ public class JarMojo
     /**
      * Add a single entry to the jar
      *
-     * @param jos    a JarOutputStream that can be used to write to the jar
-     * @param name   the entry name to use; must be '/' delimited
+     * @param jos a JarOutputStream that can be used to write to the jar
+     * @param name the entry name to use; must be '/' delimited
      * @param source the file to add
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void addEntry( JarOutputStream jos, String name, File source ) throws IOException
+    protected void addEntry( JarOutputStream jos, String name, File source )
+        throws IOException
     {
         FileInputStream fis = new FileInputStream( source );
         try

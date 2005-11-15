@@ -10,4 +10,4 @@ mkdir -p ${classesDir}
 
 "$JAVA_HOME/bin/javac" -g -d ${classesDir} `find ${srcDir} -name '*.java'`
 
-( cd ${classesDir} ; "$JAVA_HOME/bin/jar" -cfm ../bootstrap.jar ../../src/main/resources/META-INF/MANIFEST.MF * )
+( cd ${classesDir} ; "$JAVA_HOME/bin/jar" -cfm ../bootstrap-mini.jar ../../src/main/resources/META-INF/MANIFEST.MF * )

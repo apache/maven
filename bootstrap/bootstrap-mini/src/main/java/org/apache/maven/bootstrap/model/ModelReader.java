@@ -16,13 +16,14 @@ package org.apache.maven.bootstrap.model;
  * limitations under the License.
  */
 
-import org.apache.maven.bootstrap.download.DownloadFailedException;
 import org.apache.maven.bootstrap.download.ArtifactResolver;
+import org.apache.maven.bootstrap.download.DownloadFailedException;
 import org.apache.maven.bootstrap.util.AbstractReader;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,8 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.sun.corba.se.impl.ior.ObjectAdapterIdArray;
 
 /**
  * Parse a POM.
@@ -276,7 +275,7 @@ public class ModelReader
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", inheritedScope, false,
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, inheritedScope, false,
                                          excluded, Collections.EMPTY_LIST );
 
             addDependencies( p.getDependencies(), parentDependencies, inheritedScope, excluded );
@@ -529,7 +528,7 @@ public class ModelReader
                         excluded.addAll( dependency.getExclusions() );
 
                         ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
-                                                     dependency.getVersion(), dependency.getType(),
+                                                     dependency.getVersion(),
                                                      dependency.getScope(), resolveTransitiveDependencies, excluded,
                                                      dependency.getChain() );
 
@@ -586,9 +585,8 @@ public class ModelReader
         return false;
     }
 
-    private ModelReader retrievePom( String groupId, String artifactId, String version, String type,
-                                     String inheritedScope, boolean resolveTransitiveDependencies, Set excluded,
-                                     List chain )
+    private ModelReader retrievePom( String groupId, String artifactId, String version, String inheritedScope,
+                                     boolean resolveTransitiveDependencies, Set excluded, List chain )
         throws SAXException
     {
         String key = groupId + ":" + artifactId + ":" + version;
@@ -656,5 +654,10 @@ public class ModelReader
     public List getModules()
     {
         return modules;
+    }
+
+    public File getProjectFile()
+    {
+        return pomFile;
     }
 }

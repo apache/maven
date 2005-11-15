@@ -15,5 +15,5 @@ dir /B /s %srcDir%\*.java >sources
 del /F/Q sources
 
 cd %classesDir% 
-"%JAVA_HOME%\bin\jar" -cfm ..\bootstrap.jar ..\..\src\main\resources\META-INF\MANIFEST.MF *.*
+"%JAVA_HOME%\bin\jar" -cfm ..\bootstrap-mini.jar ..\..\src\main\resources\META-INF\MANIFEST.MF *.*
 cd ..\..
