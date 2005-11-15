@@ -1351,14 +1351,16 @@ public class DefaultLifecycleExecutor
             throw new BuildFailureException( message );
         }
 
-        // this has been simplified from the old code that injected the plugin management stuff, since
-        // pluginManagement injection is now handled by the project method.
-        project.addPlugin( plugin );
-
+        project.injectPluginManagementInfo( plugin );
+        
         if ( pluginDescriptor == null )
         {
             pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
         }
+
+        // this has been simplified from the old code that injected the plugin management stuff, since
+        // pluginManagement injection is now handled by the project method.
+        project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
         if ( mojoDescriptor == null )

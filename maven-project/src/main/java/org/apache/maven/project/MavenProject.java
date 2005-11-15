@@ -917,7 +917,7 @@ public class MavenProject
     {
         if ( buildOverlay == null )
         {
-            buildOverlay = new BuildOverlay( model.getBuild() );
+            buildOverlay = new BuildOverlay( getModelBuild() );
         }
 
         return buildOverlay;
@@ -1112,8 +1112,8 @@ public class MavenProject
 
         return pluginMgmt;
     }
-
-    public void addPlugin( Plugin plugin )
+    
+    private Build getModelBuild()
     {
         Build build = model.getBuild();
 
@@ -1123,28 +1123,39 @@ public class MavenProject
 
             model.setBuild( build );
         }
+        
+        return build;
+    }
+
+    public void addPlugin( Plugin plugin )
+    {
+        Build build = getModelBuild();
 
         if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
         {
-            PluginManagement pm = build.getPluginManagement();
-
-            if ( pm != null )
-            {
-                Map pmByKey = pm.getPluginsAsMap();
-
-                String pluginKey = plugin.getKey();
-
-                if ( pmByKey != null && pmByKey.containsKey( pluginKey ) )
-                {
-                    Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
-
-                    ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
-                }
-
-            }
+            injectPluginManagementInfo( plugin );
 
             build.addPlugin( plugin );
             build.flushPluginMap();
+        }
+    }
+    
+    public void injectPluginManagementInfo( Plugin plugin )
+    {
+        PluginManagement pm = getModelBuild().getPluginManagement();
+
+        if ( pm != null )
+        {
+            Map pmByKey = pm.getPluginsAsMap();
+
+            String pluginKey = plugin.getKey();
+
+            if ( pmByKey != null && pmByKey.containsKey( pluginKey ) )
+            {
+                Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
+
+                ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
+            }
         }
     }
 
