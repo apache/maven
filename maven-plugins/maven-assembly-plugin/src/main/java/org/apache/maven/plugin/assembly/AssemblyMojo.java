@@ -34,6 +34,7 @@ import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
+import org.codehaus.plexus.archiver.war.WarArchiver;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -358,6 +359,11 @@ public class AssemblyMojo
                             evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
                     }
                 }
+                else {
+                    // would be better to have a way to find out when a specified include or exclude 
+                    // is never triggered and warn() it.
+                    getLog().debug( "artifact: " + artifact + " not included" );
+                }
             }
         }
     }
@@ -590,6 +596,12 @@ public class AssemblyMojo
                 }
                 tarArchiver.setCompression( tarCompressionMethod );
             }
+        }
+        else if ( format.equals( "war" ) )
+        {
+            WarArchiver warArchiver = (WarArchiver) this.archiverManager.getArchiver( "war" );
+            warArchiver.setIgnoreWebxml( false ); // See MNG-1274
+            archiver = warArchiver;
         }
         else
         {
