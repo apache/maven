@@ -120,6 +120,12 @@ echo
 echo -----------------------------------------------------------------------
 echo Rebuilding maven2 plugins
 echo -----------------------------------------------------------------------
+
+@REM Build plugin plugin first, it seems to choke on the version built by the bootstrap
+cd maven-plugins\maven-plugin-plugin
+call mvn --no-plugin-registry --batch-mode --fail-at-end -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+cd ..\..
+
 cd maven-plugins
 @REM update the release info to ensure these versions get used in the integration tests
 call mvn --no-plugin-registry --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
