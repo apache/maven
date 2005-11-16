@@ -107,12 +107,9 @@ cd bootstrap\bootstrap-mini
 
 call .\build
 
-@REM Build Maven2
-cd ..
-
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar target\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
 
-cd bootstrap\bootstrap-installer
+cd ..\bootstrap-installer
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-installer.jar package %MAVEN_CMD_LINE_ARGS%
 cd ..\..
 
