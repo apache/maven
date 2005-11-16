@@ -16,23 +16,25 @@ package org.apache.maven.bootstrap.installer;
  * limitations under the License.
  */
 
+import org.apache.maven.bootstrap.Bootstrap;
 import org.apache.maven.bootstrap.model.Dependency;
 import org.apache.maven.bootstrap.model.ModelReader;
 import org.apache.maven.bootstrap.util.FileUtils;
-import org.apache.maven.bootstrap.Bootstrap;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.Expand;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.zip.ZipInputStream;
 
 /**
  * Main class for bootstrap module.
@@ -63,6 +65,13 @@ public class BootstrapInstaller
     {
         Date fullStart = new Date();
 
+        // TODO: use parameters instead, and use --prefix
+        String mavenHome = System.getProperty( "maven.home" );
+        if ( mavenHome == null )
+        {
+            throw new Exception( "maven.home system property is required" );
+        }
+
         String basedir = System.getProperty( "user.dir" );
 
         // TODO: only build this guy, then move the next part to a new phase using it for resolution
@@ -72,15 +81,49 @@ public class BootstrapInstaller
 
         bootstrapper.buildProject( new File( basedir ), true );
 
+        ModelReader mavenCoreModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-core" );
+
         File installation = new File( basedir, "bootstrap/target/installation" );
-        createInstallation( installation );
+        createInstallation( installation, mavenCoreModel );
 
         // TODO: should just need assembly from basedir
         runMaven( installation, new File( basedir ), new String[]{"clean", "install"} );
 
-        runMaven( installation, new File( basedir, "maven-core" ), new String[]{"clean", "assembly:assembly"} );
+        File mavenCoreDir = mavenCoreModel.getProjectFile().getParentFile();
+        runMaven( installation, mavenCoreDir, new String[]{"clean", "assembly:assembly"} );
+
+        File file = new File( mavenCoreDir, "target/maven-" + mavenCoreModel.getVersion() + "-bin.zip" );
+
+        FileUtils.deleteDirectory( mavenHome );
+
+        Expand expand = new Expand();
+        expand.setSrc( file );
+        File prefix = new File( mavenHome ).getParentFile();
+        expand.setDest( prefix );
+        expand.execute();
+
+        fixScriptPermissions( new File( prefix, "maven-" + mavenCoreModel.getVersion() + "/bin" ) );
 
         Bootstrap.stats( fullStart, new Date() );
+    }
+
+    private static void fixScriptPermissions( File binDirectory )
+        throws InterruptedException, CommandLineException
+    {
+        if ( Os.isFamily( "unix" ) )
+        {
+            Commandline cli = new Commandline();
+
+            cli.setExecutable( "chmod" );
+
+            cli.createArgument().setValue( "+x" );
+
+            cli.createArgument().setValue( new File( binDirectory, "mvn" ).getAbsolutePath() );
+
+            cli.createArgument().setValue( new File( binDirectory, "m2" ).getAbsolutePath() );
+
+            cli.execute().waitFor();
+        }
     }
 
     private void runMaven( File installation, File basedir, String[] args )
@@ -89,6 +132,11 @@ public class BootstrapInstaller
         Commandline cli = new Commandline();
 
         cli.setExecutable( new File( installation, "bin/mvn" ).getAbsolutePath() );
+
+        // TODO: should we just remove this from the equation?
+        cli.addEnvironment( "M2_HOME", installation.getAbsolutePath() );
+        // No env is passed through
+        cli.addEnvironment( "JAVA_HOME", System.getProperty( "java.home" ) );
 
         cli.setWorkingDirectory( basedir.getAbsolutePath() );
 
@@ -107,7 +155,7 @@ public class BootstrapInstaller
         }
     }
 
-    private void createInstallation( File dir )
+    private void createInstallation( File dir, ModelReader mavenCoreModel )
         throws IOException, CommandLineException, InterruptedException
     {
         FileUtils.deleteDirectory( dir );
@@ -125,9 +173,7 @@ public class BootstrapInstaller
         File bootDirectory = new File( coreDirectory, "boot" );
         bootDirectory.mkdir();
 
-        ModelReader reader = bootstrapper.getCachedModel( "org.apache.maven", "maven-core" );
-
-        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
+        for ( Iterator i = mavenCoreModel.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
 
@@ -146,26 +192,16 @@ public class BootstrapInstaller
             }
         }
 
-        Dependency coreAsDep = new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
-                                               reader.getPackaging(), Collections.EMPTY_LIST );
+        Dependency coreAsDep = new Dependency( mavenCoreModel.getGroupId(), mavenCoreModel.getArtifactId(),
+                                               mavenCoreModel.getVersion(), mavenCoreModel.getPackaging(),
+                                               Collections.EMPTY_LIST );
 
         FileUtils.copyFileToDirectory( bootstrapper.getArtifactFile( coreAsDep ), libDirectory );
 
-        File srcBinDirectory = new File( reader.getProjectFile().getParentFile(), "src/bin" );
+        File srcBinDirectory = new File( mavenCoreModel.getProjectFile().getParentFile(), "src/bin" );
 
         FileUtils.copyDirectory( srcBinDirectory, binDirectory, null, "**/.svn/**" );
 
-        if ( Os.isFamily( "unix" ) )
-        {
-            Commandline cli = new Commandline();
-
-            cli.setExecutable( "chmod" );
-
-            cli.createArgument().setValue( "+x" );
-
-            cli.createArgument().setValue( new File( binDirectory, "mvn" ).getAbsolutePath() );
-
-            cli.execute().waitFor();
-        }
+        fixScriptPermissions( binDirectory );
     }
 }
