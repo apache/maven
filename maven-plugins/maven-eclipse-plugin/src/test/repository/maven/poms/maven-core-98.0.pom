@@ -1,6 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
-  <artifactId>maven-core</artifactId>
-  <version>98.0</version>
-</project>

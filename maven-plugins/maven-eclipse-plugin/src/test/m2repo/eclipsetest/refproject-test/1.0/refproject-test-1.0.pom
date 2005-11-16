@@ -1,9 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>eclipsetest</groupId>
-  <artifactId>refproject-test</artifactId>
-  <version>1.0</version>
-  <distributionManagement>
-    <status>verified</status>
-  </distributionManagement>
-</project>

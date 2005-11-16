@@ -1,8 +1,0 @@
-<verifications>
-  <files>
-    <file>
-      <location>InexistentFileThatExists.xml</location>
-      <exists>false</exists>
-    </file>
-  </files>
-</verifications>

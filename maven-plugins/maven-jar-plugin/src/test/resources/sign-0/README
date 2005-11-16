@@ -1,7 +1,0 @@
-A pom.xml that can be used to make some functional tests.
-These values are of course specific to my environment.
-Not sure what to do with this. Should I turn this into a fully automated functional test?
-
-The keystore was generated using:
-
-keytool -genkey -alias m2 -keypass m2m2m2 -keystore keystore -storepass m2m2m2 -dname "cn=www.example.com, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US"
