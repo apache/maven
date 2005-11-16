@@ -29,12 +29,15 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Main class for bootstrap module.
@@ -183,12 +186,69 @@ public class BootstrapInstaller
         }
     }
 
+    private Properties getEnvVars()
+        throws Exception
+    {
+        // TODO : put this method in Commandline class
+        Process p = null;
+
+        Properties envVars = new Properties();
+
+        Runtime r = Runtime.getRuntime();
+
+        String OS = System.getProperty( "os.name" ).toLowerCase();
+
+        if ( OS.indexOf( "windows 9" ) > -1 )
+        {
+            p = r.exec( "command.com /c set" );
+        }
+        else if ( (OS.indexOf( "nt" ) > -1 )
+            || ( OS.indexOf( "windows 2000" ) > -1 )
+            || ( OS.indexOf( "windows xp" ) > -1) )
+        {
+            p = r.exec( "cmd.exe /c set" );
+        }
+        else
+        {
+            p = r.exec( "env" );
+        }
+
+        BufferedReader br = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
+
+        String line;
+
+        while( ( line = br.readLine() ) != null )
+        {
+            int idx = line.indexOf( '=' );
+
+            String key = line.substring( 0, idx );
+
+            String value = line.substring( idx + 1 );
+
+            envVars.setProperty( key, value );
+            // System.out.println( key + " = " + value );
+        }
+
+        return envVars;
+    }
+
     private void runMaven( File installation, File basedir, String[] args )
         throws Exception, InterruptedException
     {
         Commandline cli = new Commandline();
 
         cli.setExecutable( new File( installation, "bin/mvn" ).getAbsolutePath() );
+
+        // we need to add actual environment variable, because they don't added in commandline when
+        //we add new environment variables
+        Properties envVars = getEnvVars();
+
+        for ( Iterator i = envVars.keySet().iterator(); i.hasNext(); )
+        {
+            String key = (String) i.next();
+
+            cli.addEnvironment( key, envVars.getProperty( key ) );
+        }
 
         // TODO: should we just remove this from the equation?
         cli.addEnvironment( "M2_HOME", installation.getAbsolutePath() );
