@@ -101,34 +101,39 @@ goto Win9xApp
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
-SET MAVEN_OPTS=%MAVEN_OPTS% -Dmaven.home="%M2_HOME%"
 
 @REM Build MBoot2
-cd maven-mboot2
+cd bootstrap\bootstrap-mini
 
 call .\build
 
 @REM Build Maven2
 cd ..
 
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar mboot.jar %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar target\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
 
-@REM I Really Don't want to be rebuilding these (Especially the reports) every time, but
-@REM until we regularly push them to the repository and the integration tests rely on
-@REM some of these plugins, there is no choice
-echo
-echo -----------------------------------------------------------------------
-echo Rebuilding maven2 plugins
-echo -----------------------------------------------------------------------
-
-@REM Build plugin plugin first, it seems to choke on the version built by the bootstrap
-cd maven-plugins\maven-plugin-plugin
-call mvn --no-plugin-registry --batch-mode --fail-at-end -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+cd bootstrap\bootstrap-installer
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-installer.jar package %MAVEN_CMD_LINE_ARGS%
 cd ..\..
 
-cd maven-plugins
-@REM update the release info to ensure these versions get used in the integration tests
-call mvn --no-plugin-registry --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+set PLUGINS_DIR=..\plugins
+if exist "%PLUGINS_DIR%\pom.xml" goto setArgs
+
+set BUILD_ARGS=%MAVEN_CMD_LINE_ARGS%
+goto doBuild
+
+:setArgs
+set BUILD_ARGS=%MAVEN_CMD_LINE_ARGS% --build-plugins --plugins-directory=%PLUGINS_DIR%
+
+:doBuild
+
+REM TODO: get rid of M2_HOME once integration tests are in here
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --prefix=%M2_HOME%\.. %BUILD_ARGS%
+
+REM TODO: should w ebe going back to the mini now that we have the real thing?
+cd maven-core-it-verifier
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap\bootstrap-mini\target\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
+
 cd ..
 
 echo
