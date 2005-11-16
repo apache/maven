@@ -109,32 +109,6 @@ public class JarMojo
     }
 
     /**
-     * Create the jar file specified and include the listed files.
-     *
-     * @param jarFile the jar file to create
-     * @param includes a Map<String, File>of items to include; the key is the jar entry name
-     * @throws IOException if there is a problem writing the archive or reading the sources
-     */
-    protected void createJar( File jarFile, Map includes )
-        throws IOException
-    {
-        File parentJarFile = jarFile.getParentFile();
-        if ( !parentJarFile.exists() )
-        {
-            parentJarFile.mkdirs();
-        }
-        JarOutputStream jos = createJar( jarFile, includes.containsKey( "META-INF/MANIFEST.MF" ) );
-        try
-        {
-            addEntries( jos, includes );
-        }
-        finally
-        {
-            jos.close();
-        }
-    }
-
-    /**
      * Create a manifest for the jar file
      *
      * @return a default manifest; the Manifest-Version and Created-By attributes are initialized
@@ -149,41 +123,34 @@ public class JarMojo
     }
 
     /**
-     * Create the specified jar file and return a JarOutputStream to it
+     * Create the jar file specified and include the listed files.
      *
      * @param jarFile the jar file to create
-     * @param manifestIncluded if the manifest is included
-     * @return a JarOutputStream that can be used to write to that file
-     * @throws IOException if there was a problem opening the file
+     * @param includes a Map<String, File>of items to include; the key is the jar entry name
+     * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected JarOutputStream createJar( File jarFile, boolean manifestIncluded )
+    protected void createJar( File jarFile, Map includes )
         throws IOException
     {
         jarFile.getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream( jarFile );
+        JarOutputStream jos = null;
         try
         {
-            if ( manifestIncluded )
+            if ( includes.containsKey( MF ) )
             {
-                return new JarOutputStream( fos );
+                jos = new JarOutputStream( fos );
             }
             else
             {
-                return new JarOutputStream( fos, createManifest() );
+                jos = new JarOutputStream( fos, createManifest() );
             }
+            addEntries( jos, includes );
         }
-        catch ( IOException e )
+        finally
         {
-            try
-            {
-                fos.close();
-                jarFile.delete();
-            }
-            catch ( IOException e1 )
-            {
-                // ignore
-            }
-            throw e;
+            IOUtil.close( jos );
+            IOUtil.close( fos );
         }
     }
 
