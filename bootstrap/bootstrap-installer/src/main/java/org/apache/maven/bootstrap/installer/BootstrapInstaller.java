@@ -196,17 +196,19 @@ public class BootstrapInstaller
 
         Runtime r = Runtime.getRuntime();
 
-        String OS = System.getProperty( "os.name" ).toLowerCase();
+        String os = System.getProperty( "os.name" ).toLowerCase();
 
-        if ( OS.indexOf( "windows 9" ) > -1 )
+        //If this is windows set the shell to command.com or cmd.exe with correct arguments.
+        if ( os.indexOf( "Windows" ) != -1 )
         {
-            p = r.exec( "command.com /c set" );
-        }
-        else if ( (OS.indexOf( "nt" ) > -1 )
-            || ( OS.indexOf( "windows 20" ) > -1 )
-            || ( OS.indexOf( "windows xp" ) > -1) )
-        {
-            p = r.exec( "cmd.exe /c set" );
+            if (os.indexOf("95") != -1 || os.indexOf("98") != -1 || os.indexOf("Me") != -1)
+            {
+                p = r.exec( "command.com /c set" );
+            }
+            else
+            {
+                p = r.exec( "cmd.exe /c set" );
+            }
         }
         else
         {
