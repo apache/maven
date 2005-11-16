@@ -203,7 +203,7 @@ public class BootstrapInstaller
             p = r.exec( "command.com /c set" );
         }
         else if ( (OS.indexOf( "nt" ) > -1 )
-            || ( OS.indexOf( "windows 2000" ) > -1 )
+            || ( OS.indexOf( "windows 20" ) > -1 )
             || ( OS.indexOf( "windows xp" ) > -1) )
         {
             p = r.exec( "cmd.exe /c set" );
