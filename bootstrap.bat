@@ -31,7 +31,7 @@
 @REM ----------------------------------------------------------------------------
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
-@echo off
+@echo on
 @REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
@@ -107,10 +107,11 @@ cd bootstrap\bootstrap-mini
 
 call .\build
 
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar target\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
+copy target\bootstrap-mini.jar ..
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
 
 cd ..\bootstrap-installer
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-installer.jar package %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
 cd ..\..
 
 set PLUGINS_DIR=..\plugins
@@ -127,9 +128,9 @@ set BUILD_ARGS=%MAVEN_CMD_LINE_ARGS% --build-plugins --plugins-directory=%PLUGIN
 REM TODO: get rid of M2_HOME once integration tests are in here
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --prefix=%M2_HOME%\.. %BUILD_ARGS%
 
-REM TODO: should w ebe going back to the mini now that we have the real thing?
+REM TODO: should we be going back to the mini now that we have the real thing?
 cd maven-core-it-verifier
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap\bootstrap-mini\target\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
 
 cd ..
 
@@ -140,6 +141,8 @@ echo -----------------------------------------------------------------------
 cd maven-core-it
 call maven-core-it %MAVEN_CMD_LINE_ARGS%
 cd ..
+
+del bootstrap\bootstrap-mini.jar
 
 :end
 @REM set local scope for the variables with windows NT shell
