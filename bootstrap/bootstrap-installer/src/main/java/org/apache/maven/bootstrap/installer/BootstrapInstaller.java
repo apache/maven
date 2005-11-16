@@ -214,6 +214,9 @@ public class BootstrapInstaller
             cli.createArgument().setValue( args[i] );
         }
 
+        System.out.println( "Running Maven... " );
+        System.out.println( cli.toString() );
+
         int exitCode = CommandLineUtils.executeCommandLine( cli,
                                                             new WriterStreamConsumer( new PrintWriter( System.out ) ),
                                                             new WriterStreamConsumer( new PrintWriter( System.err ) ) );
