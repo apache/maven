@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Arrays;
 
 /**
  * Main class for bootstrap module.
@@ -47,19 +48,31 @@ public class BootstrapInstaller
 
     private final String prefix;
 
+    private String pluginsDirectory;
+
+    private boolean buildPlugins;
+
     public BootstrapInstaller( SimpleArgumentParser parser )
         throws Exception
     {
         this.bootstrapper = new Bootstrap( parser );
 
         this.prefix = parser.getArgumentValue( "--prefix" );
+
+        this.buildPlugins = parser.isArgumentSet( "--build-plugins" );
+
+        this.pluginsDirectory = parser.getArgumentValue( "--plugins-directory" );
     }
 
     public static void main( String[] args )
         throws Exception
     {
+        System.out.println( "ARGS = " + Arrays.asList( args ) );
+
         SimpleArgumentParser parser = Bootstrap.createDefaultParser();
         parser.addArgument( "--prefix", "The location to install Maven", true, getDefaultPrefix() );
+        parser.addArgument( "--build-plugins", "Build the plugins from SVN" );
+        parser.addArgument( "--plugins-directory", "Where the plugins are located to build from", true );
 
         parser.parseCommandLineArguments( args );
 
@@ -127,6 +140,16 @@ public class BootstrapInstaller
         }
 
         fixScriptPermissions( new File( mavenHome, "bin" ) );
+
+        if ( buildPlugins )
+        {
+            if ( pluginsDirectory == null )
+            {
+                throw new UnsupportedOperationException( "SVN checkout of plugins not yet supported" );
+            }
+
+            runMaven( installation, new File( pluginsDirectory ), new String[]{ "clean", "install" } );
+        }
 
         Bootstrap.stats( fullStart, new Date() );
     }

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ARGS=$@
+ORIG_ARGS=$ARGS
 
 (
   cd bootstrap/bootstrap-mini
@@ -20,9 +21,17 @@ BOOTSTRAP_JAR=bootstrap-mini/target/bootstrap-mini-2.0.1-SNAPSHOT.jar
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
+#PLUGINS_DIR=../plugins
+PLUGINS_DIR=maven-plugins
+if [ -d $PLUGINS_DIR ]; then
+  ARGS="$ARGS --build-plugins --plugins-directory=$PLUGINS_DIR"
+fi
+
 # TODO: get rid of M2_HOME?
 java -jar bootstrap/bootstrap-installer/target/bootstrap-installer-2.0.1-SNAPSHOT.jar --prefix=`dirname $M2_HOME` $ARGS
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+
+ARGS=$ORIG_ARGS
 
 (
   # TODO: should w ebe going back to the mini now that we have the real thing?

@@ -390,6 +390,10 @@ public class ModelReader
             {
                 currentDependency.setScope( getBodyText() );
             }
+            else if ( rawName.equals( "optional" ) )
+            {
+                currentDependency.setOptional( Boolean.valueOf( getBodyText() ).booleanValue() );
+            }
         }
         else if ( insideBuild && insidePlugin )
         {
@@ -505,7 +509,7 @@ public class ModelReader
         {
             Dependency dependency = (Dependency) it.next();
 
-            if ( !excluded.contains( dependency.getConflictId() ) )
+            if ( !excluded.contains( dependency.getConflictId() ) && !dependency.isOptional() )
             {
                 if ( !dependency.getScope().equals( Dependency.SCOPE_TEST ) || inheritedScope == null )
                 {
@@ -528,9 +532,8 @@ public class ModelReader
                         excluded.addAll( dependency.getExclusions() );
 
                         ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
-                                                     dependency.getVersion(),
-                                                     dependency.getScope(), resolveTransitiveDependencies, excluded,
-                                                     dependency.getChain() );
+                                                     dependency.getVersion(), dependency.getScope(),
+                                                     resolveTransitiveDependencies, excluded, dependency.getChain() );
 
                         addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(), excluded );
                     }
@@ -554,7 +557,7 @@ public class ModelReader
                     d.setScope( Dependency.SCOPE_TEST );
                 }
 
-                if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) )
+                if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) && !d.isOptional() )
                 {
                     if ( !"plexus".equals( d.getGroupId() ) || ( !"plexus-utils".equals( d.getArtifactId() ) &&
                         !"plexus-container-default".equals( d.getArtifactId() ) ) )

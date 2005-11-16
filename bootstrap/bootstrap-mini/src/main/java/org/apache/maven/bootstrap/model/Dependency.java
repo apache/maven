@@ -46,6 +46,8 @@ public class Dependency
 
     private String resolvedVersion;
 
+    private boolean optional;
+
     public static final String SCOPE_TEST = "test";
 
     public static final String SCOPE_COMPILE = "compile";
@@ -301,5 +303,15 @@ public class Dependency
     public Dependency getPomDependency()
     {
         return new Dependency( groupId, artifactId, version, "pom", chain );
+    }
+
+    public void setOptional( boolean optional )
+    {
+        this.optional = optional;
+    }
+
+    public boolean isOptional()
+    {
+        return optional;
     }
 }

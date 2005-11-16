@@ -55,20 +55,24 @@ public class SimpleArgumentParser
                     }
 
                     Argument arg = (Argument) arguments.get( name );
-                    if ( arg.isHasValue() )
+                    if ( arg != null )
                     {
-                        String value = null;
-                        if ( index >= 0 )
+                        if ( arg.isHasValue() )
                         {
-                            value = args[i].substring( index + 1 ).trim();
-                        }
-                        else if ( i != args.length - 1 && !args[i + 1].startsWith( "-" ) )
-                        {
-                            value = args[i + 1];
-                            i++;
-                        }
+                            String value = null;
+                            if ( index >= 0 )
+                            {
+                                value = args[i].substring( index + 1 ).trim();
+                            }
+                            else if ( i != args.length - 1 && !args[i + 1].startsWith( "-" ) )
+                            {
+                                value = args[i + 1];
+                                i++;
+                            }
 
-                        arg.setValue( value );
+                            arg.setValue( value );
+                        }
+                        arg.setSet( true );
                     }
                 }
                 else
@@ -76,20 +80,24 @@ public class SimpleArgumentParser
                     String name = args[i].substring( 0, 2 );
 
                     Argument arg = (Argument) arguments.get( name );
-                    if ( arg.isHasValue() )
+                    if ( arg != null )
                     {
-                        String value = null;
-                        if ( args[i].length() > 2 )
+                        if ( arg.isHasValue() )
                         {
-                            value = args[i].substring( 2 );
-                        }
-                        else if ( i != args.length - 1 && !args[i + 1].startsWith( "-" ) )
-                        {
-                            value = args[i + 1];
-                            i++;
-                        }
+                            String value = null;
+                            if ( args[i].length() > 2 )
+                            {
+                                value = args[i].substring( 2 );
+                            }
+                            else if ( i != args.length - 1 && !args[i + 1].startsWith( "-" ) )
+                            {
+                                value = args[i + 1];
+                                i++;
+                            }
 
-                        arg.setValue( value );
+                            arg.setValue( value );
+                        }
+                        arg.setSet( true );
                     }
                 }
             }
@@ -97,21 +105,6 @@ public class SimpleArgumentParser
             {
                 parameters.add( args[i] );
             }
-        }
-    }
-
-    public void addArgument( String argument, String description, String alias )
-    {
-        addArgument( argument, description, alias, false, null );
-    }
-
-    public void addArgument( String argument, String description, String alias, boolean hasValue, String defaultValue )
-    {
-        Argument arg = new Argument( argument, description, alias, hasValue, defaultValue );
-        arguments.put( argument, arg );
-        if ( alias != null )
-        {
-            arguments.put( alias, arg );
         }
     }
 
@@ -131,9 +124,39 @@ public class SimpleArgumentParser
         return parameters;
     }
 
+    public void addArgument( String argument, String description, String alias )
+    {
+        addArgument( argument, description, alias, false, null );
+    }
+
+    public void addArgument( String argument, String description, String alias, boolean hasValue, String defaultValue )
+    {
+        Argument arg = new Argument( argument, description, alias, hasValue, defaultValue );
+        arguments.put( argument, arg );
+        if ( alias != null )
+        {
+            arguments.put( alias, arg );
+        }
+    }
+
     public void addArgument( String argument, String description, boolean hasValue, String defaultValue )
     {
         addArgument( argument, description, null, hasValue, defaultValue );
+    }
+
+    public void addArgument( String argument, String description )
+    {
+        addArgument( argument, description, null );
+    }
+
+    public void addArgument( String argument, String description, boolean hasValue )
+    {
+        addArgument( argument, description, hasValue, null );
+    }
+
+    public boolean isArgumentSet( String argument )
+    {
+        return arguments.containsKey( argument );
     }
 
     private static class Argument
@@ -149,6 +172,8 @@ public class SimpleArgumentParser
         private final boolean hasValue;
 
         private final String defaultValue;
+
+        private boolean set;
 
         public Argument( String name, String description, String alias, boolean hasValue, String defaultValue )
         {
@@ -191,6 +216,16 @@ public class SimpleArgumentParser
         public boolean isHasValue()
         {
             return hasValue;
+        }
+
+        public boolean isSet()
+        {
+            return set;
+        }
+
+        public void setSet( boolean set )
+        {
+            this.set = set;
         }
     }
 }
