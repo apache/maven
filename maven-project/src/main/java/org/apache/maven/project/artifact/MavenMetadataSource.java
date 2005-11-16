@@ -104,21 +104,23 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidProjectModelException e )
                 {
-                    getLogger().warn( "POM for: \'" + pomArtifact +
-                        "\' does not appear to be valid. Its will be ignored for artifact resolution.\n\nReason: " +
-                        e.getMessage() + "\n\n" );
+                    getLogger().warn( "POM for \'" + pomArtifact +
+                        "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
 
                     if ( getLogger().isDebugEnabled() )
                     {
+                        getLogger().debug( "Reason: " + e.getMessage() );
+                        
                         ModelValidationResult validationResult = e.getValidationResult();
 
                         if ( validationResult != null )
                         {
+                            getLogger().debug( "\nValidation Errors:" );
                             for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
                             {
                                 getLogger().debug( i.next().toString() );
                             }
-                            getLogger().debug( "\n\n" );
+                            getLogger().debug( "\n" );
                         }
                     }
 

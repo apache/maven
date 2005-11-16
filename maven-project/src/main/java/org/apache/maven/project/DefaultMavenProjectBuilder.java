@@ -1080,7 +1080,7 @@ public class DefaultMavenProjectBuilder
 
         if ( modelSource.indexOf( "<modelVersion>4.0.0" ) < 0 )
         {
-            throw new InvalidProjectModelException( projectId, pomLocation, "Invalid POM (not v4.0.0 modelVersion)" );
+            throw new InvalidProjectModelException( projectId, pomLocation, "Not a v4.0.0 POM." );
         }
 
         StringReader sReader = new StringReader( modelSource );
