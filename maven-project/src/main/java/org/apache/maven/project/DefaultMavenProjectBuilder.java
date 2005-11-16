@@ -1091,7 +1091,7 @@ public class DefaultMavenProjectBuilder
         }
         catch ( XmlPullParserException e )
         {
-            throw new InvalidProjectModelException( projectId, pomLocation, "Parse error reading POM", e );
+            throw new InvalidProjectModelException( projectId, pomLocation, "Parse error reading POM. Reason: " + e.getMessage(), e );
         }
     }
 
