@@ -23,9 +23,13 @@ import org.apache.maven.bootstrap.Bootstrap;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -68,9 +72,39 @@ public class BootstrapInstaller
 
         bootstrapper.buildProject( new File( basedir ), true );
 
-        createInstallation( new File( basedir, "target/installation" ) );
+        File installation = new File( basedir, "bootstrap/target/installation" );
+        createInstallation( installation );
+
+        // TODO: should just need assembly from basedir
+        runMaven( installation, new File( basedir ), new String[]{"clean", "install"} );
+
+        runMaven( installation, new File( basedir, "maven-core" ), new String[]{"clean", "assembly:assembly"} );
 
         Bootstrap.stats( fullStart, new Date() );
+    }
+
+    private void runMaven( File installation, File basedir, String[] args )
+        throws Exception, InterruptedException
+    {
+        Commandline cli = new Commandline();
+
+        cli.setExecutable( new File( installation, "bin/mvn" ).getAbsolutePath() );
+
+        cli.setWorkingDirectory( basedir.getAbsolutePath() );
+
+        for ( int i = 0; i < args.length; i++ )
+        {
+            cli.createArgument().setValue( args[i] );
+        }
+
+        int exitCode = CommandLineUtils.executeCommandLine( cli,
+                                                            new WriterStreamConsumer( new PrintWriter( System.out ) ),
+                                                            new WriterStreamConsumer( new PrintWriter( System.err ) ) );
+
+        if ( exitCode != 0 )
+        {
+            throw new Exception( "Error executing Maven: exit code = " + exitCode );
+        }
     }
 
     private void createInstallation( File dir )
