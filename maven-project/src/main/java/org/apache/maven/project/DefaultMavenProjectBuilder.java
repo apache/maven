@@ -880,6 +880,23 @@ public class DefaultMavenProjectBuilder
             {
                 parentDescriptor = new File( projectDir, parentRelativePath );
 
+                if ( parentDescriptor.isDirectory() )
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                                           "Path specified in <relativePath/> (" + parentRelativePath
+                                               + ") is a directory. Searching for 'pom.xml' within this directory." );
+                    }
+                    
+                    parentDescriptor = new File( parentDescriptor, "pom.xml" );
+
+                    if ( !parentDescriptor.exists() )
+                    {
+                        throw new ProjectBuildingException( projectId, "missing parent project descriptor: " + parentDescriptor.getAbsolutePath() );
+                    }
+                }
+
                 try
                 {
                     parentDescriptor = parentDescriptor.getCanonicalFile();
