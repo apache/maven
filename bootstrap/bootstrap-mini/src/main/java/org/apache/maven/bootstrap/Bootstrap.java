@@ -138,16 +138,20 @@ public class Bootstrap
 
         String basedir = System.getProperty( "user.dir" );
 
+        File pom = new File( basedir, "pom.xml" );
+        ModelReader reader = readModel( resolver, pom, true );
+        File jar = buildProject( reader );
+
         if ( "install".equals( goal ) )
         {
-            File pom = new File( basedir, "pom.xml" );
-            ModelReader reader = readModel( resolver, pom, true );
-            File jar = buildProject( reader );
             install( reader, pom, jar );
         }
-        else
+
+        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
         {
-            buildProject( new File( basedir ), false );
+            Dependency dep = (Dependency) i.next();
+
+            FileUtils.copyFileToDirectory( resolver.getArtifactFile( dep ), jar.getParentFile() );
         }
 
         stats( fullStart, new Date() );

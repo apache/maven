@@ -17,6 +17,6 @@ BOOTSTRAP_JAR=../bootstrap-mini/target/bootstrap-mini-2.0.1-SNAPSHOT.jar
 
 (
   cd ..
-  java -classpath bootstrap/bootstrap-installer/target/bootstrap-installer-2.0.1-SNAPSHOT.jar:bootstrap/bootstrap-mini/target/bootstrap-mini-2.0.1-SNAPSHOT.jar org.apache.maven.bootstrap.installer.BootstrapInstaller
+  java -jar bootstrap/bootstrap-installer/target/bootstrap-installer-2.0.1-SNAPSHOT.jar
 )
 

@@ -20,6 +20,9 @@ import org.apache.maven.bootstrap.model.Dependency;
 import org.apache.maven.bootstrap.model.ModelReader;
 import org.apache.maven.bootstrap.util.FileUtils;
 import org.apache.maven.bootstrap.Bootstrap;
+import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.CommandLineException;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +74,7 @@ public class BootstrapInstaller
     }
 
     private void createInstallation( File dir )
-        throws IOException
+        throws IOException, CommandLineException, InterruptedException
     {
         FileUtils.deleteDirectory( dir );
 
@@ -117,5 +120,18 @@ public class BootstrapInstaller
         File srcBinDirectory = new File( reader.getProjectFile().getParentFile(), "src/bin" );
 
         FileUtils.copyDirectory( srcBinDirectory, binDirectory, null, "**/.svn/**" );
+
+        if ( Os.isFamily( "unix" ) )
+        {
+            Commandline cli = new Commandline();
+
+            cli.setExecutable( "chmod" );
+
+            cli.createArgument().setValue( "+x" );
+
+            cli.createArgument().setValue( new File( binDirectory, "mvn" ).getAbsolutePath() );
+
+            cli.execute().waitFor();
+        }
     }
 }
