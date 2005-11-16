@@ -52,6 +52,10 @@ public class BootstrapInstaller
 
     private boolean buildPlugins;
 
+    private boolean updateSnapshots;
+
+    private boolean offline;
+
     public BootstrapInstaller( SimpleArgumentParser parser )
         throws Exception
     {
@@ -62,17 +66,22 @@ public class BootstrapInstaller
         this.buildPlugins = parser.isArgumentSet( "--build-plugins" );
 
         this.pluginsDirectory = parser.getArgumentValue( "--plugins-directory" );
+
+        // TODO: use from Bootstrap.java
+        this.updateSnapshots = parser.isArgumentSet( "--update-snapshots" );
+
+        this.offline = parser.isArgumentSet( "--offline" );
     }
 
     public static void main( String[] args )
         throws Exception
     {
-        System.out.println( "ARGS = " + Arrays.asList( args ) );
-
         SimpleArgumentParser parser = Bootstrap.createDefaultParser();
         parser.addArgument( "--prefix", "The location to install Maven", true, getDefaultPrefix() );
         parser.addArgument( "--build-plugins", "Build the plugins from SVN" );
         parser.addArgument( "--plugins-directory", "Where the plugins are located to build from", true );
+        parser.addArgument( "--update-snapshots", "Update snapshots during build" );
+        parser.addArgument( "--offline", "Run build in offline mode", "-o" );
 
         parser.parseCommandLineArguments( args );
 
@@ -148,7 +157,8 @@ public class BootstrapInstaller
                 throw new UnsupportedOperationException( "SVN checkout of plugins not yet supported" );
             }
 
-            runMaven( installation, new File( pluginsDirectory ), new String[]{ "clean", "install" } );
+            runMaven( installation, new File( pluginsDirectory ),
+                      new String[]{"--no-plugin-registry", "--fail-at-end", "clean", "install"} );
         }
 
         Bootstrap.stats( fullStart, new Date() );
@@ -186,6 +196,18 @@ public class BootstrapInstaller
         cli.addEnvironment( "JAVA_HOME", System.getProperty( "java.home" ) );
 
         cli.setWorkingDirectory( basedir.getAbsolutePath() );
+
+        cli.createArgument().setValue( "-e" );
+        cli.createArgument().setValue( "--batch-mode" );
+
+        if ( offline )
+        {
+            cli.createArgument().setValue( "-o" );
+        }
+        if ( updateSnapshots )
+        {
+            cli.createArgument().setValue( "--update-snapshots" );
+        }
 
         for ( int i = 0; i < args.length; i++ )
         {

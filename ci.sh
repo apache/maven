@@ -39,9 +39,7 @@ DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds
 DIST=m2-${TIMESTAMP}.tar.gz
 SVN=svn
 
-M2_HOME=$HOME/m2
-export M2_HOME
-PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
+PATH=$PATH:$JAVA_HOME/bin
 export PATH
 
 MESSAGE_DIR=$WWW/logs
@@ -132,7 +130,7 @@ fi
     (
       cd $DIR/maven-components
   
-      sh m2-bootstrap-all.sh -Dmaven.repo.local="$REPO" -Dmaven.home="$M2_HOME" --update-snapshots
+      sh bootstrap.sh --prefix=$DIR --update-snapshots
       ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     )    
     ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -140,13 +138,12 @@ fi
     # Only created on success
 
     echo
-    echo "Creating m2 distribution for public consumption: ${DEPLOY_SITE}/${DIST}"
+    echo "Creating Maven distribution for public consumption: ${DEPLOY_SITE}/${DIST}"
     echo
 
     mkdir -p $DEPLOY_DIR > /dev/null 2>&1
 
-    # Assumes pwd is still $HOME_DIR
-    gtar czf $DEPLOY_DIR/$DIST m2
+    cp $DIR/maven-components/maven-core/target/*.tar.gz $DEPLOY_DIR/$DIST
 
   else
   
