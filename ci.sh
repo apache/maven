@@ -39,7 +39,8 @@ DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds
 DIST=m2-${TIMESTAMP}.tar.gz
 SVN=svn
 
-PATH=$PATH:$JAVA_HOME/bin
+export M2_HOME=$HOME/maven-2.0.1-SNAPSHOT
+PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
 export PATH
 
 MESSAGE_DIR=$WWW/logs

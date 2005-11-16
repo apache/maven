@@ -12,7 +12,7 @@ ORIG_ARGS=$ARGS
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-BOOTSTRAP_JAR=bootstrap-mini/target/bootstrap-mini-2.0.1-SNAPSHOT.jar
+BOOTSTRAP_JAR=bootstrap-mini/target/bootstrap-mini.jar
 
 (
   cd bootstrap/bootstrap-installer
@@ -27,8 +27,8 @@ if [ -d $PLUGINS_DIR ]; then
   ARGS="$ARGS --build-plugins --plugins-directory=$PLUGINS_DIR"
 fi
 
-# TODO: get rid of M2_HOME?
-java -jar bootstrap/bootstrap-installer/target/bootstrap-installer-2.0.1-SNAPSHOT.jar --prefix=`dirname $M2_HOME` $ARGS
+# TODO: get rid of M2_HOME once integration tests are in here
+java -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --prefix=`dirname $M2_HOME` $ARGS
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 ARGS=$ORIG_ARGS

@@ -438,7 +438,7 @@ public class Bootstrap
 
         FileUtils.copyFile( pomFile, new File( pomPropertiesDir, "pom.xml" ) );
 
-        File jarFile = new File( buildDir, artifactId + "-" + version + ".jar" );
+        File jarFile = new File( buildDir, artifactId + ".jar" );
         jarMojo.execute( new File( classes ), jarFile );
 
         return jarFile;
