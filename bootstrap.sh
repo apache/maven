@@ -21,8 +21,7 @@ BOOTSTRAP_JAR=bootstrap-mini/target/bootstrap-mini.jar
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-#PLUGINS_DIR=../plugins
-PLUGINS_DIR=maven-plugins
+PLUGINS_DIR=../plugins
 if [ -d $PLUGINS_DIR ]; then
   ARGS="$ARGS --build-plugins --plugins-directory=$PLUGINS_DIR"
 fi

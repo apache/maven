@@ -13,7 +13,7 @@ You can set the parameters passed to the Java VM when running Maven2 bootstrap,
 setting the environment variable MAVEN_OPTS, e.g.
 e.g. to run in offline mode, set MAVEN_OPTS=-o
 
-Then run m2-bootstrap-all.bat (in Windows) or m2-bootstrap-all.sh (in Unix)
+Then run bootstrap.bat (in Windows) or bootstrap.sh (in Unix)
 
 NOTE: You must run these instructions from this directory!
 

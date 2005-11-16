@@ -39,7 +39,7 @@ DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds
 DIST=m2-${TIMESTAMP}.tar.gz
 SVN=svn
 
-export M2_HOME=$HOME/maven-2.0.1-SNAPSHOT
+export M2_HOME=$DIR/maven-2.0.1-SNAPSHOT
 PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
 export PATH
 
@@ -86,6 +86,7 @@ fi
       cd $DIR
         
       $SVN co http://svn.apache.org/repos/asf/maven/components/trunk maven-components > $HOME_DIR/$SCM_LOG 2>&1
+      $SVN co http://svn.apache.org/repos/asf/maven/plugins/trunk plugins > $HOME_DIR/$SCM_LOG 2>&1
     
       echo "true" > $HOME_DIR/build_required     
     )
