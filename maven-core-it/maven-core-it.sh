@@ -2,7 +2,7 @@
 
 # This process assumes that maven-core-it-verifier has been built.
 
-cp=../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
+cp=../maven-core-it-verifier/target/maven-core-it-verifier.jar
 
 verifier=org.apache.maven.it.Verifier
 
