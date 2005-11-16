@@ -32,6 +32,7 @@ import org.apache.maven.bootstrap.settings.Settings;
 import org.apache.maven.bootstrap.util.FileUtils;
 import org.apache.maven.bootstrap.util.IsolatedClassLoader;
 import org.apache.maven.bootstrap.util.JarMojo;
+import org.apache.maven.bootstrap.util.SimpleArgumentParser;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -75,26 +76,39 @@ public class Bootstrap
 
     private final ArtifactResolver resolver;
 
-    public Bootstrap( String[] args )
+    private static final String USER_HOME = System.getProperty( "user.home" );
+
+    public Bootstrap( SimpleArgumentParser parser )
         throws Exception
     {
-        String userHome = System.getProperty( "user.home" );
-
-        File settingsXml = getSettingsPath( userHome, args );
+        File settingsXml = new File( parser.getArgumentValue( "--settings" ) );
 
         System.out.println( "Using settings from " + settingsXml );
 
-        Settings settings = Settings.read( userHome, settingsXml );
+        Settings settings = Settings.read( USER_HOME, settingsXml );
 
         // TODO: have an alternative implementation of ArtifactResolver for source compiles
         //      - if building from source, checkout and build then resolve to built jar (still download POM?)
         resolver = setupRepositories( settings );
     }
 
+    public static SimpleArgumentParser createDefaultParser()
+    {
+        File defaultSettingsFile = new File( USER_HOME, ".m2/settings.xml" );
+        SimpleArgumentParser parser = new SimpleArgumentParser();
+        parser.addArgument( "--settings", "The location of the settings.xml file", "-s", true,
+                            defaultSettingsFile.getAbsolutePath() );
+        return parser;
+    }
+
     public static void main( String[] args )
         throws Exception
     {
-        Bootstrap bootstrap = new Bootstrap( args );
+        SimpleArgumentParser parser = createDefaultParser();
+
+        parser.parseCommandLineArguments( args );
+
+        Bootstrap bootstrap = new Bootstrap( parser );
 
         String goal = null;
         for ( int i = 0; i < args.length && goal == null; i++ )
@@ -112,23 +126,6 @@ public class Bootstrap
         }
 
         bootstrap.run( goal );
-    }
-
-    private static File getSettingsPath( String userHome, String[] args )
-        throws Exception
-    {
-        for ( int i = 0; i < args.length; i++ )
-        {
-            if ( args[i].equals( "-s" ) || args[i].equals( "--settings" ) )
-            {
-                if ( i == args.length - 1 )
-                {
-                    throw new Exception( "missing argument to -s" );
-                }
-                return new File( args[i + 1] );
-            }
-        }
-        return new File( userHome, ".m2/settings.xml" );
     }
 
     private void run( String goal )

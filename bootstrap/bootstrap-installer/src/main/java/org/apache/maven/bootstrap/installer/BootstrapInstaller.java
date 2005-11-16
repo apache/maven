@@ -20,8 +20,9 @@ import org.apache.maven.bootstrap.Bootstrap;
 import org.apache.maven.bootstrap.model.Dependency;
 import org.apache.maven.bootstrap.model.ModelReader;
 import org.apache.maven.bootstrap.util.FileUtils;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.bootstrap.util.SimpleArgumentParser;
 import org.codehaus.plexus.util.Expand;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -30,11 +31,9 @@ import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.zip.ZipInputStream;
 
 /**
  * Main class for bootstrap module.
@@ -46,31 +45,47 @@ public class BootstrapInstaller
 {
     private final Bootstrap bootstrapper;
 
-    public BootstrapInstaller( String[] args )
+    private final String prefix;
+
+    public BootstrapInstaller( SimpleArgumentParser parser )
         throws Exception
     {
-        this.bootstrapper = new Bootstrap( args );
+        this.bootstrapper = new Bootstrap( parser );
+
+        this.prefix = parser.getArgumentValue( "--prefix" );
     }
 
     public static void main( String[] args )
         throws Exception
     {
-        BootstrapInstaller bootstrap = new BootstrapInstaller( args );
+        SimpleArgumentParser parser = Bootstrap.createDefaultParser();
+        parser.addArgument( "--prefix", "The location to install Maven", true, getDefaultPrefix() );
+
+        parser.parseCommandLineArguments( args );
+
+        BootstrapInstaller bootstrap = new BootstrapInstaller( parser );
 
         bootstrap.run();
+    }
+
+    private static String getDefaultPrefix()
+    {
+        String value;
+        if ( Os.isFamily( "windows" ) )
+        {
+            value = "c:\\program files";
+        }
+        else
+        {
+            value = "/usr/local";
+        }
+        return value;
     }
 
     private void run()
         throws Exception
     {
         Date fullStart = new Date();
-
-        // TODO: use parameters instead, and use --prefix
-        String mavenHome = System.getProperty( "maven.home" );
-        if ( mavenHome == null )
-        {
-            throw new Exception( "maven.home system property is required" );
-        }
 
         String basedir = System.getProperty( "user.dir" );
 
@@ -92,17 +107,26 @@ public class BootstrapInstaller
         File mavenCoreDir = mavenCoreModel.getProjectFile().getParentFile();
         runMaven( installation, mavenCoreDir, new String[]{"clean", "assembly:assembly"} );
 
-        File file = new File( mavenCoreDir, "target/maven-" + mavenCoreModel.getVersion() + "-bin.zip" );
+        String finalName = "maven-" + mavenCoreModel.getVersion();
+        File file = new File( mavenCoreDir, "target/" + finalName + "-bin.zip" );
+
+        File mavenHome = new File( prefix, finalName );
+
+        System.out.println( "Installing Maven in " + mavenHome );
 
         FileUtils.deleteDirectory( mavenHome );
 
         Expand expand = new Expand();
         expand.setSrc( file );
-        File prefix = new File( mavenHome ).getParentFile();
-        expand.setDest( prefix );
+        expand.setDest( new File( prefix ) );
         expand.execute();
 
-        fixScriptPermissions( new File( prefix, "maven-" + mavenCoreModel.getVersion() + "/bin" ) );
+        if ( !mavenHome.exists() )
+        {
+            throw new Exception( "Maven was not installed in " + mavenHome );
+        }
+
+        fixScriptPermissions( new File( mavenHome, "bin" ) );
 
         Bootstrap.stats( fullStart, new Date() );
     }
