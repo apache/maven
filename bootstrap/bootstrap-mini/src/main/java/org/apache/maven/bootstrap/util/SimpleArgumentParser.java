@@ -156,7 +156,8 @@ public class SimpleArgumentParser
 
     public boolean isArgumentSet( String argument )
     {
-        return arguments.containsKey( argument );
+        Argument arg = (Argument) arguments.get( argument );
+        return arg.isSet();
     }
 
     private static class Argument
