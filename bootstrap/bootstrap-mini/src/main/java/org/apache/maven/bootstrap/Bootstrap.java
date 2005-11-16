@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +57,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.Collections;
 
 /**
  * Main class for bootstrap module.
@@ -332,7 +332,9 @@ public class Bootstrap
                 generatedSourcesDirectory.mkdirs();
             }
 
-            File artifactFile = resolver.getArtifactFile( plugin.asDependencyPom() );
+            Dependency dependency = plugin.asDependencyPom();
+            resolver.downloadDependencies( Collections.singletonList( dependency ) );
+            File artifactFile = resolver.getArtifactFile( dependency );
             ModelReader pluginReader = readModel( resolver, artifactFile, true );
 
             ClassLoader classLoader =
