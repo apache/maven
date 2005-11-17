@@ -10,10 +10,12 @@ if exist %buildDir% rmdir /S/Q %buildDir%
 mkdir %buildDir%
 mkdir %classesDir%
 
+del bootstrap-mini.jar
+
 dir /B /s %srcDir%\*.java >sources
 "%JAVA_HOME%\bin\javac" -d %classesDir% @sources
 del /F/Q sources
 
 cd %classesDir% 
-"%JAVA_HOME%\bin\jar" -cfm ..\bootstrap-mini.jar ..\..\src\main\resources\META-INF\MANIFEST.MF *.*
+"%JAVA_HOME%\bin\jar" -cfm ..\..\bootstrap-mini.jar ..\..\src\main\resources\META-INF\MANIFEST.MF *.*
 cd ..\..

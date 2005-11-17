@@ -126,7 +126,11 @@ set BUILD_ARGS=%MAVEN_CMD_LINE_ARGS% --build-plugins --plugins-directory=%PLUGIN
 :doBuild
 
 REM TODO: get rid of M2_HOME once integration tests are in here
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --prefix=%M2_HOME%\.. %BUILD_ARGS%
+set PREFIX=%M2_HOME%\..
+set OLD_M2_HOME=%M2_HOME%
+set M2_HOME=
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --prefix=%PREFIX% %BUILD_ARGS%
+set M2_HOME=%OLD_M2_HOME%
 
 REM TODO: should we be going back to the mini now that we have the real thing?
 cd maven-core-it-verifier

@@ -734,7 +734,11 @@ public class Bootstrap
                 throw new FileNotFoundException( "Missing dependency: " + dependency + msg );
             }
 
-            cl.addURL( f.toURL() );
+            // Classes won't be unloaded, but we might delete the JAR, so they need to be copied to a temporary location
+            File newFile = File.createTempFile( "maven-bootstrap", "dep" );
+            newFile.deleteOnExit();
+            FileUtils.copyFile( f, newFile );
+            cl.addURL( newFile.toURL() );
         }
 
         return cl;

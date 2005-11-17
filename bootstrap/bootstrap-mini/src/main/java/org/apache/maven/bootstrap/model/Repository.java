@@ -54,14 +54,6 @@ public class Repository
         this.releases = releases;
     }
 
-    private File getArtifactFile( String groupId, String artifactId, String version, String type )
-    {
-        Dependency d = new Dependency( groupId, artifactId, version, type, Collections.EMPTY_LIST );
-
-        return getArtifactFile( d );
-
-    }
-
     public File getArtifactFile( Dependency dependency )
     {
         String repositoryPath = getArtifactPath( dependency );

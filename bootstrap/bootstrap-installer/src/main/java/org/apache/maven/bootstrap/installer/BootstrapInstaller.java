@@ -186,76 +186,12 @@ public class BootstrapInstaller
         }
     }
 
-    private Properties getEnvVars()
-        throws Exception
-    {
-        // TODO : put this method in Commandline class
-        Process p = null;
-
-        Properties envVars = new Properties();
-
-        Runtime r = Runtime.getRuntime();
-
-        String os = System.getProperty( "os.name" ).toLowerCase();
-
-        //If this is windows set the shell to command.com or cmd.exe with correct arguments.
-        if ( os.indexOf( "Windows" ) != -1 )
-        {
-            if (os.indexOf("95") != -1 || os.indexOf("98") != -1 || os.indexOf("Me") != -1)
-            {
-                p = r.exec( "command.com /c set" );
-            }
-            else
-            {
-                p = r.exec( "cmd.exe /c set" );
-            }
-        }
-        else
-        {
-            p = r.exec( "env" );
-        }
-
-        BufferedReader br = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
-
-        String line;
-
-        while( ( line = br.readLine() ) != null )
-        {
-            int idx = line.indexOf( '=' );
-
-            String key = line.substring( 0, idx );
-
-            String value = line.substring( idx + 1 );
-
-            envVars.setProperty( key, value );
-            // System.out.println( key + " = " + value );
-        }
-
-        return envVars;
-    }
-
     private void runMaven( File installation, File basedir, String[] args )
         throws Exception, InterruptedException
     {
         Commandline cli = new Commandline();
 
         cli.setExecutable( new File( installation, "bin/mvn" ).getAbsolutePath() );
-
-        // we need to add actual environment variable, because they don't added in commandline when
-        //we add new environment variables
-        Properties envVars = getEnvVars();
-
-        for ( Iterator i = envVars.keySet().iterator(); i.hasNext(); )
-        {
-            String key = (String) i.next();
-
-            cli.addEnvironment( key, envVars.getProperty( key ) );
-        }
-
-        // TODO: should we just remove this from the equation?
-        cli.addEnvironment( "M2_HOME", installation.getAbsolutePath() );
-        // No env is passed through
-        cli.addEnvironment( "JAVA_HOME", System.getProperty( "java.home" ) );
 
         cli.setWorkingDirectory( basedir.getAbsolutePath() );
 
@@ -311,18 +247,19 @@ public class BootstrapInstaller
         {
             Dependency dep = (Dependency) i.next();
 
+            File artifactFile = bootstrapper.getArtifactFile( dep );
             if ( dep.getArtifactId().equals( "classworlds" ) )
             {
-                FileUtils.copyFileToDirectory( bootstrapper.getArtifactFile( dep ), bootDirectory );
+                FileUtils.copyFileToDirectory( artifactFile, bootDirectory );
             }
             else if ( dep.getArtifactId().equals( "plexus-container-default" ) ||
                 dep.getArtifactId().equals( "plexus-utils" ) )
             {
-                FileUtils.copyFileToDirectory( bootstrapper.getArtifactFile( dep ), coreDirectory );
+                FileUtils.copyFileToDirectory( artifactFile, coreDirectory );
             }
             else
             {
-                FileUtils.copyFileToDirectory( bootstrapper.getArtifactFile( dep ), libDirectory );
+                FileUtils.copyFileToDirectory( artifactFile, libDirectory );
             }
         }
 

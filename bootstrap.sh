@@ -7,16 +7,16 @@ ORIG_ARGS=$ARGS
   cd bootstrap/bootstrap-mini
   ./build
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-  java -jar target/bootstrap-mini.jar install $ARGS
+  java $MAVEN_OPTS -jar bootstrap-mini.jar install $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-BOOTSTRAP_JAR=bootstrap-mini/target/bootstrap-mini.jar
+BOOTSTRAP_JAR=bootstrap-mini/bootstrap-mini.jar
 
 (
   cd bootstrap/bootstrap-installer
-  java -jar ../$BOOTSTRAP_JAR package $ARGS
+  java $MAVEN_OPTS -jar ../$BOOTSTRAP_JAR package $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -27,15 +27,31 @@ if [ -d $PLUGINS_DIR ]; then
 fi
 
 # TODO: get rid of M2_HOME once integration tests are in here
-java -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --prefix=`dirname $M2_HOME` $ARGS
+PREFIX=`dirname $M2_HOME`
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+if [ "$cygwin" = "true" ]; then
+  PREFIX=`cygpath -w $PREFIX`
+  JAVA_HOME=`cygpath -w $JAVA_HOME`
+fi
+
+OLD_M2_HOME=$M2_HOME
+unset M2_HOME
+java $MAVEN_OPTS -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --prefix=$PREFIX $ARGS
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+M2_HOME=$OLD_M2_HOME
 
 ARGS=$ORIG_ARGS
 
 (
   # TODO: should w ebe going back to the mini now that we have the real thing?
   cd maven-core-it-verifier
-  java -jar ../bootstrap/$BOOTSTRAP_JAR package $ARGS
+  java $MAVEN_OPTS -jar ../bootstrap/$BOOTSTRAP_JAR package $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -44,7 +60,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   cd ./maven-core-it
   echo
   echo "Running maven-core integration tests ..."
-  echo 
+  echo
   ./maven-core-it.sh $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
