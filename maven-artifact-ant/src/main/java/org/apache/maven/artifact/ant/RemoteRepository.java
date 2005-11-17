@@ -62,12 +62,12 @@ public class RemoteRepository
 
     public Proxy getProxy()
     {
-        return proxy;
+        return ( (RemoteRepository) getInstance() ).proxy;
     }
 
     public RepositoryPolicy getSnapshots()
     {
-        return snapshots;
+        return ( (RemoteRepository) getInstance() ).snapshots;
     }
 
     public void addSnapshots( RepositoryPolicy snapshots )
@@ -77,7 +77,7 @@ public class RemoteRepository
 
     public RepositoryPolicy getReleases()
     {
-        return releases;
+        return ( (RemoteRepository) getInstance() ).releases;
     }
 
     public void addReleases( RepositoryPolicy releases )

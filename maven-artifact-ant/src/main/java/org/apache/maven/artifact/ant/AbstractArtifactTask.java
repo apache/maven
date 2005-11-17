@@ -91,7 +91,7 @@ public abstract class AbstractArtifactTask
         Authentication authentication = repository.getAuthentication();
         if ( authentication != null )
         {
-            manager.addAuthenticationInfo( "remote", authentication.getUserName(), authentication.getPassword(),
+            manager.addAuthenticationInfo( repository.getId(), authentication.getUserName(), authentication.getPassword(),
                                            authentication.getPrivateKey(), authentication.getPassphrase() );
         }
 
@@ -113,7 +113,7 @@ public abstract class AbstractArtifactTask
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repository.getSnapshots() );
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repository.getReleases() );
 
-            artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(),
+            artifactRepository = repositoryFactory.createArtifactRepository( repository.getId(), repository.getUrl(),
                                                                              repositoryLayout, snapshots, releases );
         }
         finally
@@ -157,6 +157,7 @@ public abstract class AbstractArtifactTask
     {
         Settings settings = getSettings();
         LocalRepository localRepository = new LocalRepository();
+        localRepository.setId( "local" );
         localRepository.setLocation( new File( settings.getLocalRepository() ) );
         return localRepository;
     }
@@ -232,6 +233,7 @@ public abstract class AbstractArtifactTask
         // As is, this could potentially cause a problem with 2 remote repositories with different authentication info
 
         RemoteRepository r = new RemoteRepository();
+        r.setId( pomRepository.getId() );
         r.setUrl( pomRepository.getUrl() );
         r.setLayout( pomRepository.getLayout() );
 
@@ -283,6 +285,7 @@ public abstract class AbstractArtifactTask
     {
         // TODO: could we utilise the super POM for this?
         RemoteRepository remoteRepository = new RemoteRepository();
+        remoteRepository.setId( "central" );
         remoteRepository.setUrl( "http://repo1.maven.org/maven2" );
         RepositoryPolicy snapshots = new RepositoryPolicy();
         snapshots.setEnabled( false );

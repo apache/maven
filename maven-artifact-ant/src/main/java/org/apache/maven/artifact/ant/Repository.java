@@ -16,6 +16,7 @@ package org.apache.maven.artifact.ant;
  * limitations under the License.
  */
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
 
 /**
@@ -27,10 +28,27 @@ import org.apache.tools.ant.ProjectComponent;
 public abstract class Repository
     extends ProjectComponent
 {
+	private String id;
+	
     private String refid;
 
     private String layout = "default";
 
+    public String getId()
+    {
+    	    System.out.println("Repository.getId() == " + getInstance().id);
+    	    if (getInstance().id == null)
+    	    {
+    	    	    throw new BuildException("id must be specified for a repository definition");
+    	    }
+    	    return getInstance().id;
+    }
+    
+    public void setId( String id )
+    {
+    	    this.id = id;
+    }
+    
     public String getRefid()
     {
         return refid;
