@@ -969,6 +969,11 @@ public class DefaultMavenProjectBuilder
                 model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
             }
 
+            if ( model != null && !"pom".equals( model.getPackaging() ) )
+            {
+                throw new ProjectBuildingException( projectId, "Project's parent has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
+            }
+            
             File parentProjectDir = null;
             if ( parentDescriptor != null )
             {
