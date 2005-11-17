@@ -3,6 +3,7 @@ package org.apache.maven.project;
 import junit.framework.TestCase;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 
 /*
@@ -96,4 +97,108 @@ public class ModelUtilsTest
         assertEquals( 0, child.getExecutions().size() );
     }
 
+    /**
+     * Verifies MNG-1499: The order of the merged list should be the plugins specified by the parent followed by the 
+     * child list.
+     */
+    public void testShouldKeepOriginalPluginOrdering()
+    {
+        Plugin parentPlugin1 = new Plugin();
+        parentPlugin1.setArtifactId( "testArtifact" );
+        parentPlugin1.setGroupId( "zzz" );  // This will put this plugin last in the sorted map
+        parentPlugin1.setVersion( "1.0" );
+
+        PluginExecution parentExecution1 = new PluginExecution();
+        parentExecution1.setId( "testExecution" );
+
+        parentPlugin1.addExecution( parentExecution1 );
+        
+        Plugin parentPlugin2 = new Plugin();
+        parentPlugin2.setArtifactId( "testArtifact" );
+        parentPlugin2.setGroupId( "yyy" );
+        parentPlugin2.setVersion( "1.0" );
+        
+        PluginExecution parentExecution2 = new PluginExecution();
+        parentExecution2.setId( "testExecution" );
+        
+        parentPlugin2.addExecution( parentExecution2 );
+        
+        PluginContainer parentContainer = new PluginContainer();
+        parentContainer.addPlugin(parentPlugin1);
+        parentContainer.addPlugin(parentPlugin2);
+
+        
+        Plugin childPlugin1 = new Plugin();
+        childPlugin1.setArtifactId( "testArtifact" );
+        childPlugin1.setGroupId( "bbb" );
+        childPlugin1.setVersion( "1.0" );
+
+        PluginExecution childExecution1 = new PluginExecution();
+        childExecution1.setId( "testExecution" );
+
+        childPlugin1.addExecution( childExecution1 );
+        
+        Plugin childPlugin2 = new Plugin();
+        childPlugin2.setArtifactId( "testArtifact" );
+        childPlugin2.setGroupId( "aaa" );
+        childPlugin2.setVersion( "1.0" );
+        
+        PluginExecution childExecution2 = new PluginExecution();
+        childExecution2.setId( "testExecution" );
+        
+        childPlugin2.addExecution( childExecution2 );
+        
+        PluginContainer childContainer = new PluginContainer();
+        childContainer.addPlugin(childPlugin1);
+        childContainer.addPlugin(childPlugin2);
+        
+
+        ModelUtils.mergePluginLists(childContainer, parentContainer, true);
+        
+        assertEquals( 4, childContainer.getPlugins().size() );
+        assertSame(parentPlugin1, childContainer.getPlugins().get(0));
+        assertSame(parentPlugin2, childContainer.getPlugins().get(1));
+        assertSame(childPlugin1, childContainer.getPlugins().get(2));
+        assertSame(childPlugin2, childContainer.getPlugins().get(3));
+    }
+
+    /**
+     * Verifies MNG-1499: The ordering of plugin executions should also be in the specified order.
+     */
+    public void testShouldKeepOriginalPluginExecutionOrdering()
+    {
+        Plugin parent = new Plugin();
+        parent.setArtifactId( "testArtifact" );
+        parent.setGroupId( "testGroup" );
+        parent.setVersion( "1.0" );
+
+        PluginExecution parentExecution1 = new PluginExecution();
+        parentExecution1.setId( "zzz" );  // Will show up last in the sorted map
+        PluginExecution parentExecution2 = new PluginExecution();
+        parentExecution2.setId( "yyy" );  // Will show up last in the sorted map
+
+        parent.addExecution( parentExecution1 );
+        parent.addExecution( parentExecution2 );
+
+        Plugin child = new Plugin();
+        child.setArtifactId( "testArtifact" );
+        child.setGroupId( "testGroup" );
+        child.setVersion( "1.0" );
+
+        PluginExecution childExecution1 = new PluginExecution();
+        childExecution1.setId( "bbb" );
+        PluginExecution childExecution2 = new PluginExecution();
+        childExecution2.setId( "aaa" );
+
+        child.addExecution( childExecution1 );
+        child.addExecution( childExecution2 );
+
+        ModelUtils.mergePluginDefinitions( child, parent, false );
+
+        assertEquals( 4, child.getExecutions().size() );
+        assertSame(parentExecution1, child.getExecutions().get(0));
+        assertSame(parentExecution2, child.getExecutions().get(1));
+        assertSame(childExecution1, child.getExecutions().get(2));
+        assertSame(childExecution2, child.getExecutions().get(3));
+    }
 }

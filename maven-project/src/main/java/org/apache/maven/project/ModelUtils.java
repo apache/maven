@@ -64,6 +64,8 @@ public final class ModelUtils
             // nothing to do.
             return;
         }
+        
+        List mergedPlugins = new ArrayList();
 
         List parentPlugins = parentContainer.getPlugins();
 
@@ -99,7 +101,7 @@ public final class ModelUtils
                         assembledPlugin.unsetInheritanceApplied();
                     }
 
-                    assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
+                    mergedPlugins.add(assembledPlugin);
                 }
             }
 
@@ -109,11 +111,11 @@ public final class ModelUtils
 
                 if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
                 {
-                    assembledPlugins.put( childPlugin.getKey(), childPlugin );
+                    mergedPlugins.add(childPlugin);
                 }
             }
 
-            childContainer.setPlugins( new ArrayList( assembledPlugins.values() ) );
+            childContainer.setPlugins(mergedPlugins);
 
             childContainer.flushPluginMap();
         }
@@ -215,6 +217,8 @@ public final class ModelUtils
 
         if ( parentExecutions != null && !parentExecutions.isEmpty() )
         {
+            List mergedExecutions = new ArrayList();
+            
             Map assembledExecutions = new TreeMap();
 
             Map childExecutions = child.getExecutionsAsMap();
@@ -241,22 +245,21 @@ public final class ModelUtils
                     }
 
                     assembledExecutions.put( assembled.getId(), assembled );
+                    mergedExecutions.add(assembled);
                 }
             }
 
-            for ( Iterator it = childExecutions.entrySet().iterator(); it.hasNext(); )
+            for ( Iterator it = child.getExecutions().iterator(); it.hasNext(); )
             {
-                Map.Entry entry = (Map.Entry) it.next();
+                PluginExecution childExecution = (PluginExecution)it.next();
 
-                String id = (String) entry.getKey();
-
-                if ( !assembledExecutions.containsKey( id ) )
+                if ( !assembledExecutions.containsKey( childExecution.getId() ) )
                 {
-                    assembledExecutions.put( id, entry.getValue() );
+                    mergedExecutions.add(childExecution);
                 }
             }
 
-            child.setExecutions( new ArrayList( assembledExecutions.values() ) );
+            child.setExecutions(mergedExecutions);
 
             child.flushExecutionMap();
         }
