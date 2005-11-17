@@ -31,7 +31,7 @@
 @REM ----------------------------------------------------------------------------
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
-@echo on
+@echo off
 @REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
@@ -138,6 +138,8 @@ cd maven-core-it-verifier
 
 cd ..
 
+del bootstrap\bootstrap-mini.jar
+
 echo
 echo -----------------------------------------------------------------------
 echo Running integration tests
@@ -145,8 +147,6 @@ echo -----------------------------------------------------------------------
 cd maven-core-it
 call maven-core-it %MAVEN_CMD_LINE_ARGS%
 cd ..
-
-del bootstrap\bootstrap-mini.jar
 
 :end
 @REM set local scope for the variables with windows NT shell
