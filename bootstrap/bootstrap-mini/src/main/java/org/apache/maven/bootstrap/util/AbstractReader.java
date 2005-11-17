@@ -24,11 +24,11 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 
 /**
  * Parse an XML file.
@@ -52,12 +52,12 @@ public abstract class AbstractReader
         SAXParser parser = saxFactory.newSAXParser();
 
         // Cheap and cheerful. Please add more to skip if the parser chokes (or use the actual
-        StringWriter output = new StringWriter();
-        IOUtil.copy( new FileReader( file ), output);
-        String out = output.toString();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        IOUtil.copy( new FileInputStream( file ), output );
+        String out = output.toString( "UTF-8" );
         out = StringUtils.replace( out, "&oslash;", "\u00f8" );
 
-        InputSource is = new InputSource( new StringReader( out ) );
+        InputSource is = new InputSource( new ByteArrayInputStream( out.getBytes( "UTF-8" ) ) );
 
         try
         {
@@ -87,7 +87,7 @@ public abstract class AbstractReader
 
     private final void printParseError( String type, SAXParseException spe )
     {
-        System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " +
-                            spe.getMessage() );
+        System.err.println(
+            type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " + spe.getMessage() );
     }
 }
