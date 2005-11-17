@@ -971,7 +971,7 @@ public class DefaultMavenProjectBuilder
 
             if ( model != null && !"pom".equals( model.getPackaging() ) )
             {
-                throw new ProjectBuildingException( projectId, "Project's parent has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
+                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " + projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
             }
             
             File parentProjectDir = null;
