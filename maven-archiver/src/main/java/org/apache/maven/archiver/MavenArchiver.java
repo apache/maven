@@ -216,6 +216,12 @@ public class MavenArchiver
     public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration )
         throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
     {
+        // we have to clone the project instance so we can write out the pom with the deployment version,
+        // without impacting the main project instance...
+        MavenProject workingProject = new MavenProject( project );
+
+        File pomPropertiesFile = new File( workingProject.getFile().getParentFile(), "pom.properties" );
+
         if ( archiveConfiguration.isAddMavenDescriptor() )
         {
             // ----------------------------------------------------------------------
@@ -229,10 +235,6 @@ public class MavenArchiver
             // POM information without the use of maven tools can do so.
             // ----------------------------------------------------------------------
     
-            // we have to clone the project instance so we can write out the pom with the deployment version,
-            // without impacting the main project instance...
-            MavenProject workingProject = new MavenProject( project );
-
             if ( workingProject.getArtifact().isSnapshot() )
             {
                 workingProject.setVersion( workingProject.getArtifact().getVersion() );
@@ -257,8 +259,6 @@ public class MavenArchiver
             p.setProperty( "artifactId", workingProject.getArtifactId() );
 
             p.setProperty( "version", workingProject.getVersion() );
-
-            File pomPropertiesFile = new File( workingProject.getFile().getParentFile(), "pom.properties" );
 
             OutputStream os = new FileOutputStream( pomPropertiesFile );
 
@@ -335,8 +335,10 @@ public class MavenArchiver
         archiver.createArchive();
 
         // Cleanup
-
-        pomPropertiesFile.delete();
+        if ( archiveConfiguration.isAddMavenDescriptor() )
+        {
+            pomPropertiesFile.delete();
+        }
     }
 
     private File writeExportReadyPom( MavenProject project )
