@@ -547,7 +547,7 @@
         <field>
           <name>properties</name>
           <description>Extended configuration specific to this profile goes
-            here.</description>
+              here.  Contents take the form of &lt;property.name&gt;property.value&lt;/property.name&gt;</description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
             <type>String</type>
