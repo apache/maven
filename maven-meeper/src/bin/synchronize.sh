@@ -24,6 +24,10 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
+# hack prevent commons-logging-1.1-dev
+rm /home/projects/maven/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging/1.1-dev/commons-logging-1.1-dev.jar*
+
+
 # get poms from svn and generate checksums
 (
   /home/projects/maven/components/maven-meeper/src/bin/update-poms.sh
