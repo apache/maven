@@ -35,6 +35,8 @@ public class MavenArchiveConfiguration
 
     private boolean index;
 
+    private boolean addMavenDescriptor = true;
+
     private File manifestFile;
 
     private ManifestConfiguration manifest;
@@ -51,6 +53,11 @@ public class MavenArchiveConfiguration
     public boolean isIndex()
     {
         return index;
+    }
+
+    public boolean isAddMavenDescriptor()
+    {
+        return addMavenDescriptor;
     }
 
     public File getManifestFile()
@@ -75,6 +82,11 @@ public class MavenArchiveConfiguration
     public void setIndex( boolean index )
     {
         this.index = index;
+    }
+
+    public void setAddMavenDescriptor( boolean addMavenDescriptor )
+    {
+        this.addMavenDescriptor = addMavenDescriptor;
     }
 
     public void setManifestFile( File manifestFile )
