@@ -154,6 +154,8 @@
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>par</type>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
@@ -163,6 +165,8 @@
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>ejb3</type>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
 
