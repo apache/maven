@@ -45,6 +45,7 @@ unset M2_HOME
 java $MAVEN_OPTS -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --prefix=$PREFIX $ARGS
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 M2_HOME=$OLD_M2_HOME
+export M2_HOME
 
 ARGS=$ORIG_ARGS
 
