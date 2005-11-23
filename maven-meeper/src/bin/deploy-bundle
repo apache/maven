@@ -116,5 +116,15 @@ echo $BUNDLE
     echo "Deploying JAR ..."
     mkdir -p $REPODIR/${groupId}/jars
     cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
-  fi    
+  fi
+  
+  if [ -f ${artifactId}-${version}-sources.jar ]
+  then
+    echo "Deploying Java sources ..."
+    mkdir -p $REPODIR/${groupId}/java-sources
+    cp -i ${artifactId}-${version}-sources.jar $REPODIR/${groupId}/java-sources
+  else
+    echo "No Java sources available in upload bundle, skipping ..."
+  fi
+
 )  
