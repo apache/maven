@@ -81,7 +81,8 @@ public class DefaultArtifactCollector
 
                     if ( node.filterTrail( filter ) )
                     {
-                        // If it was optional, we don't add it or its children, just allow the update of the version and scope
+                        // If it was optional and not a direct dependency, 
+                        // we don't add it or its children, just allow the update of the version and scope
                         if ( node.isChildOfRootNode() || !artifact.isOptional() )
                         {
                             artifact.setDependencyTrail( node.getDependencyTrail() );
