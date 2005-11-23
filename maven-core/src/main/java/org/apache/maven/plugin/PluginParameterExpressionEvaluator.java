@@ -142,7 +142,14 @@ public class PluginParameterExpressionEvaluator
             }
 
             // Was not an expression
-            return expression.replaceAll( "\\$\\$", "$" );
+            if ( expression.indexOf( "$$" ) > -1 )
+            {
+                return expression.replaceAll( "\\$\\$", "\\$" );
+            }
+            else
+            {
+                return expression;
+            }
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
