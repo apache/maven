@@ -154,7 +154,7 @@ public class MavenMetadataSource
                         }
                         if ( relocation.getVersion() != null )
                         {
-                            artifact.setVersion( relocation.getVersion() );
+                            artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
                         }
 
                         if ( artifact.getDependencyFilter() != null &&
