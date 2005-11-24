@@ -5,11 +5,14 @@ set -x
 svnlook=/usr/local/subversion/bin/svnlook 
 repos=/home/projects/maven/repository-staging/to-ibiblio/maven2
 
+# TODO: handle deletions
 $svnlook changed -r $2 $1 | egrep '\.pom$' | while read t1 t2
 do
-  mkdir -p `dirname $repos/$t2`
-  $svnlook cat -r $2 $1 $t2 >$repos/$t2
-  sha1sum $repos/$t2 >$repos/$t2.sha1
-  md5sum $repos/$t2 >$repos/$t2.md5
+  file=$repos/`echo $t2 | sed 's/^repository\///'`
+  mkdir -p `dirname $file`
+  $svnlook cat -r $2 $1 $t2 >$file
+  sha1sum $file >$file.sha1
+  md5sum $file >$file.md5
+  chgroup maven $file $file.md5 $file.sha1
 done
 
