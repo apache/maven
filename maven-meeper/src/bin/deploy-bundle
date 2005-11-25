@@ -83,6 +83,13 @@ echo $BUNDLE
   echo "artifactId: [${artifactId}]"
   echo
 
+  if [ -f $REPODIR/${groupId} ]
+  then
+    echo "The group already exists"
+  else
+    echo "The group does NOT already exist"
+  fi
+
   echo
   echo -n Hit Enter to continue or Ctrl-C to abort...
   read
