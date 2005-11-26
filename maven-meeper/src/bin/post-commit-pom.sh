@@ -13,6 +13,6 @@ do
   $svnlook cat -r $2 $1 $t2 >$file
   sha1sum $file >$file.sha1
   md5sum $file >$file.md5
-  chgroup maven $file $file.md5 $file.sha1
+  chgrp maven $file $file.md5 $file.sha1
 done
 
