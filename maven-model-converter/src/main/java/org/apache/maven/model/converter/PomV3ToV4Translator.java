@@ -575,7 +575,7 @@ public class PomV3ToV4Translator
                     String optional = v3Dep.getProperty( "optional" );
                     if ( StringUtils.isNotEmpty( optional ) )
                     {
-                        dep.setOptional( Boolean.parseBoolean( optional ) );
+                        dep.setOptional( Boolean.valueOf( optional ).booleanValue() );
                     }
 
                     deps.add( dep );

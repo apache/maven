@@ -16,8 +16,6 @@ package org.apache.maven.model.converter;
  * limitations under the License.
  */
 
-import com.sun.corba.se.impl.ior.ObjectAdapterIdArray;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
