@@ -1,0 +1,30 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.model.converter.ArtifactPomRewriter</role>
+      <role-hint>v3</role-hint>
+      <implementation>org.apache.maven.model.converter.V3PomRewriter</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.model.converter.ModelConverter</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.model.converter.ArtifactPomRewriter</role>
+      <role-hint>v4</role-hint>
+      <implementation>org.apache.maven.model.converter.V4PomRewriter</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.model.converter.ModelConverter</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.model.converter.ModelConverter</role>
+      <implementation>org.apache.maven.model.converter.PomV3ToV4Translator</implementation>
+    </component>
+  </components>
+</component-set>
