@@ -305,7 +305,7 @@ public class DefaultArtifact
         {
             return false;
         }
-        else if ( classifier == null ? a.getClassifier() != null : !a.getClassifier().equals( classifier ) )
+        else if ( a.getClassifier() == null ? classifier != null : !a.getClassifier().equals( classifier ) )
         {
             return false;
         }
