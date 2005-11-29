@@ -196,6 +196,14 @@
       <name>Maven Central Development Repository</name>
       <url>http://snapshots.maven.codehaus.org/maven2</url>
     </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <id>apache.snapshots</id>
+      <name>Apache Development Repository</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -256,9 +264,9 @@
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
     <snapshotRepository>
-      <id>snapshots</id>
-      <name>Maven Central Development Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2</url>
+      <id>apache.snapshots</id>
+      <name>Apache Development Repository</name>
+      <url>scp://minotaur.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
     </snapshotRepository>
     <site>
       <id>website</id>
