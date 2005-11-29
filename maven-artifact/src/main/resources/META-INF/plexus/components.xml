@@ -91,6 +91,7 @@
       <role-hint>java-source</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
+        <classifier>sources</classifier>
         <type>java-source</type>
         <extension>jar</extension>
         <language>java</language>
@@ -103,6 +104,7 @@
       <role-hint>javadoc</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
+        <classifier>javadoc</classifier>
         <type>javadoc</type>
         <extension>jar</extension>
         <language>java</language>
