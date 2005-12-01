@@ -45,7 +45,7 @@ public class MavenArchiver
     private JarArchiver archiver;
 
     private File archiveFile;
-
+    
     /**
      * Return a pre-configured manifest
      *
@@ -216,6 +216,13 @@ public class MavenArchiver
     public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration )
         throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
     {
+    	createArchive( project, archiveConfiguration, false );
+    }
+    
+    public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration,
+                               boolean excludePomFiles )
+        throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
+    {
         // we have to clone the project instance so we can write out the pom with the deployment version,
         // without impacting the main project instance...
         MavenProject workingProject = new MavenProject( project );
@@ -246,8 +253,12 @@ public class MavenArchiver
 
             File exportReadyPom = writeExportReadyPom( workingProject );
 
-            archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
-
+            if( !excludePomFiles )
+            {
+            	archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
+            }
+            
+            
             // ----------------------------------------------------------------------
             // Create pom.properties file
             // ----------------------------------------------------------------------
@@ -266,7 +277,10 @@ public class MavenArchiver
 
             os.close(); // stream is flushed but not closed by Properties.store()
 
-            archiver.addFile( pomPropertiesFile, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties" );
+            if( !excludePomFiles )
+            {
+            	archiver.addFile( pomPropertiesFile, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties" );
+            }
         }
 
         // ----------------------------------------------------------------------
