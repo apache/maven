@@ -216,13 +216,6 @@ public class MavenArchiver
     public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration )
         throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
     {
-    	createArchive( project, archiveConfiguration, false );
-    }
-    
-    public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration,
-                               boolean excludePomFiles )
-        throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
-    {
         // we have to clone the project instance so we can write out the pom with the deployment version,
         // without impacting the main project instance...
         MavenProject workingProject = new MavenProject( project );
@@ -253,10 +246,7 @@ public class MavenArchiver
 
             File exportReadyPom = writeExportReadyPom( workingProject );
 
-            if( !excludePomFiles )
-            {
-            	archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
-            }
+        	archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
             
             
             // ----------------------------------------------------------------------
@@ -277,10 +267,7 @@ public class MavenArchiver
 
             os.close(); // stream is flushed but not closed by Properties.store()
 
-            if( !excludePomFiles )
-            {
-            	archiver.addFile( pomPropertiesFile, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties" );
-            }
+        	archiver.addFile( pomPropertiesFile, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties" );
         }
 
         // ----------------------------------------------------------------------
