@@ -80,6 +80,11 @@ public final class DiagnosisUtils
     public static void appendRootCauseIfPresentAndUnique( Throwable error, StringBuffer message,
                                                           boolean includeTypeInfo )
     {
+        if ( error == null )
+        {
+            return;
+        }
+        
         Throwable root = getRootCause( error );
 
         if ( root != null && !root.equals( error ) )
