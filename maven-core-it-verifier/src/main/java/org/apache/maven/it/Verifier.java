@@ -604,11 +604,11 @@ public class Verifier
             String executable;
             if ( mavenHome != null )
             {
-                executable = mavenHome + "/bin/m2";
+                executable = mavenHome + "/bin/mvn";
             }
             else
             {
-                executable = "m2";
+                executable = "mvn";
             }
 
             cli.setExecutable( executable );
