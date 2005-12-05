@@ -102,6 +102,10 @@ fi
       cd $DIR/maven-components
       
       $SVN update > $HOME_DIR/$SCM_LOG 2>&1
+
+      cd $DIR/plugins
+
+      $SVN update >> $HOME_DIR/$SCM_LOG 2>&1
       
       grep "^[PUAD] " $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
