@@ -21,11 +21,15 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 /**
  * @author jdcasey
@@ -85,10 +89,30 @@ public class DefaultMavenSettingsBuilder
             try
             {
                 reader = new FileReader( settingsFile );
+                StringWriter sWriter = new StringWriter();
+                
+                IOUtil.copy( reader, sWriter );
+                
+                String rawInput = sWriter.toString();
+                
+                try
+                {
+                    RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+                    interpolator.addValueSource( new EnvarBasedValueSource() );
+                    
+                    rawInput = interpolator.interpolate( rawInput, "settings" );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
+                    getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
+                }
 
+                StringReader sReader = new StringReader( rawInput );
+                
                 SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
-                settings = modelReader.read( reader );
+                settings = modelReader.read( sReader );
 
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 

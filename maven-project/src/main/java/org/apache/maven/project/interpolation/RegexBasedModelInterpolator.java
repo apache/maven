@@ -20,17 +20,16 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
+import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.util.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.util.interpolation.ObjectBasedValueSource;
+import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
@@ -43,8 +42,6 @@ public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.)?([^}]+)\\}" );
-
     /**
      * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve
      * POM expressions, then re-parse into the resolved Model instance.
@@ -71,7 +68,24 @@ public class RegexBasedModelInterpolator
         }
 
         String serializedModel = sWriter.toString();
-        serializedModel = interpolateInternal( serializedModel, model, context );
+        
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+        
+        interpolator.addValueSource( new MapBasedValueSource( context ) );
+        interpolator.addValueSource( new MapBasedValueSource( model.getProperties() ) );
+        interpolator.addValueSource( new ObjectBasedValueSource( model ) );
+        
+        try
+        {
+            interpolator.addValueSource( new EnvarBasedValueSource() );
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "Cannot initialize environment variables resolver. Skipping environmental resolution." );
+            getLogger().debug( "Failed to initialize envar resolver. Skipping environmental resolution.", e );
+        }
+        
+        serializedModel = interpolator.interpolate(serializedModel, "pom|project" );
 
         StringReader sReader = new StringReader( serializedModel );
 
@@ -94,66 +108,4 @@ public class RegexBasedModelInterpolator
         return model;
     }
 
-    private String interpolateInternal( String src, Model model, Map context )
-        throws ModelInterpolationException
-    {
-        String result = src;
-        Matcher matcher = EXPRESSION_PATTERN.matcher( result );
-        while ( matcher.find() )
-        {
-            String wholeExpr = matcher.group( 0 );
-            String realExpr = matcher.group( 2 );
-
-            Object value = context.get( realExpr );
-
-            if ( value == null )
-            {
-                value = model.getProperties().getProperty( realExpr );
-            }
-
-            try
-            {
-                if ( value == null )
-                {
-                    value = ReflectionValueExtractor.evaluate( realExpr, model );
-                }
-            }
-            catch ( Exception e )
-            {
-                Logger logger = getLogger();
-                if ( logger != null )
-                {
-                    logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...",
-                                  e );
-                }
-            }
-
-            // if the expression refers to itself, skip it.
-            if ( wholeExpr.equals( value ) )
-            {
-                throw new ModelInterpolationException( wholeExpr, model.getId() + " references itself." );
-            }
-
-            if ( value != null )
-            {
-                result = StringUtils.replace( result, wholeExpr, String.valueOf( value ) );
-                // could use:
-                // result = matcher.replaceFirst( stringValue );
-                // but this could result in multiple lookups of stringValue, and replaceAll is not correct behaviour
-                matcher.reset( result );
-            }
-/*
-        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
-        // timing of executing the interpolation
-        
-            else
-            {
-                throw new ModelInterpolationException(
-                    "Expression '" + wholeExpr + "' did not evaluate to anything in the model" );
-            }
-*/
-        }
-
-        return result;
-    }
 }

@@ -17,14 +17,20 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class DefaultMavenProfilesBuilder
+    extends AbstractLogEnabled
     implements MavenProfilesBuilder
 {
     private static final String PROFILES_XML_FILE = "profiles.xml";
@@ -42,9 +48,28 @@ public class DefaultMavenProfilesBuilder
             FileReader fileReader = null;
             try
             {
-                fileReader = new FileReader( profilesXml );
+                StringWriter sWriter = new StringWriter();
+                
+                IOUtil.copy( fileReader, sWriter );
+                
+                String rawInput = sWriter.toString();
+                
+                try
+                {
+                    RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+                    interpolator.addValueSource( new EnvarBasedValueSource() );
+                    
+                    rawInput = interpolator.interpolate( rawInput, "settings" );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment substitution in " + PROFILES_XML_FILE + "." );
+                    getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
+                }
 
-                profilesRoot = reader.read( fileReader );
+                StringReader sReader = new StringReader( rawInput );
+
+                profilesRoot = reader.read( sReader );
             }
             finally
             {
