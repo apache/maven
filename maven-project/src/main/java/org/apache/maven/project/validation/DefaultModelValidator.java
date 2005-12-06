@@ -21,6 +21,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
@@ -59,6 +60,16 @@ public class DefaultModelValidator
         {
             result.addMessage( "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
                     "require 'pom' as packaging." );
+        }
+        
+        Parent parent = model.getParent();
+        if ( parent != null )
+        {
+            if ( parent.getGroupId().equals( model.getGroupId() ) && 
+                    parent.getArtifactId().equals( model.getArtifactId() ) )
+            {
+                result.addMessage( "The parent element cannot have the same ID as the project." );
+            }
         }
 
         validateStringNotEmpty( "version", result, model.getVersion() );

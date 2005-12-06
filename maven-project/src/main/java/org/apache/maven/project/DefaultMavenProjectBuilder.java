@@ -290,7 +290,14 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         MavenProject p = new MavenProject( model );
         p.setFile( projectDescriptor );
-        modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), p );
+        
+        String modelKey = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        if ( modelCache.containsKey( modelKey ) )
+        {
+            throw new ProjectBuildingException( model.getGroupId() + ":" + model.getArtifactId(), 
+                    "Duplicate project ID found in " + projectDescriptor.getAbsolutePath() );
+        }
+        modelCache.put( modelKey, p );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
                                       buildArtifactRepositories( getSuperModel() ),
@@ -851,6 +858,12 @@ public class DefaultMavenProjectBuilder
             else if ( StringUtils.isEmpty( parentModel.getArtifactId() ) )
             {
                 throw new ProjectBuildingException( projectId, "Missing artifactId element from parent element" );
+            }
+            else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&  
+                    parentModel.getArtifactId().equals( model.getArtifactId() ) )
+            {
+                throw new ProjectBuildingException( projectId, "Parent element is a duplicate of " +
+                        "the current project " );
             }
             else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
