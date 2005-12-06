@@ -27,6 +27,9 @@ svn ci -m 'update scm' pom.xml
 
 rm -Rf target
 
+mvn clean install
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+
 mvn -DgenerateReleasePoms=true -e release:prepare -Denv=test -B -Dtag=test-tag
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
