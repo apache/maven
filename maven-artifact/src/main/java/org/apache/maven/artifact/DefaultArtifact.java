@@ -541,4 +541,9 @@ public class DefaultArtifact
     {
         return versionRange.isSelectedVersionKnown( this );
     }
+
+    public void setOptional( boolean optional )
+    {
+        this.optional = optional;
+    }
 }

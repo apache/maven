@@ -249,7 +249,8 @@ public class DefaultMavenProjectBuilder
                     VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                     Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                                   versionRange, d.getType(),
-                                                                                  d.getClassifier(), d.getScope() );
+                                                                                  d.getClassifier(), d.getScope(), 
+                                                                                  d.isOptional() );
                     map.put( d.getManagementKey(), artifact );
                 }
                 catch ( InvalidVersionSpecificationException e )

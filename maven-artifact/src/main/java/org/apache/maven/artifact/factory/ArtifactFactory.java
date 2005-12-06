@@ -33,6 +33,9 @@ public interface ArtifactFactory
                                        String classifier, String scope );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                       String classifier, String scope, boolean optional );
+
+    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
                                        String classifier, String scope, String inheritedScope );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,

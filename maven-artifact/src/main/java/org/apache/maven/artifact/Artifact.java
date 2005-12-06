@@ -156,6 +156,8 @@ public interface Artifact
     void setAvailableVersions( List versions );
 
     boolean isOptional();
+    
+    void setOptional( boolean optional );
 
     ArtifactVersion getSelectedVersion()
         throws OverConstrainedVersionException;

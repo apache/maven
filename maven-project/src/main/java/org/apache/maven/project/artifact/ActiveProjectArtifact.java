@@ -288,4 +288,9 @@ public class ActiveProjectArtifact
     {
         return artifact.isSelectedVersionKnown();
     }
+
+    public void setOptional( boolean optional )
+    {
+        artifact.setOptional( optional );
+    }
 }
