@@ -29,6 +29,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -86,11 +87,24 @@ public class DefaultModelValidator
 
             validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(), dependencySourceHint( d ) );
 
-            if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
+            if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
             {
-                result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
+                String systemPath = d.getSystemPath();
+                
+                if ( StringUtils.isEmpty( systemPath ) )
+                {
+                    result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
+                }
+                else
+                {
+                    if ( ! new File( systemPath ).isAbsolute() )
+                    {
+                        result.addMessage( "For dependency " + d + ": system-scoped dependency must " +
+                                "specify an absolute path systemPath." );
+                    }
+                }
             }
-            else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
+            else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
             {
                 result.addMessage(
                     "For dependency " + d + ": only dependency with system scope can specify systemPath." );
@@ -110,12 +124,24 @@ public class DefaultModelValidator
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", result,
                                                   d.getGroupId() );
 
-                if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
+                if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
                 {
-                    result.addMessage(
-                        "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
+                    String systemPath = d.getSystemPath();
+                    
+                    if ( StringUtils.isEmpty( systemPath ) )
+                    {
+                        result.addMessage( "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
+                    }
+                    else
+                    {
+                        if ( ! new File( systemPath ).isAbsolute() )
+                        {
+                            result.addMessage( "For managed dependency " + d + ": system-scoped dependency must " +
+                                    "specify an absolute path systemPath." );
+                        }
+                    }
                 }
-                else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
+                else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
                 {
                     result.addMessage(
                         "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
