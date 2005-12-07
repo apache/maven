@@ -109,7 +109,7 @@ public class DefaultArtifactResolver
                 {
                     if ( !wagonManager.isOnline() )
                     {
-                        throw new ArtifactResolutionException( "System is offline.", artifact );
+                        throw new ArtifactNotFoundException( "System is offline.", artifact );
                     }
 
                     try
