@@ -375,7 +375,7 @@ public class DefaultWagonManager
                 // try to verify the SHA-1 checksum for this file.
                 try
                 {
-                    verifyChecksum( sha1ChecksumObserver, temp, remotePath, ".sha1", wagon );
+                    verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
                 }
                 catch ( ChecksumFailedException e )
                 {
@@ -401,7 +401,7 @@ public class DefaultWagonManager
                     // file...we'll try again with the MD5 checksum.
                     try
                     {
-                        verifyChecksum( md5ChecksumObserver, temp, remotePath, ".md5", wagon );
+                        verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
                     }
                     catch ( ChecksumFailedException e )
                     {
@@ -504,7 +504,7 @@ public class DefaultWagonManager
         // otherwise it is ignore
     }
 
-    private void verifyChecksum( ChecksumObserver checksumObserver, File destination, String remotePath,
+    private void verifyChecksum( ChecksumObserver checksumObserver, File destination, File tempDestination, String remotePath,
                                  String checksumFileExtension, Wagon wagon )
         throws ResourceDoesNotExistException, TransferFailedException, AuthorizationException
     {
@@ -513,11 +513,11 @@ public class DefaultWagonManager
             // grab it first, because it's about to change...
             String actualChecksum = checksumObserver.getActualChecksum();
 
-            File checksumFile = new File( destination + checksumFileExtension );
-            checksumFile.deleteOnExit();
-            wagon.get( remotePath + checksumFileExtension, checksumFile );
+            File tempChecksumFile = new File( tempDestination + checksumFileExtension + ".tmp" );
+            tempChecksumFile.deleteOnExit();
+            wagon.get( remotePath + checksumFileExtension, tempChecksumFile );
 
-            String expectedChecksum = FileUtils.fileRead( checksumFile );
+            String expectedChecksum = FileUtils.fileRead( tempChecksumFile );
 
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();
@@ -538,7 +538,13 @@ public class DefaultWagonManager
                     expectedChecksum = expectedChecksum.substring( 0, spacePos );
                 }
             }
-            if ( !expectedChecksum.equals( actualChecksum ) )
+            if ( expectedChecksum.equals( actualChecksum ) )
+            {
+                File checksumFile = new File( destination + checksumFileExtension );
+                if ( checksumFile.exists() ) checksumFile.delete();
+                FileUtils.copyFile( tempChecksumFile, checksumFile );
+            }
+            else
             {
                 throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum +
                     "'; remote = '" + expectedChecksum + "'" );
