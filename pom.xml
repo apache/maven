@@ -228,12 +228,12 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-9-SNAPSHOT</version>
+        <version>1.0-alpha-9</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
