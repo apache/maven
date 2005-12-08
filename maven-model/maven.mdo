@@ -1961,7 +1961,7 @@
             repository.  This is used by Maven when
             <a
               href="/plugins/dist/index.html">building versions</a>
-            from specific ID.
+            from specific ID. <a href="http://maven.apache.org/scm/scm-url-format.html">Url format</a>
           ]]></description>
           <type>String</type>
         </field>
