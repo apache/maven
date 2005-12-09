@@ -10,6 +10,7 @@
   <name>Maven Script Support Root</name>
   <version>2.0.1-SNAPSHOT</version>
   <modules>
+    <module>maven-script-ant</module>
     <module>maven-script-beanshell</module>
   </modules>
 </project>
