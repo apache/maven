@@ -48,6 +48,8 @@ public class DefaultMavenProfilesBuilder
             FileReader fileReader = null;
             try
             {
+                fileReader = new FileReader( profilesXml );
+                
                 StringWriter sWriter = new StringWriter();
                 
                 IOUtil.copy( fileReader, sWriter );
