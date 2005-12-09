@@ -42,6 +42,12 @@ public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
+    public Model interpolate( Model project, Map context )
+        throws ModelInterpolationException
+    {
+        return interpolate( project, context, true );
+    }
+
     /**
      * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve
      * POM expressions, then re-parse into the resolved Model instance.
@@ -52,7 +58,7 @@ public class RegexBasedModelInterpolator
      * @param context The other context map to be used during resolution
      * @return The resolved instance of the inbound Model. This is a different instance!
      */
-    public Model interpolate( Model model, Map context )
+    public Model interpolate( Model model, Map context, boolean strict )
         throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter();
@@ -68,13 +74,13 @@ public class RegexBasedModelInterpolator
         }
 
         String serializedModel = sWriter.toString();
-        
+
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-        
+
         interpolator.addValueSource( new MapBasedValueSource( context ) );
         interpolator.addValueSource( new MapBasedValueSource( model.getProperties() ) );
         interpolator.addValueSource( new ObjectBasedValueSource( model ) );
-        
+
         try
         {
             interpolator.addValueSource( new EnvarBasedValueSource() );
@@ -84,7 +90,7 @@ public class RegexBasedModelInterpolator
             getLogger().warn( "Cannot initialize environment variables resolver. Skipping environmental resolution." );
             getLogger().debug( "Failed to initialize envar resolver. Skipping environmental resolution.", e );
         }
-        
+
         serializedModel = interpolator.interpolate(serializedModel, "pom|project" );
 
         StringReader sReader = new StringReader( serializedModel );
@@ -92,7 +98,7 @@ public class RegexBasedModelInterpolator
         MavenXpp3Reader modelReader = new MavenXpp3Reader();
         try
         {
-            model = modelReader.read( sReader );
+            model = modelReader.read( sReader, strict );
         }
         catch ( IOException e )
         {

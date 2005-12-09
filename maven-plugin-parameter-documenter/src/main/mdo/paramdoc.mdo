@@ -30,19 +30,19 @@
       <codeSegments>
         <codeSegment>
           <version>1.0.0</version>
-          <code><![CDATA[    private Map expressionsBySyntax;
+          <code><![CDATA[    private java.util.Map expressionsBySyntax;
     
-    public Map getExpressionsBySyntax()
+    public java.util.Map getExpressionsBySyntax()
     {
         if ( expressionsBySyntax == null )
         {
-            expressionsBySyntax = new HashMap();
+            expressionsBySyntax = new java.util.HashMap();
        
-            List expressions = getExpressions();
+            java.util.List expressions = getExpressions();
        
             if ( expressions != null && !expressions.isEmpty() )
             {
-                for ( Iterator it = expressions.iterator(); it.hasNext(); )
+                for ( java.util.Iterator it = expressions.iterator(); it.hasNext(); )
                 {
                     Expression expr = (Expression) it.next();
        

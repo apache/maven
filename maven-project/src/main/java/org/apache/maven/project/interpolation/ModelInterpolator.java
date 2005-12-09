@@ -32,4 +32,6 @@ public interface ModelInterpolator
     Model interpolate( Model project, Map context )
         throws ModelInterpolationException;
 
+    Model interpolate( Model model, Map context, boolean strict )
+        throws ModelInterpolationException;
 }

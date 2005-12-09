@@ -268,7 +268,7 @@ public class DefaultRepositoryMetadataManager
 
             MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
-            result = mappingReader.read( fileReader );
+            result = mappingReader.read( fileReader, false );
         }
         catch ( FileNotFoundException e )
         {

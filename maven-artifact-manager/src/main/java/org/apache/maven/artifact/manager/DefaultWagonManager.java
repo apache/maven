@@ -756,8 +756,7 @@ public class DefaultWagonManager
             throw new IllegalArgumentException( "arguments can't be null" );
         }
 
-        final XmlPlexusConfiguration xmlConf = ( configuration == null ) ? new XmlPlexusConfiguration( "configuration" )
-                                                                        : new XmlPlexusConfiguration( configuration );
+        final XmlPlexusConfiguration xmlConf = new XmlPlexusConfiguration( configuration );
 
         serverConfigurationMap.put( repositoryId, xmlConf );
     }

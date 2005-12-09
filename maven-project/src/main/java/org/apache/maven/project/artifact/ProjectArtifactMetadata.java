@@ -97,7 +97,7 @@ public class ProjectArtifactMetadata
             writer = new FileWriter( destination );
 
             MavenXpp3Reader modelReader = new MavenXpp3Reader();
-            Model model = modelReader.read( sReader );
+            Model model = modelReader.read( sReader, false );
             model.setVersion( artifact.getVersion() );
 
             DistributionManagement distributionManagement = model.getDistributionManagement();

@@ -63,7 +63,7 @@ public class Main
         MavenXpp3Reader modelReader = new MavenXpp3Reader();
         FileReader reader = new FileReader( pom );
 
-        Model model = modelReader.read( reader );
+        Model model = modelReader.read( reader, true );
 
         // Not doing inheritence, except for groupId and version
         if ( model.getGroupId() == null )

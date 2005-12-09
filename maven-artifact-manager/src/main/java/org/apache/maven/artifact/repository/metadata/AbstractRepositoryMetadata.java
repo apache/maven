@@ -92,7 +92,7 @@ public abstract class AbstractRepositoryMetadata
             {
                 reader = new FileReader( metadataFile );
 
-                metadata = mappingReader.read( reader );
+                metadata = mappingReader.read( reader, false );
             }
             finally
             {

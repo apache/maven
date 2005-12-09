@@ -249,7 +249,7 @@ public class DefaultMavenProjectBuilder
                     VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                     Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                                   versionRange, d.getType(),
-                                                                                  d.getClassifier(), d.getScope(), 
+                                                                                  d.getClassifier(), d.getScope(),
                                                                                   d.isOptional() );
                     map.put( d.getManagementKey(), artifact );
                 }
@@ -286,23 +286,24 @@ public class DefaultMavenProjectBuilder
                                               ProfileManager profileManager, boolean checkDistributionManagementStatus )
         throws ProjectBuildingException
     {
-        Model model = readModel( "unknown", projectDescriptor );
+        Model model = readModel( "unknown", projectDescriptor, true );
 
         // Always cache files in the source tree over those in the repository
         MavenProject p = new MavenProject( model );
         p.setFile( projectDescriptor );
-        
+
         String modelKey = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
         if ( modelCache.containsKey( modelKey ) )
         {
-            throw new ProjectBuildingException( model.getGroupId() + ":" + model.getArtifactId(), 
-                    "Duplicate project ID found in " + projectDescriptor.getAbsolutePath() );
+            throw new ProjectBuildingException( model.getGroupId() + ":" + model.getArtifactId(),
+                                                "Duplicate project ID found in " +
+                                                    projectDescriptor.getAbsolutePath() );
         }
         modelCache.put( modelKey, p );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
                                       buildArtifactRepositories( getSuperModel() ),
-                                      projectDescriptor.getAbsoluteFile().getParentFile(), profileManager );
+                                      projectDescriptor.getAbsoluteFile().getParentFile(), profileManager, true );
 
         if ( checkDistributionManagementStatus )
         {
@@ -350,7 +351,8 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
 
-        return build( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null );
+        return build( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null,
+                      false );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -385,7 +387,7 @@ public class DefaultMavenProjectBuilder
                 artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
                 File file = projectArtifact.getFile();
-                model = readModel( projectId, file );
+                model = readModel( projectId, file, false );
 
                 String downloadUrl = null;
                 ArtifactStatus status = ArtifactStatus.NONE;
@@ -515,7 +517,8 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List parentSearchRepositories, File projectDir, ProfileManager externalProfileManager )
+                                List parentSearchRepositories, File projectDir, ProfileManager externalProfileManager,
+                                boolean strict )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -589,7 +592,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             project = assembleLineage( model, lineage, localRepository, projectDir, parentSearchRepositories,
-                                       aggregatedRemoteWagonRepositories, externalProfileManager );
+                                       aggregatedRemoteWagonRepositories, externalProfileManager, strict );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -626,7 +629,8 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, repositories, externalProfileManager, projectDir );
+            project =
+                processProjectLogic( pomLocation, project, repositories, externalProfileManager, projectDir, strict );
         }
         catch ( ModelInterpolationException e )
         {
@@ -684,7 +688,7 @@ public class DefaultMavenProjectBuilder
      * and projects are not cached or reused
      */
     private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories,
-                                              ProfileManager profileMgr, File projectDir )
+                                              ProfileManager profileMgr, File projectDir, boolean strict )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
         Model model = project.getModel();
@@ -718,7 +722,7 @@ public class DefaultMavenProjectBuilder
             context.put( "basedir", projectDir.getAbsolutePath() );
         }
 
-        model = modelInterpolator.interpolate( model, context );
+        model = modelInterpolator.interpolate( model, context, strict );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
@@ -796,7 +800,8 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject assembleLineage( Model model, LinkedList lineage, ArtifactRepository localRepository,
                                           File projectDir, List parentSearchRepositories,
-                                          Set aggregatedRemoteWagonRepositories, ProfileManager externalProfileManager )
+                                          Set aggregatedRemoteWagonRepositories, ProfileManager externalProfileManager,
+                                          boolean strict )
         throws ProjectBuildingException, InvalidRepositoryException
     {
         if ( !model.getRepositories().isEmpty() )
@@ -860,11 +865,11 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( projectId, "Missing artifactId element from parent element" );
             }
-            else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&  
-                    parentModel.getArtifactId().equals( model.getArtifactId() ) )
+            else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&
+                parentModel.getArtifactId().equals( model.getArtifactId() ) )
             {
-                throw new ProjectBuildingException( projectId, "Parent element is a duplicate of " +
-                        "the current project " );
+                throw new ProjectBuildingException( projectId,
+                                                    "Parent element is a duplicate of " + "the current project " );
             }
             else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
@@ -898,16 +903,16 @@ public class DefaultMavenProjectBuilder
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug(
-                                           "Path specified in <relativePath/> (" + parentRelativePath
-                                               + ") is a directory. Searching for 'pom.xml' within this directory." );
+                        getLogger().debug( "Path specified in <relativePath/> (" + parentRelativePath +
+                            ") is a directory. Searching for 'pom.xml' within this directory." );
                     }
-                    
+
                     parentDescriptor = new File( parentDescriptor, "pom.xml" );
 
                     if ( !parentDescriptor.exists() )
                     {
-                        throw new ProjectBuildingException( projectId, "missing parent project descriptor: " + parentDescriptor.getAbsolutePath() );
+                        throw new ProjectBuildingException( projectId, "missing parent project descriptor: " +
+                            parentDescriptor.getAbsolutePath() );
                     }
                 }
 
@@ -924,7 +929,7 @@ public class DefaultMavenProjectBuilder
 
                 if ( parentDescriptor != null && parentDescriptor.exists() )
                 {
-                    Model candidateParent = readModel( projectId, parentDescriptor );
+                    Model candidateParent = readModel( projectId, parentDescriptor, strict );
 
                     String candidateParentGroupId = candidateParent.getGroupId();
                     if ( candidateParentGroupId == null && candidateParent.getParent() != null )
@@ -985,9 +990,10 @@ public class DefaultMavenProjectBuilder
 
             if ( model != null && !"pom".equals( model.getPackaging() ) )
             {
-                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " + projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
+                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " +
+                    projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
             }
-            
+
             File parentProjectDir = null;
             if ( parentDescriptor != null )
             {
@@ -995,7 +1001,7 @@ public class DefaultMavenProjectBuilder
             }
             MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
-                                                   externalProfileManager );
+                                                   externalProfileManager, strict );
             parent.setFile( parentDescriptor );
 
             project.setParent( parent );
@@ -1080,14 +1086,14 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId, File file )
+    private Model readModel( String projectId, File file, boolean strict )
         throws ProjectBuildingException
     {
         Reader reader = null;
         try
         {
             reader = new FileReader( file );
-            return readModel( projectId, file.getAbsolutePath(), reader );
+            return readModel( projectId, file.getAbsolutePath(), reader, strict );
         }
         catch ( FileNotFoundException e )
         {
@@ -1105,7 +1111,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId, String pomLocation, Reader reader )
+    private Model readModel( String projectId, String pomLocation, Reader reader, boolean strict )
         throws IOException, InvalidProjectModelException
     {
         StringWriter sw = new StringWriter();
@@ -1123,22 +1129,23 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            return modelReader.read( sReader );
+            return modelReader.read( sReader, strict );
         }
         catch ( XmlPullParserException e )
         {
-            throw new InvalidProjectModelException( projectId, pomLocation, "Parse error reading POM. Reason: " + e.getMessage(), e );
+            throw new InvalidProjectModelException( projectId, pomLocation,
+                                                    "Parse error reading POM. Reason: " + e.getMessage(), e );
         }
     }
 
-    private Model readModel( String projectId, URL url )
+    private Model readModel( String projectId, URL url, boolean strict )
         throws ProjectBuildingException
     {
         InputStreamReader reader = null;
         try
         {
             reader = new InputStreamReader( url.openStream() );
-            return readModel( projectId, url.toExternalForm(), reader );
+            return readModel( projectId, url.toExternalForm(), reader, strict );
         }
         catch ( IOException e )
         {
@@ -1324,7 +1331,7 @@ public class DefaultMavenProjectBuilder
         {
             List remoteRepositories = buildArtifactRepositories( superModel );
 
-            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null, null );
+            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null, null, true );
 
             project.setExecutionRoot( true );
 
@@ -1351,7 +1358,7 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
-        return readModel( projectId, url );
+        return readModel( projectId, url, true );
     }
 
     public void contextualize( Context context )

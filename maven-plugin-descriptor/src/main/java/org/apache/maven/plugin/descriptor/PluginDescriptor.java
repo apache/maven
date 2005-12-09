@@ -284,7 +284,7 @@ public class PluginDescriptor
                     throw new FileNotFoundException( "Unable to find /META-INF/maven/lifecycle.xml in the plugin" );
                 }
                 r = new InputStreamReader( resourceAsStream );
-                config = reader.read( r );
+                config = reader.read( r, true );
             }
             finally
             {

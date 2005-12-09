@@ -99,7 +99,7 @@
                 changed = true;
             }
 
-            for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            for ( java.util.Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
             {
                 String version = (String) i.next();
                 if ( !v.getVersions().contains( version ) )

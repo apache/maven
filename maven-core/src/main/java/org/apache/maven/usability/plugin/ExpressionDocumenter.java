@@ -117,7 +117,7 @@ public class ExpressionDocumenter
         
         ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
         
-        ExpressionDocumentation documentation = paramdocReader.read( reader );
+        ExpressionDocumentation documentation = paramdocReader.read( reader, true );
         
         List expressions = documentation.getExpressions();
         
