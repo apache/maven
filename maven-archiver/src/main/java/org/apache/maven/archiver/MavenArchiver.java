@@ -23,11 +23,9 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.ManifestException;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -244,9 +242,7 @@ public class MavenArchiver
 
             String artifactId = workingProject.getArtifactId();
 
-            File exportReadyPom = writeExportReadyPom( workingProject );
-
-        	archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
+        	archiver.addFile( project.getFile(), "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
             
             
             // ----------------------------------------------------------------------
@@ -340,32 +336,5 @@ public class MavenArchiver
         {
             pomPropertiesFile.delete();
         }
-    }
-
-    private File writeExportReadyPom( MavenProject project )
-        throws IOException
-    {
-        String buildDirectory = project.getBuild().getDirectory();
-
-        File buildDirectoryFile = new File( buildDirectory );
-
-        buildDirectoryFile.mkdirs();
-
-        File fullPom = new File( buildDirectoryFile, "exported-pom.xml" );
-
-        FileWriter fWriter = null;
-
-        try
-        {
-            fWriter = new FileWriter( fullPom );
-
-            project.writeModel( fWriter );
-        }
-        finally
-        {
-            IOUtil.close( fWriter );
-        }
-
-        return fullPom;
     }
 }
