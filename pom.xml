@@ -166,10 +166,7 @@
     </pluginManagement>
   </build>
   <modules>
-    <!-- Commenting this out, since it's going to be released slightly afterward.
-     | It's on a different release cycle now.
     <module>maven-archiver</module>
-    -->
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
     <module>maven-artifact-test</module>
