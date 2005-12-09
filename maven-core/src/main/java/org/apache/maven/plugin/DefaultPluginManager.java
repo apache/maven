@@ -1100,6 +1100,7 @@ public class DefaultPluginManager
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
         artifacts.add( "maven-core" );
+        artifacts.add( "maven-error-diagnoser" );
         artifacts.add( "maven-model" );
         artifacts.add( "maven-monitor" );
         artifacts.add( "maven-plugin-api" );
