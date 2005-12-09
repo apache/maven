@@ -35,17 +35,28 @@ public class OperatingSystemProfileActivator
     {
         Activation activation = profile.getActivation();
         ActivationOS os = activation.getOs();
-        
-        boolean hasNonNull = ensureAtLeastOneNonNull( os );
-        
-        boolean isFamily = determineFamilyMatch( os.getFamily() );
-        boolean isName = determineNameMatch( os.getName() );
-        boolean isArch = determineArchMatch( os.getArch() );
-        boolean isVersion = determineVersionMatch( os.getVersion() );
-        
-        return hasNonNull && isFamily && isName && isArch && isVersion;
+
+        boolean result = ensureAtLeastOneNonNull( os );
+
+        if ( result && os.getFamily() != null )
+        {
+            result = determineFamilyMatch( os.getFamily() );
+        }
+        if ( result && os.getName() != null )
+        {
+            result = determineNameMatch( os.getName() );
+        }
+        if ( result && os.getArch() != null )
+        {
+            result = determineArchMatch( os.getArch() );
+        }
+        if ( result && os.getVersion() != null )
+        {
+            result = determineVersionMatch( os.getVersion() );
+        }
+        return result;
     }
-    
+
     private boolean ensureAtLeastOneNonNull( ActivationOS os )
     {
         return os.getArch() != null || os.getFamily() != null || os.getName() != null || os.getVersion() != null;
@@ -107,9 +118,9 @@ public class OperatingSystemProfileActivator
             reverse = true;
             test = test.substring( 1 );
         }
-        
+
         boolean result = Os.isName( test );
-        
+
         if ( reverse )
         {
             return !result;

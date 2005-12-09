@@ -122,6 +122,16 @@
      -->
     <component>
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
+      <role-hint>os</role-hint>
+      <implementation>org.apache.maven.profiles.activation.OperatingSystemProfileActivator</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>file</role-hint>
       <implementation>org.apache.maven.profiles.activation.FileProfileActivator</implementation>
     </component>

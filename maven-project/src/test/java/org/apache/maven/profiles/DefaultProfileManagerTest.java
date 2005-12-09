@@ -3,6 +3,7 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ActivationOS;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -154,6 +155,31 @@ public class DefaultProfileManagerTest
         
         assertNotNull( active );
         assertEquals( 0, active.size() );
+    }
+
+   public void testOsActivationProfile() throws ProfileActivationException
+    {
+        Profile osActivated = new Profile();
+        osActivated.setId("os-profile");
+
+        Activation osActivation = new Activation();
+
+        ActivationOS activationOS = new ActivationOS();
+
+        activationOS.setName("!dddd");
+
+        osActivation.setOs(activationOS);
+
+        osActivated.setActivation(osActivation);
+
+        ProfileManager profileManager = new DefaultProfileManager(getContainer());
+
+        profileManager.addProfile(osActivated);
+
+        List active = profileManager.getActiveProfiles();
+
+        assertNotNull( active );
+        assertEquals( 1, active.size() );
     }
 
 }
