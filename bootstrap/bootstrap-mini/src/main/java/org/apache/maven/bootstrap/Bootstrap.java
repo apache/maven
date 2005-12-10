@@ -337,8 +337,17 @@ public class Bootstrap
             File artifactFile = resolver.getArtifactFile( dependency );
             ModelReader pluginReader = readModel( resolver, artifactFile, true );
 
-            ClassLoader classLoader =
-                createClassloaderFromDependencies( pluginReader.getDependencies(), null, resolver );
+            List dependencies = new ArrayList();
+            for ( Iterator i = pluginReader.getDependencies().iterator(); i.hasNext(); )
+            {
+                Dependency d = (Dependency) i.next();
+                if ( !d.getGroupId().equals( "org.apache.maven" ) )
+                {
+                    dependencies.add( d );
+                }
+            }
+
+            ClassLoader classLoader = createClassloaderFromDependencies( dependencies, null, resolver );
 
             System.out.println( "Generating model bindings for version \'" + modelVersion + "\' from '" + model + "'" );
 
@@ -410,8 +419,6 @@ public class Bootstrap
         JarMojo jarMojo = new JarMojo();
 
         String artifactId = reader.getArtifactId();
-
-        String version = reader.getVersion();
 
         // ----------------------------------------------------------------------
         // Create pom.properties file
