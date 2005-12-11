@@ -30,6 +30,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -150,6 +152,8 @@ public class DefaultMavenSettingsBuilder
             }
 
             SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+            
+            activateDefaultProfiles( userSettings );
 
             setLocalRepository( userSettings );
 
@@ -157,6 +161,23 @@ public class DefaultMavenSettingsBuilder
         }
 
         return loadedSettings;
+    }
+
+    private void activateDefaultProfiles( Settings settings )
+    {
+        List activeProfiles = settings.getActiveProfiles();
+        
+        for( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
+        {
+            Profile profile = (Profile) profiles.next();
+            if ( profile.getActivation() != null && profile.getActivation().isActiveByDefault() )
+            {
+                if ( !activeProfiles.contains( profile.getId() ) )
+                {
+                    settings.addActiveProfile( profile.getId() );
+                }
+            }
+        }
     }
 
     private void setLocalRepository( Settings userSettings )
