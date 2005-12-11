@@ -2918,6 +2918,7 @@
           <type>String</type>
           <required>true</required>
           <description>The unique id for this report set, to be used during POM inheritance.</description>
+          <defaultValue>default</defaultValue>
         </field>
         <field>
           <name>configuration</name>
