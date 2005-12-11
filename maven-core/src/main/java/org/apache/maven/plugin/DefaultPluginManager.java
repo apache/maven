@@ -137,6 +137,24 @@ public class DefaultPluginManager
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
 
+    public PluginDescriptor getPluginDescriptor( String groupId,
+                                                 String artifactId,
+                                                 MavenProject project,
+                                                 Settings settings,
+                                                 ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
+    {
+        Plugin plugin = new Plugin();
+
+        plugin.setGroupId( groupId );
+
+        plugin.setArtifactId( artifactId );
+
+        String version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings, localRepository );
+
+        return pluginCollector.getPluginDescriptor( plugin );
+    }
+
     public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
@@ -240,7 +258,8 @@ public class DefaultPluginManager
      * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
      * manager which executes before the plugin is instantiated
      */
-    private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
+    private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List
+        remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException
     {
         try
@@ -303,18 +322,18 @@ public class DefaultPluginManager
             // We need to look for a Plugin instance there, in case the instance we're using didn't come from
             // the project.
             Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
-            
+
             if ( projectPlugin == null )
             {
                 projectPlugin = plugin;
             }
-            
+
             Set artifacts =
                 MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null, null, project );
 
 //            Set artifacts =
 //                MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null, project );
-            
+
             addedPlugin.setIntroducedDependencyArtifacts( artifacts );
         }
         catch ( InvalidDependencyVersionException e )

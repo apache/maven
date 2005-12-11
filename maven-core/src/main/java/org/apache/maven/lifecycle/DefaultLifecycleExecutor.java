@@ -57,6 +57,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -496,9 +497,9 @@ public class DefaultLifecycleExecutor
             if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
             {
                 forkEntryPoints.push( mojoDescriptor );
-                
+
                 forkLifecycle( mojoDescriptor, forkEntryPoints, session, project );
-                
+
                 forkEntryPoints.pop();
             }
 
@@ -516,9 +517,9 @@ public class DefaultLifecycleExecutor
                     if ( descriptor.getExecutePhase() != null )
                     {
                         forkEntryPoints.push( descriptor );
-                        
+
                         forkLifecycle( descriptor, forkEntryPoints, session, project );
-                        
+
                         forkEntryPoints.pop();
                     }
                 }
@@ -733,7 +734,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         forkEntryPoints.push( mojoDescriptor );
-        
+
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         String targetPhase = mojoDescriptor.getExecutePhase();
@@ -780,11 +781,67 @@ public class DefaultLifecycleExecutor
                         for ( Iterator k = e.getGoals().iterator(); k.hasNext(); )
                         {
                             String goal = (String) k.next();
-                            MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
 
+                            PluginDescriptor lifecyclePluginDescriptor;
+                            String lifecycleGoal;
+
+                            // Here we are looking to see if we have a mojo from an external plugin.
+                            // If we do then we need to lookup the plugin descriptor for the externally
+                            // referenced plugin so that we can overly the execution into the lifecycle.
+                            // An example of this is the corbertura plugin that needs to call the surefire
+                            // plugin in forking mode.
+                            //
+                            //<phase>
+                            //  <id>test</id>
+                            //  <executions>
+                            //    <execution>
+                            //      <goals>
+                            //        <goal>org.apache.maven.plugins:maven-surefire-plugin:test</goal>
+                            //      </goals>
+                            //      <configuration>
+                            //        <classesDirectory>${project.build.directory}/generated-classes/cobertura</classesDirectory>
+                            //        <ignoreFailures>true</ignoreFailures>
+                            //        <forkMode>once</forkMode>
+                            //      </configuration>
+                            //    </execution>
+                            //  </executions>
+                            //</phase>
+
+                            // ----------------------------------------------------------------------
+                            //
+                            // ----------------------------------------------------------------------
+
+                            if ( goal.indexOf( ":" ) > 0 )
+                            {
+                                String[] s = StringUtils.split( goal, ":" );
+
+                                String groupId = s[0];
+                                String artifactId = s[1];
+                                String externalGoal = s[2];
+                                lifecycleGoal = externalGoal;
+
+                                try
+                                {
+                                    lifecyclePluginDescriptor = pluginManager.getPluginDescriptor( groupId,
+                                                                                                   artifactId,
+                                                                                                   project,
+                                                                                                   session.getSettings(),
+                                                                                                   session.getLocalRepository() );
+                                }
+                                catch ( Exception ex )
+                                {
+                                    throw new LifecycleExecutionException( ex );
+                                }
+                            }
+                            else
+                            {
+                                lifecyclePluginDescriptor = pluginDescriptor;
+                                lifecycleGoal = goal;
+                            }
+
+                            MojoDescriptor desc = getMojoDescriptor( lifecyclePluginDescriptor, lifecycleGoal );
                             MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
-                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
-                                                    session.getSettings() );
+                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session.getSettings() );
                         }
                     }
                 }
@@ -849,23 +906,23 @@ public class DefaultLifecycleExecutor
         for ( Iterator it = lifecycleForkers.iterator(); it.hasNext(); )
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) it.next();
-            
+
             for ( Iterator lifecycleIterator = lifecycleMappings.values().iterator(); lifecycleIterator.hasNext(); )
             {
                 List tasks = (List) lifecycleIterator.next();
-                
+
                 boolean removed = false;
                 for ( Iterator taskIterator = tasks.iterator(); taskIterator.hasNext(); )
                 {
                     MojoExecution execution = (MojoExecution) taskIterator.next();
-                    
+
                     if ( mojoDescriptor.equals( execution.getMojoDescriptor() ) )
                     {
                         taskIterator.remove();
                         removed = true;
                     }
                 }
-                
+
                 if ( removed )
                 {
                     getLogger().warn(
@@ -1230,8 +1287,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution,
-                                         Settings settings )
+    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution, Settings settings )
     {
         List goals = (List) lifecycleMappings.get( phase );
 
@@ -1374,7 +1430,7 @@ public class DefaultLifecycleExecutor
         }
 
         project.injectPluginManagementInfo( plugin );
-        
+
         if ( pluginDescriptor == null )
         {
             pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
