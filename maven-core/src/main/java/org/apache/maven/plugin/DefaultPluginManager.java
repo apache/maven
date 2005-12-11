@@ -72,6 +72,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.RealmDelegatingClassLoader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -407,7 +408,7 @@ public class DefaultPluginManager
         try
         {
             Thread.currentThread().setContextClassLoader(
-                mojoDescriptor.getPluginDescriptor().getClassRealm().getClassLoader() );
+                new RealmDelegatingClassLoader( mojoDescriptor.getPluginDescriptor().getClassRealm() ) );
 
             plugin.execute();
 
@@ -603,16 +604,15 @@ public class DefaultPluginManager
             }
 
             Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
-
             dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
-
+            
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                     localRepository,
                                                                                     resolutionGroup.getResolutionRepositories(),
                                                                                     artifactMetadataSource,
                                                                                     artifactFilter );
 
-            Set resolved = result.getArtifacts();
+            Set resolved =  result.getArtifacts();
 
             for ( Iterator it = resolved.iterator(); it.hasNext(); )
             {
