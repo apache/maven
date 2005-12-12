@@ -23,7 +23,7 @@
     <dependency>
       <groupId>org.codehaus.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
-      <version>1.0-alpha-6-SNAPSHOT</version>
+      <version>1.0-alpha-6</version>
     </dependency>
   </dependencies>
 </project>
