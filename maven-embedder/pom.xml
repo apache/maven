@@ -10,7 +10,7 @@
   <name>Maven Embedder</name>
   <version>2.0.1-SNAPSHOT</version>
   <properties>
-    <mavenVersion>2.0.1-SNAPSHOT</mavenVersion>
+    <mavenVersion>2.0.1</mavenVersion>
   </properties>  
   <build>
     <plugins>
