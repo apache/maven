@@ -16,8 +16,8 @@ package org.apache.maven.reporting.sink;
  * limitations under the License.
  */
 
+import org.apache.maven.doxia.sink.SinkAdapter;
 import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.sink.SinkAdapter;
 
 /**
  * @author Emmanuel Venisse
@@ -54,7 +54,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#anchor_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#anchor_()
      */
     public void anchor_()
     {
@@ -62,7 +62,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#anchor(java.lang.String)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#anchor(java.lang.String)
      */
     public void anchor( String arg0 )
     {
@@ -70,7 +70,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#author_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#author_()
      */
     public void author_()
     {
@@ -78,7 +78,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#author()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#author()
      */
     public void author()
     {
@@ -86,7 +86,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#body()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#body()
      */
     public void body()
     {
@@ -94,14 +94,14 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#body_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#body_()
      */
     public void body_()
     {
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#bold_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#bold_()
      */
     public void bold_()
     {
@@ -109,7 +109,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#bold()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#bold()
      */
     public void bold()
     {
@@ -117,14 +117,14 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#close()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#close()
      */
     public void close()
     {
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#date_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#date_()
      */
     public void date_()
     {
@@ -132,7 +132,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#date()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#date()
      */
     public void date()
     {
@@ -140,7 +140,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definedTerm_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definedTerm_()
      */
     public void definedTerm_()
     {
@@ -148,7 +148,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definedTerm()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definedTerm()
      */
     public void definedTerm()
     {
@@ -156,7 +156,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definition_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definition_()
      */
     public void definition_()
     {
@@ -164,7 +164,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definition()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definition()
      */
     public void definition()
     {
@@ -172,7 +172,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definitionList_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definitionList_()
      */
     public void definitionList_()
     {
@@ -180,7 +180,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definitionList()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definitionList()
      */
     public void definitionList()
     {
@@ -188,7 +188,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definitionListItem_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definitionListItem_()
      */
     public void definitionListItem_()
     {
@@ -196,7 +196,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#definitionListItem()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#definitionListItem()
      */
     public void definitionListItem()
     {
@@ -204,7 +204,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#figure_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#figure_()
      */
     public void figure_()
     {
@@ -212,7 +212,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#figure()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#figure()
      */
     public void figure()
     {
@@ -220,7 +220,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#figureCaption_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#figureCaption_()
      */
     public void figureCaption_()
     {
@@ -228,7 +228,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#figureCaption()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#figureCaption()
      */
     public void figureCaption()
     {
@@ -236,7 +236,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#figureGraphics(java.lang.String)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#figureGraphics(java.lang.String)
      */
     public void figureGraphics( String arg0 )
     {
@@ -244,7 +244,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#flush()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#flush()
      */
     public void flush()
     {
@@ -252,7 +252,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#head_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#head_()
      */
     public void head_()
     {
@@ -260,7 +260,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#head()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#head()
      */
     public void head()
     {
@@ -268,7 +268,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#horizontalRule()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#horizontalRule()
      */
     public void horizontalRule()
     {
@@ -276,7 +276,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#italic_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#italic_()
      */
     public void italic_()
     {
@@ -284,7 +284,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#italic()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#italic()
      */
     public void italic()
     {
@@ -292,7 +292,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#lineBreak()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#lineBreak()
      */
     public void lineBreak()
     {
@@ -300,7 +300,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#link_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#link_()
      */
     public void link_()
     {
@@ -308,7 +308,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#link(java.lang.String)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#link(java.lang.String)
      */
     public void link( String arg0 )
     {
@@ -316,7 +316,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#list_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#list_()
      */
     public void list_()
     {
@@ -324,7 +324,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#list()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#list()
      */
     public void list()
     {
@@ -332,7 +332,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#listItem_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#listItem_()
      */
     public void listItem_()
     {
@@ -340,7 +340,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#listItem()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#listItem()
      */
     public void listItem()
     {
@@ -348,7 +348,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#monospaced_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#monospaced_()
      */
     public void monospaced_()
     {
@@ -356,7 +356,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#monospaced()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#monospaced()
      */
     public void monospaced()
     {
@@ -364,7 +364,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#nonBreakingSpace()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#nonBreakingSpace()
      */
     public void nonBreakingSpace()
     {
@@ -372,7 +372,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#numberedList_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#numberedList_()
      */
     public void numberedList_()
     {
@@ -380,7 +380,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#numberedList(int)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#numberedList(int)
      */
     public void numberedList( int arg0 )
     {
@@ -388,7 +388,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#numberedListItem_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#numberedListItem_()
      */
     public void numberedListItem_()
     {
@@ -396,7 +396,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#numberedListItem()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#numberedListItem()
      */
     public void numberedListItem()
     {
@@ -404,7 +404,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#pageBreak()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#pageBreak()
      */
     public void pageBreak()
     {
@@ -412,7 +412,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#paragraph_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#paragraph_()
      */
     public void paragraph_()
     {
@@ -420,7 +420,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#paragraph()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#paragraph()
      */
     public void paragraph()
     {
@@ -428,7 +428,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#rawText(java.lang.String)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#rawText(java.lang.String)
      */
     public void rawText( String arg0 )
     {
@@ -436,7 +436,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section1_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section1_()
      */
     public void section1_()
     {
@@ -444,7 +444,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section1()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section1()
      */
     public void section1()
     {
@@ -452,7 +452,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section2_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section2_()
      */
     public void section2_()
     {
@@ -460,7 +460,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section2()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section2()
      */
     public void section2()
     {
@@ -468,7 +468,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section3_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section3_()
      */
     public void section3_()
     {
@@ -476,7 +476,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section3()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section3()
      */
     public void section3()
     {
@@ -484,7 +484,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section4_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section4_()
      */
     public void section4_()
     {
@@ -492,7 +492,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section4()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section4()
      */
     public void section4()
     {
@@ -500,7 +500,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section5_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section5_()
      */
     public void section5_()
     {
@@ -508,7 +508,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#section5()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#section5()
      */
     public void section5()
     {
@@ -516,7 +516,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle_()
      */
     public void sectionTitle_()
     {
@@ -524,7 +524,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle()
      */
     public void sectionTitle()
     {
@@ -532,7 +532,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle1_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle1_()
      */
     public void sectionTitle1_()
     {
@@ -540,7 +540,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle1()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle1()
      */
     public void sectionTitle1()
     {
@@ -548,7 +548,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle2_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle2_()
      */
     public void sectionTitle2_()
     {
@@ -556,7 +556,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle2()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle2()
      */
     public void sectionTitle2()
     {
@@ -564,7 +564,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle3_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle3_()
      */
     public void sectionTitle3_()
     {
@@ -572,7 +572,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle3()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle3()
      */
     public void sectionTitle3()
     {
@@ -580,7 +580,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle4_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle4_()
      */
     public void sectionTitle4_()
     {
@@ -588,7 +588,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle4()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle4()
      */
     public void sectionTitle4()
     {
@@ -596,7 +596,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle5_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle5_()
      */
     public void sectionTitle5_()
     {
@@ -604,7 +604,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#sectionTitle5()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#sectionTitle5()
      */
     public void sectionTitle5()
     {
@@ -612,7 +612,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#table_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#table_()
      */
     public void table_()
     {
@@ -620,7 +620,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#table()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#table()
      */
     public void table()
     {
@@ -628,7 +628,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableCaption_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableCaption_()
      */
     public void tableCaption_()
     {
@@ -636,7 +636,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableCaption()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableCaption()
      */
     public void tableCaption()
     {
@@ -644,7 +644,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableCell_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableCell_()
      */
     public void tableCell_()
     {
@@ -652,7 +652,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableCell()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableCell()
      */
     public void tableCell()
     {
@@ -660,7 +660,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableHeaderCell_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableHeaderCell_()
      */
     public void tableHeaderCell_()
     {
@@ -668,7 +668,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableHeaderCell()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableHeaderCell()
      */
     public void tableHeaderCell()
     {
@@ -676,7 +676,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableRow_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableRow_()
      */
     public void tableRow_()
     {
@@ -684,7 +684,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableRow()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableRow()
      */
     public void tableRow()
     {
@@ -692,7 +692,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableRows_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableRows_()
      */
     public void tableRows_()
     {
@@ -700,7 +700,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#tableRows(int[], boolean)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#tableRows(int[], boolean)
      */
     public void tableRows( int[] arg0, boolean arg1 )
     {
@@ -708,7 +708,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#text(java.lang.String)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#text(java.lang.String)
      */
     public void text( String arg0 )
     {
@@ -716,7 +716,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#title_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#title_()
      */
     public void title_()
     {
@@ -724,7 +724,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#title()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#title()
      */
     public void title()
     {
@@ -732,7 +732,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#verbatim_()
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#verbatim_()
      */
     public void verbatim_()
     {
@@ -740,7 +740,7 @@ public class MultiPageSink
     }
 
     /**
-     * @see org.codehaus.doxia.sink.SinkAdapter#verbatim(boolean)
+     * @see org.codehaus.doxia.module.xhtml.SinkAdapter#verbatim(boolean)
      */
     public void verbatim( boolean arg0 )
     {
