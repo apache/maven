@@ -56,7 +56,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.doxia</groupId>
+      <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-core</artifactId>
       <version>1.0-alpha-6</version>
       <exclusions>
