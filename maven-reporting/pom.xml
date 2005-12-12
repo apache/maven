@@ -1,15 +1,15 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?><project>
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.reporting</groupId>
   <artifactId>maven-reporting</artifactId>
   <packaging>pom</packaging>
   <name>Maven Reporting</name>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.0.1</version>
   <inceptionYear>2005</inceptionYear>
   <modules>
     <module>maven-reporting-api</module>
