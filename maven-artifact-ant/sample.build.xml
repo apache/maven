@@ -23,7 +23,7 @@
   <target name="initTaskDefs">
     <!-- don't forget to update the version! -->
     <path id="maven.classpath">
-      <pathelement location="target/maven-artifact-ant-2.0.1-SNAPSHOT-dep.jar" />
+      <pathelement location="target/maven-artifact-ant-2.1-SNAPSHOT-dep.jar" />
     </path>
 
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">

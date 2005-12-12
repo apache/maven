@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-script-ant</artifactId>
-      <version>2.0.1-SNAPSHOT</version>
+      <version>2.0.1</version>
     </dependency>
   </dependencies>
   
@@ -36,7 +36,7 @@
           <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-tools-ant</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
+            <version>2.0.1</version>
           </dependency>
         </dependencies>
       </plugin>

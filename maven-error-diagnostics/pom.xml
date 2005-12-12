@@ -2,12 +2,12 @@
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-error-diagnostics</artifactId>
   <name>Maven Error Diagnostics</name>
-  <version>2.0.2-SNAPSHOT</version>
+  <version>2.1-SNAPSHOT</version>
   <description>Provides a manager component which will process a given Throwable instance through a set of diagnostic
     sub-components, and return a String message with user-friendly information about the error and possibly
     how to fix it.</description>
