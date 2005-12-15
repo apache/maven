@@ -2,6 +2,9 @@ package org.codehaus.doxia.module.xhtml;
 
 import org.codehaus.doxia.sink.Sink;
 
+/**
+ * @deprecated Use org.apache.maven.doxia.module.xhtml.XhtmlSink instead.
+ */
 public class XhtmlSink
     implements Sink
 {

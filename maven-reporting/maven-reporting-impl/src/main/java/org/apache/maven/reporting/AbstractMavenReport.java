@@ -66,8 +66,8 @@ public abstract class AbstractMavenReport
         {
             String outputDirectory = getOutputDirectory();
 
-            XhtmlSink sink = new XhtmlSink( getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html",
-                                                           outputDirectory, getSiteDescriptor(), "maven" ) );
+            XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html",
+                                                           outputDirectory, getSiteDescriptor(), "maven" );
 
             generate( sink, Locale.ENGLISH );
 

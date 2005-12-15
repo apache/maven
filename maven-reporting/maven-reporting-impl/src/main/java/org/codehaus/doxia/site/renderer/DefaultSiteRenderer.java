@@ -1,14 +1,10 @@
 package org.codehaus.doxia.site.renderer;
 
-import org.apache.maven.doxia.siterenderer.RendererException;
-import org.codehaus.doxia.site.renderer.sink.SiteRendererSink;
+import org.apache.maven.doxia.site.renderer.SiteRenderer;
+import org.codehaus.doxia.module.xhtml.XhtmlSink;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
-import java.util.Locale;
-import java.util.Map;
 
 /*
  * Copyright 2004-2005 The Apache Software Foundation.
@@ -30,245 +26,68 @@ import java.util.Map;
  * @author <a href="mailto:evenisse@codehaus.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id:DefaultSiteRenderer.java 348612 2005-11-24 12:54:19 +1100 (Thu, 24 Nov 2005) brett $
- * @plexus.component role="org.apache.maven.doxia.siterenderer.Renderer"
+ * 
+ * @deprecated Use org.apache.maven.doxia.site.renderer.DefaultSiteRenderer instead.
  */
 public class DefaultSiteRenderer
-    extends org.apache.maven.doxia.siterenderer.DefaultSiteRenderer
-    implements Renderer
+    implements org.codehaus.doxia.site.renderer.SiteRenderer
 {
 
-    public void render( File siteDirectory, File outputDirectory, File siteDescriptor, String templateName,
-                       Map templateProperties )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    private SiteRenderer siteRenderer;
+
+    public XhtmlSink createSink( File moduleBasedir, String doc,
+                                                                String outputDirectory, File siteDescriptor,
+                                                                String flavour )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        return new org.codehaus.doxia.module.xhtml.XhtmlSink( siteRenderer.createSink( moduleBasedir, doc,
+                                                                                       outputDirectory, siteDescriptor,
+                                                                                       flavour ) );
     }
 
-    public void render( File siteDirectory, File outputDirectory, InputStream siteDescriptor, String templateName,
-                       Map templateProperties )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public void render( String siteDirectory, String generatedSiteDirectory, String outputDirectory,
+                       File resourcesDirectory )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, resourcesDirectory );
     }
 
-    public void render( File siteDirectory, File outputDirectory, String siteDescriptor, String templateName,
-                       Map templateProperties )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public void render( String siteDirectory, String generatedSiteDirectory, String outputDirectory, String flavour,
+                       File resourcesDirectory )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, resourcesDirectory );
     }
 
-    public void render( File siteDirectory, File outputDirectory, File siteDescriptor, String templateName,
-                       Map templateProperties, Locale locale )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public void render( String siteDirectory, String generatedSiteDirectory, String outputDirectory, String flavour,
+                       String siteDescriptorName, File resourcesDirectory )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties, locale );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, siteDescriptorName,
+                             resourcesDirectory );
     }
 
-    public void render( File siteDirectory, File outputDirectory, InputStream siteDescriptor, String templateName,
-                       Map templateProperties, Locale locale )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public void render( String siteDirectory, String generatedSiteDirectory, String outputDirectory, String flavour,
+                       InputStream siteDescriptor, File resourcesDirectory )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties, locale );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, siteDescriptor,
+                             resourcesDirectory );
     }
 
-    public void render( File siteDirectory, File outputDirectory, String siteDescriptor, String templateName,
-                       Map templateProperties, Locale locale )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public XhtmlSink createSink( File moduleBasedir, String doc,
+                                                                String outputDirectory, InputStream siteDescriptor,
+                                                                String flavour )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties, locale );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        return new org.codehaus.doxia.module.xhtml.XhtmlSink( siteRenderer.createSink( moduleBasedir, doc,
+                                                                                       outputDirectory, siteDescriptor,
+                                                                                       flavour ) );
     }
 
-    public void render( File siteDirectory, File outputDirectory, InputStream siteDescriptor, String templateName,
-                       Map templateProperties, Locale locale, String outputEncoding )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
+    public void copyResources( String outputDirectory, String flavour )
+        throws Exception
     {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, siteDescriptor, templateName, templateProperties, locale,
-                          outputEncoding );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
+        siteRenderer.copyResources( outputDirectory, flavour );
     }
-
-    public void render( File siteDirectory, File outputDirectory, String module, String moduleExtension,
-                       String moduleParserId, String siteDescriptor, String templateName, Map templateProperties,
-                       Locale locale, String outputEncoding )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
-    {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, module, moduleExtension, moduleParserId, siteDescriptor,
-                          templateName, templateProperties, locale, outputEncoding );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public void render( File siteDirectory, File outputDirectory, String module, String moduleExtension,
-                       String moduleParserId, InputStream siteDescriptor, String templateName, Map templateProperties,
-                       Locale locale, String outputEncoding )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
-    {
-        try
-        {
-            super.render( siteDirectory, outputDirectory, module, moduleExtension, moduleParserId, siteDescriptor,
-                          templateName, templateProperties, locale, outputEncoding );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public void generateDocument( Writer writer, String templateName, Map templateProperties,
-                                 org.apache.maven.doxia.siterenderer.sink.SiteRendererSink sink )
-        throws org.codehaus.doxia.site.renderer.RendererException
-    {
-        try
-        {
-            super.generateDocument( writer, templateName, templateProperties, sink );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public void generateDocument( Writer writer, String templateName, Map templateProperties,
-                                 org.apache.maven.doxia.siterenderer.sink.SiteRendererSink sink, Locale locale )
-        throws org.codehaus.doxia.site.renderer.RendererException
-    {
-        try
-        {
-            super.generateDocument( writer, templateName, templateProperties, sink, locale );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public void generateDocument( Writer writer, String templateName, Map templateProperties, SiteRendererSink sink )
-        throws org.codehaus.doxia.site.renderer.RendererException
-    {
-        try
-        {
-            super.generateDocument( writer, templateName, templateProperties, sink.getSinkDelegate() );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public void generateDocument( Writer writer, String templateName, Map templateProperties, SiteRendererSink sink,
-                                 Locale locale )
-        throws org.codehaus.doxia.site.renderer.RendererException
-    {
-        try
-        {
-            super.generateDocument( writer, templateName, templateProperties, sink.getSinkDelegate(), locale );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public org.apache.maven.doxia.siterenderer.sink.SiteRendererSink createSink( File moduleBaseDir, String document,
-                                                                                File siteDescriptor )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
-    {
-        try
-        {
-            return new org.codehaus.doxia.site.renderer.sink.SiteRendererSink( super.createSink( moduleBaseDir,
-                                                                                                 document,
-                                                                                                 siteDescriptor ) );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public org.apache.maven.doxia.siterenderer.sink.SiteRendererSink createSink( File moduleBaseDir, String document,
-                                                                                String siteDescriptor )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
-    {
-        try
-        {
-            return new org.codehaus.doxia.site.renderer.sink.SiteRendererSink( super.createSink( moduleBaseDir,
-                                                                                                 document,
-                                                                                                 siteDescriptor ) );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
-    public org.apache.maven.doxia.siterenderer.sink.SiteRendererSink createSink( File moduleBaseDir, String document,
-                                                                                InputStream siteDescriptor )
-        throws org.codehaus.doxia.site.renderer.RendererException, IOException
-    {
-        try
-        {
-            return new org.codehaus.doxia.site.renderer.sink.SiteRendererSink( super.createSink( moduleBaseDir,
-                                                                                                 document,
-                                                                                                 siteDescriptor ) );
-        }
-        catch ( RendererException e )
-        {
-            throw new org.codehaus.doxia.site.renderer.RendererException( e );
-        }
-    }
-
 }
