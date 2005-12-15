@@ -46,7 +46,7 @@ echo $BUNDLE
   then
     version=$VERSION
   else
-    version=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
+    version=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<reporting>.*</reporting>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
 
     if [ -z $version ]
     then
@@ -54,18 +54,18 @@ echo $BUNDLE
     fi
   fi
 
-  artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`
+  artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<reporting>.*</reporting>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`
 
   if [ -z $artifactId ]
   then
-    artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
+    artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<reporting>.*</reporting>##' | sed 's#<contributors>.*</contributors>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
   fi
   
   if [ ! -z $GROUPID ]
   then
     groupId=${GROUPID}
   else
-    groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`  
+    groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<build>.*</build>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<reporting>.*</reporting>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`  
 
     if [ -z $groupId ]
     then
