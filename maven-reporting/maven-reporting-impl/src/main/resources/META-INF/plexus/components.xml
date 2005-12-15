@@ -1,0 +1,10 @@
+<component-set>
+  <components>
+
+    <component>
+      <role>org.codehaus.doxia.site.renderer.SiteRenderer</role>
+      <implementation>org.codehaus.doxia.site.renderer.DefaultSiteRenderer</implementation>
+    </component>
+    
+  </components>
+</component-set>
