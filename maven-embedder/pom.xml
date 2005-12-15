@@ -43,6 +43,6 @@
     </plugins>
   </reporting>
   <properties>
-    <mavenVersion>2.0.1</mavenVersion>
+    <mavenVersion>2.0.2-SNAPSHOT</mavenVersion>
   </properties>
 </project>
