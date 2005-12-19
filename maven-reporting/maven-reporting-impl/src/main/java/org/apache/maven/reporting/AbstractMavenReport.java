@@ -19,9 +19,9 @@ package org.apache.maven.reporting;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.doxia.module.xhtml.XhtmlSink;
-import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.apache.maven.doxia.site.renderer.SiteRenderer;
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
@@ -75,7 +75,8 @@ public abstract class AbstractMavenReport
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.", e );
+            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
+                                              e );
         }
     }
 
@@ -89,10 +90,8 @@ public abstract class AbstractMavenReport
         {
             throw new MavenReportException( "You must specify a sink." );
         }
-        else
-        {
-            this.sink = sink;
-        }
+
+        this.sink = sink;
 
         executeReport( locale );
 

@@ -18,7 +18,7 @@ package org.apache.maven.reporting;
 
 import org.apache.commons.validator.EmailValidator;
 import org.apache.commons.validator.UrlValidator;
-import org.codehaus.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.Sink;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Collections;

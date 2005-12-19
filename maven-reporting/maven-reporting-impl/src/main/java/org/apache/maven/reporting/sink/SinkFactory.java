@@ -16,9 +16,9 @@ package org.apache.maven.reporting.sink;
  * limitations under the License.
  */
 
-import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringInputStream;
+import org.apache.maven.doxia.site.renderer.SiteRenderer;
+import org.apache.maven.doxia.sink.Sink;
 
 import java.io.File;
 import java.io.InputStream;
@@ -73,7 +73,7 @@ public class SinkFactory
             descriptor = new StringInputStream( "" );
         }
 
-        return (Sink) siteRenderer.createSink( new File( siteDirectory ), outputFileName, outputDirectory,
-                                        descriptor, flavour );
+        return siteRenderer.createSink( new File( siteDirectory ), outputFileName, outputDirectory, descriptor,
+                                        flavour );
     }
 }

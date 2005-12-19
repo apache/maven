@@ -18,7 +18,7 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.reporting.sink.MultiPageSink;
 import org.apache.maven.reporting.sink.SinkFactory;
-import org.codehaus.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.Sink;
 
 import java.io.InputStream;
 import java.util.ArrayList;
