@@ -29,7 +29,7 @@ public interface LifecycleExecutor
 {
     String ROLE = LifecycleExecutor.class.getName();
 
-    void execute( MavenSession session, ReactorManager rpm, EventDispatcher dispatcher )
+    void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException;
 
 }
