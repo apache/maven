@@ -24,8 +24,15 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
+
 # hack prevent commons-logging-1.1-dev
-rm -rf /home/projects/maven/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging/1.1-dev
+CL=/home/projects/maven/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging
+rm -rf $CL/1.1-dev
+grep -v 1.1-dev $CL/maven-metadata.xml > $CL/maven-metadata.xml.tmp
+mv $CL/maven-metadata.xml.tmp $CL/maven-metadata.xml
+md5sum $CL/maven-metadata.xml > $CL/maven-metadata.xml.md5
+sha1sum $CL/maven-metadata.xml > $CL/maven-metadata.xml.sha1
+
 
 (
   cd $TOOLS_BASE/ibiblio-sync
