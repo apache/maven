@@ -16,12 +16,12 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.doxia.site.renderer.SiteRenderer;
-import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
@@ -43,12 +43,11 @@ public abstract class AbstractMavenReport
     extends AbstractMojo
     implements MavenReport
 {
-
     private Sink sink;
 
     private Locale locale = Locale.ENGLISH;
 
-    protected abstract SiteRenderer getSiteRenderer();
+    protected abstract Renderer getSiteRenderer();
 
     protected abstract String getOutputDirectory();
 
@@ -66,8 +65,8 @@ public abstract class AbstractMavenReport
         {
             String outputDirectory = getOutputDirectory();
 
-            XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html",
-                                                           outputDirectory, getSiteDescriptor(), "maven" );
+            SiteRendererSink sink = getSiteRenderer().createSink( new File( outputDirectory ),
+                                                                  getOutputName() + ".html", getSiteDescriptor() );
 
             generate( sink, Locale.ENGLISH );
 
