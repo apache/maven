@@ -278,6 +278,7 @@ public class DefaultArtifactCollector
                             fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                         }
 
+                        artifact.setDependencyTrail( node.getDependencyTrail() );
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
 
                         //TODO might be better to have source.retreive() throw a specific exception for this situation
