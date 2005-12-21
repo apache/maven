@@ -18,6 +18,7 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.doxia.siterenderer.RendererException;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -70,9 +71,20 @@ public abstract class AbstractMavenReport
 
             generate( sink, Locale.ENGLISH );
 
-            getSiteRenderer().copyResources( outputDirectory, "maven" );
+            // TODO: add back when skinning support is in the site renderer
+//            getSiteRenderer().copyResources( outputDirectory, "maven" );
         }
-        catch ( Exception e )
+        catch ( RendererException e )
+        {
+            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
+                                              e );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
+                                              e );
+        }
+        catch ( MavenReportException e )
         {
             throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
                                               e );
