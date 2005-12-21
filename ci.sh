@@ -7,11 +7,18 @@ cd $HOME
 
 CMD=$1
 
-[ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit 1
+if [ "$1" = "" ]; then
+  echo
+  echo "You must specify a checkout or update!"
+  echo
+  exit 1
+fi
 
 BRANCH="branches/${2}"
 
-[ "$2" = "" ] BRANCH="trunk"
+if [ "$2" = "" ]; then
+  BRANCH="trunk"
+fi
 
 FROM=continuum@maven.zones.apache.org
 TO=dev@maven.apache.org
