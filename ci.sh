@@ -52,7 +52,9 @@ WWW=$HOME/public_html
 DEPLOY_DIR=$WWW/builds/$BRANCH
 DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds/$BRANCH
 DIST=m2-${TIMESTAMP}.tar.gz
+
 SVN=svn
+SED=gsed
 
 MESSAGE_DIR=$WWW/logs/$BRANCH
 MESSAGE_NAME=m2-build-log-${TIMESTAMP}.txt
@@ -149,7 +151,7 @@ fi
     grep "^[PUAD] " $SCM_LOG
     echo
 
-    version=`cat $DIR/maven-components/pom.xml | tr '\n' ' ' | sed 's#<parent>.*</parent>##g' | sed 's#<dependencies>.*</dependencies>##g' | sed 's#<build>.*</build>##g' | sed 's#^.*<version>##g' | sed 's#</version>.*$##g'`
+    version=`cat $DIR/maven-components/pom.xml | tr '\n' ' ' | $SED 's#<parent>.*</parent>##g' | $SED 's#<dependencies>.*</dependencies>##g' | $SED 's#<build>.*</build>##g' | $SED 's#^.*<version>##g' | $SED 's#</version>.*$##g'`
 
     M2_HOME=$DIR/maven-$version
     export M2_HOME
