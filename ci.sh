@@ -43,6 +43,11 @@ DIR=$HOME/m2-build/$BRANCH
 mkdir -p $DIR
 
 REPO=$DIR/maven-repo-local
+# TODO: not good for concurrency - need to pass in to bootstrap
+cat $HOME/.m2/settings.xml.template | sed "s#<localRepository>.*</localRepository>#<localRepository>$REPO</localRepository>#" >$HOME/.m2/settings.xml
+
+# Temporary to try and alleviate build failure due to race condition
+rm -rf $REPO/org/apache/maven/plugins/maven-plugin-plugin
 
 SCM_LOG=$DIR/scm.log
 BUILD_REQUIRED_FILE=$DIR/build_required
