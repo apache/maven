@@ -23,16 +23,10 @@ import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringInputStream;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * The basis for a Maven report.
@@ -66,10 +60,10 @@ public abstract class AbstractMavenReport
         {
             String outputDirectory = getOutputDirectory();
 
-            SiteRendererSink sink = getSiteRenderer().createSink( new File( outputDirectory ),
-                                                                  getOutputName() + ".html", getSiteDescriptor() );
+            SiteRendererSink sink =
+                getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html" );
 
-            generate( sink, Locale.ENGLISH );
+            generate( sink, Locale.getDefault() );
 
             // TODO: add back when skinning support is in the site renderer
 //            getSiteRenderer().copyResources( outputDirectory, "maven" );
@@ -119,61 +113,6 @@ public abstract class AbstractMavenReport
     public String getCategoryName()
     {
         return CATEGORY_PROJECT_REPORTS;
-    }
-
-    private String getReportsMenu()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append( "<menu name=\"Project Documentation\">\n" );
-
-        buffer.append( "  <item name=\"" + getName( locale ) + "\" href=\"/" + getOutputName() + ".html\"/>\n" );
-
-        buffer.append( "</menu>\n" );
-
-        return buffer.toString();
-    }
-
-    private InputStream getSiteDescriptor()
-        throws MojoExecutionException
-    {
-        String siteDescriptorContent = "";
-
-        try
-        {
-            siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-report.xml" ) );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "The site descriptor cannot be read!", e );
-        }
-
-        Map props = new HashMap();
-
-        props.put( "reports", getReportsMenu() );
-
-        // TODO: interpolate ${project.*} in general
-
-        if ( getProject().getName() != null )
-        {
-            props.put( "project.name", getProject().getName() );
-        }
-        else
-        {
-            props.put( "project.name", "NO_PROJECT_NAME_SET" );
-        }
-
-        if ( getProject().getUrl() != null )
-        {
-            props.put( "project.url", getProject().getUrl() );
-        }
-        else
-        {
-            props.put( "project.url", "NO_PROJECT_URL_SET" );
-        }
-
-        siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
-
-        return new StringInputStream( siteDescriptorContent );
     }
 
     public File getReportOutputDirectory()

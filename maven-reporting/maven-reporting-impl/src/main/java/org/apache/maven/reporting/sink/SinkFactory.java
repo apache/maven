@@ -19,11 +19,9 @@ package org.apache.maven.reporting.sink;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.RendererException;
-import org.codehaus.plexus.util.StringInputStream;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
@@ -35,8 +33,6 @@ public class SinkFactory
 
     private Renderer siteRenderer;
 
-    private InputStream siteDescriptor;
-
     public void setSiteRenderer( Renderer siteRenderer )
     {
         this.siteRenderer = siteRenderer;
@@ -47,20 +43,9 @@ public class SinkFactory
         this.siteDirectory = siteDirectory;
     }
 
-    public void setSiteDescriptor( InputStream siteDescriptor )
-    {
-        this.siteDescriptor = siteDescriptor;
-    }
-
     public Sink getSink( String outputFileName )
         throws RendererException, IOException
     {
-        InputStream descriptor = siteDescriptor;
-        if ( descriptor == null )
-        {
-            descriptor = new StringInputStream( "" );
-        }
-
-        return siteRenderer.createSink( new File( siteDirectory ), outputFileName, descriptor );
+        return siteRenderer.createSink( new File( siteDirectory ), outputFileName );
     }
 }
