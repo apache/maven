@@ -51,8 +51,7 @@ echo ERROR: JAVA_HOME not found in your environment.
 echo Please set the JAVA_HOME variable in your environment to match the
 echo location of your Java installation
 echo.
-set ERROR_CODE=1
-goto end
+goto error
 
 :OkJHome
 if exist "%JAVA_HOME%\bin\java.exe" goto chkMHome
@@ -63,8 +62,7 @@ echo JAVA_HOME = %JAVA_HOME%
 echo Please set the JAVA_HOME variable in your environment to match the
 echo location of your Java installation
 echo.
-set ERROR_CODE=1
-goto end
+goto error
 
 :chkMHome
 if not "%M2_HOME%"=="" goto valMHome
@@ -77,8 +75,7 @@ echo ERROR: M2_HOME not found in your environment.
 echo Please set the M2_HOME variable in your environment to match the
 echo location of the Maven installation
 echo.
-set ERROR_CODE=1
-goto end
+goto error
 
 :valMHome
 if exist "%M2_HOME%\bin\m2.bat" goto init
@@ -89,8 +86,7 @@ echo M2_HOME = %M2_HOME%
 echo Please set the M2_HOME variable in your environment to match the
 echo location of the Maven installation
 echo.
-set ERROR_CODE=1
-goto end
+goto error
 @REM ==== END VALIDATION ====
 
 :init
@@ -128,6 +124,7 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 @REM Start MAVEN2
 for %%i in ("%M2_HOME%"\core\boot\classworlds-*) do set CLASSWORLDS_JAR="%%i"
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
+if ERRORLEVEL 1 goto error
 goto end
 
 :error
