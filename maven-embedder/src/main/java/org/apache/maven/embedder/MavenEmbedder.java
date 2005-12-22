@@ -16,67 +16,66 @@ package org.apache.maven.embedder;
  * limitations under the License.
  */
 
+import org.apache.maven.BuildFailureException;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.DuplicateProjectException;
-import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.RuntimeInfo;
-import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.BuildFailureException;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.DuplicateProjectException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.settings.RuntimeInfo;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.embed.Embedder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -118,6 +117,8 @@ public class MavenEmbedder
     private ArtifactFactory artifactFactory;
 
     private ArtifactResolver artifactResolver;
+
+    private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -485,7 +486,7 @@ public class MavenEmbedder
 
         PlexusConfiguration configuration = descriptor.getConfiguration();
 
-        PlexusConfiguration[] phasesConfigurations = configuration.getChild( "lifecycles" ).getChild( 0 ).getChild( "phases" ).getChildren( "phase" );        
+        PlexusConfiguration[] phasesConfigurations = configuration.getChild( "lifecycles" ).getChild( 0 ).getChild( "phases" ).getChildren( "phase" );
 
         try
         {
@@ -496,48 +497,69 @@ public class MavenEmbedder
         }
         catch ( PlexusConfigurationException e )
         {
-             throw new MavenEmbedderException( "Cannot retrieve default lifecycle phasesConfigurations.", e );
+            throw new MavenEmbedderException( "Cannot retrieve default lifecycle phasesConfigurations.", e );
         }
 
         return phases;
     }
 
     // ----------------------------------------------------------------------
-    // Internal utility code
+    // Remote Repository
     // ----------------------------------------------------------------------
 
-    private ArtifactRepository createLocalRepository( Settings settings )
+    // ----------------------------------------------------------------------
+    // Local Repository
+    // ----------------------------------------------------------------------
+
+    public static final String DEFAULT_LOCAL_REPO_ID = "local";
+
+    public static final String DEFAULT_LAYOUT_ID = "default";
+
+    public ArtifactRepository createLocalRepository( File localRepository )
         throws ComponentLookupException
     {
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup( ArtifactRepositoryLayout.ROLE, "default" );
+        return createLocalRepository( localRepository.getAbsolutePath(), DEFAULT_LOCAL_REPO_ID );
+    }
 
-        String url = settings.getLocalRepository();
+    public ArtifactRepository createLocalRepository( Settings settings )
+        throws ComponentLookupException
+    {
+        return createLocalRepository( settings.getLocalRepository(), DEFAULT_LOCAL_REPO_ID );
+    }
 
+    public ArtifactRepository createLocalRepository( String url, String repositoryId )
+        throws ComponentLookupException
+    {
         if ( !url.startsWith( "file:" ) )
         {
             url = "file://" + url;
         }
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
-
-        boolean snapshotPolicySet = false;
-
-        if ( offline )
-        {
-            settings.setOffline( true );
-
-            snapshotPolicySet = true;
-        }
-
-        if ( !snapshotPolicySet && updateSnapshots )
-        {
-            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        }
-
-        artifactRepositoryFactory.setGlobalChecksumPolicy( globalChecksumPolicy );
-
-        return localRepository;
+        return createRepository( url, repositoryId );
     }
+
+    public ArtifactRepository createRepository( String url, String repositoryId )
+        throws ComponentLookupException
+    {
+        // snapshots vs releases
+        // offline = to turning the update policy off
+
+        //TODO: we'll need to allow finer grained creation of repositories but this will do for now
+
+        String updatePolicyFlag = ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS;
+
+        String checksumPolicyFlag = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+
+        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
+
+        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
+
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
+    }
+
+    // ----------------------------------------------------------------------
+    // Internal utility code
+    // ----------------------------------------------------------------------
 
     private RuntimeInfo createRuntimeInfo( Settings settings )
     {
@@ -633,6 +655,8 @@ public class MavenEmbedder
             artifactFactory = (ArtifactFactory) embedder.lookup( ArtifactFactory.ROLE );
 
             artifactResolver = (ArtifactResolver) embedder.lookup( ArtifactResolver.ROLE );
+
+            defaultArtifactRepositoryLayout = (ArtifactRepositoryLayout) embedder.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
 
             // ----------------------------------------------------------------------
             // If an explicit local repository has not been set then we will use the
