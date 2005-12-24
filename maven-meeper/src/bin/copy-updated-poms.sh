@@ -8,8 +8,8 @@ basedest=/home/projects/maven/repository-staging/to-ibiblio/maven2
 
 if [ ! -z $GROUPID ]
 then
-  src=$src/$GROUPID
-  dest=$dest/$GROUPID
+  src=$basesrc/$GROUPID
+  dest=$basedest/$GROUPID
 else
   src=$basesrc
   dest=$basedest
