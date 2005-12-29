@@ -88,7 +88,7 @@ public abstract class AbstractMavenReport
     /**
      * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
      */
-    public void generate( Sink sink, Locale locale )
+    public void generate( org.codehaus.doxia.sink.Sink sink, Locale locale )
         throws MavenReportException
     {
         if ( sink == null )
