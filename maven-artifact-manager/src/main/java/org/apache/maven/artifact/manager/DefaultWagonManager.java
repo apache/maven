@@ -317,6 +317,8 @@ public class DefaultWagonManager
         try
         {
             wagon = getWagon( protocol );
+            
+            configureWagon( wagon, repository );
         }
         catch ( UnsupportedProtocolException e )
         {
