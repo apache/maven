@@ -16,12 +16,12 @@ package org.apache.maven.reporting.sink;
  * limitations under the License.
  */
 
-import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
-import org.codehaus.plexus.util.StringInputStream;
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.doxia.siterenderer.RendererException;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
@@ -29,22 +29,11 @@ import java.io.InputStream;
  */
 public class SinkFactory
 {
-    private String outputDirectory;
-
     private String siteDirectory;
 
-    private SiteRenderer siteRenderer;
+    private Renderer siteRenderer;
 
-    private InputStream siteDescriptor;
-
-    private String flavour;
-
-    public void setOutputDirectory( String outputDirectory )
-    {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public void setSiteRenderer( SiteRenderer siteRenderer )
+    public void setSiteRenderer( Renderer siteRenderer )
     {
         this.siteRenderer = siteRenderer;
     }
@@ -54,26 +43,9 @@ public class SinkFactory
         this.siteDirectory = siteDirectory;
     }
 
-    public void setFlavour( String flavour )
-    {
-        this.flavour = flavour;
-    }
-
-    public void setSiteDescriptor( InputStream siteDescriptor )
-    {
-        this.siteDescriptor = siteDescriptor;
-    }
-
     public Sink getSink( String outputFileName )
-        throws Exception
+        throws RendererException, IOException
     {
-        InputStream descriptor = siteDescriptor;
-        if ( descriptor == null )
-        {
-            descriptor = new StringInputStream( "" );
-        }
-
-        return (Sink) siteRenderer.createSink( new File( siteDirectory ), outputFileName, outputDirectory,
-                                        descriptor, flavour );
+        return siteRenderer.createSink( new File( siteDirectory ), outputFileName );
     }
 }

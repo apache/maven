@@ -17,7 +17,7 @@ package org.apache.maven.reporting.sink;
  */
 
 import org.apache.maven.doxia.sink.SinkAdapter;
-import org.codehaus.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.Sink;
 
 /**
  * @author Emmanuel Venisse

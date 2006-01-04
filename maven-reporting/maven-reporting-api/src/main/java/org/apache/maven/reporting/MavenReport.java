@@ -36,6 +36,7 @@ public interface MavenReport
 
     String CATEGORY_PROJECT_REPORTS = "Project Reports";
 
+    // eventually, we must replace this with the o.a.m.d.s.Sink class as a parameter
     void generate( Sink sink, Locale locale )
         throws MavenReportException;
 

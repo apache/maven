@@ -257,9 +257,11 @@
   </dependencies>
   <reporting>
     <plugins>
+<!--
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
+-->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>changelog-maven-plugin</artifactId>

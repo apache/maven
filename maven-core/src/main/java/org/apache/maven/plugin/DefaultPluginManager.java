@@ -137,24 +137,6 @@ public class DefaultPluginManager
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
 
-    public PluginDescriptor getPluginDescriptor( String groupId,
-                                                 String artifactId,
-                                                 MavenProject project,
-                                                 Settings settings,
-                                                 ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        Plugin plugin = new Plugin();
-
-        plugin.setGroupId( groupId );
-
-        plugin.setArtifactId( artifactId );
-
-        String version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings, localRepository );
-
-        return pluginCollector.getPluginDescriptor( plugin );
-    }
-
     public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other

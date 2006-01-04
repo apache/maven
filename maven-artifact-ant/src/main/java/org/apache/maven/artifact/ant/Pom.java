@@ -111,6 +111,12 @@ public class Pom
 
     void initialise( MavenProjectBuilder builder, ArtifactRepository localRepository )
     {
+        if ( mavenProject != null )
+        {
+            log( "POM is already initialized for: " + mavenProject.getId(), Project.MSG_DEBUG );
+            
+            return;
+        }
         // TODO: should this be in execute() too? Would that work when it is used as a type?
         if ( file != null )
         {

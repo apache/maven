@@ -43,6 +43,12 @@ case "`uname`" in
            ;;
 esac
 
+if [ -z "$JAVA_HOME" ] ; then
+  if [ -e /etc/gentoo-release ] ; then
+    JAVA_HOME=`java-config --jre-home`
+  fi
+fi
+
 if [ -z "$M2_HOME" ] ; then
   # try to find MAVEN
   if [ -d /opt/m2 ] ; then

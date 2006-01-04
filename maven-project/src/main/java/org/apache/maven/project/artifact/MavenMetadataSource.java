@@ -171,8 +171,16 @@ public class MavenMetadataSource
                             message += "  " + relocation.getMessage() + "\n";
                         }
 
-                        getLogger().warn( "While downloading " + pomArtifact.getGroupId() + ":" +
-                            pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
+                        {
+                            getLogger().warn( "While downloading " + pomArtifact.getGroupId() + ":" +
+                                pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        }
+                        else
+                        {
+                            getLogger().debug( "While downloading " + pomArtifact.getGroupId() + ":" +
+                                pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        }
                     }
                     else
                     {
