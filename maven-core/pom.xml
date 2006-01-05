@@ -143,16 +143,11 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-ssh</artifactId>
       <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-utils</artifactId>
-          <groupId>plexus</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ssh-external</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
