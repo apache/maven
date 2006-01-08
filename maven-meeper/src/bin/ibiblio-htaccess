@@ -1,3 +1,5 @@
+##  IF YOU MODIFY THIS FILE, MAKE SURE IT GETS UPDATED IN SVN
+
 RewriteEngine on
 #RewriteLog c:/home/brett/scm/codehaus/maven/maven/rewrite.log
 #RewriteLogLevel 9
