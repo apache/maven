@@ -10,6 +10,7 @@ RedirectMatch permanent /dom4j/jars/dom4j-(.+).jar$ http://www.ibiblio.org/maven
 RedirectMatch permanent /cactus/jars/cactus-([0-9]+)-(.+).jar$ http://www.ibiblio.org/maven2/cactus/cactus/$1-$2/cactus-$1-$2.jar
 RedirectMatch permanent /commons-logging/jars/commons-logging-1.1-dev.jar http://www.ibiblio.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
 RedirectMatch permanent /strutstestcase/jars/strutstestcase-(.+).jar http://www.ibiblio.org/maven2/strutstestcase/strutstestcase/$1/strutstestcase-$1.jar
+RedirectMatch permanent /stax-utils/jars/stax-utils-snapshot-(.+).jar http://www.ibiblio.org/maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar
 
 # rewrite // to /
 #RewriteRule ^/maven//(.*) /maven/$1
