@@ -289,8 +289,7 @@ public class DefaultMavenProjectBuilder
         Model model = readModel( "unknown", projectDescriptor, true );
 
         // Always cache files in the source tree over those in the repository
-        MavenProject p = new MavenProject( model );
-        p.setFile( projectDescriptor );
+        CachedModel cachedModel = new CachedModel( projectDescriptor, model );
 
         String modelKey = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
         if ( modelCache.containsKey( modelKey ) )
@@ -299,7 +298,7 @@ public class DefaultMavenProjectBuilder
                                                 "Duplicate project ID found in " +
                                                     projectDescriptor.getAbsolutePath() );
         }
-        modelCache.put( modelKey, p );
+        modelCache.put( modelKey, cachedModel );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
                                       buildArtifactRepositories( getSuperModel() ),
@@ -375,10 +374,10 @@ public class DefaultMavenProjectBuilder
                                                                      artifact.getVersion(), artifact.getScope() );
         }
 
-        MavenProject project = getCachedProject( projectArtifact.getGroupId(), projectArtifact.getArtifactId(),
-                                                 projectArtifact.getVersion() );
+        CachedModel cachedModel = getCachedProject( projectArtifact.getGroupId(), projectArtifact.getArtifactId(),
+                                                    projectArtifact.getVersion() );
         Model model;
-        if ( project == null )
+        if ( cachedModel == null )
         {
             String projectId = ArtifactUtils.versionlessKey( projectArtifact );
 
@@ -434,7 +433,7 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            model = project.getModel();
+            model = cachedModel.getModel();
         }
 
         return model;
@@ -696,9 +695,8 @@ public class DefaultMavenProjectBuilder
         if ( !modelCache.containsKey( key ) )
         {
             // clone the model because the profile injection below will modify this instance
-            MavenProject p = new MavenProject( ModelUtils.cloneModel( model ) );
-            p.setFile( project.getFile() );
-            modelCache.put( key, p );
+            CachedModel cachedModel = new CachedModel( project.getFile(), ModelUtils.cloneModel( model ) );
+            modelCache.put( key, cachedModel );
         }
 
         List activeProfiles = project.getActiveProfiles();
@@ -879,12 +877,12 @@ public class DefaultMavenProjectBuilder
             // the only way this will have a value is if we find the parent on disk...
             File parentDescriptor = null;
 
-            MavenProject p =
+            CachedModel cachedModel =
                 getCachedProject( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
-            if ( p != null )
+            if ( cachedModel != null )
             {
-                model = p.getModel();
-                parentDescriptor = p.getFile();
+                model = cachedModel.getModel();
+                parentDescriptor = cachedModel.getDescriptor();
             }
             else
             {
@@ -1158,9 +1156,9 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private MavenProject getCachedProject( String groupId, String artifactId, String version )
+    private CachedModel getCachedProject( String groupId, String artifactId, String version )
     {
-        return (MavenProject) modelCache.get( createCacheKey( groupId, artifactId, version ) );
+        return (CachedModel) modelCache.get( createCacheKey( groupId, artifactId, version ) );
     }
 
     private static String createCacheKey( String groupId, String artifactId, String version )
@@ -1365,5 +1363,28 @@ public class DefaultMavenProjectBuilder
         throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    private static class CachedModel
+    {
+        private File descriptor;
+
+        private Model model;
+
+        public CachedModel( File descriptor, Model model )
+        {
+            this.descriptor = descriptor;
+            this.model = model;
+        }
+
+        public File getDescriptor()
+        {
+            return descriptor;
+        }
+
+        public Model getModel()
+        {
+            return model;
+        }
     }
 }
