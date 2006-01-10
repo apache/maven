@@ -21,6 +21,7 @@ import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
@@ -58,6 +59,8 @@ public class PackagingMojo
         File jarFile = new File( outputDirectory, finalName + "-it.jar" );
 
         MavenArchiver archiver = new MavenArchiver();
+
+        archiver.setArchiver( new JarArchiver() );
 
         archiver.setOutputFile( jarFile );
 
