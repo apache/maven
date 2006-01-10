@@ -234,6 +234,12 @@ it0085: Verify that system-scoped dependencies get resolved with system scope
         dependency. Inherited scope should not apply in the case of
         system-scoped dependencies, no matter where they are.
 
+it0086: Verify that a plugin dependency class can be loaded from both the plugin classloader and the
+        context classloader available to the plugin.
+
+it0087: Verify that a project-level plugin dependency class can be loaded from both the plugin classloader
+        and the context classloader available to the plugin.
+
 -------------------------------------------------------------------------------
 
 - generated sources
