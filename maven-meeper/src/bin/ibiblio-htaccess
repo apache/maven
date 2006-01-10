@@ -1,20 +1,24 @@
 ##  IF YOU MODIFY THIS FILE, MAKE SURE IT GETS UPDATED IN SVN
 
+
+## MAVEN 1.0.2 doesn't deal with redirects. Avoid them
+
 RewriteEngine on
 #RewriteLog c:/home/brett/scm/codehaus/maven/maven/rewrite.log
 #RewriteLogLevel 9
 
 RewriteBase /maven/
 
-RedirectMatch permanent /dom4j/jars/dom4j-(.+).jar$ http://www.ibiblio.org/maven2/dom4j/dom4j/$1/dom4j-$1.jar
-RedirectMatch permanent /cactus/jars/cactus-([0-9]+)-(.+).jar$ http://www.ibiblio.org/maven2/cactus/cactus/$1-$2/cactus-$1-$2.jar
-RedirectMatch permanent /commons-logging/jars/commons-logging-1.1-dev.jar http://www.ibiblio.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
-RedirectMatch permanent /strutstestcase/jars/strutstestcase-(.+).jar http://www.ibiblio.org/maven2/strutstestcase/strutstestcase/$1/strutstestcase-$1.jar
-RedirectMatch permanent /stax-utils/jars/stax-utils-snapshot-(.+).jar http://www.ibiblio.org/maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar
+RewriteRule /dom4j/jars/dom4j-(.+).jar$ /maven2/dom4j/dom4j/$1/dom4j-$1.jar [L]
+RewriteRule /cactus/jars/cactus-([0-9]+)-(.+).jar$ /maven2/cactus/cactus/$1-$2/cactus-$1-$2.jar [L]
+RewriteRule /commons-logging/jars/commons-logging-1.1-dev.jar /maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar [L]
+RewriteRule /strutstestcase/jars/strutstestcase-(.+).jar /maven2/strutstestcase/strutstestcase/$1/strutstestcase-$1.jar [L]
+RewriteRule /stax-utils/jars/stax-utils-snapshot-(.+).jar /maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar [L]
 
 # rewrite // to /
 #RewriteRule ^/maven//(.*) /maven/$1
-RewriteRule ^/(.*)$ /maven/$1 [R]
+RewriteRule ^/(.*)$ /maven/$1
+#RewriteRule ^/(.*)$ /maven/$1 [R]
 # rewrite mapped artifact
 #RewriteRule ^(.*)(\.sha1)$ ${artifact-map:$1|$1}$2 [PT]
 #RewriteRule ^(.*)(\.md5)$ ${artifact-map:$1|$1}$2 [PT]
@@ -25,7 +29,8 @@ RewriteRule ^([^/]+)/(jar|pom|config|distribution|java-source|dist|dtd|ear|ejb|l
 # rewrite dotted groups
 RewriteRule ^r/([^/]+)\.(.*)$ r/$1/$2 [PT] [N]
 # final redirect
-RewriteRule ^r/(.*)$ /maven2/$1 [R]
+RewriteRule ^r/(.*)$ /maven2/$1
+#RewriteRule ^r/(.*)$ /maven2/$ [R]
 
 # rewrite for browsing
 #RewriteRule ^/maven$ /maven2/ [R]
