@@ -234,12 +234,16 @@ it0085: Verify that system-scoped dependencies get resolved with system scope
         dependency. Inherited scope should not apply in the case of
         system-scoped dependencies, no matter where they are.
 
-it0086: Verify that a class in a plugin's dependencies can be loaded by both
-        <plugin>.getClass().getClassLoader() and Thread.currentThread().getContextClassLoader().
+it0086: Verify that a plugin dependency class can be loaded from both the plugin classloader and the
+        context classloader available to the plugin.
 
-it0087: Verify that a class in the project-level dependencies for a plugin can be loaded by both
-        <plugin>.getClass().getClassLoader() and Thread.currentThread().getContextClassLoader().
+it0087: Verify that a project-level plugin dependency class can be loaded from both the plugin classloader
+        and the context classloader available to the plugin.
 
+it0088: Test path translation
+
+it0089: Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
+        the context classloader available to the plugin.
 -------------------------------------------------------------------------------
 
 - generated sources
