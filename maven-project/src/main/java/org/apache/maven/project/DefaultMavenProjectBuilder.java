@@ -722,43 +722,6 @@ public class DefaultMavenProjectBuilder
             context.put( "basedir", projectDir.getAbsolutePath() );
         }
 
-        // ----------------------------------------------------------------------
-        // We need to translate the paths before interpolation so that things
-        // like this:
-        //
-        //<project>
-        //  ...
-        //  <build>
-        //    <plugins>
-        //       <plugin>
-        //        <groupId>org.apache.maven.plugins</groupId>
-        //        <artifactId>maven-core-it-plugin</artifactId>
-        //        <executions>
-        //          <execution>
-        //            <phase>process-resources</phase>
-        //            <configuration>
-        //              <pomBuildDirectory>${pom.build.directory}</pomBuildDirectory>
-        //            </configuration>
-        //            <goals>
-        //              <goal>generate-properties</goal>
-        //            </goals>
-        //          </execution>
-        //        </executions>
-        //      </plugin>
-        //    </plugins>
-        //  </build>
-        //</project>
-        //
-        // Are handled correctly where the ${pom.build.directory} must be path
-        // translated in the POM first. So in the Super POM the ${pom.build.directory}
-        // will get shifted to /some/absolute/path/target and then during the
-        // interpolation phase the <pomBuildDirectory/> element up thre will
-        // have the ${pom.build.directory} string swapped out and replaced with
-        // /some/absolute/path/target. [MNG-1927]
-        // ----------------------------------------------------------------------
-
-        pathTranslator.alignToBaseDirectory( project.getModel(), projectDir );
-
         model = modelInterpolator.interpolate( model, context, strict );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables

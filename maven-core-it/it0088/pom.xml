@@ -27,7 +27,7 @@
           <execution>
             <phase>process-resources</phase>
             <configuration>
-              <pomBuildDirectory>${pom.build.directory}</pomBuildDirectory>
+              <pomBuildDirectory>${project.build.directory}</pomBuildDirectory>
             </configuration>
             <goals>
               <goal>generate-properties</goal>
