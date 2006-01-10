@@ -12,6 +12,13 @@
     and the plugin's classloader.
   </description>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshots</id>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <plugins>
       <plugin>
