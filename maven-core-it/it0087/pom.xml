@@ -1,0 +1,47 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <version>1.0</version>
+
+  <artifactId>it0087</artifactId>
+
+  <name>POM Plugin-Dependency Classloading Test</name>
+  
+  <description>
+    Ensure that classes in dependencies specified in the POM's plugin configuration can be loaded, both from the context loader
+    and the plugin's classloader.
+  </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        
+        <dependencies>
+          <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.3</version>
+          </dependency>
+        </dependencies>
+
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            
+            <configuration>
+              <className>
+                org.apache.commons.logging.LogFactory
+              </className>
+            </configuration>
+            <goals>
+              <goal>loadable</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
