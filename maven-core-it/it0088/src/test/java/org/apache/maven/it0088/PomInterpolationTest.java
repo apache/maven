@@ -17,12 +17,28 @@ public class PomInterpolationTest
         basedir = System.getProperty( "basedir" );
     }
 
-    public void testProjectBuildDirectory()
+    public void testProjectBuildDirectoryAfterResourceFiltering()
         throws Exception
     {
         Properties testProperties = new Properties();
 
         File testPropertiesFile = new File( basedir, "target/classes/test.properties" );
+
+        assertTrue( testPropertiesFile.exists() );
+
+        testProperties.load( new FileInputStream( testPropertiesFile ) );
+
+        File projectBuildDirectory = new File( basedir, "target" );
+
+        assertEquals( testProperties.getProperty( "project.build.directory" ), projectBuildDirectory.getAbsolutePath() );
+    }
+
+    public void testProjectBuildDirectoryAfterForMojoExecution()
+        throws Exception
+    {
+        Properties testProperties = new Properties();
+
+        File testPropertiesFile = new File( basedir, "target/mojo-generated.properties" );
 
         assertTrue( testPropertiesFile.exists() );
 
