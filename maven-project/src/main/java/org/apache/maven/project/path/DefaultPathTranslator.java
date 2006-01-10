@@ -80,7 +80,7 @@ public class DefaultPathTranslator
 
         if ( requiresBaseDirectoryAlignment( s ) )
         {
-            s = new File( basedir, s ).getPath();
+            s = new File( basedir, s ).getAbsolutePath();
         }
 
         return s;
