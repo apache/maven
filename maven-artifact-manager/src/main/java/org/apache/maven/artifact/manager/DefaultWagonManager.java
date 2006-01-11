@@ -721,7 +721,6 @@ public class DefaultWagonManager
                 componentConfigurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE );
                 componentConfigurator.configureComponent( wagon, (PlexusConfiguration) serverConfigurationMap
                     .get( repositoryId ), container.getContainerRealm() );
-                System.out.println( "done" );
             }
             catch ( final ComponentLookupException e )
             {
