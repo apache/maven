@@ -1120,6 +1120,7 @@ public class DefaultPluginManager
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-ssh" );
+        artifacts.add( "wagon-ssh-external" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 
