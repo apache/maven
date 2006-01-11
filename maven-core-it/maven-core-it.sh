@@ -33,5 +33,7 @@ if [ "$1" = "--debug" ]; then
   echo Debugging verifier on port 5005
 fi
 
+MAVEN_TEST_ENVAR=MAVEN_TEST_ENVAR_VALUE; export MAVEN_TEST_ENVAR
+
 java "$jvm_m2_home" $opts -cp "$cp" $verifier $@
 
