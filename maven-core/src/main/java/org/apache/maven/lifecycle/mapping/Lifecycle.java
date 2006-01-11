@@ -16,6 +16,8 @@ package org.apache.maven.lifecycle.mapping;
  * limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,8 @@ public class Lifecycle
      * Field phases
      */
     private Map phases;
+    
+    private List optionalMojos = new ArrayList();
 
     /**
      * Method getId
@@ -58,4 +62,19 @@ public class Lifecycle
     {
         this.id = id;
     } //-- void setId(String) 
+    
+    public void addOptionalMojo( String optionalMojo )
+    {
+        this.optionalMojos.add( optionalMojo );
+    }
+    
+    public void setOptionalMojos( List optionalMojos )
+    {
+        this.optionalMojos = optionalMojos;
+    }
+    
+    public List getOptionalMojos()
+    {
+        return this.optionalMojos;
+    }
 }

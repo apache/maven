@@ -95,7 +95,7 @@ public class DefaultLifecycleExecutor
     private List defaultReports;
 
     private Map phaseToLifecycleMap;
-
+    
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -375,7 +375,7 @@ public class DefaultLifecycleExecutor
                     try
                     {
                         // definitely a CLI goal, can use prefix
-                        mojo = getMojoDescriptor( task, session, project, task, true );
+                        mojo = getMojoDescriptor( task, session, project, task, true, false );
                     }
                     catch ( PluginNotFoundException e )
                     {
@@ -481,7 +481,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         // guaranteed to come from the CLI and not be part of a phase
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true );
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true, false );
         executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), forkEntryPoints, session,
                       project );
     }
@@ -958,7 +958,9 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         Map mappings = findMappingsForLifecycle( session, project, lifecycle );
-
+        
+        List optionalMojos = findOptionalMojosForLifecycle( session, project, lifecycle );
+        
         Map lifecycleMappings = new HashMap();
 
         for ( Iterator i = lifecycle.getPhases().iterator(); i.hasNext(); )
@@ -974,7 +976,12 @@ public class DefaultLifecycleExecutor
                     String goal = tok.nextToken().trim();
 
                     // Not from the CLI, don't use prefix
-                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false );
+                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false, optionalMojos.contains( goal ) );
+                    
+                    if ( mojoDescriptor == null )
+                    {
+                        continue;
+                    }
 
                     if ( mojoDescriptor.isDirectInvocationOnly() )
                     {
@@ -1043,6 +1050,41 @@ public class DefaultLifecycleExecutor
         }
 
         return mappings;
+    }
+
+    private List findOptionalMojosForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
+        throws LifecycleExecutionException, PluginNotFoundException
+    {
+        String packaging = project.getPackaging();
+        List optionalMojos = null;
+
+        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session
+            .getSettings(), session.getLocalRepository() );
+        
+        if ( m != null )
+        {
+            optionalMojos = m.getOptionalMojos( lifecycle.getId() );
+        }
+
+        if ( optionalMojos == null )
+        {
+            try
+            {
+                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+                optionalMojos = m.getOptionalMojos( lifecycle.getId() );
+            }
+            catch ( ComponentLookupException e )
+            {
+                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
+            }
+        }
+        
+        if ( optionalMojos == null )
+        {
+            optionalMojos = Collections.EMPTY_LIST;
+        }
+
+        return optionalMojos;
     }
 
     private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
@@ -1334,7 +1376,7 @@ public class DefaultLifecycleExecutor
     }
 
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
-                                              String invokedVia, boolean canUsePrefix )
+                                              String invokedVia, boolean canUsePrefix, boolean isOptionalMojo )
         throws BuildFailureException, LifecycleExecutionException, PluginNotFoundException
     {
         String goal;
@@ -1342,114 +1384,138 @@ public class DefaultLifecycleExecutor
 
         PluginDescriptor pluginDescriptor = null;
 
-        StringTokenizer tok = new StringTokenizer( task, ":" );
-        int numTokens = tok.countTokens();
-
-        if ( numTokens == 2 )
+        try
         {
-            if ( !canUsePrefix )
+            StringTokenizer tok = new StringTokenizer( task, ":" );
+            int numTokens = tok.countTokens();
+
+            if ( numTokens == 2 )
             {
-                String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. " +
-                    "Please use specification of the form groupId:artifactId[:version]:goal instead. " +
-                    "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
-                throw new LifecycleExecutionException( msg );
-            }
+                if ( !canUsePrefix )
+                {
+                    String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. "
+                        + "Please use specification of the form groupId:artifactId[:version]:goal instead. "
+                        + "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
+                    throw new LifecycleExecutionException( msg );
+                }
 
-            String prefix = tok.nextToken();
-            goal = tok.nextToken();
+                String prefix = tok.nextToken();
+                goal = tok.nextToken();
 
-            // Steps for retrieving the plugin model instance:
-            // 1. request directly from the plugin collector by prefix
-            pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
+                // Steps for retrieving the plugin model instance:
+                // 1. request directly from the plugin collector by prefix
+                pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
 
-            // 2. look in the repository via search groups
-            if ( pluginDescriptor == null )
-            {
-                plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
-            }
-            else
-            {
-                plugin = new Plugin();
+                // 2. look in the repository via search groups
+                if ( pluginDescriptor == null )
+                {
+                    plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
+                }
+                else
+                {
+                    plugin = new Plugin();
 
-                plugin.setGroupId( pluginDescriptor.getGroupId() );
-                plugin.setArtifactId( pluginDescriptor.getArtifactId() );
-                plugin.setVersion( pluginDescriptor.getVersion() );
-            }
+                    plugin.setGroupId( pluginDescriptor.getGroupId() );
+                    plugin.setArtifactId( pluginDescriptor.getArtifactId() );
+                    plugin.setVersion( pluginDescriptor.getVersion() );
+                }
 
-            // 3. search plugins in the current POM
-            if ( plugin == null )
-            {
+                // 3. search plugins in the current POM
+                if ( plugin == null )
+                {
+                    for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+                    {
+                        Plugin buildPlugin = (Plugin) i.next();
+
+                        PluginDescriptor desc = verifyPlugin( buildPlugin, project, session.getSettings(), session
+                            .getLocalRepository() );
+                        if ( prefix.equals( desc.getGoalPrefix() ) )
+                        {
+                            plugin = buildPlugin;
+                        }
+                    }
+                }
+
+                // 4. default to o.a.m.plugins and maven-<prefix>-plugin
+                if ( plugin == null )
+                {
+                    plugin = new Plugin();
+                    plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
+                    plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
+                }
+
                 for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
                 {
                     Plugin buildPlugin = (Plugin) i.next();
 
-                    PluginDescriptor desc =
-                        verifyPlugin( buildPlugin, project, session.getSettings(), session.getLocalRepository() );
-                    if ( prefix.equals( desc.getGoalPrefix() ) )
+                    if ( buildPlugin.getKey().equals( plugin.getKey() ) )
                     {
                         plugin = buildPlugin;
+                        break;
                     }
                 }
             }
-
-            // 4. default to o.a.m.plugins and maven-<prefix>-plugin
-            if ( plugin == null )
+            else if ( numTokens == 3 || numTokens == 4 )
             {
                 plugin = new Plugin();
-                plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
-                plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
+
+                plugin.setGroupId( tok.nextToken() );
+                plugin.setArtifactId( tok.nextToken() );
+
+                if ( numTokens == 4 )
+                {
+                    plugin.setVersion( tok.nextToken() );
+                }
+
+                goal = tok.nextToken();
+            }
+            else
+            {
+                String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
+                    + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+                throw new BuildFailureException( message );
             }
 
-            for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
-            {
-                Plugin buildPlugin = (Plugin) i.next();
+            project.injectPluginManagementInfo( plugin );
 
-                if ( buildPlugin.getKey().equals( plugin.getKey() ) )
+            if ( pluginDescriptor == null )
+            {
+                pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
+            }
+
+            // this has been simplified from the old code that injected the plugin management stuff, since
+            // pluginManagement injection is now handled by the project method.
+            project.addPlugin( plugin );
+
+            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+            if ( mojoDescriptor == null )
+            {
+                if ( isOptionalMojo )
                 {
-                    plugin = buildPlugin;
-                    break;
+                    getLogger().info( "Skipping missing optional mojo: " + task );
+                }
+                else
+                {
+                    throw new BuildFailureException( "Required goal not found: " + task );
                 }
             }
+
+            return mojoDescriptor;
         }
-        else if ( numTokens == 3 || numTokens == 4 )
+        catch ( PluginNotFoundException e )
         {
-            plugin = new Plugin();
-
-            plugin.setGroupId( tok.nextToken() );
-            plugin.setArtifactId( tok.nextToken() );
-
-            if ( numTokens == 4 )
+            if ( isOptionalMojo )
             {
-                plugin.setVersion( tok.nextToken() );
+                getLogger().info( "Skipping missing optional mojo: " + task );
+                getLogger().debug( "Mojo: " + task + " could not be found. Reason: " + e.getMessage(), e );
             }
-
-            goal = tok.nextToken();
+            else
+            {
+                throw e;
+            }
         }
-        else
-        {
-            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
-                " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-            throw new BuildFailureException( message );
-        }
-
-        project.injectPluginManagementInfo( plugin );
-
-        if ( pluginDescriptor == null )
-        {
-            pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
-        }
-
-        // this has been simplified from the old code that injected the plugin management stuff, since
-        // pluginManagement injection is now handled by the project method.
-        project.addPlugin( plugin );
-
-        MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-        if ( mojoDescriptor == null )
-        {
-            throw new BuildFailureException( "Required goal not found: " + task );
-        }
-
-        return mojoDescriptor;
+        
+        return null;
     }
 
     protected void line()
