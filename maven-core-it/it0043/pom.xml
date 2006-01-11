@@ -32,7 +32,7 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-help-plugin</artifactId>
+        <artifactId>maven-projecthelp-plugin</artifactId>
         <executions>
           <execution>
             <phase>generate-test-resources</phase>

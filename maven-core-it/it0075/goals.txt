@@ -1,4 +1,4 @@
-help:active-profiles
+projecthelp:active-profiles
 package
 eclipse:eclipse
 clean:clean
