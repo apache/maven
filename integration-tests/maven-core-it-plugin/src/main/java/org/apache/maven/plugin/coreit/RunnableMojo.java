@@ -4,7 +4,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @goal runnable
@@ -19,7 +19,7 @@ public class RunnableMojo
      */
     private String script;
 
-    public void execute() throws MojoFailureException
+    public void execute() throws MojoExecutionException
     {
         Interpreter terp = new Interpreter();
 
@@ -27,14 +27,13 @@ public class RunnableMojo
         {
             getLog().info( "Executing in java version: " + System.getProperty( "java.version" ) );
             
-            Class result = (Class) terp.eval( script );
+            Object result = terp.eval( script );
 
-            getLog().info( "Result of script evaluation was: " + result + "\nLoaded from: " + result.getClassLoader() );
+            getLog().info( "Result of script evaluation was: " + result + "\nLoaded from: " + result.getClass().getClassLoader() );
         }
         catch ( EvalError e )
         {
-            throw new MojoFailureException( this, "Failed to evaluate script.", "Script: \n\n" + script
-                + "\n\nfailed to evaluate. Error: " + e.getMessage() + "\nLine: " + e.getErrorLineNumber() );
+            throw new MojoExecutionException( "Failed to evaluate script.", e );
         }
     }
 }
