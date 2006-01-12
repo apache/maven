@@ -221,9 +221,9 @@
               <phase>test-compile</phase>
               <phase>test</phase>
               <phase>package</phase>
-              <phase>before-integration-test</phase>
+              <phase>pre-integration-test</phase>
               <phase>integration-test</phase>
-              <phase>after-integration-test</phase>
+              <phase>post-integration-test</phase>
               <phase>verify</phase>
               <phase>install</phase>
               <phase>deploy</phase>
