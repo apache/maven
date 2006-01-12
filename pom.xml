@@ -145,9 +145,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.2-SNAPSHOT</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.2-SNAPSHOT</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/components/tags/maven-2.0.2-SNAPSHOT</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/branches/maven-2.0.x</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
@@ -297,27 +297,27 @@
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-file</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-alpha-6-SNAPSHOT</version>
+        <version>1.0-alpha-6</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
