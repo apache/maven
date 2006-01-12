@@ -16,6 +16,8 @@ RewriteRule commons-logging/jars/commons-logging-1.1-dev.jar /maven2/commons-log
 RewriteRule strutstestcase/jars/strutstestcase-(.+).jar /maven2/strutstestcase/strutstestcase/$1/strutstestcase-$1.jar [L]
 RewriteRule stax-utils/jars/stax-utils-snapshot-(.+).jar /maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar [L]
 
+RewriteRule maven$ /maven2/ [R]
+
 # rewrite // to /
 #RewriteRule ^/maven//(.*) /maven/$1
 RewriteRule ^/(.*)$ /maven/$1
@@ -26,6 +28,7 @@ RewriteRule ^/(.*)$ /maven/$1
 #RewriteRule ^(.*)$ ${artifact-map:$1|$1}
 # rewrite artifact
 # don't translate plugins - they aren't copied in the reposync
+RewriteRule ^([^/]+)/(jar|pom|config|distribution|java-source|dist|dtd|ear|ejb|license|licence|nbm|rar|sar|tld|war|xml|zip)s/([^0-9]+)-([0-9].+)\.([^0-9]+)(\.md5|\.sha1){0,1}$ r/$1/$3/$4/$3-$4.$5$6 [PT]
 RewriteRule ^([^/]+)/(jar|pom|config|distribution|java-source|dist|dtd|ear|ejb|license|licence|nbm|rar|sar|tld|war|xml|zip)s/(.+)-([0-9].+)\.([^0-9]+)(\.md5|\.sha1){0,1}$ r/$1/$3/$4/$3-$4.$5$6 [PT]
 # rewrite dotted groups
 RewriteRule ^r/([^/]+)\.(.*)$ r/$1/$2 [PT] [N]
