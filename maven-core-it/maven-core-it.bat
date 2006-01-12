@@ -20,5 +20,7 @@
 @REM NOTE: for simplicity, only Windows NT/2000/XP is current supported
 @REM This also assumes that M2_HOME and JAVA_HOME are set, which are verified in the bootstrap script only
 
+SET MAVEN_TEST_ENVAR=MAVEN_TEST_ENVAR_VALUE
+
 "%JAVA_HOME%\bin\java.exe" -Dmaven.home="%M2_HOME%" %MAVEN_OPTS% -cp "..\maven-core-it-verifier\target\maven-core-it-verifier.jar" org.apache.maven.it.Verifier %*
 

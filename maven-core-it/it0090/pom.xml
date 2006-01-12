@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0088</artifactId>
+  <artifactId>maven-core-it0090</artifactId>
   <version>1.0</version>
   <dependencies>
     <dependency>
@@ -28,10 +28,10 @@
           <execution>
             <phase>process-resources</phase>
             <configuration>
-              <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+              <mavenTestEnvar>${env.MAVEN_TEST_ENVAR}</mavenTestEnvar>
             </configuration>
             <goals>
-              <goal>generate-properties</goal>
+              <goal>generate-envar-properties</goal>
             </goals>
           </execution>
         </executions>

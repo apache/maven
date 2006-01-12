@@ -78,3 +78,4 @@ public class PackagingMojo
     }
 
 }
+                    

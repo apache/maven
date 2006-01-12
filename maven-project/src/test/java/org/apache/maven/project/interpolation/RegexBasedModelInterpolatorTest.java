@@ -24,6 +24,7 @@ import org.apache.maven.model.Repository;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author jdcasey
@@ -43,7 +44,7 @@ public class RegexBasedModelInterpolatorTest
     }
 
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
-        throws ModelInterpolationException
+        throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -59,7 +60,7 @@ public class RegexBasedModelInterpolatorTest
     }
 
     public void testShouldNotInterpolateDependencyVersionWithInvalidReference()
-        throws ModelInterpolationException
+        throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -90,7 +91,7 @@ public class RegexBasedModelInterpolatorTest
     }
 
     public void testTwoReferences()
-        throws ModelInterpolationException
+        throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -107,7 +108,7 @@ public class RegexBasedModelInterpolatorTest
     }
 
     public void testBasedir()
-        throws ModelInterpolationException
+        throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -123,5 +124,65 @@ public class RegexBasedModelInterpolatorTest
 
         assertEquals( "file://localhost/myBasedir/temp-repo",
                       ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
+    }
+
+    public void testEnvars()
+        throws Exception
+    {
+        Properties envars = new Properties();
+
+        envars.setProperty( "HOME", "/path/to/home" );
+
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+
+        modelProperties.setProperty( "outputDirectory", "${env.HOME}" );
+
+        model.setProperties( modelProperties );
+
+        Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
+
+        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "/path/to/home" );
+    }
+
+    public void testEnvarExpressionThatEvaluatesToNullReturnsTheLiteralString()
+        throws Exception
+    {
+        Properties envars = new Properties();
+
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+
+        modelProperties.setProperty( "outputDirectory", "${env.DOES_NOT_EXIST}" );
+
+        model.setProperties( modelProperties );
+
+        Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
+
+        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );        
+
+        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
+    }
+
+
+
+    public void testExpressionThatEvaluatesToNullReturnsTheLiteralString()
+        throws Exception
+    {
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+
+        modelProperties.setProperty( "outputDirectory", "${DOES_NOT_EXIST}" );
+
+        model.setProperties( modelProperties );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );
+
+        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
 }
