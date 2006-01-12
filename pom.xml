@@ -292,7 +292,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>1.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
@@ -325,16 +325,16 @@
     <repository>
       <id>repo1</id>
       <name>Maven Central Repository</name>
-      <url>scpexe://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
     <snapshotRepository>
       <id>apache.snapshots</id>
       <name>Apache Development Repository</name>
-      <url>scpexe://minotaur.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
+      <url>scp://minotaur.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
     </snapshotRepository>
     <site>
       <id>website</id>
-      <url>scpexe://minotaur.apache.org/www/maven.apache.org/</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/</url>
     </site>
   </distributionManagement>
 </project>
