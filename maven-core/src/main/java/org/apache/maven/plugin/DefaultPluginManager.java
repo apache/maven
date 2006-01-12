@@ -55,6 +55,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.MavenArtifactFilterManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -1092,36 +1093,7 @@ public class DefaultPluginManager
 
     public void initialize()
     {
-        // TODO: configure this from bootstrap or scan lib
-        Set artifacts = new HashSet();
-        artifacts.add( "classworlds" );
-        artifacts.add( "commons-cli" );
-        artifacts.add( "doxia-sink-api" );
-        artifacts.add( "jsch" );
-        artifacts.add( "maven-artifact" );
-        artifacts.add( "maven-artifact-manager" );
-        artifacts.add( "maven-core" );
-        artifacts.add( "maven-error-diagnoser" );
-        artifacts.add( "maven-model" );
-        artifacts.add( "maven-monitor" );
-        artifacts.add( "maven-plugin-api" );
-        artifacts.add( "maven-plugin-descriptor" );
-        artifacts.add( "maven-plugin-parameter-documenter" );
-        artifacts.add( "maven-plugin-registry" );
-        artifacts.add( "maven-profile" );
-        artifacts.add( "maven-project" );
-        artifacts.add( "maven-reporting-api" );
-        artifacts.add( "maven-repository-metadata" );
-        artifacts.add( "maven-settings" );
-        artifacts.add( "plexus-container-default" );
-        artifacts.add( "plexus-interactivity-api" );
-        artifacts.add( "plexus-utils" );
-        artifacts.add( "wagon-provider-api" );
-        artifacts.add( "wagon-file" );
-        artifacts.add( "wagon-http-lightweight" );
-        artifacts.add( "wagon-ssh" );
-        artifacts.add( "wagon-ssh-external" );
-        artifactFilter = new ExclusionSetFilter( artifacts );
+        artifactFilter =  MavenArtifactFilterManager.createStandardFilter();
     }
 
     // ----------------------------------------------------------------------

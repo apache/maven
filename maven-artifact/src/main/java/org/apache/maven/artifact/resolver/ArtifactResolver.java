@@ -32,6 +32,7 @@ import java.util.Set;
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
+ * @todo possibly fix the signatures, it's unfortunate that in some methods the local repo is listed first and second in others.
  */
 public interface ArtifactResolver
 {
@@ -40,33 +41,53 @@ public interface ArtifactResolver
     void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
-                                                  ArtifactRepository localRepository, ArtifactMetadataSource source )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
-                                                  ArtifactRepository localRepository, ArtifactMetadataSource source,
-                                                  List listeners )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                  ArtifactRepository localRepository, List remoteRepositories,
-                                                  ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                                  ArtifactRepository localRepository, List remoteRepositories,
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  List remoteRepositories,
+                                                  ArtifactRepository localRepository,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                                  ArtifactRepository localRepository, List remoteRepositories,
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  List remoteRepositories,
+                                                  ArtifactRepository localRepository,
+                                                  ArtifactMetadataSource source,
+                                                  List listeners )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  ArtifactRepository localRepository,
+                                                  List remoteRepositories,
+                                                  ArtifactMetadataSource source,
+                                                  ArtifactFilter filter )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  Map managedVersions,
+                                                  ArtifactRepository localRepository,
+                                                  List remoteRepositories,
+                                                  ArtifactMetadataSource source )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  Map managedVersions,
+                                                  ArtifactRepository localRepository,
+                                                  List remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                                  ArtifactRepository localRepository, List remoteRepositories,
-                                                  ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  Map managedVersions,
+                                                  ArtifactRepository localRepository,
+                                                  List remoteRepositories,
+                                                  ArtifactMetadataSource source,
+                                                  ArtifactFilter filter,
+                                                  List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )

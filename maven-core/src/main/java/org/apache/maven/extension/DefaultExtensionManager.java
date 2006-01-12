@@ -24,8 +24,10 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Extension;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.MavenArtifactFilterManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -40,6 +42,7 @@ import java.util.Iterator;
  * Used to locate extensions.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class DefaultExtensionManager
@@ -50,6 +53,8 @@ public class DefaultExtensionManager
     private ArtifactMetadataSource artifactMetadataSource;
 
     private PlexusContainer container;
+
+    private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createStandardFilter();
 
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
@@ -62,9 +67,10 @@ public class DefaultExtensionManager
         {
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
                                                                                     project.getArtifact(),
-                                                                                    project.getRemoteArtifactRepositories(),
                                                                                     localRepository,
-                                                                                    artifactMetadataSource );
+                                                                                    project.getRemoteArtifactRepositories(),
+                                                                                    artifactMetadataSource,
+                                                                                    artifactFilter );
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
