@@ -22,14 +22,6 @@
         <exclude>commons-lang:commons-lang</exclude>
         <exclude>commons-logging:commons-logging</exclude>
         <exclude>commons-cli:commons-cli</exclude>
-        <!--
-         |
-         | When the embedder API provides deployment options this can be put
-         | back in along with some other libraries for convenience.
-         |
-         -->
-        <exclude>jsch:jsch</exclude>                
-        <exclude>org.apache.maven.wagon:wagon-ssh</exclude>
         <!-- TODO: can probably be removed now -->
         <exclude>plexus:plexus-container-default</exclude>
       </excludes>
