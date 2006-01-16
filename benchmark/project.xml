@@ -1,8 +1,0 @@
-<project>
-  <groupId>foo</groupId>
-  <artifactId>foo</artifactId>
-  <currentVersion>1.0</currentVersion>
-  <build>
-    <sourceDirectory>src/main/java</sourceDirectory>
-  </build>
-</project>
