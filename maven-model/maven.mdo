@@ -2299,8 +2299,7 @@
         <field>
           <name>checksumPolicy</name>
           <version>4.0.0</version>
-          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
-            "fail" or "warn"</description>
+          <description>What to do when verification of an artifact checksum fails. Valid values are "ignore", "fail" or "warn"</description>
           <type>String</type>
         </field>
       </fields>
