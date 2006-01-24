@@ -185,26 +185,30 @@ public class DefaultArtifactCollector
 
                     // TODO: should this be part of mediation?
                     // previous one is more dominant
+                    ResolutionNode nearest, farthest;
                     if ( previous.getDepth() <= node.getDepth() )
                     {
-                        checkScopeUpdate( node, previous, listeners );
+                        nearest = previous;
+                        farthest = node;
                     }
                     else
                     {
-                        checkScopeUpdate( previous, node, listeners );
+                        nearest = node;
+                        farthest = previous;
                     }
 
-                    if ( previous.getDepth() <= node.getDepth() )
+                    /* if we need to update scope of nearest to use farthest scope */
+                    if ( checkScopeUpdate( farthest, nearest, listeners ) )
                     {
-                        // previous was nearer
-                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, node, previous.getArtifact() );
-                        node.disable();
+                        fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthest.getArtifact() );
+
+                        // previously we cloned the artifact, but it is more effecient to just update the scope
+                        // if problems are later discovered that the original object needs its original scope value, cloning may
+                        // again be appropriate
+                        nearest.getArtifact().setScope( farthest.getArtifact().getScope() );
                     }
-                    else
-                    {
-                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, previous, node.getArtifact() );
-                        previous.disable();
-                    }
+                    fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, farthest, nearest.getArtifact() );
+                    farthest.disable();
                 }
             }
         }
@@ -316,13 +320,13 @@ public class DefaultArtifactCollector
     }
 
     /**
-     * Check if the scope needs to be updated.
+     * Check if the scope of the nearest needs to be updated with the scope of the farthest.
      * <a href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
      * @param farthest farthest resolution node
      * @param nearest nearest resolution node
      * @param listeners
      */
-    void checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
+    private boolean checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
     {
         boolean updateScope = false;
         Artifact farthestArtifact = farthest.getArtifact();
@@ -349,15 +353,7 @@ public class DefaultArtifactCollector
             fireEvent( ResolutionListener.UPDATE_SCOPE_CURRENT_POM, listeners, nearest, farthestArtifact );
         }
 
-        if ( updateScope )
-        {
-            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
-
-            // previously we cloned the artifact, but it is more effecient to just update the scope
-            // if problems are later discovered that the original object needs its original scope value, cloning may
-            // again be appropriate
-            nearestArtifact.setScope( farthestArtifact.getScope() );
-        }
+        return updateScope;
     }
 
     private void fireEvent( int event, List listeners, ResolutionNode node )
