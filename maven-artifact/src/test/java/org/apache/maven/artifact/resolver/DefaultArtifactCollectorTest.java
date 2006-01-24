@@ -18,7 +18,6 @@ package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -506,58 +505,104 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
     }
     
-    public void testCheckScopeUpdate()
+    public void testScopeUpdate( )
         throws InvalidVersionSpecificationException, ArtifactResolutionException
     {
         /* farthest = compile */
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE );
 
         /* farthest = provided */
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
-        //checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
 
         /* farthest = runtime */
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME );
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
-        //checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
-        //checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME );
 
         /* farthest = system */
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
-        //checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
 
         /* farthest = test */
         checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
-        //checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
         checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
-        //checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
     }
-
+    
     private void checkScopeUpdate( String farthestScope, String nearestScope, String expectedScope )
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        checkScopeUpdateDirect( farthestScope, nearestScope, expectedScope );
+        checkScopeUpdateTransitively( farthestScope, nearestScope, expectedScope );
+    }
+
+    private void checkScopeUpdateTransitively( String farthestScope, String nearestScope, String expectedScope )
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = createArtifact( "b", "1.0", nearestScope );
         ArtifactSpec c = createArtifact( "c", "1.0" );
         a.addDependency( c );
-        ArtifactSpec d = createArtifact( "d", "2.0" );
-        b.addDependency( d );
-        c.addDependency( "d", "2.0", farthestScope );
+        ArtifactSpec dNearest = createArtifact( "d", "2.0" );
+        b.addDependency( dNearest );
+        ArtifactSpec dFarthest = createArtifact( "d", "2.0", farthestScope );
+        c.addDependency( dFarthest );
+
+        /* system and provided dependencies are not transitive */
+        if ( !Artifact.SCOPE_SYSTEM.equals( nearestScope ) && !Artifact.SCOPE_PROVIDED.equals( nearestScope ) )
+        {
+          checkScopeUpdate( a, b, expectedScope );
+        }
+    }
+
+    private void checkScopeUpdateDirect( String farthestScope, String nearestScope, String expectedScope )
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+        ArtifactSpec c = createArtifact( "c", "1.0" );
+        a.addDependency( c );
+        ArtifactSpec dNearest = createArtifact( "d", "2.0", nearestScope );
+        b.addDependency( dNearest );
+        ArtifactSpec dFarthest = createArtifact( "d", "2.0", farthestScope );
+        c.addDependency( dFarthest );
+        
+        checkScopeUpdate( a, b, expectedScope );
+    }
     
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ), 
-                                                new ScopeArtifactFilter( expectedScope ) );
+    private void checkScopeUpdate( ArtifactSpec a, ArtifactSpec b, String expectedScope )
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ScopeArtifactFilter filter;
+        if ( Artifact.SCOPE_PROVIDED.equals( expectedScope ) )
+        {
+            filter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
+        }
+        else if ( Artifact.SCOPE_SYSTEM.equals( expectedScope ) )
+        {
+            filter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
+        }
+        else
+        {
+            filter = new ScopeArtifactFilter( expectedScope );
+        }
+
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ), filter );
         Artifact artifact = getArtifact( "d", res.getArtifacts() );
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
         assertEquals( "Check scope", expectedScope, artifact.getScope() );
@@ -776,8 +821,9 @@ public class DefaultArtifactCollectorTest
                     versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 }
                 Artifact artifact;
-                if ( d.getScope().equals( Artifact.SCOPE_TEST ) )
+                if ( d.getScope().equals( Artifact.SCOPE_TEST ) || d.getScope().equals( Artifact.SCOPE_PROVIDED ) )
                 {
+                    /* don't call createDependencyArtifact as it'll ignore test and provided scopes */
                     artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d
                         .getScope(), d.getType() );
                 }
