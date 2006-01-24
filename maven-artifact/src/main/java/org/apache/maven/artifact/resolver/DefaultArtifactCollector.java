@@ -351,7 +351,7 @@ public class DefaultArtifactCollector
 
         if ( updateScope )
         {
-            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, farthest, nearestArtifact );
+            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
 
             // previously we cloned the artifact, but it is more effecient to just update the scope
             // if problems are later discovered that the original object needs its original scope value, cloning may
