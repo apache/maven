@@ -315,7 +315,14 @@ public class DefaultArtifactCollector
         }
     }
 
-    private void checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
+    /**
+     * Check if the scope needs to be updated.
+     * <a href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
+     * @param farthest farthest resolution node
+     * @param nearest nearest resolution node
+     * @param listeners
+     */
+    void checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
     {
         boolean updateScope = false;
         Artifact farthestArtifact = farthest.getArtifact();

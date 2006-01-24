@@ -503,6 +503,68 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
     }
+    
+    public void testCheckScopeUpdate()
+        throws InvalidVersionSpecificationException
+    {
+        /* farthest = compile */
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE );
+
+        /* farthest = provided */
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
+
+        /* farthest = runtime */
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME );
+
+        /* farthest = system */
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
+
+        /* farthest = test */
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
+        checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
+    }
+
+    private ResolutionNode createResolutionNode( String scope )
+        throws InvalidVersionSpecificationException
+    {
+        /* force depth > 1 to avoid "current pom" overrides */
+        ResolutionNode parent = new ResolutionNode( createArtifact( "parent", "0.1", scope ).artifact, null );
+        parent = new ResolutionNode( createArtifact( "parent", "0.1", scope ).artifact, null, parent );
+
+        String artifactId = "a", version = "1.0";
+        return new ResolutionNode( createArtifact( artifactId, version, scope ).artifact, null, parent );
+    }
+
+    private void checkScopeUpdate( String farthestScope, String nearestScope, String expectedScope )
+        throws InvalidVersionSpecificationException
+    {
+        DefaultArtifactCollector defaultArtifactCollector = (DefaultArtifactCollector) artifactCollector;
+        ResolutionNode farthest = createResolutionNode( farthestScope );
+        ResolutionNode nearest = createResolutionNode( nearestScope );
+
+        defaultArtifactCollector.checkScopeUpdate( farthest, nearest, new ArrayList() );
+        //assertEquals( expectedFarthestScope, farthest.getArtifact().getScope() );
+        assertEquals( expectedScope, nearest.getArtifact().getScope() );
+    }
 
     public void disabledtestOptionalNotTransitiveButVersionIsInfluential()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
