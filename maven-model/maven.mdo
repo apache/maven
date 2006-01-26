@@ -1992,12 +1992,11 @@
           <name>connection</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            The source configuration management system URL
+            The <a href="http://maven.apache.org/scm/scm-url-format.html">source configuration management system URL</a>
             that describes the repository and how to connect to the
             repository.  This is used by Maven when
-            <a
-              href="/plugins/dist/index.html">building versions</a>
-            from specific ID. <a href="http://maven.apache.org/scm/scm-url-format.html">Url format</a>
+            <a href="/plugins/maven-assembly-plugin/index.html">building versions</a>
+            from specific ID.
           ]]></description>
           <type>String</type>
         </field>
@@ -2022,7 +2021,7 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description><![CDATA[The URL to the project's browsable CVS repository.]]></description>
+          <description><![CDATA[The URL to the project's browsable scm repository.]]></description>
           <type>String</type>
         </field>
       </fields>
