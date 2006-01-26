@@ -132,7 +132,21 @@
         <field>
           <name>packaging</name>
           <version>4.0.0</version>
-          <description><![CDATA[The type of artifact this project produces.]]></description>
+          <description><![CDATA[
+            The type of artifact this project produces.
+            The main types are:
+            <ul>
+              <li>jar</li>
+              <li>war</li>
+              <li>ear</li>
+              <li>pom</li>
+            </ul>
+            <p>
+            However, plugins can create their own packaging, and
+            therefore their own packaging types,
+            so this list can not contain all possible types.
+            </p>
+          ]]></description>
           <type>String</type>
           <defaultValue>jar</defaultValue>
         </field>
@@ -1297,7 +1311,7 @@
           <name>scope</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            The scope of the dependency - compile, runtime, test. Used to
+            The scope of the dependency - compile, runtime, test, system. Used to
             calculate the various classpaths used for testing, etc. and for 
             determining which artifacts to include in a distribution of this
             project. For more information, see 
@@ -1313,8 +1327,13 @@
         <field>
           <name>systemPath</name>
           <version>4.0.0</version>
-          <description>FOR SYSTEM SCOPE ONLY. This specifies the path on the filesystem for this
-            dependency.</description>
+          <description>
+            FOR SYSTEM SCOPE ONLY.
+            This specifies the path on the filesystem for this dependency.
+            Requires an absolute path for the value, not relative.
+            Use a property that gives the machine specific absolute path,
+            e.g. ${java.home}.
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -1811,7 +1830,24 @@
         <field>
           <name>relativePath</name>
           <version>4.0.0</version>
-          <description><![CDATA[The relative path of the parent-pom within the project hierarchy]]></description>
+          <description><![CDATA[
+            The relative path of the parent-pom within the project hierarchy.
+            The default value is ../pom.xml.
+            <p>
+            Normally, Maven looks for the parent pom first in the default location,
+            then the local repository, and lastly in the remote repo.
+            </p>
+            <p>
+            relativePath allows you to select a different location,
+            for example when your structure is flat, or deeper without an intermediate parent pom.
+            </p>
+            <p>
+            However, the group and artifact ID is still required,
+            as when the parent is coming from the repository,
+            it must look for the parent in the repository, and so on.
+            This feature is only for enhancing the development in a local checkout of that project.
+            </p>
+          ]]></description>
           <type>String</type>
           <defaultValue>../pom.xml</defaultValue>
         </field>
@@ -1956,12 +1992,11 @@
           <name>connection</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            The source configuration management system URL
+            The <a href="http://maven.apache.org/scm/scm-url-format.html">source configuration management system URL</a>
             that describes the repository and how to connect to the
             repository.  This is used by Maven when
-            <a
-              href="/plugins/dist/index.html">building versions</a>
-            from specific ID. <a href="http://maven.apache.org/scm/scm-url-format.html">Url format</a>
+            <a href="/plugins/maven-assembly-plugin/index.html">building versions</a>
+            from specific ID.
           ]]></description>
           <type>String</type>
         </field>
@@ -1986,7 +2021,7 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description><![CDATA[The URL to the project's browsable CVS repository.]]></description>
+          <description><![CDATA[The URL to the project's browsable scm repository.]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -2299,8 +2334,7 @@
         <field>
           <name>checksumPolicy</name>
           <version>4.0.0</version>
-          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
-            "fail" or "warn"</description>
+          <description>What to do when verification of an artifact checksum fails. Valid values are "ignore", "fail" or "warn"</description>
           <type>String</type>
         </field>
       </fields>
