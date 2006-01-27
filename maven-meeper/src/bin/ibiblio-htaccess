@@ -14,6 +14,7 @@ RewriteRule cactus/jars/cactus-([0-9]+)-(.+).jar$ /maven2/cactus/cactus/$1-$2/ca
 RewriteRule commons-logging/jars/commons-logging-1.1-dev.jar /maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar [L]
 RewriteRule strutstestcase/jars/strutstestcase-(.+).jar /maven2/strutstestcase/strutstestcase/$1/strutstestcase-$1.jar [L]
 RewriteRule stax-utils/jars/stax-utils-snapshot-(.+).jar /maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar [L]
+RewriteRule batik/jars/batik-1.5-fop-(.+).jar /maven2/batik/batik-1.5-fop/$1/batik-1.5-fop-$1.jar [L]
 
 # rewrite // to /
 #RewriteRule ^/maven//(.*) /maven/$1
