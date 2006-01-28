@@ -273,8 +273,11 @@ public class DefaultArtifact
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        sb.append( getGroupId() );
-        sb.append( ":" );
+        if ( getGroupId() != null )
+        {
+            sb.append( getGroupId() );
+            sb.append( ":" );
+        }
         appendArtifactTypeClassifierString( sb );
         sb.append( ":" );
         if ( version != null || baseVersion != null )
@@ -285,8 +288,11 @@ public class DefaultArtifact
         {
             sb.append( versionRange.toString() );
         }
-        sb.append( ":" );
-        sb.append( scope );
+        if ( scope != null )
+        {
+            sb.append( ":" );
+            sb.append( scope );
+        }
         return sb.toString();
     }
 

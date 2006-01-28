@@ -75,22 +75,19 @@ public class DefaultArtifactTest
     public void testToStringNullGroupId()
     {
         artifact.setGroupId( null );
-        assertEquals( null + ":" + artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope, artifact
-            .toString() );
+        assertEquals( artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope, artifact.toString() );
     }
 
     public void testToStringNullClassifier()
     {
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, null, artifactHandler );
-        assertEquals( groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact
-            .toString() );
+        assertEquals( groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact.toString() );
     }
 
     public void testToStringNullScope()
     {
         artifact.setScope( null );
-        assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version + ":" + null, artifact
-            .toString() );
+        assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version, artifact.toString() );
     }
 
 }
