@@ -11,5 +11,5 @@ if [ "$1" == "go" ]; then
 fi
 
 cd $HOME/repository-staging/to-ibiblio/maven2
-echo rsync --exclude="README.txt" -e ssh $OPTS -avz carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/* .
-rsync --exclude="README.txt" -e ssh $OPTS -avz carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/* .
+echo rsync --exclude="README.txt" -e ssh $OPTS -avz carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/* net/sourceforge/maven-taglib/
+rsync --exclude="README.txt" -e ssh $OPTS -avz carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/* net/sourceforge/maven-taglib/
