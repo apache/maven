@@ -99,7 +99,7 @@ echo $BUNDLE
   # A little help for manually created upload bundles
   [ -f license.txt ] && mv license.txt $LIC
 
-  if [ ! -f $LIC ]
+  if [ -f $LIC ]
   then
     ../d2u $LIC
     mkdir -p $REPODIR/${groupId}/licenses
