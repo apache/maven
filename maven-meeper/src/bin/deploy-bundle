@@ -98,16 +98,16 @@ echo $BUNDLE
 
   # A little help for manually created upload bundles
   [ -f license.txt ] && mv license.txt $LIC
-  [ -f licence.txt ] && mv licence.txt $LIC
 
-  [ ! -f $LIC ] && echo && echo "Cannot deploy without the $LIC file!" && echo && exit
+  if [ ! -f $LIC ]
+  then
+    ../d2u $LIC
+    mkdir -p $REPODIR/${groupId}/licenses
+    cp -i $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
+  fi
 
   cp ${POM} ${artifactId}-${version}.pom
 
-  ../d2u $LIC
-
-  mkdir -p $REPODIR/${groupId}/licenses
-  cp -i $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
 
   mkdir -p $REPODIR/${groupId}/poms
   cp -i ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
