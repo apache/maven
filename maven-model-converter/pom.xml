@@ -9,7 +9,6 @@
   <name>Maven Model Converter</name>
   <version>2.1-SNAPSHOT</version>
   <description>Converts between version 3.0.0 and version 4.0.0 models.</description>
-  <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
