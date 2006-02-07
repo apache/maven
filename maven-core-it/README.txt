@@ -244,9 +244,18 @@ it0088: Test path translation.
 
 it0089: Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
         the context classloader available to the plugin.
+       
+it0090: Test that ensures that envars are interpolated correctly into plugin
+        configurations.
+
+it0091: Test that currently demonstrates that properties are not correctly
+        interpolated into other areas in the POM. This may strictly be a boolean
+        problem: I captured the problem as it was reported.
 
 it0092: Test that legacy repositories with legacy snapshots download correctly.
 
+it0093: A test that ensures that an exception is thrown when two artifacts
+with the same id are present in the reactor.
 -------------------------------------------------------------------------------
 
 - generated sources

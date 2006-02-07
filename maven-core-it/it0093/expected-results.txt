@@ -1,0 +1,3 @@
+target/touch.txt
+!subproject/target/touch.txt
+subproject2/target/touch.txt

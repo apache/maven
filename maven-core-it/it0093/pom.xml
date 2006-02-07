@@ -1,0 +1,11 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>parent-it0093</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <modules>
+    <module>a-one</module>
+    <module>b-one</module>
+  </modules>
+</model>
