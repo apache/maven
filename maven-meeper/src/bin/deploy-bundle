@@ -35,6 +35,10 @@ echo $BUNDLE
   then
     POM=pom.xml
   fi
+  if [ ! -f ${POM} ]
+  then
+    POM=`find . -iname *.pom`
+  fi
 
   [ ! -f ${POM} ] && echo && echo "Cannot deploy without the pom.xml or project.xml file!" && echo && exit
 
