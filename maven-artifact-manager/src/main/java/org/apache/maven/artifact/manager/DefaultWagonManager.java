@@ -255,7 +255,8 @@ public class DefaultWagonManager
             }
         }
 
-        if ( !successful )
+        // if it already exists locally we were just trying to force it - ignore the update
+        if ( !successful && !artifact.getFile().exists() )
         {
             throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
         }
