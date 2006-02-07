@@ -152,7 +152,7 @@ public class DefaultArtifactResolver
                             wagonManager.getArtifact( artifact, repositories );
                         }
 
-                        if ( !artifact.isResolved() )
+                        if ( !artifact.isResolved() && !destination.exists() )
                         {
                             throw new ArtifactResolutionException(
                                 "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
