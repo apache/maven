@@ -32,8 +32,10 @@ public interface MavenReport
 {
     String ROLE = MavenReport.class.getName();
 
+    /** @deprecated For removal in Maven 3.0 or when reporting-api is decoupled from the core, as categories are dynamic. */
     String CATEGORY_PROJECT_INFORMATION = "Project Info";
 
+    /** @deprecated For removal in Maven 3.0 or when reporting-api is decoupled from the core, as categories are dynamic. */
     String CATEGORY_PROJECT_REPORTS = "Project Reports";
 
     // eventually, we must replace this with the o.a.m.d.s.Sink class as a parameter
