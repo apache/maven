@@ -21,6 +21,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +106,32 @@ public class DefaultArtifactResolver
                 transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
                 File destination = artifact.getFile();
+                List repositories = remoteRepositories;
+
+                // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
+                if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
+                    destination.exists() )
+                {
+                    Date comparisonDate = new Date( destination.lastModified() );
+
+                    // cull to list of repositories that would like an update
+                    repositories = new ArrayList( remoteRepositories );
+                    for ( Iterator i = repositories.iterator(); i.hasNext(); )
+                    {
+                        ArtifactRepository repository = (ArtifactRepository) i.next();
+                        ArtifactRepositoryPolicy policy = repository.getSnapshots();
+                        if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
+                        {
+                            i.remove();
+                        }
+                    }
+
+                    if ( !repositories.isEmpty() )
+                    {
+                        // someone wants to check for updates
+                        force = true;
+                    }
+                }
                 boolean resolved = false;
                 if ( !destination.exists() || force )
                 {
@@ -121,7 +149,7 @@ public class DefaultArtifactResolver
                         }
                         else
                         {
-                            wagonManager.getArtifact( artifact, remoteRepositories );
+                            wagonManager.getArtifact( artifact, repositories );
                         }
 
                         if ( !artifact.isResolved() )
@@ -238,11 +266,11 @@ public class DefaultArtifactResolver
                 missingArtifacts.add( node.getArtifact() );
             }
         }
-        
+
         if ( missingArtifacts.size() > 0 )
         {
             String message = "required artifacts missing:\n";
-            for( Iterator i=missingArtifacts.iterator(); i.hasNext(); )
+            for ( Iterator i = missingArtifacts.iterator(); i.hasNext(); )
             {
                 Artifact missingArtifact = (Artifact) i.next();
                 message += "  " + missingArtifact.getId() + "\n";
