@@ -73,7 +73,7 @@ public class DefaultWagonManager
     private Map serverPermissionsMap = new HashMap();
 
     private Map mirrors = new HashMap();
-    
+
     private Map serverConfigurationMap = new HashMap();
 
     private TransferListener downloadMonitor;
@@ -128,14 +128,14 @@ public class DefaultWagonManager
         try
         {
             wagon = getWagon( protocol );
-            
+
             configureWagon( wagon, repository );
         }
         catch ( UnsupportedProtocolException e )
         {
             throw new TransferFailedException( "Unsupported Protocol: '" + protocol + "': " + e.getMessage(), e );
         }
-        
+
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );
@@ -349,6 +349,8 @@ public class DefaultWagonManager
         File temp = new File( destination + ".tmp" );
         temp.deleteOnExit();
 
+        boolean downloaded = false;
+
         try
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
@@ -366,51 +368,38 @@ public class DefaultWagonManager
                 retry = false;
 
                 // This should take care of creating destination directory now on
-                wagon.get( remotePath, temp );
-
-                // keep the checksum files from showing up on the download monitor...
-                if ( downloadMonitor != null )
+                if ( destination.exists() )
                 {
-                    wagon.removeTransferListener( downloadMonitor );
+                    downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+                }
+                else
+                {
+                    wagon.get( remotePath, temp );
+                    downloaded = true;
                 }
 
-                // try to verify the SHA-1 checksum for this file.
-                try
+                if ( downloaded )
                 {
-                    verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
-                    // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
-                    // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
-                    // repository's checksum checking policy.
-                    if ( firstRun )
+                    // keep the checksum files from showing up on the download monitor...
+                    if ( downloadMonitor != null )
                     {
-                        getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
-                        retry = true;
+                        wagon.removeTransferListener( downloadMonitor );
                     }
-                    else
-                    {
-                        handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
-                    }
-                }
-                catch ( ResourceDoesNotExistException sha1TryException )
-                {
-                    getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
 
-                    // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
-                    // file...we'll try again with the MD5 checksum.
+                    // try to verify the SHA-1 checksum for this file.
                     try
                     {
-                        verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
+                        verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
                     }
                     catch ( ChecksumFailedException e )
                     {
-                        // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
-                        // succeeded, then we need to determine whether to retry or handle it as a failure.
+                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
+                        // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
+                        // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
+                        // repository's checksum checking policy.
                         if ( firstRun )
                         {
+                            getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
                             retry = true;
                         }
                         else
@@ -418,18 +407,42 @@ public class DefaultWagonManager
                             handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
                         }
                     }
-                    catch ( ResourceDoesNotExistException md5TryException )
+                    catch ( ResourceDoesNotExistException sha1TryException )
                     {
-                        // this was a failed transfer, and we don't want to retry.
-                        handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
-                                               md5TryException );
-                    }
-                }
+                        getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
 
-                // reinstate the download monitor...
-                if ( downloadMonitor != null )
-                {
-                    wagon.addTransferListener( downloadMonitor );
+                        // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
+                        // file...we'll try again with the MD5 checksum.
+                        try
+                        {
+                            verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
+                        }
+                        catch ( ChecksumFailedException e )
+                        {
+                            // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
+                            // succeeded, then we need to determine whether to retry or handle it as a failure.
+                            if ( firstRun )
+                            {
+                                retry = true;
+                            }
+                            else
+                            {
+                                handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
+                            }
+                        }
+                        catch ( ResourceDoesNotExistException md5TryException )
+                        {
+                            // this was a failed transfer, and we don't want to retry.
+                            handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
+                                                   md5TryException );
+                        }
+                    }
+
+                    // reinstate the download monitor...
+                    if ( downloadMonitor != null )
+                    {
+                        wagon.addTransferListener( downloadMonitor );
+                    }
                 }
 
                 // unset the firstRun flag, so we don't get caught in an infinite loop...
@@ -455,29 +468,32 @@ public class DefaultWagonManager
             releaseWagon( wagon );
         }
 
-        if ( !temp.exists() )
+        if ( downloaded )
         {
-            throw new ResourceDoesNotExistException( "Downloaded file does not exist: " + temp );
-        }
-
-        // The temporary file is named destination + ".tmp" and is done this way to ensure
-        // that the temporary file is in the same file system as the destination because the
-        // File.renameTo operation doesn't really work across file systems.
-        // So we will attempt to do a File.renameTo for efficiency and atomicity, if this fails
-        // then we will use a brute force copy and delete the temporary file.
-
-        if ( !temp.renameTo( destination ) )
-        {
-            try
+            if ( !temp.exists() )
             {
-                FileUtils.copyFile( temp, destination );
-
-                temp.delete();
+                throw new ResourceDoesNotExistException( "Downloaded file does not exist: " + temp );
             }
-            catch ( IOException e )
+
+            // The temporary file is named destination + ".tmp" and is done this way to ensure
+            // that the temporary file is in the same file system as the destination because the
+            // File.renameTo operation doesn't really work across file systems.
+            // So we will attempt to do a File.renameTo for efficiency and atomicity, if this fails
+            // then we will use a brute force copy and delete the temporary file.
+
+            if ( !temp.renameTo( destination ) )
             {
-                throw new TransferFailedException(
-                    "Error copying temporary file to the final destination: " + e.getMessage(), e );
+                try
+                {
+                    FileUtils.copyFile( temp, destination );
+
+                    temp.delete();
+                }
+                catch ( IOException e )
+                {
+                    throw new TransferFailedException(
+                        "Error copying temporary file to the final destination: " + e.getMessage(), e );
+                }
             }
         }
     }
@@ -506,8 +522,8 @@ public class DefaultWagonManager
         // otherwise it is ignore
     }
 
-    private void verifyChecksum( ChecksumObserver checksumObserver, File destination, File tempDestination, String remotePath,
-                                 String checksumFileExtension, Wagon wagon )
+    private void verifyChecksum( ChecksumObserver checksumObserver, File destination, File tempDestination,
+                                 String remotePath, String checksumFileExtension, Wagon wagon )
         throws ResourceDoesNotExistException, TransferFailedException, AuthorizationException
     {
         try
@@ -543,7 +559,10 @@ public class DefaultWagonManager
             if ( expectedChecksum.equals( actualChecksum ) )
             {
                 File checksumFile = new File( destination + checksumFileExtension );
-                if ( checksumFile.exists() ) checksumFile.delete();
+                if ( checksumFile.exists() )
+                {
+                    checksumFile.delete();
+                }
                 FileUtils.copyFile( tempChecksumFile, checksumFile );
             }
             else
@@ -600,13 +619,13 @@ public class DefaultWagonManager
     /**
      * Set the proxy used for a particular protocol.
      *
-     * @param protocol the protocol (required)
-     * @param host the proxy host name (required)
-     * @param port the proxy port (required)
-     * @param username the username for the proxy, or null if there is none
-     * @param password the password for the proxy, or null if there is none
+     * @param protocol      the protocol (required)
+     * @param host          the proxy host name (required)
+     * @param port          the proxy port (required)
+     * @param username      the username for the proxy, or null if there is none
+     * @param password      the password for the proxy, or null if there is none
      * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system
-     * property format: <code>*.foo.com|localhost</code>.
+     *                      property format: <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
     public void addProxy( String protocol, String host, int port, String username, String password,
@@ -698,12 +717,12 @@ public class DefaultWagonManager
     {
         this.interactive = interactive;
     }
-    
+
 
     /**
      * Applies the server configuration to the wagon
-     * 
-     * @param wagon the wagon to configure
+     *
+     * @param wagon      the wagon to configure
      * @param repository the repository that has the configuration
      * @throws WagonConfigurationException wraps any error given during configuration of the wagon instance
      */
@@ -724,7 +743,9 @@ public class DefaultWagonManager
             }
             catch ( final ComponentLookupException e )
             {
-                throw new WagonConfigurationException( repositoryId, "Unable to lookup wagon configurator. Wagon configuration cannot be applied.", e );
+                throw new WagonConfigurationException( repositoryId,
+                                                       "Unable to lookup wagon configurator. Wagon configuration cannot be applied.",
+                                                       e );
             }
             catch ( ComponentConfigurationException e )
             {
@@ -747,7 +768,7 @@ public class DefaultWagonManager
             }
         }
     }
-    
+
 
     public void addConfiguration( String repositoryId, Xpp3Dom configuration )
     {
