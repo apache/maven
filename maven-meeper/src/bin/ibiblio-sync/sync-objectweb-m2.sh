@@ -11,6 +11,6 @@ if [ "$1" == "go" ]; then
 fi
 
 cd $HOME/repository-staging/to-ibiblio/maven2
-CMD="rsync --exclude="README.txt" -e ssh $OPTS -avz maven@forge.objectweb.org:../../groups/maven/htdocs/maven2/org/objectweb/* org/objectweb/"
+CMD="rsync --exclude="README.txt" -e ssh $OPTS -avz maven@forge.objectweb.org:../../groups/maven/htdocs/maven2/org/objectweb org/objectweb"
 echo $CMD
 $CMD
