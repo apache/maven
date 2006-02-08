@@ -16,6 +16,7 @@ RewriteRule strutstestcase/jars/strutstestcase-(.+).jar /maven2/strutstestcase/s
 RewriteRule stax-utils/jars/stax-utils-snapshot-(.+).jar /maven2/stax-utils/stax-utils/snapshot-$1/stax-utils-snapshot-$1.jar [L]
 RewriteRule batik/jars/batik-1.5-fop-(.+).jar /maven2/batik/batik-1.5-fop/$1/batik-1.5-fop-$1.jar [L]
 RewriteRule poi/jars/poi-(.+)-final-(.+).jar /maven2/poi/poi-$1-final/$2/poi-$1-final-$2.jar [L]
+RewriteRule jython/jars/jython-20020827-no-oro.jar /maven2/jython/jython/20020827/jython-20020827-no-oro.jar [L]
 
 # rewrite // to /
 #RewriteRule ^/maven//(.*) /maven/$1
