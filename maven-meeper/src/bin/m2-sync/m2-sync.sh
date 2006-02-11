@@ -15,4 +15,4 @@ fi
 cd $HOME/repository-staging/to-ibiblio/maven2
 CMD="rsync --exclude="README.txt" -e ssh $OPTS -avz $FROM $TO"
 echo "Syncing $FROM -> $TO"
-source $CMD
+$CMD
