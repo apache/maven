@@ -55,7 +55,7 @@ public abstract class ArtifactTestCase
             Settings settings = new SettingsXpp3Reader().read( new FileReader( settingsFile ) );
             localRepo = settings.getLocalRepository();
         }
-        else
+        if ( localRepo == null )
         {
             localRepo = System.getProperty( "user.home" ) + "/.m2/repository";
         }
