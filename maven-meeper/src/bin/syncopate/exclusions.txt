@@ -1,4 +1,4 @@
-.htaccess
+**/.*
 **/distributions
 **SNAPSHOT*
 **snapshot*
@@ -6,5 +6,4 @@
 **-DEV.*
 **/dist
 **-200*
-**/.svn
 README.txt
