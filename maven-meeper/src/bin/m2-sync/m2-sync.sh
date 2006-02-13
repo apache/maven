@@ -13,6 +13,6 @@ else
 fi
 
 cd $HOME/repository-staging/to-ibiblio/maven2
-CMD="rsync --exclude="README.txt" -e ssh $OPTS -avz $FROM $TO"
+CMD="rsync --exclude-from=/home/projects/maven/repository-tools/syncopate/exclusions.txt -e ssh $OPTS -avz $FROM $TO"
 echo "Syncing $FROM -> $TO"
 $CMD
