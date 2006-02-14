@@ -224,6 +224,7 @@ public class DefaultArtifactVersion
                 majorVersion = null;
                 minorVersion = null;
                 incrementalVersion = null;
+                buildNumber = null;
             }
         }
     }
