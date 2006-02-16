@@ -138,4 +138,13 @@ echo $BUNDLE
     echo "No Java sources available in upload bundle, skipping ..."
   fi
 
+  if [ -f ${artifactId}-${version}-javadoc.jar ]
+  then
+    echo "Deploying Javadocs ..."
+    mkdir -p $REPODIR/${groupId}/javadoc
+    cp -i ${artifactId}-${version}-javadoc.jar $REPODIR/${groupId}/javadoc
+  else
+    echo "No Javadocs available in upload bundle, skipping ..."
+  fi
+
 )  
