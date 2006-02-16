@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pluginMetadata xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ../../../../../../maven-plugin-tools-model/target/generated-site/xsd/plugin-metadata-1.0.0.xsd ">
+  <mojos>
+    <mojo>
+      <call>test</call>
+      <goal>test</goal>
+      <requiresDependencyResolution>compile</requiresDependencyResolution>
+      <parameters>
+        <parameter>
+          <name>artifacts</name>
+          <expression>${project.artifacts}</expression>
+          <required>true</required>
+          <readonly>true</readonly>
+          <type>java.util.List</type>
+        </parameter>
+      </parameters>
+    </mojo>
+  </mojos>
+</pluginMetadata>

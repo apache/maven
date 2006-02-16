@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:test="urn:maven-antWithRefs">
+  <target name="test">
+    <typedef resource="org/apache/maven/plugins/antWithRefs/antlib.xml" uri="urn:maven-antWithRefs"/>
+    
+    <echo>Project artifacts:</echo>
+    <test:artifacts/>
+  </target>
+</project>
