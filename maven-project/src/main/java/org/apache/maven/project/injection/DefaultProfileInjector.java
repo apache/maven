@@ -138,6 +138,12 @@ public class DefaultProfileInjector
 
     private void injectPlugins( PluginContainer profileContainer, PluginContainer modelContainer )
     {
+        if ( profileContainer == null || modelContainer == null )
+        {
+            // nothing to do...
+            return;
+        }
+        
         List modelPlugins = modelContainer.getPlugins();
 
         if ( modelPlugins == null )
