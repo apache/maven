@@ -120,6 +120,7 @@ public class DefaultLifecycleExecutor
         if ( goals.isEmpty() && rootProject != null )
         {
             String goal = rootProject.getDefaultGoal();
+
             if ( goal != null )
             {
                 goals = Collections.singletonList( goal );
@@ -170,6 +171,7 @@ public class DefaultLifecycleExecutor
             try
             {
                 Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
+
                 artifactHandlerManager.addHandlers( handlers );
             }
             catch ( PluginNotFoundException e )
@@ -179,8 +181,11 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
-                                      MavenProject rootProject, EventDispatcher dispatcher )
+    private void executeTaskSegments( List taskSegments,
+                                      ReactorManager rm,
+                                      MavenSession session,
+                                      MavenProject rootProject,
+                                      EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -206,6 +211,7 @@ public class DefaultLifecycleExecutor
                     long buildStartTime = System.currentTimeMillis();
 
                     String target = rootProject.getId() + " ( " + segment + " )";
+
                     dispatcher.dispatchStart( event, target );
 
                     // only call once, with the top-level project (assumed to be provided as a parameter)...
@@ -213,8 +219,7 @@ public class DefaultLifecycleExecutor
                     {
                         String task = (String) goalIterator.next();
 
-                        executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,
-                                                      target );
+                        executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,target );
                     }
 
                     rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
@@ -229,8 +234,7 @@ public class DefaultLifecycleExecutor
 
                     getLogger().info( "  " + segment );
 
-                    getLogger().info(
-                        "This project has been banned from further executions due to previous failures." );
+                    getLogger().info("This project has been banned from further executions due to previous failures." );
 
                     line();
                 }
@@ -283,8 +287,7 @@ public class DefaultLifecycleExecutor
 
                         getLogger().info( "  " + segment );
 
-                        getLogger().info(
-                            "This project has been banned from further executions due to previous failures." );
+                        getLogger().info( "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -293,9 +296,14 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project,
-                                               EventDispatcher dispatcher, String event, ReactorManager rm,
-                                               long buildStartTime, String target )
+    private void executeGoalAndHandleFailures( String task,
+                                               MavenSession session,
+                                               MavenProject project,
+                                               EventDispatcher dispatcher,
+                                               String event,
+                                               ReactorManager rm,
+                                               long buildStartTime,
+                                               String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try

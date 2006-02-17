@@ -240,7 +240,7 @@ it0086: Verify that a plugin dependency class can be loaded from both the plugin
 it0087: Verify that a project-level plugin dependency class can be loaded from both the plugin classloader
         and the context classloader available to the plugin.
 
-it0088: Test path translation
+it0088: Test path translation.
 
 it0089: Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
         the context classloader available to the plugin.

@@ -137,43 +137,22 @@ public class MavenEmbedder
     // User options
     // ----------------------------------------------------------------------
 
-    private boolean pluginUpdateOverride;
-
-    private boolean checkLatestPluginVersion;
-
+    // release plugin uses this but in IDE there will probably always be some form of interaction.
     private boolean interactiveMode;
-
-    private boolean usePluginRegistry;
 
     private boolean offline;
 
-    private boolean updateSnapshots;
-
     private String globalChecksumPolicy;
+
+    /**
+     * This option determines whether the embedder is to be aligned to the user
+     * installation.
+     */
+    private boolean alignWithUserInstallation;
 
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
-
-    public void setPluginUpdateOverride( boolean pluginUpdateOverride )
-    {
-        this.pluginUpdateOverride = pluginUpdateOverride;
-    }
-
-    public boolean isPluginUpdateOverride()
-    {
-        return pluginUpdateOverride;
-    }
-
-    public void setCheckLatestPluginVersion( boolean checkLatestPluginVersion )
-    {
-        this.checkLatestPluginVersion = checkLatestPluginVersion;
-    }
-
-    public boolean isCheckLatestPluginVersion()
-    {
-        return checkLatestPluginVersion;
-    }
 
     public void setInteractiveMode( boolean interactiveMode )
     {
@@ -183,16 +162,6 @@ public class MavenEmbedder
     public boolean isInteractiveMode()
     {
         return interactiveMode;
-    }
-
-    public void setUsePluginRegistry( boolean usePluginRegistry )
-    {
-        this.usePluginRegistry = usePluginRegistry;
-    }
-
-    public boolean isUsePluginRegistry()
-    {
-        return usePluginRegistry;
     }
 
     public void setOffline( boolean offline )
@@ -205,16 +174,6 @@ public class MavenEmbedder
         return offline;
     }
 
-    public void setUpdateSnapshots( boolean updateSnapshots )
-    {
-        this.updateSnapshots = updateSnapshots;
-    }
-
-    public boolean isUpdateSnapshots()
-    {
-        return updateSnapshots;
-    }
-
     public void setGlobalChecksumPolicy( String globalChecksumPolicy )
     {
         this.globalChecksumPolicy = globalChecksumPolicy;
@@ -223,6 +182,16 @@ public class MavenEmbedder
     public String getGlobalChecksumPolicy()
     {
         return globalChecksumPolicy;
+    }
+
+    public boolean isAlignWithUserInstallation()
+    {
+        return alignWithUserInstallation;
+    }
+
+    public void setAlignWithUserInstallation( boolean alignWithUserInstallation )
+    {
+        this.alignWithUserInstallation = alignWithUserInstallation;
     }
 
     /**
@@ -398,7 +367,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     // TODO: should we allow the passing in of a settings object so that everything can be taken from the client env
-
     // TODO: transfer listener
     // TODO: logger
 
@@ -543,14 +511,7 @@ public class MavenEmbedder
     {
         RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
 
-        if ( pluginUpdateOverride )
-        {
-            runtimeInfo.setPluginUpdateOverride( Boolean.TRUE );
-        }
-        else
-        {
-            runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
-        }
+        runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
 
         return runtimeInfo;
     }
@@ -584,6 +545,8 @@ public class MavenEmbedder
     public void start()
         throws MavenEmbedderException
     {
+        detectUserInstallation();
+
         // ----------------------------------------------------------------------
         // Set the maven.home system property which is need by components like
         // the plugin registry builder.
@@ -624,52 +587,21 @@ public class MavenEmbedder
 
             mavenProjectBuilder = (MavenProjectBuilder) embedder.lookup( MavenProjectBuilder.ROLE );
 
+            // ----------------------------------------------------------------------
+            // Artifact related components
+            // ----------------------------------------------------------------------
+
             artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
-
-            lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
-
-            wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 
             artifactFactory = (ArtifactFactory) embedder.lookup( ArtifactFactory.ROLE );
 
             artifactResolver = (ArtifactResolver) embedder.lookup( ArtifactResolver.ROLE );
 
-            // ----------------------------------------------------------------------
-            // If an explicit local repository has not been set then we will use the
-            // setting builder to use the maven defaults to help us find one.
-            // ----------------------------------------------------------------------
+            lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
 
-            if ( localRepositoryDirectory == null )
-            {
-                settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+            wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 
-                try
-                {
-                    settings = settingsBuilder.buildSettings();
-                }
-                catch ( IOException e )
-                {
-                    throw new MavenEmbedderException( "Error creating settings.", e );
-                }
-                catch ( XmlPullParserException e )
-                {
-                    throw new MavenEmbedderException( "Error creating settings.", e );
-                }
-            }
-            else
-            {
-                settings = new Settings();
-
-                settings.setLocalRepository( localRepositoryDirectory.getAbsolutePath() );
-            }
-
-            settings.setRuntimeInfo( createRuntimeInfo( settings ) );
-
-            settings.setOffline( offline );
-
-            settings.setUsePluginRegistry( usePluginRegistry );
-
-            settings.setInteractiveMode( interactiveMode );
+            createMavenSettings();
 
             localRepository = createLocalRepository( settings );
         }
@@ -686,6 +618,76 @@ public class MavenEmbedder
             throw new MavenEmbedderException( "Cannot lookup required component.", e );
         }
     }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    private void detectUserInstallation()
+    {
+        if ( new File( userHome, ".m2" ).exists() )
+        {
+            alignWithUserInstallation = true;
+        }
+    }
+
+    /**
+     * Create the Settings that will be used with the embedder. If we are aligning with the user
+     * installation then we lookup the standard settings builder and use that to create our
+     * settings. Otherwise we constructs a settings object and populate the information
+     * ourselves.
+     *
+     * @throws MavenEmbedderException
+     * @throws ComponentLookupException
+     */
+    private void createMavenSettings()
+        throws MavenEmbedderException, ComponentLookupException
+    {
+        if ( alignWithUserInstallation )
+        {
+            // ----------------------------------------------------------------------
+            // We will use the standard method for creating the settings. This
+            // method reproduces the method of building the settings from the CLI
+            // mode of operation.
+            // ----------------------------------------------------------------------
+
+            settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+
+            try
+            {
+                settings = settingsBuilder.buildSettings();
+            }
+            catch ( IOException e )
+            {
+                throw new MavenEmbedderException( "Error creating settings.", e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new MavenEmbedderException( "Error creating settings.", e );
+            }
+        }
+        else
+        {
+            if ( localRepository == null )
+            {
+                throw new IllegalArgumentException( "When not aligning with a user install you must specify a local repository location using the setLocalRepositoryDirectory( File ) method." );
+            }
+
+            settings = new Settings();
+
+            settings.setLocalRepository( localRepositoryDirectory.getAbsolutePath() );
+
+            settings.setRuntimeInfo( createRuntimeInfo( settings ) );
+
+            settings.setOffline( offline );
+
+            settings.setInteractiveMode( interactiveMode );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Lifecycle
+    // ----------------------------------------------------------------------
 
     public void stop()
         throws MavenEmbedderException
