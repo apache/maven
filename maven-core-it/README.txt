@@ -255,7 +255,10 @@ it0091: Test that currently demonstrates that properties are not correctly
 it0092: Test that legacy repositories with legacy snapshots download correctly.
 
 it0093: A test that ensures that an exception is thrown when two artifacts
-with the same id are present in the reactor.
+        with the same id are present in the reactor.
+
+it0094: Test classloading issues with mojos after 2.0 (MNG-1898).
+
 -------------------------------------------------------------------------------
 
 - generated sources
