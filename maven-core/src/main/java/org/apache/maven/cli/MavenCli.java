@@ -119,11 +119,16 @@ public class MavenCli
             cliManager.displayHelp();
             return 0;
         }
+        
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
             showVersion();
 
             return 0;
+        }
+        else if ( debug )
+        {
+            showVersion();
         }
 
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
