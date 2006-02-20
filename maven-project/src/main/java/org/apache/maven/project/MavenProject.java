@@ -135,6 +135,8 @@ public class MavenProject
     private Build buildOverlay;
 
     private boolean executionRoot;
+    
+    private Map moduleFiles;
 
     public MavenProject( Model model )
     {
@@ -187,6 +189,44 @@ public class MavenProject
         this.executionRoot = project.executionRoot;
 
         this.artifact = ArtifactUtils.copyArtifact( project.artifact );
+    }
+    
+    public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
+    {
+        File module = moduleProject.getFile();
+        
+        if ( module == null )
+        {
+            return null;
+        }
+        
+        module = module.getCanonicalFile();
+        
+        if ( moduleFiles == null )
+        {
+            moduleFiles = new HashMap();
+            
+            List modules = getModules();
+            File myFile = getFile();
+            
+            if ( myFile != null )
+            {
+                File myDir = myFile.getCanonicalFile().getParentFile();
+                if ( modules != null )
+                {
+                    for ( Iterator it = modules.iterator(); it.hasNext(); )
+                    {
+                        String modulePath = (String) it.next();
+
+                        File moduleFile = new File( myDir, modulePath ).getCanonicalFile();
+
+                        moduleFiles.put( moduleFile, modulePath );
+                    }
+                }
+            }            
+        }
+        
+        return (String) moduleFiles.get( module );
     }
 
     // ----------------------------------------------------------------------

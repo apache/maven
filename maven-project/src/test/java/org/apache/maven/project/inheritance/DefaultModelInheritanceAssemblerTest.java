@@ -43,6 +43,19 @@ public class DefaultModelInheritanceAssemblerTest
     extends TestCase
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
+    
+    public void testShouldAppendPathWithChildPathAdjustment()
+    {
+        String parentPath = "http://maven.apache.org/shared/maven-shared-parent";
+        String childPath = "file-management";
+        String pathAdjustment = "..";
+        
+        String result = ((DefaultModelInheritanceAssembler) assembler).appendPath( parentPath, childPath, pathAdjustment, true );
+        
+        System.out.println( "Resulting path is: \'" + result + "\'" );
+        
+        assertEquals( "Append with path adjustment failed.", "http://maven.apache.org/shared/file-management", result );
+    }
 
     public void testShouldOverrideUnitTestExcludesOnly()
     {
