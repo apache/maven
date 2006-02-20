@@ -26,6 +26,8 @@ public interface ModelInheritanceAssembler
 {
     String ROLE = ModelInheritanceAssembler.class.getName();
 
+    void assembleModelInheritance( Model child, Model parent, String childPathAdjustment );
+
     void assembleModelInheritance( Model child, Model parent );
 
     void copyModel( Model dest, Model source );

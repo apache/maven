@@ -686,6 +686,8 @@ public class DefaultMavenProjectBuilder
         project.setOriginalModel( originalModel );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
+        MavenProject previousProject = superProject;
+        
         Model previous = superProject.getModel();
 
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
@@ -693,10 +695,22 @@ public class DefaultMavenProjectBuilder
             MavenProject currentProject = (MavenProject) i.next();
 
             Model current = currentProject.getModel();
+            
+            String pathAdjustment = null;
+            
+            try
+            {
+                pathAdjustment = previousProject.getModulePathAdjustment( currentProject );
+            }
+            catch ( IOException e )
+            {
+                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
+            }
 
-            modelInheritanceAssembler.assembleModelInheritance( current, previous );
+            modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
 
             previous = current;
+            previousProject = currentProject;
         }
 
         // only add the super repository if it wasn't overridden by a profile or project
