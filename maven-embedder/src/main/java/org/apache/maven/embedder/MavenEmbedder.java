@@ -627,7 +627,7 @@ public class MavenEmbedder
 
             createMavenSettings();
 
-            profileManager.loadSettingsProfile( settings );
+            profileManager.loadSettingsProfiles( settings );
 
             localRepository = createLocalRepository( settings );
         }
