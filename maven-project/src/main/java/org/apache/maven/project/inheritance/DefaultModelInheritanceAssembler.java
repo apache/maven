@@ -506,7 +506,10 @@ public class DefaultModelInheritanceAssembler
                 pathFragments.add( pathAdjustment );
             }
 
-            pathFragments.add( childPath );
+            if ( childPath != null )
+            {
+                pathFragments.add( childPath );
+            }            
         }
 
         StringBuffer cleanedPath = new StringBuffer();
@@ -548,7 +551,18 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        if ( !childPath.endsWith( "/" ) && appendPaths )
+        String lastPathPart = childPath;
+        if ( lastPathPart == null )
+        {
+            lastPathPart = pathAdjustment;
+        }
+        
+        if ( lastPathPart == null )
+        {
+            lastPathPart = parentPath;
+        }
+        
+        if ( appendPaths && lastPathPart != null && !lastPathPart.endsWith( "/" ) )
         {
             cleanedPath.setLength( cleanedPath.length() - 1 );
         }

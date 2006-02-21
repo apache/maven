@@ -48,6 +48,20 @@ public class DefaultModelInheritanceAssemblerTest
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
 
+    public void testShouldAppendChildPathAdjustmentWithNoChildPart()
+    {
+        String parentPath = "http://maven.apache.org/shared/maven-shared-parent";
+        String childPath = null;
+        String pathAdjustment = "../file-management";
+
+        String result =
+            ( (DefaultModelInheritanceAssembler) assembler ).appendPath( parentPath, childPath, pathAdjustment, true );
+
+        System.out.println( "Resulting path is: \'" + result + "\'" );
+
+        assertEquals( "Append with path adjustment failed.", "http://maven.apache.org/shared/file-management", result );
+    }
+
     public void testShouldAppendPathWithChildPathAdjustment()
     {
         String parentPath = "http://maven.apache.org/shared/maven-shared-parent";
