@@ -270,7 +270,7 @@ public class DefaultMaven
 
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
 
-        loadSettingsProfiles( globalProfileManager, request.getSettings() );
+        globalProfileManager.loadSettingsProfiles( request.getSettings() );
 
         getLogger().info( "Scanning for projects..." );
 
@@ -513,28 +513,6 @@ public class DefaultMaven
         }
 
         return projectBuilder.build( pom, localRepository, globalProfileManager );
-    }
-
-    private void loadSettingsProfiles( ProfileManager profileManager, Settings settings )
-    {
-        List settingsProfiles = settings.getProfiles();
-
-        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
-        {
-            List settingsActiveProfileIds = settings.getActiveProfiles();
-
-            profileManager.explicitlyActivate( settingsActiveProfileIds );
-
-            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
-            {
-                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
-
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                profileManager.addProfile( profile );
-            }
-        }
-
     }
 
     // ----------------------------------------------------------------------

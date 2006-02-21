@@ -252,7 +252,7 @@ public class DefaultProfileManager
         return defaultIds;
     }
 
-    private void loadSettingsProfiles( Settings settings )
+    public void loadSettingsProfiles( Settings settings )
     {
         if ( settings == null )
         {
