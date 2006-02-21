@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -27,7 +28,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -55,7 +55,6 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.MavenArtifactFilterManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -73,7 +72,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.classworlds.RealmDelegatingClassLoader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -241,8 +239,7 @@ public class DefaultPluginManager
      * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
      * manager which executes before the plugin is instantiated
      */
-    private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List
-        remoteRepositories )
+    private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException
     {
         try
@@ -311,8 +308,8 @@ public class DefaultPluginManager
                 projectPlugin = plugin;
             }
 
-            Set artifacts =
-                MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null, null, project );
+            Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null,
+                                                                 null, project );
 
 //            Set artifacts =
 //                MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null, null, project );
@@ -410,7 +407,7 @@ public class DefaultPluginManager
         try
         {
             Thread.currentThread().setContextClassLoader(
-                new RealmDelegatingClassLoader( mojoDescriptor.getPluginDescriptor().getClassRealm() ) );
+                mojoDescriptor.getPluginDescriptor().getClassRealm().getClassLoader() );
 
             plugin.execute();
 
@@ -607,14 +604,14 @@ public class DefaultPluginManager
 
             Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
             dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
-            
+
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                     localRepository,
                                                                                     resolutionGroup.getResolutionRepositories(),
                                                                                     artifactMetadataSource,
                                                                                     artifactFilter );
 
-            Set resolved =  result.getArtifacts();
+            Set resolved = result.getArtifacts();
 
             for ( Iterator it = resolved.iterator(); it.hasNext(); )
             {
@@ -1093,7 +1090,7 @@ public class DefaultPluginManager
 
     public void initialize()
     {
-        artifactFilter =  MavenArtifactFilterManager.createStandardFilter();
+        artifactFilter = MavenArtifactFilterManager.createStandardFilter();
     }
 
     // ----------------------------------------------------------------------
