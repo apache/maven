@@ -6,6 +6,10 @@ import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringInputStream;
+import org.codehaus.plexus.util.StringUtils;
+
 public class PomInterpolationTest
     extends TestCase
 {
@@ -26,7 +30,12 @@ public class PomInterpolationTest
 
         assertTrue( testPropertiesFile.exists() );
 
-        testProperties.load( new FileInputStream( testPropertiesFile ) );
+        String content = FileUtils.fileRead( testPropertiesFile );
+
+        // Properties files need \\ escaped
+        content = StringUtils.replace( content, "\\", "\\\\" );
+
+        testProperties.load( new StringInputStream( content ) );
 
         File projectBuildDirectory = new File( basedir, "target" );
 
