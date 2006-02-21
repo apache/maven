@@ -35,5 +35,5 @@ public interface ProfileManager
 
     List getIdsActivatedByDefault();
 
-    void loadSettingsProfiles( Settings settings )
+    void loadSettingsProfiles( Settings settings );
 }
