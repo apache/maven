@@ -16,23 +16,21 @@
 
 package org.codehaus.mojo.kodo;
 
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLClassLoader;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.xerces.jaxp.SAXParserFactoryImpl;
 import org.codehaus.classworlds.ClassRealm;
 
+import javax.xml.parsers.SAXParserFactory;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 /**
  * Goal that enhances persistant classes
- * 
+ *
  * @requiresDependancyResolution test
  * @goal enhance
- * 
  * @phase compile
  */
 public class Enhance
@@ -55,21 +53,21 @@ public class Enhance
         setupClassloader();
         originalLoader = Thread.currentThread().getContextClassLoader();
         System.out.println( originalLoader.getClass() );
-        
+
         SAXParserFactoryImpl spi = new SAXParserFactoryImpl();
         SAXParserFactory spf = SAXParserFactory.newInstance();
         this.getLog().info( spf.toString() );
         String t = "org/apache/xerces/jaxp/SAXParserFactoryImpl.class";
-        this.getLog().info(t);
-        URL url = originalLoader.getResource(t);
+        this.getLog().info( t );
+        URL url = originalLoader.getResource( t );
         //URL url = spf.getClass().getClassLoader().getResource("javax/xml/parsers/SAXParserFactory.class");
-        this.getLog().info("Loaded from: "+url.toString());
-        
+        this.getLog().info( "Loaded from: " + url.toString() );
+
     }
 
     /**
      * Adds nessessary items to the classloader.
-     * 
+     *
      * @return ClassLoader original Classloader.
      * @throws MojoExecutionException
      */
@@ -79,26 +77,54 @@ public class Enhance
 
         URLClassLoader loader = null;
         ClassLoader originalLoader = Thread.currentThread().getContextClassLoader();
-        this.getLog().info( originalLoader.toString() );
+        this.getLog().info( "orig classloader:" );
+        printURLClassPath( Thread.currentThread().getContextClassLoader(), "" );
         URL[] urls = new URL[0];
         loader = new URLClassLoader( urls, originalLoader );
 
         Thread.currentThread().setContextClassLoader( loader );
-        printURLClassPath();
+        this.getLog().info( "new classloader:" );
+        printURLClassPath( Thread.currentThread().getContextClassLoader(), "" );
         return originalLoader;
 
     }
 
-    public void printURLClassPath()
+    public void printURLClassPath( ClassLoader sysClassLoader, String s )
+        throws MojoExecutionException
     {
         //Get the Classloader
-        ClassLoader sysClassLoader = Thread.currentThread().getContextClassLoader();
         //Get the URLs
-        URL[] urls = ( (URLClassLoader) sysClassLoader ).getURLs();
-        this.getLog().info( "Added to Classpath:" );
+        URL[] urls;
+        if ( sysClassLoader instanceof URLClassLoader )
+        {
+            urls = ( (URLClassLoader) sysClassLoader ).getURLs();
+        }
+        else
+        {
+            try
+            {
+                Field f = sysClassLoader.getClass().getDeclaredField( "realm" );
+                f.setAccessible( true );
+                ClassRealm r = (ClassRealm) f.get( sysClassLoader );
+                urls = r.getConstituents();
+            }
+            catch ( NoSuchFieldException e )
+            {
+                throw new MojoExecutionException( "mee ", e );
+            }
+            catch ( IllegalAccessException e )
+            {
+                throw new MojoExecutionException( "mee ", e );
+            }
+        }
         for ( int i = 0; i < urls.length; i++ )
         {
-            this.getLog().info( urls[i].getFile() );
+            this.getLog().info( s + urls[i].getFile() );
+        }
+
+        if ( sysClassLoader.getParent() != null )
+        {
+            printURLClassPath( sysClassLoader.getParent(), s + "  " );
         }
     }
 
