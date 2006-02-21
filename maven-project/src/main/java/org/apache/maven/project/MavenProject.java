@@ -136,7 +136,7 @@ public class MavenProject
 
     private boolean executionRoot;
     
-    private Map moduleFiles;
+    private Map moduleAdjustments;
 
     public MavenProject( Model model )
     {
@@ -193,40 +193,57 @@ public class MavenProject
     
     public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
     {
-        File module = moduleProject.getFile();
+        // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
+        // is coming from the repository??
+        String module = moduleProject.getArtifactId();
         
-        if ( module == null )
+        File moduleFile = moduleProject.getFile();
+        
+        if ( moduleFile != null )
         {
-            return null;
+            File moduleDir = moduleFile.getCanonicalFile().getParentFile();
+            
+            module = moduleDir.getName();
         }
         
-        module = module.getCanonicalFile();
-        
-        if ( moduleFiles == null )
+        if ( moduleAdjustments == null )
         {
-            moduleFiles = new HashMap();
+            moduleAdjustments = new HashMap();
             
             List modules = getModules();
-            File myFile = getFile();
-            
-            if ( myFile != null )
+            if ( modules != null )
             {
-                File myDir = myFile.getCanonicalFile().getParentFile();
-                if ( modules != null )
+                for ( Iterator it = modules.iterator(); it.hasNext(); )
                 {
-                    for ( Iterator it = modules.iterator(); it.hasNext(); )
+                    String modulePath = (String) it.next();
+                    String moduleName = modulePath;
+                    
+                    if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
                     {
-                        String modulePath = (String) it.next();
-
-                        File moduleFile = new File( myDir, modulePath ).getCanonicalFile();
-
-                        moduleFiles.put( moduleFile, modulePath );
+                        moduleName = moduleName.substring( 0, moduleName.length() - 1 );
                     }
+                    
+                    int lastSlash = moduleName.lastIndexOf( '/' );
+                    
+                    if ( lastSlash < 0 )
+                    {
+                        lastSlash = moduleName.lastIndexOf( '\\' );
+                    }
+                    
+                    String adjustment = null;
+                    
+                    if ( lastSlash > -1 )
+                    {
+                        moduleName = moduleName.substring( lastSlash + 1 );
+                        adjustment = modulePath.substring( 0, lastSlash );
+                    }
+
+                    moduleAdjustments.put( moduleName, adjustment );
                 }
-            }            
+            }
         }
         
-        return (String) moduleFiles.get( module );
+        return (String) moduleAdjustments.get( module );
     }
 
     // ----------------------------------------------------------------------

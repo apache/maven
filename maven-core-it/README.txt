@@ -256,6 +256,8 @@ it0092: Test that legacy repositories with legacy snapshots download correctly.
 
 it0094: Test classloading issues with mojos after 2.0 (MNG-1898).
 
+it0095: Test URL calculation when modules are in sibling dirs of parent. (MNG-2006)
+
 -------------------------------------------------------------------------------
 
 - generated sources

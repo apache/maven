@@ -17,6 +17,9 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.io.IOException;
+
+import org.apache.maven.model.Model;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -28,5 +31,23 @@ public class MavenProjectTest
 
         MavenProject clonedProject = new MavenProject(projectToClone);
         assertEquals("maven-core", clonedProject.getArtifactId());
+    }
+    
+    public void testGetModulePathAdjustment() throws IOException
+    {
+        Model moduleModel = new Model();
+        
+        MavenProject module = new MavenProject( moduleModel );
+        module.setFile( new File( "module-dir/pom.xml" ) );
+        
+        Model parentModel = new Model();
+        parentModel.addModule( "../module-dir" );
+        
+        MavenProject parent = new MavenProject( parentModel );
+        parent.setFile( new File( "parent-dir/pom.xml" ) );
+        
+        String pathAdjustment = parent.getModulePathAdjustment( module );
+        
+        assertEquals( "..", pathAdjustment );
     }
 }
