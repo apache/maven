@@ -72,6 +72,12 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>configuration</name>
+          <version>1.0.0</version>
+          <type>DOM</type>
+          <description>Configuration to pass to all goals run in this phase.</description>
+        </field>
       </fields>
     </class>
     <class>

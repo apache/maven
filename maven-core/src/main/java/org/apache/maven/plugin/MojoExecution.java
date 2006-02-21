@@ -34,7 +34,7 @@ public class MojoExecution
 
     private final MojoDescriptor mojoDescriptor;
 
-    private final Xpp3Dom configuration;
+    private Xpp3Dom configuration;
 
     private List forkedExecutions = new ArrayList();
 
@@ -94,5 +94,10 @@ public class MojoExecution
     public List getForkedExecutions()
     {
         return forkedExecutions;
+    }
+
+    public void setConfiguration( Xpp3Dom configuration )
+    {
+        this.configuration = configuration;
     }
 }
