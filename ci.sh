@@ -7,7 +7,18 @@ cd $HOME
 
 CMD=$1
 
-[ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit 1
+if [ "$1" = "" ]; then
+  echo
+  echo "You must specify a checkout or update!"
+  echo
+  exit 1
+fi
+
+BRANCH="branches/${2}"
+
+if [ "$2" = "" ]; then
+  BRANCH="trunk"
+fi
 
 FROM=continuum@maven.zones.apache.org
 TO=dev@maven.apache.org
@@ -19,7 +30,7 @@ if [ ! -z "$RUNNING" ]; then
   if [ "$CMD" = "checkout" ]; then
     echo "From: $FROM" > running_log
     echo "To: $TO" >> running_log
-    echo "Subject: [maven2 build - SKIPPED - $CMD] $DATE" >>running_log
+    echo "Subject: [maven2 build $BRANCH - SKIPPED - $CMD] $DATE" >>running_log
     echo "" >> running_log
     echo "ci.sh already running... exiting" >>running_log
     echo "$RUNNING" >>running_log
@@ -28,24 +39,31 @@ if [ ! -z "$RUNNING" ]; then
   exit 1
 fi
 
-HOME_DIR=`pwd`
-DIR=$HOME/m2-build
-REPO=$HOME_DIR/maven-repo-local
-SCM_LOG=scm.log
+DIR=$HOME/m2-build/$BRANCH
+mkdir -p $DIR
+
+REPO=$DIR/maven-repo-local
+# TODO: not good for concurrency - need to pass in to bootstrap
+cat $HOME/.m2/settings.xml.template | sed "s#<localRepository>.*</localRepository>#<localRepository>$REPO</localRepository>#" >$HOME/.m2/settings.xml
+
+# Temporary to try and alleviate build failure due to race condition
+rm -rf $REPO/org/apache/maven/plugins/maven-plugin-plugin
+
+SCM_LOG=$DIR/scm.log
+BUILD_REQUIRED_FILE=$DIR/build_required
+
 TIMESTAMP=`date +%Y%m%d.%H%M%S`
 WWW=$HOME/public_html
-DEPLOY_DIR=$WWW/builds
-DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds
+DEPLOY_DIR=$WWW/builds/$BRANCH
+DEPLOY_SITE=http://maven.zones.apache.org/~maven/builds/$BRANCH
 DIST=m2-${TIMESTAMP}.tar.gz
+
 SVN=svn
+SED=gsed
 
-M2_HOME=$DIR/maven-2.0.1-SNAPSHOT
-export M2_HOME
-PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
-export PATH
-
-MESSAGE_DIR=$WWW/logs
+MESSAGE_DIR=$WWW/logs/$BRANCH
 MESSAGE_NAME=m2-build-log-${TIMESTAMP}.txt
+MESSAGE_SITE=http://maven.zones.apache.org/~maven/logs/$BRANCH
 MESSAGE=${MESSAGE_DIR}/${MESSAGE_NAME}
 
 mkdir -p $DEPLOY_DIR
@@ -59,11 +77,15 @@ mkdir -p $MESSAGE_DIR
 # ----------------------------------------------------------------------------------
 
 BUILD_REQUIRED=false
-if [ -f $HOME_DIR/build_required ]; then
-  BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+if [ -f $BUILD_REQUIRED_FILE ]; then
+  BUILD_REQUIRED=`cat $BUILD_REQUIRED_FILE`
 fi
 
 if [ ! -d $DIR/maven-components ]; then
+  CMD="checkout"
+fi
+
+if [ ! -d $DIR/plugins ]; then
   CMD="checkout"
 fi
 
@@ -86,10 +108,10 @@ fi
     (
       cd $DIR
         
-      $SVN co http://svn.apache.org/repos/asf/maven/components/trunk maven-components > $HOME_DIR/$SCM_LOG 2>&1
-      $SVN co http://svn.apache.org/repos/asf/maven/plugins/trunk plugins > $HOME_DIR/$SCM_LOG 2>&1
+      $SVN co http://svn.apache.org/repos/asf/maven/components/$BRANCH maven-components > $SCM_LOG 2>&1
+      $SVN co http://svn.apache.org/repos/asf/maven/plugins/trunk plugins > $SCM_LOG 2>&1
     
-      echo "true" > $HOME_DIR/build_required     
+      echo "true" > $BUILD_REQUIRED_FILE
     )
     
   else
@@ -101,22 +123,22 @@ fi
     (
       cd $DIR/maven-components
       
-      $SVN update > $HOME_DIR/$SCM_LOG 2>&1
+      $SVN update > $SCM_LOG 2>&1
 
       cd $DIR/plugins
 
-      $SVN update >> $HOME_DIR/$SCM_LOG 2>&1
+      $SVN update >> $SCM_LOG 2>&1
       
-      grep "^[PUAD] " $HOME_DIR/$SCM_LOG > /dev/null 2>&1
+      grep "^[PUAD] " $SCM_LOG > /dev/null 2>&1
 
       if [ "$?" = "1" ]
       then
         
-	echo $BUILD_REQUIRED > $HOME_DIR/build_required
+	echo $BUILD_REQUIRED > $BUILD_REQUIRED_FILE
       
         else
 	
-	echo "true" > $HOME_DIR/build_required
+	echo "true" > $BUILD_REQUIRED_FILE
 	  
       fi
 
@@ -124,15 +146,22 @@ fi
 
   fi
     
-  BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+  BUILD_REQUIRED=`cat $BUILD_REQUIRED_FILE`
 
   if [ "$BUILD_REQUIRED" = "true" ]
   then
       
     echo "Updates occured, build required ..."
     echo
-    grep "^[PUAD] " $HOME_DIR/$SCM_LOG
+    grep "^[PUAD] " $SCM_LOG
     echo
+
+    version=`cat $DIR/maven-components/pom.xml | tr '\n' ' ' | $SED 's#<parent>.*</parent>##g' | $SED 's#<dependencies>.*</dependencies>##g' | $SED 's#<build>.*</build>##g' | $SED 's#^.*<version>##g' | $SED 's#</version>.*$##g'`
+
+    M2_HOME=$DIR/maven-$version
+    export M2_HOME
+    PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
+    export PATH
 
     (
       cd $DIR/maven-components
@@ -161,7 +190,7 @@ fi
 ) >> $MESSAGE 2>&1
 ret=$?
 
-BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+BUILD_REQUIRED=`cat $BUILD_REQUIRED_FILE`
 
 # Only send mail to the list if a build was required.
 
@@ -172,17 +201,18 @@ then
   echo "From: $FROM" > log
   echo "To: $TO" >> log
   if [ $ret != 0 ]; then
-    echo "Subject: [maven2 build - FAILED - $CMD] $DATE" >> log
+    echo "Subject: [maven2 build $BRANCH - FAILED - $CMD] $DATE" >> log
   else
-    echo "Subject: [maven2 build - SUCCESS - $CMD] $DATE" >> log
+    echo "Subject: [maven2 build $BRANCH - SUCCESS - $CMD] $DATE" >> log
     echo "" >> log
     echo "Distribution:" >> log
     echo "${DEPLOY_SITE}/${DIST}" >>log
-    rm $HOME_DIR/build_required
+    rm $BUILD_REQUIRED_FILE
   fi
   echo "" >> log
   echo "Log:" >> log
-  echo "http://maven.zones.apache.org/~maven/logs/${MESSAGE_NAME}" >> log
+  echo "${MESSAGE_SITE}/${MESSAGE_NAME}" >> log
 
   /usr/sbin/sendmail -t < log
 fi
+

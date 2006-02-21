@@ -28,11 +28,6 @@ BOOTSTRAP_JAR=bootstrap-mini/bootstrap-mini.jar
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-PLUGINS_DIR=../plugins
-if [ -d $PLUGINS_DIR ]; then
-  ARGS="$ARGS --build-plugins --plugins-directory=$PLUGINS_DIR"
-fi
-
 # TODO: get rid of M2_HOME once integration tests are in here
 PREFIX=`dirname $M2_HOME`
 
@@ -57,7 +52,7 @@ export M2_HOME
 ARGS=$ORIG_ARGS
 
 (
-  # TODO: should w ebe going back to the mini now that we have the real thing?
+  # TODO: should we be going back to the mini now that we have the real thing?
   cd maven-core-it-verifier
   $JAVACMD $MAVEN_OPTS -jar ../bootstrap/$BOOTSTRAP_JAR package $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
