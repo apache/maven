@@ -865,9 +865,8 @@
           <name>finalName</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            The filename (including an extension, but with no path information) that the produced artifact
-            will be called. The default value is artifactId-version.extension (where extension is derived from
-            type).
+            The filename (excluding the extension, and with no path information) that the produced artifact
+            will be called. The default value is artifactId-version.
           ]]></description>
           <type>String</type>
         </field>
