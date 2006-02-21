@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>parent-it0092</artifactId>
+    <artifactId>parent-it0093</artifactId>
     <version>1.0</version>
   </parent>
   <groupId>it0093</groupId>
