@@ -28,7 +28,7 @@
     <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
-      <version>1.1.4</version>
+      <version>1.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
