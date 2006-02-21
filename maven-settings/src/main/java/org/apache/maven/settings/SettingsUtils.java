@@ -163,9 +163,9 @@ public final class SettingsUtils
 
                 activation.setProperty( prop );
             }
-            
+
             ActivationOS settingsOs = settingsActivation.getOs();
-            
+
             if ( settingsOs != null )
             {
                 org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
@@ -174,8 +174,10 @@ public final class SettingsUtils
                 os.setFamily( settingsOs.getFamily() );
                 os.setName( settingsOs.getName() );
                 os.setVersion( settingsOs.getVersion() );
+
+                activation.setOs( os );
             }
-            
+
             org.apache.maven.settings.ActivationFile settingsFile = settingsActivation.getFile();
 
             if ( settingsFile != null )
@@ -187,6 +189,8 @@ public final class SettingsUtils
 
                 activation.setFile( file );
             }
+
+            profile.setActivation( activation );
         }
 
         profile.setProperties( settingsProfile.getProperties() );
