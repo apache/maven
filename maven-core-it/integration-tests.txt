@@ -1,4 +1,4 @@
-it0094 currently fails. It is testing MNG-1898
+it0094
 it0092
 # it0091 currrently fails. Not sure if there is an associated JIRA.
 it0090
