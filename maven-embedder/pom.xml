@@ -44,6 +44,6 @@
     </plugins>
   </reporting>
   <properties>
-    <mavenVersion>2.0.2</mavenVersion>
+    <mavenVersion>2.0.3-SNAPSHOT</mavenVersion>
   </properties>
 </project>
