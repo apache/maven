@@ -189,16 +189,27 @@ public class AbstractArtifactResolutionException
     {
         StringBuffer sb = new StringBuffer( message );
 
-        if ( downloadUrl != null && !"pom".equals( type ) )
+        if ( !"pom".equals( type ) )
         {
-            sb.append( LS );
-            sb.append( LS );
-            sb.append( indentation );
-            sb.append( "Try downloading the file manually from: " );
-            sb.append( LS );
-            sb.append( indentation );
-            sb.append( "    " );
-            sb.append( downloadUrl );
+            if ( downloadUrl != null )
+            {
+                sb.append( LS );
+                sb.append( LS );
+                sb.append( indentation );
+                sb.append( "Try downloading the file manually from: " );
+                sb.append( LS );
+                sb.append( indentation );
+                sb.append( "    " );
+                sb.append( downloadUrl );
+            }
+            else
+            {
+                sb.append( LS );
+                sb.append( LS );
+                sb.append( indentation );
+                sb.append( "Try downloading the file manually from the project website." );
+            }
+            
             sb.append( LS );
             sb.append( LS );
             sb.append( indentation );
