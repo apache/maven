@@ -17,7 +17,6 @@ package org.apache.maven.project.inheritance;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -43,17 +42,18 @@ public class DefaultModelInheritanceAssemblerTest
     extends TestCase
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
-    
+
     public void testShouldAppendPathWithChildPathAdjustment()
     {
         String parentPath = "http://maven.apache.org/shared/maven-shared-parent";
         String childPath = "file-management";
         String pathAdjustment = "..";
-        
-        String result = ((DefaultModelInheritanceAssembler) assembler).appendPath( parentPath, childPath, pathAdjustment, true );
-        
+
+        String result =
+            ( (DefaultModelInheritanceAssembler) assembler ).appendPath( parentPath, childPath, pathAdjustment, true );
+
         System.out.println( "Resulting path is: \'" + result + "\'" );
-        
+
         assertEquals( "Append with path adjustment failed.", "http://maven.apache.org/shared/file-management", result );
     }
 
@@ -151,8 +151,8 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model artifact1_1 = makeScmModel( "artifact1-1" );
 
-        Model artifact2 = makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2",
-                                        "scm:foo:/scm-dev-root/yay-artifact2", null );
+        Model artifact2 =
+            makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2", "scm:foo:/scm-dev-root/yay-artifact2", null );
 
         Model artifact2_1 = makeScmModel( "artifact2-1" );
 
@@ -424,6 +424,29 @@ public class DefaultModelInheritanceAssemblerTest
             assertTrue( "Unexpected goals specification",
                         ( testExecutionsMap == null || testExecutionsMap.isEmpty() ) );
         }
+    }
+
+    public void testReportingExcludeDefaultsInheritance()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        Reporting parentBuild = new Reporting();
+        parentBuild.setExcludeDefaults( false );
+        parent.setReporting( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertFalse( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
+
+        child = makeBaseModel( "child" );
+
+        parentBuild.setExcludeDefaults( true );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertTrue( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
     }
 
     public void testReportInheritanceWhereParentReportWithoutInheritFlagAndChildHasNoReports()

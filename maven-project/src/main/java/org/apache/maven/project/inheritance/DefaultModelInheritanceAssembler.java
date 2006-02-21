@@ -16,15 +16,6 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -37,6 +28,15 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -275,6 +275,8 @@ public class DefaultModelInheritanceAssembler
                 child.setReporting( childReporting );
             }
 
+            childReporting.setExcludeDefaults( parentReporting.isExcludeDefaults() );
+
             if ( StringUtils.isEmpty( childReporting.getOutputDirectory() ) )
             {
                 childReporting.setOutputDirectory( parentReporting.getOutputDirectory() );
@@ -422,25 +424,28 @@ public class DefaultModelInheritanceAssembler
 
             if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
-                childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                childScm.setConnection(
+                    appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
                 !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
-                    .setDeveloperConnection(
-                        appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),
+                                                         childPathAdjustment, appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
             {
-                childScm.setUrl( appendPath( parentScm.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                childScm.setUrl(
+                    appendPath( parentScm.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
             }
         }
     }
 
-    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment,
+                                                  boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )
         {
@@ -471,7 +476,8 @@ public class DefaultModelInheritanceAssembler
 
                     if ( site.getUrl() != null )
                     {
-                        site.setUrl( appendPath( site.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                        site.setUrl(
+                            appendPath( site.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
                     }
                 }
             }
@@ -517,56 +523,56 @@ public class DefaultModelInheritanceAssembler
     protected String appendPath( String parentPath, String childPath, String pathAdjustment, boolean appendPaths )
     {
         List pathFragments = new ArrayList();
-        
+
         String rootPath = parentPath;
 
         String protocol = null;
         int protocolIdx = rootPath.indexOf( "://" );
-        
+
         if ( protocolIdx > -1 )
         {
             protocol = rootPath.substring( 0, protocolIdx + 3 );
             rootPath = rootPath.substring( protocolIdx + 3 );
         }
-        
+
         pathFragments.add( rootPath );
-        
+
         if ( appendPaths )
         {
             if ( pathAdjustment != null )
             {
                 pathFragments.add( pathAdjustment );
             }
-            
+
             pathFragments.add( childPath );
         }
-        
+
         StringBuffer cleanedPath = new StringBuffer();
-        
+
         if ( protocol != null )
         {
             cleanedPath.append( protocol );
         }
-        
+
         if ( rootPath.startsWith( "/" ) )
         {
             cleanedPath.append( '/' );
         }
-        
+
         String lastToken = null;
         String currentToken = null;
-        
+
         for ( Iterator it = pathFragments.iterator(); it.hasNext(); )
         {
             String pathFragment = (String) it.next();
-            
+
             StringTokenizer tokens = new StringTokenizer( pathFragment, "/" );
-            
-            while( tokens.hasMoreTokens() )
+
+            while ( tokens.hasMoreTokens() )
             {
                 lastToken = currentToken;
                 currentToken = tokens.nextToken();
-                
+
                 if ( "..".equals( currentToken ) )
                 {
                     // trim the previous path part off...
@@ -579,12 +585,12 @@ public class DefaultModelInheritanceAssembler
                 }
             }
         }
-        
+
         if ( !childPath.endsWith( "/" ) && appendPaths )
         {
             cleanedPath.setLength( cleanedPath.length() - 1 );
         }
-        
+
         return cleanedPath.toString();
     }
 
