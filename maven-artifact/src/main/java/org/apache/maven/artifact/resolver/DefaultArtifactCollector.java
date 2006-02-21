@@ -363,6 +363,8 @@ public class DefaultArtifactCollector
             // again be appropriate
             nearestArtifact.setScope( farthestArtifact.getScope() );
         }
+        
+        return updateScope;
     }
 
     private void fireEvent( int event, List listeners, ResolutionNode node )
