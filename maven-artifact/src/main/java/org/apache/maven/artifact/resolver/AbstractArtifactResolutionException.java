@@ -59,7 +59,7 @@ public class AbstractArtifactResolutionException
         this.type = type;
         this.version = version;
         this.remoteRepositories = remoteRepositories;
-        this.path = constructArtifactPath( path );
+        this.path = constructArtifactPath( path, "" );
     }
 
     protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
@@ -73,7 +73,7 @@ public class AbstractArtifactResolutionException
         this.type = type;
         this.version = version;
         this.remoteRepositories = remoteRepositories;
-        this.path = constructArtifactPath( path );
+        this.path = constructArtifactPath( path, "" );
     }
 
     protected AbstractArtifactResolutionException( String message, Artifact artifact )
@@ -124,18 +124,20 @@ public class AbstractArtifactResolutionException
         return originalMessage;
     }
 
-    protected static String constructArtifactPath( List path )
+    protected static String constructArtifactPath( List path, String indentation )
     {
         StringBuffer sb = new StringBuffer();
 
         if ( path != null )
         {
             sb.append( LS );
+            sb.append( indentation );
             sb.append( "Path to dependency: " );
             sb.append( LS );
             int num = 1;
             for ( Iterator i = path.iterator(); i.hasNext(); num++ )
             {
+                sb.append( indentation );
                 sb.append( "\t" );
                 sb.append( num );
                 sb.append( ") " );
@@ -177,11 +179,53 @@ public class AbstractArtifactResolutionException
             }
         }
 
-        sb.append( constructArtifactPath( path ) );
+        sb.append( constructArtifactPath( path, "" ) );
         sb.append( LS );
         return sb.toString();
     }
 
+    protected static String constructMissingArtifactMessage( String message, String indentation, String groupId, String artifactId, String version,
+                                              String type, String downloadUrl, List path )
+    {
+        StringBuffer sb = new StringBuffer( message );
+
+        if ( downloadUrl != null && !"pom".equals( type ) )
+        {
+            sb.append( LS );
+            sb.append( LS );
+            sb.append( indentation );
+            sb.append( "Try downloading the file manually from" );
+            sb.append( LS );
+            sb.append( indentation );
+            sb.append( "    " );
+            sb.append( downloadUrl );
+            sb.append( LS );
+            sb.append( LS );
+            sb.append( indentation );
+            sb.append( "Then, install it using the command: " );
+            sb.append( LS );
+            sb.append( indentation );
+            sb.append( "    mvn install:install-file -DgroupId=" );
+            sb.append( groupId );
+            sb.append( " -DartifactId=" );
+            sb.append( artifactId );
+            sb.append( " \\\n");
+            sb.append( indentation );
+            sb.append( "        " );
+            sb.append( "-Dversion=" );
+            sb.append( version );
+            sb.append( " -Dpackaging=" );
+            sb.append( type );
+            sb.append( " -Dfile=/path/to/file" );
+            sb.append( LS );
+        }
+
+        sb.append( constructArtifactPath( path, indentation ) );
+        sb.append( LS );
+
+        return sb.toString();
+    }
+    
     public String getArtifactPath()
     {
         return path;
