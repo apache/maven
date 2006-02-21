@@ -34,6 +34,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
@@ -191,6 +192,8 @@ public class MavenProject
         this.artifact = ArtifactUtils.copyArtifact( project.artifact );
     }
     
+    // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
+    // usually doesn't have a file associated with it yet.
     public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
     {
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
