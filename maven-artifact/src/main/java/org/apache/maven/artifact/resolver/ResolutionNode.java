@@ -216,4 +216,10 @@ public class ResolutionNode
         }
         return success;
     }
+
+    public String toString()
+    {
+        return artifact.toString() + " (" + depth + ")";
+    }
+
 }

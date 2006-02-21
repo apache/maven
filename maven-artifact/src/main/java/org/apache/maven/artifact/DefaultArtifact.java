@@ -258,7 +258,8 @@ public class DefaultArtifact
     public String toString()
     {
         return getDependencyConflictId() + ":" +
-            ( version != null || baseVersion != null ? getBaseVersion() : versionRange.toString() );
+            ( version != null || baseVersion != null ? getBaseVersion() : versionRange.toString() ) + 
+            ":" + scope;
     }
 
     public int hashCode()
