@@ -5,6 +5,9 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Dependency;
+
+import java.util.Collections;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -98,7 +101,7 @@ public class ModelUtilsTest
     }
 
     /**
-     * Verifies MNG-1499: The order of the merged list should be the plugins specified by the parent followed by the 
+     * Verifies MNG-1499: The order of the merged list should be the plugins specified by the parent followed by the
      * child list.
      */
     public void testShouldKeepOriginalPluginOrdering()
@@ -112,22 +115,22 @@ public class ModelUtilsTest
         parentExecution1.setId( "testExecution" );
 
         parentPlugin1.addExecution( parentExecution1 );
-        
+
         Plugin parentPlugin2 = new Plugin();
         parentPlugin2.setArtifactId( "testArtifact" );
         parentPlugin2.setGroupId( "yyy" );
         parentPlugin2.setVersion( "1.0" );
-        
+
         PluginExecution parentExecution2 = new PluginExecution();
         parentExecution2.setId( "testExecution" );
-        
+
         parentPlugin2.addExecution( parentExecution2 );
-        
+
         PluginContainer parentContainer = new PluginContainer();
         parentContainer.addPlugin(parentPlugin1);
         parentContainer.addPlugin(parentPlugin2);
 
-        
+
         Plugin childPlugin1 = new Plugin();
         childPlugin1.setArtifactId( "testArtifact" );
         childPlugin1.setGroupId( "bbb" );
@@ -137,24 +140,24 @@ public class ModelUtilsTest
         childExecution1.setId( "testExecution" );
 
         childPlugin1.addExecution( childExecution1 );
-        
+
         Plugin childPlugin2 = new Plugin();
         childPlugin2.setArtifactId( "testArtifact" );
         childPlugin2.setGroupId( "aaa" );
         childPlugin2.setVersion( "1.0" );
-        
+
         PluginExecution childExecution2 = new PluginExecution();
         childExecution2.setId( "testExecution" );
-        
+
         childPlugin2.addExecution( childExecution2 );
-        
+
         PluginContainer childContainer = new PluginContainer();
         childContainer.addPlugin(childPlugin1);
         childContainer.addPlugin(childPlugin2);
-        
+
 
         ModelUtils.mergePluginLists(childContainer, parentContainer, true);
-        
+
         assertEquals( 4, childContainer.getPlugins().size() );
         assertSame(parentPlugin1, childContainer.getPlugins().get(0));
         assertSame(parentPlugin2, childContainer.getPlugins().get(1));
@@ -180,6 +183,13 @@ public class ModelUtilsTest
         parent.addExecution( parentExecution1 );
         parent.addExecution( parentExecution2 );
 
+        // this block verifies MNG-1703
+        Dependency dep = new Dependency();
+        dep.setGroupId( "depGroupId" );
+        dep.setArtifactId( "depArtifactId" );
+        dep.setVersion( "depVersion" );
+        parent.setDependencies( Collections.singletonList( dep ) );
+
         Plugin child = new Plugin();
         child.setArtifactId( "testArtifact" );
         child.setGroupId( "testGroup" );
@@ -200,5 +210,10 @@ public class ModelUtilsTest
         assertSame(parentExecution2, child.getExecutions().get(1));
         assertSame(childExecution1, child.getExecutions().get(2));
         assertSame(childExecution2, child.getExecutions().get(3));
+
+        // this block prevents MNG-1703
+        assertEquals( 1, child.getDependencies().size() );
+        Dependency dep2 = (Dependency) child.getDependencies().get( 0 );
+        assertEquals( dep.getManagementKey(), dep2.getManagementKey() );
     }
 }
