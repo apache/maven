@@ -163,48 +163,6 @@
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
           </configuration>
         </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
