@@ -55,9 +55,9 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class DefaultLifecycleExecutor
     private List defaultReports;
 
     private Map phaseToLifecycleMap;
-    
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -181,11 +181,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeTaskSegments( List taskSegments,
-                                      ReactorManager rm,
-                                      MavenSession session,
-                                      MavenProject rootProject,
-                                      EventDispatcher dispatcher )
+    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
+                                      MavenProject rootProject, EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -219,7 +216,8 @@ public class DefaultLifecycleExecutor
                     {
                         String task = (String) goalIterator.next();
 
-                        executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,target );
+                        executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,
+                                                      target );
                     }
 
                     rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
@@ -234,7 +232,8 @@ public class DefaultLifecycleExecutor
 
                     getLogger().info( "  " + segment );
 
-                    getLogger().info("This project has been banned from further executions due to previous failures." );
+                    getLogger().info(
+                        "This project has been banned from further executions due to previous failures." );
 
                     line();
                 }
@@ -287,7 +286,8 @@ public class DefaultLifecycleExecutor
 
                         getLogger().info( "  " + segment );
 
-                        getLogger().info( "This project has been banned from further executions due to previous failures." );
+                        getLogger().info(
+                            "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -296,14 +296,9 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalAndHandleFailures( String task,
-                                               MavenSession session,
-                                               MavenProject project,
-                                               EventDispatcher dispatcher,
-                                               String event,
-                                               ReactorManager rm,
-                                               long buildStartTime,
-                                               String target )
+    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project,
+                                               EventDispatcher dispatcher, String event, ReactorManager rm,
+                                               long buildStartTime, String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try
@@ -847,12 +842,41 @@ public class DefaultLifecycleExecutor
                                 lifecycleGoal = goal;
                             }
 
+                            Xpp3Dom configuration = (Xpp3Dom) exec.getConfiguration();
+                            if ( phase.getConfiguration() != null )
+                            {
+                                configuration = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ),
+                                                                      configuration );
+                            }
+
                             MojoDescriptor desc = getMojoDescriptor( lifecyclePluginDescriptor, lifecycleGoal );
-                            MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) exec.getConfiguration() );
+                            MojoExecution mojoExecution = new MojoExecution( desc, configuration );
                             addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
                                                     session.getSettings() );
                         }
                     }
+
+                    if ( phase.getConfiguration() != null )
+                    {
+                        // Merge in general configuration for a phase.
+                        // TODO: this is all kind of backwards from the POMM. Let's align it all under 2.1.
+                        //   We should create a new lifecycle executor for modelVersion >5.0.0
+                        for ( Iterator j = lifecycleMappings.values().iterator(); j.hasNext(); )
+                        {
+                            List tasks = (List) j.next();
+
+                            for ( Iterator k = tasks.iterator(); k.hasNext(); )
+                            {
+                                MojoExecution exec = (MojoExecution) k.next();
+
+                                Xpp3Dom configuration = Xpp3Dom.mergeXpp3Dom(
+                                    new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ), exec.getConfiguration() );
+
+                                exec.setConfiguration( configuration );
+                            }
+                        }
+                    }
+
                 }
             }
 
@@ -966,9 +990,9 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         Map mappings = findMappingsForLifecycle( session, project, lifecycle );
-        
+
         List optionalMojos = findOptionalMojosForLifecycle( session, project, lifecycle );
-        
+
         Map lifecycleMappings = new HashMap();
 
         for ( Iterator i = lifecycle.getPhases().iterator(); i.hasNext(); )
@@ -984,8 +1008,9 @@ public class DefaultLifecycleExecutor
                     String goal = tok.nextToken().trim();
 
                     // Not from the CLI, don't use prefix
-                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false, optionalMojos.contains( goal ) );
-                    
+                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false,
+                                                                       optionalMojos.contains( goal ) );
+
                     if ( mojoDescriptor == null )
                     {
                         continue;
@@ -1068,7 +1093,7 @@ public class DefaultLifecycleExecutor
 
         LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session
             .getSettings(), session.getLocalRepository() );
-        
+
         if ( m != null )
         {
             optionalMojos = m.getOptionalMojos( lifecycle.getId() );
@@ -1083,10 +1108,11 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
+                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " +
+                    lifecycle.getId() + ". Error: " + e.getMessage(), e );
             }
         }
-        
+
         if ( optionalMojos == null )
         {
             optionalMojos = Collections.EMPTY_LIST;
@@ -1401,9 +1427,9 @@ public class DefaultLifecycleExecutor
             {
                 if ( !canUsePrefix )
                 {
-                    String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. "
-                        + "Please use specification of the form groupId:artifactId[:version]:goal instead. "
-                        + "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
+                    String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. " +
+                        "Please use specification of the form groupId:artifactId[:version]:goal instead. " +
+                        "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
                     throw new LifecycleExecutionException( msg );
                 }
 
@@ -1479,8 +1505,8 @@ public class DefaultLifecycleExecutor
             }
             else
             {
-                String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
-                    + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+                String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
+                    " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
                 throw new BuildFailureException( message );
             }
 
@@ -1522,7 +1548,7 @@ public class DefaultLifecycleExecutor
                 throw e;
             }
         }
-        
+
         return null;
     }
 
