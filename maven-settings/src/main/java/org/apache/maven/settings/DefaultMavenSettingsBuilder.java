@@ -65,11 +65,11 @@ public class DefaultMavenSettingsBuilder
 
     public void initialize()
     {
-        userSettingsFile = getFile( userSettingsPath, "user.home",
-                                    MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        userSettingsFile =
+            getFile( userSettingsPath, "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
 
-        globalSettingsFile = getFile( globalSettingsPath, "maven.home",
-                                      MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
+        globalSettingsFile =
+            getFile( globalSettingsPath, "maven.home", MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
         getLogger().debug(
             "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
@@ -92,26 +92,27 @@ public class DefaultMavenSettingsBuilder
             {
                 reader = new FileReader( settingsFile );
                 StringWriter sWriter = new StringWriter();
-                
+
                 IOUtil.copy( reader, sWriter );
-                
+
                 String rawInput = sWriter.toString();
-                
+
                 try
                 {
                     RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
                     interpolator.addValueSource( new EnvarBasedValueSource() );
-                    
+
                     rawInput = interpolator.interpolate( rawInput, "settings" );
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
+                    getLogger().warn(
+                        "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
                     getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
                 }
 
                 StringReader sReader = new StringReader( rawInput );
-                
+
                 SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
                 settings = modelReader.read( sReader );
@@ -145,6 +146,11 @@ public class DefaultMavenSettingsBuilder
             Settings globalSettings = readSettings( globalSettingsFile );
             Settings userSettings = readSettings( userSettingsFile );
 
+            if ( globalSettings == null )
+            {
+                globalSettings = new Settings();
+            }
+
             if ( userSettings == null )
             {
                 userSettings = new Settings();
@@ -152,7 +158,7 @@ public class DefaultMavenSettingsBuilder
             }
 
             SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
-            
+
             activateDefaultProfiles( userSettings );
 
             setLocalRepository( userSettings );
@@ -166,8 +172,8 @@ public class DefaultMavenSettingsBuilder
     private void activateDefaultProfiles( Settings settings )
     {
         List activeProfiles = settings.getActiveProfiles();
-        
-        for( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
+
+        for ( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
         {
             Profile profile = (Profile) profiles.next();
             if ( profile.getActivation() != null && profile.getActivation().isActiveByDefault() )
