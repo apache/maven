@@ -78,11 +78,10 @@ public class DefaultRepositoryMetadataManager
                     File file = new File( localRepository.getBasedir(),
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
-                    boolean checkForUpdates =
-                        policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
+                    boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
                     boolean metadataIsEmpty = true;
-
+                    
                     if ( checkForUpdates )
                     {
                         getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
@@ -202,8 +201,6 @@ public class DefaultRepositoryMetadataManager
 
                     if ( !m.getVersioning().getSnapshot().isLocalCopy() )
                     {
-                        // TODO: I think this is incorrect (it results in localCopy set in a remote profile). Probably
-                        //   harmless so not removing at this point until full tests in place.
                         m.getVersioning().getSnapshot().setLocalCopy( true );
                         metadata.setMetadata( m );
                         metadata.storeInLocalRepository( localRepository, repository );
@@ -375,7 +372,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
             repository.setBlacklisted( allowBlacklisting );
-
+            
             throw e;
         }
     }

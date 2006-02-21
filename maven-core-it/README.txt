@@ -244,9 +244,6 @@ it0088: Test path translation.
 
 it0089: Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
         the context classloader available to the plugin.
-
-it0092: Test that legacy repositories with legacy snapshots download correctly.
-
 -------------------------------------------------------------------------------
 
 - generated sources
