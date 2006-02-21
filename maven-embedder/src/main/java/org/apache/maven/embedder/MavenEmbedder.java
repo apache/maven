@@ -627,6 +627,8 @@ public class MavenEmbedder
 
             createMavenSettings();
 
+            profileManager.loadSettingsProfile( settings );
+
             localRepository = createLocalRepository( settings );
         }
         catch ( PlexusContainerException e )
