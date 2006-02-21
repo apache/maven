@@ -18,16 +18,21 @@ package org.apache.maven.project.inheritance;
 
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Relocation;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +60,69 @@ public class DefaultModelInheritanceAssemblerTest
         System.out.println( "Resulting path is: \'" + result + "\'" );
 
         assertEquals( "Append with path adjustment failed.", "http://maven.apache.org/shared/file-management", result );
+    }
+
+    public void testDistributionManagementInheritance()
+    {
+        Model parent = makeBaseModel( "parent" );
+        Model child = makeBaseModel( "child" );
+
+        DistributionManagement distributionManagement = new DistributionManagement();
+        distributionManagement.setDownloadUrl( "downloadUrl" );
+        distributionManagement.setRelocation( new Relocation() );
+        distributionManagement.setStatus( "deployed" );
+
+        DeploymentRepository repository = new DeploymentRepository();
+        repository.setId( "apache.releases" );
+        repository.setUrl( "scp://minotaur.apache.org/www/www.apache.org/dist/java-repository" );
+        repository.setName( "name" );
+        repository.setLayout( "legacy" );
+        distributionManagement.setRepository( repository );
+
+        DeploymentRepository snapshotRepository = new DeploymentRepository();
+        snapshotRepository.setId( "apache.snapshots" );
+        snapshotRepository.setUrl( "scp://minotaur.apache.org/www/cvs.apache.org/repository" );
+        snapshotRepository.setName( "name" );
+        snapshotRepository.setLayout( "legacy" );
+        snapshotRepository.setUniqueVersion( false );
+        distributionManagement.setSnapshotRepository( snapshotRepository );
+
+        Site site = new Site();
+        site.setId( "apache.website" );
+        site.setUrl( "scp://minotaur.apache.org/www/maven.apache.org/" );
+        site.setName( "name3" );
+        distributionManagement.setSite( site );
+
+        parent.setDistributionManagement( distributionManagement );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        DistributionManagement childDistMgmt = child.getDistributionManagement();
+        assertNotNull( "Check distMgmt inherited", childDistMgmt );
+        assertNull( "Check status NOT inherited", childDistMgmt.getStatus() );
+        assertNull( "Check relocation NOT inherited", childDistMgmt.getRelocation() );
+        assertEquals( "Check downloadUrl inherited", distributionManagement.getDownloadUrl(),
+                      childDistMgmt.getDownloadUrl() );
+
+        Site childSite = childDistMgmt.getSite();
+        assertNotNull( "Check site inherited", childSite );
+        assertEquals( "Check id matches", site.getId(), childSite.getId() );
+        assertEquals( "Check name matches", site.getName(), childSite.getName() );
+        assertEquals( "Check url matches with appended path", site.getUrl() + "child", childSite.getUrl() );
+
+        assertRepositoryBase( childDistMgmt.getRepository(), repository );
+        assertRepositoryBase( childDistMgmt.getSnapshotRepository(), snapshotRepository );
+        assertEquals( "Check uniqueVersion is inherited", snapshotRepository.isUniqueVersion(),
+                      childDistMgmt.getSnapshotRepository().isUniqueVersion() );
+    }
+
+    private static void assertRepositoryBase( RepositoryBase childRepository, RepositoryBase repository )
+    {
+        assertNotNull( "Check repository inherited", childRepository );
+        assertEquals( "Check id matches", repository.getId(), childRepository.getId() );
+        assertEquals( "Check name matches", repository.getName(), childRepository.getName() );
+        assertEquals( "Check url matches", repository.getUrl(), childRepository.getUrl() );
+        assertEquals( "Check layout matches", repository.getLayout(), childRepository.getLayout() );
     }
 
     public void testShouldOverrideUnitTestExcludesOnly()
@@ -659,13 +727,19 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Model model = makeBaseModel( artifactId );
 
-        Repository repository = new Repository();
-        repository.setId( id );
-        repository.setUrl( url );
+        Repository repository = makeRepository( id, url );
 
         model.setRepositories( new ArrayList( Collections.singletonList( repository ) ) );
 
         return model;
+    }
+
+    private static Repository makeRepository( String id, String url )
+    {
+        Repository repository = new Repository();
+        repository.setId( id );
+        repository.setUrl( url );
+        return repository;
     }
 
     private void assertRepositories( List expected, List actual )
