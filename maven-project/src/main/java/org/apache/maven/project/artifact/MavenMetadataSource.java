@@ -140,6 +140,9 @@ public class MavenMetadataSource
                     if ( distMgmt != null )
                     {
                         relocation = distMgmt.getRelocation();
+                        
+                        artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                        pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                     }
 
                     if ( relocation != null )
@@ -195,9 +198,13 @@ public class MavenMetadataSource
         }
         while ( !done );
 
-        // TODO: this could come straight from the project, negating the need to set it in the project itself?
-        artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-
+        // last ditch effort to try to get this set...
+        if ( artifact.getDownloadUrl() == null )
+        {
+            // TODO: this could come straight from the project, negating the need to set it in the project itself?
+            artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
+        }        
+        
         ResolutionGroup result;
 
         if ( project == null )

@@ -194,7 +194,7 @@ public class AbstractArtifactResolutionException
             sb.append( LS );
             sb.append( LS );
             sb.append( indentation );
-            sb.append( "Try downloading the file manually from" );
+            sb.append( "Try downloading the file manually from: " );
             sb.append( LS );
             sb.append( indentation );
             sb.append( "    " );

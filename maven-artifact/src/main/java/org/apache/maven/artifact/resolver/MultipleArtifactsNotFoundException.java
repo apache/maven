@@ -16,34 +16,38 @@ public class MultipleArtifactsNotFoundException
 
     private static String constructMessage( List artifacts )
     {
-        StringBuffer buffer = new StringBuffer();
-
-        int size = artifacts.size();
-
-        buffer.append( size ).append( " required artifact" );
-
-        if ( size > 1 )
-        {
-            buffer.append( "s" );
-        }
-
-        buffer.append( " missing:\n" );
+        StringBuffer buffer = new StringBuffer( "Missing:\n" );
+        
+        buffer.append( "----------\n" );
 
         int counter = 0;
 
         for ( Iterator i = artifacts.iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
-            String message = "\n" + ( ++counter ) + ") " + artifact.getId();
+            String message = ( ++counter ) + ") " + artifact.getId();
 
             buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(), artifact
                 .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getDownloadUrl(), artifact
                 .getDependencyTrail() ) );
-
-            buffer.append( "\n" );
         }
 
-        buffer.append( "\nfor the artifact:" );
+        buffer.append( "----------\n" );
+        
+        int size = artifacts.size();
+
+        buffer.append( size ).append( " required artifact" );
+
+        if ( size > 1 )
+        {
+            buffer.append( "s are" );
+        }
+        else
+        {
+            buffer.append( " is" );
+        }
+
+        buffer.append( " missing.\n\nfor artifact: " );
         
         return buffer.toString();
     }
