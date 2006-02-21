@@ -17,7 +17,7 @@ public class PomInterpolationTest
         basedir = System.getProperty( "basedir" );
     }
 
-    public void xtestProjectBuildDirectoryAfterForMojoExecution()
+    public void testProjectBuildDirectoryAfterForMojoExecution()
         throws Exception
     {
         Properties testProperties = new Properties();
