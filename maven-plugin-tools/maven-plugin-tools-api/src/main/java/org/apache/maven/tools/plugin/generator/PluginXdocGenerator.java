@@ -158,65 +158,68 @@ public class PluginXdocGenerator
 
         List mojos = pluginDescriptor.getMojos();
 
-        for ( Iterator i = mojos.iterator(); i.hasNext(); )
+        if ( mojos != null )
         {
-            MojoDescriptor mojo = (MojoDescriptor) i.next();
-
-            w.startElement( "tr" );
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            String paramName = mojo.getFullGoalName();
-
-            w.startElement( "a" );
-
-            w.addAttribute( "href", getMojoFilename( mojo, "html" ) );
-
-            w.startElement( "code" );
-
-            w.writeText( paramName );
-
-            w.endElement();
-
-            w.endElement();
-
-            w.endElement();
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            if ( StringUtils.isNotEmpty( mojo.getDescription() ) )
+            for ( Iterator i = mojos.iterator(); i.hasNext(); )
             {
-                w.writeMarkup( mojo.getDescription() );
-            }
-            else
-            {
-                w.writeText( "No description." );
-            }
+                MojoDescriptor mojo = (MojoDescriptor) i.next();
 
-            String deprecationWarning = mojo.getDeprecated();
-            if ( deprecationWarning != null )
-            {
-                w.writeMarkup( "<br/><b>Deprecated:</b> " );
-                w.writeMarkup( deprecationWarning );
-                if ( deprecationWarning.length() == 0 )
+                w.startElement( "tr" );
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                String paramName = mojo.getFullGoalName();
+
+                w.startElement( "a" );
+
+                w.addAttribute( "href", getMojoFilename( mojo, "html" ) );
+
+                w.startElement( "code" );
+
+                w.writeText( paramName );
+
+                w.endElement();
+
+                w.endElement();
+
+                w.endElement();
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                if ( StringUtils.isNotEmpty( mojo.getDescription() ) )
                 {
-                    w.writeText( "No reason given." );
+                    w.writeMarkup( mojo.getDescription() );
+                }
+                else
+                {
+                    w.writeText( "No description." );
+                }
+
+                String deprecationWarning = mojo.getDeprecated();
+                if ( deprecationWarning != null )
+                {
+                    w.writeMarkup( "<br/><b>Deprecated:</b> " );
+                    w.writeMarkup( deprecationWarning );
+                    if ( deprecationWarning.length() == 0 )
+                    {
+                        w.writeText( "No reason given." );
+                    }
+
+                    w.endElement();
                 }
 
                 w.endElement();
+
+                w.endElement();
             }
-
-            w.endElement();
-
-            w.endElement();
         }
 
         w.endElement();
@@ -323,143 +326,146 @@ public class PluginXdocGenerator
 
         List parameters = mojoDescriptor.getParameters();
 
-        for ( int i = 0; i < parameters.size(); i++ )
+        if ( parameters != null )
         {
-            Parameter parameter = (Parameter) parameters.get( i );
-
-            w.startElement( "tr" );
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            String paramName = parameter.getAlias();
-
-            if ( StringUtils.isEmpty( paramName ) )
+            for ( int i = 0; i < parameters.size(); i++ )
             {
-                paramName = parameter.getName();
-            }
+                Parameter parameter = (Parameter) parameters.get( i );
 
-            w.startElement( "code" );
+                w.startElement( "tr" );
 
-            w.writeText( paramName );
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
 
-            w.endElement(); // code
+                w.startElement( "td" );
 
-            if ( !parameter.isRequired() )
-            {
-                w.writeMarkup( " <i>(Optional)</i>" );
-            }
+                String paramName = parameter.getAlias();
 
-            if ( parameter.getExpression() != null && parameter.getExpression().startsWith( "${component." ) )
-            {
-                w.writeMarkup( " <i>(Discovered)</i>" );
-            }
-            else if ( parameter.getRequirement() != null )
-            {
-                w.writeMarkup( " <i>(Discovered)</i>" );
-            }
-
-            w.endElement(); // td
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            w.startElement( "code" );
-
-            w.addAttribute( "title", parameter.getType() );
-
-            int index = parameter.getType().lastIndexOf( "." );
-            if ( index >= 0 )
-            {
-                w.writeText( parameter.getType().substring( index + 1 ) );
-            }
-            else
-            {
-                w.writeText( parameter.getType() );
-            }
-
-            w.endElement(); // code
-
-            w.endElement(); // td
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            w.startElement( "code" );
-
-            if ( StringUtils.isNotEmpty( parameter.getExpression() ) &&
-                !parameter.getExpression().startsWith( "${component." ) )
-            {
-                w.writeText( parameter.getExpression() );
-            }
-            else
-            {
-                w.writeText( "-" );
-            }
-
-            w.endElement(); // code
-
-            w.endElement(); // td
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            w.startElement( "code" );
-
-            if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
-            {
-                w.writeText( parameter.getDefaultValue() );
-            }
-            else
-            {
-                w.writeText( "-" );
-            }
-
-            w.endElement(); // code
-
-            w.endElement(); // td
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            if ( StringUtils.isNotEmpty( parameter.getDescription() ) )
-            {
-                w.writeMarkup( parameter.getDescription() );
-            }
-            else
-            {
-                w.writeText( "No description." );
-            }
-
-            String deprecationWarning = parameter.getDeprecated();
-            if ( deprecationWarning != null )
-            {
-                w.writeMarkup( "<br/><b>Deprecated:</b> " );
-                w.writeMarkup( deprecationWarning );
-                if ( deprecationWarning.length() == 0 )
+                if ( StringUtils.isEmpty( paramName ) )
                 {
-                    w.writeText( "No reason given." );
+                    paramName = parameter.getName();
                 }
+
+                w.startElement( "code" );
+
+                w.writeText( paramName );
+
+                w.endElement(); // code
+
+                if ( !parameter.isRequired() )
+                {
+                    w.writeMarkup( " <i>(Optional)</i>" );
+                }
+
+                if ( parameter.getExpression() != null && parameter.getExpression().startsWith( "${component." ) )
+                {
+                    w.writeMarkup( " <i>(Discovered)</i>" );
+                }
+                else if ( parameter.getRequirement() != null )
+                {
+                    w.writeMarkup( " <i>(Discovered)</i>" );
+                }
+
+                w.endElement(); // td
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                w.startElement( "code" );
+
+                w.addAttribute( "title", parameter.getType() );
+
+                int index = parameter.getType().lastIndexOf( "." );
+                if ( index >= 0 )
+                {
+                    w.writeText( parameter.getType().substring( index + 1 ) );
+                }
+                else
+                {
+                    w.writeText( parameter.getType() );
+                }
+
+                w.endElement(); // code
+
+                w.endElement(); // td
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                w.startElement( "code" );
+
+                if ( StringUtils.isNotEmpty( parameter.getExpression() ) &&
+                    !parameter.getExpression().startsWith( "${component." ) )
+                {
+                    w.writeText( parameter.getExpression() );
+                }
+                else
+                {
+                    w.writeText( "-" );
+                }
+
+                w.endElement(); // code
+
+                w.endElement(); // td
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                w.startElement( "code" );
+
+                if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
+                {
+                    w.writeText( parameter.getDefaultValue() );
+                }
+                else
+                {
+                    w.writeText( "-" );
+                }
+
+                w.endElement(); // code
+
+                w.endElement(); // td
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                if ( StringUtils.isNotEmpty( parameter.getDescription() ) )
+                {
+                    w.writeMarkup( parameter.getDescription() );
+                }
+                else
+                {
+                    w.writeText( "No description." );
+                }
+
+                String deprecationWarning = parameter.getDeprecated();
+                if ( deprecationWarning != null )
+                {
+                    w.writeMarkup( "<br/><b>Deprecated:</b> " );
+                    w.writeMarkup( deprecationWarning );
+                    if ( deprecationWarning.length() == 0 )
+                    {
+                        w.writeText( "No reason given." );
+                    }
+                }
+
+                w.endElement(); // td
+
+                w.endElement(); // tr
             }
-
-            w.endElement(); // td
-
-            w.endElement(); // tr
         }
 
         w.endElement(); // table
