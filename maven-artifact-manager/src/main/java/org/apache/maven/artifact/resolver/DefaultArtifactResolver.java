@@ -241,14 +241,15 @@ public class DefaultArtifactResolver
         
         if ( missingArtifacts.size() > 0 )
         {
-            String message = "required artifacts missing:\n";
-            for( Iterator i=missingArtifacts.iterator(); i.hasNext(); )
-            {
-                Artifact missingArtifact = (Artifact) i.next();
-                message += "  " + missingArtifact.getId() + "\n";
-            }
-            message += "\nfor the artifact:";
-            throw new ArtifactResolutionException( message, originatingArtifact, remoteRepositories );
+            throw new MultipleArtifactsNotFoundException( originatingArtifact, missingArtifacts, remoteRepositories );
+//            String message = "required artifacts missing:\n";
+//            for ( Iterator i = missingArtifacts.iterator(); i.hasNext(); )
+//            {
+//                Artifact missingArtifact = (Artifact) i.next();
+//                message += "  " + missingArtifact.getId() + "\n";
+//            }
+//            message += "\nfor the artifact:";
+//            throw new ArtifactResolutionException( message, originatingArtifact, remoteRepositories );
         }
 
         return artifactResolutionResult;

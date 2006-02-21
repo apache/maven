@@ -28,7 +28,12 @@ public class ArtifactNotFoundException
     extends AbstractArtifactResolutionException
 {
     private String downloadUrl;
-
+    
+    protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories )
+    {
+        super( message, artifact, remoteRepositories );
+    }
+    
     public ArtifactNotFoundException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
@@ -44,7 +49,7 @@ public class ArtifactNotFoundException
     public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
                                       List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
                version, type, remoteRepositories, null, t );
 
         this.downloadUrl = downloadUrl;
@@ -53,42 +58,10 @@ public class ArtifactNotFoundException
     private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
                                        List remoteRepositories, String downloadUrl, List path )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
                version, type, remoteRepositories, null );
 
         this.downloadUrl = downloadUrl;
-    }
-
-    private static String constructMessage( String message, String groupId, String artifactId, String version,
-                                            String type, String downloadUrl, List path )
-    {
-        StringBuffer sb = new StringBuffer( message );
-
-        if ( downloadUrl != null && !"pom".equals( type ) )
-        {
-            sb.append( LS );
-            sb.append( LS );
-            sb.append( "Try downloading the file manually from" );
-            sb.append( LS );
-            sb.append( "  " );
-            sb.append( downloadUrl );
-            sb.append( LS );
-            sb.append( "and install it using the command: " );
-            sb.append( LS );
-            sb.append( "  mvn install:install-file -DgroupId=" );
-            sb.append( groupId );
-            sb.append( " -DartifactId=" );
-            sb.append( artifactId );
-            sb.append( " -Dversion=" );
-            sb.append( version );
-            sb.append( " -Dpackaging=" );
-            sb.append( type );
-            sb.append( " -Dfile=/path/to/file" );
-        }
-
-        sb.append( constructArtifactPath( path ) );
-        sb.append( LS );
-        return sb.toString();
     }
 
     public String getDownloadUrl()
