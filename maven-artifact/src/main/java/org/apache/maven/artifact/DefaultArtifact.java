@@ -224,8 +224,23 @@ public class DefaultArtifact
 
     public String getDependencyConflictId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType() +
-            ( hasClassifier() ? ":" + getClassifier() : "" );
+        StringBuffer sb = new StringBuffer();
+        sb.append( getGroupId() );
+        sb.append( ":" );
+        appendArtifactTypeClassifierString( sb );
+        return sb.toString();
+    }
+
+    private void appendArtifactTypeClassifierString( StringBuffer sb )
+    {
+        sb.append( getArtifactId() );
+        sb.append( ":" );
+        sb.append( getType() );
+        if ( hasClassifier() )
+        {
+            sb.append( ":" );
+            sb.append( getClassifier() );
+        }
     }
 
     public void addMetadata( ArtifactMetadata metadata )
@@ -257,9 +272,28 @@ public class DefaultArtifact
 
     public String toString()
     {
-        return getDependencyConflictId() + ":" +
-            ( version != null || baseVersion != null ? getBaseVersion() : versionRange.toString() ) + 
-            ":" + scope;
+        StringBuffer sb = new StringBuffer();
+        if ( getGroupId() != null )
+        {
+            sb.append( getGroupId() );
+            sb.append( ":" );
+        }
+        appendArtifactTypeClassifierString( sb );
+        sb.append( ":" );
+        if ( version != null || baseVersion != null )
+        {
+            sb.append( getBaseVersion() );
+        }
+        else
+        {
+            sb.append( versionRange.toString() );
+        }
+        if ( scope != null )
+        {
+            sb.append( ":" );
+            sb.append( scope );
+        }
+        return sb.toString();
     }
 
     public int hashCode()
