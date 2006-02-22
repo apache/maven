@@ -4,5 +4,9 @@
       <location>target/effective-pom.xml</location>
       <contains>scp://host/path/sub1</contains>
     </file>
+    <file>
+      <location>target/effective-pom.xml</location>
+      <contains>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x/maven-core-it/it0095/sub1</contains>
+    </file>
   </files>
 </verifications>
