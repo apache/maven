@@ -413,6 +413,8 @@ public class MavenEmbedder2 {
         	}
         	
         	ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer() );
+
+        	profileManager.loadSettingsProfiles( settings );
         	
         	String profilesLine = getActivateProfiles();
         	if ( profilesLine != null )
