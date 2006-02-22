@@ -146,7 +146,7 @@ public class ResolutionNode
     {
         return children != null;
     }
-    
+
     public boolean isChildOfRootNode()
     {
         return parent != null && parent.parent == null;
@@ -219,7 +219,7 @@ public class ResolutionNode
 
     public String toString()
     {
-        return artifact.toString() + " (" + depth + ")";
+        return artifact.toString() + " (" + depth + "; " + ( active ? "enabled" : "disabled" ) + ")";
     }
 
 }
