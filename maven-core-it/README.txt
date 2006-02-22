@@ -252,6 +252,8 @@ it0091: Test that currently demonstrates that properties are not correctly
         interpolated into other areas in the POM. This may strictly be a boolean
         problem: I captured the problem as it was reported.
 
+it0095: Test URL calculation when modules are in sibling dirs of parent. (MNG-2006)
+
 -------------------------------------------------------------------------------
 
 - generated sources
