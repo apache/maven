@@ -16,6 +16,13 @@
         <version>1.0-alpha-7</version>
         <executions>
           <execution>
+            <id>site-xsd</id>
+            <phase>site</phase>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>base</id>
             <goals>
               <goal>xpp3-writer</goal>

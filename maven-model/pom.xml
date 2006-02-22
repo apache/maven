@@ -25,6 +25,13 @@
               <goal>xsd</goal>
             </goals>
           </execution>
+          <execution>
+            <id>site-xsd</id>
+            <phase>site</phase>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+          </execution>
         </executions>
         <configuration>
           <version>4.0.0</version>
