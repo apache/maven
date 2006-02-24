@@ -256,6 +256,9 @@ it0095: Test URL calculation when modules are in sibling dirs of parent. (MNG-20
 
 it0096: Test that plugin executions from >1 step of inheritance don't run multiple times. 
 
+it0097: Test that the implied relative path for the parent POM works, even two
+        levels deep.
+
 -------------------------------------------------------------------------------
 
 - generated sources
