@@ -258,6 +258,8 @@ it0094: Test classloading issues with mojos after 2.0 (MNG-1898).
 
 it0095: Test URL calculation when modules are in sibling dirs of parent. (MNG-2006)
 
+it0096: Test that plugin executions from >1 step of inheritance don't run multiple times. 
+
 -------------------------------------------------------------------------------
 
 - generated sources
