@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl"?>
+<rdf:RDF xml:lang="en"
+         xmlns="http://usefulinc.com/ns/doap#" 
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:asfext="http://projects.apache.org/ns/asfext#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/">
+<!--
+  =======================================================================
+
+   Copyright (c) 2006 The Apache Software Foundation.  
+   All rights reserved.
+
+  =======================================================================
+-->
+  <Project rdf:about="http://Maven.rdf.apache.org/">
+    <created>2006-02-28</created>
+    <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
+    <name>http://Maven</name>
+    <homepage rdf:resource="http://maven.apache.org" />
+    <asfext:pmc rdf:resource="http://maven.apache.org" />
+    <shortdesc>Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.</shortdesc>
+    <description>At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt to apply patterns to a project's build infrastructure in order to promote comprehension and productivity by providing a clear path in the use of best practices. Maven is essentially a project management and comprehension tool and as such provides a way to help with managing:
+
+    * Builds
+    * Documentation
+    * Reporting
+    * Dependencies
+    * SCMs
+    * Releases
+    * Distribution</description>
+    <bug-database rdf:resource="http://jira.codehaus.org/browse/MNG" />
+    <mailing-list rdf:resource="http://maven.apache.org/mail-lists.html" />
+    <download-page rdf:resource="http://maven.apache.org/download.html" />
+    <programming-language>Java</programming-language>
+    <category rdf:resource="http://projects.apache.org/category/build-management" />
+    <release>
+      <Version>
+        <name>Latest stable release</name>
+        <created>2006-01-16</created>
+        <revision>2.0.2</revision>
+      </Version>
+    </release>
+    <repository>
+      <SVNRepository>
+        <location rdf:resource="http://svn.apache.org/repos/asf/maven/components/trunk/"/>
+        <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/maven/components/trunk/"/>
+      </SVNRepository>
+    </repository>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Emmanuel Venisse</foaf:name>
+          <foaf:mbox rdf:resource="mailto:evenisse@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+  </Project>
+</rdf:RDF>
