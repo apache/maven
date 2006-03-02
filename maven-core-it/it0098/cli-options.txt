@@ -1,0 +1,1 @@
+-DgroupId=org.someproject "-DartifactId=test project"

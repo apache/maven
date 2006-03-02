@@ -259,6 +259,8 @@ it0096: Test that plugin executions from >1 step of inheritance don't run multip
 it0097: Test that the implied relative path for the parent POM works, even two
         levels deep.
 
+it0098: Test that quoted system properties are processed correctly. [MNG-1415]
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -56,6 +56,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -703,8 +705,125 @@ public class MavenCli
         public CommandLine parse( String[] args )
             throws ParseException
         {
+            // We need to eat any quotes surrounding arguments...
+            String[] cleanArgs = cleanArgs( args );
+            
             CommandLineParser parser = new GnuParser();
-            return parser.parse( options, args );
+            return parser.parse( options, cleanArgs );
+        }
+        
+        private String[] cleanArgs( String[] args )
+        {
+            List cleaned = new ArrayList();
+            
+            StringBuffer currentArg = null;
+            
+            for ( int i = 0; i < args.length; i++ )
+            {
+                String arg = args[i];
+                
+//                System.out.println( "Processing raw arg: " + arg );
+                
+                boolean addedToBuffer = false;
+                
+                if ( arg.startsWith( "\"" ) )
+                {
+                    // if we're in the process of building up another arg, push it and start over.
+                    // this is for the case: "-Dfoo=bar "-Dfoo2=bar two" (note the first unterminated quote)
+                    if ( currentArg != null )
+                    {
+//                        System.out.println( "Flushing last arg buffer: \'" + currentArg + "\' to cleaned list." );
+                        cleaned.add( currentArg.toString() );
+                    }
+                    
+                    // start building an argument here.
+                    currentArg = new StringBuffer( arg.substring( 1 ) );
+                    addedToBuffer = true;
+                }
+                
+                // this has to be a separate "if" statement, to capture the case of: "-Dfoo=bar"
+                if ( arg.endsWith( "\"" ) )
+                {
+                    String cleanArgPart = arg.substring( 0, arg.length() - 1 );
+                    
+                    // if we're building an argument, keep doing so.
+                    if ( currentArg != null )
+                    {
+                        // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
+                        if ( addedToBuffer )
+                        {
+//                            System.out.println( "Adjusting argument already appended to the arg buffer." );
+                            currentArg.setLength( currentArg.length() - 1 );
+                        }
+                        // otherwise, we trim the trailing " and append to the buffer.
+                        else
+                        {
+//                            System.out.println( "Appending arg part: \'" + cleanArgPart + "\' with preceding space to arg buffer." );
+                            // TODO: introducing a space here...not sure what else to do but collapse whitespace
+                            currentArg.append( ' ' ).append( cleanArgPart );
+                        }
+                        
+//                        System.out.println( "Flushing completed arg buffer: \'" + currentArg + "\' to cleaned list." );
+                        
+                        // we're done with this argument, so add it.
+                        cleaned.add( currentArg.toString() );
+                    }
+                    else
+                    {
+//                        System.out.println( "appending cleaned arg: \'" + cleanArgPart + "\' directly to cleaned list." );
+                        // this is a simple argument...just add it.
+                        cleaned.add( cleanArgPart );
+                    }
+                    
+//                    System.out.println( "Clearing arg buffer." );
+                    // the currentArg MUST be finished when this completes.
+                    currentArg = null;
+                    continue;
+                }
+                
+                // if we haven't added this arg to the buffer, and we ARE building an argument
+                // buffer, then append it with a preceding space...again, not sure what else to
+                // do other than collapse whitespace.
+                // NOTE: The case of a trailing quote is handled by nullifying the arg buffer.
+                if ( !addedToBuffer )
+                {
+                    // append to the argument we're building, collapsing whitespace to a single space.
+                    if ( currentArg != null )
+                    {
+//                        System.out.println( "Append unquoted arg part: \'" + arg + "\' to arg buffer." );
+                        currentArg.append( ' ' ).append( arg );
+                    }
+                    // this is a loner, just add it directly.
+                    else
+                    {
+//                        System.out.println( "Append unquoted arg part: \'" + arg + "\' directly to cleaned list." );
+                        cleaned.add( arg );
+                    }
+                }
+            }
+            
+            // clean up.
+            if ( currentArg != null )
+            {
+//                System.out.println( "Adding unterminated arg buffer: \'" + currentArg + "\' to cleaned list." );
+                cleaned.add( currentArg.toString() );
+            }
+            
+            int cleanedSz = cleaned.size();
+            String[] cleanArgs = null;
+            
+            if ( cleanedSz == 0 )
+            {
+                // if we didn't have any arguments to clean, simply pass the original array through
+                cleanArgs = args;
+            }
+            else
+            {
+//                System.out.println( "Cleaned argument list:\n" + cleaned );
+                cleanArgs = (String[]) cleaned.toArray( new String[cleanedSz] );
+            }
+            
+            return cleanArgs;
         }
 
         public void displayHelp()
