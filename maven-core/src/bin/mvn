@@ -18,6 +18,14 @@
 #   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
 #   reserved.
 
+QUOTED_ARGS=""
+while [ "$1" != "" ] ; do
+
+  QUOTED_ARGS="$QUOTED_ARGS \"$1\""
+  shift
+
+done
+
 if [ -f /etc/mavenrc ] ; then
   . /etc/mavenrc
 fi
@@ -134,5 +142,5 @@ exec "$JAVACMD" \
   -classpath "${M2_HOME}"/core/boot/classworlds-*.jar \
   "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
   "-Dmaven.home=${M2_HOME}"  \
-  ${CLASSWORLDS_LAUNCHER} $@
+  ${CLASSWORLDS_LAUNCHER} $QUOTED_ARGS
 
