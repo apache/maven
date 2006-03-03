@@ -482,6 +482,7 @@ public class DefaultModelInheritanceAssembler
         return repository;
     }
 
+    // TODO: This should eventually be migrated to DefaultPathTranslator.
     protected String appendPath( String parentPath, String childPath, String pathAdjustment, boolean appendPaths )
     {
         List pathFragments = new ArrayList();
@@ -570,7 +571,12 @@ public class DefaultModelInheritanceAssembler
         
         if ( appendPaths && lastPathPart != null && !lastPathPart.endsWith( "/" ) )
         {
-            cleanedPath.setLength( cleanedPath.length() - 1 );
+            int cleanedPathLen = cleanedPath.length();
+            
+            if ( cleanedPathLen > 0 )
+            {
+                cleanedPath.setLength( cleanedPathLen - 1 );
+            }            
         }
 
         return cleanedPath.toString();
