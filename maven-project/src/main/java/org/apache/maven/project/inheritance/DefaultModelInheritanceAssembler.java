@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -485,98 +486,75 @@ public class DefaultModelInheritanceAssembler
     // TODO: This should eventually be migrated to DefaultPathTranslator.
     protected String appendPath( String parentPath, String childPath, String pathAdjustment, boolean appendPaths )
     {
-        List pathFragments = new ArrayList();
-
-        String rootPath = parentPath;
-
-        String protocol = null;
-        int protocolIdx = rootPath.indexOf( "://" );
-
-        if ( protocolIdx > -1 )
-        {
-            protocol = rootPath.substring( 0, protocolIdx + 3 );
-            rootPath = rootPath.substring( protocolIdx + 3 );
-        }
-
-        pathFragments.add( rootPath );
+        String uncleanPath = parentPath;
 
         if ( appendPaths )
         {
             if ( pathAdjustment != null )
-            {
-                pathFragments.add( pathAdjustment );
-            }
+                uncleanPath += "/" + pathAdjustment;
 
             if ( childPath != null )
-            {
-                pathFragments.add( childPath );
-            }            
+                uncleanPath += "/" + childPath;
         }
+
+        String cleanedPath = "";
+
+        int protocolIdx = uncleanPath.indexOf( "://" );
+
+        if ( protocolIdx > -1 )
+        {
+            cleanedPath = uncleanPath.substring( 0, protocolIdx + 3 );
+            uncleanPath = uncleanPath.substring( protocolIdx + 3 );
+        }
+
+        if ( uncleanPath.startsWith( "/" ) )
+            cleanedPath += "/";
+
+        return cleanedPath + resolvePath( uncleanPath );
+    }
+
+    // TODO: Move this to plexus-utils' PathTool.
+    private static String resolvePath( String uncleanPath )
+    {
+        LinkedList pathElements = new LinkedList();
+
+        StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
+
+        while ( tokenizer.hasMoreTokens() )
+        {
+            String token = (String) tokenizer.nextToken();
+
+            if ( token.equals( "" ) )
+            {
+                // Empty path entry ("...//.."), remove.
+            }
+            else if ( token.equals( ".." ) )
+            {
+                if ( pathElements.isEmpty() )
+                {
+                    // FIXME: somehow report to the user
+                    // that there are too many '..' elements.
+                    // For now, ignore the extra '..'.
+                }
+                else
+                {
+                    pathElements.removeLast();
+                }
+            }
+            else
+            {
+                pathElements.addLast( token );
+            }
+        }
+
 
         StringBuffer cleanedPath = new StringBuffer();
 
-        if ( protocol != null )
+        while ( !pathElements.isEmpty() )
         {
-            cleanedPath.append( protocol );
-        }
-
-        if ( rootPath.startsWith( "/" ) )
-        {
-            cleanedPath.append( '/' );
-        }
-
-        String lastToken = null;
-        String currentToken = null;
-
-        for ( Iterator it = pathFragments.iterator(); it.hasNext(); )
-        {
-            String pathFragment = (String) it.next();
-
-            StringTokenizer tokens = new StringTokenizer( pathFragment, "/" );
-
-            while ( tokens.hasMoreTokens() )
-            {
-                lastToken = currentToken;
-                currentToken = tokens.nextToken();
-
-                if ( "..".equals( currentToken ) && lastToken != null )
-                {
-                    int cleanedPathLen = cleanedPath.length();
-                    int lastTokenLen = lastToken.length();
-                    
-                    if ( cleanedPathLen > lastTokenLen )
-                    {
-                        // trim the previous path part off...
-                        cleanedPath.setLength( cleanedPath.length() - ( lastToken.length() + 1 ) );
-                    }
-                }
-                else if ( !".".equals( currentToken ) )
-                {
-                    // don't worry about /./ self-references.
-                    cleanedPath.append( currentToken ).append( '/' );
-                }
-            }
-        }
-
-        String lastPathPart = childPath;
-        if ( lastPathPart == null )
-        {
-            lastPathPart = pathAdjustment;
-        }
-        
-        if ( lastPathPart == null )
-        {
-            lastPathPart = parentPath;
-        }
-        
-        if ( appendPaths && lastPathPart != null && !lastPathPart.endsWith( "/" ) )
-        {
-            int cleanedPathLen = cleanedPath.length();
-            
-            if ( cleanedPathLen > 0 )
-            {
-                cleanedPath.setLength( cleanedPathLen - 1 );
-            }            
+            cleanedPath.append( pathElements.removeFirst() );
+            if ( !pathElements.isEmpty() )
+                cleanedPath.append( '/' );
         }
 
         return cleanedPath.toString();
