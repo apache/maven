@@ -137,6 +137,16 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+    <developer>
+      <id>snicoll</id>
+      <name>Stephane Nicoll</name>
+      <email>snicoll@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <licenses>
     <license>
