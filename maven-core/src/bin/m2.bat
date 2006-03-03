@@ -20,5 +20,5 @@ echo.
 echo THE m2 COMMMAND IS DEPRECATED - PLEASE RUN mvn INSTEAD
 echo.
 
-%~dps0\mvn %*
+"%~dp0\mvn" %*
 
