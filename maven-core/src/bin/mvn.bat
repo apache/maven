@@ -67,7 +67,7 @@ goto error
 :chkMHome
 if not "%M2_HOME%"=="" goto valMHome
 
-if "%OS%"=="Windows_NT" SET M2_HOME=%~dps0\..
+if "%OS%"=="Windows_NT" SET M2_HOME=%~dp0\..
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
