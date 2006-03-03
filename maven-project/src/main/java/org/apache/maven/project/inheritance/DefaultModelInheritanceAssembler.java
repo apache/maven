@@ -538,10 +538,16 @@ public class DefaultModelInheritanceAssembler
                 lastToken = currentToken;
                 currentToken = tokens.nextToken();
 
-                if ( "..".equals( currentToken ) )
+                if ( "..".equals( currentToken ) && lastToken != null )
                 {
-                    // trim the previous path part off...
-                    cleanedPath.setLength( cleanedPath.length() - ( lastToken.length() + 1 ) );
+                    int cleanedPathLen = cleanedPath.length();
+                    int lastTokenLen = lastToken.length();
+                    
+                    if ( cleanedPathLen > lastTokenLen )
+                    {
+                        // trim the previous path part off...
+                        cleanedPath.setLength( cleanedPath.length() - ( lastToken.length() + 1 ) );
+                    }
                 }
                 else if ( !".".equals( currentToken ) )
                 {
