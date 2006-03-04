@@ -8,5 +8,6 @@
   <modules>
     <module>plugin</module>
     <module>project/project-level2/project-level3</module>
+    <module>project/relative-project-level2/relative-project-level3/</module>
   </modules>
 </project>

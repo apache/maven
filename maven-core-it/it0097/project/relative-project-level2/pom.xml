@@ -7,11 +7,10 @@
     <version>1</version>
   </parent>
 
-  <artifactId>maven-it0097-project-level2</artifactId>
+  <artifactId>maven-it0097-relative-project-level2</artifactId>
 
   <packaging>pom</packaging>
   <modules>
-    <module>project-level3</module>
-    <module>../project-sibling-level2</module>
+    <module>relative-project-level3</module>
   </modules>
 </project>
