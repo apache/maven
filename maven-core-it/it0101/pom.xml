@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it0101</groupId>
+  <artifactId>it0101</artifactId>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>test</groupId>
+      <artifactId>test-dependency</artifactId>
+      <version>1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/${libdir}/test-dep.txt</systemPath>
+    </dependency>
+  </dependencies>
+</project>
+
