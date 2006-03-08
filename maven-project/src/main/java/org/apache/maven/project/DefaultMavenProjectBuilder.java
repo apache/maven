@@ -690,10 +690,13 @@ public class DefaultMavenProjectBuilder
         
         Model previous = superProject.getModel();
 
+//        System.out.println( "Assembling inheritance..." );
+        
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
             MavenProject currentProject = (MavenProject) i.next();
 
+//            System.out.println( "Assembling inheritance: " + previousProject.getId() + "(" + previousProject.getName() + ")" + " <- " + currentProject.getId() + "(" + currentProject.getName() + ")" );
             Model current = currentProject.getModel();
             
             String pathAdjustment = null;
@@ -711,6 +714,8 @@ public class DefaultMavenProjectBuilder
 
             previous = current;
             previousProject = currentProject;
+            
+//            System.out.println( "New parent project is: " + previousProject.getId() + "(" + previousProject.getName() + ")" );
         }
 
         // only add the super repository if it wasn't overridden by a profile or project
@@ -995,11 +1000,23 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException( projectId, "Missing version element from parent element" );
             }
 
+            String parentKey = createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
+            MavenProject parentProject = (MavenProject)projectCache.get( parentKey );
+
             // the only way this will have a value is if we find the parent on disk...
             File parentDescriptor = null;
-
-            model = null;
-
+            
+            if ( parentProject != null )
+            {
+                model = parentProject.getOriginalModel();
+                
+                parentDescriptor = parentProject.getFile();
+            }
+            else
+            {
+                model = null;
+            }
+            
             String parentRelativePath = parentModel.getRelativePath();
 
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using
@@ -1108,14 +1125,16 @@ public class DefaultMavenProjectBuilder
             {
                 parentProjectDir = parentDescriptor.getParentFile();
             }
-            MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
+            
+            parentProject = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
                                                    externalProfileManager, strict );
-            parent.setFile( parentDescriptor );
+            parentProject.setFile( parentDescriptor );
 
-            project.setParent( parent );
+            project.setParent( parentProject );
 
             project.setParentArtifact( parentArtifact );
+            
         }
 
         return project;
