@@ -336,8 +336,6 @@ public class MavenMetadataSource
                 artifact.setFile( new File( d.getSystemPath() ) );
             }
 
-            ArtifactFilter artifactFilter = dependencyFilter;
-            
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {
                 if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )
@@ -356,15 +354,15 @@ public class MavenMetadataSource
                         AndArtifactFilter filter = new AndArtifactFilter();
                         filter.add( dependencyFilter );
                         filter.add( newFilter );
-                        artifactFilter = filter;
+                        dependencyFilter = filter;
                     }
                     else
                     {
-                        artifactFilter = newFilter;
+                        dependencyFilter = newFilter;
                     }
                 }
 
-                artifact.setDependencyFilter( artifactFilter );
+                artifact.setDependencyFilter( dependencyFilter );
 
                 if ( project != null )
                 {
