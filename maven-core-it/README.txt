@@ -270,6 +270,10 @@ it0099: Test that parent-POMs cached during a build are available as parents
 
 it0100: Test that ${parent.artifactId} resolves correctly. [MNG-2124]
 
+it0101: Test that properties defined in an active profile in the user's
+        settings are available for interpolation of systemPath in a dependency.
+        [MNG-2052]
+
 -------------------------------------------------------------------------------
 
 - generated sources
