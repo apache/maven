@@ -136,7 +136,10 @@ public class RegexBasedModelInterpolator
             {
                 try
                 {
-                    value = ReflectionValueExtractor.evaluate( realExpr, model );
+                    // NOTE: We've already trimmed off any leading expression parts like 'project.'
+                    // or 'pom.', and now we have to ensure that the ReflectionValueExtractor 
+                    // doesn't try to do it again.
+                    value = ReflectionValueExtractor.evaluate( realExpr, model, false );
                 }
                 catch ( Exception e )
                 {
