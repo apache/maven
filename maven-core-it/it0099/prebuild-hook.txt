@@ -1,0 +1,1 @@
+rm ${artifact:org.apache.maven.it0099:maven-it0099-parent:1:pom}

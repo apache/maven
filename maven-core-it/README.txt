@@ -261,6 +261,9 @@ it0097: Test that the implied relative path for the parent POM works, even two
 
 it0098: Test that quoted system properties are processed correctly. [MNG-1415]
 
+it0099: Test that parent-POMs cached during a build are available as parents
+        to other POMs in the multimodule build. [MNG-2124]
+
 -------------------------------------------------------------------------------
 
 - generated sources
