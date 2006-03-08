@@ -21,7 +21,7 @@ if [ "$2" = "" ]; then
 fi
 
 FROM=continuum@maven.zones.apache.org
-TO=dev@maven.apache.org
+TO=notifications@maven.apache.org
 DATE=`date`
 
 PID=$$
