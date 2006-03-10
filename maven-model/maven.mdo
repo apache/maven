@@ -1683,7 +1683,7 @@
         <field>
           <name>includes</name>
           <version>3.0.0+</version>
-          <description><![CDATA[A list of patterns to include, e.g. **/*.xml]]></description>
+          <description><![CDATA[A list of patterns to include, e.g. <code>**&#47;*.xml</code>.]]></description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -1692,7 +1692,7 @@
         <field>
           <name>excludes</name>
           <version>3.0.0+</version>
-          <description><![CDATA[A list of patterns to exclude, e.g. **/*.xml]]></description>
+          <description><![CDATA[A list of patterns to exclude, e.g. <code>**&#47;*.xml</code>]]></description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
