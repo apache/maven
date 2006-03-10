@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
 
 import java.util.Collections;
@@ -41,6 +42,24 @@ public class RegexBasedModelInterpolatorTest
         super.setUp();
 
         context = Collections.singletonMap( "basedir", "myBasedir" );
+    }
+
+    public void testShouldInterpolateOrganizationNameCorrectly()
+        throws Exception
+    {
+        String orgName = "MyCo";
+
+        Model model = new Model();
+        model.setName( "${pom.organization.name} Tools" );
+
+        Organization org = new Organization();
+        org.setName( orgName );
+
+        model.setOrganization( org );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        assertEquals( orgName + " Tools", out.getName() );
     }
 
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
@@ -70,20 +89,20 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
-/*
-        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
-        // timing of executing the interpolation
+        /*
+         // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
+         // timing of executing the interpolation
 
-        try
-        {
-            new RegexBasedModelInterpolator().interpolate( model, context );
-            fail( "Should have failed to interpolate with invalid reference" );
-        }
-        catch ( ModelInterpolationException expected )
-        {
-            assertTrue( true );
-        }
-*/
+         try
+         {
+         new RegexBasedModelInterpolator().interpolate( model, context );
+         fail( "Should have failed to interpolate with invalid reference" );
+         }
+         catch ( ModelInterpolationException expected )
+         {
+         assertTrue( true );
+         }
+         */
 
         Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
@@ -122,8 +141,7 @@ public class RegexBasedModelInterpolatorTest
 
         Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
-        assertEquals( "file://localhost/myBasedir/temp-repo",
-                      ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
+        assertEquals( "file://localhost/myBasedir/temp-repo", ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
     }
 
     public void testEnvars()
@@ -161,12 +179,10 @@ public class RegexBasedModelInterpolatorTest
 
         Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
 
-        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );        
+        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
     }
-
-
 
     public void testExpressionThatEvaluatesToNullReturnsTheLiteralString()
         throws Exception

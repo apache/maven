@@ -145,7 +145,8 @@ public class DefaultProfileManager
     public List getActiveProfiles()
         throws ProfileActivationException
     {
-        List active = new ArrayList( profilesById.size() );
+        List activeFromPom = new ArrayList();
+        List activeExternal = new ArrayList();
 
         for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
         {
@@ -154,17 +155,30 @@ public class DefaultProfileManager
             String profileId = (String) entry.getKey();
             Profile profile = (Profile) entry.getValue();
 
+            boolean shouldAdd = false;
             if ( activatedIds.contains( profileId ) )
             {
-                active.add( profile );
+                shouldAdd = true;
             }
             else if ( !deactivatedIds.contains( profileId ) && isActive( profile ) )
             {
-                active.add( profile );
+                shouldAdd = true;
+            }
+            
+            if ( shouldAdd )
+            {
+                if ( "pom".equals( profile.getSource() ) )
+                {
+                    activeFromPom.add( profile );
+                }
+                else
+                {
+                    activeExternal.add( profile );
+                }
             }
         }
 
-        if ( active.isEmpty() )
+        if ( activeFromPom.isEmpty() )
         {
             for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
             {
@@ -172,11 +186,16 @@ public class DefaultProfileManager
 
                 Profile profile = (Profile) profilesById.get( profileId );
 
-                active.add( profile );
+                activeFromPom.add( profile );
             }
         }
+        
+        List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
+        
+        allActive.addAll( activeExternal );
+        allActive.addAll( activeFromPom );
 
-        return active;
+        return allActive;
     }
 
     private boolean isActive( Profile profile )
