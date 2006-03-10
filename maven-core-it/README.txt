@@ -270,6 +270,9 @@ it0101: Test that properties defined in an active profile in the user's
         settings are available for interpolation of systemPath in a dependency.
         [MNG-2052]
 
+it0102: Test that <activeByDefault/> calculations for profile activation only
+        use profiles defined in the POM. [MNG-2136]
+
 -------------------------------------------------------------------------------
 
 - generated sources

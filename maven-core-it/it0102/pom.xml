@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it0102</groupId>
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <name>parent</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-help-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>output-pom</id>
+            <phase>generate-resources</phase>
+            <configuration>
+              <output>target/effective-pom.txt</output>
+            </configuration>
+            <goals>
+              <goal>effective-pom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <configuration>
+              <tasks>
+                <echo>value from external profile: ${profilesXmlValue}</echo>
+                <echo>test output: ${testOutput}</echo>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>       
+          </execution>   
+        </executions>  
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>testInternal</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <testOutput>Failure</testOutput>
+      </properties>
+    </profile>
+    <profile>
+      <id>testInternal2</id>
+      <activation>
+        <property><name>user.name</name></property>
+      </activation>
+      <properties>
+        <testOutput>Success</testOutput>
+      </properties>
+    </profile>
+  </profiles>
+</project>
