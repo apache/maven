@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
+    <artifactId>maven-parent</artifactId>
     <version>1</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
