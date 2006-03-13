@@ -58,7 +58,8 @@ public class DefaultPluginRegistryBuilder
 
         getLogger().debug( "Building Maven user-level plugin registry from: '" + userRegistryFile.getAbsolutePath() + "'" );
 
-        if ( System.getProperty( "maven.home" ) != null )
+        if ( System.getProperty( "maven.home" ) != null ||
+             System.getProperty( MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION ) != null )
         {
             globalRegistryFile = getFile( globalRegistryPath, "maven.home", MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION );
 
@@ -94,7 +95,7 @@ public class DefaultPluginRegistryBuilder
     {
         PluginRegistry registry = null;
 
-        if ( registryFile.exists() && registryFile.isFile() )
+        if ( registryFile != null && registryFile.exists() && registryFile.isFile() )
         {
             FileReader reader = null;
             try
