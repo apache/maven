@@ -1024,6 +1024,11 @@ public class DefaultMavenProjectBuilder
             if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
             {
                 parentDescriptor = new File( projectDir, parentRelativePath );
+                
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " + project.getId() + " in relative path: " + parentRelativePath );
+                }
 
                 if ( parentDescriptor.isDirectory() )
                 {
@@ -1037,8 +1042,12 @@ public class DefaultMavenProjectBuilder
 
                     if ( !parentDescriptor.exists() )
                     {
-                        throw new ProjectBuildingException( projectId, "missing parent project descriptor: " +
-                            parentDescriptor.getAbsolutePath() );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " + project.getId() + " cannot be loaded from relative path: " + parentDescriptor + "; path does not exist." );
+                        }
+                        
+                        parentDescriptor = null;
                     }
                 }
 
@@ -1085,6 +1094,10 @@ public class DefaultMavenProjectBuilder
                             "\n  Specified: " + parentModel.getId() + "\n  Found:     " + candidateParent.getId() );
                     }
                 }
+                else if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Parent-POM: " + parentModel.getId() + " not found in relative path: " + parentRelativePath );
+                }
             }
 
             Artifact parentArtifact = null;
@@ -1101,17 +1114,30 @@ public class DefaultMavenProjectBuilder
                 // as we go in order to do this.
                 // ----------------------------------------------------------------------
 
-                getLogger().debug( "Retrieving parent-POM from the repository for project: " + project.getId() );
-
-                parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
-                                                                       parentModel.getArtifactId(),
-                                                                       parentModel.getVersion() );
-
                 // we must add the repository this POM was found in too, by chance it may be located where the parent is
                 // we can't query the parent to ask where it is :)
                 List remoteRepositories = new ArrayList( aggregatedRemoteWagonRepositories );
                 remoteRepositories.addAll( parentSearchRepositories );
-                model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
+                
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                                       "Retrieving parent-POM: " + parentModel.getId() + " for project: "
+                                           + project.getId() + " from the repository." );
+                }
+                
+                parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
+                                                                       parentModel.getArtifactId(),
+                                                                       parentModel.getVersion() );
+
+                try
+                {
+                    model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
+                }
+                catch( ProjectBuildingException e )
+                {
+                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId() + " for project: " + project.getId(), e );
+                }
             }
 
             if ( model != null && !"pom".equals( model.getPackaging() ) )

@@ -382,7 +382,7 @@ public class DefaultMaven
 
         messageBuffer.append( name );
 
-        int dotCount = 55;
+        int dotCount = 54;
 
         dotCount -= name.length();
 
@@ -760,9 +760,9 @@ public class DefaultMaven
 
     protected void line()
     {
-        getLogger().info( "----------------------------------------------------------------------------" );
+        getLogger().info( "------------------------------------------------------------------------" );
     }
-
+    
     protected static String formatTime( long ms )
     {
         long secs = ms / MS_PER_SEC;
