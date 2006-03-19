@@ -17,7 +17,7 @@
     <notifiers>
       <notifier>
         <configuration>
-          <address>commits@maven.apache.org</address>
+          <address>notifications@maven.apache.org</address>
         </configuration>
       </notifier>
     </notifiers>
