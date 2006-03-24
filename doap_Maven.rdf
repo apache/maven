@@ -16,7 +16,7 @@
   <Project rdf:about="http://Maven.rdf.apache.org/">
     <created>2006-02-28</created>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
-    <name>http://Maven</name>
+    <name>Apache Maven</name>
     <homepage rdf:resource="http://maven.apache.org" />
     <asfext:pmc rdf:resource="http://maven.apache.org" />
     <shortdesc>Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.</shortdesc>
