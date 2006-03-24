@@ -138,6 +138,10 @@ public class MavenProject
     
     private Map moduleAdjustments;
 
+    public MavenProject()
+    {
+    }
+
     public MavenProject( Model model )
     {
         this.model = model;
