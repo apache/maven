@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-reporting-impl</artifactId>
-  <name>Maven Reporting</name>
+  <name>Maven Reporting Implementation</name>
   <version>2.1-SNAPSHOT</version>
   <developers>
     <developer>
