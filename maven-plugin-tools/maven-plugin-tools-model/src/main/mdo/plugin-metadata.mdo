@@ -1,40 +1,51 @@
 <!--
-  <pluginMetadata>
-    <mojos>
-      <mojo goal="myGoal" 
-            phase="compile"
-            requiresDependencyResolution="compile"
-            requiresProject="true"
-            requiresReports="true"
-            requiresOnline="true"
-            inheritByDefault="true"
-            requiresDirectInvocation="true"
-            aggregator="true">
+<pluginMetadata>
+  <mojos>
+    <mojo>
+      <goal>myGoal</goal>
+      <phase>compile</phase>
+      <requiresDependencyResolution>compile</requiresDependencyResolution>
+      <requiresProject>true</requiresProject>
+      <requiresReports>true</requiresReports>
+      <requiresOnline>true</requiresOnline>
+      <inheritByDefault>true</inheritByDefault>
+      <requiresDirectInvocation>true</requiresDirectInvocation>
+      <aggregator>true</aggregator>
   
-        <execute phase="initialize" lifecycle="mine" goal="some:goal"/>
-        <components>
-          <component role="stuff" hint="more"/>
-        </components>
-        <parameters>
-          <parameter name="nom" 
-                     property="prop" 
-                     required="true" 
-                     readonly="true" 
-                     expression="${my.property}" 
-                     defaultValue="${project.artifactId}"
-                     type="org.apache.maven.project.MavenProject"
-                     alias="otherProp">
-            <description>Test parameter</description>
-            <deprecated>Use something else</deprecated>
-          </parameter>
-        </parameters>
-        <description>
-          This is a test.
-        </description>
-        <deprecated>Use another mojo</deprecated>
-      </mojo>
-    </mojos>
-  </pluginMetadata>
+      <execute>
+        <phase>initialize</phase>
+        <lifecycle>mine</lifecycle>
+        <goal>goal</goal>
+      </execute>
+
+      <components>
+        <component>
+          <role>stuff</role>
+          <hint>more</hint>
+        </component>
+      </components>
+
+      <parameters>
+        <parameter>
+          <name>nom</name> 
+          <property>prop</property> 
+          <required>true</required>
+          <readonly>true</readonly> 
+          <expression>${my.property}</expression> 
+          <defaultValue>${project.artifactId}</defaultValue>
+          <type>org.apache.maven.project.MavenProject</type>
+          <alias>otherProp</alias>
+          <description>Test parameter</description>
+          <deprecated>Use something else</deprecated>
+        </parameter>
+      </parameters>
+      <description>
+        This is a test.
+      </description>
+      <deprecated>Use another mojo</deprecated>
+    </mojo>
+  </mojos>
+</pluginMetadata>
   -->
 <model>
   <id>plugin-metadata</id>
