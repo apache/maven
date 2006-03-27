@@ -21,6 +21,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.repository.ComponentDependency;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -83,13 +84,15 @@ public abstract class AbstractGeneratorTestCase
 
         pluginDescriptor.setDependencies( Collections.singletonList( dependency ) );
 
-        File tempFile = File.createTempFile( "testGenerator-outDir", ".marker.txt" ).getAbsoluteFile();
-        tempFile.deleteOnExit();
-        File destinationDirectory = tempFile.getParentFile();
+        File destinationDirectory = new File( System.getProperty( "java.io.tmpdir" ), "testGenerator-outDir" );
+        FileUtils.deleteDirectory( destinationDirectory );
+        destinationDirectory.mkdir();
 
         generator.execute( destinationDirectory, pluginDescriptor );
 
         validate( destinationDirectory );
+
+        FileUtils.deleteDirectory( destinationDirectory );
     }
 
     // ----------------------------------------------------------------------
