@@ -24,6 +24,15 @@ import org.apache.maven.model.Model;
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
 {
+    
+    public void testEmptyConstructor()
+    {
+        MavenProject project = new MavenProject();
+        
+        assertEquals( MavenProject.EMPTY_PROJECT_GROUP_ID + ":" + MavenProject.EMPTY_PROJECT_ARTIFACT_ID + ":jar:"
+            + MavenProject.EMPTY_PROJECT_VERSION, project.getId() );
+    }
+    
     public void testCopyConstructor() throws Exception
     {
         File f = getFileForClasspathResource( "canonical-pom.xml" );

@@ -78,6 +78,12 @@ import java.util.Set;
  */
 public class MavenProject
 {
+    public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
+    
+    public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
+    
+    public static final String EMPTY_PROJECT_VERSION = "0";
+    
     private Model model;
 
     private MavenProject parent;
@@ -138,6 +144,17 @@ public class MavenProject
     private boolean executionRoot;
     
     private Map moduleAdjustments;
+
+    public MavenProject()
+    {
+        Model model = new Model();
+        
+        model.setGroupId( EMPTY_PROJECT_GROUP_ID );
+        model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
+        model.setVersion( EMPTY_PROJECT_VERSION );
+        
+        this.model = model;
+    }
 
     public MavenProject( Model model )
     {
