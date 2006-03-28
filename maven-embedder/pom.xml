@@ -8,7 +8,7 @@
   <groupId>org.apache.maven</groupId>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
-  <version>2.0.3</version>
+  <version>2.0.4-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
