@@ -14,6 +14,10 @@
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.0-alpha-7</version>
+        <configuration>
+          <version>1.0.0</version>
+          <model>profiles.mdo</model>
+        </configuration>
         <executions>
           <execution>
             <id>site-xsd</id>
@@ -28,10 +32,6 @@
               <goal>java</goal>
               <goal>xpp3-reader</goal>
             </goals>
-            <configuration>
-              <version>1.0.0</version>
-              <model>profiles.mdo</model>
-            </configuration>
           </execution>
         </executions>
       </plugin>
