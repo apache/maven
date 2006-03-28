@@ -14,12 +14,7 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
-          <descriptorRefs>
-            <descriptorRef>src</descriptorRef>
-          </descriptorRefs>
-          <descriptors>
-            <descriptor>src/assemble/bin.xml</descriptor>
-          </descriptors>
+          <descriptor>src/assemble/bin.xml</descriptor>
           <finalName>maven-${version}</finalName>
         </configuration>
       </plugin>
