@@ -172,6 +172,15 @@
     </testResources>
     <directory>target</directory>
     <finalName>${artifactId}-${version}</finalName>
+    <plugins>
+       <plugin>
+         <artifactId>maven-assembly-plugin</artifactId>
+         <configuration>
+           <descriptor>src/assemble/src.xml</descriptor>
+           <finalName>maven-${version}</finalName>
+         </configuration>
+       </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -225,6 +234,34 @@
       </plugins>
     </pluginManagement>
   </build>
+  <profiles>
+    <profile>
+      <id>clean-before-source-assembly</id>
+      <activation>
+        <property>
+          <name>source-assembly</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean-before-source-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <modules>
     <module>maven-archiver</module>
     <module>maven-artifact</module>
