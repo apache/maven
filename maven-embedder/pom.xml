@@ -13,7 +13,9 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <!-- release plugin won't like this:
         <version>2.1-SNAPSHOT</version>
+        -->
         <configuration>
           <descriptor>src/main/assembly/dep.xml</descriptor>
         </configuration>
@@ -44,6 +46,6 @@
     </plugins>
   </reporting>
   <properties>
-    <mavenVersion>2.0.3-SNAPSHOT</mavenVersion>
+    <mavenVersion>2.0.3</mavenVersion>
   </properties>
 </project>
