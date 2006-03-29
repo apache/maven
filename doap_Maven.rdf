@@ -37,8 +37,8 @@
     <release>
       <Version>
         <name>Latest stable release</name>
-        <created>2006-01-16</created>
-        <revision>2.0.2</revision>
+        <created>2006-03-28</created>
+        <revision>2.0.3</revision>
       </Version>
     </release>
     <repository>
