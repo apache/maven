@@ -129,6 +129,13 @@ public class RegexBasedModelInterpolator
 
             if ( value == null )
             {
+                // This may look out of place, but its here for the MNG-2124/MNG-1927 fix described in the project builder
+                if ( context.containsKey( realExpr ) )
+                {
+                    // It existed, but was null. Leave it alone.
+                    continue;
+                }
+
                 value = model.getProperties().getProperty( realExpr );
             }
 
@@ -137,7 +144,7 @@ public class RegexBasedModelInterpolator
                 try
                 {
                     // NOTE: We've already trimmed off any leading expression parts like 'project.'
-                    // or 'pom.', and now we have to ensure that the ReflectionValueExtractor 
+                    // or 'pom.', and now we have to ensure that the ReflectionValueExtractor
                     // doesn't try to do it again.
                     value = ReflectionValueExtractor.evaluate( realExpr, model, false );
                 }

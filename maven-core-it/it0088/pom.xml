@@ -29,6 +29,8 @@
             <phase>process-resources</phase>
             <configuration>
               <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+              <targetDirectoryString>target</targetDirectoryString>
+              <targetDirectoryFile>target</targetDirectoryFile>
             </configuration>
             <goals>
               <goal>generate-properties</goal>
@@ -40,9 +42,9 @@
   </build>
   <pluginRepositories>
     <pluginRepository>
-      <id>snapshots</id>
-      <name>Maven Central Plugins Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
+      <id>apache.snapshots</id>
+      <name>Maven Plugins Development Repository</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
     </pluginRepository>
   </pluginRepositories>
 </project>
