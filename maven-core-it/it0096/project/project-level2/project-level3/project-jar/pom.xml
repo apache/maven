@@ -2,11 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.apache.maven.it0096</groupId>
-    <artifactId>maven-it0096-project-level2</artifactId>
+    <artifactId>maven-it0096-project-level3</artifactId>
     <version>1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>maven-it0096-project-level3</artifactId>
+  <artifactId>maven-it0096-project-jar</artifactId>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

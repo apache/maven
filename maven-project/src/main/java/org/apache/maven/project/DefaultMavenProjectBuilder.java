@@ -1005,22 +1005,10 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException( projectId, "Missing version element from parent element" );
             }
 
-            String parentKey = createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
-            MavenProject parentProject = (MavenProject)projectCache.get( parentKey );
-
             // the only way this will have a value is if we find the parent on disk...
             File parentDescriptor = null;
 
-            if ( parentProject != null )
-            {
-                model = parentProject.getOriginalModel();
-
-                parentDescriptor = parentProject.getFile();
-            }
-            else
-            {
-                model = null;
-            }
+            model = null;
 
             String parentRelativePath = parentModel.getRelativePath();
 
@@ -1156,16 +1144,14 @@ public class DefaultMavenProjectBuilder
             {
                 parentProjectDir = parentDescriptor.getParentFile();
             }
-
-            parentProject = assembleLineage( model, lineage, localRepository, parentProjectDir,
+            MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
                                                    externalProfileManager, strict );
-            parentProject.setFile( parentDescriptor );
+            parent.setFile( parentDescriptor );
 
-            project.setParent( parentProject );
+            project.setParent( parent );
 
             project.setParentArtifact( parentArtifact );
-
         }
 
         return project;
