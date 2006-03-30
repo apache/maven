@@ -687,20 +687,17 @@ public class DefaultMavenProjectBuilder
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         MavenProject previousProject = superProject;
-        
+
         Model previous = superProject.getModel();
 
-//        System.out.println( "Assembling inheritance..." );
-        
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
             MavenProject currentProject = (MavenProject) i.next();
 
-//            System.out.println( "Assembling inheritance: " + previousProject.getId() + "(" + previousProject.getName() + ")" + " <- " + currentProject.getId() + "(" + currentProject.getName() + ")" );
             Model current = currentProject.getModel();
-            
+
             String pathAdjustment = null;
-            
+
             try
             {
                 pathAdjustment = previousProject.getModulePathAdjustment( currentProject );
@@ -714,8 +711,6 @@ public class DefaultMavenProjectBuilder
 
             previous = current;
             previousProject = currentProject;
-            
-//            System.out.println( "New parent project is: " + previousProject.getId() + "(" + previousProject.getName() + ")" );
         }
 
         // only add the super repository if it wasn't overridden by a profile or project
@@ -840,6 +835,16 @@ public class DefaultMavenProjectBuilder
         {
             context.put( "basedir", projectDir.getAbsolutePath() );
         }
+
+        // TODO: this is a hack to ensure MNG-2124 can be satisfied without triggering MNG-1927
+        //  MNG-1927 relies on the false assumption that ${project.build.*} evaluates to null, which occurs before
+        //  MNG-2124 is fixed. The null value would leave it uninterpolated, to be handled after path translation.
+        //  Until these steps are correctly sequenced, we guarantee these fields remain uninterpolated.
+        context.put( "build.directory", null );
+        context.put( "build.outputDirectory", null );
+        context.put( "build.testOutputDirectory", null );
+        context.put( "build.sourceDirectory", null );
+        context.put( "build.testSourceDirectory", null );
 
         model = modelInterpolator.interpolate( model, context, strict );
 
@@ -1005,18 +1010,18 @@ public class DefaultMavenProjectBuilder
 
             // the only way this will have a value is if we find the parent on disk...
             File parentDescriptor = null;
-            
+
             if ( parentProject != null )
             {
                 model = parentProject.getOriginalModel();
-                
+
                 parentDescriptor = parentProject.getFile();
             }
             else
             {
                 model = null;
             }
-            
+
             String parentRelativePath = parentModel.getRelativePath();
 
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using
@@ -1024,7 +1029,7 @@ public class DefaultMavenProjectBuilder
             if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
             {
                 parentDescriptor = new File( projectDir, parentRelativePath );
-                
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " + project.getId() + " in relative path: " + parentRelativePath );
@@ -1046,7 +1051,7 @@ public class DefaultMavenProjectBuilder
                         {
                             getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " + project.getId() + " cannot be loaded from relative path: " + parentDescriptor + "; path does not exist." );
                         }
-                        
+
                         parentDescriptor = null;
                     }
                 }
@@ -1118,14 +1123,14 @@ public class DefaultMavenProjectBuilder
                 // we can't query the parent to ask where it is :)
                 List remoteRepositories = new ArrayList( aggregatedRemoteWagonRepositories );
                 remoteRepositories.addAll( parentSearchRepositories );
-                
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
                                        "Retrieving parent-POM: " + parentModel.getId() + " for project: "
                                            + project.getId() + " from the repository." );
                 }
-                
+
                 parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
                                                                        parentModel.getArtifactId(),
                                                                        parentModel.getVersion() );
@@ -1151,7 +1156,7 @@ public class DefaultMavenProjectBuilder
             {
                 parentProjectDir = parentDescriptor.getParentFile();
             }
-            
+
             parentProject = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
                                                    externalProfileManager, strict );
@@ -1160,7 +1165,7 @@ public class DefaultMavenProjectBuilder
             project.setParent( parentProject );
 
             project.setParentArtifact( parentArtifact );
-            
+
         }
 
         return project;

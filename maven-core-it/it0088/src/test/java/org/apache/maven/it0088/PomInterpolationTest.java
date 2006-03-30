@@ -30,10 +30,10 @@ public class PomInterpolationTest
 
         File projectBuildDirectory = new File( basedir, "target" );
 
-        assertEquals( testProperties.getProperty( "project.build.directory" ), projectBuildDirectory.getAbsolutePath() );
+        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "project.build.directory" ) );
     }
 
-    public void testProjectBuildDirectoryAfterForMojoExecution()
+    public void testProjectBuildDirectoryForMojoExecution()
         throws Exception
     {
         Properties testProperties = new Properties();
@@ -44,9 +44,10 @@ public class PomInterpolationTest
 
         testProperties.load( new FileInputStream( testPropertiesFile ) );
 
-        // [jdcasey] NOTE: This property is not a java.io.File, so it will NOT be adjusted
-        // to the basedir! We need to simply check that it's value is "target", rather than
-        // new java.io.File( basedir, "target" ).getAbsolutePath();
-        assertEquals( testProperties.getProperty( "project.build.directory" ), "target" );
+        File projectBuildDirectory = new File( basedir, "target" );
+
+        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "project.build.directory" ) );
+        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "targetDirectoryFile" ) );
+        assertEquals( "target", testProperties.getProperty( "targetDirectoryString" ) );
     }
 }

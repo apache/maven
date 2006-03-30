@@ -26,6 +26,16 @@ public class InterpolatedPomConfigurationMojo
      */
     private String projectBuildDirectory;
 
+    /**
+     * @parameter expression="${targetDirectoryString}"
+     */
+    private String targetDirectoryString;
+
+    /**
+     * @parameter expression="${targetDirectoryFile}"
+     */
+    private File targetDirectoryFile;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -34,6 +44,14 @@ public class InterpolatedPomConfigurationMojo
             Properties mojoGeneratedPropeties = new Properties();
 
             mojoGeneratedPropeties.put( "project.build.directory", projectBuildDirectory );
+            if ( targetDirectoryString != null )
+            {
+                mojoGeneratedPropeties.put( "targetDirectoryString", targetDirectoryString );
+            }    
+            if ( targetDirectoryFile != null )
+            {
+                mojoGeneratedPropeties.put( "targetDirectoryFile", targetDirectoryFile.getAbsolutePath() );
+            }    
 
             FileOutputStream fos = new FileOutputStream( new File( basedir, "target/mojo-generated.properties" ) );
 
