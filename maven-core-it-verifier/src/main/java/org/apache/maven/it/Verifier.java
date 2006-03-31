@@ -352,7 +352,7 @@ public class Verifier
 
             for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
-                String line = (String) i.next();
+                String line = resolveCommandLineArg( (String) i.next() );
 
                 executeCommand( line );
             }
@@ -396,6 +396,21 @@ public class Verifier
             if ( f.exists() && !f.delete() )
             {
                 throw new VerificationException( "Error removing file - delete failed" );
+            }
+        }
+        else if ( "rmdir".equals( cmd ) )
+        {
+            System.out.println( "Removing directory: " + args );
+
+            try
+            {
+                File f = new File( args );
+
+                FileUtils.deleteDirectory( f );
+            }
+            catch ( IOException e )
+            {
+                throw new VerificationException( "Error removing directory - delete failed" );
             }
         }
         else
@@ -634,8 +649,8 @@ public class Verifier
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
 
-            boolean useMavenRepoLocal = Boolean.valueOf(
-                controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+            boolean useMavenRepoLocal =
+                Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
             if ( useMavenRepoLocal )
             {
                 // Note: Make sure that the repo is surrounded by quotes as it can possibly have
@@ -850,8 +865,8 @@ public class Verifier
 
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
-                boolean chokeOnErrorOutput = Boolean.valueOf(
-                    controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
+                boolean chokeOnErrorOutput =
+                    Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
 
                 verifier.executeGoals( properties, controlProperties, "goals.txt" );
 
