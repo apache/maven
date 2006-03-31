@@ -3,20 +3,4 @@
   <groupId>org.apache.maven.it0098</groupId>
   <artifactId>it0098-archetype-orchestration-test</artifactId>
   <version>1</version>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>test project</directory>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
