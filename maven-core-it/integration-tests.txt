@@ -1,4 +1,4 @@
-it0103
+#it0103 Trying to get this to fail under maven-2.0.3...
 it0102
 it0101
 it0100
