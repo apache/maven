@@ -1,4 +1,4 @@
-package org.someproject;
+package org.apache.maven.it;
 
 /**
  * Hello world!
