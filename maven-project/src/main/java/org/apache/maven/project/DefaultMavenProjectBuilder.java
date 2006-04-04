@@ -765,10 +765,25 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
+        
+        MavenProject rawParent = project.getParent();
+        
+        if ( rawParent != null )
+        {
+            String cacheKey = createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
+            
+            MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
+            
+            // yeah, this null check might be a bit paranoid, but better safe than sorry...
+            if ( processedParent != null )
+            {
+                project.setParent( processedParent );
+            }
+        }
 
         return project;
     }
-
+    
     private String safeVersionlessKey( String groupId, String artifactId )
     {
         String gid = groupId;
