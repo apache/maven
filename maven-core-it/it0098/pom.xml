@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.it0098</groupId>
-  <artifactId>it0098-archetype-orchestration-test</artifactId>
+  <artifactId>it0098</artifactId>
   <version>1</version>
   
   <dependencies>
