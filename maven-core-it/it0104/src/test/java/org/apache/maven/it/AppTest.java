@@ -24,6 +24,6 @@ public class AppTest
         System.out.println( "Got 'target.dir' of: '" + targetDir + "'" );
 
         assertNotNull( "System property 'target.dir' is not present.", targetDir );
-        assertFalse( "System property 'target.dir' was not resolved correctly.", "${project.build.directory}".equals( targetDir ) );
+        assertTrue( "System property 'target.dir' was not resolved correctly.", targetDir.indexOf( "${" ) < 0 );
     }
 }
