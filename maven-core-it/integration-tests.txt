@@ -1,4 +1,4 @@
-it0104
+#it0104 Commenting out, not fixed until post-2.0.4, due to dependency on new plexus-container-default version.
 it0103
 it0102
 it0101
