@@ -151,8 +151,10 @@ public class DefaultMavenProjectBuilder
     private ProfileInjector profileInjector;
 
     private ModelValidator validator;
+    
+    private Map rawProjectCache = new HashMap();
 
-    private Map projectCache = new HashMap();
+    private Map processedProjectCache = new HashMap();
 
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
@@ -213,7 +215,7 @@ public class DefaultMavenProjectBuilder
     {
         String cacheKey = createCacheKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
 
-        MavenProject project = (MavenProject) projectCache.get( cacheKey );
+        MavenProject project = (MavenProject) processedProjectCache.get( cacheKey );
 
         if ( project != null )
         {
@@ -684,6 +686,8 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setOriginalModel( originalModel );
+        
+        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), new MavenProject( project ) );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         MavenProject previousProject = superProject;
@@ -741,7 +745,7 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
         }
 
-        projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+        processedProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
 
         // jvz:note
         // this only happens if we are building from a source file
@@ -761,10 +765,25 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
+        
+        MavenProject rawParent = project.getParent();
+        
+        if ( rawParent != null )
+        {
+            String cacheKey = createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
+            
+            MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
+            
+            // yeah, this null check might be a bit paranoid, but better safe than sorry...
+            if ( processedParent != null )
+            {
+                project.setParent( processedParent );
+            }
+        }
 
         return project;
     }
-
+    
     private String safeVersionlessKey( String groupId, String artifactId )
     {
         String gid = groupId;
@@ -1009,7 +1028,17 @@ public class DefaultMavenProjectBuilder
             File parentDescriptor = null;
 
             model = null;
-
+            
+            String parentKey = createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
+            MavenProject parentProject = (MavenProject) rawProjectCache.get( parentKey );
+    
+            if ( parentProject != null )
+            {
+                model = ModelUtils.cloneModel( parentProject.getModel() );
+                
+                parentDescriptor = parentProject.getFile();
+            }
+            
             String parentRelativePath = parentModel.getRelativePath();
 
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using

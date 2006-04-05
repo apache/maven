@@ -277,6 +277,14 @@ it0101: Test that properties defined in an active profile in the user's
 it0102: Test that <activeByDefault/> calculations for profile activation only
         use profiles defined in the POM. [MNG-2136]
 
+it0103: Verify that multimodule builds where one project references another as
+        a parent can build, even if that parent is not correctly referenced by
+        <relativePath/> and is not in the local repository. [MNG-2196]
+
+it0104: Verify that plugin configurations are resolved correctly, particularly
+        when they contain ${project.build.directory} in the string value of a 
+        Map.Entry.
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -173,30 +173,71 @@ public class MavenProject
         {
             this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
         }
+        
         if ( project.artifacts != null )
         {
             this.artifacts = Collections.unmodifiableSet( project.artifacts );
         }
-        this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
-        this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
-        this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
+        
+        if ( project.pluginArtifacts != null )
+        {
+            this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
+        }
+        
+        if ( project.reportArtifacts != null )
+        {
+            this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
+        }        
+        
+        if ( project.extensionArtifacts != null )
+        {
+            this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
+        }        
+        
         this.parentArtifact = project.parentArtifact;
 
-        this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
-        this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
-        this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
-        this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
-
-        // clone properties modifyable by plugins in a forked lifecycle
-        this.attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
-
-        // no need for execution project
-
-        // clone source roots
-        this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
-        this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
-        this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
-
+        if ( project.remoteArtifactRepositories != null )
+        {
+            this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
+        }        
+        
+        if ( project.pluginArtifactRepositories != null )
+        {
+            this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
+        }        
+        
+        if ( project.collectedProjects != null )
+        {
+            this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
+        }        
+        
+        if ( project.activeProfiles != null )
+        {
+            this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
+        }        
+        
+        if ( project.getAttachedArtifacts() != null )
+        {
+            // clone properties modifyable by plugins in a forked lifecycle
+            this.attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
+        }        
+        
+        if ( project.compileSourceRoots != null )
+        {
+            // clone source roots
+            this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
+        }        
+        
+        if ( project.testCompileSourceRoots != null )
+        {
+            this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
+        }        
+        
+        if ( project.scriptSourceRoots != null )
+        {
+            this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
+        }        
+        
         this.model = ModelUtils.cloneModel( project.model );
 
         if ( project.originalModel != null )
@@ -206,7 +247,10 @@ public class MavenProject
 
         this.executionRoot = project.executionRoot;
 
-        this.artifact = ArtifactUtils.copyArtifact( project.artifact );
+        if ( project.artifact != null )
+        {
+            this.artifact = ArtifactUtils.copyArtifact( project.artifact );
+        }        
     }
     
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
@@ -802,7 +846,14 @@ public class MavenProject
 
     public String getGroupId()
     {
-        return model.getGroupId();
+        String groupId = model.getGroupId();
+        
+        if ( groupId == null && model.getParent() != null )
+        {
+            groupId = model.getParent().getGroupId();
+        }
+        
+        return groupId;
     }
 
     public void setArtifactId( String artifactId )
@@ -840,7 +891,14 @@ public class MavenProject
 
     public String getVersion()
     {
-        return model.getVersion();
+        String version = model.getVersion();
+        
+        if ( version == null && model.getParent() != null )
+        {
+            version = model.getParent().getVersion();
+        }
+        
+        return version;
     }
 
     public String getPackaging()
