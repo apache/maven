@@ -22,7 +22,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Scm;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -42,6 +44,27 @@ public class RegexBasedModelInterpolatorTest
         super.setUp();
 
         context = Collections.singletonMap( "basedir", "myBasedir" );
+    }
+    
+    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws IOException
+    {
+        Model model = new Model();
+        
+        Scm scm = new Scm();
+        scm.setConnection( "${project.scm.connection}/somepath" );
+        
+        model.setScm( scm );
+        
+        try
+        {
+            Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+            
+            fail( "The interpolator should not allow self-referencing expressions in POM." );
+        }
+        catch ( ModelInterpolationException e )
+        {
+            
+        }
     }
 
     public void testShouldInterpolateOrganizationNameCorrectly()
@@ -179,8 +202,6 @@ public class RegexBasedModelInterpolatorTest
 
         Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
 
-        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );
-
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
     }
 
@@ -196,8 +217,6 @@ public class RegexBasedModelInterpolatorTest
         model.setProperties( modelProperties );
 
         Model out = new RegexBasedModelInterpolator().interpolate( model, context );
-
-        System.out.println( ">>> " + out.getProperties().getProperty( "outputDirectory" ) );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
