@@ -45,26 +45,59 @@ public class RegexBasedModelInterpolatorTest
 
         context = Collections.singletonMap( "basedir", "myBasedir" );
     }
-    
-    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws IOException
+
+    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue()
+        throws IOException, ModelInterpolationException
     {
         Model model = new Model();
-        
+
+        Scm scm = new Scm();
+        scm.setConnection( "${test}/somepath" );
+
+        model.setScm( scm );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        assertEquals( "${test}/somepath", out.getScm().getConnection() );
+    }
+
+    public void testShouldThrowExceptionOnRecursiveScmConnectionReference()
+        throws IOException
+    {
+        Model model = new Model();
+
         Scm scm = new Scm();
         scm.setConnection( "${project.scm.connection}/somepath" );
-        
+
         model.setScm( scm );
-        
+
         try
         {
             Model out = new RegexBasedModelInterpolator().interpolate( model, context );
-            
+
             fail( "The interpolator should not allow self-referencing expressions in POM." );
         }
         catch ( ModelInterpolationException e )
         {
-            
+
         }
+    }
+
+    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression()
+        throws IOException, ModelInterpolationException
+    {
+        Model model = new Model();
+
+        Scm scm = new Scm();
+        scm.setConnection( "${test}/somepath" );
+
+        model.setScm( scm );
+
+        model.addProperty( "test", "test" );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        assertEquals( "test/somepath", out.getScm().getConnection() );
     }
 
     public void testShouldInterpolateOrganizationNameCorrectly()
