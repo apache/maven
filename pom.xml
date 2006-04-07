@@ -103,6 +103,7 @@
     <module>maven-settings</module>
     <module>maven-cli</module>
     <module>maven-embedder</module>
+    <module>maven-tools</module>
   </modules>
   <dependencies>
     <dependency>
