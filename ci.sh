@@ -179,7 +179,7 @@ fi
 
     mkdir -p $DEPLOY_DIR > /dev/null 2>&1
 
-    cp $DIR/maven-components/maven-core/target/*.tar.gz $DEPLOY_DIR/$DIST
+    cp $DIR/maven-components/maven-cli/target/*.tar.gz $DEPLOY_DIR/$DIST
 
   else
   
