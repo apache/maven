@@ -10,8 +10,21 @@ import java.util.List;
 public class DefaultEventDispatcher
     implements EventDispatcher
 {
-
     private List eventMonitors = new ArrayList();
+
+    public DefaultEventDispatcher()
+    {
+    }
+
+    public DefaultEventDispatcher( List eventMonitors )
+    {
+        this.eventMonitors = eventMonitors;
+    }
+
+    public void addEventMonitors( List eventMonitors )
+    {
+        this.eventMonitors = eventMonitors;
+    }
 
     public void addEventMonitor( EventMonitor monitor )
     {

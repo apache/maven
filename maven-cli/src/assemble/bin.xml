@@ -41,10 +41,10 @@
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>maven-core-*.jar</include>
+        <include>maven-cli-*.jar</include>
       </includes>
       <excludes>
-        <exclude>maven-core-*-sources.jar</exclude>
+        <exclude>maven-cli-*-sources.jar</exclude>
       </excludes>
     </fileSet>
   </fileSets>

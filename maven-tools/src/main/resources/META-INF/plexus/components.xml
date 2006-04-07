@@ -1,0 +1,20 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.MavenTools</role>
+      <implementation>org.apache.maven.DefaultMavenTools</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

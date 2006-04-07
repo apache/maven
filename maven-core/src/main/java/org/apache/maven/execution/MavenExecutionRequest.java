@@ -16,12 +16,14 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.codehaus.plexus.logging.Logger;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -32,43 +34,137 @@ import java.util.Properties;
  */
 public interface MavenExecutionRequest
 {
+    File getLocalRepositoryPath();
+
     ArtifactRepository getLocalRepository();
 
     List getGoals();
-
-    void setSession( MavenSession session );
-
-    MavenSession getSession();
-
-    void addEventMonitor( EventMonitor monitor );
-
-    EventDispatcher getEventDispatcher();
 
     Settings getSettings();
 
     String getBaseDirectory();
 
-    void setRecursive( boolean recursive );
-
     boolean isRecursive();
 
-    void setReactorActive( boolean reactorActive );
+    boolean isInteractive();
 
     boolean isReactorActive();
 
-    void setPomFile( String pomFile );
-
     String getPomFile();
-
-    void setFailureBehavior( String failureBehavior );
 
     String getFailureBehavior();
 
-    ProfileManager getGlobalProfileManager();
-
-    Properties getExecutionProperties();
+    Properties getProperties();
 
     Date getStartTime();
 
     boolean isShowErrors();
+
+    List getEventMonitors();
+
+    List getActiveProfiles();
+
+    List getInactiveProfiles();
+
+    TransferListener getTransferListener();
+
+    int getLoggingLevel();
+
+    boolean isDefaultEventMonitorActive();
+
+    boolean isOffline();
+
+    boolean isUpdateSnapshots();
+
+    String getGlobalChecksumPolicy();
+
+    // ----------------------------------------------------------------------
+    // Logging
+    // ----------------------------------------------------------------------
+
+    static final int LOGGING_LEVEL_DEBUG = Logger.LEVEL_DEBUG;
+
+    static final int LOGGING_LEVEL_INFO = Logger.LEVEL_INFO;
+
+    static final int LOGGING_LEVEL_WARN = Logger.LEVEL_WARN;
+
+    static final int LOGGING_LEVEL_ERROR = Logger.LEVEL_ERROR;
+
+    static final int LOGGING_LEVEL_FATAL = Logger.LEVEL_FATAL;
+
+    static final int LOGGING_LEVEL_DISABLED = Logger.LEVEL_DISABLED;
+
+    // ----------------------------------------------------------------------
+    // Reactor Failure Mode
+    // ----------------------------------------------------------------------
+
+    static final String REACTOR_FAIL_FAST = ReactorManager.FAIL_FAST;
+
+    static final String REACTOR_FAIL_AT_END = ReactorManager.FAIL_AT_END;
+
+    static final String REACTOR_FAIL_NEVER = ReactorManager.FAIL_NEVER;
+
+    // ----------------------------------------------------------------------
+    // Artifactr repository policies
+    // ----------------------------------------------------------------------
+    
+    static final String CHECKSUM_POLICY_FAIL = ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL;
+
+    static final String CHECKSUM_POLICY_WARN = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    MavenExecutionRequest setBasedir( File basedir );
+
+    MavenExecutionRequest setSettings( Settings settings );
+
+    MavenExecutionRequest setStartTime( Date start );
+
+    MavenExecutionRequest setGoals( List goals );
+
+    MavenExecutionRequest setLocalRepository( ArtifactRepository localRepository );
+
+    MavenExecutionRequest setLocalRepositoryPath( String localRepository );
+
+    MavenExecutionRequest setLocalRepositoryPath( File localRepository );
+
+    MavenExecutionRequest setProperties( Properties properties );
+
+    MavenExecutionRequest setFailureBehavior( String failureBehavior );
+
+    MavenExecutionRequest setSession( MavenSession session );
+
+    MavenExecutionRequest addActiveProfile( String profile );
+
+    MavenExecutionRequest addInactiveProfile( String profile );
+
+    MavenExecutionRequest addActiveProfiles( List profiles );
+
+    MavenExecutionRequest addInactiveProfiles( List profiles );
+
+    MavenExecutionRequest addEventMonitor( EventMonitor monitor );
+
+    MavenExecutionRequest setReactorActive( boolean reactorActive );
+
+    MavenExecutionRequest setPomFile( String pomFilename );
+
+    MavenExecutionRequest setRecursive( boolean recursive );
+
+    MavenExecutionRequest setShowErrors( boolean showErrors );
+
+    MavenExecutionRequest setInteractive( boolean interactive );
+
+    MavenExecutionRequest setTransferListener( TransferListener transferListener );
+
+    MavenExecutionRequest setLoggingLevel( int loggingLevel );
+
+    MavenExecutionRequest activateDefaultEventMonitor();
+
+    MavenExecutionRequest setOffline( boolean offline );
+
+    MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots );
+
+    MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
 }

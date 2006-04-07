@@ -18,7 +18,6 @@ package org.apache.maven.settings;
 
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
@@ -39,50 +38,46 @@ import java.util.List;
  */
 public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
-    implements MavenSettingsBuilder, Initializable
+    implements MavenSettingsBuilder
 {
-    public static final String userHome = System.getProperty( "user.home" );
-
-    /**
-     * @configuration
-     */
-    private String userSettingsPath;
-
-    /**
-     * @configuration
-     */
-    private String globalSettingsPath;
-
-    private File userSettingsFile;
-
-    private File globalSettingsFile;
-
-    private Settings loadedSettings;
-
-    // ----------------------------------------------------------------------
-    // Component Lifecycle
-    // ----------------------------------------------------------------------
-
-    public void initialize()
-    {
-        userSettingsFile =
-            getFile( userSettingsPath, "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
-
-        globalSettingsFile =
-            getFile( globalSettingsPath, "maven.home", MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
-
-        getLogger().debug(
-            "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
-        getLogger().debug( "Building Maven user-level settings from: '" + userSettingsFile.getAbsolutePath() + "'" );
-    }
-
     // ----------------------------------------------------------------------
     // MavenProfilesBuilder Implementation
     // ----------------------------------------------------------------------
 
+    public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
+        throws IOException, XmlPullParserException
+    {
+        Settings globalSettings = readSettings( globalSettingsFile );
+
+        Settings userSettings = readSettings( userSettingsFile );
+
+        if ( globalSettings == null )
+        {
+            globalSettings = new Settings();
+        }
+
+        if ( userSettings == null )
+        {
+            userSettings = new Settings();
+
+            userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
+        }
+
+        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+
+        activateDefaultProfiles( userSettings );
+
+        return userSettings;
+    }
+
     private Settings readSettings( File settingsFile )
         throws IOException, XmlPullParserException
     {
+        if ( settingsFile == null )
+        {
+            return null;
+        }
+
         Settings settings = null;
 
         if ( settingsFile.exists() && settingsFile.isFile() )
@@ -117,6 +112,8 @@ public class DefaultMavenSettingsBuilder
 
                 settings = modelReader.read( sReader );
 
+                System.out.println( "settings.getPluginGroups().size() = " + settings.getPluginGroups().size() );
+
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 
                 rtInfo.setFile( settingsFile );
@@ -130,43 +127,6 @@ public class DefaultMavenSettingsBuilder
         }
 
         return settings;
-    }
-
-    public Settings buildSettings()
-        throws IOException, XmlPullParserException
-    {
-        return buildSettings( userSettingsFile );
-    }
-
-    public Settings buildSettings( File userSettingsFile )
-        throws IOException, XmlPullParserException
-    {
-        if ( loadedSettings == null )
-        {
-            Settings globalSettings = readSettings( globalSettingsFile );
-            Settings userSettings = readSettings( userSettingsFile );
-
-            if ( globalSettings == null )
-            {
-                globalSettings = new Settings();
-            }
-
-            if ( userSettings == null )
-            {
-                userSettings = new Settings();
-                userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
-            }
-
-            SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
-
-            activateDefaultProfiles( userSettings );
-
-            setLocalRepository( userSettings );
-
-            loadedSettings = userSettings;
-        }
-
-        return loadedSettings;
     }
 
     private void activateDefaultProfiles( Settings settings )
@@ -184,35 +144,6 @@ public class DefaultMavenSettingsBuilder
                 }
             }
         }
-    }
-
-    private void setLocalRepository( Settings userSettings )
-    {
-        // try using the local repository specified on the command line...
-        String localRepository = System.getProperty( MavenSettingsBuilder.ALT_LOCAL_REPOSITORY_LOCATION );
-
-        // otherwise, use the one in settings.xml
-        if ( localRepository == null || localRepository.length() < 1 )
-        {
-            localRepository = userSettings.getLocalRepository();
-        }
-
-        // if all of the above are missing, default to ~/.m2/repository.
-        if ( localRepository == null || localRepository.length() < 1 )
-        {
-            File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
-            if ( !mavenUserConfigurationDirectory.exists() )
-            {
-                if ( !mavenUserConfigurationDirectory.mkdirs() )
-                {
-                    //throw a configuration exception
-                }
-            }
-
-            localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
-        }
-
-        userSettings.setLocalRepository( localRepository );
     }
 
     private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )
@@ -256,5 +187,4 @@ public class DefaultMavenSettingsBuilder
             return new File( path ).getAbsoluteFile();
         }
     }
-
 }

@@ -16,7 +16,9 @@ package org.apache.maven.embedder;
  * limitations under the License.
  */
 
-import org.apache.maven.BuildFailureException;
+import org.apache.maven.Maven;
+import org.apache.maven.MavenTools;
+import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -27,27 +29,21 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.classworlds.ClassWorld;
@@ -60,7 +56,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -71,11 +66,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -121,6 +113,14 @@ public class MavenEmbedder
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
     // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    private Maven maven;
+
+    private MavenTools mavenTools;
+
+    // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
 
@@ -131,6 +131,8 @@ public class MavenEmbedder
     private File localRepositoryDirectory;
 
     private ClassLoader classLoader;
+
+    private ClassWorld classWorld;
 
     private MavenEmbedderLogger logger;
 
@@ -208,6 +210,16 @@ public class MavenEmbedder
     public ClassLoader getClassLoader()
     {
         return classLoader;
+    }
+
+    public void setClassWorld( ClassWorld classWorld )
+    {
+        this.classWorld = classWorld;
+    }
+
+    public ClassWorld getClassWorld()
+    {
+        return classWorld;
     }
 
     public void setLocalRepositoryDirectory( File localRepositoryDirectory )
@@ -367,80 +379,6 @@ public class MavenEmbedder
     // Execution of phases/goals
     // ----------------------------------------------------------------------
 
-    // TODO: should we allow the passing in of a settings object so that everything can be taken from the client env
-    // TODO: transfer listener
-    // TODO: logger
-
-    public void execute( MavenProject project,
-                         List goals,
-                         EventMonitor eventMonitor,
-                         TransferListener transferListener,
-                         Properties properties,
-                         File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException, DuplicateProjectException
-    {
-        execute( Collections.singletonList( project ), goals, eventMonitor, transferListener, properties, executionRootDirectory );
-    }
-
-    public void execute( List projects,
-                         List goals,
-                         EventMonitor eventMonitor,
-                         TransferListener transferListener,
-                         Properties properties,
-                         File executionRootDirectory )
-        throws CycleDetectedException, LifecycleExecutionException, BuildFailureException, DuplicateProjectException
-    {
-        ReactorManager rm = new ReactorManager( projects );
-
-        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
-
-        eventDispatcher.addEventMonitor( eventMonitor );
-
-        // If this option is set the exception seems to be hidden ...
-
-        //rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
-
-        rm.setFailureBehavior( ReactorManager.FAIL_FAST );
-
-        MavenSession session = new MavenSession( embedder.getContainer(),
-                                                 settings,
-                                                 localRepository,
-                                                 eventDispatcher,
-                                                 rm,
-                                                 goals,
-                                                 executionRootDirectory.getAbsolutePath(),
-                                                 properties,
-                                                 new Date() );
-
-        session.setUsingPOMsFromFilesystem( true );
-
-        if ( transferListener != null )
-        {
-            wagonManager.setDownloadMonitor( transferListener );
-        }
-
-        // ----------------------------------------------------------------------
-        // Maven should not be using system properties internally but because
-        // it does for now I'll just take properties that are handed to me
-        // and set them so that the plugin expression evaluator will work
-        // as expected.
-        // ----------------------------------------------------------------------
-
-        if ( properties != null )
-        {
-            for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
-            {
-                String key = (String) i.next();
-
-                String value = properties.getProperty( key );
-
-                System.setProperty( key, value );
-            }
-        }
-
-        lifecycleExecutor.execute( session, rm, session.getEventDispatcher() );
-    }
-
     // ----------------------------------------------------------------------
     // Lifecycle information
     // ----------------------------------------------------------------------
@@ -490,13 +428,11 @@ public class MavenEmbedder
     }
 
     public ArtifactRepository createLocalRepository( Settings settings )
-        throws ComponentLookupException
     {
         return createLocalRepository( settings.getLocalRepository(), DEFAULT_LOCAL_REPO_ID );
     }
 
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
-        throws ComponentLookupException
     {
         if ( !url.startsWith( "file:" ) )
         {
@@ -507,7 +443,6 @@ public class MavenEmbedder
     }
 
     public ArtifactRepository createRepository( String url, String repositoryId )
-        throws ComponentLookupException
     {
         // snapshots vs releases
         // offline = to turning the update policy off
@@ -528,15 +463,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Internal utility code
     // ----------------------------------------------------------------------
-
-    private RuntimeInfo createRuntimeInfo( Settings settings )
-    {
-        RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
-
-        runtimeInfo.setPluginUpdateOverride( Boolean.FALSE );
-
-        return runtimeInfo;
-    }
 
     private List getPomFiles( File basedir, String[] includes, String[] excludes )
     {
@@ -574,9 +500,9 @@ public class MavenEmbedder
         // the plugin registry builder.
         // ----------------------------------------------------------------------
 
-        if ( classLoader == null )
+        if ( classWorld == null && classLoader == null )
         {
-            throw new IllegalStateException( "A classloader must be specified using setClassLoader(ClassLoader)." );
+            throw new IllegalStateException( "A classWorld or classloader must be specified using setClassLoader|World(ClassLoader)." );
         }
 
         embedder = new Embedder();
@@ -588,9 +514,12 @@ public class MavenEmbedder
 
         try
         {
-            ClassWorld classWorld = new ClassWorld();
+            if ( classWorld == null )
+            {
+                classWorld = new ClassWorld();
 
-            classWorld.newRealm( "plexus.core", classLoader );
+                classWorld.newRealm( "plexus.core", classLoader );
+            }
 
             embedder.start( classWorld );
 
@@ -602,6 +531,10 @@ public class MavenEmbedder
             modelReader = new MavenXpp3Reader();
 
             modelWriter = new MavenXpp3Writer();
+
+            maven = (Maven) embedder.lookup( Maven.ROLE );
+
+            mavenTools = (MavenTools) embedder.lookup( MavenTools.ROLE );
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
@@ -625,11 +558,7 @@ public class MavenEmbedder
 
             wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 
-            createMavenSettings();
-
             profileManager.loadSettingsProfiles( settings );
-
-            localRepository = createLocalRepository( settings );
         }
         catch ( PlexusContainerException e )
         {
@@ -657,60 +586,6 @@ public class MavenEmbedder
         }
     }
 
-    /**
-     * Create the Settings that will be used with the embedder. If we are aligning with the user
-     * installation then we lookup the standard settings builder and use that to create our
-     * settings. Otherwise we constructs a settings object and populate the information
-     * ourselves.
-     *
-     * @throws MavenEmbedderException
-     * @throws ComponentLookupException
-     */
-    private void createMavenSettings()
-        throws MavenEmbedderException, ComponentLookupException
-    {
-        if ( alignWithUserInstallation )
-        {
-            // ----------------------------------------------------------------------
-            // We will use the standard method for creating the settings. This
-            // method reproduces the method of building the settings from the CLI
-            // mode of operation.
-            // ----------------------------------------------------------------------
-
-            settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
-
-            try
-            {
-                settings = settingsBuilder.buildSettings();
-            }
-            catch ( IOException e )
-            {
-                throw new MavenEmbedderException( "Error creating settings.", e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new MavenEmbedderException( "Error creating settings.", e );
-            }
-        }
-        else
-        {
-            if ( localRepository == null )
-            {
-                throw new IllegalArgumentException( "When not aligning with a user install you must specify a local repository location using the setLocalRepositoryDirectory( File ) method." );
-            }
-
-            settings = new Settings();
-
-            settings.setLocalRepository( localRepositoryDirectory.getAbsolutePath() );
-
-            settings.setRuntimeInfo( createRuntimeInfo( settings ) );
-
-            settings.setOffline( offline );
-
-            settings.setInteractiveMode( interactiveMode );
-        }
-    }
-
     // ----------------------------------------------------------------------
     // Lifecycle
     // ----------------------------------------------------------------------
@@ -732,5 +607,46 @@ public class MavenEmbedder
         {
             throw new MavenEmbedderException( "Cannot stop the embedder.", e );
         }
+    }
+
+    // ----------------------------------------------------------------------
+    // Start of new embedder API
+    // ----------------------------------------------------------------------
+
+    public void execute( MavenExecutionRequest request )
+        throws MavenExecutionException
+    {
+        maven.execute(  request );
+    }
+
+    public Settings buildSettings( File userSettingsPath,
+                                   File globalSettingsPath,
+                                   boolean interactive,
+                                   boolean offline,
+                                   boolean usePluginRegistry,
+                                   Boolean pluginUpdateOverride )
+        throws SettingsConfigurationException
+    {
+        return mavenTools.buildSettings( userSettingsPath,
+                                                 globalSettingsPath,
+                                                 interactive,
+                                                 offline,
+                                                 usePluginRegistry,
+                                                 pluginUpdateOverride );
+    }
+
+    public File getUserSettingsPath( String optionalSettingsPath )
+    {
+        return mavenTools.getUserSettingsPath( optionalSettingsPath );
+    }
+
+    public File getGlobalSettingsPath()
+    {
+        return mavenTools.getGlobalSettingsPath();
+    }
+
+    public String getLocalRepositoryPath( Settings settings )
+    {
+        return mavenTools.getLocalRepositoryPath( settings );
     }
 }

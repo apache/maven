@@ -19,6 +19,7 @@ package org.apache.maven.cli;
 import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.MavenTransferListener;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -29,7 +30,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  */
 public class ConsoleDownloadMonitor
     extends AbstractLogEnabled
-    implements TransferListener
+    implements MavenTransferListener
 {
     private long complete;
 

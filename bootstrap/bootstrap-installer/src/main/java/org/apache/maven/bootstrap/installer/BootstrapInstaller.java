@@ -121,19 +121,19 @@ public class BootstrapInstaller
 
         bootstrapper.buildProject( new File( basedir ), true );
 
-        ModelReader mavenCoreModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-core" );
+        ModelReader mavenCliModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-cli" );
 
         File installation = new File( basedir, "bootstrap/target/installation" );
-        createInstallation( installation, mavenCoreModel );
+        createInstallation( installation, mavenCliModel );
 
         // TODO: should just need assembly from basedir
         runMaven( installation, new File( basedir ), new String[]{"clean", "install"} );
 
-        File mavenCoreDir = mavenCoreModel.getProjectFile().getParentFile();
-        runMaven( installation, mavenCoreDir, new String[]{"clean", "assembly:assembly"} );
+        File mavenCliDir = mavenCliModel.getProjectFile().getParentFile();
+        runMaven( installation, mavenCliDir, new String[]{"clean", "assembly:assembly"} );
 
-        String finalName = "maven-" + mavenCoreModel.getVersion();
-        File file = new File( mavenCoreDir, "target/" + finalName + "-bin.zip" );
+        String finalName = "maven-" + mavenCliModel.getVersion();
+        File file = new File( mavenCliDir, "target/" + finalName + "-bin.zip" );
 
         File mavenHome = new File( prefix, finalName );
 
@@ -225,7 +225,7 @@ public class BootstrapInstaller
         }
     }
 
-    private void createInstallation( File dir, ModelReader mavenCoreModel )
+    private void createInstallation( File dir, ModelReader mavenCliModel )
         throws IOException, CommandLineException, InterruptedException
     {
         FileUtils.deleteDirectory( dir );
@@ -243,7 +243,7 @@ public class BootstrapInstaller
         File bootDirectory = new File( coreDirectory, "boot" );
         bootDirectory.mkdir();
 
-        for ( Iterator i = mavenCoreModel.getDependencies().iterator(); i.hasNext(); )
+        for ( Iterator i = mavenCliModel.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
 
@@ -263,13 +263,13 @@ public class BootstrapInstaller
             }
         }
 
-        Dependency coreAsDep = new Dependency( mavenCoreModel.getGroupId(), mavenCoreModel.getArtifactId(),
-                                               mavenCoreModel.getVersion(), mavenCoreModel.getPackaging(),
+        Dependency coreAsDep = new Dependency( mavenCliModel.getGroupId(), mavenCliModel.getArtifactId(),
+                                               mavenCliModel.getVersion(), mavenCliModel.getPackaging(),
                                                Collections.EMPTY_LIST );
 
         FileUtils.copyFileToDirectory( bootstrapper.getArtifactFile( coreAsDep ), libDirectory );
 
-        File srcBinDirectory = new File( mavenCoreModel.getProjectFile().getParentFile(), "src/bin" );
+        File srcBinDirectory = new File( mavenCliModel.getProjectFile().getParentFile(), "src/bin" );
 
         FileUtils.copyDirectory( srcBinDirectory, binDirectory, null, "**/.svn/**" );
 

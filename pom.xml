@@ -101,6 +101,8 @@
     <module>maven-repository-metadata</module>
     <module>maven-script</module>
     <module>maven-settings</module>
+    <module>maven-cli</module>
+    <module>maven-embedder</module>
   </modules>
   <dependencies>
     <dependency>

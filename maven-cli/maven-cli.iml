@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4" relativePaths="false" type="JAVA_MODULE">
+  <component name="ModuleRootManager" />
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <exclude-output />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="maven-archiver" />
+    <orderEntry type="module" module-name="maven-artifact" />
+    <orderEntry type="module" module-name="maven-artifact-manager" />
+    <orderEntry type="module" module-name="maven-artifact-test" />
+    <orderEntry type="module" module-name="maven-embedder" />
+    <orderEntry type="module" module-name="maven-core" />
+    <orderEntry type="module" module-name="maven-error-diagnostics" />
+    <orderEntry type="module" module-name="maven-model" />
+    <orderEntry type="module" module-name="maven-model-converter" />
+    <orderEntry type="module" module-name="maven-monitor" />
+    <orderEntry type="module" module-name="maven-plugin-api" />
+    <orderEntry type="module" module-name="maven-plugin-descriptor" />
+    <orderEntry type="module" module-name="maven-plugin-parameter-documenter" />
+    <orderEntry type="module" module-name="maven-plugin-registry" />
+    <orderEntry type="module" module-name="maven-plugin-tools" />
+    <orderEntry type="module" module-name="maven-plugin-tools-ant" />
+    <orderEntry type="module" module-name="maven-plugin-tools-api" />
+    <orderEntry type="module" module-name="maven-plugin-tools-beanshell" />
+    <orderEntry type="module" module-name="maven-plugin-tools-java" />
+    <orderEntry type="module" module-name="maven-plugin-tools-pluggy" />
+    <orderEntry type="module" module-name="maven-plugin-tools-model" />
+    <orderEntry type="module" module-name="maven-profile" />
+    <orderEntry type="module" module-name="maven-project" />
+    <orderEntry type="module" module-name="maven-reporting" />
+    <orderEntry type="module" module-name="maven-reporting-api" />
+    <orderEntry type="module" module-name="maven-reporting-impl" />
+    <orderEntry type="module" module-name="maven-repository-metadata" />
+    <orderEntry type="module" module-name="maven-script" />
+    <orderEntry type="module" module-name="maven-script-ant" />
+    <orderEntry type="module" module-name="maven-script-beanshell" />
+    <orderEntry type="module" module-name="maven-settings" />
+    <orderEntry type="module-library">
+      <library name="maven-core">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-core/2.1-SNAPSHOT/maven-core-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="junit">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/junit/junit/3.8.1/junit-3.8.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsch">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/com/jcraft/jsch/0.1.24/jsch-0.1.24.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-artifact">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-artifact/2.1-SNAPSHOT/maven-artifact-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-embedder">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-embedder/2.1-SNAPSHOT/maven-embedder-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="plexus-interactivity-api">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="classworlds">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/classworlds/classworlds/1.1/classworlds-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wagon-ssh">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/wagon/wagon-ssh/1.0-alpha-7/wagon-ssh-1.0-alpha-7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-plugin-descriptor">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-plugin-descriptor/2.1-SNAPSHOT/maven-plugin-descriptor-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-cli">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/commons-cli/commons-cli/1.0/commons-cli-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-plugin-parameter-documenter">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-plugin-parameter-documenter/2.1-SNAPSHOT/maven-plugin-parameter-documenter-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-profile">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-profile/2.1-SNAPSHOT/maven-profile-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-reporting-api">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/reporting/maven-reporting-api/2.1-SNAPSHOT/maven-reporting-api-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="plexus-container-default">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-repository-metadata">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-repository-metadata/2.1-SNAPSHOT/maven-repository-metadata-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wagon-provider-api">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wagon-file">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-model">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-model/2.1-SNAPSHOT/maven-model-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="plexus-utils">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-plugin-api">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-plugin-api/2.1-SNAPSHOT/maven-plugin-api-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-settings">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-settings/2.1-SNAPSHOT/maven-settings-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-monitor">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-monitor/2.1-SNAPSHOT/maven-monitor-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-artifact-manager">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-artifact-manager/2.1-SNAPSHOT/maven-artifact-manager-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wagon-ssh-external">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/wagon/wagon-ssh-external/1.0-alpha-6/wagon-ssh-external-1.0-alpha-6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="doxia-sink-api">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-error-diagnostics">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-error-diagnostics/2.1-SNAPSHOT/maven-error-diagnostics-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-plugin-registry">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-plugin-registry/2.1-SNAPSHOT/maven-plugin-registry-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="maven-project">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/maven-project/2.1-SNAPSHOT/maven-project-2.1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wagon-http-lightweight">
+        <CLASSES>
+          <root url="jar:///Users/jvanzyl/maven-repo-local/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-6/wagon-http-lightweight-1.0-alpha-6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntryProperties />
+  </component>
+</module>
+

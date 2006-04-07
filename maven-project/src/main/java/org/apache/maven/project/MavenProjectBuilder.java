@@ -36,6 +36,8 @@ public interface MavenProjectBuilder
 
     String STANDALONE_SUPERPOM_VERSION = "2.0";
 
+    boolean STRICT_MODEL_PARSING = true;
+
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 

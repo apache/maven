@@ -1,5 +1,7 @@
 package org.apache.maven.embedder;
 
+import java.io.File;
+
 /*
 * Copyright 2001-2005 The Apache Software Foundation.
 *
@@ -41,7 +43,7 @@ public abstract class AbstractMavenEmbedderLogger
     {
         return name;
     }
-
+    
     public void debug( String message )
     {
         debug( message, null );

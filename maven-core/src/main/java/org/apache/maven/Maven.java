@@ -31,6 +31,24 @@ public interface Maven
 
     String RELEASE_POMv4 = "release-pom.xml";
 
+    // ----------------------------------------------------------------------
+    // Logging
+    // ----------------------------------------------------------------------
+
+    static final int LOGGING_LEVEL_DEBUG = 0;
+
+    static final int LOGGING_LEVEL_INFO = 1;
+
+    static final int LOGGING_LEVEL_WARN = 2;
+
+    static final int LOGGING_LEVEL_ERROR = 3;
+
+    static final int LOGGING_LEVEL_FATAL = 4;
+
+    static final int LOGGING_LEVEL_DISABLE = 5;
+
+    
+
     void execute( MavenExecutionRequest request )
         throws MavenExecutionException;
 }

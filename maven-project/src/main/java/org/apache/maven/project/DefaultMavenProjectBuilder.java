@@ -60,6 +60,7 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.MavenTools;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -135,8 +136,7 @@ public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
     implements MavenProjectBuilder, Initializable, Contextualizable
 {
-    // TODO: remove
-    private PlexusContainer container;
+    protected PlexusContainer container;
 
     protected MavenProfilesBuilder profilesBuilder;
 
@@ -166,6 +166,8 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+
+    private MavenTools mavenTools;
 
     // ----------------------------------------------------------------------
     // I am making this available for use with a new method that takes a
@@ -265,7 +267,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( "<Super-POM>", project, null, null, true );
+            project = processProjectLogic( "<Super-POM>", project, null, null, STRICT_MODEL_PARSING );
 
             project.setExecutionRoot( true );
 
@@ -411,7 +413,7 @@ public class DefaultMavenProjectBuilder
                                                       boolean checkDistributionManagementStatus )
         throws ProjectBuildingException
     {
-        Model model = readModel( "unknown", projectDescriptor, true );
+        Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
         MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(),
                                               model,
@@ -419,7 +421,7 @@ public class DefaultMavenProjectBuilder
                                               buildArtifactRepositories( getSuperModel() ),
                                               projectDescriptor,
                                               profileManager,
-                                              true );
+                                              STRICT_MODEL_PARSING );
 
         if ( checkDistributionManagementStatus )
         {
@@ -468,7 +470,7 @@ public class DefaultMavenProjectBuilder
 
             File file = projectArtifact.getFile();
 
-            model = readModel( projectId, file, false );
+            model = readModel( projectId, file, STRICT_MODEL_PARSING );
 
             String downloadUrl = null;
 
@@ -655,7 +657,7 @@ public class DefaultMavenProjectBuilder
                 ArtifactRepository artifactRepo = null;
                 try
                 {
-                    artifactRepo = ProjectUtils.buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
+                    artifactRepo = mavenTools.buildArtifactRepository( mavenRepo );
                 }
                 catch ( InvalidRepositoryException e )
                 {
@@ -808,7 +810,7 @@ public class DefaultMavenProjectBuilder
     {
         try
         {
-            return ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container );
+            return mavenTools.buildArtifactRepositories( model.getRepositories() );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -886,22 +888,17 @@ public class DefaultMavenProjectBuilder
                                                                         project.getVersion(), project.getPackaging() );
         project.setArtifact( projectArtifact );
 
-        project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),
-                                                                                       artifactRepositoryFactory,
-                                                                                       container ) );
+        project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( model.getPluginRepositories() ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            ArtifactRepository repo = ProjectUtils.buildDeploymentArtifactRepository( dm.getRepository(),
-                                                                                      artifactRepositoryFactory,
-                                                                                      container );
+            ArtifactRepository repo = mavenTools.buildDeploymentArtifactRepository( dm.getRepository() );
             project.setReleaseArtifactRepository( repo );
 
             if ( dm.getSnapshotRepository() != null )
             {
-                repo = ProjectUtils.buildDeploymentArtifactRepository( dm.getSnapshotRepository(),
-                                                                       artifactRepositoryFactory, container );
+                repo = mavenTools.buildDeploymentArtifactRepository( dm.getSnapshotRepository() );
                 project.setSnapshotArtifactRepository( repo );
             }
         }
@@ -928,7 +925,7 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setRemoteArtifactRepositories(
-            ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container ) );
+            mavenTools.buildArtifactRepositories( model.getRepositories() ) );
 
         // TODO: these aren't taking active project artifacts into consideration in the reactor
         project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins() ) );
@@ -1480,7 +1477,7 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
-        return readModel( projectId, url, true );
+        return readModel( projectId, url, STRICT_MODEL_PARSING );
     }
 
     public void contextualize( Context context )

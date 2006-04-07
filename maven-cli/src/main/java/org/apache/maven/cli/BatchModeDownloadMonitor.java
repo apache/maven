@@ -19,17 +19,18 @@ package org.apache.maven.cli;
 import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.MavenTransferListener;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * Console download progress meter.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: ConsoleDownloadMonitor.java 169548 2005-05-11 01:04:50Z brett $
+ * @version $Id$
  */
 public class BatchModeDownloadMonitor
     extends AbstractLogEnabled
-    implements TransferListener
+    implements MavenTransferListener
 {
     public void transferInitiated( TransferEvent transferEvent )
     {

@@ -16,15 +16,16 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.ArrayList;
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -33,20 +34,20 @@ import java.util.Properties;
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
+    private File basedir;
+
     /**
      * @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession).
      */
-    private final ArtifactRepository localRepository;
+    private ArtifactRepository localRepository;
 
-    private final List goals;
+    private File localRepositoryPath;
+
+    private  List goals;
 
     protected MavenSession session;
 
-    private final EventDispatcher eventDispatcher;
-
-    private final Settings settings;
-
-    private final String baseDirectory;
+    private  Settings settings;
 
     private boolean recursive = true;
 
@@ -56,36 +57,39 @@ public class DefaultMavenExecutionRequest
 
     private String failureBehavior;
 
-    private final ProfileManager globalProfileManager;
+    private  Properties properties;
 
-    private final Properties executionProperties;
+    private  Date startTime;
 
-    private final Date startTime;
+    private  boolean showErrors;
 
-    private final boolean showErrors;
+    private List eventMonitors;
 
-    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
-                                         EventDispatcher eventDispatcher, List goals, String baseDirectory,
-                                         ProfileManager globalProfileManager, Properties executionProperties,
-                                         boolean showErrors )
+    private List activeProfiles;
+
+    private List inactiveProfiles;
+
+    private boolean interactive;
+
+    private TransferListener transferListener;
+
+    private int loggingLevel;
+
+    private boolean activateDefaultEventMonitor;
+
+    private boolean offline;
+
+    private boolean updateSnapshots;
+
+    private String globalChecksumPolicy;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    public String getBaseDirectory()
     {
-        this.localRepository = localRepository;
-
-        this.settings = settings;
-
-        this.goals = goals;
-
-        this.eventDispatcher = eventDispatcher;
-
-        this.baseDirectory = baseDirectory;
-
-        this.globalProfileManager = globalProfileManager;
-
-        this.executionProperties = executionProperties;
-
-        this.startTime = new Date();
-
-        this.showErrors = showErrors;
+        return basedir.getAbsolutePath();
     }
 
     public Settings getSettings()
@@ -93,19 +97,9 @@ public class DefaultMavenExecutionRequest
         return settings;
     }
 
-    public String getBaseDirectory()
-    {
-        return baseDirectory;
-    }
-
     public boolean isRecursive()
     {
         return recursive;
-    }
-
-    public void setRecursive( boolean recursive )
-    {
-        this.recursive = false;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -113,53 +107,24 @@ public class DefaultMavenExecutionRequest
         return localRepository;
     }
 
+    public File getLocalRepositoryPath()
+    {
+        return localRepositoryPath;
+    }
+
     public List getGoals()
     {
         return goals;
     }
 
-    public Properties getExecutionProperties()
+    public Properties getProperties()
     {
-        return executionProperties;
+        return properties;
     }
-
-    // ----------------------------------------------------------------------
-    // Putting the session here but it can probably be folded right in here.
-    // ----------------------------------------------------------------------
 
     public MavenSession getSession()
     {
         return session;
-    }
-
-    public void setSession( MavenSession session )
-    {
-        this.session = session;
-    }
-
-    public void addEventMonitor( EventMonitor monitor )
-    {
-        eventDispatcher.addEventMonitor( monitor );
-    }
-
-    public EventDispatcher getEventDispatcher()
-    {
-        return eventDispatcher;
-    }
-
-    public void setReactorActive( boolean reactorActive )
-    {
-        this.reactorActive = reactorActive;
-    }
-
-    public boolean isReactorActive()
-    {
-        return reactorActive;
-    }
-
-    public void setPomFile( String pomFilename )
-    {
-        this.pomFilename = pomFilename;
     }
 
     public String getPomFile()
@@ -167,19 +132,9 @@ public class DefaultMavenExecutionRequest
         return pomFilename;
     }
 
-    public void setFailureBehavior( String failureBehavior )
-    {
-        this.failureBehavior = failureBehavior;
-    }
-
     public String getFailureBehavior()
     {
         return failureBehavior;
-    }
-
-    public ProfileManager getGlobalProfileManager()
-    {
-        return globalProfileManager;
     }
 
     public Date getStartTime()
@@ -190,5 +145,277 @@ public class DefaultMavenExecutionRequest
     public boolean isShowErrors()
     {
         return showErrors;
+    }
+
+    public boolean isInteractive()
+    {
+        return interactive;
+    }
+
+    public List getEventMonitors()
+    {
+        return eventMonitors;
+    }
+
+    public List getActiveProfiles()
+    {
+        return activeProfiles;
+    }
+
+    public List getInactiveProfiles()
+    {
+        return inactiveProfiles;
+    }
+
+    public TransferListener getTransferListener()
+    {
+        return transferListener;
+    }
+
+    public boolean isDefaultEventMonitorActivated()
+    {
+        return activateDefaultEventMonitor;
+    }
+
+    public int getLoggingLevel()
+    {
+        return loggingLevel;
+    }
+
+    public boolean isDefaultEventMonitorActive()
+    {
+        return activateDefaultEventMonitor;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
+    }
+
+    public boolean isUpdateSnapshots()
+    {
+        return updateSnapshots;
+    }
+
+    public String getGlobalChecksumPolicy()
+    {
+        return globalChecksumPolicy;
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    public MavenExecutionRequest setBasedir( File basedir )
+    {
+        this.basedir = basedir;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setStartTime( Date startTime )
+    {
+        this.startTime= startTime;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setShowErrors( boolean showErrors )
+    {
+        this.showErrors = showErrors;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setSettings( Settings settings )
+    {
+        this.settings = settings;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setGoals( List goals )
+    {
+        this.goals = goals;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setLocalRepository( ArtifactRepository localRepository )
+    {
+        this.localRepository = localRepository;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setLocalRepositoryPath( File localRepository )
+    {
+        this.localRepositoryPath = localRepository;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setLocalRepositoryPath( String localRepository )
+    {
+        this.localRepositoryPath = new File( localRepository );
+
+        return this;
+    }
+
+    public MavenExecutionRequest setProperties( Properties properties )
+    {
+        this.properties = properties;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setFailureBehavior( String failureBehavior )
+    {
+        this.failureBehavior = failureBehavior;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setSession( MavenSession session )
+    {
+        this.session = session;
+
+        return this;
+    }
+
+    public MavenExecutionRequest addActiveProfile( String profile )
+    {
+        if ( activeProfiles == null )
+        {
+            activeProfiles = new ArrayList();
+        }
+
+        activeProfiles.add( profile );
+
+        return this;
+    }
+
+    public MavenExecutionRequest addInactiveProfile( String profile )
+    {
+        if ( inactiveProfiles == null )
+        {
+            inactiveProfiles = new ArrayList();
+        }
+
+        inactiveProfiles.add( profile );
+
+        return this;
+    }
+
+    public MavenExecutionRequest addActiveProfiles( List profiles )
+    {
+        if ( activeProfiles == null )
+        {
+            activeProfiles = new ArrayList();
+        }
+
+        activeProfiles.addAll( profiles );
+
+        return this;
+    }
+
+    public MavenExecutionRequest addInactiveProfiles( List profiles )
+    {
+        if ( inactiveProfiles == null )
+        {
+            inactiveProfiles = new ArrayList();
+        }
+
+        inactiveProfiles.addAll( profiles );
+
+        return this;
+    }
+
+
+    public MavenExecutionRequest addEventMonitor( EventMonitor monitor )
+    {
+        if ( eventMonitors == null )
+        {
+            eventMonitors = new ArrayList();
+        }
+
+        eventMonitors.add( monitor );
+
+        return this;
+    }
+
+    public MavenExecutionRequest activateDefaultEventMonitor()
+    {
+        activateDefaultEventMonitor = true;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setReactorActive( boolean reactorActive )
+    {
+        this.reactorActive = reactorActive;
+
+        return this;
+    }
+
+    public boolean isReactorActive()
+    {
+        return reactorActive;
+    }
+
+    public MavenExecutionRequest setPomFile( String pomFilename )
+    {
+        this.pomFilename = pomFilename;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setRecursive( boolean recursive )
+    {
+        this.recursive = recursive;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setInteractive( boolean interactive )
+    {
+        this.interactive = interactive;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setTransferListener( TransferListener transferListener )
+    {
+        this.transferListener = transferListener;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setLoggingLevel( int loggingLevel )
+    {
+        this.loggingLevel = loggingLevel;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setOffline( boolean offline )
+    {
+        this.offline = offline;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots )
+    {
+        this.updateSnapshots = updateSnapshots;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy )
+    {
+        this.globalChecksumPolicy = globalChecksumPolicy;
+
+        return this;
     }
 }

@@ -73,6 +73,9 @@
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.MavenTools</role>
+        </requirement>
       </requirements>
     </component>
   </components>
