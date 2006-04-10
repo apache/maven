@@ -17,7 +17,11 @@ package org.apache.maven.project.inheritance.t02;
  */
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.MailingList;
@@ -58,6 +62,9 @@ public class ProjectInheritanceTest
         throws Exception
     {
         File localRepo = getLocalRepositoryPath();
+        
+        System.out.println( "Local repository is at: " + localRepo.getAbsolutePath() );
+        
         File pom0 = new File( localRepo, "p0/pom.xml" );
         File pom1 = new File( pom0.getParentFile(), "p1/pom.xml" );
         File pom2 = new File( pom1.getParentFile(), "p2/pom.xml" );
@@ -110,10 +117,53 @@ public class ProjectInheritanceTest
         Build build = project4.getBuild();
         List plugins = build.getPlugins();
         
-        assertEquals( 1, plugins.size() );
+        Map validPluginCounts = new HashMap();
         
-        Plugin plugin = (Plugin) plugins.get( 0 );
-        List executions = plugin.getExecutions();
+        String testPluginArtifactId = "maven-compiler-plugin";
+        
+        // this is the plugin we're looking for.
+        validPluginCounts.put( testPluginArtifactId, Integer.valueOf( 0 ) );
+        
+        // these are injected if -DperformRelease=true
+        validPluginCounts.put( "maven-deploy-plugin", Integer.valueOf( 0 ) );
+        validPluginCounts.put( "maven-javadoc-plugin", Integer.valueOf( 0 ) );
+        validPluginCounts.put( "maven-source-plugin", Integer.valueOf( 0 ) );
+        
+        Plugin testPlugin = null;
+        
+        for ( Iterator it = plugins.iterator(); it.hasNext(); )
+        {
+            Plugin plugin = (Plugin) it.next();
+            
+            String pluginArtifactId = plugin.getArtifactId();
+            
+            if ( !validPluginCounts.containsKey( pluginArtifactId ) )
+            {
+                fail( "Illegal plugin found: " + pluginArtifactId );
+            }
+            else
+            {
+                if ( pluginArtifactId.equals( testPluginArtifactId ) )
+                {
+                    testPlugin = plugin;
+                }
+                
+                Integer count = (Integer) validPluginCounts.get( pluginArtifactId );
+                
+                if ( count.intValue() > 0 )
+                {
+                    fail( "Multiple copies of plugin: " + pluginArtifactId + " found in POM." );
+                }
+                else
+                {
+                    count = Integer.valueOf( count.intValue() + 1 );
+                    
+                    validPluginCounts.put( pluginArtifactId, count );
+                }
+            }
+        }
+        
+        List executions = testPlugin.getExecutions();
         
         assertEquals( 1, executions.size() );
     }
