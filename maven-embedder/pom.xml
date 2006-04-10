@@ -31,9 +31,9 @@
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
-      <plugin>
+      <!-- plugin>
         <artifactId>maven-clover-plugin</artifactId>
-      </plugin>
+      </plugin -->
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
