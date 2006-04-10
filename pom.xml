@@ -228,9 +228,11 @@
   </modules>
   <repositories>
     <repository>
+      <!-- Have to enable releases, so we can search this repo for site skins...
       <releases>
         <enabled>false</enabled>
       </releases>
+      -->
       <id>apache.snapshots</id>
       <name>Apache Development Repository</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
@@ -245,6 +247,16 @@
     </repository>
   </repositories>
   <pluginRepositories>
+    <pluginRepository>
+      <!-- Have to enable releases, so we can search this repo for plugins...
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      -->
+      <id>apache.snapshots</id>
+      <name>Apache Development Repository</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+    </pluginRepository>
     <pluginRepository>
       <releases>
         <enabled>false</enabled>
