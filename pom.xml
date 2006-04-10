@@ -283,10 +283,12 @@
           </links>
         </configuration>
       </plugin>
+      <!-- Commenting these out for the release...they're in the sandbox, and 
+           shouldn't be on the critical path for a release of the core project.
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
         <artifactId>changelog-maven-plugin</artifactId>
       </plugin>
+      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jxr-maven-plugin</artifactId>
