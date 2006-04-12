@@ -20,7 +20,17 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-        <filtering>${filter.resources}</filtering>
+        <filtering>true</filtering>
+        <!--
+        <filtering>${filtering.resources}</filtering>
+        -->
+      </resource>    
+      <resource>
+        <directory>${project.build.sourceDirectory}</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
       </resource>
     </resources>
   </build>

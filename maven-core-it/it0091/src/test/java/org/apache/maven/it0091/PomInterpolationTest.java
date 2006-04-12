@@ -32,4 +32,20 @@ public class PomInterpolationTest
 
         assertEquals( testProperties.getProperty( "name" ), "jason" );
     }
+    
+    public void testInterpolatedProjectSourceDirectory()
+        throws Exception
+    {
+        Properties testProperties = new Properties();
+
+        File testPropertiesFile = new File( basedir, "target/classes/source.properties" );
+
+        assertTrue( testPropertiesFile.exists() );
+
+        testProperties.load( new FileInputStream( testPropertiesFile ) );
+
+        File projectBuildDirectory = new File( basedir, "target" );
+
+        assertEquals( testProperties.getProperty( "name" ), "jason" );
+    }    
 }
