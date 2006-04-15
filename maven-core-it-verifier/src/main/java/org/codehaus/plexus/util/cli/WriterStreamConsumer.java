@@ -1,6 +1,6 @@
-package org.apache.maven.it;
+package org.codehaus.plexus.util.cli;
 
-import org.apache.maven.it.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.StreamConsumer;
 
 import java.io.Writer;
 import java.io.PrintWriter;

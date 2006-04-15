@@ -1,4 +1,4 @@
-package org.apache.maven.it.cli;
+package org.codehaus.plexus.util.cli;
 
 /*
  * The MIT License
@@ -77,6 +77,8 @@ package org.apache.maven.it.cli;
  * limitations under the License.
  * ====================================================================
  */
+
+import org.codehaus.plexus.util.cli.StreamConsumer;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.apache.maven.it.cli;
+package org.codehaus.plexus.util.cli;
 
 /*
  * The MIT License
@@ -23,6 +23,9 @@ package org.apache.maven.it.cli;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.CommandLineException;
 
 import java.io.InputStream;
 

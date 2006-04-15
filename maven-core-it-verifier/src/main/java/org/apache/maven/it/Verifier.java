@@ -1,9 +1,11 @@
 package org.apache.maven.it;
 
-import org.apache.maven.it.cli.CommandLineException;
-import org.apache.maven.it.cli.CommandLineUtils;
-import org.apache.maven.it.cli.Commandline;
-import org.apache.maven.it.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.WriterStreamConsumer;
+import org.codehaus.plexus.util.FileUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
