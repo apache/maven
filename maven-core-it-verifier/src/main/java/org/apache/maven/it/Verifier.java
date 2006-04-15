@@ -125,7 +125,8 @@ public class Verifier
             {
                 String line = (String) i.next();
 
-                if ( line.indexOf( "[ERROR]" ) >= 0 )
+                // A hack to keep stupid velocity resource loader errors from triggering failure
+                if ( line.indexOf( "[ERROR]" ) >= 0 && line.indexOf( "VM_global_library.vm" ) == -1 )
                 {
                     throw new VerificationException( "Error in execution." );
                 }
@@ -649,8 +650,8 @@ public class Verifier
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
 
-            boolean useMavenRepoLocal =
-                Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+            boolean useMavenRepoLocal = Boolean.valueOf( controlProperties.getProperty( "use.mavenRepoLocal", "true" ) ).booleanValue();
+
             if ( useMavenRepoLocal )
             {
                 // Note: Make sure that the repo is surrounded by quotes as it can possibly have
@@ -778,12 +779,17 @@ public class Verifier
 
         if ( localRepo == null )
         {
+            localRepo = System.getProperty( "maven.repo.local" );
+        }
+
+        if ( localRepo == null )
+        {
             localRepo = retrieveLocalRepo( settingsFile );
         }
 
         if ( localRepo == null )
         {
-            localRepo = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+            localRepo = System.getProperty( "user.home" ) + "/.m2/repository";
         }
 
         File repoDir = new File( localRepo );
