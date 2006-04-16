@@ -370,7 +370,7 @@ public class Verifier
         }
     }
 
-    private static void executeCommand( String line )
+    private void executeCommand( String line )
         throws VerificationException
     {
         int index = line.indexOf( " " );
@@ -414,6 +414,43 @@ public class Verifier
             catch ( IOException e )
             {
                 throw new VerificationException( "Error removing directory - delete failed" );
+            }
+        }
+        else if ( "svn".equals( cmd ) )
+        {
+            try
+            {
+
+                Commandline cli = new Commandline( line );
+
+                cli.setWorkingDirectory( basedir );
+
+                Writer logWriter = new FileWriter( new File( basedir, LOG_FILENAME ) );
+
+                StreamConsumer out = new WriterStreamConsumer( logWriter );
+
+                StreamConsumer err = new WriterStreamConsumer( logWriter );
+
+                System.out.println( "Command: " + Commandline.toString( cli.getCommandline() ) );
+
+                int ret = CommandLineUtils.executeCommandLine( cli, out, err );
+
+                logWriter.close();
+
+                if ( ret > 0 )
+                {
+                    System.err.println( "Exit code: " + ret );
+
+                    throw new VerificationException();
+                }
+            }
+            catch ( CommandLineException e )
+            {
+                throw new VerificationException( e );
+            }
+            catch ( IOException e )
+            {
+                throw new VerificationException( e );
             }
         }
         else
