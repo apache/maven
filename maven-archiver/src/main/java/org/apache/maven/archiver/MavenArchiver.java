@@ -151,6 +151,10 @@ public class MavenArchiver
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
+                if ( "test".equals( artifact.getScope() ) )
+                {
+                    continue;
+                }
                 // TODO: type of ejb should be added too?
                 if ( "jar".equals( artifact.getType() ) )
                 {
