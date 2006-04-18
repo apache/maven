@@ -6,6 +6,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -741,6 +742,28 @@ public class Verifier
         return result;
     }
 
+    private static List discoverIntegrationTests( String directory ) throws VerificationException
+    {
+        try
+        {
+        ArrayList tests = new ArrayList();
+
+        List subTests = FileUtils.getFiles( new File( directory ), "**/goals.txt", null );
+
+        for ( Iterator i = subTests.iterator(); i.hasNext(); )
+        {
+            File testCase = (File) i.next();
+            tests.add( testCase.getParent() );
+        }
+
+        return tests;
+        }
+        catch (IOException e )
+        {
+            throw new VerificationException( directory + " is not a valid test case container", e);
+        }
+    }
+
     private void displayLogFile()
     {
         System.out.println( "Log file contents:" );
@@ -841,17 +864,24 @@ public class Verifier
 
         if ( argsList.size() == 0 )
         {
-            try
+            if ( FileUtils.fileExists( basedir + File.separator + "integration-tests.txt" ) )
             {
-                tests = loadFile( basedir, "integration-tests.txt", false );
+                try
+                {
+                    tests = loadFile( basedir, "integration-tests.txt", false );
+                }
+                catch ( VerificationException e )
+                {
+                    System.err.println( "Unable to load integration tests file" );
+
+                    System.err.println( e.getMessage() );
+
+                    System.exit( 2 );
+                }
             }
-            catch ( VerificationException e )
+            else
             {
-                System.err.println( "Unable to load integration tests file" );
-
-                System.err.println( e.getMessage() );
-
-                System.exit( 2 );
+                tests = discoverIntegrationTests( "." );
             }
         }
         else
@@ -865,14 +895,29 @@ public class Verifier
                 {
                     test = test.substring( 0, test.length() - 1 );
                 }
-                if ( !test.startsWith( "it" ) )
+
+                if ( StringUtils.isNumeric( test ) )
                 {
-                    test = "it" + fmt.format( Integer.valueOf( test ) );
+
+                        test = "it" + fmt.format( Integer.valueOf( test ) );
+                        test.trim();
+                        tests.add( test );
                 }
-                test = test.trim();
-                if ( test.length() > 0 )
+                else if ( "it".startsWith( test ))
                 {
-                    tests.add( test );
+                    test = test.trim();
+                    if ( test.length() > 0 )
+                    {
+                        tests.add( test );
+                    }
+                }
+                else if ( FileUtils.fileExists( test ) && new File(test).isDirectory() )
+                {
+                        tests.addAll( discoverIntegrationTests( test ) );
+                }
+                else
+                {
+                    System.err.println( "[WARNING] rejecting " + test + " as an invalid test or test source directory" );
                 }
             }
         }
