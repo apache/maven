@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FROM=carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/*
+FROM=carlossg@shell.sourceforge.net:/home/groups/m/ma/maven-taglib/htdocs/m2repo/net/sourceforge/maven-taglib/
 TO=net/sourceforge/maven-taglib/
 
 source ./m2-sync.sh
