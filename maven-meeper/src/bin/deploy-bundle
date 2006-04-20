@@ -21,7 +21,7 @@ BUNDLE=`echo $BUNDLEURL | sed -e 's#^.*/##;'`
 
 echo $BUNDLE
 mv $BUNDLE tmp.jar
-BUNDLE = tmp.jar
+BUNDLE=tmp.jar
 
 (
 
