@@ -26,9 +26,10 @@
             </goals>
           </execution>
           <execution>
-            <id>site-xsd</id>
-            <phase>site</phase>
+            <id>site-docs</id>
+            <phase>pre-site</phase>
             <goals>
+              <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
           </execution>

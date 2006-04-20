@@ -16,9 +16,10 @@
         <version>1.0-alpha-7</version>
         <executions>
           <execution>
-            <id>site-xsd</id>
-            <phase>site</phase>
+            <id>site-docs</id>
+            <phase>pre-site</phase>
             <goals>
+              <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
           </execution>
