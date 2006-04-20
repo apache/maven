@@ -43,7 +43,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.classworlds.ClassWorld;
@@ -92,7 +91,6 @@ public class MavenEmbedder
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    private MavenSettingsBuilder settingsBuilder;
 
     private LifecycleExecutor lifecycleExecutor;
 
@@ -150,6 +148,7 @@ public class MavenEmbedder
     /**
      * This option determines whether the embedder is to be aligned to the user
      * installation.
+     * @deprecated not used
      */
     private boolean alignWithUserInstallation;
 
@@ -157,41 +156,65 @@ public class MavenEmbedder
     // Accessors
     // ----------------------------------------------------------------------
 
+    /**
+     * @deprecated not used.
+     */
     public void setInteractiveMode( boolean interactiveMode )
     {
         this.interactiveMode = interactiveMode;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public boolean isInteractiveMode()
     {
         return interactiveMode;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public void setOffline( boolean offline )
     {
         this.offline = offline;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public boolean isOffline()
     {
         return offline;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public void setGlobalChecksumPolicy( String globalChecksumPolicy )
     {
         this.globalChecksumPolicy = globalChecksumPolicy;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public String getGlobalChecksumPolicy()
     {
         return globalChecksumPolicy;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public boolean isAlignWithUserInstallation()
     {
         return alignWithUserInstallation;
     }
 
+    /**
+     * @deprecated not used
+     */
     public void setAlignWithUserInstallation( boolean alignWithUserInstallation )
     {
         this.alignWithUserInstallation = alignWithUserInstallation;
@@ -222,11 +245,17 @@ public class MavenEmbedder
         return classWorld;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public void setLocalRepositoryDirectory( File localRepositoryDirectory )
     {
         this.localRepositoryDirectory = localRepositoryDirectory;
     }
 
+    /**
+     * @deprecated not used.
+     */
     public File getLocalRepositoryDirectory()
     {
         return localRepositoryDirectory;
@@ -429,7 +458,7 @@ public class MavenEmbedder
 
     public ArtifactRepository createLocalRepository( Settings settings )
     {
-        return createLocalRepository( settings.getLocalRepository(), DEFAULT_LOCAL_REPO_ID );
+        return createLocalRepository( mavenTools.getLocalRepositoryPath( settings ), DEFAULT_LOCAL_REPO_ID );
     }
 
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
@@ -493,7 +522,13 @@ public class MavenEmbedder
     public void start()
         throws MavenEmbedderException
     {
-        detectUserInstallation();
+        start(new DefaultMavenEmbedRequest());
+        
+    }
+    
+    public void start(MavenEmbedRequest req)
+        throws MavenEmbedderException
+    {
 
         // ----------------------------------------------------------------------
         // Set the maven.home system property which is need by components like
@@ -506,7 +541,6 @@ public class MavenEmbedder
         }
 
         embedder = new Embedder();
-
         if ( logger != null )
         {
             embedder.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
@@ -522,7 +556,12 @@ public class MavenEmbedder
             }
 
             embedder.start( classWorld );
-
+            
+            if (req.getContainerCustomizer() != null) 
+            {
+                req.getContainerCustomizer().customize(embedder.getContainer());
+            }
+            
             // ----------------------------------------------------------------------
             // Lookup each of the components we need to provide the desired
             // client interface.
@@ -539,6 +578,10 @@ public class MavenEmbedder
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
             profileManager = new DefaultProfileManager( embedder.getContainer() );
+            
+            profileManager.explicitlyActivate(req.getActiveProfiles());
+            
+            profileManager.explicitlyDeactivate(req.getInactiveProfiles());
 
             mavenProjectBuilder = (MavenProjectBuilder) embedder.lookup( MavenProjectBuilder.ROLE );
 
@@ -557,8 +600,15 @@ public class MavenEmbedder
             lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
 
             wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
+            
+            settings = mavenTools.buildSettings( req.getUserSettingsFile(), 
+                                                 req.getGlobalSettingsFile(), 
+                                                 null );
 
             profileManager.loadSettingsProfiles( settings );
+            
+            localRepository = createLocalRepository( settings );
+            
         }
         catch ( PlexusContainerException e )
         {
@@ -571,20 +621,13 @@ public class MavenEmbedder
         catch ( ComponentLookupException e )
         {
             throw new MavenEmbedderException( "Cannot lookup required component.", e );
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    private void detectUserInstallation()
-    {
-        if ( new File( userHome, ".m2" ).exists() )
+        } 
+        catch (SettingsConfigurationException e ) 
         {
-            alignWithUserInstallation = true;
+            throw new MavenEmbedderException( "Cannot create settings configuration", e );
         }
     }
+
 
     // ----------------------------------------------------------------------
     // Lifecycle
@@ -598,8 +641,6 @@ public class MavenEmbedder
             embedder.release( mavenProjectBuilder );
 
             embedder.release( artifactRepositoryFactory );
-
-            embedder.release( settingsBuilder );
 
             embedder.release( lifecycleExecutor );
         }
@@ -634,6 +675,17 @@ public class MavenEmbedder
                                                  usePluginRegistry,
                                                  pluginUpdateOverride );
     }
+    
+    public Settings buildSettings( File userSettingsPath,
+                                   File globalSettingsPath,
+                                   Boolean pluginUpdateOverride )
+        throws SettingsConfigurationException
+    {
+        return mavenTools.buildSettings( userSettingsPath,
+                                         globalSettingsPath,
+                                         pluginUpdateOverride );
+    }
+    
 
     public File getUserSettingsPath( String optionalSettingsPath )
     {

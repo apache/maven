@@ -102,6 +102,26 @@ public class DefaultMavenTools
                                    Boolean pluginUpdateOverride )
         throws SettingsConfigurationException
     {
+        Settings settings = buildSettings(userSettingsPath,
+                                          globalSettingsPath,
+                                          pluginUpdateOverride);
+        if ( offline )
+        {
+            settings.setOffline( true );
+        }
+        
+        settings.setInteractiveMode( interactive );
+        
+        settings.setUsePluginRegistry( usePluginRegistry );
+        
+        return settings;
+    }
+    
+    public Settings buildSettings( File userSettingsPath,
+                                   File globalSettingsPath,
+                                   Boolean pluginUpdateOverride )
+        throws SettingsConfigurationException
+    {
         Settings settings;
 
         try
@@ -117,15 +137,6 @@ public class DefaultMavenTools
             throw new SettingsConfigurationException( e.getMessage(), e.getDetail(), e.getLineNumber(),
                                                       e.getColumnNumber() );
         }
-
-        if ( offline )
-        {
-            settings.setOffline( true );
-        }
-
-        settings.setInteractiveMode( interactive );
-
-        settings.setUsePluginRegistry( usePluginRegistry );
 
         RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
 
