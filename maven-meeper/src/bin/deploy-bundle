@@ -7,6 +7,7 @@ VERSION=$3
 [ "${BUNDLEURL}" = "" ] && echo && echo "You must specify a bundle URL!" && echo && exit
 
 WORKDIR=bundle.tmp
+SCRIPTDIR=`dirname $0`
 # repo dir relative to WORKDIR
 REPODIR=$HOME/repository-staging/to-ibiblio/maven
 
@@ -46,7 +47,7 @@ BUNDLE=tmp.jar
 
   less $POM
 
-  ../d2u ${POM}
+  $SCRIPTDIR/d2u ${POM}
 
   if [ ! -z $VERSION ]
   then
@@ -107,7 +108,7 @@ BUNDLE=tmp.jar
 
   if [ -f $LIC ]
   then
-    ../d2u $LIC
+    $SCRIPTDIR/d2u $LIC
     mkdir -p $REPODIR/${groupId}/licenses
     cp -i $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
   fi
