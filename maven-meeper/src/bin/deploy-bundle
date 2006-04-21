@@ -7,7 +7,16 @@ VERSION=$3
 [ "${BUNDLEURL}" = "" ] && echo && echo "You must specify a bundle URL!" && echo && exit
 
 WORKDIR=bundle.tmp
-SCRIPTDIR=`dirname $0`
+
+base=`basename $0`
+mylocation=`which $base`
+
+SCRIPTDIR=`dirname $mylocation`
+
+[ -d $SCRIPTDIR ] || SCRIPTDIR=.
+
+echo "Script directory is: ${SCRIPTDIR}"
+
 # repo dir relative to WORKDIR
 REPODIR=$HOME/repository-staging/to-ibiblio/maven
 
@@ -17,6 +26,7 @@ mkdir $WORKDIR
 
 cd $WORKDIR
 
+echo "Retrieving URL: '${BUNDLEURL}'"
 wget $BUNDLEURL
 BUNDLE=`echo $BUNDLEURL | sed -e 's#^.*/##;'`
 
@@ -26,25 +36,34 @@ BUNDLE=tmp.jar
 
 (
 
-  jar xf $BUNDLE
+  echo "Unzipping original bundle."
+  jar xf $BUNDLE || unzip $BUNDLE
 
   # copy files in subdirs to workdir
+  echo "Copying files to working directory."
   for d in `find ./* -type d` ; do
     for f in `find $d -type f` ; do cp $f .; done;
   done
 
+  echo "Searching for POM:"
+  echo "...checking for 'project.xml'"
   POM=project.xml
   if [ ! -f ${POM} ]
   then
+    echo "...checking for 'pom.xml'"
     POM=pom.xml
   fi
+
   if [ ! -f ${POM} ]
   then
+    echo "...searching for **/*.pom"
     POM=`find . -iname *.pom`
   fi
 
+  [ "" == "${POM}" ] && echo && echo "Cannot deploy without the pom.xml or project.xml file!" && echo && exit
   [ ! -f ${POM} ] && echo && echo "Cannot deploy without the pom.xml or project.xml file!" && echo && exit
 
+  echo "POM is: '${POM}'"
   less $POM
 
   $SCRIPTDIR/d2u ${POM}
