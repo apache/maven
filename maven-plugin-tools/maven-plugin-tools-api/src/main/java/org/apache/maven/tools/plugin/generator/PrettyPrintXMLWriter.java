@@ -2,7 +2,6 @@ package org.apache.maven.tools.plugin.generator;
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.LinkedList;
 
 /*
  * Copyright 2001-2006 The Apache Software Foundation.
@@ -21,7 +20,7 @@ import java.util.LinkedList;
  */
 
 /**
- * Copied from plexus-utils 1.2 as we can't upgrade it yet.
+ * Copied from plexus-utils 1.3-SNAPSHOT as we can't upgrade it yet.
  * This class can be removed when a newer version of plexus-utils is included with Maven
  * 
  * @see org.codehaus.plexus.util.xml.PrettyPrintXMLWriter
