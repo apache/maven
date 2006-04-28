@@ -21,7 +21,6 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
@@ -36,6 +35,7 @@ import java.util.List;
 public class PluginXdocGenerator
     implements Generator
 {
+
     public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
