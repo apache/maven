@@ -19,6 +19,7 @@ echo "Script directory is: ${SCRIPTDIR}"
 
 # repo dir relative to WORKDIR
 REPODIR=$HOME/repository-staging/to-ibiblio/maven
+REPO2DIR=$HOME/repository-staging/to-ibiblio/maven2
 
 rm -rf $WORKDIR > /dev/null 2>&1
 
@@ -102,6 +103,15 @@ BUNDLE=tmp.jar
   version=`echo ${version} | sed -e 's/ *$//'`
   artifactId=`echo ${artifactId} | sed -e 's/ *$//'`
   groupId=`echo ${groupId} | sed -e 's/ *$//'`  
+  groupDir=`echo ${groupId} | sed -e 's/\./\//g'`  
+
+  maven2=`cat ${POM} | tr '\n' ' ' | sed -e 's#^.*<modelVersion>##;s#</modelVersion>.*$##'`  
+
+  echo
+  if [ ! -z ${maven2} ]
+  then
+    echo " ========= MAVEN 2 ========= "
+  fi
 
   echo
   echo "   version: [${version}]"
@@ -109,7 +119,7 @@ BUNDLE=tmp.jar
   echo "artifactId: [${artifactId}]"
   echo
 
-  if [ -d $REPODIR/${groupId} ]
+  if [ -d $REPO2DIR/${groupDir} ]
   then
     echo "The group already exists"
   else
@@ -134,21 +144,35 @@ BUNDLE=tmp.jar
 
   cp ${POM} ${artifactId}-${version}.pom
 
+  m2dir=$REPO2DIR/${groupDir}/${artifactId}/${version}
+
+  mkdir -p ${m2dir}
 
   mkdir -p $REPODIR/${groupId}/poms
   cp -i ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
+  if [ ! -z ${maven2} ]
+  then
+    cp -i ${artifactId}-${version}.pom ${m2dir}
+    md5sum  ${m2dir}/${artifactId}-${version}.pom > ${m2dir}/${artifactId}-${version}.pom.md5
+    sha1sum ${m2dir}/${artifactId}-${version}.pom > ${m2dir}/${artifactId}-${version}.pom.sha1
+  fi
 
   artifactType=`echo ${artifactId} | sed -e 's/maven-.*-plugin//'`
   
   if [ -z ${artifactType} ]
   then
     echo "Deploying Plugin ..."
-     mkdir -p $REPODIR/${groupId}/plugins
-     cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/plugins
+    mkdir -p $REPODIR/${groupId}/plugins
+    cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/plugins
   else
     echo "Deploying JAR ..."
     mkdir -p $REPODIR/${groupId}/jars
     cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
+    cp -i ${artifactId}-${version}.jar ${m2dir}
+    if [ -f ${m2dir}/${artifactId}-${version}.jar ]
+      md5sum  ${m2dir}/${artifactId}-${version}.jar > ${m2dir}/${artifactId}-${version}.jar.md5
+      sha1sum ${m2dir}/${artifactId}-${version}.jar > ${m2dir}/${artifactId}-${version}.jar.sha1
+    fi
   fi
   
   if [ -f ${artifactId}-${version}-sources.jar ]
@@ -156,6 +180,9 @@ BUNDLE=tmp.jar
     echo "Deploying Java sources ..."
     mkdir -p $REPODIR/${groupId}/java-sources
     cp -i ${artifactId}-${version}-sources.jar $REPODIR/${groupId}/java-sources
+    cp -i ${artifactId}-${version}-sources.jar ${m2dir}
+    md5sum  ${m2dir}/${artifactId}-${version}-sources.jar > ${m2dir}/${artifactId}-${version}-sources.jar.md5
+    sha1sum ${m2dir}/${artifactId}-${version}-sources.jar > ${m2dir}/${artifactId}-${version}-sources.jar.sha1
   else
     echo "No Java sources available in upload bundle, skipping ..."
   fi
@@ -165,6 +192,9 @@ BUNDLE=tmp.jar
     echo "Deploying Javadocs ..."
     mkdir -p $REPODIR/${groupId}/javadoc
     cp -i ${artifactId}-${version}-javadoc.jar $REPODIR/${groupId}/javadoc
+    cp -i ${artifactId}-${version}-javadoc.jar ${m2dir}
+    md5sum  ${m2dir}/${artifactId}-${version}-javadoc.jar > ${m2dir}/${artifactId}-${version}-javadoc.jar.md5
+    sha1sum ${m2dir}/${artifactId}-${version}-javadoc.jar > ${m2dir}/${artifactId}-${version}-javadoc.jar.sha1
   else
     echo "No Javadocs available in upload bundle, skipping ..."
   fi
