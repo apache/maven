@@ -170,6 +170,7 @@ BUNDLE=tmp.jar
     cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
     cp -i ${artifactId}-${version}.jar ${m2dir}
     if [ -f ${m2dir}/${artifactId}-${version}.jar ]
+    then
       md5sum  ${m2dir}/${artifactId}-${version}.jar > ${m2dir}/${artifactId}-${version}.jar.md5
       sha1sum ${m2dir}/${artifactId}-${version}.jar > ${m2dir}/${artifactId}-${version}.jar.sha1
     fi
