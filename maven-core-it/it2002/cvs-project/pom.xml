@@ -40,7 +40,7 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:cvs:local:/${project.file.parentFile.parentFile}/target/cvsroot:project</connection>
+    <connection>scm:cvs:ext:${user.name}@localhost:${project.file.parentFile.parentFile}/target/cvsroot:project</connection>
     <tag>p1</tag>
   </scm>
 

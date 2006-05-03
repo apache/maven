@@ -4,8 +4,6 @@ rm -Rf target
 
 mkdir target
 
-cvs -d target/cvsroot init
-
 dir=`readlink -f ${PWD}`
 
 if [ "$1" == "windows" ]; then
@@ -13,18 +11,27 @@ if [ "$1" == "windows" ]; then
   echo setting dir to $dir
 fi
 
-export CVSROOT=$PWD/target/cvsroot
+export CVSROOT=:ext:localhost:$dir/target/cvsroot
 
-cvs import cvs-project -m "import." project ASF INIT
+cvs init
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+
+cd cvs-project
+cvs import -I '.svn' -m "import." project ASF INIT
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+cd ..
 
 cvs co -d target/project.checkout project
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
+(
 cd target/project.checkout
 
 cat pom.xml | sed "s#\${project.file.parentFile.parentFile}#$dir#g" >tmp
 mv tmp pom.xml
 
 cvs ci -m 'update scm' pom.xml
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 rm -Rf target
 
@@ -36,4 +43,4 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 mvn -DreleasePom=release-pom.xml -e release:perform -Denv=test
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-
+)
