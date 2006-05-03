@@ -21,11 +21,12 @@ cvs import -I '.svn' -m "import." project ASF INIT
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 cd ..
 
-cvs co -d target/project.checkout project
+cd target
+cvs co -d project.checkout project
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 (
-cd target/project.checkout
+cd project.checkout
 
 cat pom.xml | sed "s#\${project.file.parentFile.parentFile}#$dir#g" >tmp
 mv tmp pom.xml
