@@ -106,6 +106,9 @@ public final class ModelUtils
                 }
             }
 
+	    // FIXME: not sure what's intended here, but this entire
+	    // loop can be replaced by 'mergedPlugins.addAll( childPlugins.values() );
+	    // since assembledPlugins is never updated and remains empty.
             for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
             {
                 Plugin childPlugin = (Plugin) it.next();
