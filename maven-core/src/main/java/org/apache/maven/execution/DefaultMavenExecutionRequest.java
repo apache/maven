@@ -159,11 +159,19 @@ public class DefaultMavenExecutionRequest
 
     public List getActiveProfiles()
     {
+        if ( activeProfiles == null )
+        {
+            activeProfiles = new ArrayList();
+        }
         return activeProfiles;
     }
 
     public List getInactiveProfiles()
     {
+        if ( inactiveProfiles == null )
+        {
+            inactiveProfiles = new ArrayList();
+        }
         return inactiveProfiles;
     }
 
@@ -285,48 +293,28 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest addActiveProfile( String profile )
     {
-        if ( activeProfiles == null )
-        {
-            activeProfiles = new ArrayList();
-        }
-
-        activeProfiles.add( profile );
+        getActiveProfiles().add( profile );
 
         return this;
     }
 
     public MavenExecutionRequest addInactiveProfile( String profile )
     {
-        if ( inactiveProfiles == null )
-        {
-            inactiveProfiles = new ArrayList();
-        }
-
-        inactiveProfiles.add( profile );
+        getInactiveProfiles().add( profile );
 
         return this;
     }
 
     public MavenExecutionRequest addActiveProfiles( List profiles )
     {
-        if ( activeProfiles == null )
-        {
-            activeProfiles = new ArrayList();
-        }
-
-        activeProfiles.addAll( profiles );
+        getActiveProfiles().addAll( profiles );
 
         return this;
     }
 
     public MavenExecutionRequest addInactiveProfiles( List profiles )
     {
-        if ( inactiveProfiles == null )
-        {
-            inactiveProfiles = new ArrayList();
-        }
-
-        inactiveProfiles.addAll( profiles );
+        getInactiveProfiles().addAll( profiles );
 
         return this;
     }
