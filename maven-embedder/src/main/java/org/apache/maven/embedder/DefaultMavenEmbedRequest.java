@@ -19,16 +19,20 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.settings.Settings;
 
 /**
  * Default implementation of MavenEmbedRequest intefrace.
+ *
  * @author mkleint
  */
-public class DefaultMavenEmbedRequest implements MavenEmbedRequest {
+public class DefaultMavenEmbedRequest
+    implements MavenEmbedRequest
+{
 
     private List inactives;
-    
+
     private List actives;
 
     private Settings settings;
@@ -39,68 +43,85 @@ public class DefaultMavenEmbedRequest implements MavenEmbedRequest {
 
     private ContainerCustomizer customizer;
 
-    /** Creates a new instance of DefaultMavenEmbedRequest */
-    public DefaultMavenEmbedRequest() {
+    /**
+     * Creates a new instance of DefaultMavenEmbedRequest
+     */
+    public DefaultMavenEmbedRequest()
+    {
     }
-   
-    public MavenEmbedRequest addActiveProfile(String profile) {
-        getActiveProfiles().add(profile);
+
+    public MavenEmbedRequest addActiveProfile( String profile )
+    {
+        getActiveProfiles().add( profile );
         return this;
     }
 
-    public MavenEmbedRequest addInactiveProfile(String profile) {
-        getInactiveProfiles().add(profile);
+    public MavenEmbedRequest addInactiveProfile( String profile )
+    {
+        getInactiveProfiles().add( profile );
         return this;
     }
 
-    public MavenEmbedRequest addActiveProfiles(List profiles) {
-        getActiveProfiles().addAll(profiles);
+    public MavenEmbedRequest addActiveProfiles( List profiles )
+    {
+        getActiveProfiles().addAll( profiles );
         return this;
     }
 
-    public MavenEmbedRequest addInactiveProfiles(List profiles) {
-        getInactiveProfiles().addAll(profiles);
+    public MavenEmbedRequest addInactiveProfiles( List profiles )
+    {
+        getInactiveProfiles().addAll( profiles );
         return this;
     }
 
-    public List getActiveProfiles() {
-        if (actives == null) {
+    public List getActiveProfiles()
+    {
+        if ( actives == null )
+        {
             actives = new ArrayList();
         }
         return actives;
     }
 
-    public List getInactiveProfiles() {
-        if (inactives == null) {
+    public List getInactiveProfiles()
+    {
+        if ( inactives == null )
+        {
             inactives = new ArrayList();
         }
         return inactives;
     }
 
-    public MavenEmbedRequest setUserSettingsFile(File user) {
+    public MavenEmbedRequest setUserSettingsFile( File user )
+    {
         userSettings = user;
         return this;
     }
 
-    public MavenEmbedRequest setGlobalSettingsFile(File global) {
+    public MavenEmbedRequest setGlobalSettingsFile( File global )
+    {
         globalSettings = global;
         return this;
     }
 
-    public File getUserSettingsFile() {
+    public File getUserSettingsFile()
+    {
         return userSettings;
     }
 
-    public File getGlobalSettingsFile() {
+    public File getGlobalSettingsFile()
+    {
         return globalSettings;
     }
 
-    public MavenEmbedRequest setConfigurationCustomizer(ContainerCustomizer customizer) {
+    public MavenEmbedRequest setConfigurationCustomizer( ContainerCustomizer customizer )
+    {
         this.customizer = customizer;
         return this;
     }
 
-    public ContainerCustomizer getContainerCustomizer() {
+    public ContainerCustomizer getContainerCustomizer()
+    {
         return customizer;
     }
 

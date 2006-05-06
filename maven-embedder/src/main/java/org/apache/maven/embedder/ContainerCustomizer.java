@@ -14,18 +14,21 @@ package org.apache.maven.embedder;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import org.codehaus.plexus.PlexusContainer;
 
 /**
  * Instances of this interface can be user upon start of the embedder to customize
  * the components in the plexus container.
+ *
  * @author mkleint
  */
-public interface ContainerCustomizer {
+public interface ContainerCustomizer
+{
     /**
      * callback from embedder's start() method that allows to customize the components
      * in the container.
      */
-    void customize(PlexusContainer container);
-    
+    void customize( PlexusContainer container );
+
 }
