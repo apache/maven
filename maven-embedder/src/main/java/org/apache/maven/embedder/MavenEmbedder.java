@@ -151,6 +151,8 @@ public class MavenEmbedder
      * @deprecated not used
      */
     private boolean alignWithUserInstallation;
+    
+    private boolean started = false;
 
     // ----------------------------------------------------------------------
     // Accessors
@@ -254,11 +256,11 @@ public class MavenEmbedder
     }
 
     /**
-     * @deprecated not used.
+     * 
      */
     public File getLocalRepositoryDirectory()
     {
-        return localRepositoryDirectory;
+        return new File(getLocalRepositoryPath(settings));
     }
 
     public ArtifactRepository getLocalRepository()
@@ -284,15 +286,25 @@ public class MavenEmbedder
     // Model
     // ----------------------------------------------------------------------
 
+    /**
+     * read the model.
+     * requires a start()-ed embedder.
+     */
     public Model readModel( File model )
         throws XmlPullParserException, FileNotFoundException, IOException
     {
+        checkStarted();
         return modelReader.read( new FileReader( model ) );
     }
 
+    /**
+     * write the model.
+     * requires a start()-ed embedder.
+     */
     public void writeModel( Writer writer, Model model )
         throws IOException
     {
+        checkStarted();
         modelWriter.write( writer, model );
     }
 
@@ -300,27 +312,35 @@ public class MavenEmbedder
     // Project
     // ----------------------------------------------------------------------
 
+    /**
+     * read the project.
+     * requires a start()-ed embedder.
+     */
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
     {
+        checkStarted();
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
 
     public MavenProject readProjectWithDependencies( File mavenProject, TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
+        checkStarted();
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager, transferListener );
     }
 
     public MavenProject readProjectWithDependencies( File mavenProject )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
+        checkStarted();
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
     }
 
     public List collectProjects( File basedir, String[] includes, String[] excludes )
         throws MojoExecutionException
     {
+        checkStarted();
         List projects = new ArrayList();
 
         List poms = getPomFiles( basedir, includes, excludes );
@@ -351,17 +371,20 @@ public class MavenEmbedder
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
+        checkStarted();
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
     }
 
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
+        checkStarted();
         return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
 
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
+        checkStarted();
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }
 
@@ -415,6 +438,7 @@ public class MavenEmbedder
     public List getLifecyclePhases()
         throws MavenEmbedderException
     {
+        checkStarted();
         List phases = new ArrayList();
 
         ComponentDescriptor descriptor = embedder.getContainer().getComponentDescriptor( LifecycleExecutor.ROLE );
@@ -473,6 +497,7 @@ public class MavenEmbedder
 
     public ArtifactRepository createRepository( String url, String repositoryId )
     {
+        checkStarted();
         // snapshots vs releases
         // offline = to turning the update policy off
 
@@ -606,6 +631,8 @@ public class MavenEmbedder
                                                  null );
 
             profileManager.loadSettingsProfiles( settings );
+    
+            started = true;
             
             localRepository = createLocalRepository( settings );
             
@@ -636,6 +663,7 @@ public class MavenEmbedder
     public void stop()
         throws MavenEmbedderException
     {
+        started = false;
         try
         {
             embedder.release( mavenProjectBuilder );
@@ -657,6 +685,7 @@ public class MavenEmbedder
     public void execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
+        checkStarted();
         maven.execute(  request );
     }
 
@@ -668,6 +697,7 @@ public class MavenEmbedder
                                    Boolean pluginUpdateOverride )
         throws SettingsConfigurationException
     {
+        checkStarted();
         return mavenTools.buildSettings( userSettingsPath,
                                                  globalSettingsPath,
                                                  interactive,
@@ -681,6 +711,7 @@ public class MavenEmbedder
                                    Boolean pluginUpdateOverride )
         throws SettingsConfigurationException
     {
+        checkStarted();
         return mavenTools.buildSettings( userSettingsPath,
                                          globalSettingsPath,
                                          pluginUpdateOverride );
@@ -689,16 +720,25 @@ public class MavenEmbedder
 
     public File getUserSettingsPath( String optionalSettingsPath )
     {
+        checkStarted();
         return mavenTools.getUserSettingsPath( optionalSettingsPath );
     }
 
     public File getGlobalSettingsPath()
     {
+        checkStarted();
         return mavenTools.getGlobalSettingsPath();
     }
 
     public String getLocalRepositoryPath( Settings settings )
     {
+        checkStarted();
         return mavenTools.getLocalRepositoryPath( settings );
+    }
+    
+    private void checkStarted() {
+        if (!started) {
+            throw new IllegalStateException("The embedder is not started, you need to call start() on the embedder prior to calling this method");
+        } 
     }
 }
