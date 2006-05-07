@@ -80,7 +80,7 @@ sub syncSource()
         $repoDirectory = $sourceConfiguration->val( "host", "repoDirectory" );
     }
     
-    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -T -l $rsyncUser\" $address:$directory/ $repoDirectory";
+    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -o BatchMode -T -l $rsyncUser\" $address:$directory/ $repoDirectory";
     
     runRsync( $cmd, $sourceConfiguration );
 
