@@ -332,6 +332,17 @@ public class MavenArchiver
 
         archiver.setDestFile( archiveFile );
 
+        // make the archiver index the jars on the classpath, if we are adding that to the manifest
+        if ( archiveConfiguration.getManifest().isAddClasspath() )
+        {
+            List artifacts = project.getRuntimeClasspathElements();
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+            {
+                File f = new File( (String) iter.next() );
+                archiver.addConfiguredIndexJars(f);
+            }
+        }
+        
         // create archive
         archiver.createArchive();
 

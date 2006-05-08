@@ -17,7 +17,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0-alpha-6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
