@@ -108,7 +108,7 @@ BUNDLE=tmp.jar
   maven2=`cat ${POM} | tr '\n' ' ' | sed -e 's#^.*<modelVersion>##;s#</modelVersion>.*$##'`  
 
   echo
-  if [ ! -z ${maven2} ]
+  if [ ! -z "${maven2}" ]
   then
     echo " ========= MAVEN 2 ========= "
   fi
@@ -150,7 +150,7 @@ BUNDLE=tmp.jar
 
   mkdir -p $REPODIR/${groupId}/poms
   cp -i ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
-  if [ ! -z ${maven2} ]
+  if [ ! -z "${maven2}" ]
   then
     cp -i ${artifactId}-${version}.pom ${m2dir}
     md5sum  ${m2dir}/${artifactId}-${version}.pom > ${m2dir}/${artifactId}-${version}.pom.md5
