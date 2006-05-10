@@ -77,7 +77,7 @@ BUNDLE=tmp.jar
 
     if [ -z $version ]
     then
-      version=`grep currentVersion ${POM} | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+      version=`grep currentVersion ${POM} | sed -e 's#^.*<currentVersion>##;s#</currentVersion>.*$##'`
     fi
   fi
 
