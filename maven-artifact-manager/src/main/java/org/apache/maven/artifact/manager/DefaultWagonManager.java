@@ -253,6 +253,11 @@ public class DefaultWagonManager
                 getLogger().warn(
                     "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
             }
+            catch ( TransferFailedException e )
+            {
+                getLogger().warn(
+                    "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
+            }
         }
 
         if ( !successful )
