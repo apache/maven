@@ -11,9 +11,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,7 +44,7 @@ public class DefaultProfileManager
 
     private List defaultIds = new ArrayList();
 
-    private Map profilesById = new HashMap();
+    private Map profilesById = new LinkedHashMap();
 
     public DefaultProfileManager( PlexusContainer container )
     {
