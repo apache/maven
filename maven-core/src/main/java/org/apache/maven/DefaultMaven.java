@@ -118,7 +118,10 @@ public class DefaultMaven
     public void execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
+        if ( request.getLocalRepository() == null )
+        {
+            request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
+        }
 
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
 
