@@ -103,10 +103,10 @@ public class DefaultMaven
     public void execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        if ( request.getLocalRepository() == null )
-        {
-            request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
-        }
+//        if ( request.getLocalRepository() == null )
+//        {
+//            request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
+//        }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
 
