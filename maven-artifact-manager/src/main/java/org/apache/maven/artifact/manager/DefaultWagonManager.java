@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.manager;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ public class DefaultWagonManager
 
     private Map mirrors = new HashMap();
     
+    /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map serverConfigurationMap = new HashMap();
 
     private TransferListener downloadMonitor;
@@ -83,6 +84,23 @@ public class DefaultWagonManager
     private ArtifactRepositoryFactory repositoryFactory;
 
     private boolean interactive = true;
+
+    public Wagon getWagon( Repository repository )
+        throws UnsupportedProtocolException, WagonConfigurationException
+    {
+        String protocol = repository.getProtocol();
+
+        if ( protocol == null )
+        {
+            throw new UnsupportedProtocolException( "The repository " + repository + " does not specify a protocol" );
+        }
+
+        Wagon wagon = getWagon( protocol );
+
+        configureWagon( wagon, repository.getId() );
+
+        return wagon;
+    }
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
@@ -715,9 +733,12 @@ public class DefaultWagonManager
     private void configureWagon( Wagon wagon, ArtifactRepository repository )
         throws WagonConfigurationException
     {
+       configureWagon( wagon, repository.getId() );
+    }
 
-        final String repositoryId = repository.getId();
-
+    private void configureWagon( Wagon wagon, String repositoryId )
+        throws WagonConfigurationException
+    {
         if ( serverConfigurationMap.containsKey( repositoryId ) )
         {
             ComponentConfigurator componentConfigurator = null;
@@ -752,11 +773,9 @@ public class DefaultWagonManager
             }
         }
     }
-    
 
     public void addConfiguration( String repositoryId, Xpp3Dom configuration )
     {
-
         if ( repositoryId == null || configuration == null )
         {
             throw new IllegalArgumentException( "arguments can't be null" );
@@ -766,4 +785,5 @@ public class DefaultWagonManager
 
         serverConfigurationMap.put( repositoryId, xmlConf );
     }
+
 }

@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.manager;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -39,8 +40,30 @@ public interface WagonManager
 {
     String ROLE = WagonManager.class.getName();
 
+    /**
+     * Get a Wagon provider that understands the protocol passed as argument.
+     * It doesn't configure the Wagon.
+     * 
+     * @deprecated prone to errors. use {@link #getWagon(Repository)} instead.
+     * 
+     * @param protocol the protocol the {@link Wagon} will handle
+     * @return the {@link Wagon} instance able to handle the protocol provided
+     * @throws UnsupportedProtocolException if there is no provider able to handle the protocol
+     */
     Wagon getWagon( String protocol )
         throws UnsupportedProtocolException;
+
+    /**
+     * Get a Wagon provider for the provided repository.
+     * It will configure the Wagon for that repository.
+     * 
+     * @param repository the repository
+     * @return the {@link Wagon} instance that can be used to connect to the repository
+     * @throws UnsupportedProtocolException if there is no provider able to handle the protocol
+     * @throws WagonConfigurationException if the wagon can't be configured for the repository
+     */
+    Wagon getWagon( Repository repository )
+        throws UnsupportedProtocolException, WagonConfigurationException;
 
     void getArtifact( Artifact artifact, List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;
@@ -77,7 +100,13 @@ public interface WagonManager
 
     AuthenticationInfo getAuthenticationInfo( String id );
 
+    /**
+     * Set the configuration for a repository 
+     * 
+     * @param repositoryId id of the repository to set the configuration to
+     * @param configuration dom tree of the xml with the configuration for the {@link Wagon} 
+     */
     void addConfiguration( String repositoryId, Xpp3Dom configuration );
-    
+
     void setInteractive( boolean interactive );
 }
