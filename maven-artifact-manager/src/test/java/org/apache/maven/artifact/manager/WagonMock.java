@@ -16,18 +16,33 @@ package org.apache.maven.artifact.manager;
  * limitations under the License.
  */
 
+import org.apache.maven.wagon.providers.file.FileWagon;
+
 /**
- * Wagon for testing, for protocol <code>c</code>
+ * Mock of a Wagon for testing
  * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class WagonC
-    extends WagonMock
+public class WagonMock
+    extends FileWagon
 {
-    public String[] getSupportedProtocols()
+
+    /**
+     * A field that can be configured in the Wagon
+     *
+     * @component.configuration default="configurableField"
+     */
+    private String configurableField = null;
+
+    public void setConfigurableField( String configurableField )
     {
-        return new String[]{ "c" };
+        this.configurableField = configurableField;
     }
+
+    public String getConfigurableField()
+    {
+        return configurableField;
+    }
+
 }
