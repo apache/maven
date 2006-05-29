@@ -318,8 +318,10 @@ public class OnlineArtifactDownloader
             // TODO: use super POM?
             remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT, false, true ) );
             // TODO: use maven root POM?
+/*
             remoteRepositories.add( new Repository( "snapshots", "http://snapshots.maven.codehaus.org/maven2/",
                                                     Repository.LAYOUT_DEFAULT, true, false ) );
+*/
         }
 
         return remoteRepositories;

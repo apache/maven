@@ -4,13 +4,6 @@
   <artifactId>maven-core-it0045</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>snapshots</id>
-      <name>Maven Central Plugins Development Repository</name>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
-    </pluginRepository>
-  </pluginRepositories>
   <modules>
     <module>subproject</module>
   </modules>

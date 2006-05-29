@@ -19,15 +19,6 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>snapshots</id>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
-    </repository>
-  </repositories>
-
   <distributionManagement>
     <repository>
       <id>test</id>
