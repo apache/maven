@@ -94,7 +94,7 @@ public class OnlineArtifactDownloader
                     directory.mkdirs();
                 }
 
-                if ( !getRemoteArtifact( dep, destinationFile ) )
+                if ( !getRemoteArtifact( dep, destinationFile ) && !destinationFile.exists() )
                 {
                     throw new DownloadFailedException( "Failed to download " + dep );
                 }
@@ -318,10 +318,8 @@ public class OnlineArtifactDownloader
             // TODO: use super POM?
             remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT, false, true ) );
             // TODO: use maven root POM?
-/*
-            remoteRepositories.add( new Repository( "snapshots", "http://snapshots.maven.codehaus.org/maven2/",
+            remoteRepositories.add( new Repository( "apache.snapshots", "http://cvs.apache.org/maven-snapshot-repository/",
                                                     Repository.LAYOUT_DEFAULT, true, false ) );
-*/
         }
 
         return remoteRepositories;
