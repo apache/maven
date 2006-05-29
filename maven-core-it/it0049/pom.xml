@@ -9,7 +9,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-core-it-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
 
         <configuration>
           <pluginFile>touchFile.txt</pluginFile>
@@ -18,11 +18,4 @@
     </plugins>
   </build>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>snapshots</id>
-      <name>Plugin Snapshots</name>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

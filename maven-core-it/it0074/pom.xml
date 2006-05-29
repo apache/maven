@@ -5,16 +5,6 @@
   <artifactId>maven-core-it0074</artifactId>
   <version>1.0</version>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>snapshots</id>
-      <url>http://snapshots.maven.codehaus.org/maven2</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <dependencies>
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
