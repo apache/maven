@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dest=/home/projects/maven/repository-staging/to-ibiblio
+dest=/home/maven/repository-staging/to-ibiblio
 
 # NO MORE m1 SYNC
 
