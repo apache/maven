@@ -335,6 +335,11 @@ public class PluginDescriptorGenerator
                         element( w, "deprecated", parameter.getDeprecated() );
                     }
 
+                    if ( parameter.getImplementation() != null )
+                    {
+                        element( w, "implementation", parameter.getImplementation() );
+                    }
+
                     element( w, "required", Boolean.toString( parameter.isRequired() ) );
 
                     element( w, "editable", Boolean.toString( parameter.isEditable() ) );

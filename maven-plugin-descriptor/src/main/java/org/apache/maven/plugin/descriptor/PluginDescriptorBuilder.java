@@ -250,6 +250,8 @@ public class PluginDescriptorBuilder
 
             parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
 
+            parameter.setImplementation( d.getChild( "implementation" ).getValue() );
+
             parameters.add( parameter );
         }
 

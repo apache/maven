@@ -1,3 +1,11 @@
+Notes:
+- today, 3 sets of integration tests, categorized by their ids (it0xxx, it1xxx, it2xxx). 
+  see below for what these groups represent
+- creating a new test:
+ - you can add mojos to the integration-tests plugins/maven-core-it-plugin
+ - add log.txt and target to your it test svn ignore list
+
+Details:
 -------------------------------------------------------------------------------
 it0000: The simplest of builds. We have one application class and one test
         class. There are no resources, no source generation, no resource
@@ -285,6 +293,8 @@ it0104: Verify that plugin configurations are resolved correctly, particularly
         when they contain ${project.build.directory} in the string value of a 
         Map.Entry.
 
+it0107: Verify that default implementation of an implementation for a complex object works as 
+        expected [MNG-2293]
 -------------------------------------------------------------------------------
 
 - generated sources
