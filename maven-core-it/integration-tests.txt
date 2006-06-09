@@ -1,4 +1,6 @@
 it0107
+#it0106 MNG-2318 not yet fixed
+it0105
 #it0104 Commenting out, not fixed until post-2.0.4, due to dependency on new plexus-container-default version.
 it0103
 it0102

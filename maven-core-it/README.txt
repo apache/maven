@@ -293,6 +293,10 @@ it0104: Verify that plugin configurations are resolved correctly, particularly
         when they contain ${project.build.directory} in the string value of a 
         Map.Entry.
 
+it0105: MRESOURCES-18
+
+it0106: When a project has modules and its parent is not preinstalled [MNG-2318]
+
 it0107: Verify that default implementation of an implementation for a complex object works as 
         expected [MNG-2293]
 -------------------------------------------------------------------------------
