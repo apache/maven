@@ -2,8 +2,8 @@
 
 GROUPID=$1
 
-basesrc=/home/projects/maven/repository-staging/pom-svn-repository
-basedest=/home/projects/maven/repository-staging/to-ibiblio/maven2
+basesrc=$HOME/maven/repository-staging/pom-svn-repository
+basedest=$HOME/maven/repository-staging/to-ibiblio/maven2
 
 
 if [ ! -z $GROUPID ]

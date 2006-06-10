@@ -9,7 +9,7 @@ if [ ! -z "$RUNNING" ]; then
 fi
 
 
-TOOLS_BASE=/home/projects/maven/repository-tools
+TOOLS_BASE=$HOME/maven/repository-tools
 (
   cd $TOOLS_BASE/syncopate
   ./sync
@@ -26,7 +26,7 @@ retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
 
 # hack prevent commons-logging-1.1-dev
-CL=/home/projects/maven/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging
+CL=$HOME/maven/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging
 rm -rf $CL/1.1-dev
 grep -v 1.1-dev $CL/maven-metadata.xml > $CL/maven-metadata.xml.tmp
 mv $CL/maven-metadata.xml.tmp $CL/maven-metadata.xml

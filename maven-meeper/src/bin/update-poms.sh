@@ -1,7 +1,7 @@
 #!/bin/sh
 
-src=/home/projects/maven/repository-staging/pom-svn-repository
-dest=/home/projects/maven/repository-staging/to-ibiblio/maven2
+src=$HOME/maven/repository-staging/pom-svn-repository
+dest=$HOME/maven/repository-staging/to-ibiblio/maven2
 
 /usr/local/subversion/bin/svn update $src
 
