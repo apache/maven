@@ -3,7 +3,7 @@
 set -x
 
 svnlook=/usr/local/subversion/bin/svnlook 
-repos=$HOME/maven/repository-staging/to-ibiblio/maven2
+repos=$HOME/repository-staging/to-ibiblio/maven2
 
 # TODO: handle deletions
 $svnlook changed -r $2 $1 | egrep '\.pom$' | while read t1 t2
