@@ -31,7 +31,7 @@ public class FilterTest
     public void testSystemPropertyInterpolation()
         throws IOException
     {
-        assertEquals( "System property", System.getProperty( "user.home" ), properties.getProperty( "systemProperty" ) );
+        assertEquals( "System property", System.getProperty( "java.version" ), properties.getProperty( "systemProperty" ) );
     }    
 
     public void testParameterInterpolation()
