@@ -736,7 +736,10 @@ public class Verifier
     private String resolveCommandLineArg( String key )
     {
         String result = key.replaceAll( "\\$\\{basedir\\}", basedir );
-        result = result.replaceAll( "\\\\", "\\" );
+        if ( result.indexOf( "\\\\" ) >= 0 )
+        {
+            result = result.replaceAll( "\\\\", "\\" );
+        }
         result = result.replaceAll( "\\/\\/", "\\/" );
 
         return result;
