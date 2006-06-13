@@ -289,6 +289,11 @@ public class DefaultPluginManager
         // circle around and set the artifacts and class realm
         PluginDescriptor addedPlugin = pluginCollector.getPluginDescriptor( plugin );
 
+        if ( addedPlugin == null )
+        {
+            throw new IllegalStateException( "The PluginDescriptor for the plugin " + plugin + " was not found." );
+        }
+
         addedPlugin.setClassRealm( child.getContainerRealm() );
 
         // we're only setting the plugin's artifact itself as the artifact list, to allow it to be retrieved

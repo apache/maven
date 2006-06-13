@@ -70,17 +70,12 @@ public abstract class AbstractMavenProjectTestCase
 
         URL resourceUrl = cloader.getResource( resource );
 
-        File resourceFile = null;
-        if ( resourceUrl != null )
-        {
-            resourceFile = new File( resourceUrl.getPath() );
-        }
-        else
+        if ( resourceUrl == null )
         {
             throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
-        return resourceFile;
+        return new File( resourceUrl.getPath() );
     }
 
     protected ArtifactRepository getLocalRepository()
