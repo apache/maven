@@ -81,7 +81,6 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>maven-archiver</module>
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
     <module>maven-artifact-test</module>
