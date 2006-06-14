@@ -237,5 +237,17 @@ public class DefaultArtifactVersionTest
 
         version = new DefaultArtifactVersion( "2.0-1" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "2.0.1-klm" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1-lmn" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "2.0.1-xyz" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "2.0.1" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1-123" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "2.0.1-xyz" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1-123" ) ) < 0 );
     }
 }
