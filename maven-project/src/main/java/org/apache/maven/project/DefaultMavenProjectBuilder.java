@@ -241,6 +241,14 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
+        ProfileManager profileManager = new DefaultProfileManager( container );
+        return buildStandaloneSuperProject( localRepository, profileManager );
+    }
+    
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager ) 
+        throws ProjectBuildingException
+    {
         Model superModel = getSuperModel();
 
         superModel.setGroupId( STANDALONE_SUPERPOM_GROUPID );
@@ -249,7 +257,6 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
-        ProfileManager profileManager = new DefaultProfileManager( container );
 
         List activeProfiles;
 
@@ -606,7 +613,15 @@ public class DefaultMavenProjectBuilder
 
         Model superModel = getSuperModel();
 
-        ProfileManager superProjectProfileManager = new DefaultProfileManager( container );
+        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
+        // shall the ProfileManager intefrace expose the properties?
+        
+        ProfileManager superProjectProfileManager;
+        if (externalProfileManager instanceof DefaultProfileManager) {
+            superProjectProfileManager = new DefaultProfileManager( container, ((DefaultProfileManager) externalProfileManager).getSystemProperties() );
+        } else {
+            superProjectProfileManager = new DefaultProfileManager( container );
+        }
 
         List activeProfiles;
 
@@ -965,7 +980,13 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        ProfileManager profileManager = new DefaultProfileManager( container );
+        //TODO mkleint - use the (Container, Properties constructor to make system properties embeddable
+        ProfileManager profileManager;
+        if (externalProfileManager != null && externalProfileManager instanceof DefaultProfileManager ) {
+            profileManager = new DefaultProfileManager( container, ((DefaultProfileManager)externalProfileManager).getSystemProperties() );
+        } else {
+            profileManager = new DefaultProfileManager( container );
+        }
 
         if ( externalProfileManager != null )
         {

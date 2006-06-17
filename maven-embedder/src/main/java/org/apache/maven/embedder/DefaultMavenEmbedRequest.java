@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.settings.Settings;
 
@@ -42,6 +43,8 @@ public class DefaultMavenEmbedRequest
     private File globalSettings;
 
     private ContainerCustomizer customizer;
+
+    private Properties systemProperties;
 
     /**
      * Creates a new instance of DefaultMavenEmbedRequest
@@ -123,6 +126,17 @@ public class DefaultMavenEmbedRequest
     public ContainerCustomizer getContainerCustomizer()
     {
         return customizer;
+    }
+
+    public MavenEmbedRequest setSystemProperties(Properties properties) 
+    {
+        systemProperties = properties;
+        return this;
+    }
+
+    public Properties getSystemProperties() 
+    {
+        return systemProperties != null ? systemProperties : System.getProperties();
     }
 
 }

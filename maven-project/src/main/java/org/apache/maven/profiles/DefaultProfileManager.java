@@ -1,5 +1,6 @@
 package org.apache.maven.profiles;
 
+import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -45,17 +46,42 @@ public class DefaultProfileManager
     private List defaultIds = new ArrayList();
 
     private Map profilesById = new LinkedHashMap();
+    
+    // default fallback..
+    private Properties systemProperties = System.getProperties();
 
+    /**
+     * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work correctly
+     * in embedded envirnments.
+     */
     public DefaultProfileManager( PlexusContainer container )
     {
-        this( container, null );
+        this( container, (Settings)null);
+    }
+    
+    /**
+     * the properties passed to the profile manager are the props that
+     * are passed to maven, possibly containing profile activator properties
+     *
+     */
+    public DefaultProfileManager( PlexusContainer container, Properties props )
+    {
+        this( container, (Settings)null );
+        if (props != null) {
+            systemProperties = props;
+        }
+        
     }
 
-    public DefaultProfileManager( PlexusContainer container, Settings settings )
+    private DefaultProfileManager( PlexusContainer container, Settings settings )
     {
         this.container = container;
 
         loadSettingsProfiles( settings );
+    }
+    
+    public Properties getSystemProperties() {
+        return systemProperties;
     }
 
     public Map getProfilesById()
@@ -202,6 +228,7 @@ public class DefaultProfileManager
         throws ProfileActivationException
     {
         List activators = null;
+        container.addContextValue("SystemProperties", systemProperties);
         try
         {
             activators = container.lookupList( ProfileActivator.ROLE );
@@ -224,13 +251,17 @@ public class DefaultProfileManager
         }
         finally
         {
-            try
+            container.getContext().put("SystemProperties", null);
+            if ( activators != null )
             {
-                container.releaseAll( activators );
-            }
-            catch ( ComponentLifecycleException e )
-            {
-                container.getLogger().debug( "Error releasing profile activators - ignoring.", e );
+                try
+                {
+                    container.releaseAll( activators );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    container.getLogger().debug( "Error releasing profile activators - ignoring.", e );
+                }
             }
         }
     }

@@ -602,7 +602,7 @@ public class MavenEmbedder
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
-            profileManager = new DefaultProfileManager( embedder.getContainer() );
+            profileManager = new DefaultProfileManager( embedder.getContainer(), req.getSystemProperties() );
             
             profileManager.explicitlyActivate(req.getActiveProfiles());
             

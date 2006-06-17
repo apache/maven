@@ -306,7 +306,7 @@ public class DefaultMaven
             throw new MavenExecutionException( "Unable to configure Maven for execution", e );
         }
 
-        ProfileManager globalProfileManager = new DefaultProfileManager( container );
+        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
 
         globalProfileManager.loadSettingsProfiles( request.getSettings() );
 
@@ -372,7 +372,8 @@ public class DefaultMaven
         MavenProject superProject;
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
+            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), 
+                                                   new DefaultProfileManager( container, request.getProperties()) );
 
         }
         catch ( ProjectBuildingException e )

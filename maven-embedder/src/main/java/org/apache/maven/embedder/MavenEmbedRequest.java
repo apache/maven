@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -60,6 +61,11 @@ public interface MavenEmbedRequest {
      */
     MavenEmbedRequest setConfigurationCustomizer(ContainerCustomizer customizer);
     
+    /**
+     * set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used.
+     */
+    MavenEmbedRequest setSystemProperties( Properties properties );
+    
     List getActiveProfiles();
 
     List getInactiveProfiles();
@@ -69,5 +75,8 @@ public interface MavenEmbedRequest {
     File getGlobalSettingsFile();
     
     ContainerCustomizer getContainerCustomizer();
+    
+    Properties getSystemProperties();
+    
     
 }
