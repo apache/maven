@@ -112,8 +112,6 @@ public class DefaultMavenSettingsBuilder
 
                 settings = modelReader.read( sReader );
 
-                System.out.println( "settings.getPluginGroups().size() = " + settings.getPluginGroups().size() );
-
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 
                 rtInfo.setFile( settingsFile );
