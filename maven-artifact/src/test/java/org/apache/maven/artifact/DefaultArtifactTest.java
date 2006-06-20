@@ -18,7 +18,7 @@ package org.apache.maven.artifact;
 
 import junit.framework.TestCase;
 
-import org.apache.maven.artifact.handler.MockArtifactHandler;
+import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 public class DefaultArtifactTest
@@ -32,13 +32,13 @@ public class DefaultArtifactTest
 
     private VersionRange versionRange;
 
-    private MockArtifactHandler artifactHandler;
+    private ArtifactHandlerMock artifactHandler;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        artifactHandler = new MockArtifactHandler();
+        artifactHandler = new ArtifactHandlerMock();
         versionRange = VersionRange.createFromVersion( version );
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler );
     }
