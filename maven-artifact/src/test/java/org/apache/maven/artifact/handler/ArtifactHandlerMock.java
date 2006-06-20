@@ -16,7 +16,7 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-public class MockArtifactHandler
+public class ArtifactHandlerMock
     implements ArtifactHandler
 {
 
