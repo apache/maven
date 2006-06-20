@@ -1,3 +1,44 @@
+Notes:
+- today, 3 sets of integration tests, categorized by their ids (it0xxx, it1xxx, it2xxx). 
+  see below for what these groups represent
+- creating a new test:
+ - you can add mojos to the integration-tests plugins/maven-core-it-plugin
+ - add log.txt and target to your it test svn ignore list
+
+
+Format of tests:
+-------------------------------------------------------------------------------
+
+Any Maven project plus the following optional files
+
+- goals.txt goals to run
+
+- expected-results.txt path of files expected after build, use "!" as first char to mark it as not expected
+
+Examples:
+target/maven-core-it0003-1.0.jar
+${artifact:org.apache.maven:maven-core-it0003:1.0:jar}
+!target/maven-core-it0016-1.0/WEB-INF/lib/servletapi-2.4-20040521.jar
+target/maven-core-it0057-1.0.jar!/it0001.properties
+
+This means that
+we expect target/maven-core-it0003-1.0.jar
+we expect an artifact in the local repo under org.apache.maven groupId, maven-core-it0003 artifactId, 1.0 version and type jar
+we don't expect target/maven-core-it0016-1.0/WEB-INF/lib/servletapi-2.4-20040521.jar
+we don't expect it0001.properties inside target/maven-core-it0057-1.0.jar
+
+
+- prebuild-hook.txt comands to run before the invocation of mvn
+
+Examples:
+rm ${artifact:org.apache.maven.plugins:maven-core-it-plugin:1.0:maven-plugin}
+rmdir ${basedir}/test project
+
+- cli-options.txt options used in mvn command line
+
+
+
+Details:
 -------------------------------------------------------------------------------
 it0000: The simplest of builds. We have one application class and one test
         class. There are no resources, no source generation, no resource
