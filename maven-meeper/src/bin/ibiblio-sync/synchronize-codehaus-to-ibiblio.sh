@@ -2,6 +2,12 @@
 
 dest=/home/maven/repository-staging/to-ibiblio
 
+rsync -e ssh --delete --max-delete=10 -v -riplt $dest/maven2/ login.ibiblio.org:/public/html/maven2
+
+date > $dest/maven2/last-sync.txt
+chmod a+r $dest/maven2/last-sync.txt
+
+
 # NO MORE m1 SYNC
 
 #date > $dest/maven/last-sync.txt
@@ -19,7 +25,3 @@ rsync -e ssh --delete --max-delete=10 -v -riplt $dest/maven/ login.ibiblio.org:/
     #rsync -e ssh --delete --max-delete=10 -v -riplt $i login.ibiblio.org:/public/html/maven/$i
   #done
 #)
-
-date > $dest/maven2/last-sync.txt
-chmod a+r $dest/maven2/last-sync.txt
-rsync -e ssh --delete --max-delete=10 -v -riplt $dest/maven2/ login.ibiblio.org:/public/html/maven2
