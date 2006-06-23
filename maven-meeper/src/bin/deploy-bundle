@@ -105,7 +105,7 @@ BUNDLE=tmp.jar
   groupId=`echo ${groupId} | sed -e 's/ *$//'`  
   groupDir=`echo ${groupId} | sed -e 's/\./\//g'`  
 
-  maven2=`cat ${POM} | tr '\n' ' ' | sed -e 's#^.*<modelVersion>##;s#</modelVersion>.*$##'`  
+  maven2=`cat ${POM} | grep '<modelVersion>'`
 
   echo
   if [ ! -z "${maven2}" ]
