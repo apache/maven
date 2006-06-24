@@ -9,7 +9,7 @@ if [ ! -z "$RUNNING" ]; then
 fi
 
 
-TOOLS_BASE=$HOME/repository-tools
+TOOLS_BASE=$HOME/components/maven-meeper/src/bin
 (
   cd $TOOLS_BASE/syncopate
   ./sync
@@ -18,8 +18,7 @@ TOOLS_BASE=$HOME/repository-tools
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
 (
-  cd $TOOLS_BASE/repoclean
-  ./repoclean.sh synchronize.properties
+  $TOOLS_BASE/repoclean/sync-repoclean.sh
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
