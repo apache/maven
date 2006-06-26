@@ -62,6 +62,8 @@ public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager, Contextualizable
 {
+    private static final String WILDCARD = "*"; 
+
     private PlexusContainer container;
 
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
@@ -617,7 +619,12 @@ public class DefaultWagonManager
 
     public ArtifactRepository getMirror( String mirrorOf )
     {
-        return (ArtifactRepository) mirrors.get( mirrorOf );
+        ArtifactRepository repository = (ArtifactRepository) mirrors.get( mirrorOf );
+        if ( repository == null )
+        {
+            repository = (ArtifactRepository) mirrors.get( WILDCARD );
+        }
+        return repository;
     }
 
     /**
