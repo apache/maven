@@ -7,6 +7,6 @@ cd $dest/maven-java.net
 
 cvs update -P
 
-$repocleanhome/repoclean.sh ~/components/src/bin/repoclean/java.net/synchronize.properties
+$repocleanhome/repoclean.sh ~/components/maven-meeper/src/bin/repoclean/java.net/synchronize.properties
 
 rsync --ignore-existing -ripl $dest/maven2-repoclean-java.net/ $dest/maven2/
