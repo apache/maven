@@ -19,4 +19,10 @@
       </plugin>
     </plugins>
   </build>
+  <pluginsRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>http://people.apache.org/maven-snapshot-repository</url>
+    </pluginRepository>
+  </pluginsRepositories>
 </model>
