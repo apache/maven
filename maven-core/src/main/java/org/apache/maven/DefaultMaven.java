@@ -708,13 +708,6 @@ public class DefaultMaven
         logDiagnostics( e );
 
         logTrace( e, showErrors );
-
-        if ( !showErrors )
-        {
-            getLogger().info( "For more information, run Maven with the -e switch" );
-
-            line();
-        }
     }
 
     private void logTrace( Throwable t, boolean showErrors )
