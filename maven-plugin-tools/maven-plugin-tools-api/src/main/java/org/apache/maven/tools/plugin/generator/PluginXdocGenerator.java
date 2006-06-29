@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -271,12 +272,6 @@ public class PluginXdocGenerator
 
         w.endElement(); // p
 
-        w.startElement( "p" );
-
-        w.writeText( "Parameters for the goal: " );
-
-        w.endElement(); // p
-
         writeGoalParameterTable( mojoDescriptor, w );
 
         w.endElement(); // section
@@ -288,214 +283,167 @@ public class PluginXdocGenerator
 
     private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
-        w.startElement( "table" );
+        List parameterList = mojoDescriptor.getParameters();
 
-        w.startElement( "tr" );
+        //remove components and read-only parameters
+        List list = filterParameters( parameterList );
 
-        w.startElement( "th" );
-
-        w.writeText( "Parameter" );
-
-        w.endElement(); // th
-
-        w.startElement( "th" );
-
-        w.writeText( "Type" );
-
-        w.endElement(); // th
-
-        w.startElement( "th" );
-
-        w.writeText( "Expression" );
-
-        w.endElement(); // th
-
-        w.startElement( "th" );
-
-        w.writeText( "Default Value" );
-
-        w.endElement(); // th
-
-        w.startElement( "th" );
-
-        w.writeText( "Since" );
-
-        w.endElement(); // th
-
-        w.startElement( "th" );
-
-        w.writeText( "Description" );
-
-        w.endElement(); // th
-
-        w.endElement(); // tr
-
-        List parameters = mojoDescriptor.getParameters();
-
-        if ( parameters != null )
+        if ( list != null )
         {
-            for ( int i = 0; i < parameters.size(); i++ )
+            writeParameterSummary( list, w );
+
+            writeParameterDetails( list, w );
+        }
+    }
+
+    private List filterParameters( List parameterList )
+    {
+        List filtered = new ArrayList();
+
+        for ( Iterator parameters = parameterList.iterator(); parameters.hasNext(); )
+        {
+            Parameter parameter = (Parameter) parameters.next();
+
+            if ( parameter.isEditable() )
             {
-                Parameter parameter = (Parameter) parameters.get( i );
+                String expression = parameter.getExpression();
 
-                w.startElement( "tr" );
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                String paramName = parameter.getAlias();
-
-                if ( StringUtils.isEmpty( paramName ) )
+                if ( expression != null && !expression.startsWith( "${component." ) )
                 {
-                    paramName = parameter.getName();
+                    filtered.add( parameter );
                 }
-
-                w.startElement( "code" );
-
-                w.writeText( paramName );
-
-                w.endElement(); // code
-
-                if ( !parameter.isRequired() )
-                {
-                    w.writeMarkup( " <i>(Optional)</i>" );
-                }
-
-                if ( parameter.getExpression() != null && parameter.getExpression().startsWith( "${component." ) )
-                {
-                    w.writeMarkup( " <i>(Discovered)</i>" );
-                }
-                else if ( parameter.getRequirement() != null )
-                {
-                    w.writeMarkup( " <i>(Discovered)</i>" );
-                }
-
-                w.endElement(); // td
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                w.startElement( "code" );
-
-                w.addAttribute( "title", parameter.getType() );
-
-                int index = parameter.getType().lastIndexOf( "." );
-                if ( index >= 0 )
-                {
-                    w.writeText( parameter.getType().substring( index + 1 ) );
-                }
-                else
-                {
-                    w.writeText( parameter.getType() );
-                }
-
-                w.endElement(); // code
-
-                w.endElement(); // td
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                w.startElement( "code" );
-
-                if ( StringUtils.isNotEmpty( parameter.getExpression() ) &&
-                    !parameter.getExpression().startsWith( "${component." ) )
-                {
-                    w.writeText( parameter.getExpression() );
-                }
-                else
-                {
-                    w.writeText( "-" );
-                }
-
-                w.endElement(); // code
-
-                w.endElement(); // td
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                w.startElement( "code" );
-
-                if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
-                {
-                    w.writeText( parameter.getDefaultValue() );
-                }
-                else
-                {
-                    w.writeText( "-" );
-                }
-
-                w.endElement(); // code
-
-                w.endElement(); // td
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                w.startElement( "code" );
-
-                String since = parameter.getSince();
-                if ( StringUtils.isNotEmpty( since ) )
-                {
-                    w.writeText( since );
-                }
-                else
-                {
-                    w.writeText( "-" );
-                }
-
-                w.endElement(); // code
-
-                w.endElement(); // td
-
-                // ----------------------------------------------------------------------
-                //
-                // ----------------------------------------------------------------------
-
-                w.startElement( "td" );
-
-                if ( StringUtils.isNotEmpty( parameter.getDescription() ) )
-                {
-                    w.writeMarkup( parameter.getDescription() );
-                }
-                else
-                {
-                    w.writeText( "No description." );
-                }
-
-                String deprecationWarning = parameter.getDeprecated();
-                if ( deprecationWarning != null )
-                {
-                    w.writeMarkup( "<br/><b>Deprecated:</b> " );
-                    w.writeMarkup( deprecationWarning );
-                    if ( deprecationWarning.length() == 0 )
-                    {
-                        w.writeText( "No reason given." );
-                    }
-                }
-
-                w.endElement(); // td
-
-                w.endElement(); // tr
             }
         }
 
-        w.endElement(); // table
+        return filtered;
+    }
+
+    private void writeParameterDetails( List parameterList, XMLWriter w )
+    {
+        w.startElement( "section" );
+        w.addAttribute( "name", "Parameter Details" );
+
+        for( Iterator parameters = parameterList.iterator(); parameters.hasNext(); )
+        {
+            Parameter parameter = (Parameter) parameters.next();
+
+            w.writeMarkup( "<p><b><a name=\"" + parameter.getName() + "\">" + parameter.getName() + "</a></b></p>" );
+            w.writeMarkup( "<p/>" );
+
+            String description = parameter.getDescription();
+            if ( StringUtils.isEmpty( description ) )
+            {
+                description = "No Description.";
+            }
+            w.writeMarkup( "<p>" + description + "</p>" );
+
+            w.startElement( "ul" );
+
+            writeDetail( "Type", parameter.getType(), w );
+
+            writeDetail( "Since", parameter.getSince(), w );
+
+            if ( parameter.isRequired() )
+            {
+                writeDetail( "Required", "Yes", w );
+            }
+            else
+            {
+                writeDetail( "Required", "No", w );
+            }
+
+            writeDetail( "Expression", parameter.getExpression(), w );
+
+            writeDetail( "Default", parameter.getDefaultValue(), w );
+
+            w.endElement();//ul
+
+            w.writeMarkup( "<hr/>" );
+        }
+
+        w.endElement();
+    }
+
+    private void writeDetail( String param, String value, XMLWriter w )
+    {
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li><b>" + param + "</b>: <code>" + value + "</code></li>" );
+        }
+    }
+
+    private void writeParameterSummary( List parameterList, XMLWriter w )
+    {
+        List requiredParams = getParametersByRequired( true, parameterList );
+        List optionalParams = getParametersByRequired( false, parameterList );
+
+        writeParameterList( "Required Parameters", requiredParams, w );
+        writeParameterList( "Optional Parameters", optionalParams, w );
+    }
+
+    private void writeParameterList( String title, List parameterList, XMLWriter w )
+    {
+        w.startElement( "section" );
+        w.addAttribute( "name", title );
+
+        w.startElement( "table" );
+
+        w.startElement( "tr" );
+        w.startElement( "th" );
+        w.writeText( "Name" );
+        w.endElement();//th
+        w.startElement( "th" );
+        w.writeText( "Type" );
+        w.endElement();//th
+        w.startElement( "th" );
+        w.writeText( "Description" );
+        w.endElement();//th
+        w.endElement();//tr
+
+        for( Iterator parameters = parameterList.iterator(); parameters.hasNext(); )
+        {
+            Parameter parameter = (Parameter) parameters.next();
+
+            w.startElement( "tr" );
+            w.startElement( "td" );
+            w.writeMarkup( "<b><a href=\"#" + parameter.getName() + "\">" + parameter.getName() + "</a></b>");
+            w.endElement();//td
+            w.startElement( "td" );
+            int index = parameter.getType().lastIndexOf( "." );
+            w.writeMarkup( "<code>" + parameter.getType().substring( index + 1 ) + "</code>" );
+            w.endElement();//td
+            w.startElement( "td" );
+            String description = parameter.getDescription();
+            if ( StringUtils.isEmpty( description ) )
+            {
+                w.writeText( "No description." );
+            }
+            else
+            {
+                w.writeMarkup( parameter.getDescription() );
+            }
+            w.endElement();//td
+            w.endElement(); //tr
+        }
+
+        w.endElement();//table
+        w.endElement();//section
+    }
+
+    private List getParametersByRequired( boolean required, List parameterList )
+    {
+        List list = new ArrayList();
+
+        for ( Iterator parameters = parameterList.iterator(); parameters.hasNext(); )
+        {
+            Parameter parameter = (Parameter) parameters.next();
+
+            if ( parameter.isRequired() == required )
+            {
+                list.add( parameter );
+            }
+        }
+
+        return list;
     }
 }
