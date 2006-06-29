@@ -318,6 +318,12 @@ public class PluginXdocGenerator
 
         w.startElement( "th" );
 
+        w.writeText( "Since" );
+
+        w.endElement(); // th
+
+        w.startElement( "th" );
+
         w.writeText( "Description" );
 
         w.endElement(); // th
@@ -426,6 +432,28 @@ public class PluginXdocGenerator
                 if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
                 {
                     w.writeText( parameter.getDefaultValue() );
+                }
+                else
+                {
+                    w.writeText( "-" );
+                }
+
+                w.endElement(); // code
+
+                w.endElement(); // td
+
+                // ----------------------------------------------------------------------
+                //
+                // ----------------------------------------------------------------------
+
+                w.startElement( "td" );
+
+                w.startElement( "code" );
+
+                String since = parameter.getSince();
+                if ( StringUtils.isNotEmpty( since ) )
+                {
+                    w.writeText( since );
                 }
                 else
                 {

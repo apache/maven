@@ -59,6 +59,10 @@ public class JavaMojoDescriptorExtractor
 
     public static final String PARAMETER_DEFAULT_VALUE = "default-value";
 
+    public static final String PARAMETER_ALIAS = "alias";
+
+    public static final String SINCE = "since";
+
     /**
      * This defines the default implementation in the case the parameter type is an interface.
      */
@@ -88,6 +92,12 @@ public class JavaMojoDescriptorExtractor
 
     public static final String EXECUTE = "execute";
 
+    public static final String EXECUTE_LIFECYCLE = "lifecycle";
+
+    public static final String EXECUTE_PHASE = "phase";
+
+    public static final String EXECUTE_GOAL = "goal";
+
     public static final String GOAL_DESCRIPTION = "description";
 
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
@@ -107,6 +117,10 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_REQUIRES_DIRECT_INVOCATION = "requiresDirectInvocation";
 
     private static final String COMPONENT = "component";
+
+    private static final String COMPONENT_ROLE = "role";
+
+    private static final String COMPONENT_ROLEHINT = "roleHint";
 
     protected void validateParameter( Parameter parameter, int i )
         throws InvalidParameterException
@@ -214,8 +228,8 @@ public class JavaMojoDescriptorExtractor
 
         if ( execute != null )
         {
-            String executePhase = execute.getNamedParameter( "phase" );
-            String executeGoal = execute.getNamedParameter( "goal" );
+            String executePhase = execute.getNamedParameter( EXECUTE_PHASE );
+            String executeGoal = execute.getNamedParameter( EXECUTE_GOAL );
 
             if ( executePhase == null && executeGoal == null )
             {
@@ -229,7 +243,7 @@ public class JavaMojoDescriptorExtractor
             mojoDescriptor.setExecutePhase( executePhase );
             mojoDescriptor.setExecuteGoal( executeGoal );
 
-            String lifecycle = execute.getNamedParameter( "lifecycle" );
+            String lifecycle = execute.getNamedParameter( EXECUTE_LIFECYCLE );
 
             if ( lifecycle != null )
             {
@@ -363,14 +377,14 @@ public class JavaMojoDescriptorExtractor
 
             if ( componentTag != null )
             {
-                String role = componentTag.getNamedParameter( "role" );
+                String role = componentTag.getNamedParameter( COMPONENT_ROLE );
 
                 if ( role == null )
                 {
                     role = field.getType().toString();
                 }
 
-                String roleHint = componentTag.getNamedParameter( "roleHint" );
+                String roleHint = componentTag.getNamedParameter( COMPONENT_ROLEHINT );
 
                 pd.setRequirement( new Requirement( role, roleHint ) );
 
@@ -412,7 +426,13 @@ public class JavaMojoDescriptorExtractor
                     pd.setDeprecated( deprecationTag.getValue() );
                 }
 
-                String alias = parameter.getNamedParameter( "alias" );
+                DocletTag sinceTag = field.getTagByName( SINCE );
+                if ( sinceTag != null )
+                {
+                    pd.setSince( sinceTag.getValue() );
+                }
+
+                String alias = parameter.getNamedParameter( PARAMETER_ALIAS );
 
                 if ( !StringUtils.isEmpty( alias ) )
                 {
@@ -429,7 +449,6 @@ public class JavaMojoDescriptorExtractor
                 pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
 
                 pd.setImplementation( parameter.getNamedParameter( PARAMETER_IMPLEMENTATION ) );
-                
             }
 
             mojoDescriptor.addParameter( pd );

@@ -44,6 +44,8 @@ public class Parameter
 
     private Requirement requirement;
 
+    private String since;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -171,5 +173,15 @@ public class Parameter
     public void setImplementation( String implementation )
     {
         this.implementation = implementation;
+    }
+
+    public String getSince()
+    {
+        return since;
+    }
+
+    public void setSince( String since )
+    {
+        this.since = since;
     }
 }
