@@ -272,6 +272,8 @@ public class PluginXdocGenerator
 
         w.endElement(); // p
 
+        writeGoalAttributes( mojoDescriptor, w );
+
         writeGoalParameterTable( mojoDescriptor, w );
 
         w.endElement(); // section
@@ -279,6 +281,80 @@ public class PluginXdocGenerator
         w.endElement(); // body
 
         w.endElement(); // document
+    }
+
+    private void writeGoalAttributes( MojoDescriptor mojoDescriptor, XMLWriter w )
+    {
+        w.startElement( "p" );
+        w.writeMarkup( "<b>Mojo Attributes</b>:" );
+        w.startElement( "ul" );
+
+        String value = mojoDescriptor.getDeprecated();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>This plugin goal has been deprecated: " + value + "</li>" );
+        }
+
+        if ( mojoDescriptor.isProjectRequired() )
+        {
+            w.writeMarkup( "<li>Requires a Maven 2.0 project to execute.</li>" );
+        }
+
+        if ( mojoDescriptor.isAggregator() )
+        {
+            w.writeMarkup( "<li>Executes as an aggregator plugin.</li>" );
+        }
+
+        if ( mojoDescriptor.isDirectInvocationOnly() )
+        {
+            w.writeMarkup( "<li>Executes by direct invocation only.</li>" );
+        }
+
+        value = mojoDescriptor.isDependencyResolutionRequired();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>Requires dependency resolution of artifacts in scope: <code>" + value +
+                "</code></li>" );
+        }
+
+        value = mojoDescriptor.getPhase();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>Automatically executes within the lifecycle phase: <code>" + value + "</code></li>" );
+        }
+
+        value = mojoDescriptor.getExecutePhase();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>Invokes the execution of the lifecycle phase <code>" + value +
+                "</code> prior to executing itself.</li>" );
+        }
+
+        value = mojoDescriptor.getExecuteGoal();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>Invokes the execution of this plugin's goal <code>" + value +
+                "</code> prior to executing itself.</li>" );
+        }
+
+        value = mojoDescriptor.getExecuteLifecycle();
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            w.writeMarkup( "<li>Executes in its own lifecycle: <code>" + value + "</code></li>" );
+        }
+
+        if ( mojoDescriptor.isOnlineRequired() )
+        {
+            w.writeMarkup( "<li>Requires that mvn runs in online mode.</li>" );
+        }
+
+        if ( !mojoDescriptor.isInheritedByDefault() )
+        {
+            w.writeMarkup( "<li>Is NOT inherited by default in multi-project builds.</li>" );
+        }
+
+        w.endElement();//ul
+        w.endElement();//p
     }
 
     private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
@@ -290,9 +366,16 @@ public class PluginXdocGenerator
 
         if ( list != null )
         {
-            writeParameterSummary( list, w );
+            if ( list.size() > 0 )
+            {
+                writeParameterSummary( list, w );
 
-            writeParameterDetails( list, w );
+                writeParameterDetails( list, w );
+            }
+            else
+            {
+                w.startElement( "" );
+            }
         }
     }
 
@@ -320,7 +403,7 @@ public class PluginXdocGenerator
 
     private void writeParameterDetails( List parameterList, XMLWriter w )
     {
-        w.startElement( "section" );
+        w.startElement( "subsection" );
         w.addAttribute( "name", "Parameter Details" );
 
         for( Iterator parameters = parameterList.iterator(); parameters.hasNext(); )
@@ -328,7 +411,6 @@ public class PluginXdocGenerator
             Parameter parameter = (Parameter) parameters.next();
 
             w.writeMarkup( "<p><b><a name=\"" + parameter.getName() + "\">" + parameter.getName() + "</a></b></p>" );
-            w.writeMarkup( "<p/>" );
 
             String description = parameter.getDescription();
             if ( StringUtils.isEmpty( description ) )
@@ -375,15 +457,21 @@ public class PluginXdocGenerator
     private void writeParameterSummary( List parameterList, XMLWriter w )
     {
         List requiredParams = getParametersByRequired( true, parameterList );
-        List optionalParams = getParametersByRequired( false, parameterList );
+        if ( requiredParams.size() > 0 )
+        {
+            writeParameterList( "Required Parameters", requiredParams, w );
+        }
 
-        writeParameterList( "Required Parameters", requiredParams, w );
-        writeParameterList( "Optional Parameters", optionalParams, w );
+        List optionalParams = getParametersByRequired( false, parameterList );
+        if ( optionalParams.size() > 0 )
+        {
+            writeParameterList( "Optional Parameters", optionalParams, w );
+        }
     }
 
     private void writeParameterList( String title, List parameterList, XMLWriter w )
     {
-        w.startElement( "section" );
+        w.startElement( "subsection" );
         w.addAttribute( "name", title );
 
         w.startElement( "table" );
@@ -416,12 +504,13 @@ public class PluginXdocGenerator
             String description = parameter.getDescription();
             if ( StringUtils.isEmpty( description ) )
             {
-                w.writeText( "No description." );
+                description = "No description.";
             }
-            else
+            if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
             {
-                w.writeMarkup( parameter.getDescription() );
+                description = description + " Default value is <code>" + parameter.getDefaultValue() + "</code>.";
             }
+            w.writeMarkup( description );
             w.endElement();//td
             w.endElement(); //tr
         }
