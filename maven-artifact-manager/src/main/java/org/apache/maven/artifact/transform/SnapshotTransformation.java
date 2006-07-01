@@ -159,12 +159,10 @@ public class SnapshotTransformation
 
         int buildNumber = 0;
         Metadata repoMetadata = metadata.getMetadata();
-        if ( repoMetadata != null )
+        if ( ( repoMetadata != null )
+            && ( repoMetadata.getVersioning() != null && repoMetadata.getVersioning().getSnapshot() != null ) )
         {
-            if ( repoMetadata.getVersioning() != null && repoMetadata.getVersioning().getSnapshot() != null )
-            {
-                buildNumber = repoMetadata.getVersioning().getSnapshot().getBuildNumber();
-            }
+            buildNumber = repoMetadata.getVersioning().getSnapshot().getBuildNumber();
         }
         return buildNumber;
     }

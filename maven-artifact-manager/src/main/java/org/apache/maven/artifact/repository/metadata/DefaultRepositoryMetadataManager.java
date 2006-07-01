@@ -156,13 +156,11 @@ public class DefaultRepositoryMetadataManager
             ArtifactRepositoryPolicy policy =
                 metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-            if ( policy.isEnabled() && !repository.isBlacklisted() )
+            if ( ( policy.isEnabled() && !repository.isBlacklisted() )
+                && ( loadMetadata( metadata, repository, localRepository, previousMetadata ) ) )
             {
-                if ( loadMetadata( metadata, repository, localRepository, previousMetadata ) )
-                {
-                    metadata.setRepository( repository );
-                    selected = repository;
-                }
+                metadata.setRepository( repository );
+                selected = repository;
             }
         }
         if ( loadMetadata( metadata, localRepository, localRepository, previousMetadata ) )

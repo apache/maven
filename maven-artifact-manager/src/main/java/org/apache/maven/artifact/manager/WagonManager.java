@@ -33,6 +33,8 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
+ * 
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
