@@ -865,6 +865,7 @@ public class DefaultMavenProjectBuilder
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
         //  [BP] - Can this above comment be explained?
         // We don't need all the project methods that are added over those in the model, but we do need basedir
+        // mkleint - using System.getProperties() is almost definitely bad for embedding.
         Map context = new HashMap( System.getProperties() );
 
         if ( projectDir != null )
