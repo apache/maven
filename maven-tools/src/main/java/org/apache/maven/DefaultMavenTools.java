@@ -61,32 +61,14 @@ public class DefaultMavenTools
             localRepositoryUrl = "file://" + localRepositoryUrl;
         }
 
-        return createRepository( "local", localRepositoryUrl, false, true, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        return createRepository( "local", localRepositoryUrl);
     }
 
-    public ArtifactRepository createRepository( String repositoryId,
-                                                String repositoryUrl,
-                                                boolean offline,
-                                                boolean updateSnapshots,
-                                                String globalChecksumPolicy )
+    private ArtifactRepository createRepository( String repositoryId,
+                                                String repositoryUrl)
     {
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( repositoryId, repositoryUrl, repositoryLayout );
-
-        boolean snapshotPolicySet = false;
-
-        if ( offline )
-        {
-            snapshotPolicySet = true;
-        }
-
-        if ( !snapshotPolicySet && updateSnapshots )
-        {
-            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        }
-
-        artifactRepositoryFactory.setGlobalChecksumPolicy( globalChecksumPolicy );
-
         return localRepository;
     }
 

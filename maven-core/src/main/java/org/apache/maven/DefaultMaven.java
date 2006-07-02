@@ -19,6 +19,8 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
@@ -104,6 +106,8 @@ public class DefaultMaven
     protected LoggerManager loggerManager;
 
     protected MavenTools mavenTools;
+    
+    protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private static final long MB = 1024 * 1024;
 
@@ -118,6 +122,20 @@ public class DefaultMaven
     public void execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
+        boolean snapshotPolicySet = false;
+
+        if ( request.isOffline() )
+        {
+            snapshotPolicySet = true;
+        }
+
+        if ( !snapshotPolicySet && request.isUpdateSnapshots() )
+        {
+            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+        }
+
+        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
+        
         if ( request.getLocalRepository() == null )
         {
             request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
