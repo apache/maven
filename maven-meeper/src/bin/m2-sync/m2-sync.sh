@@ -13,18 +13,16 @@ echo
 echo For a better explanation of the output flags please check --itemize-changes at rsync man page
 echo
 
-OPTS=-n
 if [ "$1" == "go" ]; then
   echo Doing sync for real
-  OPTS=
 else
   echo Not syncing
+  RSYNC_OPTS="$RSYNC_OPTS -n"
 fi
 
 cd $HOME/repository-staging/to-ibiblio/maven2
 
 # ideally we would use --ignore-existing but we need to copy the metadata files
 
-CMD="rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt -e ssh $OPTS -acivz $FROM $TO"
+rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -acivz -e "ssh $SSH_OPTS" $FROM $TO
 echo "Syncing $FROM -> $TO"
-$CMD
