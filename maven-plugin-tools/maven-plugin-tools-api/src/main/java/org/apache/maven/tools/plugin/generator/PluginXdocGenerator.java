@@ -134,65 +134,87 @@ public class PluginXdocGenerator
         String value = mojoDescriptor.getDeprecated();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>This plugin goal has been deprecated: " + value + "</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "This plugin goal has been deprecated: " + value + "" );
+            w.endElement(); //li
         }
 
         if ( mojoDescriptor.isProjectRequired() )
         {
-            w.writeMarkup( "<li>Requires a Maven 2.0 project to execute.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Requires a Maven 2.0 project to execute." );
+            w.endElement(); //li
         }
 
         if ( mojoDescriptor.isAggregator() )
         {
-            w.writeMarkup( "<li>Executes as an aggregator plugin.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Executes as an aggregator plugin." );
+            w.endElement(); //li
         }
 
         if ( mojoDescriptor.isDirectInvocationOnly() )
         {
-            w.writeMarkup( "<li>Executes by direct invocation only.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Executes by direct invocation only." );
+            w.endElement(); //li
         }
 
         value = mojoDescriptor.isDependencyResolutionRequired();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>Requires dependency resolution of artifacts in scope: <code>" + value +
-                "</code></li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Requires dependency resolution of artifacts in scope: <code>" + value +
+                "</code>" );
+            w.endElement(); //li
         }
 
         value = mojoDescriptor.getPhase();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>Automatically executes within the lifecycle phase: <code>" + value + "</code></li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Automatically executes within the lifecycle phase: <code>" + value + "</code>" );
+            w.endElement(); //li
         }
 
         value = mojoDescriptor.getExecutePhase();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>Invokes the execution of the lifecycle phase <code>" + value +
-                "</code> prior to executing itself.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Invokes the execution of the lifecycle phase <code>" + value +
+                "</code> prior to executing itself." );
+            w.endElement(); //li
         }
 
         value = mojoDescriptor.getExecuteGoal();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>Invokes the execution of this plugin's goal <code>" + value +
-                "</code> prior to executing itself.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Invokes the execution of this plugin's goal <code>" + value +
+                "</code> prior to executing itself." );
+            w.endElement(); //li
         }
 
         value = mojoDescriptor.getExecuteLifecycle();
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li>Executes in its own lifecycle: <code>" + value + "</code></li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Executes in its own lifecycle: <code>" + value + "</code>" );
+            w.endElement(); //li
         }
 
         if ( mojoDescriptor.isOnlineRequired() )
         {
-            w.writeMarkup( "<li>Requires that mvn runs in online mode.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Requires that mvn runs in online mode." );
+            w.endElement(); //li
         }
 
         if ( !mojoDescriptor.isInheritedByDefault() )
         {
-            w.writeMarkup( "<li>Is NOT inherited by default in multi-project builds.</li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "Is NOT inherited by default in multi-project builds." );
+            w.endElement(); //li
         }
 
         w.endElement();//ul
@@ -252,14 +274,18 @@ public class PluginXdocGenerator
         {
             Parameter parameter = (Parameter) parameters.next();
 
-            w.writeMarkup( "<p><b><a name=\"" + parameter.getName() + "\">" + parameter.getName() + "</a></b></p>" );
+            w.startElement( "p" );
+            w.writeMarkup( "<b><a name=\"" + parameter.getName() + "\">" + parameter.getName() + "</a></b>" );
+            w.endElement(); //p
 
             String description = parameter.getDescription();
             if ( StringUtils.isEmpty( description ) )
             {
                 description = "No Description.";
             }
-            w.writeMarkup( "<p>" + description + "</p>" );
+            w.startElement( "p" );
+            w.writeMarkup( description );
+            w.endElement(); //p
 
             w.startElement( "ul" );
 
@@ -282,7 +308,10 @@ public class PluginXdocGenerator
 
             w.endElement();//ul
 
-            w.writeMarkup( "<hr/>" );
+            if ( parameters.hasNext() )
+            {
+                w.writeMarkup( "<hr/>" );
+            }
         }
 
         w.endElement();
@@ -292,7 +321,11 @@ public class PluginXdocGenerator
     {
         if ( StringUtils.isNotEmpty( value ) )
         {
-            w.writeMarkup( "<li><b>" + param + "</b>: <code>" + value + "</code></li>" );
+            w.startElement( "li" );
+            w.writeMarkup( "<b>" + param + "</b>: <code>" );
+            w.writeText( value );
+            w.writeMarkup( "</code>" );
+            w.endElement(); //li
         }
     }
 
@@ -348,11 +381,14 @@ public class PluginXdocGenerator
             {
                 description = "No description.";
             }
+            w.writeMarkup( description );
+
             if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
             {
-                description = description + " Default value is <code>" + parameter.getDefaultValue() + "</code>.";
+                w.writeMarkup( " Default value is <code>" );
+                w.writeText( parameter.getDefaultValue() );
+                w.writeMarkup( "</code>." );
             }
-            w.writeMarkup( description );
             w.endElement();//td
             w.endElement(); //tr
         }
@@ -378,3 +414,4 @@ public class PluginXdocGenerator
         return list;
     }
 }
+
