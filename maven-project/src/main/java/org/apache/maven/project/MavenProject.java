@@ -471,7 +471,7 @@ public class MavenProject
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
                     Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
-                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId() );
+                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
                     MavenProject project = (MavenProject) projectReferences.get( refId );
                     if ( project != null )
                     {
@@ -742,7 +742,7 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
-                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId() );
+                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
                     MavenProject project = (MavenProject) projectReferences.get( refId );
                     if ( project != null )
                     {
@@ -1550,12 +1550,12 @@ public class MavenProject
 
     public void addProjectReference( MavenProject project )
     {
-        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId() ), project );
+        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
     }
 
-    private static String getProjectReferenceId( String groupId, String artifactId )
+    private static String getProjectReferenceId( String groupId, String artifactId, String version )
     {
-        return groupId + ":" + artifactId;
+        return groupId + ":" + artifactId + ":" + version;
     }
 
     /**
@@ -1599,8 +1599,7 @@ public class MavenProject
     {
         if ( getProjectReferences() != null && !getProjectReferences().isEmpty() )
         {
-            // TODO: use MavenProject getProjectReferenceId
-            String refId = ArtifactUtils.versionlessKey( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId() );
+            String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
             MavenProject ref = (MavenProject) getProjectReferences().get( refId );
             if ( ref != null && ref.getArtifact() != null )
             {
