@@ -216,7 +216,7 @@ public class DefaultModelValidatorTest
     private ModelValidationResult validate( String testName )
         throws Exception
     {
-        Reader input = new FileReader( getFileForClasspathResource( "/validation/" + testName ) );
+        Reader input = new FileReader( getFileForClasspathResource( "validation/" + testName ) );
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
 

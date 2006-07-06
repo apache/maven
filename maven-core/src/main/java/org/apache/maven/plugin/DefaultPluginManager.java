@@ -877,6 +877,7 @@ public class DefaultPluginManager
 
                 String paramName = parameter.getName();
                 String alias = parameter.getAlias();
+                String implementation = parameter.getImplementation();
 
                 PlexusConfiguration pomConfig = fromPom.getChild( paramName );
                 PlexusConfiguration aliased = null;
@@ -900,7 +901,7 @@ public class DefaultPluginManager
                     pomConfig = buildTopDownMergedConfiguration( pomConfig, aliased );
                 }
 
-                boolean addedPomConfig = false;
+                PlexusConfiguration toAdd = null;
 
                 if ( pomConfig != null )
                 {
@@ -908,15 +909,29 @@ public class DefaultPluginManager
 
                     if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || pomConfig.getChildCount() > 0 )
                     {
-                        result.addChild( pomConfig );
-
-                        addedPomConfig = true;
+                        toAdd = pomConfig;
                     }
                 }
 
-                if ( !addedPomConfig && mojoConfig != null )
+                if ( toAdd == null && mojoConfig != null )
                 {
-                    result.addChild( copyConfiguration( mojoConfig ) );
+                    toAdd = copyConfiguration( mojoConfig );
+                }
+
+                if ( toAdd != null )
+                {
+                    if ( implementation != null
+                        && toAdd.getAttribute( "implementation", null ) == null )
+                    {
+
+                        XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
+
+                        implementationConf.setAttribute( "implementation", parameter.getImplementation() );
+
+                        toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf  );
+                    }
+
+                    result.addChild( toAdd );
                 }
             }
         }

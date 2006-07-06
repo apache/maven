@@ -40,6 +40,8 @@ public class Parameter
 
     private String defaultValue;
 
+    private String implementation;
+
     private Requirement requirement;
 
     // ----------------------------------------------------------------------
@@ -159,5 +161,15 @@ public class Parameter
     public void setRequirement( Requirement requirement )
     {
         this.requirement = requirement;
+    }
+
+    public String getImplementation()
+    {
+        return implementation;
+    }
+
+    public void setImplementation( String implementation )
+    {
+        this.implementation = implementation;
     }
 }
