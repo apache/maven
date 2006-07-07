@@ -16,9 +16,10 @@
         <version>1.0-alpha-7</version>
         <executions>
           <execution>
-            <id>site-xsd</id>
-            <phase>site</phase>
+            <id>site-docs</id>
+            <phase>pre-site</phase>
             <goals>
+              <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
           </execution>
@@ -28,12 +29,12 @@
               <goal>java</goal>
               <goal>xpp3-reader</goal>
             </goals>
-            <configuration>
-              <version>1.0.0</version>
-              <model>profiles.mdo</model>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <version>1.0.0</version>
+          <model>profiles.mdo</model>
+        </configuration>
       </plugin>
     </plugins>
   </build>
