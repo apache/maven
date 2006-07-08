@@ -36,6 +36,14 @@
         <enabled>false</enabled>
       </releases>
     </repository>
+    <repository>
+      <id>codehaus</id>
+      <name>Codehaus Repository</name>
+      <url>http://repository.codehaus.org/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
   <modules>
     <module>maven-script-ant</module>
