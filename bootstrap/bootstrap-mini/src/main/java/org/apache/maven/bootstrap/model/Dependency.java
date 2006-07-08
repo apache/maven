@@ -17,6 +17,7 @@ package org.apache.maven.bootstrap.model;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +58,8 @@ public class Dependency
     private Set exclusions = new HashSet();
 
     private List chain;
+
+    private Collection repositories;
 
     public Dependency( List chain )
     {
@@ -213,6 +216,14 @@ public class Dependency
 
     }
 
+    public Collection getRepositories()
+    {
+        if ( repositories == null )
+            repositories = new ArrayList();
+
+        return repositories;
+    }
+
     public String toString()
     {
         return getId() + ":" + getVersion() + ":" + getType();
@@ -302,7 +313,9 @@ public class Dependency
 
     public Dependency getPomDependency()
     {
-        return new Dependency( groupId, artifactId, version, "pom", chain );
+        Dependency dep = new Dependency( groupId, artifactId, version, "pom", chain );
+        dep.repositories = repositories;
+        return dep;
     }
 
     public void setOptional( boolean optional )

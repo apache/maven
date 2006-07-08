@@ -287,6 +287,8 @@ public class Bootstrap
         {
             Dependency dep = (Dependency) i.next();
 
+            dep.getRepositories().addAll( reader.getRemoteRepositories() );
+
             if ( modelFileCache.containsKey( dep.getId() ) )
             {
                 buildProject( resolver.getArtifactFile( dep.getPomDependency() ).getParentFile(), false );

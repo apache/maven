@@ -180,9 +180,9 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            List chain =
+            List newChain =
                 Collections.singletonList( new Dependency( groupId, artifactId, version, packaging, this.chain ) );
-            currentDependency = new Dependency( chain );
+            currentDependency = new Dependency( newChain );
 
             insideDependency = true;
         }
@@ -281,6 +281,8 @@ public class ModelReader
             addDependencies( p.getDependencies(), parentDependencies, inheritedScope, excluded );
 
             addDependencies( p.getManagedDependencies(), managedDependencies, inheritedScope, Collections.EMPTY_SET );
+
+            repositories.addAll( p.getRemoteRepositories() );
 
             resources.addAll( p.getResources() );
 
@@ -606,6 +608,11 @@ public class ModelReader
         try
         {
             Dependency pom = new Dependency( groupId, artifactId, version, "pom", chain );
+            pom.getRepositories().addAll( repositories );
+            for ( Iterator it = chain.iterator(); it.hasNext(); )
+            {
+                pom.getRepositories().addAll( ( (Dependency) it.next() ).getRepositories() );
+            }
 
             resolver.downloadDependencies( Collections.singletonList( pom ) );
 

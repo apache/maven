@@ -96,7 +96,7 @@ public class OnlineArtifactDownloader
 
                 if ( !getRemoteArtifact( dep, destinationFile ) && !destinationFile.exists() )
                 {
-                    throw new DownloadFailedException( "Failed to download " + dep );
+                    throw new DownloadFailedException( dep );
                 }
 
                 downloadedArtifacts.put( dependencyConflictId, dep );
@@ -123,7 +123,16 @@ public class OnlineArtifactDownloader
     {
         boolean fileFound = false;
 
-        for ( Iterator i = getRemoteRepositories().iterator(); i.hasNext(); )
+        List repositories = new ArrayList();
+        repositories.addAll( getRemoteRepositories() );
+        repositories.addAll( dep.getRepositories() );
+
+        for ( Iterator i = dep.getChain().iterator(); i.hasNext(); )
+        {
+            repositories.addAll( ( (Dependency) i.next() ).getRepositories() );
+        }
+
+        for ( Iterator i = repositories.iterator(); i.hasNext(); )
         {
             Repository remoteRepo = (Repository) i.next();
 
