@@ -33,13 +33,13 @@ public class Repository
 
     private String basedir;
 
-    private String layout;
+    private String layout = LAYOUT_DEFAULT;
 
     private String id;
 
-    private boolean releases;
+    private boolean releases = true;
 
-    private boolean snapshots;
+    private boolean snapshots = true;
 
     public Repository()
     {
