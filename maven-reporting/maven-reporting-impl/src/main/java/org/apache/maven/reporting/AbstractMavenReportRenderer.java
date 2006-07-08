@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: AbstractMavenReportRenderer.java 163373 2005-02-22 03:37:00Z brett $
+ * @version $Id$
  * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
  */
 public abstract class AbstractMavenReportRenderer

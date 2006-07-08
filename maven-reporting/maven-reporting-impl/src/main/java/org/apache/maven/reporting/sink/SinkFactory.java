@@ -25,7 +25,7 @@ import java.io.IOException;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: MavenReport.java 163376 2005-02-23 00:06:06Z brett $
+ * @version $Id$
  */
 public class SinkFactory
 {
