@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * @author jdcasey
- * @version $Id: DefaultMavenSettingsBuilder.java 189510 2005-06-08 03:27:43Z jdcasey $
+ * @version $Id$
  */
 public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled

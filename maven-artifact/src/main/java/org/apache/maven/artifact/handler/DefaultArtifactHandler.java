@@ -18,7 +18,7 @@ package org.apache.maven.artifact.handler;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: AbstractArtifactHandler.java 189871 2005-06-10 00:57:19Z brett $
+ * @version $Id$
  */
 public class DefaultArtifactHandler
     implements ArtifactHandler

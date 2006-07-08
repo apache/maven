@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * @author jdcasey
- * @version $Id: MavenSettingsBuilder.java 189510 2005-06-08 03:27:43Z jdcasey $
+ * @version $Id$
  */
 public interface MavenSettingsBuilder
 {
