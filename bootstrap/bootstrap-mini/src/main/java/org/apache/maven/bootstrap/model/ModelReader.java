@@ -282,6 +282,8 @@ public class ModelReader
 
             addDependencies( p.getManagedDependencies(), managedDependencies, inheritedScope, Collections.EMPTY_SET );
 
+            repositories.addAll( p.getRemoteRepositories() );
+
             resources.addAll( p.getResources() );
 
             insideParent = false;
