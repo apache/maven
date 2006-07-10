@@ -45,13 +45,13 @@ public class ModelReader
 
     private Resource currentResource;
 
-    private boolean insideParent = false;
+    private boolean insideParent;
 
-    private boolean insideDependency = false;
+    private boolean insideDependency;
 
-    private boolean insideResource = false;
+    private boolean insideResource;
 
-    private boolean insideRepository = false;
+    private boolean insideRepository;
 
     private StringBuffer bodyText = new StringBuffer();
 
@@ -61,7 +61,9 @@ public class ModelReader
 
     private final ArtifactResolver resolver;
 
-    private boolean insideDependencyManagement = false;
+    private boolean insideDependencyManagement;
+
+    private boolean insideDistributionManagement;
 
     private boolean insideReleases;
 
@@ -125,8 +127,6 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-//            List newChain = Collections.singletonList( new Dependency( model.getGroupId(), model.getArtifactId(), model
-//                .getVersion(), model.getPackaging(), this.chain ) );
             currentDependency = new Dependency( model.getChain() );
 
             insideDependency = true;
@@ -144,6 +144,10 @@ public class ModelReader
         else if ( rawName.equals( "dependencyManagement" ) )
         {
             insideDependencyManagement = true;
+        }
+        else if ( rawName.equals( "distributionManagement" ) )
+        {
+            insideDistributionManagement = true;
         }
         else if ( rawName.equals( "resource" ) )
         {
@@ -219,13 +223,12 @@ public class ModelReader
                 model.setVersion( model.getParentVersion() );
             }
 
-            // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
             Model p = ProjectResolver.retrievePom( resolver, model.getParentGroupId(), model.getParentArtifactId(),
-                                                   model.getParentVersion(), inheritedScope, false, excluded, model.getChain() );//Collections.singletonList( model ) );
+                                                   model.getParentVersion(), inheritedScope, false, excluded, model.getChain() );
 
-            ProjectResolver.addDependencies( p.getAllDependencies(), model.parentDependencies, inheritedScope, excluded );
+            ProjectResolver.addDependencies( p.getAllDependencies(), model.getParentDependencies(), inheritedScope, excluded );
 
-            ProjectResolver.addDependencies( p.getManagedDependencies(), model.managedDependencies, inheritedScope, Collections.EMPTY_SET );
+            ProjectResolver.addDependencies( p.getManagedDependenciesCollection(), model.getManagedDependencies(), inheritedScope, Collections.EMPTY_SET );
 
             model.getRepositories().addAll( p.getRepositories() );
 
@@ -239,7 +242,7 @@ public class ModelReader
 
             if ( insideDependencyManagement )
             {
-                model.managedDependencies.put( currentDependency.getConflictId(), currentDependency );
+                model.getManagedDependencies().put( currentDependency.getConflictId(), currentDependency );
             }
             else
             {
@@ -255,6 +258,10 @@ public class ModelReader
         {
             insideDependencyManagement = false;
         }
+        else if ( rawName.equals( "distributionManagement" ) )
+        {
+            insideDistributionManagement = false;
+        }
         else if ( rawName.equals( "resource" ) )
         {
             model.getResources().add( currentResource );
@@ -263,7 +270,10 @@ public class ModelReader
         }
         else if ( rawName.equals( "repository" ) )
         {
-            model.getRepositories().add( currentRepository );
+            if ( !insideDistributionManagement )
+            {
+                model.getRepositories().add( currentRepository );
+            }
 
             insideRepository = false;
         }

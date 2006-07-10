@@ -59,7 +59,7 @@ public final class ProjectResolver
                 {
                     if ( dependency.getVersion() == null )
                     {
-                        Dependency managedDependency = (Dependency) model.managedDependencies.get( dependency
+                        Dependency managedDependency = (Dependency) model.getManagedDependencies().get( dependency
                             .getConflictId() );
 
                         if ( managedDependency == null )
@@ -80,7 +80,7 @@ public final class ProjectResolver
                                                dependency.getVersion(), dependency.getScope(),
                                                resolveTransitiveDependencies, excluded2, dependency.getChain() );
 
-                        addDependencies( p.getAllDependencies(), model.transitiveDependencies, dependency.getScope(),
+                        addDependencies( p.getAllDependencies(), model.getTransitiveDependencies(), dependency.getScope(),
                                          excluded2 );
                     }
                 }
