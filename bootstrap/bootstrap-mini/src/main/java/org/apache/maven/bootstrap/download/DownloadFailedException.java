@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.bootstrap.model.Dependency;
+import org.apache.maven.bootstrap.model.Model;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -49,7 +50,7 @@ public class DownloadFailedException
 
         for ( Iterator it = dep.getChain().iterator(); it.hasNext(); )
         {
-            Dependency chainDep = (Dependency) it.next();
+            Model chainDep = (Model) it.next();
             msg += "\n\t" + chainDep;
             repos.addAll( chainDep.getRepositories() );
         }

@@ -23,6 +23,7 @@ import org.apache.maven.bootstrap.download.OfflineArtifactResolver;
 import org.apache.maven.bootstrap.download.OnlineArtifactDownloader;
 import org.apache.maven.bootstrap.download.RepositoryMetadata;
 import org.apache.maven.bootstrap.model.Dependency;
+import org.apache.maven.bootstrap.model.Model;
 import org.apache.maven.bootstrap.model.ModelReader;
 import org.apache.maven.bootstrap.model.Plugin;
 import org.apache.maven.bootstrap.model.Repository;
@@ -35,7 +36,6 @@ import org.apache.maven.bootstrap.util.JarMojo;
 import org.apache.maven.bootstrap.util.SimpleArgumentParser;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,6 +57,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Main class for bootstrap module.
@@ -136,7 +138,7 @@ public class Bootstrap
         String basedir = System.getProperty( "user.dir" );
 
         File pom = new File( basedir, "pom.xml" );
-        ModelReader reader = readModel( resolver, pom, true );
+        Model reader = readModel( resolver, pom, true );
         File jar = buildProject( reader );
 
         if ( "install".equals( goal ) )
@@ -144,7 +146,7 @@ public class Bootstrap
             install( reader, pom, jar );
         }
 
-        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
+        for ( Iterator i = reader.getAllDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
 
@@ -154,16 +156,16 @@ public class Bootstrap
         stats( fullStart, new Date() );
     }
 
-    private void install( ModelReader reader, File pom, File jar )
+    private void install( Model model, File pom, File jar )
         throws Exception
     {
-        String artifactId = reader.getArtifactId();
+        String artifactId = model.getArtifactId();
 
-        String version = reader.getVersion();
+        String version = model.getVersion();
 
-        String groupId = reader.getGroupId();
+        String groupId = model.getGroupId();
 
-        String type = reader.getPackaging();
+        String type = model.getPackaging();
 
         Repository localRepository = resolver.getLocalRepository();
         File file = localRepository.getArtifactFile(
@@ -173,7 +175,7 @@ public class Bootstrap
 
         FileUtils.copyFile( jar, file );
 
-        installPomFile( reader, pom );
+        installPomFile( model, pom );
 
         RepositoryMetadata metadata = new RepositoryMetadata();
         metadata.setReleaseVersion( version );
@@ -188,17 +190,17 @@ public class Bootstrap
         metadata.write( file );
     }
 
-    private void installPomFile( ModelReader reader, File source )
+    private void installPomFile( Model model, File source )
         throws IOException
     {
-        String artifactId = reader.getArtifactId();
+        String artifactId = model.getArtifactId();
 
-        String version = reader.getVersion();
+        String version = model.getVersion();
 
-        String groupId = reader.getGroupId();
+        String groupId = model.getGroupId();
 
         Repository localRepository = resolver.getLocalRepository();
-        File pom = localRepository.getMetadataFile( groupId, artifactId, version, reader.getPackaging(),
+        File pom = localRepository.getMetadataFile( groupId, artifactId, version, model.getPackaging(),
                                                     artifactId + "-" + version + ".pom" );
 
         System.out.println( "Installing POM: " + pom );
@@ -209,9 +211,9 @@ public class Bootstrap
     private void cacheModels( File basedir, ArtifactResolver resolver )
         throws IOException, ParserConfigurationException, SAXException
     {
-        ModelReader reader = readModel( resolver, new File( basedir, "pom.xml" ), false );
+        Model model = readModel( resolver, new File( basedir, "pom.xml" ), false );
 
-        for ( Iterator i = reader.getModules().iterator(); i.hasNext(); )
+        for ( Iterator i = model.getModules().iterator(); i.hasNext(); )
         {
             String module = (String) i.next();
 
@@ -232,19 +234,19 @@ public class Bootstrap
 
         File file = new File( basedir, "pom.xml" );
 
-        ModelReader reader = readModel( resolver, file, true );
+        Model model = readModel( resolver, file, true );
 
-        String key = reader.getGroupId() + ":" + reader.getArtifactId() + ":" + reader.getPackaging();
+        String key = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getPackaging();
         if ( inProgress.contains( key ) )
         {
             return;
         }
 
-        if ( reader.getPackaging().equals( "pom" ) )
+        if ( model.getPackaging().equals( "pom" ) )
         {
             if ( buildModules )
             {
-                for ( Iterator i = reader.getModules().iterator(); i.hasNext(); )
+                for ( Iterator i = model.getModules().iterator(); i.hasNext(); )
                 {
                     String module = (String) i.next();
 
@@ -262,15 +264,15 @@ public class Bootstrap
             return;
         }
 
-        buildProject( reader );
+        buildProject( model );
 
         inProgress.remove( key );
     }
 
-    private File buildProject( ModelReader reader )
+    private File buildProject( Model model )
         throws Exception
     {
-        File basedir = reader.getProjectFile().getParentFile();
+        File basedir = model.getProjectFile().getParentFile();
 
         String sources = new File( basedir, "src/main/java" ).getAbsolutePath();
 
@@ -283,11 +285,11 @@ public class Bootstrap
 
         System.out.println( "Analysing dependencies ..." );
 
-        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
+        for ( Iterator i = model.getAllDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
 
-            dep.getRepositories().addAll( reader.getRemoteRepositories() );
+            dep.getRepositories().addAll( model.getRepositories() );
 
             if ( modelFileCache.containsKey( dep.getId() ) )
             {
@@ -295,7 +297,7 @@ public class Bootstrap
             }
         }
 
-        resolver.downloadDependencies( reader.getDependencies() );
+        resolver.downloadDependencies( model.getAllDependencies() );
 
         System.out.println();
         System.out.println();
@@ -312,11 +314,11 @@ public class Bootstrap
         // ----------------------------------------------------------------------
 
         File generatedSourcesDirectory = null;
-        if ( reader.getPlugins().containsKey( MODELLO_PLUGIN_ID ) )
+        if ( model.getPlugins().containsKey( MODELLO_PLUGIN_ID ) )
         {
-            Plugin plugin = (Plugin) reader.getPlugins().get( MODELLO_PLUGIN_ID );
+            Plugin plugin = (Plugin) model.getPlugins().get( MODELLO_PLUGIN_ID );
 
-            File model = new File( basedir, (String) plugin.getConfiguration().get( "model" ) );
+            File modelFile = new File( basedir, (String) plugin.getConfiguration().get( "model" ) );
 
             System.out.println( "Model exists!" );
 
@@ -337,10 +339,10 @@ public class Bootstrap
             Dependency dependency = plugin.asDependencyPom();
             resolver.downloadDependencies( Collections.singletonList( dependency ) );
             File artifactFile = resolver.getArtifactFile( dependency );
-            ModelReader pluginReader = readModel( resolver, artifactFile, true );
+            Model pluginReader = readModel( resolver, artifactFile, true );
 
             List dependencies = new ArrayList();
-            for ( Iterator i = pluginReader.getDependencies().iterator(); i.hasNext(); )
+            for ( Iterator i = pluginReader.getAllDependencies().iterator(); i.hasNext(); )
             {
                 Dependency d = (Dependency) i.next();
                 if ( !d.getGroupId().equals( "org.apache.maven" ) )
@@ -353,11 +355,11 @@ public class Bootstrap
 
             System.out.println( "Generating model bindings for version \'" + modelVersion + "\' from '" + model + "'" );
 
-            generateModelloSources( model.getAbsolutePath(), "java", generatedSourcesDirectory, modelVersion, "false",
+            generateModelloSources( modelFile.getAbsolutePath(), "java", generatedSourcesDirectory, modelVersion, "false",
                                     classLoader );
-            generateModelloSources( model.getAbsolutePath(), "xpp3-reader", generatedSourcesDirectory, modelVersion,
+            generateModelloSources( modelFile.getAbsolutePath(), "xpp3-reader", generatedSourcesDirectory, modelVersion,
                                     "false", classLoader );
-            generateModelloSources( model.getAbsolutePath(), "xpp3-writer", generatedSourcesDirectory, modelVersion,
+            generateModelloSources( modelFile.getAbsolutePath(), "xpp3-writer", generatedSourcesDirectory, modelVersion,
                                     "false", classLoader );
         }
 
@@ -367,7 +369,7 @@ public class Bootstrap
 
         System.out.println( "Compiling sources ..." );
 
-        compile( reader.getDependencies(), sources, classes, null, generatedSourcesDirectory, Dependency.SCOPE_COMPILE,
+        compile( model.getAllDependencies(), sources, classes, null, generatedSourcesDirectory, Dependency.SCOPE_COMPILE,
                  resolver );
 
         // ----------------------------------------------------------------------
@@ -382,32 +384,32 @@ public class Bootstrap
         // Create JAR
         // ----------------------------------------------------------------------
 
-        File jarFile = createJar( new File( basedir, "pom.xml" ), classes, buildDir, reader );
+        File jarFile = createJar( new File( basedir, "pom.xml" ), classes, buildDir, model );
 
         System.out.println( "Packaging " + jarFile + " ..." );
 
-        resolver.addBuiltArtifact( reader.getGroupId(), reader.getArtifactId(), "jar", jarFile );
+        resolver.addBuiltArtifact( model.getGroupId(), model.getArtifactId(), "jar", jarFile );
 
         line();
 
         return jarFile;
     }
 
-    private ModelReader readModel( ArtifactResolver resolver, File file, boolean resolveTransitiveDependencies )
+    private Model readModel( ArtifactResolver resolver, File file, boolean resolveTransitiveDependencies )
         throws ParserConfigurationException, SAXException, IOException
     {
         ModelReader reader = new ModelReader( resolver, resolveTransitiveDependencies );
 
-        reader.parse( file );
+        Model model = reader.parseModel( file, Collections.EMPTY_LIST );
 
-        resolver.addBuiltArtifact( reader.getGroupId(), reader.getArtifactId(), "pom", file );
+        resolver.addBuiltArtifact( model.getGroupId(), model.getArtifactId(), "pom", file );
 
-        String id = reader.getGroupId() + ":" + reader.getArtifactId();
+        String id = model.getGroupId() + ":" + model.getArtifactId();
         modelFileCache.put( id, file );
 
-        modelCache.put( id, reader );
+        modelCache.put( id, model );
 
-        return reader;
+        return model;
     }
 
     private void line()
@@ -415,7 +417,7 @@ public class Bootstrap
         System.out.println( "------------------------------------------------------------------" );
     }
 
-    private File createJar( File pomFile, String classes, String buildDir, ModelReader reader )
+    private File createJar( File pomFile, String classes, String buildDir, Model reader )
         throws Exception
     {
         JarMojo jarMojo = new JarMojo();
@@ -753,9 +755,9 @@ public class Bootstrap
         return cl;
     }
 
-    public ModelReader getCachedModel( String groupId, String artifactId )
+    public Model getCachedModel( String groupId, String artifactId )
     {
-        return (ModelReader) modelCache.get( groupId + ":" + artifactId );
+        return (Model) modelCache.get( groupId + ":" + artifactId );
     }
 
     public File getArtifactFile( Dependency dep )

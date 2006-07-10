@@ -16,8 +16,6 @@ package org.apache.maven.bootstrap.model;
  * limitations under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,21 +25,13 @@ import java.util.Set;
  *
  * @version $Id$
  */
-public class Dependency
+public class Dependency extends Model
 {
     private String id;
-
-    private String version;
 
     private String url;
 
     private String jar;
-
-    private String artifactId;
-
-    private String groupId;
-
-    private String type = "jar";
 
     private String scope = SCOPE_COMPILE;
 
@@ -57,23 +47,18 @@ public class Dependency
 
     private Set exclusions = new HashSet();
 
-    private List chain;
-
-    private Collection repositories;
-
     public Dependency( List chain )
     {
-        this.chain = new ArrayList( chain );
-        this.chain.add( this );
+        super(chain);
     }
 
     public Dependency( String groupId, String artifactId, String version, String type, List chain )
     {
         this( chain );
-        this.version = version;
-        this.artifactId = artifactId;
-        this.groupId = groupId;
-        this.type = type;
+        setVersion( version );
+        setArtifactId( artifactId );
+        setGroupId( groupId );
+        setType( type );
     }
 
     public void setId( String id )
@@ -91,16 +76,6 @@ public class Dependency
         return id;
     }
 
-    public void setGroupId( String groupId )
-    {
-        this.groupId = groupId;
-    }
-
-    public String getGroupId()
-    {
-        return groupId;
-    }
-
     public String getArtifactDirectory()
     {
         if ( isValid( getGroupId() ) )
@@ -109,16 +84,6 @@ public class Dependency
         }
 
         return getId();
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
-
-    public void setArtifactId( String artifactId )
-    {
-        this.artifactId = artifactId;
     }
 
     public String getArtifact()
@@ -150,16 +115,6 @@ public class Dependency
             artifact += getType();
         }
         return artifact;
-    }
-
-    public void setVersion( String version )
-    {
-        this.version = version;
-    }
-
-    public String getVersion()
-    {
-        return version;
     }
 
     public void setJar( String jar )
@@ -202,12 +157,12 @@ public class Dependency
 
     public String getType()
     {
-        return type;
+        return getPackaging();
     }
 
     public void setType( String type )
     {
-        this.type = type;
+        setPackaging( type );
     }
 
     private boolean isValid( String value )
@@ -216,61 +171,11 @@ public class Dependency
 
     }
 
-    public Collection getRepositories()
-    {
-        if ( repositories == null )
-            repositories = new ArrayList();
-
-        return repositories;
-    }
-
     public String toString()
     {
-        return getId() + ":" + getVersion() + ":" + getType();
+        return "Dependency[" + getId() + ":" + getVersion() + ":" + getType() + "]";
     }
 
-    public int hashCode()
-    {
-        int result = 17;
-        result = 37 * result + groupId.hashCode();
-        result = 37 * result + artifactId.hashCode();
-        result = 37 * result + type.hashCode();
-        result = 37 * result + version.hashCode();
-        return result;
-    }
-
-    public boolean equals( Object o )
-    {
-        if ( o == this )
-        {
-            return true;
-        }
-
-        if ( !( o instanceof Dependency ) )
-        {
-            return false;
-        }
-
-        Dependency d = (Dependency) o;
-
-        if ( !d.getGroupId().equals( groupId ) )
-        {
-            return false;
-        }
-        else if ( !d.getArtifactId().equals( artifactId ) )
-        {
-            return false;
-        }
-        else if ( !d.getVersion().equals( version ) )
-        {
-            return false;
-        }
-        else if ( !d.getType().equals( type ) )
-        {
-            return false;
-        }
-        return true;
-    }
 
     public String getConflictId()
     {
@@ -306,15 +211,10 @@ public class Dependency
         return exclusions;
     }
 
-    public List getChain()
-    {
-        return chain;
-    }
-
     public Dependency getPomDependency()
     {
-        Dependency dep = new Dependency( groupId, artifactId, version, "pom", chain );
-        dep.repositories = repositories;
+        Dependency dep = new Dependency( getGroupId(), getArtifactId(), getVersion(), "pom", getChain() );
+        dep.getRepositories().addAll( getRepositories() );
         return dep;
     }
 
@@ -326,5 +226,17 @@ public class Dependency
     public boolean isOptional()
     {
         return optional;
+    }
+
+    public boolean equals( Object o )
+    {
+        if ( o instanceof Dependency )
+        {
+            return super.equals( o );
+        }
+        else
+        {
+            return false;
+        }
     }
 }

@@ -18,7 +18,7 @@ package org.apache.maven.bootstrap.installer;
 
 import org.apache.maven.bootstrap.Bootstrap;
 import org.apache.maven.bootstrap.model.Dependency;
-import org.apache.maven.bootstrap.model.ModelReader;
+import org.apache.maven.bootstrap.model.Model;
 import org.apache.maven.bootstrap.util.FileUtils;
 import org.apache.maven.bootstrap.util.SimpleArgumentParser;
 import org.codehaus.plexus.util.Expand;
@@ -29,15 +29,11 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 import java.io.File;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Properties;
 
 /**
  * Main class for bootstrap module.
@@ -121,7 +117,7 @@ public class BootstrapInstaller
 
         bootstrapper.buildProject( new File( basedir ), true );
 
-        ModelReader mavenCliModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-cli" );
+        Model mavenCliModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-cli" );
 
         File installation = new File( basedir, "bootstrap/target/installation" );
         createInstallation( installation, mavenCliModel );
@@ -225,7 +221,7 @@ public class BootstrapInstaller
         }
     }
 
-    private void createInstallation( File dir, ModelReader mavenCliModel )
+    private void createInstallation( File dir, Model mavenCliModel )
         throws IOException, CommandLineException, InterruptedException
     {
         FileUtils.deleteDirectory( dir );
@@ -243,7 +239,7 @@ public class BootstrapInstaller
         File bootDirectory = new File( coreDirectory, "boot" );
         bootDirectory.mkdir();
 
-        for ( Iterator i = mavenCliModel.getDependencies().iterator(); i.hasNext(); )
+        for ( Iterator i = mavenCliModel.getAllDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
 

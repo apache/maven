@@ -40,13 +40,9 @@ public abstract class AbstractReader
 {
     private SAXParserFactory saxFactory;
 
-    protected File pomFile;
-
     public void parse( File file )
         throws ParserConfigurationException, SAXException, IOException
     {
-        pomFile = file;
-
         saxFactory = SAXParserFactory.newInstance();
 
         SAXParser parser = saxFactory.newSAXParser();
