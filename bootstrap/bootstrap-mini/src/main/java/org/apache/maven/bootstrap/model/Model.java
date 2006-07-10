@@ -33,12 +33,6 @@ import java.util.Set;
  */
 public class Model
 {
-    private Map dependencies = new HashMap();
-
-    Map parentDependencies = new HashMap();
-
-    Map transitiveDependencies = new HashMap();
-
     private Map plugins = new HashMap();
 
     private String artifactId;
@@ -63,7 +57,13 @@ public class Model
 
     private Set repositories = new HashSet();
 
-    Map managedDependencies = new HashMap();
+    private Map dependencies = new HashMap();
+
+    private Map parentDependencies = new HashMap();
+
+    private Map transitiveDependencies = new HashMap();
+
+    private Map managedDependencies = new HashMap();
 
     private List chain;
 
@@ -183,13 +183,6 @@ public class Model
         return repositories;
     }
 
-    public Collection getManagedDependencies()
-    {
-        Map m = new HashMap();
-        m.putAll( managedDependencies );
-        return m.values();
-    }
-
     public Collection getAllDependencies()
     {
         Map m = new HashMap();
@@ -207,6 +200,28 @@ public class Model
     public Map getDependencies()
     {
         return dependencies;
+    }
+
+    public Map getParentDependencies()
+    {
+        return parentDependencies;
+    }
+
+    public Map getTransitiveDependencies()
+    {
+        return transitiveDependencies;
+    }
+
+    public Map getManagedDependencies()
+    {
+        return managedDependencies;
+    }
+
+    public Collection getManagedDependenciesCollection()
+    {
+        Map m = new HashMap();
+        m.putAll( managedDependencies );
+        return m.values();
     }
 
     public String toString()
