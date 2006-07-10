@@ -17,22 +17,16 @@ package org.apache.maven.bootstrap.model;
  */
 
 import org.apache.maven.bootstrap.download.ArtifactResolver;
-import org.apache.maven.bootstrap.download.DownloadFailedException;
 import org.apache.maven.bootstrap.util.AbstractReader;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,27 +39,7 @@ public class ModelReader
 {
     private int depth = 0;
 
-    private String artifactId;
-
-    private String version;
-
-    private String groupId;
-
-    private String packaging = "jar";
-
-    private String parentGroupId;
-
-    private String parentArtifactId;
-
-    private String parentVersion;
-
-    private Map dependencies = new HashMap();
-
-    private List repositories = new ArrayList();
-
-    private List resources = new ArrayList();
-
-    private Map managedDependencies = new HashMap();
+    private Model model;
 
     private Dependency currentDependency;
 
@@ -87,12 +61,6 @@ public class ModelReader
 
     private final ArtifactResolver resolver;
 
-    private static Set inProgress = new HashSet();
-
-    private Map parentDependencies = new HashMap();
-
-    private Map transitiveDependencies = new HashMap();
-
     private boolean insideDependencyManagement = false;
 
     private boolean insideReleases;
@@ -105,11 +73,7 @@ public class ModelReader
 
     private final Set excluded;
 
-    private final List chain;
-
     private final String inheritedScope;
-
-    private Map plugins = new HashMap();
 
     private boolean insideConfiguration;
 
@@ -119,15 +83,13 @@ public class ModelReader
 
     private boolean insidePlugin;
 
-    private List modules = new ArrayList();
-
     public ModelReader( ArtifactResolver resolver, boolean resolveTransitiveDependencies )
     {
-        this( resolver, null, resolveTransitiveDependencies, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+        this( resolver, null, resolveTransitiveDependencies, Collections.EMPTY_SET );
     }
 
     public ModelReader( ArtifactResolver resolver, String inheritedScope, boolean resolveTransitiveDependencies,
-                        Set excluded, List chain )
+                        Set excluded )
     {
         this.resolver = resolver;
 
@@ -136,34 +98,17 @@ public class ModelReader
         this.excluded = excluded;
 
         this.inheritedScope = inheritedScope;
-
-        this.chain = chain;
     }
 
-    public List getRemoteRepositories()
+    public Model parseModel( File file, List chain )
+        throws ParserConfigurationException, SAXException, IOException
     {
-        return repositories;
-    }
+        this.model = new Model( chain );
+        model.setPomFile( file );
 
-    public Collection getDependencies()
-    {
-        Map m = new HashMap();
-        m.putAll( transitiveDependencies );
-        m.putAll( parentDependencies );
-        m.putAll( dependencies );
-        return m.values();
-    }
+        super.parse( file );
 
-    public Collection getManagedDependencies()
-    {
-        Map m = new HashMap();
-        m.putAll( managedDependencies );
-        return m.values();
-    }
-
-    public List getResources()
-    {
-        return resources;
+        return model;
     }
 
     public void startElement( String uri, String localName, String rawName, Attributes attributes )
@@ -180,9 +125,9 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            List newChain =
-                Collections.singletonList( new Dependency( groupId, artifactId, version, packaging, this.chain ) );
-            currentDependency = new Dependency( newChain );
+//            List newChain = Collections.singletonList( new Dependency( model.getGroupId(), model.getArtifactId(), model
+//                .getVersion(), model.getPackaging(), this.chain ) );
+            currentDependency = new Dependency( model.getChain() );
 
             insideDependency = true;
         }
@@ -249,42 +194,42 @@ public class ModelReader
         // support both v3 <extend> and v4 <parent>
         if ( rawName.equals( "parent" ) )
         {
-            if ( parentArtifactId == null || parentArtifactId.trim().length() == 0 )
+            if ( model.getParentArtifactId() == null || model.getParentArtifactId().trim().length() == 0 )
             {
                 throw new SAXException( "Missing required element in <parent>: artifactId." );
             }
 
-            if ( parentGroupId == null || parentGroupId.trim().length() == 0 )
+            if ( model.getParentGroupId() == null || model.getParentGroupId().trim().length() == 0 )
             {
                 throw new SAXException( "Missing required element in <parent>: groupId." );
             }
 
-            if ( parentVersion == null || parentVersion.trim().length() == 0 )
+            if ( model.getParentVersion() == null || model.getParentVersion().trim().length() == 0 )
             {
                 throw new SAXException( "Missing required element in <parent>: version." );
             }
 
-            if ( groupId == null )
+            if ( model.getGroupId() == null )
             {
-                groupId = parentGroupId;
+                model.setGroupId( model.getParentGroupId() );
             }
 
-            if ( version == null )
+            if ( model.getVersion() == null )
             {
-                version = parentVersion;
+                model.setVersion( model.getParentVersion() );
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, inheritedScope, false,
-                                         excluded, Collections.EMPTY_LIST );
+            Model p = ProjectResolver.retrievePom( resolver, model.getParentGroupId(), model.getParentArtifactId(),
+                                                   model.getParentVersion(), inheritedScope, false, excluded, model.getChain() );//Collections.singletonList( model ) );
 
-            addDependencies( p.getDependencies(), parentDependencies, inheritedScope, excluded );
+            ProjectResolver.addDependencies( p.getAllDependencies(), model.parentDependencies, inheritedScope, excluded );
 
-            addDependencies( p.getManagedDependencies(), managedDependencies, inheritedScope, Collections.EMPTY_SET );
+            ProjectResolver.addDependencies( p.getManagedDependencies(), model.managedDependencies, inheritedScope, Collections.EMPTY_SET );
 
-            repositories.addAll( p.getRemoteRepositories() );
+            model.getRepositories().addAll( p.getRepositories() );
 
-            resources.addAll( p.getResources() );
+            model.getResources().addAll( p.getResources() );
 
             insideParent = false;
         }
@@ -294,11 +239,11 @@ public class ModelReader
 
             if ( insideDependencyManagement )
             {
-                managedDependencies.put( currentDependency.getConflictId(), currentDependency );
+                model.managedDependencies.put( currentDependency.getConflictId(), currentDependency );
             }
             else
             {
-                dependencies.put( currentDependency.getConflictId(), currentDependency );
+                model.getDependencies().put( currentDependency.getConflictId(), currentDependency );
             }
         }
         else if ( rawName.equals( "exclusion" ) )
@@ -312,19 +257,19 @@ public class ModelReader
         }
         else if ( rawName.equals( "resource" ) )
         {
-            resources.add( currentResource );
+            model.getResources().add( currentResource );
 
             insideResource = false;
         }
         else if ( rawName.equals( "repository" ) )
         {
-            repositories.add( currentRepository );
+            model.getRepositories().add( currentRepository );
 
             insideRepository = false;
         }
         else if ( rawName.equals( "plugin" ) )
         {
-            plugins.put( currentPlugin.getId(), currentPlugin );
+            model.getPlugins().put( currentPlugin.getId(), currentPlugin );
 
             insidePlugin = false;
         }
@@ -334,21 +279,21 @@ public class ModelReader
         }
         else if ( rawName.equals( "module" ) )
         {
-            modules.add( getBodyText() );
+            model.getModules().add( getBodyText() );
         }
         else if ( insideParent )
         {
             if ( rawName.equals( "groupId" ) )
             {
-                parentGroupId = getBodyText();
+                model.setParentGroupId( getBodyText() );
             }
             else if ( rawName.equals( "artifactId" ) )
             {
-                parentArtifactId = getBodyText();
+                model.setParentArtifactId( getBodyText() );
             }
             else if ( rawName.equals( "version" ) )
             {
-                parentVersion = getBodyText();
+                model.setParentVersion( getBodyText() );
             }
         }
         else if ( insideDependency )
@@ -476,27 +421,27 @@ public class ModelReader
         {
             if ( rawName.equals( "artifactId" ) )
             {
-                artifactId = getBodyText();
+                model.setArtifactId( getBodyText() );
             }
             else if ( rawName.equals( "version" ) )
             {
-                version = getBodyText();
+                model.setVersion( getBodyText() );
             }
             else if ( rawName.equals( "groupId" ) )
             {
-                groupId = getBodyText();
+                model.setGroupId( getBodyText() );
             }
             else if ( rawName.equals( "packaging" ) )
             {
-                packaging = getBodyText();
+                model.setPackaging( getBodyText() );
             }
         }
 
         if ( depth == 1 ) // model / project
         {
-            resolver.addBuiltArtifact( groupId, artifactId, "pom", pomFile );
+            resolver.addBuiltArtifact( model.getGroupId(), model.getArtifactId(), "pom", model.getProjectFile() );
 
-            resolveDependencies();
+            ProjectResolver.resolveDependencies( resolver, model, resolveTransitiveDependencies, inheritedScope, excluded );
         }
 
         bodyText = new StringBuffer();
@@ -504,170 +449,4 @@ public class ModelReader
         depth--;
     }
 
-    private void resolveDependencies()
-        throws SAXException
-    {
-        for ( Iterator it = dependencies.values().iterator(); it.hasNext(); )
-        {
-            Dependency dependency = (Dependency) it.next();
-
-            if ( !excluded.contains( dependency.getConflictId() ) && !dependency.isOptional() )
-            {
-                if ( !dependency.getScope().equals( Dependency.SCOPE_TEST ) || inheritedScope == null )
-                {
-                    if ( dependency.getVersion() == null )
-                    {
-                        Dependency managedDependency =
-                            (Dependency) managedDependencies.get( dependency.getConflictId() );
-                        if ( managedDependency == null )
-                        {
-                            throw new NullPointerException( "[" + groupId + ":" + artifactId + ":" + packaging + ":" +
-                                version + "] " + "Dependency " + dependency.getConflictId() +
-                                " is missing a version, and nothing is found in dependencyManagement. " );
-                        }
-                        dependency.setVersion( managedDependency.getVersion() );
-                    }
-
-                    if ( resolveTransitiveDependencies )
-                    {
-                        Set excluded = new HashSet( this.excluded );
-                        excluded.addAll( dependency.getExclusions() );
-
-                        ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
-                                                     dependency.getVersion(), dependency.getScope(),
-                                                     resolveTransitiveDependencies, excluded, dependency.getChain() );
-
-                        addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope(), excluded );
-                    }
-                }
-            }
-        }
-    }
-
-    private void addDependencies( Collection dependencies, Map target, String inheritedScope, Set excluded )
-    {
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency d = (Dependency) i.next();
-
-            // skip test deps
-            if ( !Dependency.SCOPE_TEST.equals( d.getScope() ) )
-            {
-                // Do we care about runtime here?
-                if ( Dependency.SCOPE_TEST.equals( inheritedScope ) )
-                {
-                    d.setScope( Dependency.SCOPE_TEST );
-                }
-
-                if ( !hasDependency( d, target ) && !excluded.contains( d.getConflictId() ) && !d.isOptional() )
-                {
-                    if ( !"plexus".equals( d.getGroupId() ) || ( !"plexus-utils".equals( d.getArtifactId() ) &&
-                        !"plexus-container-default".equals( d.getArtifactId() ) ) )
-                    {
-                        target.put( d.getConflictId(), d );
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean hasDependency( Dependency d, Map dependencies )
-    {
-        String conflictId = d.getConflictId();
-        if ( dependencies.containsKey( conflictId ) )
-        {
-            // We only care about pushing in compile scope dependencies I think
-            // if not, we'll need to be able to get the original and pick the appropriate scope
-            if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) )
-            {
-                dependencies.remove( conflictId );
-            }
-            else
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private ModelReader retrievePom( String groupId, String artifactId, String version, String inheritedScope,
-                                     boolean resolveTransitiveDependencies, Set excluded, List chain )
-        throws SAXException
-    {
-        String key = groupId + ":" + artifactId + ":" + version;
-
-        if ( inProgress.contains( key ) )
-        {
-            throw new SAXException( "Circular dependency found, looking for " + key + "\nIn progress:" + inProgress );
-        }
-
-        inProgress.add( key );
-
-        ModelReader p = new ModelReader( resolver, inheritedScope, resolveTransitiveDependencies, excluded, chain );
-
-        try
-        {
-            Dependency pom = new Dependency( groupId, artifactId, version, "pom", chain );
-            pom.getRepositories().addAll( repositories );
-            for ( Iterator it = chain.iterator(); it.hasNext(); )
-            {
-                pom.getRepositories().addAll( ( (Dependency) it.next() ).getRepositories() );
-            }
-
-            resolver.downloadDependencies( Collections.singletonList( pom ) );
-
-            p.parse( resolver.getArtifactFile( pom ) );
-        }
-        catch ( IOException e )
-        {
-            throw new SAXException( "Error getting parent POM", e );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            throw new SAXException( "Error getting parent POM", e );
-        }
-        catch ( DownloadFailedException e )
-        {
-            throw new SAXException( "Error getting parent POM", e );
-        }
-
-        inProgress.remove( key );
-
-        return p;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
-
-    public String getVersion()
-    {
-        return version;
-    }
-
-    public String getGroupId()
-    {
-        return groupId;
-    }
-
-    public String getPackaging()
-    {
-        return packaging;
-    }
-
-    public Map getPlugins()
-    {
-        return plugins;
-    }
-
-    public List getModules()
-    {
-        return modules;
-    }
-
-    public File getProjectFile()
-    {
-        return pomFile;
-    }
 }

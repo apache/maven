@@ -17,6 +17,7 @@ package org.apache.maven.bootstrap.download;
  */
 
 import org.apache.maven.bootstrap.model.Dependency;
+import org.apache.maven.bootstrap.model.Model;
 import org.apache.maven.bootstrap.model.Repository;
 import org.apache.maven.bootstrap.util.FileUtils;
 import org.apache.maven.bootstrap.util.StringUtils;
@@ -129,7 +130,7 @@ public class OnlineArtifactDownloader
 
         for ( Iterator i = dep.getChain().iterator(); i.hasNext(); )
         {
-            repositories.addAll( ( (Dependency) i.next() ).getRepositories() );
+            repositories.addAll( ( (Model) i.next() ).getRepositories() );
         }
 
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
