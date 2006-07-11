@@ -228,18 +228,11 @@ public class PluginXdocGenerator
         //remove components and read-only parameters
         List list = filterParameters( parameterList );
 
-        if ( list != null )
+        if ( list != null && list.size() > 0 )
         {
-            if ( list.size() > 0 )
-            {
-                writeParameterSummary( list, w );
+            writeParameterSummary( list, w );
 
-                writeParameterDetails( list, w );
-            }
-            else
-            {
-                w.startElement( "" );
-            }
+            writeParameterDetails( list, w );
         }
     }
 
@@ -255,7 +248,7 @@ public class PluginXdocGenerator
             {
                 String expression = parameter.getExpression();
 
-                if ( expression != null && !expression.startsWith( "${component." ) )
+                if ( expression == null || !expression.startsWith( "${component." ) )
                 {
                     filtered.add( parameter );
                 }
