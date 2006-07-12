@@ -50,6 +50,7 @@
   </dependencies>
   <reporting>
     <plugins>
+<!--
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
@@ -62,6 +63,7 @@
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
+ -->
     </plugins>
   </reporting>
 </project>

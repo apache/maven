@@ -32,24 +32,6 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-8</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>xpp3-writer</goal>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>site-xsd</id>
-            <phase>site</phase>
-            <goals>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <version>4.0.0</version>
           <model>maven.mdo</model>
@@ -65,7 +47,6 @@
           <plugin>
             <groupId>org.codehaus.modello</groupId>
             <artifactId>modello-maven-plugin</artifactId>
-            <version>1.0-alpha-8</version>
             <executions>
               <execution>
                 <id>v3</id>

@@ -31,23 +31,6 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>site-xsd</id>
-            <phase>site</phase>
-            <goals>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-          <execution>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <model>src/main/mdo/plugin-metadata.mdo</model>
           <version>1.0.0</version>
