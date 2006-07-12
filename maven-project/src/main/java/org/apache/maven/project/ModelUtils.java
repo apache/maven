@@ -82,6 +82,11 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
+                // only merge plugin definition from the parent if at least one 
+                // of these is true:
+                // 1. we're not processing the plugins in an inheritance-based merge
+                // 2. the parent's <inherited/> flag is not set
+                // 3. the parent's <inherited/> flag is set to true
                 if ( !handleAsInheritance || parentInherited == null ||
                     Boolean.valueOf( parentInherited ).booleanValue() )
                 {
@@ -97,12 +102,18 @@ public final class ModelUtils
                         mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
                     }
 
+                    // if we're processing this as an inheritance-based merge, and
+                    // the parent's <inherited/> flag is not set, then we need to
+                    // clear the inherited flag in the merge result.
                     if ( handleAsInheritance && parentInherited == null )
                     {
                         assembledPlugin.unsetInheritanceApplied();
                     }
 
                     mergedPlugins.add(assembledPlugin);
+
+                    // fix for MNG-2221 (assembly cache was not being populated for later reference):
+                    assembledPlugins.put(  assembledPlugin.getKey(), assembledPlugin );
                 }
             }
 
