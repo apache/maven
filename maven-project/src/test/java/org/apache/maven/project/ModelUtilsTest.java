@@ -2,12 +2,14 @@ package org.apache.maven.project;
 
 import junit.framework.TestCase;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Dependency;
 
 import java.util.Collections;
+import java.util.List;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -75,6 +77,80 @@ public class ModelUtilsTest
         ModelUtils.mergePluginDefinitions( child, parent, false );
 
         assertEquals( 2, child.getExecutions().size() );
+    }
+
+    public void testShouldMergeOnePluginWithInheritExecutionWithoutDuplicatingPluginInList()
+    {
+        Plugin parent = new Plugin();
+        parent.setArtifactId( "testArtifact" );
+        parent.setGroupId( "testGroup" );
+        parent.setVersion( "1.0" );
+
+        PluginExecution parentExecution = new PluginExecution();
+        parentExecution.setId( "testExecution" );
+
+        parent.addExecution( parentExecution );
+        
+        Build parentContainer = new Build();
+        parentContainer.addPlugin( parent );
+
+        Plugin child = new Plugin();
+        child.setArtifactId( "testArtifact" );
+        child.setGroupId( "testGroup" );
+        child.setVersion( "1.0" );
+        
+        Build childContainer = new Build();
+        childContainer.addPlugin( child );
+
+        ModelUtils.mergePluginLists( childContainer, parentContainer, true );
+        
+        List plugins = childContainer.getPlugins();
+        
+        assertEquals( 1, plugins.size() );
+        
+        Plugin plugin = (Plugin) plugins.get( 0 );
+        
+        assertEquals( 1, plugin.getExecutions().size() );
+    }
+
+    public void testShouldMergePluginWithDifferentExecutionFromParentWithoutDuplicatingPluginInList()
+    {
+        Plugin parent = new Plugin();
+        parent.setArtifactId( "testArtifact" );
+        parent.setGroupId( "testGroup" );
+        parent.setVersion( "1.0" );
+
+        PluginExecution parentExecution = new PluginExecution();
+        parentExecution.setId( "testExecution" );
+
+        parent.addExecution( parentExecution );
+        
+        Build parentContainer = new Build();
+        parentContainer.addPlugin( parent );
+
+        Plugin child = new Plugin();
+        child.setArtifactId( "testArtifact" );
+        child.setGroupId( "testGroup" );
+        child.setVersion( "1.0" );
+
+        PluginExecution childExecution = new PluginExecution();
+        childExecution.setId( "testExecution2" );
+
+        child.addExecution( childExecution );
+
+        
+        Build childContainer = new Build();
+        childContainer.addPlugin( child );
+
+        ModelUtils.mergePluginLists( childContainer, parentContainer, true );
+        
+        List plugins = childContainer.getPlugins();
+        
+        assertEquals( 1, plugins.size() );
+        
+        Plugin plugin = (Plugin) plugins.get( 0 );
+        
+        assertEquals( 2, plugin.getExecutions().size() );
     }
 
     public void testShouldNOTMergeInheritedPluginHavingInheritEqualFalse()
