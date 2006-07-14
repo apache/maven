@@ -64,6 +64,8 @@ public class ModelReader
     private boolean insideDependencyManagement;
 
     private boolean insideDistributionManagement;
+    
+    private boolean insidePluginManagement;
 
     private boolean insideReleases;
 
@@ -141,6 +143,11 @@ public class ModelReader
 
             insidePlugin = true;
         }
+        else if ( rawName.equals( "pluginManagement" ) )
+        {
+            insidePluginManagement = true;
+        }
+        
         else if ( rawName.equals( "dependencyManagement" ) )
         {
             insideDependencyManagement = true;
@@ -230,6 +237,7 @@ public class ModelReader
 
             ProjectResolver.addDependencies( p.getManagedDependenciesCollection(), model.getManagedDependencies(), inheritedScope, Collections.EMPTY_SET );
 
+            ProjectResolver.addPluginManagement( p.getManagedPluginsCollection(), model.getManagedPlugins() );            
             model.getRepositories().addAll( p.getRepositories() );
 
             model.getResources().addAll( p.getResources() );
@@ -279,8 +287,15 @@ public class ModelReader
         }
         else if ( rawName.equals( "plugin" ) )
         {
-            model.getPlugins().put( currentPlugin.getId(), currentPlugin );
-
+            if (insidePluginManagement)
+            {
+                model.getManagedPlugins().put( currentPlugin.getId(), currentPlugin );
+            }
+            else
+            {
+                model.getPlugins().put( currentPlugin.getId(), currentPlugin );
+            }
+        	    
             insidePlugin = false;
         }
         else if ( rawName.equals( "build" ) )

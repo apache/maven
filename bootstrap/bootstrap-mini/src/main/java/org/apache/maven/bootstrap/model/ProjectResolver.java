@@ -116,6 +116,16 @@ public final class ProjectResolver
         }
     }
 
+    public static void addPluginManagement( Collection plugins, Map target)
+    {
+    	    Plugin managedPlugin;
+    	    for (Iterator i = plugins.iterator(); i.hasNext(); )
+    	    {
+    	    	    managedPlugin = (Plugin) i.next();
+    	    	    target.put(managedPlugin.getId(),managedPlugin);    	    	    
+    	    }
+    }
+    
     private static boolean hasDependency( Dependency d, Map dependencies )
     {
         String conflictId = d.getConflictId();

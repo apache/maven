@@ -322,6 +322,20 @@ public class Bootstrap
 
             System.out.println( "Model exists!" );
 
+            // acquire the version from the parent pom pluginManagement
+            String version = plugin.getVersion();
+            if ( ( version == null ) || ( version == "" ) )
+            {
+                Plugin managedPlugin = (Plugin) model.getManagedPlugins().get( MODELLO_PLUGIN_ID );
+                
+                if ( managedPlugin == null )
+                {
+                    throw new Exception( "can not determine version of " + MODELLO_PLUGIN_ID );	
+                }
+                
+                plugin.setVersion( managedPlugin.getVersion() );
+            }
+            
             String modelVersion = (String) plugin.getConfiguration().get( "version" );
             if ( modelVersion == null || modelVersion.trim().length() < 1 )
             {

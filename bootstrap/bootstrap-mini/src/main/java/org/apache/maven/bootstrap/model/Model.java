@@ -65,6 +65,8 @@ public class Model
 
     private Map managedDependencies = new HashMap();
 
+    private Map managedPlugins = new HashMap();    
+    
     private List chain;
 
     public Model()
@@ -224,6 +226,19 @@ public class Model
         return m.values();
     }
 
+    public Map getManagedPlugins()
+    {
+        return managedPlugins;
+    }
+
+    public Collection getManagedPluginsCollection()
+    {
+        Map m = new HashMap();
+        m.putAll( managedPlugins );
+        return m.values();
+    }
+    
+    
     public String toString()
     {
         return "Model[" + getId() + "]";
