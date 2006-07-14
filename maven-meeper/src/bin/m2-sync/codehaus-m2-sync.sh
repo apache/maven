@@ -1,11 +1,11 @@
 #!/bin/sh
 
-FROM=mavensync@repository.codehaus.org:/var/www/domains/codehaus.org/repository/htdocs/org/codehaus/
-TO=org/codehaus/
+FROM=mavensync@repository.codehaus.org:/repository/
+TO=.
 SSH_OPTS="-i $HOME/.ssh/new-id_dsa"
-RSYNC_OPTS="-k"
+#RSYNC_OPTS="-L"
 
-# NOTE: If the rsync options change, the codehaus configuration may need to be changed.
-# It currently runs "rsync --server --sender -vnlkogDtprcz . /var/www/domains/codehaus.org/repository/htdocs/org/codehaus/" regardless of the rsync command sent
+## NOTE that codehaus only honours some rsync options. Others may be summarily discarded and/or cause the rsync to break - check
+## with them if changing them
 
 source ./m2-sync.sh

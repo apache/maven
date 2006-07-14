@@ -70,9 +70,16 @@ sub syncSource()
 
     my $rsyncUser = $configuration->val( "syncopate", "rsyncUser" );
     
+    my $identity = $configuration->val( "syncopate", "identity" );
+    
     if ( $sourceConfiguration->val( "host", "rsyncUser" ) )
     {
         $rsyncUser = $sourceConfiguration->val( "host", "rsyncUser" );
+    }
+
+    if ( $sourceConfiguration->val( "host", "identity" ) )
+    {
+        $identity = "-i " . $sourceConfiguration->val( "host", "identity" );
     }
 
     if ( $sourceConfiguration->val( "host", "repoDirectory" ) )
@@ -80,8 +87,8 @@ sub syncSource()
         $repoDirectory = $sourceConfiguration->val( "host", "repoDirectory" );
     }
     
-    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -oBatchMode=yes -T -l $rsyncUser\" $address:$directory/ $repoDirectory";
-    
+    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -oBatchMode=yes $identity -T -l $rsyncUser\" $address:$directory/ $repoDirectory";
+
     runRsync( $cmd, $sourceConfiguration );
 
     $repoDirectory = $globalRepoDirectory;
