@@ -1,63 +1,114 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl"?>
-<rdf:RDF xml:lang="en"
-         xmlns="http://usefulinc.com/ns/doap#" 
-         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-         xmlns:asfext="http://projects.apache.org/ns/asfext#"
-         xmlns:foaf="http://xmlns.com/foaf/0.1/">
 <!--
-  =======================================================================
-
-   Copyright (c) 2006 The Apache Software Foundation.  
-   All rights reserved.
-
-  =======================================================================
--->
+  ~ Copyright 2006 The Apache Software Foundation.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+--> 
+<rdf:RDF xml:lang="en" xmlns="http://usefulinc.com/ns/doap#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:asfext="http://projects.apache.org/ns/asfext#" xmlns:foaf="http://xmlns.com/foaf/0.1/">
   <Project rdf:about="http://Maven.rdf.apache.org/">
-    <created>2006-02-28</created>
-    <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
-    <name>Apache Maven</name>
-    <homepage rdf:resource="http://maven.apache.org" />
-    <asfext:pmc rdf:resource="http://maven.apache.org" />
-    <shortdesc>Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.</shortdesc>
-    <description>At first glance Maven can appear to be many things, but in a nutshell Maven is an attempt to apply patterns to a project's build infrastructure in order to promote comprehension and productivity by providing a clear path in the use of best practices. Maven is essentially a project management and comprehension tool and as such provides a way to help with managing:
-
-    * Builds
-    * Documentation
-    * Reporting
-    * Dependencies
-    * SCMs
-    * Releases
-    * Distribution</description>
-    <bug-database rdf:resource="http://jira.codehaus.org/browse/MNG" />
-    <mailing-list rdf:resource="http://maven.apache.org/mail-lists.html" />
-    <download-page rdf:resource="http://maven.apache.org/download.html" />
+    <created>2001</created>
+    <license rdf:resource="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+    <name>Maven</name>
+    <homepage rdf:resource="http://maven.apache.org/"/>
+    <asfext:pmc rdf:resource="http://maven.apache.org/"/>
+    <shortdesc>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</shortdesc>
+    <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</description>
+    <bug-database rdf:resource="http://jira.codehaus.org/browse/MNG"/>
+    <mailing-list rdf:resource="http://maven.apache.org//mail-lists.html"/>
+    <download-page rdf:resource="http://maven.apache.org//download.html"/>
     <programming-language>Java</programming-language>
-    <category rdf:resource="http://projects.apache.org/category/build-management" />
-    <release>
-      <Version>
-        <name>Latest stable release</name>
-        <created>2006-03-28</created>
-        <revision>2.0.3</revision>
-      </Version>
-    </release>
-    <release>
-      <Version>
-        <name>Maven 2.0.2</name>
-        <created>2006-01-16</created>
-        <revision>2.0.2</revision>
-      </Version>
-    </release>
+    <category rdf:resource="http://projects.apache.org/category/build-management"/>
     <repository>
       <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/maven/components/trunk/"/>
-        <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/maven/components/trunk/"/>
+        <location rdf:resource="http://svn.apache.org/repos/asf/maven/components/trunk"/>
+        <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/maven/components/trunk"/>
       </SVNRepository>
     </repository>
     <maintainer>
       <foaf:Person>
+        <foaf:name>Jason van Zyl</foaf:name>
+        <foaf:mbox rdf:resource="mailto:jason@maven.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Brett Porter</foaf:name>
+        <foaf:mbox rdf:resource="mailto:brett@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
         <foaf:name>Emmanuel Venisse</foaf:name>
-          <foaf:mbox rdf:resource="mailto:evenisse@apache.org"/>
+        <foaf:mbox rdf:resource="mailto:evenisse@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Kenney Westerhof</foaf:name>
+        <foaf:mbox rdf:resource="mailto:kenney@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Stephane Nicoll</foaf:name>
+        <foaf:mbox rdf:resource="mailto:snicoll@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Vincent Massol</foaf:name>
+        <foaf:mbox rdf:resource="mailto:vmassol@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Fabrizio Giustina</foaf:name>
+        <foaf:mbox rdf:resource="mailto:fgiust@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Edwin Punzalan</foaf:name>
+        <foaf:mbox rdf:resource="mailto:epunzalan@mergere.com"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Mike Perham</foaf:name>
+        <foaf:mbox rdf:resource="mailto:mperham@gmail.com"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>John Casey</foaf:name>
+        <foaf:mbox rdf:resource="mailto:jdcasey@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Trygve Laugstol</foaf:name>
+        <foaf:mbox rdf:resource="mailto:trygvis@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Vincent Siveton</foaf:name>
+        <foaf:mbox rdf:resource="mailto:vsiveton@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Carlos Sanchez</foaf:name>
+        <foaf:mbox rdf:resource="mailto:carlos@apache.org"/>
       </foaf:Person>
     </maintainer>
   </Project>
