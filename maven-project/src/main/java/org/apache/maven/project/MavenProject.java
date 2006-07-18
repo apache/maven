@@ -471,21 +471,7 @@ public class MavenProject
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
                     Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
-                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-                    MavenProject project = (MavenProject) projectReferences.get( refId );
-                    if ( project != null )
-                    {
-                        list.add( project.getBuild().getOutputDirectory() );
-                    }
-                    else
-                    {
-                        File file = a.getFile();
-                        if ( file == null )
-                        {
-                            throw new DependencyResolutionRequiredException( a );
-                        }
-                        list.add( file.getPath() );
-                    }
+                    addArtifactPath( a, list );
                 }
             }
         }
@@ -742,21 +728,7 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
-                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-                    MavenProject project = (MavenProject) projectReferences.get( refId );
-                    if ( project != null )
-                    {
-                        list.add( project.getBuild().getOutputDirectory() );
-                    }
-                    else
-                    {
-                        File file = a.getFile();
-                        if ( file == null )
-                        {
-                            throw new DependencyResolutionRequiredException( a );
-                        }
-                        list.add( file.getPath() );
-                    }
+                    addArtifactPath( a, list );
                 }
             }
         }
@@ -1622,5 +1594,24 @@ public class MavenProject
             }
         }
         return pluginArtifact;
+    }
+    
+    private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
+    {
+        String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
+        MavenProject project = (MavenProject) projectReferences.get( refId );
+        if ( project != null )
+        {
+            list.add( project.getBuild().getOutputDirectory() );
+        }
+        else
+        {
+            File file = a.getFile();
+            if ( file == null )
+            {
+                throw new DependencyResolutionRequiredException( a );
+            }
+            list.add( file.getPath() );
+        }
     }
 }
