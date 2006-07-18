@@ -1,20 +1,23 @@
 #!/bin/bash
 
-dest=/home/maven/repository-staging/to-ibiblio
+dir=/home/maven/repository-staging/to-ibiblio
 repocleanhome=$HOME/repository-tools/repoclean
 log=$repocleanhome/last-changes-java.net.log
 
-cd $dest/maven-java.net
+src=maven2-repoclean-java.net/com/sun
+dst=maven2/com/sun
+
+cd $dir/maven-java.net
 
 cvs update -P
 
 $repocleanhome/repoclean.sh ~/components/maven-meeper/src/bin/repoclean/java.net/synchronize.properties
 
-rsync --ignore-existing -ripl $dest/maven2-repoclean-java.net/com/sun/ $dest/maven2/com/sun/ > $log
+rsync --ignore-existing -rvpl $dir/$src/ $dir/dst/ > $log
 
-for f in `cat $log | grep maven-metadata.xml` ; do
-  md5sum $dest/maven2/$f > $dest/maven2/$f.md5;
-  sha1sum $dest/maven2/$f > $dest/maven2/$f.sha1;
-  md5sum $dest/maven2-repoclean-java.net/$f > $dest/maven2-repoclean-java.net/$f.md5;
-  sha1sum $dest/maven2-repoclean-java.net/$f > $dest/maven2-repoclean-java.net/$f.sha1;
+for f in `cat $log | grep maven-metadata.xml$` ; do
+  md5sum $dir/$dst/$f > $dir/$dst/$f.md5;
+  sha1sum $dir/$dst/$f > $dir/$dst/$f.sha1;
+  md5sum $dir/$src/$f > $dir/$src/$f.md5;
+  sha1sum $dir/$src/$f > $dir/$src/$f.sha1;
 done
