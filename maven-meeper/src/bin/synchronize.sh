@@ -10,6 +10,9 @@ fi
 
 
 TOOLS_BASE=$HOME/components/maven-meeper/src/bin
+
+echo Running Syncopate
+
 (
   cd $TOOLS_BASE/syncopate
   ./sync
@@ -17,12 +20,15 @@ TOOLS_BASE=$HOME/components/maven-meeper/src/bin
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
+echo Running repoclean
+
 (
   $TOOLS_BASE/repoclean/sync-repoclean.sh
   retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 )
 retval=$?; if [ $retval != 0 ]; then exit $retval; fi
 
+echo Removing commons-logging 1.1-dev
 
 # hack prevent commons-logging-1.1-dev
 CL=$HOME/repository-staging/to-ibiblio/maven2/commons-logging/commons-logging
@@ -32,6 +38,7 @@ mv $CL/maven-metadata.xml.tmp $CL/maven-metadata.xml
 md5sum $CL/maven-metadata.xml > $CL/maven-metadata.xml.md5
 sha1sum $CL/maven-metadata.xml > $CL/maven-metadata.xml.sha1
 
+echo Synchronizing to ibiblio
 
 (
   cd $TOOLS_BASE/ibiblio-sync
