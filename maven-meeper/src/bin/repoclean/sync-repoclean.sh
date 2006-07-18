@@ -9,7 +9,7 @@ dst=maven2
 
 $repocleanhome/repoclean.sh ~/components/maven-meeper/src/bin/repoclean/synchronize.properties
 
-rsync --ignore-existing -rvpl $dir/$src/ $dir/dst/ > $log
+rsync --ignore-existing -rvpl $dir/$src/ $dir/$dst/ > $log
 
 for f in `cat $log | grep maven-metadata.xml$` ; do
   md5sum $dir/$dst/$f > $dir/$dst/$f.md5;
