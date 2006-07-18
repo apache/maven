@@ -101,6 +101,15 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-doap-plugin</artifactId>
+        <configuration>
+          <category>build-management</category>
+          <language>Java</language>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
   <modules>
     <module>maven-artifact</module>
@@ -139,9 +148,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <!-- We need to upgrade this to 1.0-alpha-10-SNAPSHOT for >= 2.0.5, to correct MNG-2201
-        <version>1.0-alpha-10-SNAPSHOT</version>
-        -->
+        <!-- We need to upgrade this to 1.0-alpha-10-SNAPSHOT for >= 2.0.5, to correct MNG-2201 -->
         <version>1.0-alpha-9</version>
       </dependency>
       <dependency>
