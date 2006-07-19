@@ -8,6 +8,7 @@ RewriteEngine on
 
 RewriteBase /maven/
 
+RewriteRule maven/jars/dom4j-(.+).jar$ /maven2/maven/dom4j/$1/dom4j-$1.jar [L]
 RewriteRule dom4j/jars/dom4j-(.+).jar$ /maven2/dom4j/dom4j/$1/dom4j-$1.jar [L]
 RewriteRule jaxen/jars/jaxen-1.0-FCS-full.jar$ /maven2/jaxen/jaxen/1.0-FCS/jaxen-1.0-FCS-full.jar [L]
 RewriteRule cactus/jars/cactus-([0-9]+)-(.+).jar$ /maven2/cactus/cactus/$1-$2/cactus-$1-$2.jar [L]
