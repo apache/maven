@@ -25,6 +25,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="surefire"
+ *
  * @author Fabrizio Giustina
  * @author Dennis Lundberg
  * @version $Id$

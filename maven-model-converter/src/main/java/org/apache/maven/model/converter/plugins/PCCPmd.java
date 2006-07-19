@@ -25,6 +25,8 @@ import java.util.StringTokenizer;
 /**
  * A <code>PluginConfigurationConverter</code> for the maven-pmd-plugin.
  *
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="pmd"
+ *
  * @author Dennis Lundberg
  * @version $Id: PCCPmd.java 409264 2006-05-24 23:13:13 +0000 (on, 24 maj 2006) carlos $
  */

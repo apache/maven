@@ -44,6 +44,7 @@ import java.util.Properties;
 
 /**
  * @author jdcasey
+ * @plexus.component role="org.apache.maven.model.converter.ModelConverter"
  */
 public class PomV3ToV4Translator
     implements ModelConverter

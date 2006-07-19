@@ -22,6 +22,8 @@ import org.apache.maven.model.converter.ProjectConverterException;
 import java.util.Properties;
 
 /**
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="multiproject"
+ *
  * @author Fabrizio Giustina
  * @version $Id$
  */

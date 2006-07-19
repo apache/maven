@@ -17,17 +17,6 @@ package org.apache.maven.model.converter;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.converter.plugins.PCCChangelog;
-import org.apache.maven.model.converter.plugins.PCCChanges;
-import org.apache.maven.model.converter.plugins.PCCCheckstyle;
-import org.apache.maven.model.converter.plugins.PCCCompiler;
-import org.apache.maven.model.converter.plugins.PCCJar;
-import org.apache.maven.model.converter.plugins.PCCJavadoc;
-import org.apache.maven.model.converter.plugins.PCCMultiproject;
-import org.apache.maven.model.converter.plugins.PCCPmd;
-import org.apache.maven.model.converter.plugins.PCCSurefire;
-import org.apache.maven.model.converter.plugins.PCCTaglist;
-import org.apache.maven.model.converter.plugins.PCCWar;
 import org.apache.maven.model.converter.plugins.PluginConfigurationConverter;
 import org.apache.maven.model.converter.relocators.PluginRelocator;
 import org.apache.maven.model.converter.relocators.PluginRelocatorManager;
@@ -48,6 +37,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -56,6 +46,7 @@ import java.util.Properties;
  * @author Fabrizio Giustina
  * @author Dennis Lundberg
  * @version $Id$
+ * @plexus.component role="org.apache.maven.model.converter.Maven1Converter"
  */
 public class Maven1Converter
     extends AbstractLogEnabled
@@ -64,10 +55,10 @@ public class Maven1Converter
 
     /**
      * Available converters for specific plugin configurations
+     *
+     * @plexus.requirement role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter"
      */
-    private PluginConfigurationConverter[] converters = new PluginConfigurationConverter[]{new PCCChangelog(),
-        new PCCChanges(), new PCCCheckstyle(), new PCCCompiler(), new PCCJar(), new PCCJavadoc(), new PCCMultiproject(),
-        new PCCPmd(), new PCCSurefire(), new PCCTaglist(), new PCCWar()};
+    private List converters;
 
     /**
      * Plexus component that manages plugin relocators
@@ -120,9 +111,10 @@ public class Maven1Converter
 
         loadProperties( properties, new File( basedir, "project.properties" ) );
 
-        for ( int j = 0; j < converters.length; j++ )
+        for ( Iterator i = converters.iterator(); i.hasNext(); )
         {
-            converters[j].convertConfiguration( v4Model, v3Model, properties );
+            PluginConfigurationConverter converter = (PluginConfigurationConverter) i.next();
+            converter.convertConfiguration( v4Model, v3Model, properties );
         }
 
         // @todo Should this be run before or after the configuration converters?

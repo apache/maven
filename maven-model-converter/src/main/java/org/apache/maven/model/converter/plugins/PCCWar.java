@@ -23,6 +23,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.util.Properties;
 
 /**
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="war"
+ *
  * @author Fabrizio Giustina
  * @author Dennis Lundberg
  * @version $Id$

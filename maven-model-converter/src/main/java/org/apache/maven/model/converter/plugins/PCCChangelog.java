@@ -24,6 +24,8 @@ import java.util.Properties;
 /**
  * A <code>PluginConfigurationConverter</code> for the maven-changelog-plugin.
  *
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="changelog"
+ *
  * @author Dennis Lundberg
  * @version $Id: PCCChangelog.java 409264 2006-05-24 23:13:13 +0000 (on, 24 maj 2006) carlos $
  */

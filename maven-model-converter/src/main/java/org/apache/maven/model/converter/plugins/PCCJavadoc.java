@@ -25,6 +25,8 @@ import java.util.StringTokenizer;
 /**
  * A <code>PluginConfigurationConverter</code> for the maven-javadoc-plugin.
  *
+ * @plexus.component role="org.apache.maven.model.converter.plugins.PluginConfigurationConverter" role-hint="javadoc"
+ *
  * @author Dennis Lundberg
  * @version $Id: PCCJavadoc.java 409264 2006-05-24 23:13:13 +0000 (on, 24 maj 2006) carlos $
  */
