@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+echo
+echo "*********************************************************"
+echo if you are running in windows, run $0 windows
+echo "*********************************************************"
+echo
+
+
 rm -Rf target
 
 mkdir target
