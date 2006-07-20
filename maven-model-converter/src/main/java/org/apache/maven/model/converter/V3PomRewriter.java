@@ -30,10 +30,14 @@ import java.util.List;
 
 /**
  * @author jdcasey
+ * @plexus.component role="org.apache.maven.model.converter.ArtifactPomRewriter" role-hint="v3"
  */
 public class V3PomRewriter
     implements ArtifactPomRewriter
 {
+    /**
+     * @plexus.requirement
+     */
     private ModelConverter translator;
 
     public void rewrite( Reader from, Writer to, boolean reportOnly, String groupId, String artifactId, String version,

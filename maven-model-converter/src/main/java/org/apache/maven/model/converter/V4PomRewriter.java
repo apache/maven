@@ -22,15 +22,18 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author jdcasey
+ * @plexus.component role="org.apache.maven.model.converter.ArtifactPomRewriter" role-hint="v4"
  */
 public class V4PomRewriter
     implements ArtifactPomRewriter
 {
+    /**
+     * @plexus.requirement
+     */
     private ModelConverter translator;
 
     public void rewrite( Reader from, Writer to, boolean reportOnly, String groupId, String artifactId, String version,
