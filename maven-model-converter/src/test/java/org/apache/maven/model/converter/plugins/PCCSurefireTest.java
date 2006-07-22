@@ -41,7 +41,7 @@ public class PCCSurefireTest
     {
         try
         {
-            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSurefireTest1.properties" ) );
+            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSureFireTest1.properties" ) );
 
             pluginConfigurationConverter.buildConfiguration( configuration, v3Model, projectProperties );
 
@@ -96,7 +96,7 @@ public class PCCSurefireTest
     {
         try
         {
-            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSurefireTest1.properties" ) );
+            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSureFireTest1.properties" ) );
 
             pluginConfigurationConverter.buildConfiguration( configuration, v3Model, projectProperties );
 
@@ -117,7 +117,7 @@ public class PCCSurefireTest
     {
         try
         {
-            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSurefireTest2.properties" ) );
+            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSureFireTest2.properties" ) );
 
             pluginConfigurationConverter.buildConfiguration( configuration, v3Model, projectProperties );
 
@@ -138,7 +138,7 @@ public class PCCSurefireTest
     {
         try
         {
-            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSurefireTest3.properties" ) );
+            projectProperties.load( getClassLoader().getResourceAsStream( "PCCSureFireTest3.properties" ) );
 
             pluginConfigurationConverter.buildConfiguration( configuration, v3Model, projectProperties );
 
