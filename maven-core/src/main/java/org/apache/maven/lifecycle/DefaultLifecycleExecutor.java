@@ -1335,7 +1335,7 @@ public class DefaultLifecycleExecutor
             if ( mojoDescriptor == null )
             {
                 throw new LifecycleExecutionException(
-                    "'" + goal + "' was specified in an execution, but not found in the plugin" );
+                    "Goal '" + goal + "' was specified in an execution, but not found in plugin " + pluginDescriptor.getId() );
             }
 
             // We have to check to see that the inheritance rules have been applied before binding this mojo.
