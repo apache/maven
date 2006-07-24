@@ -1,7 +1,7 @@
 package org.apache.maven.plugin;
 
 /*
- * Copyright 2001-2006 The Apache Software Foundation.
+ * Copyright 2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,21 @@ package org.apache.maven.plugin;
  */
 
 /**
- * Thrown when a plugin is not internally consistent.
+ * Marker exception to aggregate all kind of plugin exceptions.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @version $Id$
  */
-public class InvalidPluginException
-    extends PluginException
+public abstract class PluginException
+    extends Exception
 {
-    public InvalidPluginException( String message, Exception e )
+    public PluginException( String message )
     {
-        super( message, e );
+        super( message );
+    }
+
+    public PluginException( String message, Throwable t )
+    {
+        super( message, t );
     }
 }
