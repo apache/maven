@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @version $Id$
+ * @since 2.0.5
  */
 public abstract class PluginException
     extends Exception
