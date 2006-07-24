@@ -35,6 +35,10 @@ import java.util.Properties;
 public class DefaultRuntimeInformation
     implements RuntimeInformation, Initializable
 {
+    private static final String MAVEN_GROUPID = "org.apache.maven";
+    
+    private static final String MAVEN_PROPERTIES = "META-INF/maven/" + MAVEN_GROUPID + "/maven-core/pom.properties";
+
     private ArtifactVersion applicationVersion;
 
     public ArtifactVersion getApplicationVersion()
@@ -49,8 +53,12 @@ public class DefaultRuntimeInformation
         try
         {
             Properties properties = new Properties();
-            resourceAsStream = getClass().getClassLoader().getResourceAsStream(
-                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+            resourceAsStream = getClass().getClassLoader().getResourceAsStream( MAVEN_PROPERTIES );
+            
+            if ( resourceAsStream == null )
+            {
+                throw new IllegalStateException( "Unable to find Maven properties in classpath: " + MAVEN_PROPERTIES );
+            }
             properties.load( resourceAsStream );
 
             String property = properties.getProperty( "version" );

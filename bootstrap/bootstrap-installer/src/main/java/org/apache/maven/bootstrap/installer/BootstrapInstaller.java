@@ -43,6 +43,8 @@ import java.util.Iterator;
  */
 public class BootstrapInstaller
 {
+    private static final String MAVEN_GROUPID = "org.apache.maven";
+
     private final Bootstrap bootstrapper;
 
     private final String prefix;
@@ -117,7 +119,7 @@ public class BootstrapInstaller
 
         bootstrapper.buildProject( new File( basedir ), true );
 
-        Model mavenCoreModel = bootstrapper.getCachedModel( "org.apache.maven", "maven-core" );
+        Model mavenCoreModel = bootstrapper.getCachedModel( MAVEN_GROUPID, "maven-core" );
 
         File installation = new File( basedir, "bootstrap/target/installation" );
         createInstallation( installation, mavenCoreModel );
