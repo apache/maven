@@ -26,7 +26,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @version $Id$
- * @since 2.1
+ * @since 2.0.5
  */
 public abstract class AbstractConsoleDownloadMonitor
     extends AbstractLogEnabled
