@@ -63,7 +63,7 @@ public class Maven1Converter
     /**
      * Plexus component that manages plugin relocators
      *
-     * @component
+     * @plexus.requirement
      */
     private PluginRelocatorManager pluginRelocatorManager;
 
