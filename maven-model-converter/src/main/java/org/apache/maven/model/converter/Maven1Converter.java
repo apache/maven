@@ -51,8 +51,6 @@ import java.util.Properties;
 public class Maven1Converter
     extends AbstractLogEnabled
 {
-    private File basedir;
-
     /**
      * Available converters for specific plugin configurations
      *
@@ -67,14 +65,20 @@ public class Maven1Converter
      */
     private PluginRelocatorManager pluginRelocatorManager;
 
+    private File basedir;
+
+    private File outputdir;
+
+    private String fileName = "project.xml";
+
     public void execute()
         throws ProjectConverterException
     {
-        File projectxml = new File( basedir, "project.xml" );
+        File projectxml = new File( basedir, fileName );
 
         if ( !projectxml.exists() )
         {
-            throw new ProjectConverterException( "Missing project.xml in " + basedir.getAbsolutePath() );
+            throw new ProjectConverterException( "Missing " + fileName + " in " + basedir.getAbsolutePath() );
         }
 
         PomV3ToV4Translator translator = new PomV3ToV4Translator();
@@ -86,7 +90,7 @@ public class Maven1Converter
         }
         catch ( Exception e )
         {
-            throw new ProjectConverterException( "Exception caught while loading project.xml. " + e.getMessage(), e );
+            throw new ProjectConverterException( "Exception caught while loading " + fileName + ". " + e.getMessage(), e );
         }
 
         Model v4Model;
@@ -97,7 +101,7 @@ public class Maven1Converter
         }
         catch ( Exception e )
         {
-            throw new ProjectConverterException( "Exception caught while converting project.xml. " + e.getMessage(),
+            throw new ProjectConverterException( "Exception caught while converting " + fileName + ". " + e.getMessage(),
                                                  e );
         }
 
@@ -254,11 +258,16 @@ public class Maven1Converter
     private void writeV4Pom( Model v4Model )
         throws ProjectConverterException
     {
-        File pomxml = new File( basedir, "pom.xml" );
+        if ( outputdir == null )
+        {
+            outputdir = basedir;
+        }
+
+        File pomxml = new File( outputdir, "pom.xml" );
 
         if ( pomxml.exists() )
         {
-            getLogger().warn( "pom.xml in " + basedir.getAbsolutePath() + " already exists, overwriting" );
+            getLogger().warn( "pom.xml in " + outputdir.getAbsolutePath() + " already exists, overwriting" );
         }
 
         MavenXpp3Writer v4Writer = new MavenXpp3Writer();
@@ -291,5 +300,34 @@ public class Maven1Converter
     public void setBasedir( File basedir )
     {
         this.basedir = basedir;
+    }
+
+    public String getProjectFileName()
+    {
+        return fileName;
+    }
+
+    public void setProjectFileName( String projectFileName )
+    {
+        this.fileName = projectFileName;
+    }
+
+    public void setProjectFile( File projectFile )
+    {
+        if ( projectFile != null )
+        {
+            basedir = projectFile.getParentFile();
+            fileName = projectFile.getName();
+        }
+    }
+
+    public File getOutputdir()
+    {
+        return outputdir;
+    }
+
+    public void setOutputdir( File outputdir )
+    {
+        this.outputdir = outputdir;
     }
 }
