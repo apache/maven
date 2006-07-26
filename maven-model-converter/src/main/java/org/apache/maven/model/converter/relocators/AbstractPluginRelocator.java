@@ -19,8 +19,13 @@ package org.apache.maven.model.converter.relocators;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.converter.ConverterListener;
 import org.apache.maven.model.converter.ModelUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A general implementation of the <code>PluginRelocator</code> interface.
@@ -32,6 +37,8 @@ public abstract class AbstractPluginRelocator
     extends AbstractLogEnabled
     implements PluginRelocator
 {
+    private List listeners = new ArrayList();
+
     /**
      * If there is no replacement for this plugin, you can have the plugin
      * removed from the v4 pom by returning <code>null</code> from this method
@@ -89,7 +96,7 @@ public abstract class AbstractPluginRelocator
             {
                 // Remove the old plugin
                 v4Model.getBuild().getPlugins().remove( oldBuildPlugin );
-                getLogger().info( "Removing build plugin " + getOldGroupId() + ":" + getOldArtifactId() );
+                sendInfoMessage( "Removing build plugin " + getOldGroupId() + ":" + getOldArtifactId() );
             }
             else
             {
@@ -99,13 +106,13 @@ public abstract class AbstractPluginRelocator
                     // The new plugin does not exist, relocate the old one
                     oldBuildPlugin.setArtifactId( getNewArtifactId() );
                     oldBuildPlugin.setGroupId( getNewGroupId() );
-                    getLogger().info( "Relocating build plugin " + getOldGroupId() + ":" + getOldArtifactId() );
+                    sendInfoMessage( "Relocating build plugin " + getOldGroupId() + ":" + getOldArtifactId() );
                 }
                 else
                 {
                     // The new plugin already exist, remove the old one
                     v4Model.getBuild().getPlugins().remove( oldBuildPlugin );
-                    getLogger().info( "Removing old build plugin " + getOldGroupId() + ":" + getOldArtifactId() +
+                    sendInfoMessage( "Removing old build plugin " + getOldGroupId() + ":" + getOldArtifactId() +
                         " because the new one already exist" );
                 }
             }
@@ -119,7 +126,7 @@ public abstract class AbstractPluginRelocator
             {
                 // Remove the old plugin
                 v4Model.getReporting().getPlugins().remove( oldReportPlugin );
-                getLogger().info( "Removing report plugin " + getOldGroupId() + ":" + getOldArtifactId() );
+                sendInfoMessage( "Removing report plugin " + getOldGroupId() + ":" + getOldArtifactId() );
             }
             else
             {
@@ -129,16 +136,44 @@ public abstract class AbstractPluginRelocator
                     // The new plugin does not exist, relocate the old one
                     oldReportPlugin.setArtifactId( getNewArtifactId() );
                     oldReportPlugin.setGroupId( getNewGroupId() );
-                    getLogger().info( "Relocating report plugin " + getOldGroupId() + ":" + getOldArtifactId() );
+                    sendInfoMessage( "Relocating report plugin " + getOldGroupId() + ":" + getOldArtifactId() );
                 }
                 else
                 {
                     // The new plugin already exist, remove the old one
                     v4Model.getReporting().getPlugins().remove( oldReportPlugin );
-                    getLogger().info( "Removing old report plugin " + getOldGroupId() + ":" + getOldArtifactId() +
+                    sendInfoMessage( "Removing old report plugin " + getOldGroupId() + ":" + getOldArtifactId() +
                         " because the new one already exist" );
                 }
             }
+        }
+    }
+
+    public void addListener( ConverterListener listener )
+    {
+        if ( !listeners.contains( listener ) )
+        {
+            listeners.add( listener );
+        }
+    }
+
+    public void addListeners( List listeners )
+    {
+        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        {
+            ConverterListener listener = (ConverterListener) i.next();
+            addListener( listener );
+        }
+    }
+
+    private void sendInfoMessage( String message )
+    {
+        getLogger().info( message );
+        
+        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        {
+            ConverterListener listener = (ConverterListener) i.next();
+            listener.info( message );
         }
     }
 }
