@@ -2356,6 +2356,28 @@
     {
         return groupId + ":" + artifactId;
     }
+    
+    public boolean equals( Object other )
+    {
+        if ( other instanceof Plugin )
+        {
+            Plugin otherPlugin = (Plugin) other;
+            
+            return getKey().equals( otherPlugin.getKey() );
+        }
+        
+        return false;
+    }
+    
+    public int hashCode()
+    {
+        return getKey().hashCode();
+    }
+    
+    public String toString()
+    {
+        return "Plugin [" + getKey() + "]";
+    }
           ]]></code>
         </codeSegment>
       </codeSegments>
