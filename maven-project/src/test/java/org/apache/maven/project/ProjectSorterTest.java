@@ -18,11 +18,14 @@ package org.apache.maven.project;
 
 import junit.framework.TestCase;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +37,32 @@ import java.util.List;
 public class ProjectSorterTest
     extends TestCase
 {
+    
+    public void testShouldNotFailWhenProjectReferencesNonExistentProject()
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        MavenProject project = createProject( "group", "artifact", "1.0" );
+        Model model = project.getModel();
+        
+        Build build = model.getBuild();
+        
+        if ( build == null )
+        {
+            build = new Build();
+            model.setBuild( build );
+        }
+        
+        Extension extension = new Extension();
+        
+        extension.setArtifactId( "other-artifact" );
+        extension.setGroupId( "other.group" );
+        extension.setVersion( "1.0" );
+        
+        build.addExtension( extension );
+        
+        new ProjectSorter( Collections.singletonList( project ) );
+    }
+    
     public void testMatchingArtifactIdsDifferentGroupIds()
         throws CycleDetectedException, DuplicateProjectException
     {
