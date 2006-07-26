@@ -267,6 +267,8 @@ public class Maven1Converter
             outputdir = basedir;
         }
 
+        outputdir.mkdirs();
+
         File pomxml = new File( outputdir, "pom.xml" );
 
         if ( pomxml.exists() )
