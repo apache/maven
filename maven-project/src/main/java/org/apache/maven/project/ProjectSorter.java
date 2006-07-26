@@ -75,7 +75,7 @@ public class ProjectSorter
             {
                 throw new DuplicateProjectException( "Project '" + id + "' is duplicated in the reactor" );
             }
-            
+
             dag.addVertex( id );
 
             projectMap.put( id, project );
@@ -91,8 +91,8 @@ public class ProjectSorter
             {
                 Dependency dependency = (Dependency) j.next();
 
-                String dependencyId = ArtifactUtils.versionlessKey( dependency.getGroupId(),
-                                                                    dependency.getArtifactId() );
+                String dependencyId = ArtifactUtils
+                    .versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
 
                 if ( dag.getVertex( dependencyId ) != null )
                 {
@@ -168,10 +168,16 @@ public class ProjectSorter
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
     }
 
-    private void addEdgeWithParentCheck( Map projectMap, String extensionId, MavenProject project, String id )
+    private void addEdgeWithParentCheck( Map projectMap, String projectRefId, MavenProject project, String id )
         throws CycleDetectedException
     {
-        MavenProject extProject = (MavenProject) projectMap.get( extensionId );
+        MavenProject extProject = (MavenProject) projectMap.get( projectRefId );
+        
+        if ( extProject == null )
+        {
+            return;
+        }
+
         project.addProjectReference( extProject );
 
         MavenProject extParent = extProject.getParent();
@@ -179,9 +185,9 @@ public class ProjectSorter
         {
             String parentId = ArtifactUtils.versionlessKey( extParent.getGroupId(), extParent.getArtifactId() );
             // Don't add edge from parent to extension if a reverse edge already exists
-            if ( !dag.hasEdge( extensionId, id ) || !parentId.equals( id ) )
+            if ( !dag.hasEdge( projectRefId, id ) || !parentId.equals( id ) )
             {
-                dag.addEdge( id, extensionId );
+                dag.addEdge( id, projectRefId );
             }
         }
     }
