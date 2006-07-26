@@ -17,6 +17,9 @@ package org.apache.maven.model.converter.relocators;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.converter.ConverterListener;
+
+import java.util.List;
 
 /**
  * A plugin relocator handles a plugin that has changed its groupId and/or
@@ -36,4 +39,18 @@ public interface PluginRelocator
      * @param v4Model The model where we look for the plugin
      */
     void relocate( Model v4Model );
+
+    /**
+     * Add a listener for all messages sended by the relocator.
+     *
+     * @param listener The listener that will receive messages
+     */
+    void addListener( ConverterListener listener );
+
+    /**
+     * Add a listeners list for all messages sended by the relocator.
+     *
+     * @param listeners The listeners list that will receive messages
+     */
+    void addListeners( List listeners );
 }

@@ -35,8 +35,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -70,6 +72,8 @@ public class Maven1Converter
     private File outputdir;
 
     private String fileName = "project.xml";
+
+    private List listeners = new ArrayList();
 
     public void execute()
         throws ProjectConverterException
@@ -123,7 +127,7 @@ public class Maven1Converter
 
         // @todo Should this be run before or after the configuration converters?
         Collection pluginRelocators = pluginRelocatorManager.getPluginRelocators();
-        getLogger().info( "There are " + pluginRelocators.size() + " plugin relocators available" );
+        sendInfoMessage( "There are " + pluginRelocators.size() + " plugin relocators available" );
         PluginRelocator pluginRelocator;
         Iterator iterator = pluginRelocators.iterator();
         while ( iterator.hasNext() )
@@ -152,7 +156,7 @@ public class Maven1Converter
             }
             catch ( IOException e )
             {
-                getLogger().warn( "Unable to read " + propertiesFile.getAbsolutePath() + ", ignoring." );
+                sendWarnMessage( "Unable to read " + propertiesFile.getAbsolutePath() + ", ignoring." );
             }
             finally
             {
@@ -217,14 +221,14 @@ public class Maven1Converter
 
             if ( !isEmpty( groupId ) )
             {
-                getLogger().warn( "Both <id> and <groupId> is set, using <groupId>." );
+                sendWarnMessage( "Both <id> and <groupId> is set, using <groupId>." );
 
                 model.setGroupId( groupId );
             }
 
             if ( !isEmpty( artifactId ) )
             {
-                getLogger().warn( "Both <id> and <artifactId> is set, using <artifactId>." );
+                sendWarnMessage( "Both <id> and <artifactId> is set, using <artifactId>." );
 
                 model.setArtifactId( artifactId );
             }
@@ -267,13 +271,13 @@ public class Maven1Converter
 
         if ( pomxml.exists() )
         {
-            getLogger().warn( "pom.xml in " + outputdir.getAbsolutePath() + " already exists, overwriting" );
+            sendWarnMessage( "pom.xml in " + outputdir.getAbsolutePath() + " already exists, overwriting" );
         }
 
         MavenXpp3Writer v4Writer = new MavenXpp3Writer();
 
         // write the new pom.xml
-        getLogger().info( "Writing new pom to: " + pomxml.getAbsolutePath() );
+        sendInfoMessage( "Writing new pom to: " + pomxml.getAbsolutePath() );
 
         Writer output = null;
         try
@@ -329,5 +333,35 @@ public class Maven1Converter
     public void setOutputdir( File outputdir )
     {
         this.outputdir = outputdir;
+    }
+
+    public void addListener( ConverterListener listener )
+    {
+        if ( !listeners.contains( listener ) )
+        {
+            listeners.add( listener );
+        }
+    }
+
+    private void sendInfoMessage( String message )
+    {
+        getLogger().info( message );
+        
+        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        {
+            ConverterListener listener = (ConverterListener) i.next();
+            listener.info( message );
+        }
+    }
+
+    private void sendWarnMessage( String message )
+    {
+        getLogger().warn( message );
+        
+        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        {
+            ConverterListener listener = (ConverterListener) i.next();
+            listener.warn( message );
+        }
     }
 }
