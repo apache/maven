@@ -16,14 +16,14 @@ package org.apache.maven.project.injection;
  * limitations under the License.
  */
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
-
-import java.util.List;
 
 /**
  * @author jdcasey
@@ -34,6 +34,45 @@ public class DefaultModelDefaultsInjectorTest
     public void testShouldConstructWithNoParams()
     {
         new DefaultModelDefaultsInjector();
+    }
+
+    public void testShouldMergeManagedDependencyOfTypeEJBToDependencyList()
+    {
+        Model model = new Model();
+        
+        Dependency managedDep = new Dependency();
+        
+        managedDep.setGroupId( "group" );
+        managedDep.setArtifactId( "artifact" );
+        managedDep.setVersion( "1.0" );
+        managedDep.setType( "ejb" );
+        
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency( managedDep );
+        
+        model.setDependencyManagement( depMgmt );
+        
+        Dependency dep = new Dependency();
+        
+        dep.setGroupId( "group" );
+        dep.setArtifactId( "artifact" );
+        
+        // looks like groupId:artifactId:type is the minimum for identification, where
+        // type is defaulted to "jar".
+        dep.setType( "ejb" );
+        
+        model.addDependency( dep );
+        
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+        
+        List resultingDeps = model.getDependencies();
+        
+        assertEquals( 1, resultingDeps.size() );
+        
+        Dependency result = (Dependency) resultingDeps.get( 0 );
+        
+        assertEquals( "1.0", result.getVersion() );
     }
 
     public void testShouldSucceedInMergingDependencyWithDependency()
