@@ -136,7 +136,14 @@ public class Maven1Converter
             pluginRelocator.relocate( v4Model );
         }
 
-        writeV4Pom( v4Model );
+        try
+        {
+            writeV4Pom( v4Model );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectConverterException( "Failed to write the pom.xml.", e );
+        }
     }
 
     private boolean isEmpty( String value )
@@ -260,14 +267,17 @@ public class Maven1Converter
      * @throws ProjectConverterException
      */
     private void writeV4Pom( Model v4Model )
-        throws ProjectConverterException
+        throws ProjectConverterException, IOException
     {
         if ( outputdir == null )
         {
             outputdir = basedir;
         }
 
-        outputdir.mkdirs();
+        if ( !outputdir.exists() && !outputdir.mkdirs() )
+        {
+            throw new IOException( "Failed to create directory " + outputdir );
+        }
 
         File pomxml = new File( outputdir, "pom.xml" );
 
