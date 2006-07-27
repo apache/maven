@@ -416,8 +416,7 @@
           <name>nonProxyHosts</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The list of non-proxied hosts (usually 
-          	comma-delimited).
+          	The list of non-proxied hosts (delimited by |).
           ]]></description>
           <type>String</type>
         </field>
