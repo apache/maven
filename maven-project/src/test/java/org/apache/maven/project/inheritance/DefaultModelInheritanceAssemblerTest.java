@@ -18,6 +18,8 @@ package org.apache.maven.project.inheritance;
 
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -47,6 +49,85 @@ public class DefaultModelInheritanceAssemblerTest
     extends TestCase
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
+    
+    public void testShouldMergeSuccessiveDependencyManagementSectionsOverThreeLevels()
+    {
+        Model top = makeBaseModel( "top" );
+        
+        DependencyManagement topMgmt = new DependencyManagement();
+        
+        topMgmt.addDependency( makeDep( "top-dep" ) );
+        
+        top.setDependencyManagement( topMgmt );
+        
+        Model mid = makeBaseModel( "mid" );
+        
+        DependencyManagement midMgmt = new DependencyManagement();
+        
+        midMgmt.addDependency( makeDep( "mid-dep" ) );
+        
+        mid.setDependencyManagement( midMgmt );
+        
+        Model bottom = makeBaseModel( "bottom" );
+        
+        DependencyManagement bottomMgmt = new DependencyManagement();
+        
+        bottomMgmt.addDependency( makeDep( "bottom-dep" ) );
+        
+        bottom.setDependencyManagement( bottomMgmt );
+        
+        assembler.assembleModelInheritance( mid, top );
+        
+        assembler.assembleModelInheritance( bottom, mid );
+        
+        DependencyManagement result = bottom.getDependencyManagement();
+        
+        List resultDeps = result.getDependencies();
+        
+        assertEquals( 3, resultDeps.size() );
+    }
+    
+    public void testShouldMergeDependencyManagementSectionsFromTopTwoLevelsToBottomLevel()
+    {
+        Model top = makeBaseModel( "top" );
+        
+        DependencyManagement topMgmt = new DependencyManagement();
+        
+        topMgmt.addDependency( makeDep( "top-dep" ) );
+        
+        top.setDependencyManagement( topMgmt );
+        
+        Model mid = makeBaseModel( "mid" );
+        
+        DependencyManagement midMgmt = new DependencyManagement();
+        
+        midMgmt.addDependency( makeDep( "mid-dep" ) );
+        
+        mid.setDependencyManagement( midMgmt );
+        
+        Model bottom = makeBaseModel( "bottom" );
+        
+        assembler.assembleModelInheritance( mid, top );
+        
+        assembler.assembleModelInheritance( bottom, mid );
+        
+        DependencyManagement result = bottom.getDependencyManagement();
+        
+        List resultDeps = result.getDependencies();
+        
+        assertEquals( 2, resultDeps.size() );
+    }
+    
+    private Dependency makeDep( String artifactId )
+    {
+        Dependency dep = new Dependency();
+        
+        dep.setGroupId( "maven" );
+        dep.setArtifactId( artifactId );
+        dep.setVersion( "1.0" );
+        
+        return dep;
+    }
 
     public void testShouldAppendChildPathAdjustmentWithNoChildPartAndNoParentPart()
     {
