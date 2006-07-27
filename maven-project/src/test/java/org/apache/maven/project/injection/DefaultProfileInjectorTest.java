@@ -1,21 +1,105 @@
 package org.apache.maven.project.injection;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import junit.framework.TestCase;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.List;
-
 public class DefaultProfileInjectorTest
     extends TestCase
 {
+
+    /**
+     * Test that this is the resulting ordering of plugins after merging:
+     * 
+     * Given:
+     * 
+     *   model: X -> A -> B -> D -> E
+     *   profile: Y -> A -> C -> D -> F
+     *  
+     * Result: 
+     * 
+     *   X -> Y -> A -> B -> C -> D -> E -> F
+     */
+    public void testShouldPreserveOrderingOfPluginsAfterProfileMerge()
+    {
+        PluginContainer profile = new PluginContainer();
+        
+        profile.addPlugin( createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP ) );
+        profile.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key", "value" ) ) );
+        
+        PluginContainer model = new PluginContainer();
+        
+        model.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
+        model.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key2", "value2" ) ) );
+        
+        new DefaultProfileInjector().injectPlugins( profile, model );
+        
+        List results = model.getPlugins();
+        
+        assertEquals( 3, results.size() );
+        
+        Plugin result1 = (Plugin) results.get( 0 );
+        
+        assertEquals( "group3", result1.getGroupId() );
+        assertEquals( "artifact3", result1.getArtifactId() );
+        
+        Plugin result2 = (Plugin) results.get( 1 );
+        
+        assertEquals( "group", result2.getGroupId() );
+        assertEquals( "artifact", result2.getArtifactId() );
+        
+        Plugin result3 = (Plugin) results.get( 2 );
+        
+        assertEquals( "group2", result3.getGroupId() );
+        assertEquals( "artifact2", result3.getArtifactId() );
+        
+        Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
+        
+        assertNotNull( result3Config );
+        
+        assertEquals( "value", result3Config.getChild( "key" ).getValue() );
+        assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
+    }
+    
+    private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
+    {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( groupId );
+        plugin.setArtifactId( artifactId );
+        plugin.setVersion( version );
+        
+        Xpp3Dom config = new Xpp3Dom( "configuration" );
+        
+        if( configuration != null )
+        {
+            for ( Iterator it = configuration.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+                
+                Xpp3Dom param = new Xpp3Dom( String.valueOf( entry.getKey() ) );
+                param.setValue( String.valueOf( entry.getValue() ) );
+                
+                config.addChild( param );
+            }
+        }
+        
+        plugin.setConfiguration( config );
+        
+        return plugin;
+    }
 
     public void testProfilePluginConfigurationShouldOverrideCollidingModelPluginConfiguration()
     {

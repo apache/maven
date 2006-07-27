@@ -136,7 +136,19 @@ public class DefaultProfileInjector
         }
     }
 
-    private void injectPlugins( PluginContainer profileContainer, PluginContainer modelContainer )
+    /**
+     * This should be the resulting ordering of plugins after injection:
+     * 
+     * Given:
+     * 
+     *   model: X -> A -> B -> D -> E
+     *   profile: Y -> A -> C -> D -> F
+     *  
+     * Result: 
+     * 
+     *   X -> Y -> A -> B -> C -> D -> E -> F
+     */
+    protected void injectPlugins( PluginContainer profileContainer, PluginContainer modelContainer )
     {
         if ( profileContainer == null || modelContainer == null )
         {
@@ -152,7 +164,7 @@ public class DefaultProfileInjector
         }
         else if ( profileContainer.getPlugins() != null )
         {
-            Map mergedPlugins = new TreeMap();
+            List mergedPlugins = new ArrayList();
 
             Map profilePlugins = profileContainer.getPluginsAsMap();
 
@@ -160,31 +172,21 @@ public class DefaultProfileInjector
             {
                 Plugin modelPlugin = (Plugin) it.next();
 
-                Plugin mergedPlugin = modelPlugin;
-
                 Plugin profilePlugin = (Plugin) profilePlugins.get( modelPlugin.getKey() );
 
-                if ( profilePlugin != null )
+                if ( profilePlugin != null && !mergedPlugins.contains( profilePlugin ) )
                 {
-                    mergedPlugin = modelPlugin;
+                    Plugin mergedPlugin = modelPlugin;
 
                     injectPluginDefinition( profilePlugin, modelPlugin );
-                }
 
-                mergedPlugins.put( mergedPlugin.getKey(), mergedPlugin );
-            }
-
-            for ( Iterator it = profilePlugins.values().iterator(); it.hasNext(); )
-            {
-                Plugin profilePlugin = (Plugin) it.next();
-
-                if ( !mergedPlugins.containsKey( profilePlugin.getKey() ) )
-                {
-                    mergedPlugins.put( profilePlugin.getKey(), profilePlugin );
+                    mergedPlugins.add( mergedPlugin );
                 }
             }
 
-            modelContainer.setPlugins( new ArrayList( mergedPlugins.values() ) );
+            List results = ModelUtils.orderAfterMerge( mergedPlugins, modelPlugins, profileContainer.getPlugins() );
+
+            modelContainer.setPlugins( results );
 
             modelContainer.flushPluginMap();
         }
