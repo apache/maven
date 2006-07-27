@@ -50,6 +50,52 @@ public class DefaultModelInheritanceAssemblerTest
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
     
+    public void testShouldAdjustChildUrlBasedOnParentAndModulePathInSiblingDir()
+    {
+        Model parent = makeBaseModel( "parent" );
+        
+        parent.setUrl( "http://www.google.com/parent" );
+        
+        Model child = makeBaseModel( "child" );
+        
+        // TODO: this is probably what we should be appending...
+//        child.setUrl( "/child.dir" );
+        
+        parent.addModule( "../child" );
+        
+        assembler.assembleModelInheritance( child, parent, ".." );
+        
+        String resultingUrl = child.getUrl();
+        
+        System.out.println( resultingUrl );
+        
+        assertEquals( "http://www.google.com/child", resultingUrl );
+    }
+    
+    public void testShouldAdjustPathsThreeLevelsDeepAncestryInRepoAndNonStandardModulePaths()
+    {
+        Model top = makeBaseModel( "top" );
+        
+        top.setUrl( "http://www.google.com/top" );
+        
+        Model middle = makeBaseModel( "middle" );
+        
+        top.addModule( "../middle" );
+        
+        Model bottom = makeBaseModel( "bottom" );
+        
+        middle.addModule( "../bottom" );
+        
+        assembler.assembleModelInheritance( middle, top, ".." );
+        assembler.assembleModelInheritance( bottom, middle, ".." );
+        
+        String resultingUrl = bottom.getUrl();
+        
+        System.out.println( resultingUrl );
+        
+        assertEquals( "http://www.google.com/bottom", resultingUrl );
+    }
+    
     public void testShouldMergeSuccessiveDependencyManagementSectionsOverThreeLevels()
     {
         Model top = makeBaseModel( "top" );
