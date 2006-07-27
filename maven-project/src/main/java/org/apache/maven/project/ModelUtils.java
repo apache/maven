@@ -57,6 +57,19 @@ import java.util.HashMap;
 
 public final class ModelUtils
 {
+    
+    /**
+     * This should be the resulting ordering of plugins after merging:
+     * 
+     * Given:
+     * 
+     *   parent: X -> A -> B -> D -> E
+     *   child: Y -> A -> C -> D -> F
+     *  
+     * Result: 
+     * 
+     *   X -> Y -> A -> B -> C -> D -> E -> F
+     */
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
                                          boolean handleAsInheritance )
     {
@@ -66,16 +79,33 @@ public final class ModelUtils
             return;
         }
 
-        List mergedPlugins = new ArrayList();
-
         List parentPlugins = parentContainer.getPlugins();
-
+        
         if ( parentPlugins != null && !parentPlugins.isEmpty() )
         {
-            Map assembledPlugins = new TreeMap();
+            parentPlugins = new ArrayList( parentPlugins );
+            
+            // If we're processing this merge as an inheritance, we have to build up a list of 
+            // plugins that were considered for inheritance.
+            if ( handleAsInheritance )
+            {
+                for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    
+                    String inherited = plugin.getInherited();
+                    
+                    if ( inherited != null && !Boolean.valueOf( inherited ).booleanValue() )
+                    {
+                        it.remove();
+                    }
+                }
+            }
+            
+            List assembledPlugins = new ArrayList();
 
             Map childPlugins = childContainer.getPluginsAsMap();
-
+            
             for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
             {
                 Plugin parentPlugin = (Plugin) it.next();
@@ -90,16 +120,16 @@ public final class ModelUtils
                 if ( !handleAsInheritance || parentInherited == null ||
                     Boolean.valueOf( parentInherited ).booleanValue() )
                 {
-
-                    Plugin assembledPlugin = parentPlugin;
-
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
 
-                    if ( childPlugin != null )
+                    if ( childPlugin != null && !assembledPlugins.contains( childPlugin ) )
                     {
-                        assembledPlugin = childPlugin;
+                        Plugin assembledPlugin = childPlugin;
 
                         mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+                        
+                        // fix for MNG-2221 (assembly cache was not being populated for later reference):
+                        assembledPlugins.add( assembledPlugin );
                     }
 
                     // if we're processing this as an inheritance-based merge, and
@@ -107,30 +137,78 @@ public final class ModelUtils
                     // clear the inherited flag in the merge result.
                     if ( handleAsInheritance && parentInherited == null )
                     {
-                        assembledPlugin.unsetInheritanceApplied();
+                        parentPlugin.unsetInheritanceApplied();
                     }
-
-                    mergedPlugins.add(assembledPlugin);
-
-                    // fix for MNG-2221 (assembly cache was not being populated for later reference):
-                    assembledPlugins.put(  assembledPlugin.getKey(), assembledPlugin );
                 }
+                
+                // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
+                // since this list is a local one, and may have been modified during processing.
+                List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
+                                                                        childContainer.getPlugins() );
+                
+                
+                childContainer.setPlugins( results );
+
+                childContainer.flushPluginMap();
             }
-
-            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
-            {
-                Plugin childPlugin = (Plugin) it.next();
-
-                if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
-                {
-                    mergedPlugins.add(childPlugin);
-                }
-            }
-
-            childContainer.setPlugins(mergedPlugins);
-
-            childContainer.flushPluginMap();
         }
+    }
+
+    public static List orderAfterMerge( List merged, List highPrioritySource, List lowPrioritySource )
+    {
+        List results = new ArrayList();
+        
+        if ( !merged.isEmpty() )
+        {
+            results.addAll( merged );
+        }
+        
+        List missingFromResults = new ArrayList();
+        
+        List sources = new ArrayList();
+        
+        sources.add( highPrioritySource );
+        sources.add( lowPrioritySource );
+        
+        for ( Iterator sourceIterator = sources.iterator(); sourceIterator.hasNext(); )
+        {
+            List source = (List) sourceIterator.next();
+            
+            for ( Iterator it = source.iterator(); it.hasNext(); )
+            {
+                Object item = it.next();
+                
+                if ( results.contains( item ) )
+                {
+                    if ( !missingFromResults.isEmpty() )
+                    {
+                        int idx = results.indexOf( item );
+                        
+                        if ( idx < 0 )
+                        {
+                            idx = 0;
+                        }
+                        
+                        results.addAll( idx, missingFromResults );
+                        
+                        missingFromResults.clear();
+                    }
+                }
+                else
+                {
+                    missingFromResults.add( item );
+                }
+            }
+            
+            if ( !missingFromResults.isEmpty() )
+            {
+                results.addAll( missingFromResults );
+                
+                missingFromResults.clear();
+            }
+        }
+        
+        return results;
     }
 
     public static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
