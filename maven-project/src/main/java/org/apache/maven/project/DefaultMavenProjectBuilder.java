@@ -957,6 +957,8 @@ public class DefaultMavenProjectBuilder
 
     /**
      * @noinspection CollectionDeclaredAsConcreteClass
+     * @todo We need to find an effective way to unit test parts of this method!
+     * @todo Refactor this into smaller methods with discrete purposes.
      */
     private MavenProject assembleLineage( Model model,
                                           LinkedList lineage,
@@ -1148,6 +1150,10 @@ public class DefaultMavenProjectBuilder
             // only resolve the parent model from the repository system if we didn't find it on disk...
             if ( model == null )
             {
+                // MNG-2302: parent's File was being populated incorrectly when parent is loaded from repo.
+                // keep this in line with other POMs loaded from the repository...the file should be null.
+                parentDescriptor = null;
+                
                 //!! (**)
                 // ----------------------------------------------------------------------
                 // Do we have the necessary information to actually find the parent
@@ -1194,9 +1200,11 @@ public class DefaultMavenProjectBuilder
             {
                 parentProjectDir = parentDescriptor.getParentFile();
             }
+            
             MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
                                                    externalProfileManager, strict );
+            
             parent.setFile( parentDescriptor );
 
             project.setParent( parent );

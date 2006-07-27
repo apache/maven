@@ -16,6 +16,18 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -49,18 +61,6 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.overlay.BuildOverlay;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -256,6 +256,11 @@ public class MavenProject
     {
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
         // is coming from the repository??
+        
+        // FIXME: If there is a hierarchy of three projects, with the url specified at the top, 
+        // and the top two projects are referenced from copies that are in the repository, the
+        // middle-level POM doesn't have a File associated with it (or the file's directory is
+        // of an unexpected name), and module path adjustments fail.
         String module = moduleProject.getArtifactId();
         
         File moduleFile = moduleProject.getFile();
