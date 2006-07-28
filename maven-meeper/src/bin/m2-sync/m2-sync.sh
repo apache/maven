@@ -24,5 +24,15 @@ cd $HOME/repository-staging/to-ibiblio/maven2
 
 # ideally we would use --ignore-existing but we need to copy the metadata files
 
+if [ -z $NO_SSH ]
+then
+  if [ -z $SSH_OPTS ]
+  then
+    RSYNC_SSH="-e ssh"
+  else
+    RSYNC_SSH="-e \"ssh $SSH_OPTS\""
+  fi
+fi
+
 echo "Syncing $FROM -> $TO"
-rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lrtivz -e "ssh $SSH_OPTS" $FROM $TO
+rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $TO
