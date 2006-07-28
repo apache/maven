@@ -35,4 +35,4 @@ then
 fi
 
 echo "Syncing $FROM -> $TO"
-rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $TO
+rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lcrtivz $RSYNC_SSH $FROM $TO
