@@ -70,6 +70,22 @@ public class VersionRange
         return new VersionRange( recommendedVersion, copiedRestrictions );
     }
 
+    /**
+     * Create a version range from a string representation
+     * 
+     * Some spec examples are
+     * <ul>
+     *   <li><code>1.0</code> Version 1.0</li>
+     *   <li><code>[1.0,2.0)</code> Versions 1.0 (included) to 2.0 (not included)</li>
+     *   <li><code>[1.0,2.0]</code> Versions 1.0 to 2.0 (both included)</li>
+     *   <li><code>[1.5,)</code> Versions 1.5 and higher</li>
+     *   <li><code>(,1.0],[1.2,)</code> Versions up to 1.0 (included) and 1.2 or higher</li>
+     * </ul>
+     * 
+     * @param spec string representation of a version or version range
+     * @return a new {@link VersionRange} object that represents the spec
+     * @throws InvalidVersionSpecificationException
+     */
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException
     {

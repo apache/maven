@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.metadata;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,14 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 import java.util.List;
 
 /**
+ * Provides some metadata operations, like querying the remote repository for a list of versions available for an
+ * artifact.
+ * 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
@@ -32,6 +36,17 @@ public interface ArtifactMetadataSource
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
+    /**
+     * Get a list of available versions for an artifact in the remote repository
+     * 
+     * @param artifact artifact we are interested in. Only <code>groupid</code> and <code>artifactId</code>
+     *                 are needed, for instance the following code will work 
+     *                 <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
+     * @param localRepository local repository
+     * @param remoteRepositories remote repositories, {@link List} $lt; {@link ArtifactRepository} >
+     * @return {@link List} $lt; {@link ArtifactVersion} >
+     * @throws ArtifactMetadataRetrievalException
+     */
     List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }
