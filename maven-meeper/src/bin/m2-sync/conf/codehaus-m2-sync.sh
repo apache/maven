@@ -7,5 +7,3 @@ SSH_OPTS="-i $HOME/.ssh/new-id_dsa"
 
 ## NOTE that codehaus only honours some rsync options. Others may be summarily discarded and/or cause the rsync to break - check
 ## with them if changing them
-
-source ./m2-sync.sh

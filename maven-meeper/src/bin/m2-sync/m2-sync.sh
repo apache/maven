@@ -20,19 +20,31 @@ else
   RSYNC_OPTS="$RSYNC_OPTS -n"
 fi
 
-cd $HOME/repository-staging/to-ibiblio/maven2
+BASEDIR=$HOME/repository-staging/to-ibiblio/maven2
 
-# ideally we would use --ignore-existing but we need to copy the metadata files
+for f in `find conf -iname "*.sh"`
+  do
 
-if [ -z $NO_SSH ]
-then
-  if [ -z $SSH_OPTS ]
+  FROM=
+  TO=
+  NO_SSH=
+  SSH_OPTS=
+  RSYNC_SSH=
+
+  source $f
+
+  if [ -z $NO_SSH ]
   then
-    RSYNC_SSH="-e ssh"
-  else
-    RSYNC_SSH="-e \"ssh $SSH_OPTS\""
+    if [ -z $SSH_OPTS ]
+    then
+      RSYNC_SSH="-e ssh"
+    else
+      RSYNC_SSH="-e \"ssh $SSH_OPTS\""
+    fi
   fi
-fi
 
-echo "Syncing $FROM -> $TO"
-rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lcrtivz $RSYNC_SSH $FROM $TO
+  echo "Syncing $FROM -> $TO"
+  rsync --include=*/ --include=**/maven-metadata.xml* --exclude=* --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO
+  rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --ignore-existing $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO
+
+done
