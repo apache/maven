@@ -23,7 +23,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-core-it-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -40,11 +40,4 @@
       </plugin>
     </plugins>
   </build>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <name>Maven Plugins Development Repository</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>
