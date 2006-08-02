@@ -18,6 +18,8 @@ else
 fi
 
 BASEDIR=$HOME/repository-staging/to-ibiblio/maven2
+CHANGED_LOG=/tmp/sync-changed.log
+rm $CHANGED_LOG
 
 for f in `find conf -iname "*.sh"`
   do
@@ -44,4 +46,16 @@ for f in `find conf -iname "*.sh"`
   rsync --include=*/ --include=**/maven-metadata.xml* --exclude=* --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO
   rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --ignore-existing $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO
 
+  # check for changed files
+  rsync -n --exclude=**/maven-metadata.xml* --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --existing $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO >> $CHANGED_LOG
+
 done
+
+echo "*******************************************************************************"
+echo "*******************************  CHANGED FILES  *******************************"
+echo "*******************************************************************************"
+cat $CHANGED_LOG
+echo "*******************************************************************************"
+echo "*******************************************************************************"
+echo "*******************************************************************************"
+
