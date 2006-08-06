@@ -47,7 +47,7 @@ for f in `find conf -iname "*.sh"`
   rsync --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --ignore-existing $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO
 
   # check for changed files
-  rsync -n --exclude=**/maven-metadata.xml* --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --existing $RSYNC_OPTS -Lrtivz $RSYNC_SSH $FROM $BASEDIR/$TO >> $CHANGED_LOG
+  rsync -n --exclude=**/maven-metadata.xml* --exclude-from=$HOME/components/maven-meeper/src/bin/syncopate/exclusions.txt --existing $RSYNC_OPTS -Lrtivzc $RSYNC_SSH $FROM $BASEDIR/$TO >> $CHANGED_LOG
 
 done
 
