@@ -17,7 +17,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -55,20 +54,12 @@ public interface PluginManager
 
     Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
 
-    /**
-     * TODO should throw {@link PluginException} and {@link AbstractArtifactResolutionException}
-     * instead of all the subclasses
-     */
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;
 
-    /**
-     * TODO should throw {@link PluginException} and {@link AbstractArtifactResolutionException}
-     * instead of all the subclasses
-     */
     PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,

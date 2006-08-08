@@ -1,7 +1,7 @@
 package org.apache.maven.lifecycle;
 
 /*
- * Copyright 2001-2006 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -35,11 +34,11 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -47,6 +46,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
@@ -1255,7 +1256,7 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException(
                 "Internal error in the plugin manager getting plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
         }
-        catch ( PluginException e )
+        catch ( PluginVersionResolutionException e )
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
@@ -1263,7 +1264,19 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
-        catch ( AbstractArtifactResolutionException e )
+        catch ( InvalidPluginException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( PluginVersionNotFoundException e )
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
@@ -1283,7 +1296,7 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException(
                 "Internal error in the plugin manager getting report '" + plugin.getKey() + "': " + e.getMessage(), e );
         }
-        catch ( PluginException e )
+        catch ( PluginVersionResolutionException e )
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
@@ -1291,7 +1304,19 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
-        catch ( AbstractArtifactResolutionException e )
+        catch ( InvalidPluginException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( PluginVersionNotFoundException e )
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
         }

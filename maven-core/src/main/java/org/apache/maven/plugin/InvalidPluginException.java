@@ -1,7 +1,7 @@
 package org.apache.maven.plugin;
 
 /*
- * Copyright 2001-2006 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package org.apache.maven.plugin;
  * @version $Id$
  */
 public class InvalidPluginException
-    extends PluginException
+    extends Exception
 {
     public InvalidPluginException( String message, Exception e )
     {
