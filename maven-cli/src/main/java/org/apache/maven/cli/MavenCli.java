@@ -170,6 +170,13 @@ public class MavenCli
             {
                 recursive = false;
             }
+            else if ( commandLine.hasOption( CLIManager.QUIET ) )
+            {
+                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+                // Ideally, we could use Warn across the board
+                loggerManager.setThreshold( Logger.LEVEL_ERROR );
+                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+            }
 
             if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
             {

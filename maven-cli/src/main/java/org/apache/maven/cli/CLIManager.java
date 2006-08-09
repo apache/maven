@@ -30,6 +30,8 @@ public class CLIManager
 
     public static final char REACTOR = 'r';
 
+    public static final char QUIET = 'q';
+
     public static final char DEBUG = 'X';
 
     public static final char ERRORS = 'e';
@@ -83,6 +85,9 @@ public class CLIManager
         options.addOption(
             OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
                 VERSION ) );
+        options.addOption(
+            OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show warnings and errors" ).create(
+                QUIET ) );
         options.addOption(
             OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
                 DEBUG ) );
