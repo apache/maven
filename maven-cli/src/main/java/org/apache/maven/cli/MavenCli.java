@@ -77,6 +77,7 @@ public class MavenCli
         }
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
+        boolean quiet = !debug && commandLine.hasOption( CLIManager.QUIET );
 
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
 
@@ -169,13 +170,6 @@ public class MavenCli
             if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
             {
                 recursive = false;
-            }
-            else if ( commandLine.hasOption( CLIManager.QUIET ) )
-            {
-                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
-                // Ideally, we could use Warn across the board
-                loggerManager.setThreshold( Logger.LEVEL_ERROR );
-                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
             }
 
             if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
@@ -330,9 +324,16 @@ public class MavenCli
             {
                 loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
             }
+            else if ( quiet )
+            {
+                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+                // Ideally, we could use Warn across the board
+                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
+                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+            }
             else
             {
-                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_WARN;
+                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
             }
 
             Properties executionProperties = getExecutionProperties( commandLine );
