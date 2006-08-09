@@ -194,6 +194,13 @@ public class MavenCli
             {
                 loggerManager.setThreshold( Logger.LEVEL_DEBUG );
             }
+            else if ( commandLine.hasOption( CLIManager.QUIET ) )
+            {
+                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+                // Ideally, we could use Warn across the board
+                loggerManager.setThreshold( Logger.LEVEL_ERROR );
+                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+            }
 
             ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer() );
 
@@ -601,6 +608,8 @@ public class MavenCli
 
         public static final char REACTOR = 'r';
 
+        public static final char QUIET = 'q';
+
         public static final char DEBUG = 'X';
 
         public static final char ERRORS = 'e';
@@ -654,6 +663,9 @@ public class MavenCli
             options.addOption(
                 OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
                     VERSION ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show warnings and errors" ).create(
+                    QUIET ) );
             options.addOption(
                 OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
                     DEBUG ) );
