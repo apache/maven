@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -302,7 +303,7 @@ public class MavenMetadataSource
                                        ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException
     {
-        Set projectArtifacts = new HashSet( dependencies.size() );
+        Set projectArtifacts = new LinkedHashSet( dependencies.size() );
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
