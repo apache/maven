@@ -566,6 +566,7 @@ public class MavenEmbedder
         }
 
         embedder = new Embedder();
+        
         if ( logger != null )
         {
             embedder.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );

@@ -58,6 +58,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.AbstractLogger;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
@@ -141,14 +142,24 @@ public class DefaultMaven
             request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
         }
 
-        Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
+        // FIXME: This will not touch the core maven logger, since it's already been initialized for
+        // this component.
+        loggerManager.setThreshold( request.getLoggingLevel() );
+        
+        Logger myLogger = getLogger();
+        
+        // TODO: When the above problem is fixed, remove this.
+        if ( myLogger instanceof AbstractLogger )
+        {
+            ((AbstractLogger) myLogger).setThreshold( request.getLoggingLevel() );
+        }
+
+        Logger mojoLogger = loggerManager.getLoggerForComponent( Mojo.ROLE );
 
         if ( request.isDefaultEventMonitorActive() )
         {
-            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+            request.addEventMonitor( new DefaultEventMonitor( mojoLogger ) );
         }
-
-        loggerManager.setThreshold( request.getLoggingLevel() );
 
         request.setStartTime( new Date() );
 
