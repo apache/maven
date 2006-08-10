@@ -40,7 +40,7 @@
     <dependency>
       <groupId>qdox</groupId>
       <artifactId>qdox</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5</version>
     </dependency>
   </dependencies>
 </project>
