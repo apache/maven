@@ -664,7 +664,7 @@ public class MavenCli
                 OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
                     VERSION ) );
             options.addOption(
-                OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show warnings and errors" ).create(
+                OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create(
                     QUIET ) );
             options.addOption(
                 OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
