@@ -291,7 +291,7 @@ public class DefaultPluginManager
 
         if ( addedPlugin == null )
         {
-            throw new IllegalStateException( "The PluginDescriptor for the plugin " + plugin + " was not found." );
+            throw new IllegalStateException( "The PluginDescriptor for the plugin " + plugin.getKey() + " was not found" );
         }
 
         addedPlugin.setClassRealm( child.getContainerRealm() );
