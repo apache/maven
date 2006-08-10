@@ -17,6 +17,7 @@ package org.apache.maven.reporting;
  */
 
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.SinkFactory;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.RendererException;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
@@ -40,6 +41,8 @@ public abstract class AbstractMavenReport
 {
     private Sink sink;
 
+    private SinkFactory sinkFactory;
+
     private Locale locale = Locale.ENGLISH;
 
     protected abstract Renderer getSiteRenderer();
@@ -51,44 +54,43 @@ public abstract class AbstractMavenReport
     private File reportOutputDirectory;
 
     /**
+     * TODO: This method is never called - all reports are rendered by maven-site-plugin's
+     * ReportDocumentRender.
+     *
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute()
         throws MojoExecutionException
     {
-        try
-        {
-            String outputDirectory = getOutputDirectory();
-
-            SiteRendererSink sink =
-                getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html" );
-
-            generate( sink, Locale.getDefault() );
-
-            // TODO: add back when skinning support is in the site renderer
-//            getSiteRenderer().copyResources( outputDirectory, "maven" );
-        }
-        catch ( RendererException e )
-        {
-            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
-                                              e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
-                                              e );
-        }
-        catch ( MavenReportException e )
-        {
-            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.",
-                                              e );
-        }
+        throw new MojoExecutionException( "Reporting mojo's can only be called from ReportDocumentRender" );
     }
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
+     * @see org.apache.maven.reporting.MavenReport#generate(org.apache.maven.doxia.sink.Sink, org.apache.maven.reporting.SinkFactory, java.util.Locale)
+     * @deprecated
      */
     public void generate( org.codehaus.doxia.sink.Sink sink, Locale locale )
+        throws MavenReportException
+    {
+        getLog().warn( "Deprecated API called - no SinkFactory available. Please update this plugin." );
+        generate( sink, null, locale );
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#generate(org.apache.maven.doxia.sink.Sink, org.apache.maven.reporting.SinkFactory, java.util.Locale)
+     * @deprecated
+     */
+    public void generate( Sink sink, Locale locale )
+        throws MavenReportException
+    {
+        getLog().warn( "Deprecated API called - no SinkFactory available. Please update this plugin." );
+        generate( sink, null, locale );
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#generate(org.apache.maven.doxia.sink.Sink, org.apache.maven.reporting.SinkFactory, java.util.Locale)
+     */
+    public void generate( Sink sink, SinkFactory sinkFactory, Locale locale )
         throws MavenReportException
     {
         if ( sink == null )
@@ -97,6 +99,8 @@ public abstract class AbstractMavenReport
         }
 
         this.sink = sink;
+
+        this.sinkFactory = sinkFactory;
 
         executeReport( locale );
 
@@ -132,6 +136,11 @@ public abstract class AbstractMavenReport
     public Sink getSink()
     {
         return sink;
+    }
+
+    public SinkFactory getSinkFactory()
+    {
+        return sinkFactory;
     }
 
     public boolean isExternalReport()
