@@ -53,7 +53,7 @@ public class V3PomRewriterTest
         rewriter.rewrite( new StringReader( pom ), to, false, null, null, null, null );
 
         Xpp3Dom dom = Xpp3DomBuilder.build( new StringReader( to.toString() ) );
-        String version = dom.getChild( "dependencies" ).getChild( "dependency" ).getChild( "version" ).getValue();
+        String version = dom.getChild( "dependencies" ).getChild( 0 ).getChild( "version" ).getValue();
         assertEquals( "check new version expression", "${project.version}", version );
     }
 

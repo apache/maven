@@ -128,7 +128,12 @@ public class PomV3ToV4TranslatorTest
         Assert.assertEquals( "testArtifact", plugin.getArtifactId() );
         Assert.assertEquals( "1.0", plugin.getVersion() );
 
-        Assert.assertEquals( "check no dependencies", 0, result.getDependencies().size() );
+        Assert.assertEquals( "check one dependency", 1, result.getDependencies().size() );
+        Dependency dep = (Dependency) result.getDependencies().get( 0 );
+        Assert.assertEquals( "junit", dep.getGroupId() );
+        Assert.assertEquals( "junit", dep.getArtifactId() );
+        Assert.assertEquals( "3.8.2", dep.getVersion() );
+        Assert.assertEquals( "test", dep.getScope() );
     }
 
     public void testShouldConvertDependencyWithTypePluginAndGroupMavenToBuildPluginEntryWithOAMPluginsGroup()
@@ -149,7 +154,12 @@ public class PomV3ToV4TranslatorTest
         Assert.assertEquals( "testArtifact", plugin.getArtifactId() );
         Assert.assertEquals( "1.0", plugin.getVersion() );
 
-        Assert.assertEquals( "check no dependencies", 0, result.getDependencies().size() );
+        Assert.assertEquals( "check one dependency", 1, result.getDependencies().size() );
+        Dependency dep = (Dependency) result.getDependencies().get( 0 );
+        Assert.assertEquals( "junit", dep.getGroupId() );
+        Assert.assertEquals( "junit", dep.getArtifactId() );
+        Assert.assertEquals( "3.8.2", dep.getVersion() );
+        Assert.assertEquals( "test", dep.getScope() );
     }
 
 }
