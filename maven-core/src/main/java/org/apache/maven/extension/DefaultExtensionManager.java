@@ -65,12 +65,14 @@ public class DefaultExtensionManager
 
         if ( artifact != null )
         {
+        		ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
+        		
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
                                                                                     project.getArtifact(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource,
-                                                                                    artifactFilter );
+                                                                                    filter );
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
@@ -86,5 +88,24 @@ public class DefaultExtensionManager
         throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+    
+    private static final class ProjectArtifactExceptionFilter implements ArtifactFilter
+    {
+    		private ArtifactFilter passThroughFilter;
+    		private String projectDependencyConflictId;
+    		
+    		ProjectArtifactExceptionFilter( ArtifactFilter passThroughFilter, Artifact projectArtifact )
+    		{
+				this.passThroughFilter = passThroughFilter;
+				this.projectDependencyConflictId = projectArtifact.getDependencyConflictId();
+    		}
+
+		public boolean include(Artifact artifact) {
+			String depConflictId = artifact.getDependencyConflictId();
+			
+			return projectDependencyConflictId.equals( depConflictId )
+					|| passThroughFilter.include( artifact );
+		}
     }
 }
