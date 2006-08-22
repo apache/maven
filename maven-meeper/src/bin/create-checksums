@@ -1,7 +1,0 @@
-#!/bin/sh
-for i in `find -regex '.*\.jar\|.*\.pom'`
-do
-  md5sum $i | sed 's/ .*$//' > $i.md5
-  chown --reference $i $i.md5
-done
-  
