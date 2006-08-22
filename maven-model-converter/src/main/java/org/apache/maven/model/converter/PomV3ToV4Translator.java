@@ -492,6 +492,8 @@ public class PomV3ToV4Translator
 
         if ( notEmpty( v3Deps ) )
         {
+            boolean isJunitPresent = false;
+
             for ( Iterator it = v3Deps.iterator(); it.hasNext(); )
             {
                 org.apache.maven.model.v3_0_0.Dependency v3Dep = (org.apache.maven.model.v3_0_0.Dependency) it.next();
@@ -521,6 +523,11 @@ public class PomV3ToV4Translator
                     {
                         artifactId = format( id );
                     }
+                }
+
+                if ( "junit".equals( groupId ) && "junit".equals( artifactId ) )
+                {
+                    isJunitPresent = true;
                 }
 
                 String type = v3Dep.getType();
@@ -581,6 +588,16 @@ public class PomV3ToV4Translator
 
                     deps.add( dep );
                 }
+            }
+
+            if ( !isJunitPresent )
+            {
+                Dependency junitDep = new Dependency();
+                junitDep.setGroupId( "junit" );
+                junitDep.setArtifactId( "junit" );
+                junitDep.setVersion( "3.8.2" );
+                junitDep.setScope( "test" );
+                deps.add( junitDep );
             }
         }
 
