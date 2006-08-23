@@ -617,6 +617,8 @@ public class DefaultMaven
      * them in. It doesn't feel quite right.
      * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
      * the wagons, shouldn't we?
+     * @todo [mkleint] as part of fix MNG-1884, I've copied this code into 
+     * MavenEmbedder. if rewritten, needs to be rewritten there too
      */
     private void resolveParameters( Settings settings )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
