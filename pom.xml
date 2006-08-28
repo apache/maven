@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>4-SNAPSHOT</version>
+    <version>4</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <artifactId>maven</artifactId>
