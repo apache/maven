@@ -73,7 +73,7 @@ public class DefaultProfileManager
         
     }
 
-    private DefaultProfileManager( PlexusContainer container, Settings settings )
+    public DefaultProfileManager( PlexusContainer container, Settings settings )
     {
         this.container = container;
 
