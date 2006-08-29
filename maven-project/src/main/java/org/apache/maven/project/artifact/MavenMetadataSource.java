@@ -48,7 +48,6 @@ import org.codehaus.plexus.util.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -337,7 +336,9 @@ public class MavenMetadataSource
                 artifact.setFile( new File( d.getSystemPath() ) );
             }
 
-            if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
+            ArtifactFilter artifactFilter = dependencyFilter;
+            
+            if ( artifact != null && ( artifactFilter == null || artifactFilter.include( artifact ) ) )
             {
                 if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )
                 {
@@ -350,20 +351,20 @@ public class MavenMetadataSource
 
                     ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
 
-                    if ( dependencyFilter != null )
+                    if ( artifactFilter != null )
                     {
                         AndArtifactFilter filter = new AndArtifactFilter();
-                        filter.add( dependencyFilter );
+                        filter.add( artifactFilter );
                         filter.add( newFilter );
-                        dependencyFilter = filter;
+                        artifactFilter = filter;
                     }
                     else
                     {
-                        dependencyFilter = newFilter;
+                        artifactFilter = newFilter;
                     }
                 }
 
-                artifact.setDependencyFilter( dependencyFilter );
+                artifact.setDependencyFilter( artifactFilter );
 
                 if ( project != null )
                 {

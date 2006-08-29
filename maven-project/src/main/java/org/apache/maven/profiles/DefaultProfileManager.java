@@ -66,18 +66,36 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container, Properties props )
     {
-        this( container, (Settings)null );
-        if (props != null) {
-            systemProperties = props;
-        }
+        this( container, (Settings)null, props );
         
     }
 
+    /**
+     * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work correctly
+     * in embedded envirnments.
+     */
     public DefaultProfileManager( PlexusContainer container, Settings settings )
     {
         this.container = container;
 
         loadSettingsProfiles( settings );
+    }
+    
+    /**
+     * the properties passed to the profile manager are the props that
+     * are passed to maven, possibly containing profile activator properties
+     *
+     */
+    public DefaultProfileManager( PlexusContainer container, Settings settings, Properties props )
+    {
+        this.container = container;
+
+        loadSettingsProfiles( settings );
+        
+        if ( props != null )
+        {
+            systemProperties = props;
+        }
     }
     
     public Properties getSystemProperties() {

@@ -3,18 +3,71 @@ package org.apache.maven.project.artifact;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.codehaus.plexus.PlexusTestCase;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {
+    
+    public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
+        throws Exception
+    {
+        Dependency dep1 = new Dependency();
+        dep1.setGroupId( "test" );
+        dep1.setArtifactId( "test-artifact" );
+        dep1.setVersion( "1" );
+        dep1.setType( "jar" );
+        
+        Exclusion exc = new Exclusion();
+        exc.setGroupId( "test" );
+        exc.setArtifactId( "test-artifact3" );
+        
+        dep1.addExclusion( exc );
+        
+        Dependency dep2 = new Dependency();
+        dep2.setGroupId( "test" );
+        dep2.setArtifactId( "test-artifact2" );
+        dep2.setVersion( "1" );
+        dep2.setType( "jar" );
+        
+        List deps = new ArrayList();
+        deps.add( dep1 );
+        deps.add( dep2 );
+        
+        ArtifactFactory factory = ( ArtifactFactory ) lookup( ArtifactFactory.ROLE );
+        
+        ArtifactFilter dependencyFilter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
+        
+        MavenProject project = new MavenProject( new Model() );
+        
+        Set result = MavenMetadataSource.createArtifacts( factory, deps, null, dependencyFilter, project );
+        
+        for ( Iterator it = result.iterator(); it.hasNext(); )
+        {
+            Artifact artifact = ( Artifact ) it.next();
+            
+            if ( "test-artifact2".equals( artifact.getArtifactId() ) )
+            {
+                ArtifactFilter filter = artifact.getDependencyFilter();
+                
+                assertSame( dependencyFilter, filter );
+            }
+        }
+    }
 
     public void testShouldUseCompileScopeIfDependencyScopeEmpty()
         throws Exception
