@@ -183,6 +183,12 @@
         <artifactId>wagon-http-lightweight</artifactId>
         <version>1.0-alpha-6</version>
       </dependency>
+      <dependency>
+        <groupId>easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>1.2_Java1.3</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <distributionManagement>
