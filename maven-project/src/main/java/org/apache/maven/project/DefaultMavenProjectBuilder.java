@@ -891,6 +891,8 @@ public class DefaultMavenProjectBuilder
         MavenProject parentProject = project.getParent();
 
         Model originalModel = project.getOriginalModel();
+        
+        Artifact parentArtifact = project.getParentArtifact();
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
         project = new MavenProject( model );
@@ -923,9 +925,10 @@ public class DefaultMavenProjectBuilder
 
         if ( parentProject != null )
         {
-            Artifact parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
-                                                                            parentProject.getArtifactId(),
-                                                                            parentProject.getVersion() );
+//            Artifact parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
+//                                                                            parentProject.getArtifactId(),
+//                                                                            parentProject.getVersion() );
+            // the parent artifact from the parameter passed project instance is resolved.
             project.setParentArtifact( parentArtifact );
         }
 
