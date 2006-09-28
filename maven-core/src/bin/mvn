@@ -37,8 +37,10 @@ fi
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
 darwin=false;
+mingw=false
 case "`uname`" in
   CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
   Darwin*) darwin=true 
            if [ -z "$JAVA_VERSION" ] ; then
              JAVA_VERSION="CurrentJDK"
@@ -100,6 +102,15 @@ if $cygwin ; then
     JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$CLASSPATH" ] &&
     CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+# For Migwn, ensure paths are in UNIX format before anything is touched
+if $mingw ; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME="`(cd "$M2_HOME"; pwd)`"
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
+  # TODO classpath?
 fi
 
 if [ -z "$JAVACMD" ] ; then
