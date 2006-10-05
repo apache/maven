@@ -47,7 +47,7 @@ public class BootstrapInstaller
 
     private final Bootstrap bootstrapper;
 
-    private final String prefix;
+    private final String destDir;
 
     private String pluginsDirectory;
 
@@ -62,7 +62,7 @@ public class BootstrapInstaller
     {
         this.bootstrapper = new Bootstrap( parser );
 
-        this.prefix = parser.getArgumentValue( "--prefix" );
+        this.destDir = parser.getArgumentValue( "--destDir" );
 
         this.buildPlugins = parser.isArgumentSet( "--build-plugins" );
 
@@ -78,7 +78,7 @@ public class BootstrapInstaller
         throws Exception
     {
         SimpleArgumentParser parser = Bootstrap.createDefaultParser();
-        parser.addArgument( "--prefix", "The location to install Maven", true, getDefaultPrefix() );
+        parser.addArgument( "--destDir", "The location to install Maven", true, getDefaultPrefix() );
         parser.addArgument( "--build-plugins", "Build the plugins from SVN" );
         parser.addArgument( "--plugins-directory", "Where the plugins are located to build from", true );
         parser.addArgument( "--update-snapshots", "Update snapshots during build" );
@@ -117,6 +117,17 @@ public class BootstrapInstaller
 //        buildProject( basedir, "", resolver, false );
 //        buildProject( basedir, "maven-artifact-manager", resolver );
 
+        Model mavenRootModel = bootstrapper.readModel(new File(basedir, "pom.xml"), false);
+
+        String finalName = "maven-" + mavenRootModel.getVersion();
+        
+        File destDirFile = new File(destDir);
+        if (!finalName.equals(destDirFile.getName())) {
+            throw new Exception("The Maven install destination directory must end with '" + finalName + "'.\n"
+                    + "Your destDir was = " + destDirFile.getAbsolutePath() + "\n"
+                    + "we recommend = " + new File(destDirFile.getParent(), finalName).getAbsolutePath());
+        }
+        
         bootstrapper.buildProject( new File( basedir ), true );
 
         Model mavenCoreModel = bootstrapper.getCachedModel( MAVEN_GROUPID, "maven-core" );
@@ -130,10 +141,9 @@ public class BootstrapInstaller
         File mavenCoreDir = mavenCoreModel.getProjectFile().getParentFile();
         runMaven( installation, mavenCoreDir, new String[]{"clean", "assembly:assembly"} );
 
-        String finalName = "maven-" + mavenCoreModel.getVersion();
         File file = new File( mavenCoreDir, "target/" + finalName + "-bin.zip" );
 
-        File mavenHome = new File( prefix, finalName );
+        File mavenHome = new File( destDir );
 
         System.out.println( "Installing Maven in " + mavenHome );
 
@@ -141,7 +151,7 @@ public class BootstrapInstaller
 
         Expand expand = new Expand();
         expand.setSrc( file );
-        expand.setDest( new File( prefix ) );
+        expand.setDest( new File( destDir ).getParentFile() );
         expand.execute();
 
         if ( !mavenHome.exists() )

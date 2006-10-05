@@ -138,7 +138,7 @@ public class Bootstrap
         String basedir = System.getProperty( "user.dir" );
 
         File pom = new File( basedir, "pom.xml" );
-        Model reader = readModel( resolver, pom, true );
+        Model reader = readModel( pom, true );
         File jar = buildProject( reader );
 
         if ( "install".equals( goal ) )
@@ -211,7 +211,7 @@ public class Bootstrap
     private void cacheModels( File basedir, ArtifactResolver resolver )
         throws IOException, ParserConfigurationException, SAXException
     {
-        Model model = readModel( resolver, new File( basedir, "pom.xml" ), false );
+        Model model = readModel( new File( basedir, "pom.xml" ), false );
 
         for ( Iterator i = model.getModules().iterator(); i.hasNext(); )
         {
@@ -234,7 +234,7 @@ public class Bootstrap
 
         File file = new File( basedir, "pom.xml" );
 
-        Model model = readModel( resolver, file, true );
+        Model model = readModel( file, true );
 
         String key = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getPackaging();
         if ( inProgress.contains( key ) )
@@ -339,7 +339,7 @@ public class Bootstrap
             Dependency dependency = plugin.asDependencyPom();
             resolver.downloadDependencies( Collections.singletonList( dependency ) );
             File artifactFile = resolver.getArtifactFile( dependency );
-            Model pluginReader = readModel( resolver, artifactFile, true );
+            Model pluginReader = readModel( artifactFile, true );
 
             List dependencies = new ArrayList();
             for ( Iterator i = pluginReader.getAllDependencies().iterator(); i.hasNext(); )
@@ -395,7 +395,7 @@ public class Bootstrap
         return jarFile;
     }
 
-    private Model readModel( ArtifactResolver resolver, File file, boolean resolveTransitiveDependencies )
+    public Model readModel( File file, boolean resolveTransitiveDependencies )
         throws ParserConfigurationException, SAXException, IOException
     {
         ModelReader reader = new ModelReader( resolver, resolveTransitiveDependencies );
@@ -412,7 +412,7 @@ public class Bootstrap
         return model;
     }
 
-    private void line()
+    public void line()
     {
         System.out.println( "------------------------------------------------------------------" );
     }

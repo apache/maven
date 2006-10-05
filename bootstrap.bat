@@ -108,10 +108,12 @@ cd bootstrap\bootstrap-mini
 call .\build
 
 copy target\bootstrap-mini.jar ..
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -Djava.compiler=NONE -jar ..\bootstrap-mini.jar install %MAVEN_CMD_LINE_ARGS%
+if ERRORLEVEL 1 goto error
 
 cd ..\bootstrap-installer
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
+if ERRORLEVEL 1 goto error
 cd ..\..
 
 set PLUGINS_DIR=..\plugins
@@ -126,15 +128,19 @@ set BUILD_ARGS=%MAVEN_CMD_LINE_ARGS% --build-plugins --plugins-directory=%PLUGIN
 :doBuild
 
 REM TODO: get rid of M2_HOME once integration tests are in here
-set PREFIX=%M2_HOME%\..
+set DESTDIR=%M2_HOME%
 set OLD_M2_HOME=%M2_HOME%
 set M2_HOME=
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --prefix=%PREFIX% %BUILD_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --destDir=%DESTDIR% %BUILD_ARGS%
+REM %MAVEN_JAVA_EXE% %MAVEN_OPTS% -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -jar bootstrap\bootstrap-installer\target\bootstrap-installer.jar --destDir=%DESTDIR% %BUILD_ARGS%
+
 set M2_HOME=%OLD_M2_HOME%
+if ERRORLEVEL 1 goto error
 
 REM TODO: should we be going back to the mini now that we have the real thing?
 cd maven-core-it-verifier
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar ..\bootstrap\bootstrap-mini.jar package %MAVEN_CMD_LINE_ARGS%
+if ERRORLEVEL 1 goto error
 
 cd ..
 
@@ -147,6 +153,15 @@ echo -----------------------------------------------------------------------
 cd maven-core-it
 call maven-core-it %MAVEN_CMD_LINE_ARGS%
 cd ..
+
+if ERRORLEVEL 1 goto error
+goto end
+
+:error
+echo -----------------------------------------------------------------------
+echo BUILD FAILED
+echo -----------------------------------------------------------------------
+
 
 :end
 @REM set local scope for the variables with windows NT shell
