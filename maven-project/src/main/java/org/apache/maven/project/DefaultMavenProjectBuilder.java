@@ -257,6 +257,11 @@ public class DefaultMavenProjectBuilder
 
 
         List activeProfiles;
+        
+        if ( profileManager == null )
+        {
+        	profileManager = new DefaultProfileManager( container );
+        }
 
         profileManager.addProfiles( superModel.getProfiles() );
 
