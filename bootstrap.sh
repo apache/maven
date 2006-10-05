@@ -3,6 +3,10 @@
 ARGS=$@
 ORIG_ARGS=$ARGS
 
+echo $M2_HOME
+
+exit
+
 if [ -z "$JAVA_HOME" ]; then
   echo You must specify the JAVA_HOME environment variable
   exit 1
@@ -29,7 +33,7 @@ BOOTSTRAP_JAR=bootstrap-mini/bootstrap-mini.jar
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 # TODO: get rid of M2_HOME once integration tests are in here
-PREFIX=`dirname $M2_HOME`
+DESTDIR=$M2_HOME
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
@@ -38,13 +42,13 @@ case "`uname`" in
 esac
 
 if [ "$cygwin" = "true" ]; then
-  PREFIX=`cygpath -w $PREFIX`
+  DESTDIR=`cygpath -w $DESTDIR`
   JAVA_HOME=`cygpath -w $JAVA_HOME`
 fi
 
 OLD_M2_HOME=$M2_HOME
 unset M2_HOME
-$JAVACMD $MAVEN_OPTS -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --prefix=$PREFIX $ARGS
+$JAVACMD $MAVEN_OPTS -jar bootstrap/bootstrap-installer/target/bootstrap-installer.jar --destDir=$DESTDIR $ARGS
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 M2_HOME=$OLD_M2_HOME
 export M2_HOME

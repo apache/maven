@@ -95,7 +95,6 @@ public class MavenEmbedder
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-
     private LifecycleExecutor lifecycleExecutor;
 
     private WagonManager wagonManager;

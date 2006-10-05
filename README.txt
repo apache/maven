@@ -2,19 +2,20 @@
 Bootstrapping Maven
 -------------------------------------------------------------------------------
 
-Set the environment variable M2_HOME pointing to the dir where you want Maven2 installed.
+Set the environment variable M2_HOME pointing to the dir where you want Maven2
+installed... with two key restrictions.
 
-NOTE: presently, the directory {M2_HOME}/bin must be in your path:
+1) presently, the directory {M2_HOME}/bin must be in your path:
 set PATH=%PATH%;%M2_HOME%\bin
 or
 export PATH=$PATH:$M2_HOME/bin
 
-In addition, the last part of the M2_HOME path MUST be of the form maven-$version, eg:
+2) The last part of the M2_HOME path MUST be of the form maven-$version, eg:
 /usr/local/maven-2.1-SNAPSHOT
 
 You can set the parameters passed to the Java VM when running Maven2 bootstrap,
-setting the environment variable MAVEN_OPTS, e.g.
-e.g. to run in offline mode, set MAVEN_OPTS=-o
+setting the environment variable MAVEN_OPTS, e.g. to run in offline mode,
+set MAVEN_OPTS=-o
 
 Then run bootstrap.bat (in Windows) or bootstrap.sh (in Unix)
 
