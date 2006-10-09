@@ -3,10 +3,6 @@
 ARGS=$@
 ORIG_ARGS=$ARGS
 
-echo $M2_HOME
-
-exit
-
 if [ -z "$JAVA_HOME" ]; then
   echo You must specify the JAVA_HOME environment variable
   exit 1
