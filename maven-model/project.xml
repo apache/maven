@@ -4,20 +4,29 @@
   <name>Maven Model</name>
   <groupId>maven</groupId>
   <artifactId>maven-model</artifactId>
-  <currentVersion>3.0.1</currentVersion>
+  <currentVersion>3.0.2-SNAPSHOT</currentVersion>
   <description>Maven Model</description>
   <shortDescription>Maven Model</shortDescription>
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-modello-plugin</artifactId>
-      <version>1.0-alpha-2</version>
+      <version>1.0-alpha-3-SNAPSHOT</version>
       <type>plugin</type>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.7-20060614</version>
+      <url>http://www.dom4j.org/</url>
     </dependency>
   </dependencies>
+  <build>
+    <defaultGoal>jar</defaultGoal>
+  </build>
 </project>
