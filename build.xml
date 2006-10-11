@@ -134,7 +134,7 @@ need different versions of modello.  -->
 
   <target name="generate-sources" depends="classpath-pre"
           description="generates Java sources from Modello mdo model files"
-  >
+      >
     <mkdir dir="bootstrap/target"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
 
@@ -241,6 +241,12 @@ need different versions of modello.  -->
           description="extracts the maven assembly into maven.home">
     <delete dir="${maven.home}"/>
     <unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
+    <chmod perm="+x">
+      <fileset dir="${maven.home}/bin">
+        <include name="mvn"/>
+        <include name="m2"/>
+      </fileset>
+    </chmod>
   </target>
 
   <target name="run-full-maven" depends="init,extract-assembly"
@@ -269,7 +275,8 @@ need different versions of modello.  -->
   <target name="download-artifact">
 
     <!-- choose the proper repository -->
-    <condition property="repo" value="http://people.apache.org/repo/m2-snapshot-repository" else="http://repo1.maven.org/maven2">
+    <condition property="repo" value="http://people.apache.org/repo/m2-snapshot-repository"
+               else="http://repo1.maven.org/maven2">
       <contains string="${version}" substring="SNAPSHOT"/>
     </condition>
 
@@ -279,7 +286,7 @@ need different versions of modello.  -->
     <get src="${repo}/${orgpath}/${version}/maven-metadata.xml"
          dest="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml" usetimestamp="true"
          ignoreerrors="true"
-    />
+        />
 
     <!-- Replace 'SNAPSHOT' with 'timestamp-buildnumber'. This is ugly but
       ant doesn't allow updating of properties.
@@ -298,7 +305,7 @@ need different versions of modello.  -->
     <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.jar"
          dest="${maven.repo.local}/${orgpath}/${version}/${name}-${fileversion}.jar" usetimestamp="true"
          ignoreerrors="false"
-    />
+        />
     <condition property="build.failed">
       <not>
         <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.jar"/>
