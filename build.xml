@@ -273,6 +273,8 @@ need different versions of modello.  -->
       <contains string="${version}" substring="SNAPSHOT"/>
     </condition>
 
+    <mkdir dir="${maven.repo.local}/${orgpath}/${version}"/>
+
     <!-- get the metadata file -->
     <get src="${repo}/${orgpath}/${version}/maven-metadata.xml"
          dest="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml" usetimestamp="true"
