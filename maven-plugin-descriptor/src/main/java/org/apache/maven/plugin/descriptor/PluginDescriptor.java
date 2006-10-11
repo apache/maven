@@ -17,6 +17,7 @@ package org.apache.maven.plugin.descriptor;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
@@ -69,6 +70,8 @@ public class PluginDescriptor
     private String name;
 
     private String description;
+
+    private Artifact pluginArtifact;
 
     // ----------------------------------------------------------------------
     //
@@ -342,5 +345,15 @@ public class PluginDescriptor
     public String getDescription()
     {
         return description;
+    }
+
+    public Artifact getPluginArtifact()
+    {
+        return pluginArtifact;
+    }
+
+    public void setPluginArtifact( Artifact pluginArtifact )
+    {
+        this.pluginArtifact = pluginArtifact;
     }
 }

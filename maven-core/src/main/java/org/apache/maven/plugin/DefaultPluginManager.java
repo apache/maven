@@ -543,6 +543,10 @@ public class DefaultPluginManager
         {
             Map pluginContext = session.getPluginContext( pluginDescriptor, project );
 
+            pluginContext.put( "project", project );
+
+            pluginContext.put( "pluginDescriptor", pluginDescriptor );
+
             ( (ContextEnabled) plugin ).setPluginContext( pluginContext );
         }
 
@@ -592,6 +596,8 @@ public class DefaultPluginManager
         if ( pluginDescriptor.getArtifacts() != null && pluginDescriptor.getArtifacts().size() == 1 )
         {
             Artifact pluginArtifact = (Artifact) pluginDescriptor.getArtifacts().get( 0 );
+
+            pluginDescriptor.setPluginArtifact( pluginArtifact );
 
             ArtifactRepository localRepository = session.getLocalRepository();
 
