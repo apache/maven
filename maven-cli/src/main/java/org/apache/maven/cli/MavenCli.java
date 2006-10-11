@@ -43,11 +43,12 @@ import java.util.StringTokenizer;
  */
 public class MavenCli
 {
-    public static int main( String[] args )
+    public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
         
-        return main( args, classWorld );
+        int result = main( args, classWorld );
+        System.exit(result);
     }
 
     /**
