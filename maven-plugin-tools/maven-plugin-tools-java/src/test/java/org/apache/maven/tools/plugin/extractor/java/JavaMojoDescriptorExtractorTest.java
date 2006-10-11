@@ -27,8 +27,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import source2.sub.MyBla;
-
 /**
  * @author jdcasey
  */
@@ -57,7 +55,7 @@ public class JavaMojoDescriptorExtractorTest
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         pluginDescriptor.setGoalPrefix( "test" );
         List results = extractor.execute( project, pluginDescriptor );
-        assertEquals( 2, results.size() );
+        assertEquals( "Extracted mojos", 2, results.size() );
     }
 
     public void testShouldPropagateImplementationParameter()
@@ -91,7 +89,7 @@ public class JavaMojoDescriptorExtractorTest
 
         Parameter parameter = (Parameter) parameters.get( 0 );
 
-        assertEquals( MyBla.class.getName(), parameter.getImplementation() );
+        assertEquals( "Implementation parameter", "source2.sub.MyBla", parameter.getImplementation() );
     }
 
     private File fileOf( String classpathResource )
