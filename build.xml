@@ -308,7 +308,7 @@ need different versions of modello.  -->
         />
     <condition property="build.failed">
       <not>
-        <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.jar"/>
+        <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${fileversion}.jar"/>
       </not>
     </condition>
     <fail if="build.failed" message="Couldn't pull dependency ${orgpath}/${name}/${version}"/>
