@@ -1,4 +1,6 @@
-$dirname = "C:\\svn\\maven\\trunk\\maven-core-it";
+#!/usr/bin/perl
+
+$dirname = "maven-core-it";
 $readme = <<'END';
 it0000: The simplest of builds. We have one application class and one test
         class. There are no resources, no source generation, no resource
