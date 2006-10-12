@@ -8,8 +8,8 @@ it0101
 it0100
 it0099
 # it0098 - something started failing here, not yet identified. MNG-2322
-it0097
-it0096
+#it0097 MNG-870
+#it0096 MNG-870
 it0095
 it0094
 it0092
@@ -23,7 +23,7 @@ it0085
 it0084
 it0083
 it0082
-it0081
+#it0081 MNG-2603
 it0080
 it0079
 it0078
@@ -62,7 +62,7 @@ it0046
 it0045
 it0044
 it0043
-it0042
+#it0042 MNG-870
 it0041
 it0040
 it0039
