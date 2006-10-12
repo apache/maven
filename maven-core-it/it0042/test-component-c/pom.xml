@@ -24,7 +24,7 @@
     <plugins>
       <plugin>
         <groupId>test</groupId>
-        <artifactId>test-plugin</artifactId>
+        <artifactId>it0042-test-plugin</artifactId>
         <version>0.1</version>
         <configuration>
           <value>my-test</value>
