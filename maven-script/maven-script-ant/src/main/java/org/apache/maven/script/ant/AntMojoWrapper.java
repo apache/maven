@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -120,6 +121,10 @@ public class AntMojoWrapper
             ua.extract( resourcesPath, outputDirectory );
         }
         catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "Error extracting resources from your Ant-based plugin.", e );
+        }
+        catch( IOException e )
         {
             throw new MojoExecutionException( "Error extracting resources from your Ant-based plugin.", e );
         }
