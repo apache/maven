@@ -71,7 +71,18 @@ while ( <TESTS> )
 }	        
 
 print "};" . "\n";        
-        
+
+$TEST_SUITE = <<EOF;
+TestSuite suite = new TestSuite(IntegrationTests.class.getName());                                                                                                                                                                 
+              for (int i = 0; i < tests.length; i++) {                                                                                                                                                                                           
+                        suite.addTest(new IntegrationTests(tests[i]));                                                                                                                                                                                 
+                    }                                                                                                                                                                                                                                  
+         return suite;
+}        
+EOF
+ 
+print $TEST_SUITE;    
+    
 opendir(DIR, $dirname) or die "can't opendir $dirname: $!";
 while (defined($filename = readdir(DIR))) {
     next unless (-d "$dirname/$filename");
