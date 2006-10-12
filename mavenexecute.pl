@@ -15,6 +15,63 @@ for $desc (@descriptions) {
 	$comment{$name} = $value;
 }
 
+
+$preamble = <<EOF;
+package org.apache.maven.it;                                                                                                                                                                                                                
+                                                                                                                                                                                                                                            
+import java.io.*;                                                                                                                                                                                                                           
+import java.util.*;                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                            
+import junit.framework.*;                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                            
+import org.apache.maven.it.*;                                                                                                                                                                                                               
+import org.codehaus.plexus.util.*;
+
+public class IntegrationTests extends TestCase 
+{
+    private static final String rootdir = System.getProperty("maven.it.dir", "maven-core-it");
+
+    private Verifier verifier;                                                                                                                                                                                                                                                
+        
+    public IntegrationTests(String name) 
+    {
+        super(name);                                                                                                                                                                                                                        
+    }                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                        
+    public static Test suite() 
+    {
+        String[] tests = new String[] 
+        {
+EOF
+
+$postamble = <<EOF;
+    public void tearDown() throws VerificationException 
+    {
+        verifier.resetStreams();                                                                                                                                                                                                            
+            
+    }                                                                                                                                                                                                                                       
+}
+
+EOF
+
+print $preamble;        
+
+$/ = "\n";
+open( TESTS, "maven-core-it/integration-tests.txt" ) or die;      
+        
+while ( <TESTS> )
+{
+     chomp;
+     if ( /^\#/ )
+     {
+         print "//";
+     }
+    
+	print "\"" . $_ . "\"," . "\n";
+}	        
+
+print "};" . "\n";        
+        
 opendir(DIR, $dirname) or die "can't opendir $dirname: $!";
 while (defined($filename = readdir(DIR))) {
     next unless (-d "$dirname/$filename");
@@ -151,4 +208,7 @@ while (defined($filename = readdir(DIR))) {
 	print "}\n\n";
 	
 }
+        
+print $postamble;        
+        
 closedir(DIR);

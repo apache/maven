@@ -55,6 +55,7 @@ package org.codehaus.plexus.util;
  *
  */
 
+import java.io.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -75,6 +76,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+
+import org.apache.maven.it.*;
 
 /**
  * This class provides basic facilities for manipulating files and file paths.
@@ -1180,7 +1183,7 @@ public class FileUtils
      * Others possible. If the delete does not work, call System.gc(),
      * wait a little and try again.
      */
-    private static boolean deleteFile( File file )
+    public static boolean deleteFile( File file )
         throws IOException
     {
         if ( file.isDirectory() )
@@ -1670,6 +1673,33 @@ public class FileUtils
        }
     }
 
+    public static List loadFile( File file ) throws IOException
+    {
+        List lines = new ArrayList();
+    
+        if ( file.exists() )
+        {
+            BufferedReader reader = new BufferedReader( new FileReader( file ) );
+   
+            String line = reader.readLine();
+   
+            while ( line != null )
+            {
+                line = line.trim();
+   
+                if ( !line.startsWith( "#" ) && line.length() != 0 )
+                {
+                    lines.add ( line );
+                }
+                line = reader.readLine();
+            }
+   
+            reader.close();
+        }
+    
+        return lines;
+    }
+    
     /**
      * Renames a file, even if that involves crossing file system boundaries.
      *
