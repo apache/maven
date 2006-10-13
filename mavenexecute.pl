@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
 $dirname = "maven-core-it";
+$newITs = "maven-core-it-new";
 
-open( FILE, "maven-core-it/integration-tests-descriptions.txt" ) or die;
+open( FILE, "$dirname/integration-tests-descriptions.txt" ) or die;
 undef $/;
 $readme = <FILE>; 
+close( FILE );
 
 @descriptions = $readme =~ m/(it\d+\: .*?)(?=\nit\d+\:|$)/gsx;
 for $desc (@descriptions) {
@@ -12,72 +14,8 @@ for $desc (@descriptions) {
 	chomp ($value);
 	$comment{$name} = $value;
 }
-$preamble = <<EOF;
-package org.apache.maven.it;                                                                                                                                                                                                                
-                                                                                                                                                                                                                                            
-import java.io.*;                                                                                                                                                                                                                           
-import java.util.*;                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                            
-import junit.framework.*;                                                                                                                                                                                                                   
-                                                                                                                                                                                                                                            
-import org.apache.maven.it.*;                                                                                                                                                                                                               
-import org.codehaus.plexus.util.*;
-
-public class IntegrationTests extends TestCase 
-{
-    private static final String rootdir = System.getProperty("maven.it.dir", "maven-core-it");
-
-    private Verifier verifier;                                                                                                                                                                                                                                                
-        
-    public IntegrationTests(String name) 
-    {
-        super(name);                                                                                                                                                                                                                        
-    }                                                                                                                                                                                                                                       
-                                                                                                                                                                                                                                                        
-    public static Test suite() 
-    {
-        String[] tests = new String[] 
-        {
-EOF
-
-$postamble = <<EOF;
-    public void tearDown() throws VerificationException 
-    {
-        verifier.resetStreams();                                                                                                                                                                                                            
-            
-    }                                                                                                                                                                                                                                       
-}
-EOF
-
-print T  $preamble;        
-
-$/ = "\n";
-open( TESTS, "maven-core-it/integration-tests.txt" ) or die;      
-        
-while ( <TESTS> )
-{
-     chomp;
-     if ( /^\#/ )
-     {
-         print T  "//";
-     }
     
-	print T  "\"" . $_ . "\"," . "\n";
-}	        
-
-print T  "};" . "\n";        
- 
-$TEST_SUITE = <<EOF;
-    TestSuite suite = new TestSuite(IntegrationTests.class.getName());                                                                                                                                                                 
-    for (int i = 0; i < tests.length; i++) 
-    {
-        suite.addTest(new IntegrationTests(tests[i]));                                                                                                                                                                                  
-    }
-    return suite;
-}        
-EOF
- 
-print T  $TEST_SUITE;    
+system( "rm -rf $newITs" );    
     
 opendir(DIR, $dirname) or die "can't opendir $dirname: $!";
 while (defined($filename = readdir(DIR))) {
@@ -95,13 +33,21 @@ while (defined($filename = readdir(DIR))) {
     	die "no comment: $filename\n";
     }
     
-    mkdir( "/tmp/mits" );
-    open( T, "> /tmp/mits/MavenIntegrationTest_$filename" . ".java" ) or die;
+    $itBaseDirectory = "$newITs/$filename";
+    $itTestCaseDirectory = "$itBaseDirectory/src/test/java/org/apache/maven/it";    
+    $testFile = "$itTestCaseDirectory/MavenIntegrationTest_$filename" . ".java";    
+    $testProjectDirectory = "$itBaseDirectory/src/test-project";
+    
+    system( "mkdir -p $itTestCaseDirectory" );
+    system( "cp -r $dirname/$filename $testProjectDirectory" );
+    #system( "mkdir -p $testProjectDirectory" );
+    
+    print $testFile . "\n";
+    open( T, "> $testFile") or die;
     print $filename . "\n";    
     print T "package org.apache.maven.it;\n";
     print T "import java.io.File;\n";
-    print T "public class MavenIntegrationTest${filename} /*extends AbstractMavenIntegrationTest*/ {\n";
-    
+    print T "public class MavenIntegrationTest${filename} /*extends AbstractMavenIntegrationTest*/ {\n";    
     print T "/** $comment{$filename} */\n";
     print T "public void test_$filename() throws Exception {\n";
     print T "String rootdir = System.getProperty(\"rootdir\");\n";
