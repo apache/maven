@@ -8,6 +8,8 @@ undef $/;
 $readme = <FILE>; 
 close( FILE );
 
+$/ = "\n";
+
 @descriptions = $readme =~ m/(it\d+\: .*?)(?=\nit\d+\:|$)/gsx;
 for $desc (@descriptions) {
 	($name, $value) = ($desc =~ m/^(it\d+)\: (.*)$/s);
@@ -34,9 +36,10 @@ while (defined($filename = readdir(DIR))) {
     }
     
     $itBaseDirectory = "$newITs/$filename";
+    $itPOM = "$itBaseDirectory/pom.xml";
     $itTestCaseDirectory = "$itBaseDirectory/src/test/java/org/apache/maven/it";    
     $testFile = "$itTestCaseDirectory/MavenIntegrationTest_$filename" . ".java";    
-    $testProjectDirectory = "$itBaseDirectory/src/test-project";
+    $testProjectDirectory = "$itBaseDirectory/src/test-projects";
     
     system( "mkdir -p $itTestCaseDirectory" );
     system( "cp -r $dirname/$filename $testProjectDirectory" );
@@ -46,13 +49,57 @@ while (defined($filename = readdir(DIR))) {
 	system( "rm $testProjectDirectory/goals.txt > /dev/null 2>&1" );
 	system( "rm $testProjectDirectory/expected-results.txt > /dev/null 2>&1" );
 	system( "rm $testProjectDirectory/log.txt > /dev/null 2>&1" );
+
+	open( P, "> $itPOM" ) or die;
+	
+	print P "<project>\n";
+	print P "  <modelVersion>4.0.0</modelVersion>\n";
+	print P "  <groupId>org.apache.maven.it</groupId>\n";
+	print P "  <artifactId>maven-core-it-$filename</artifactId>\n"; 
+	print P "  <version>1.0-SNAPSHOT</version>\n";
+
+$build = <<EOF;	
+ <dependencies>
+   <dependency>
+     <groupId>org.apache.maven</groupId>
+     <artifactId>maven-core-it-verifier</artifactId>
+     <version>2.1-SNAPSHOT</version>
+   </dependency>
+ </dependencies>
+ <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <debug>true</debug>
+          <projectsDirectory>src/test-projects</projectsDirectory>
+          <pomIncludes>
+            <pomInclude>**/pom.xml</pomInclude>
+          </pomIncludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+EOF
+
+	print P "$build";
+	print P "</project>\n";
+	close P;
     
-    print $testFile . "\n";
     open( T, "> $testFile") or die;
     print $filename . "\n";    
     print T "package org.apache.maven.it;\n";
     print T "import java.io.File;\n";
-    print T "public class MavenIntegrationTest${filename} /*extends AbstractMavenIntegrationTest*/ {\n";    
+    print T "public class MavenIntegrationTest_${filename} /*extends AbstractMavenIntegrationTest*/ {\n";    
     print T "/** $comment{$filename} */\n";
     print T "public void test_$filename() throws Exception {\n";
     print T "String rootdir = System.getProperty(\"rootdir\");\n";
