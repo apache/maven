@@ -99,7 +99,8 @@ EOF
     print $filename . "\n";    
     print T "package org.apache.maven.it;\n";
     print T "import java.io.File;\n";
-    print T "public class MavenIntegrationTest_${filename} /*extends AbstractMavenIntegrationTest*/ {\n";    
+    print T "import junit.framework.*;\n";
+    print T "public class MavenIntegrationTest_${filename} extends TestCase /*extends AbstractMavenIntegrationTest*/ {\n";    
     print T "/** $comment{$filename} */\n";
     print T "public void test_$filename() throws Exception {\n";
     print T "String rootdir = System.getProperty(\"rootdir\");\n";
