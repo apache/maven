@@ -40,7 +40,12 @@ while (defined($filename = readdir(DIR))) {
     
     system( "mkdir -p $itTestCaseDirectory" );
     system( "cp -r $dirname/$filename $testProjectDirectory" );
-    #system( "mkdir -p $testProjectDirectory" );
+	system( "rm $testProjectDirectory/cli-options.txt > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/system.properties > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/verifier.properties > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/goals.txt > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/expected-results.txt > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/log.txt > /dev/null 2>&1" );
     
     print $testFile . "\n";
     open( T, "> $testFile") or die;
