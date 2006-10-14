@@ -116,7 +116,7 @@ public class ProjectSorter
                     dag.addEdge( id, parentId );
                 }
             }
-/*
+
             List buildPlugins = project.getBuildPlugins();
             if ( buildPlugins != null )
             {
@@ -144,7 +144,7 @@ public class ProjectSorter
                     }
                 }
             }
-*/
+
             for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
             {
                 Extension extension = (Extension) j.next();
