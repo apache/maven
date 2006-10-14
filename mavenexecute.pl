@@ -18,6 +18,16 @@ for $desc (@descriptions) {
 }
     
 system( "rm -rf $newITs" );    
+system( "mkdir -p $newITs" );
+
+open( POM, "> $newITs/pom.xml" );  
+print POM "<project>\n";
+print POM "  <modelVersion>4.0.0</modelVersion>\n";
+print POM "  <groupId>org.apache.maven.it</groupId>\n";
+print POM "  <artifactId>maven-core-its</artifactId>\n"; 
+print POM "  <version>1.0-SNAPSHOT</version>\n";
+print POM "  <packaging>pom</packaging>\n";
+print POM "  <modules>\n";
     
 opendir(DIR, $dirname) or die "can't opendir $dirname: $!";
 while (defined($filename = readdir(DIR))) {
@@ -31,15 +41,19 @@ while (defined($filename = readdir(DIR))) {
     $fileGoals = "$dirname/$filename/goals.txt";
     $fileExpectedResults = "$dirname/$filename/expected-results.txt";
     $failOnErrorOutput = 1;
+    
+    print POM "    <module>$filename</module>\n";
+    
     if (!exists($comment{$filename})) {
     	die "no comment: $filename\n";
     }
     
     $itBaseDirectory = "$newITs/$filename";
     $itPOM = "$itBaseDirectory/pom.xml";
-    $itTestCaseDirectory = "$itBaseDirectory/src/test/java/org/apache/maven/it";    
-    $testFile = "$itTestCaseDirectory/MavenIntegrationTest_$filename" . ".java";    
-    $testProjectDirectory = "$itBaseDirectory/src/test-projects";
+    $itTestCaseDirectory = "$itBaseDirectory/src/test/java/org/apache/maven/it"; 
+    $itTestName = "Maven" . uc($filename) . "Test";
+    $testFile = "$itTestCaseDirectory/$itTestName" . ".java";    
+    $testProjectDirectory = "$itBaseDirectory/src/test-project";
     
     system( "mkdir -p $itTestCaseDirectory" );
     system( "cp -r $dirname/$filename $testProjectDirectory" );
@@ -48,47 +62,25 @@ while (defined($filename = readdir(DIR))) {
 	system( "rm $testProjectDirectory/verifier.properties > /dev/null 2>&1" );
 	system( "rm $testProjectDirectory/goals.txt > /dev/null 2>&1" );
 	system( "rm $testProjectDirectory/expected-results.txt > /dev/null 2>&1" );
+	system( "rm $testProjectDirectory/prebuild-hook.txt > /dev/null 2>&1" );
 	system( "rm $testProjectDirectory/log.txt > /dev/null 2>&1" );
 
-	open( P, "> $itPOM" ) or die;
-	
+	open( P, "> $itPOM" ) or die;	
 	print P "<project>\n";
 	print P "  <modelVersion>4.0.0</modelVersion>\n";
 	print P "  <groupId>org.apache.maven.it</groupId>\n";
 	print P "  <artifactId>maven-core-it-$filename</artifactId>\n"; 
 	print P "  <version>1.0-SNAPSHOT</version>\n";
+	print P "  <name>Maven Integration Tests :: $filename</name>\n"; 
 
 $build = <<EOF;	
- <dependencies>
-   <dependency>
-     <groupId>org.apache.maven</groupId>
-     <artifactId>maven-core-it-verifier</artifactId>
-     <version>2.1-SNAPSHOT</version>
-   </dependency>
- </dependencies>
- <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <configuration>
-          <debug>true</debug>
-          <projectsDirectory>src/test-projects</projectsDirectory>
-          <pomIncludes>
-            <pomInclude>**/pom.xml</pomInclude>
-          </pomIncludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core-it-verifier</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 EOF
 
 	print P "$build";
@@ -100,12 +92,12 @@ EOF
     print T "package org.apache.maven.it;\n";
     print T "import java.io.File;\n";
     print T "import junit.framework.*;\n";
-    print T "public class MavenIntegrationTest_${filename} extends TestCase /*extends AbstractMavenIntegrationTest*/ {\n";    
+    print T "public class $itTestName extends TestCase /*extends AbstractMavenIntegrationTest*/ {\n";    
     print T "/** $comment{$filename} */\n";
-    print T "public void test_$filename() throws Exception {\n";
-    print T "String rootdir = System.getProperty(\"rootdir\");\n";
-    print T "File basedir = new File(rootdir, \"$filename\");\n";
-    print T "Verifier verifier = new Verifier(basedir.getAbsolutePath());\n";
+    print T "public void test$filename() throws Exception {\n";
+    print T "String basedir = System.getProperty(\"basedir\");\n";
+    print T "File testDir = new File(basedir, \"src\/test-project\");\n";
+    print T "Verifier verifier = new Verifier(testDir.getAbsolutePath());\n";
     
     if (-e "$filePrebuildHook") {
     	open (FILE, "$filePrebuildHook");
@@ -222,6 +214,9 @@ EOF
 	print T  "}}\n\n";
 	
 }
+
+print POM "  </modules>\n";
+print POM "</project>";
         
 print T  $postamble;        
         
