@@ -1,4 +1,4 @@
-package org.codehaus.plexus.util;
+package org.apache.maven.it.util;
 
 /* ====================================================================
  * The Apache Software License, Version 1.1
@@ -55,7 +55,6 @@ package org.codehaus.plexus.util;
  *
  */
 
-import java.io.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -76,8 +75,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-
-import org.apache.maven.it.*;
 
 /**
  * This class provides basic facilities for manipulating files and file paths.

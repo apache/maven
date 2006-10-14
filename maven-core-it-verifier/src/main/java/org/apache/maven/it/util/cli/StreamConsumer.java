@@ -1,4 +1,4 @@
-package org.codehaus.plexus.util.cli;
+package org.apache.maven.it.util.cli;
 
 /*
  * The MIT License

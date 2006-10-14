@@ -9,8 +9,8 @@ import javax.xml.parsers.*;
 
 import junit.framework.*;
 
-import org.codehaus.plexus.util.*;
-import org.codehaus.plexus.util.cli.*;
+import org.apache.maven.it.util.*;
+import org.apache.maven.it.util.cli.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 

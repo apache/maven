@@ -1,4 +1,4 @@
-package org.codehaus.plexus.util;
+package org.apache.maven.it.util;
 
 /* ====================================================================
  * The Apache Software License, Version 1.1

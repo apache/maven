@@ -51,7 +51,7 @@
  * information on the Apache Software Foundation, please see
  * <http://www.codehaus.org/>.
  */
-package org.codehaus.plexus.util;
+package org.apache.maven.it.util;
 
 import java.util.Iterator;
 import java.util.Map;
