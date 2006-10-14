@@ -89,9 +89,10 @@ EOF
     
     open( T, "> $testFile") or die;
     print $filename . "\n";    
-    print T "package org.apache.maven.it;\n";
-    print T "import java.io.File;\n";
-    print T "import junit.framework.*;\n";
+    print T "package org.apache.maven.it;\n\n";
+    print T "import java.io.*;\n";
+    print T "import java.util.*;\n";
+    print T "import junit.framework.*;\n\n";
     print T "public class $itTestName extends TestCase /*extends AbstractMavenIntegrationTest*/ {\n";    
     print T "/** $comment{$filename} */\n";
     print T "public void test$filename() throws Exception {\n";
