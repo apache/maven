@@ -249,6 +249,21 @@ need different versions of modello.  -->
     </chmod>
   </target>
 
+  <target name="mits"
+          description="Run the Maven integration tests."
+          depends="init">
+    <java fork="true"
+          dir="maven-core-it-new"
+          classname="org.apache.maven.cli.MavenCli"
+          failonerror="true">
+      <classpath refid="maven.classpath"/>
+      <sysproperty key="maven.test.skip" value="true"/>
+      <arg value="-e"/>
+      <arg value="clean"/>
+      <arg value="test"/>
+    </java>
+  </target>
+
   <target name="run-full-maven" depends="init,extract-assembly"
           description="runs the full extracted Maven, now with tests">
     <property name="maven.goals" value="clean install"/>
