@@ -50,7 +50,7 @@ while (defined($filename = readdir(DIR))) {
          $filename eq "it0096" || 
          $filename eq "it0097" ||
          $filename eq "it0043" ||
-         $filename eq "it0090"  
+         $filename eq "it0090" ) 
     {
     	print POM "    <!-- <module>$filename</module> -->\n";
     }
