@@ -257,7 +257,6 @@ need different versions of modello.  -->
           classname="org.apache.maven.cli.MavenCli"
           failonerror="true">
       <classpath refid="maven.classpath"/>
-      <sysproperty key="maven.test.skip" value="true"/>
       <arg value="-e"/>
       <arg value="clean"/>
       <arg value="test"/>
