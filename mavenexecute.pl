@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use File::Path;
 
 $dirname = "maven-core-it";
 $newITs = "maven-core-it-new";
@@ -16,9 +17,9 @@ for $desc (@descriptions) {
 	chomp ($value);
 	$comment{$name} = $value;
 }
-    
-system( "rm -rf $newITs" );    
-system( "mkdir -p $newITs" );
+
+rmtree($newITs);
+mkpath($newITs);
 
 open( POM, "> $newITs/pom.xml" );  
 print POM "<project>\n";
@@ -42,7 +43,20 @@ while (defined($filename = readdir(DIR))) {
     $fileExpectedResults = "$dirname/$filename/expected-results.txt";
     $failOnErrorOutput = 1;
     
-    # 96, 97 will not due to bugs in maven, they work when other ITs are run but it's due to ordering and fluke
+    # 96 
+    # 97 will not due to bugs in maven, they work when other ITs are run but it's due to ordering and fluke
+    # notes: I'm not sure this is testing anything anyone would be stupid enough to do. Basically creating an 
+    #        incomprehensible path though projects.
+    #        - mvn clean with this project seems to require plugin resolution and it fails. Executing clean should not require plugins.
+    # fix: remove the plugin it requires to be built to work and use a special IT repo that is checked in so that it will work.
+    # we should also setup a local instance of jetty to test remote repository workings
+    #
+    # - setup file based repo
+    # - run all tests with file-base repos
+    # - fire up jetty
+    # - run all tests with an http-based repo
+    # 
+    # We need to isolate 
     # 43 will not run because it can't find the maven-help-plugin
     # 90 will not run because it relies of an environment variable which I think is wrong 
     # 91 POM interpolation test failure
@@ -78,15 +92,25 @@ while (defined($filename = readdir(DIR))) {
     $testFile = "$itTestCaseDirectory/$itTestName" . ".java";    
     $testProjectDirectory = "$itBaseDirectory/src/test-project";
     
-    system( "mkdir -p $itTestCaseDirectory" );
-    system( "cp -r $dirname/$filename $testProjectDirectory" );
-	system( "rm $testProjectDirectory/cli-options.txt > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/system.properties > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/verifier.properties > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/goals.txt > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/expected-results.txt > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/prebuild-hook.txt > /dev/null 2>&1" );
-	system( "rm $testProjectDirectory/log.txt > /dev/null 2>&1" );
+    mkpath($itTestCaseDirectory);
+    # DGF can't believe perl doesn't have a baked in recursive copy!
+    if ("MSWin32" eq $^O) {
+        $winSrc = "$dirname/$filename";
+        $winSrc =~ s!/!\\!g;
+        $winDest = $testProjectDirectory;
+        $winDest =~ s!/!\\!g;
+        mkpath($testProjectDirectory);
+        system( "xcopy /e $winSrc $winDest" );
+    } else {
+        system( "cp -r $dirname/$filename $testProjectDirectory" );
+    }
+	unlink("$testProjectDirectory/cli-options.txt");
+	unlink("$testProjectDirectory/system.properties");
+	unlink("$testProjectDirectory/verifier.properties");
+	unlink("$testProjectDirectory/goals.txt");
+	unlink("$testProjectDirectory/expected-results.txt");
+	unlink("$testProjectDirectory/prebuild-hook.txt");
+	unlink("$testProjectDirectory/log.txt");
 
 	open( P, "> $itPOM" ) or die;	
 	print P "<project>\n";
@@ -95,6 +119,9 @@ while (defined($filename = readdir(DIR))) {
 	print P "  <artifactId>maven-core-it-$filename</artifactId>\n"; 
 	print P "  <version>1.0-SNAPSHOT</version>\n";
 	print P "  <name>Maven Integration Tests :: $filename</name>\n"; 
+	print P "  <description>![CDATA[\n\n";
+	print P "    $comment{$filename}\n\n";
+	print P "  ]]</description>\n";	
 
 $build = <<EOF;	
   <dependencies>
