@@ -50,9 +50,9 @@ print POM <<END;
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core-it-verifier</artifactId>
-      <version>2.1-SNAPSHOT</version>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
