@@ -1,19 +1,23 @@
 #!/usr/bin/perl
 use File::Path;
+use strict;
 
-$dirname = "maven-core-it";
-$newITs = "maven-core-it-new";
+my $dirname = "maven-core-it";
+my $newITs = "maven-core-it-new";
+my $newITsResources = "$newITs/src/test/resources";
+
 
 open( FILE, "$dirname/integration-tests-descriptions.txt" ) or die;
 undef $/;
-$readme = <FILE>; 
+my $readme = <FILE>; 
 close( FILE );
 
 $/ = "\n";
 
-@descriptions = $readme =~ m/(it\d+\: .*?)(?=\nit\d+\:|$)/gsx;
-for $desc (@descriptions) {
-	($name, $value) = ($desc =~ m/^(it\d+)\: (.*)$/s);
+my @descriptions = $readme =~ m/(it\d+\: .*?)(?=\nit\d+\:|$)/gsx;
+my %comment;
+for my $desc (@descriptions) {
+	my ($name, $value) = ($desc =~ m/^(it\d+)\: (.*)$/s);
 	chomp ($value);
 	$comment{$name} = $value;
 }
@@ -21,42 +25,82 @@ for $desc (@descriptions) {
 rmtree($newITs);
 mkpath($newITs);
 
-open( POM, "> $newITs/pom.xml" );  
-print POM "<project>\n";
-print POM "  <modelVersion>4.0.0</modelVersion>\n";
-print POM "  <groupId>org.apache.maven.it</groupId>\n";
-print POM "  <artifactId>maven-core-its</artifactId>\n"; 
-print POM "  <version>1.0-SNAPSHOT</version>\n";
-print POM "  <packaging>pom</packaging>\n";
-print POM "  <modules>\n";
+open (POM, "> $newITs/pom.xml" );
+print POM <<END;
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.integrationtests</groupId>
+  <artifactId>maven-core-integrationtests</artifactId> 
+  <version>1.0-SNAPSHOT</version>
+  <name>Maven Integration Tests</name> 
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <includes>
+                    <include>**/IntegrationTestSuite.java</include>
+                 </includes>
+                 <forkMode>never</forkMode>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core-it-verifier</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+END
+
+close POM;
+
+my $suiteRoot = "$newITs/src/test/java/org/apache/maven/integrationtests";
+mkpath($suiteRoot);
+mkpath($newITsResources);
+
+open( SUITE, "> $suiteRoot/IntegrationTestSuite.java" );  
+print SUITE <<END;
+package org.apache.maven.integrationtests;
+
+import junit.framework.*;
+
+public class IntegrationTestSuite extends TestCase {
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+END
     
 opendir(DIR, $dirname) or die "can't opendir $dirname: $!";
-while (defined($filename = readdir(DIR))) {
+while (defined(my $filename = readdir(DIR))) {
     next unless (-d "$dirname/$filename");
     next if ($filename eq ".svn");
     next unless ($filename =~ m/^it0\d+$/);
-    $filePrebuildHook = "$dirname/$filename/prebuild-hook.txt";
-    $fileCliOptions = "$dirname/$filename/cli-options.txt";
-    $fileSystemProperties = "$dirname/$filename/system.properties";
-    $fileVerifierProperties = "$dirname/$filename/verifier.properties";
-    $fileGoals = "$dirname/$filename/goals.txt";
-    $fileExpectedResults = "$dirname/$filename/expected-results.txt";
-    $failOnErrorOutput = 1;
+    my $filePrebuildHook = "$dirname/$filename/prebuild-hook.txt";
+    my $fileCliOptions = "$dirname/$filename/cli-options.txt";
+    my $fileSystemProperties = "$dirname/$filename/system.properties";
+    my $fileVerifierProperties = "$dirname/$filename/verifier.properties";
+    my $fileGoals = "$dirname/$filename/goals.txt";
+    my $fileExpectedResults = "$dirname/$filename/expected-results.txt";
+    my $failOnErrorOutput = 1;
     
-    # 96 
-    # 97 will not due to bugs in maven, they work when other ITs are run but it's due to ordering and fluke
-    # notes: I'm not sure this is testing anything anyone would be stupid enough to do. Basically creating an 
-    #        incomprehensible path though projects.
-    #        - mvn clean with this project seems to require plugin resolution and it fails. Executing clean should not require plugins.
-    # fix: remove the plugin it requires to be built to work and use a special IT repo that is checked in so that it will work.
-    # we should also setup a local instance of jetty to test remote repository workings
-    #
-    # - setup file based repo
-    # - run all tests with file-base repos
-    # - fire up jetty
-    # - run all tests with an http-based repo
-    # 
-    # We need to isolate 
+    my $itTestCaseDirectory = $suiteRoot; 
+    my $itTestName = "Maven" . uc($filename) . "Test";
+    my $testFile = "$itTestCaseDirectory/$itTestName" . ".java";    
+    my $testProjectDirectory = "$newITsResources/$filename";
+    
+    # 96, 97 will not due to bugs in maven, they work when other ITs are run but it's due to ordering and fluke
     # 43 will not run because it can't find the maven-help-plugin
     # 90 will not run because it relies of an environment variable which I think is wrong 
     # 91 POM interpolation test failure
@@ -74,30 +118,25 @@ while (defined($filename = readdir(DIR))) {
          $filename eq "it0106" || 
          $filename eq "it0107" ) 
     {
-    	print POM "    <!-- <module>$filename</module> -->\n";
+        print SUITE "       // suite.addTestSuite($itTestName.class);\n";
     }
     else
     {
-    	print POM "    <module>$filename</module>\n";
+        print SUITE "       suite.addTestSuite($itTestName.class);\n";
     }    	
     
     if (!exists($comment{$filename})) {
     	die "no comment: $filename\n";
     }
     
-    $itBaseDirectory = "$newITs/$filename";
-    $itPOM = "$itBaseDirectory/pom.xml";
-    $itTestCaseDirectory = "$itBaseDirectory/src/test/java/org/apache/maven/it"; 
-    $itTestName = "Maven" . uc($filename) . "Test";
-    $testFile = "$itTestCaseDirectory/$itTestName" . ".java";    
-    $testProjectDirectory = "$itBaseDirectory/src/test-project";
+    
     
     mkpath($itTestCaseDirectory);
     # DGF can't believe perl doesn't have a baked in recursive copy!
     if ("MSWin32" eq $^O) {
-        $winSrc = "$dirname/$filename";
+        my $winSrc = "$dirname/$filename";
         $winSrc =~ s!/!\\!g;
-        $winDest = $testProjectDirectory;
+        my $winDest = $testProjectDirectory;
         $winDest =~ s!/!\\!g;
         mkpath($testProjectDirectory);
         system( "xcopy /e $winSrc $winDest" );
@@ -112,50 +151,35 @@ while (defined($filename = readdir(DIR))) {
 	unlink("$testProjectDirectory/prebuild-hook.txt");
 	unlink("$testProjectDirectory/log.txt");
 
-	open( P, "> $itPOM" ) or die;	
-	print P "<project>\n";
-	print P "  <modelVersion>4.0.0</modelVersion>\n";
-	print P "  <groupId>org.apache.maven.it</groupId>\n";
-	print P "  <artifactId>maven-core-it-$filename</artifactId>\n"; 
-	print P "  <version>1.0-SNAPSHOT</version>\n";
-	print P "  <name>Maven Integration Tests :: $filename</name>\n"; 
-	print P "  <description>![CDATA[\n\n";
-	print P "    $comment{$filename}\n\n";
-	print P "  ]]</description>\n";	
-
-$build = <<EOF;	
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core-it-verifier</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-EOF
-
-	print P "$build";
-	print P "</project>\n";
-	close P;
-    
-    open( T, "> $testFile") or die;
+	open( T, "> $testFile") or die;
     print $filename . "\n";    
-    print T "package org.apache.maven.it;\n\n";
-    print T "import java.io.*;\n";
-    print T "import java.util.*;\n";
-    print T "import junit.framework.*;\n\n";
-    print T "import org.apache.maven.it.util.*;\n";
-    print T "public class $itTestName extends TestCase /*extends AbstractMavenIntegrationTest*/ {\n";    
-    print T "/** $comment{$filename} */\n";
-    print T "public void test$filename() throws Exception {\n";
-    print T "String basedir = System.getProperty(\"basedir\");\n";
-    print T "File testDir = new File(basedir, \"src\/test-project\");\n";
-    print T "Verifier verifier = new Verifier(testDir.getAbsolutePath());\n";
-    
+    print T <<END;
+package org.apache.maven.integrationtests;
+import java.io.*;
+import java.util.*;
+
+import junit.framework.*;
+
+import org.apache.maven.it.*;
+import org.apache.maven.it.util.*;
+
+public class $itTestName extends TestCase /*extends AbstractMavenIntegrationTest*/ {    
+
+/** $comment{$filename} */
+public void test$filename() throws Exception {
+String basedir = System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"));
+File testDir = new File(basedir, getName());
+FileUtils.deleteDirectory(testDir);
+System.out.println("Extracting $filename to " + testDir.getAbsolutePath());
+ResourceExtractor.extractResourcePath(getClass(), "/$filename", testDir);
+Verifier verifier = new Verifier(testDir.getAbsolutePath());
+END
+
     if (-e "$filePrebuildHook") {
     	open (FILE, "$filePrebuildHook");
-	    while ($line = <FILE>) {
+	    while (my $line = <FILE>) {
 	    	if ($line =~ /^(rm|rmdir) (.*)/) {
-	    		($cmd, $path) = ($1, $2);
+	    		my ($cmd, $path) = ($1, $2);
 	    		
 	    		if ($cmd eq "rm") {
 	    			if ($path =~ m/^\$\{artifact:([^:]*?):([^:]*?):([^:]*?):([^:]*?)\}$/) {
@@ -178,7 +202,7 @@ EOF
     
     if (-e "$fileCliOptions") {
     	open(FILE, $fileCliOptions);
-    	$cliOptions = <FILE>;
+    	my $cliOptions = <FILE>;
     	chomp ($cliOptions);
     	$cliOptions =~ s/"/\\"/g;
     	print T "List cliOptions = new ArrayList();\n";
@@ -189,9 +213,9 @@ EOF
     if (-e "$fileSystemProperties") {
     	open(FILE, $fileSystemProperties);
     	print T  "Properties systemProperties = new Properties();\n";
-    	while ($line = <FILE>) {
+    	while (my $line = <FILE>) {
     		next if ($line =~ m/^\s*\#/);
-    		($name, $value) = ($line =~ m/^([^=]*)=(.*)/);
+    		my ($name, $value) = ($line =~ m/^([^=]*)=(.*)/);
     		print T  "systemProperties.put(\"$name\", \"$value\");\n";
     	}
     	print T  "verifier.setSystemProperties(systemProperties);\n";
@@ -200,9 +224,9 @@ EOF
     if (-e "$fileVerifierProperties") {
     	open(FILE, $fileVerifierProperties);
     	print T  "Properties verifierProperties = new Properties();\n";
-    	while ($line = <FILE>) {
+    	while (my $line = <FILE>) {
     		next if ($line =~ m/^\s*\#/);
-    		($name, $value) = ($line =~ m/^([^=]*)=(.*)/);
+    		my ($name, $value) = ($line =~ m/^([^=]*)=(.*)/);
     		if ($name eq "failOnErrorOutput" and $value eq "false") {
     			$failOnErrorOutput = 0;
     		}
@@ -214,8 +238,8 @@ EOF
     
     open (FILE, $fileGoals) or die "Couldn't open $fileGoals: $!\n";
     
-    @goals = ();
-    while ($line = <FILE>) {
+    my @goals = ();
+    while (my $line = <FILE>) {
     	next if ($line =~ m/^\s*$/);
     	chomp ($line);
     	push (@goals, $line);
@@ -224,7 +248,7 @@ EOF
     	print T  "verifier.executeGoal(\"$goals[0]\");\n";
     } else {
 	    print T  "List goals = Arrays.asList(new String[] {";
-	    for ($i = 0; $i < @goals; $i++) {
+	    for (my $i = 0; $i < @goals; $i++) {
 	    	print T  "\"$goals[$i]\"";
 	    	print T  ", " if ($i != scalar(@goals) -1);
 		}
@@ -238,7 +262,7 @@ EOF
 	
 		open (FILE, $fileExpectedResults) or die "Couldn't open $fileExpectedResults: $!\n";
 		
-		while ($line = <FILE>) {
+		while (my $line = <FILE>) {
 	    	chomp ($line);
 	    	#print T  ("OLDLINE: $line\n");
 	    	if ($line =~ /^\#(.*)/) {
@@ -263,13 +287,18 @@ EOF
 	} else {
 		print T  "// don't verify error free log\n";
 	}
+	print T "verifier.resetStreams();\n";
+	print T "System.out.println(\"PASS\");\n";
 	print T  "}}\n\n";
 	
 }
 
-print POM "  </modules>\n";
-print POM "</project>";
-        
-print T  $postamble;        
+# DGF end of the suite
+print SUITE <<END;
+        return suite;
+    }
+}
+END
+
         
 closedir(DIR);
