@@ -1,0 +1,30 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it0107</artifactId>
+  <description>Verify that default implementation of an implementation for a complex object works as 
+        expected [MNG-2293]</description>
+  <packaging>pom</packaging>
+  <version>3.8.1</version>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <goals>
+          <goal>param-implementation</goal>
+        </goals>
+        <configuration>
+          <bla><field>foobar</field></bla>
+          <expected>class org.apache.maven.plugin.coreit.sub.MyBla-foobar</expected>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <pluginsRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>http://people.apache.org/maven-snapshot-repository</url>
+    </pluginRepository>
+  </pluginsRepositories>
+</model>
