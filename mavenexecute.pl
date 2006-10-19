@@ -3,7 +3,7 @@ use File::Path;
 use strict;
 
 my $dirname = "maven-core-it";
-my $newITs = "maven-core-it-new";
+my $newITs = "maven-core-integrationtests";
 my $newITsResources = "$newITs/src/test/resources";
 
 
@@ -143,6 +143,28 @@ while (defined(my $filename = readdir(DIR))) {
     } else {
         system( "cp -r $dirname/$filename $testProjectDirectory" );
     }
+    my $testPomFile = "$testProjectDirectory/pom.xml";
+    my $testDescription = $comment{$filename} or die "wtf? no test description for $filename\n";
+    (my $testDescriptionEscaped = $testDescription) =~ s/</\&lt;/gs;
+    $testDescriptionEscaped =~ s/>/\&gt;/gs;
+    if (-e $testPomFile) {
+        my $testPom;
+        {
+            local( $/, *TESTPOM );
+            open (TESTPOM, "<$testPomFile");
+            $testPom = <TESTPOM>;
+            close TESTPOM;
+        }
+        # drop the existing description, if there is one
+        $testPom =~ s!<description>.*?</description>!!s;
+        # insert the test description into the POM
+        $testPom =~ s^</artifactId>(?!.*</parent>)(\s+)<^</artifactId>\1<description>$testDescriptionEscaped</description>\1<^sx;
+        my $testDescriptionMatcher = quotemeta($testDescriptionEscaped);
+        die "failed to insert description in $testProjectDirectory/pom.xml " unless ($testPom =~ m/$testDescriptionMatcher/s);
+        open (TESTPOM, ">$testPomFile");
+        print TESTPOM $testPom;
+        close TESTPOM;
+    }
 	unlink("$testProjectDirectory/cli-options.txt");
 	unlink("$testProjectDirectory/system.properties");
 	unlink("$testProjectDirectory/verifier.properties");
@@ -165,7 +187,7 @@ import org.apache.maven.it.util.*;
 
 public class $itTestName extends TestCase /*extends AbstractMavenIntegrationTest*/ {    
 
-/** $comment{$filename} */
+/** $testDescriptionEscaped */
 public void test$filename() throws Exception {
 String basedir = System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"));
 File testDir = new File(basedir, getName());
