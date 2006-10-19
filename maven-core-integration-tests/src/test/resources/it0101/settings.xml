@@ -1,0 +1,13 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>test</id>
+      <properties>
+        <libdir>lib</libdir>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>test</activeProfile>
+  </activeProfiles>
+</settings>
