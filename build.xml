@@ -1,4 +1,4 @@
-<project default="run-full-maven">
+<project default="all">
 
   <description>
     The first time you build Maven from source, you have to build Maven without Maven.
@@ -262,6 +262,8 @@ need different versions of modello.  -->
       <arg value="test"/>
     </java>
   </target>
+
+  <target name="all" depends="init,extract-assembly,mits"/>
 
   <target name="run-full-maven" depends="init,extract-assembly"
           description="runs the full extracted Maven, now with tests">
