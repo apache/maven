@@ -253,7 +253,7 @@ need different versions of modello.  -->
           description="Run the Maven integration tests."
           depends="init">
     <java fork="true"
-          dir="maven-core-it-new"
+          dir="maven-core-integration-tests"
           classname="org.apache.maven.cli.MavenCli"
           failonerror="true">
       <classpath refid="maven.classpath"/>
