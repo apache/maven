@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+
+# DO NOT EXECUTE THIS SCRIPT!!!!!!
+# This script was used to generate the new IT structure and we're leaving it around for safe keeping
+# but the transfer to the new mechanism has been made.
+
 use File::Path;
 use strict;
 
