@@ -3,7 +3,7 @@ use File::Path;
 use strict;
 
 my $dirname = "maven-core-it";
-my $newITs = "maven-core-integrationtests";
+my $newITs = "maven-core-integration-tests";
 my $newITsResources = "$newITs/src/test/resources";
 
 
