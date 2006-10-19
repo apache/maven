@@ -1,0 +1,31 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it0064</artifactId>
+  <description>Test the use of a mojo that uses setters instead of private fields
+        for the population of configuration values.</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <foo>fooValue</foo>
+          <bar>barValue</bar>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>
