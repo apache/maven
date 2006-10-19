@@ -1,0 +1,39 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <version>1.0</version>
+
+  <artifactId>it0086</artifactId>
+  
+  <description>Verify that a plugin dependency class can be loaded from both the plugin classloader and the
+        context classloader available to the plugin.</description>
+  
+  <name>Plugin Dependency Classloading Test</name>
+  
+  
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0</version>
+
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            
+            <configuration>
+              <className>
+                bsh.Interpreter
+              </className>
+            </configuration>
+            <goals>
+              <goal>loadable</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
