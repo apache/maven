@@ -1,0 +1,15 @@
+<verifications>
+  <files>
+    <file>
+      <location>src/test/verifier/verifications.xml</location>
+    </file>
+    <file>
+      <location>src/test/verifier/invalidfile</location>
+      <exists>false</exists>
+    </file>
+    <file>
+      <location>pom.xml</location>
+      <contains>Maven.*Plugin Test</contains>
+    </file>
+  </files>
+</verifications>
