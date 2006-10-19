@@ -1,0 +1,28 @@
+/**
+ * Beanshell mojo integration test.
+ * @goal it0020
+ */
+
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.script.beanshell.BeanshellMojoAdapter;
+
+execute()
+{
+    logger.info( "Executing it0020..." );
+    print( "info level?" );
+    org.codehaus.plexus.util.FileUtils.fileWrite( outDir.getAbsolutePath() + "/out.txt", "This is a Beanshell test" );
+}
+
+/**
+ * Output directory for files.
+ *
+ * @parameter expression="${project.build.directory}" type="java.io.File"
+ * @required
+ */
+setOutDir( file )
+{
+    outDir = file;
+}
+
+return new BeanshellMojoAdapter( (Mojo) this, this.interpreter );
+
