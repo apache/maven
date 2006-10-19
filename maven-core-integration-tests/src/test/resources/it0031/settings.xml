@@ -1,0 +1,19 @@
+<settings>
+  <pluginGroups>
+    <pluginGroup>org.codehaus.modello</pluginGroup>
+  </pluginGroups>
+  <mirrors>
+   <mirror>
+      <id>test</id>
+      <name>Test Mirror of ibiblio.org</name>
+      <url>http://test.maven.codehaus.org/maven2</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+   <mirror>
+      <id>test-plugins</id>
+      <name>Test Mirror of ibiblio.org Plugin Repository</name>
+      <url>http://test.maven.codehaus.org/maven2/plugins</url>
+      <mirrorOf>central-plugins</mirrorOf>
+    </mirror>
+  </mirrors>
+</settings>

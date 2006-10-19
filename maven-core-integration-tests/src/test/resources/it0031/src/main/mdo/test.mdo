@@ -1,0 +1,20 @@
+<model>
+  <id>lifecycle-mappings</id>
+  <name>LifecycleMappings</name>
+  <description><![CDATA[
+    test modello file.
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.it.it0031</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="root">
+      <name>Root</name>
+      <version>1.0.0</version>
+      <description>Root element of the test model.</description>
+    </class>
+  </classes>
+</model>
