@@ -1,0 +1,42 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>test-components</artifactId>
+		<groupId>test</groupId>
+		<version>0.1</version>
+	</parent>
+
+  <groupId>test</groupId>
+  <artifactId>test-component-c</artifactId>
+  <version>0.1</version>
+  <name>Test Component C</name>
+  <packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>test</groupId>
+			<artifactId>test-component-b</artifactId>
+			<version>0.1</version>
+		</dependency>
+	</dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>test</groupId>
+        <artifactId>it0042-test-plugin</artifactId>
+        <version>0.1</version>
+        <configuration>
+          <value>my-test</value>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
