@@ -1,0 +1,16 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>it0089-root</artifactId>
+  <description>Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
+        the context classloader available to the plugin.
+       </description>
+  <version>1.0</version>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>plugin</module>
+    <module>project</module>
+  </modules>
+</project>
