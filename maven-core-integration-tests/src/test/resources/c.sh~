@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for i in `ls -1`
+do
+  echo $i
+done
