@@ -1,0 +1,17 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it0027</artifactId>
+  <description>Test @execute with a custom lifecycle, including configuration</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0</version>
+      </plugin>
+    </plugins>
+  </build>
+</model>
