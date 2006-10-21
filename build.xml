@@ -263,7 +263,7 @@ need different versions of modello.  -->
     </java>
   </target>
 
-  <target name="all" depends="init,extract-assembly,mits"/>
+  <target name="all" depends="clean-bootstrap,init,extract-assembly,mits"/>
 
   <target name="run-full-maven" depends="init,extract-assembly"
           description="runs the full extracted Maven, now with tests">
