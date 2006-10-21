@@ -170,7 +170,6 @@ need different versions of modello.  -->
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
     <modello file="maven-plugin-registry/plugin-registry.mdo"/>
-    <modello file="maven-plugin-tools/maven-plugin-tools-model/src/main/mdo/plugin-metadata.mdo"/>
     <modello file="maven-profile/profiles.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/plugins.mdo"/>
