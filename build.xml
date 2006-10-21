@@ -46,10 +46,6 @@
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
   </target>
 
-  <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
-    <delete dir="bootstrap/target"/>
-  </target>
-
   <!-- DGF TODO Make a simple Java Ant task that pulls dependencies and adds them to a path reference, so we don't have to copy-and-paste -->
   <!-- Then again, this *is* a very simple Ant script, so maybe there's no need to get fancy...? -->
   <target name="pull" depends="init"
@@ -249,7 +245,7 @@ need different versions of modello.  -->
     </chmod>
   </target>
 
-  <target name="mits"
+  <target name=""
           description="Run the Maven integration tests."
           depends="init">
     <java fork="true"
