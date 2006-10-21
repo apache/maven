@@ -46,6 +46,10 @@
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
   </target>
 
+  <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
+    <delete dir="bootstrap/target"/>
+  </target>
+
   <!-- DGF TODO Make a simple Java Ant task that pulls dependencies and adds them to a path reference, so we don't have to copy-and-paste -->
   <!-- Then again, this *is* a very simple Ant script, so maybe there's no need to get fancy...? -->
   <target name="pull" depends="init"
