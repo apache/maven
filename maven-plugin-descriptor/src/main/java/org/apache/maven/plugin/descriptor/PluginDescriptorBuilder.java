@@ -131,6 +131,13 @@ public class PluginDescriptorBuilder
             mojo.setComponentComposer( composerConfig.getValue() );
         }
 
+        String since = c.getChild( "since" ).getValue();
+
+        if ( since != null )
+        {
+            mojo.setSince( since );
+        }
+
         String phase = c.getChild( "phase" ).getValue();
 
         if ( phase != null )
