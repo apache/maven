@@ -245,7 +245,7 @@ need different versions of modello.  -->
     </chmod>
   </target>
 
-  <target name=""
+  <target name="mits"
           description="Run the Maven integration tests."
           depends="init">
     <java fork="true"
