@@ -55,6 +55,8 @@ public class MojoDescriptor
     private String goal;
 
     private String phase;
+    
+    private String since;
 
     private String executePhase;
 
@@ -229,6 +231,16 @@ public class MojoDescriptor
     public void setPhase( String phase )
     {
         this.phase = phase;
+    }
+
+    public String getSince()
+    {
+        return since;
+    }
+
+    public void setSince( String since )
+    {
+        this.since = since;
     }
 
     public String getGoal()
