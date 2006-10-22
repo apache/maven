@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0054</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0054</artifactId>
   <description>Test resource filtering.</description>
   <packaging>jar</packaging>
   <version>1.0</version>
