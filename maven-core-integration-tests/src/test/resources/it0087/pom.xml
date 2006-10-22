@@ -1,9 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
+  <groupId>org.apache.maven.its</groupId>
   <version>1.0</version>
 
-  <artifactId>it0087</artifactId>
+  <artifactId>maven-it-it0087</artifactId>
 
   <description>Verify that a project-level plugin dependency class can be loaded from both the plugin classloader
         and the context classloader available to the plugin.</description>
