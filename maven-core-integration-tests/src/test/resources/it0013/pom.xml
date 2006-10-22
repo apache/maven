@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0013</groupId>
   <artifactId>maven-it-it0013</artifactId>
   <description>Test plugin-plugin, which tests maven-plugin-tools-api and 
         maven-plugin-tools-java. This will generate a plugin descriptor from 
