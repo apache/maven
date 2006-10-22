@@ -17,7 +17,7 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.apache.maven.it</groupId>
+        <groupId>org.apache.maven.its.it0085</groupId>
         <artifactId>pom-dep</artifactId>
         <version>1.4.2</version>
         <scope>system</scope>

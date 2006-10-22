@@ -21,13 +21,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.test.it0106</groupId>
+    <groupId>org.apache.maven.its.it0106</groupId>
     <artifactId>B</artifactId>
     <version>1</version>
   </parent>
-
   <artifactId>C</artifactId>
   <packaging>pom</packaging>
   <name>C</name>
 </project>
-

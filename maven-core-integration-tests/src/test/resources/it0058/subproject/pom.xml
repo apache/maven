@@ -1,11 +1,11 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven.its</groupId>
+    <groupId>org.apache.maven.its.it0058</groupId>
     <artifactId>maven-it-it0058</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>maven-it-it0058-subproject</artifactId>
+  <artifactId>subproject</artifactId>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

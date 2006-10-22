@@ -1,24 +1,19 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven.it</groupId>
+    <groupId>org.apache.maven.its.it0089</groupId>
     <version>1.0</version>
-    <artifactId>it0089-root</artifactId>
+    <artifactId>maven-it-it0089</artifactId>
   </parent>
-
-  <artifactId>it0089</artifactId>
-
+  <artifactId>project</artifactId>
   <name>Plugin Transitive Dependency Classloading Test</name>
-  
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-it0089-plugin</artifactId>
-        
         <executions>
           <execution>
             <phase>validate</phase>
-            
             <goals>
               <goal>test</goal>
             </goals>

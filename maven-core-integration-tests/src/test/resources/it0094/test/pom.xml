@@ -3,20 +3,18 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven.it</groupId>
-    <artifactId>maven-core-it0094</artifactId>
+    <groupId>org.apache.maven.its.it0094</groupId>
+    <artifactId>maven-it-it0094</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>maven-core-it0094-test</artifactId>
-
+  <artifactId>test</artifactId>
   <dependencies>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.it</groupId>
-        <artifactId>maven-core-it0094-mojo</artifactId>
+        <groupId>org.apache.maven.its.it0094</groupId>
+        <artifactId>maven-it0094-plugin</artifactId>
         <executions>
           <execution>
             <id>process-classes</id>
