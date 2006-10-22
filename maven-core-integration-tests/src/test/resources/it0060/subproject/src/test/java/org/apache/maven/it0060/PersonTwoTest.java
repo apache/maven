@@ -1,8 +1,8 @@
-package org.apache.maven.it0001;
+package org.apache.maven.it0060;
 
 import junit.framework.TestCase;
 
-public class PersonTest
+public class PersonTwoTest
     extends TestCase
 {
     public void testPerson()

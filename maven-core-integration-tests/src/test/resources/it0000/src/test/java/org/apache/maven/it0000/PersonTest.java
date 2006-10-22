@@ -7,7 +7,7 @@ public class PersonTest
 {
     public void testPerson()
     {
-        Person person = new Person();
+        IT0000Person person = new IT0000Person();
         
         person.setName( "foo" );
         

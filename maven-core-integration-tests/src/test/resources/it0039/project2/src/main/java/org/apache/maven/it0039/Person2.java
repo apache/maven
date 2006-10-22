@@ -1,6 +1,6 @@
-package org.apache.maven.it0001;
+package org.apache.maven.it0000;
 
-public class Person
+public class Person2
 {
     private String name;
     

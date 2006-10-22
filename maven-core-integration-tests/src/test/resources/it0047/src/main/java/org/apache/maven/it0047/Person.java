@@ -3,7 +3,7 @@ package org.apache.maven.it0047;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class Person
-  extends PlexusTestCase
+    extends PlexusTestCase
 {
     private String name;
     
