@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0065</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0065</artifactId>
   <description>Test that the basedir of the parent is set correctly.</description>
   <packaging>pom</packaging>
   <version>1.0</version>
