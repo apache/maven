@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>test</groupId>
-  <artifactId>test-components</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0084</artifactId>
   <description>Verify that the collector selecting a particular version gets the correct subtree</description>
   <version>0.1</version>
   <name>Test Components</name>
