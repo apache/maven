@@ -1,8 +1,8 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven.it</groupId>
-    <artifactId>it0085-parent</artifactId>
+    <groupId>org.apache.maven.its</groupId>
+    <artifactId>maven-it-it0085</artifactId>
     <version>1.0</version>
   </parent>
   <artifactId>it0085-war</artifactId>
@@ -15,7 +15,7 @@
       <version>3.8.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.it</groupId>
+      <groupId>org.apache.maven.its</groupId>
       <artifactId>it0085-dep</artifactId>
       <version>1.0</version>
       <scope>provided</scope>
