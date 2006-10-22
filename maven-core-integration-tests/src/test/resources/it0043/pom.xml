@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0043</groupId>
   <artifactId>maven-it-it0043</artifactId>
   <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
   <version>1.0-SNAPSHOT</version>
