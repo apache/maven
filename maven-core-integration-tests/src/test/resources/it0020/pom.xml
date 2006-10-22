@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-it0020-plugin</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0020</artifactId>
   <description>Test beanshell mojo support.</description>
   <packaging>maven-plugin</packaging>
   <version>1.0-SNAPSHOT</version>
