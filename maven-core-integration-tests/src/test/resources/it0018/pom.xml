@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0018</groupId>
   <artifactId>maven-it-it0018</artifactId>
   <description>Ensure that managed dependencies for dependency POMs are calculated
         correctly when resolved. Removes commons-logging-1.0.3 and checks it is
