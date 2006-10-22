@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0078</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0078</artifactId>
   <description>Test that configuration for maven-compiler-plugin is injected from
         PluginManagement section even when it's not explicitly defined in the
         plugins section.</description>
