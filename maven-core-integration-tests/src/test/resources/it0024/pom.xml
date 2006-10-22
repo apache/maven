@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0024</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0024</artifactId>
   <description>Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;
         that are directly inside th plugin.</description>
   <packaging>jar</packaging>
