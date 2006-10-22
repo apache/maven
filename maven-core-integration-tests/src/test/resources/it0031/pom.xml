@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-it0031</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0031</artifactId>
   <description>Test usage of plugins.xml mapping file on the repository to resolve
         plugin artifactId from it's prefix using the pluginGroups in
         the provided settings.xml.</description>
