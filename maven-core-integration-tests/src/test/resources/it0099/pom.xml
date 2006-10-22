@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it0099</groupId>
-  <artifactId>maven-it0099-parent</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0099</artifactId>
   <description>Test that parent-POMs cached during a build are available as parents
         to other POMs in the multimodule build. [MNG-2130]</description>
   <version>1</version>
