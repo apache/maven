@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0051</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0052</artifactId>
   <description>Test that source attachment doesn't take place when
         -DperformRelease=true is missing.</description>
   <packaging>jar</packaging>
