@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0053</groupId>
   <artifactId>maven-it-it0053</artifactId>
   <description>Test that attached artifacts have the same buildnumber and timestamp
         as the main artifact. This will not correctly verify until we have
