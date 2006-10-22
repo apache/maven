@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0062</groupId>
   <artifactId>maven-it-it0062</artifactId>
   <description>Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
         specified.</description>
