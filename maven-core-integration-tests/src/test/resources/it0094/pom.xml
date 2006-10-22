@@ -2,8 +2,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0094</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0094</artifactId>
   <description>Test classloading issues with mojos after 2.0 (MNG-1898).</description>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
