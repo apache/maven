@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it.mng2006</groupId>
-  <artifactId>bootstrapper</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0095</artifactId>
   <description>Test URL calculation when modules are in sibling dirs of parent. (MNG-2006)</description>
   <version>1</version>
 
