@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0083</groupId>
   <artifactId>maven-it-it0083</artifactId>
   <description>Verify that overriding a compile time dependency as provided in a WAR ensures it is not included.</description>
   <version>0.1</version>
