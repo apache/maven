@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0067</groupId>
   <artifactId>maven-it-it0067</artifactId>
   <description>Test activation of a profile from the command line.</description>
   <packaging>maven-plugin</packaging>
