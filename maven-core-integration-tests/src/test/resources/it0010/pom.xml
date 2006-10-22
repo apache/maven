@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0010</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0010</artifactId>
   <description>Since the artifact resolution does not use the project builder, we must
         ensure that the full hierarchy of all dependencies is resolved. This
         includes the dependencies of the parent-pom's of dependencies. This test
