@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>testing</groupId>
-  <artifactId>maven-core-it-it0105</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0105</artifactId>
   <description>MRESOURCES-18</description>
   <version>1.0</version>
   <dependencies>
