@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0045</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0045</artifactId>
   <description>Test non-reactor behavior when plugin declares "@requiresProject false"</description>
   <packaging>pom</packaging>
   <version>1.0</version>
