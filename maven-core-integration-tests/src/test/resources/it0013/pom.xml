@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-it0013-plugin</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0013</artifactId>
   <description>Test plugin-plugin, which tests maven-plugin-tools-api and 
         maven-plugin-tools-java. This will generate a plugin descriptor from 
         java-based mojo sources, install the plugin, and then use it.</description>
