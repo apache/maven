@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0063</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0063</artifactId>
   <description>Test the use of a system scoped dependency to tools.jar.</description>
   <packaging>jar</packaging>
   <version>1.0</version>
