@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0055</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0055</artifactId>
   <description>Test that source includes/excludes with in the compiler plugin config.
         This will test excludes and testExcludes...</description>
   <packaging>jar</packaging>
