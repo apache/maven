@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0092</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0092</artifactId>
   <description>Test that legacy repositories with legacy snapshots download correctly.</description>
   <version>1.0</version>
   <dependencies>
