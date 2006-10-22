@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0107</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0107</artifactId>
   <description>Verify that default implementation of an implementation for a complex object works as 
         expected [MNG-2293]</description>
   <packaging>pom</packaging>
