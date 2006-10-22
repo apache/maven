@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0096</groupId>
   <artifactId>maven-it-it0096</artifactId>
   <description>Test that plugin executions from &gt;1 step of inheritance don't run multiple times. </description>
   <version>1</version>
