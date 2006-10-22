@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0038</groupId>
   <artifactId>maven-it-it0038</artifactId>
   <description>Test building project from outside the project directory using '-f'
         option</description>
