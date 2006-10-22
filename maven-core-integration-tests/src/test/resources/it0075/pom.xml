@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0075</groupId>
   <artifactId>maven-it-it0075</artifactId>
   <description>Verify that direct invocation of a mojo from the command line still
         results in the processing of modules included via profiles.</description>
