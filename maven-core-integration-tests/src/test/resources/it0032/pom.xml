@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0032</groupId>
   <artifactId>maven-it-it0032</artifactId>
   <description>Tests that a specified Maven version requirement that is lower doesn't cause any problems</description>
   <packaging>jar</packaging>
