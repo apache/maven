@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0072</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0072</artifactId>
   <description>Verifies that property references with dotted notation work within
         POM interpolation.</description>
   <packaging>jar</packaging>
