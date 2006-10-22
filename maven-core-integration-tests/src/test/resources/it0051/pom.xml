@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0051</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0051</artifactId>
   <description>Test source attachment when -DperformRelease=true is specified.</description>
   <packaging>jar</packaging>
   <version>1.0</version>
