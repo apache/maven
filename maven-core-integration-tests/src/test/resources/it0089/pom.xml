@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>it0089-root</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0089</artifactId>
   <description>Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
         the context classloader available to the plugin.
        </description>
