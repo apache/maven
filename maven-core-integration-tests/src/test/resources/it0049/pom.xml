@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0049</groupId>
   <artifactId>maven-it-it0049</artifactId>
   <description>Test parameter alias usage.</description>
   <version>1.0-SNAPSHOT</version>
