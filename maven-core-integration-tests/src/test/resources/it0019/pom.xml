@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it0019</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0019</artifactId>
   <description>Test that a version is managed by pluginManagement in the super POM</description>
   <version>1.0</version>
   <build>
