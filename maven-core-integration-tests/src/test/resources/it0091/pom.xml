@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0091</groupId>
   <artifactId>maven-it-it0091</artifactId>
   <description>Test that currently demonstrates that properties are not correctly
         interpolated into other areas in the POM. This may strictly be a boolean
