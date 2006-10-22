@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0061</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0061</artifactId>
   <description>Verify that deployment of artifacts to a legacy-layout repository
         results in a groupId directory of 'the.full.group.id' instead of
         'the/full/group/id'.</description>
