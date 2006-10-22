@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0006</groupId>
   <artifactId>maven-it-it0006</artifactId>
   <description>Integration test for the verifier plugin.</description>
   <name>Maven Verifier Plugin Test</name>
