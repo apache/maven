@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0090</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0090</artifactId>
   <description>Test that ensures that envars are interpolated correctly into plugin
         configurations.</description>
   <version>1.0</version>
