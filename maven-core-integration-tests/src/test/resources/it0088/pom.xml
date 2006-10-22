@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0088</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0088</artifactId>
   <description>Test path translation.</description>
   <version>1.0</version>
   <dependencies>
