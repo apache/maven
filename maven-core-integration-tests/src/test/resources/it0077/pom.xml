@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0077</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0077</artifactId>
   <description>Test test jar attachment.</description>
   <packaging>pom</packaging>
   <version>1.0</version>
