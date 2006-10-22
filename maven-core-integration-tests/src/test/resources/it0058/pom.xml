@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0058</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0058</artifactId>
   <description>Verify that profiles from settings.xml do not pollute module lists
         across projects in a reactorized build.</description>
   <packaging>pom</packaging>
