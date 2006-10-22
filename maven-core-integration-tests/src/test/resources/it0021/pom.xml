@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-it0021-plugin</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0021</artifactId>
   <description>Test pom-level profile inclusion (this one is activated by system
         property).</description>
   <packaging>maven-plugin</packaging>
