@@ -1,6 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0064</groupId>
   <artifactId>maven-it-it0064</artifactId>
   <description>Test the use of a mojo that uses setters instead of private fields
         for the population of configuration values.</description>
