@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0076</artifactId> 
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0076</artifactId> 
   <description>Test that plugins in pluginManagement aren't included in the build
         unless they are referenced by groupId/artifactId within the plugins
         section of a pom.</description> 
