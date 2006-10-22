@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0080</groupId>
   <artifactId>maven-it-it0080</artifactId>
   <description>Test that depending on a WAR doesn't also get its dependencies
         transitively.</description>
