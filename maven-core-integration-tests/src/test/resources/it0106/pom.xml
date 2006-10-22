@@ -27,7 +27,7 @@
     <relativePath>A/pom.xml</relativePath>
   </parent>
 
-  <artifactId>B</artifactId>
+  <artifactId>maven-it-it0106</artifactId>
   <description>When a project has modules and its parent is not preinstalled [MNG-2318]</description>
   <packaging>pom</packaging>
   <name>B</name>
