@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0103</groupId>
   <artifactId>maven-it-it0103</artifactId>
   <description>Verify that multimodule builds where one project references another as
         a parent can build, even if that parent is not correctly referenced by
