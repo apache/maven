@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its</groupId>
+  <groupId>org.apache.maven.its.it0081</groupId>
   <artifactId>maven-it-it0081</artifactId>
   <description>Test per-plugin dependencies.</description>
   <version>0.1</version>
