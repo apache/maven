@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0090</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0091</artifactId>
   <description>Test that currently demonstrates that properties are not correctly
         interpolated into other areas in the POM. This may strictly be a boolean
         problem: I captured the problem as it was reported.</description>
