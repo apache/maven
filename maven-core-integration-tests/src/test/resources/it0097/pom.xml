@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it0097</groupId>
-  <artifactId>maven-it0097-launcher</artifactId>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>maven-it-it0097</artifactId>
   <description>Test that the implied relative path for the parent POM works, even two
         levels deep.</description>
   <version>1</version>
