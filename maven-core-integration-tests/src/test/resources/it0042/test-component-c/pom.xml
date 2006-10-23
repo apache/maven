@@ -1,20 +1,18 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>test-components</artifactId>
-		<groupId>test</groupId>
-		<version>0.1</version>
-	</parent>
+        <parent>
+                <artifactId>maven-it-it0042</artifactId>
+                <groupId>org.apache.maven.its.it0042</groupId>
+                <version>0.1</version>
+        </parent>
 
-  <groupId>test</groupId>
   <artifactId>test-component-c</artifactId>
   <version>0.1</version>
   <name>Test Component C</name>
   <packaging>war</packaging>
-
 	<dependencies>
 		<dependency>
-			<groupId>test</groupId>
+			<groupId>org.apache.maven.its.it0042</groupId>
 			<artifactId>test-component-b</artifactId>
 			<version>0.1</version>
 		</dependency>
@@ -23,7 +21,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>test</groupId>
+        <groupId>org.apache.maven.its.it0042</groupId>
         <artifactId>it0042-test-plugin</artifactId>
         <version>0.1</version>
         <configuration>
