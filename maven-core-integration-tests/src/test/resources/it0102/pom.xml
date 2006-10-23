@@ -1,14 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0102</name> 
   <groupId>org.apache.maven.its.it0102</groupId>
   <artifactId>maven-it-it0102</artifactId>
   <description>Test that &lt;activeByDefault/&gt; calculations for profile activation only
         use profiles defined in the POM. [MNG-2136]</description>
   <packaging>pom</packaging>
   <version>1.0</version>
-  <name>parent</name>
-
   <build>
     <plugins>
       <plugin>

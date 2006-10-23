@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0003</name> 
   <groupId>org.apache.maven.its.it0003</groupId>
   <artifactId>maven-it-it0003</artifactId>
   <description>Builds upon it0001: we add a jar installation step. We delete the JAR

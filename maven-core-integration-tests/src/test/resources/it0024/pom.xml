@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0024</name> 
   <groupId>org.apache.maven.its.it0024</groupId>
   <artifactId>maven-it-it0024</artifactId>
   <description>Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;

@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0038</name> 
   <groupId>org.apache.maven.its.it0038</groupId>
   <artifactId>maven-it-it0038</artifactId>
   <description>Test building project from outside the project directory using '-f'

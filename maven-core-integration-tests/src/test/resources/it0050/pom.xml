@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0050</name> 
   <groupId>org.apache.maven.its.it0050</groupId>
   <artifactId>maven-it-it0050</artifactId>
   <description>Test surefire inclusion/exclusions</description>

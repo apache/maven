@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0020</name> 
   <groupId>org.apache.maven.its.it0020</groupId>
   <artifactId>maven-it-it0020</artifactId>
   <description>Test beanshell mojo support.</description>

@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0067</name> 
   <groupId>org.apache.maven.its.it0067</groupId>
   <artifactId>maven-it-it0067</artifactId>
   <description>Test activation of a profile from the command line.</description>

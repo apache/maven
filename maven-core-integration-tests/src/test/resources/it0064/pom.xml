@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0064</name> 
   <groupId>org.apache.maven.its.it0064</groupId>
   <artifactId>maven-it-it0064</artifactId>
   <description>Test the use of a mojo that uses setters instead of private fields

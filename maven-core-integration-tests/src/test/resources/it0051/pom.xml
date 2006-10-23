@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0051</name> 
   <groupId>org.apache.maven.its.it0051</groupId>
   <artifactId>maven-it-it0051</artifactId>
   <description>Test source attachment when -DperformRelease=true is specified.</description>

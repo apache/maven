@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0025</name> 
   <groupId>org.apache.maven.its.it0025</groupId>
   <artifactId>maven-it-it0025</artifactId>
   <description>Test multiple goal executions with different execution-level configs.</description>

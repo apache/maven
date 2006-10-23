@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0022</name> 
   <groupId>org.apache.maven.its.it0022</groupId>
   <artifactId>maven-it-it0022</artifactId>
   <description>Test profile inclusion from profiles.xml (this one is activated by system property).</description>

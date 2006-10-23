@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0009</name> 
   <groupId>org.apache.maven.its.it0009</groupId>
   <artifactId>maven-it-it0009</artifactId>
   <description>Test plugin configuration and goal configuration that overrides what the

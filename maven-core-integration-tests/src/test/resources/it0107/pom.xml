@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0107</name> 
   <groupId>org.apache.maven.its.it0107</groupId>
   <artifactId>maven-it-it0107</artifactId>
   <description>Verify that default implementation of an implementation for a complex object works as 

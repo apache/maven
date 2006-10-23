@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0041</name> 
   <groupId>org.apache.maven.its.it0041</groupId>
   <artifactId>maven-it-it0041</artifactId>
   <description>Test the use of a new type from a plugin</description>

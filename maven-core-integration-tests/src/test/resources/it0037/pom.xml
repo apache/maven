@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0037</name> 
   <groupId>org.apache.maven.its.it0037</groupId>
   <artifactId>maven-it-it0037</artifactId>
   <description>Test building with alternate pom file using '-f'</description>

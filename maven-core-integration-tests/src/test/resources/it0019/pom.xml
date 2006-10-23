@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0019</name> 
   <groupId>org.apache.maven.its.it0019</groupId>
   <artifactId>maven-it-it0019</artifactId>
   <description>Test that a version is managed by pluginManagement in the super POM</description>

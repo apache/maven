@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0076</name> 
   <groupId>org.apache.maven.its.it0076</groupId>
   <artifactId>maven-it-it0076</artifactId> 
   <description>Test that plugins in pluginManagement aren't included in the build

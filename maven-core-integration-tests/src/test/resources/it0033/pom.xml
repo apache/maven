@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0033</name> 
   <groupId>org.apache.maven.its.it0033</groupId>
   <artifactId>maven-it-it0033</artifactId>
   <description>Test an EAR generation</description>

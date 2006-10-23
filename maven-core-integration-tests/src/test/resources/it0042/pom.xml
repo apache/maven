@@ -1,10 +1,10 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0042</name> 
   <groupId>org.apache.maven.its.it0042</groupId>
   <artifactId>maven-it-it0042</artifactId>
   <description>Test that the reactor can establish the artifact location of known projects for dependencies</description>
   <version>0.1</version>
-  <name>Test Components</name>
   <packaging>pom</packaging>
   <modules>
     <module>test-component-c</module>

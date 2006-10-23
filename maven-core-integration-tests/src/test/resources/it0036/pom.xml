@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0036</name> 
   <groupId>org.apache.maven.its.it0036</groupId>
   <artifactId>maven-it-it0036</artifactId>
   <description>Test building from release-pom.xml when it's available</description>

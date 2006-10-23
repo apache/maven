@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0105</name> 
   <groupId>org.apache.maven.its.it0105</groupId>
   <artifactId>maven-it-it0105</artifactId>
   <description>MRESOURCES-18</description>

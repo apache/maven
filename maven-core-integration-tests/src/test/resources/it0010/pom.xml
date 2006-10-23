@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0010</name> 
   <groupId>org.apache.maven.its.it0010</groupId>
   <artifactId>maven-it-it0010</artifactId>
   <description>Since the artifact resolution does not use the project builder, we must

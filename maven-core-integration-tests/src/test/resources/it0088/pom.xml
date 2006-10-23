@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0088</name> 
   <groupId>org.apache.maven.its.it0088</groupId>
   <artifactId>maven-it-it0088</artifactId>
   <description>Test path translation.</description>

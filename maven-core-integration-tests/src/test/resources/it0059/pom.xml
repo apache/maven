@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0059</name> 
   <groupId>org.apache.maven.its.it0059</groupId>
   <artifactId>maven-it-it0059</artifactId>
   <description>Verify that maven-1 POMs will be ignored but not stop the resolution

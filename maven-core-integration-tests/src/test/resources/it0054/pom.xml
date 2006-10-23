@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0054</name> 
   <groupId>org.apache.maven.its.it0054</groupId>
   <artifactId>maven-it-it0054</artifactId>
   <description>Test resource filtering.</description>

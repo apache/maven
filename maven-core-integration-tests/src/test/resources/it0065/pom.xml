@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0065</name> 
   <groupId>org.apache.maven.its.it0065</groupId>
   <artifactId>maven-it-it0065</artifactId>
   <description>Test that the basedir of the parent is set correctly.</description>

@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0061</name> 
   <groupId>org.apache.maven.its.it0061</groupId>
   <artifactId>maven-it-it0061</artifactId>
   <description>Verify that deployment of artifacts to a legacy-layout repository

@@ -1,11 +1,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0080</name> 
   <groupId>org.apache.maven.its.it0080</groupId>
   <artifactId>maven-it-it0080</artifactId>
   <description>Test that depending on a WAR doesn't also get its dependencies
         transitively.</description>
   <version>0.1</version>
-  <name>Test Components</name>
   <packaging>pom</packaging>
   <modules>
     <module>test-component-c</module>

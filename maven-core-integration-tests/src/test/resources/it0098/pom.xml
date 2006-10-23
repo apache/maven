@@ -1,5 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0098</name> 
   <groupId>org.apache.maven.its.it0098</groupId>
   <artifactId>maven-it-it0098</artifactId>
   <description>Test that quoted system properties are processed correctly. [MNG-1415]</description>

@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0060</name> 
   <groupId>org.apache.maven.its.it0060</groupId>
   <artifactId>maven-it-it0060</artifactId>
   <description>Test aggregation of list configuration items when using

@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0053</name> 
   <groupId>org.apache.maven.its.it0053</groupId>
   <artifactId>maven-it-it0053</artifactId>
   <description>Test that attached artifacts have the same buildnumber and timestamp

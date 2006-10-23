@@ -1,5 +1,6 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0045</name> 
   <groupId>org.apache.maven.its.it0045</groupId>
   <artifactId>maven-it-it0045</artifactId>
   <description>Test non-reactor behavior when plugin declares "@requiresProject false"</description>

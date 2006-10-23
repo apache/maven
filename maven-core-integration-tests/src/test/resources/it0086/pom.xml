@@ -1,17 +1,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0086</name> 
   <groupId>org.apache.maven.its.it0086</groupId>
   <version>1.0</version>
-
   <artifactId>maven-it-it0086</artifactId>
-  
   <description>Verify that a plugin dependency class can be loaded from both the plugin classloader and the
         context classloader available to the plugin.</description>
-  
-  <name>Plugin Dependency Classloading Test</name>
-  
-  
-
   <build>
     <plugins>
       <plugin>
