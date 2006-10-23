@@ -1,17 +1,14 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven.it.mng2006</groupId>
+    <groupId>org.apache.maven.its.it0095</groupId>
     <artifactId>parent</artifactId>
     <version>1</version>
     <relativePath>../parent</relativePath>
   </parent>
-
   <artifactId>sub1</artifactId>
-
   <build>
     <defaultGoal>integration-test</defaultGoal>
-
     <plugins>
       <plugin>
         <artifactId>maven-help-plugin</artifactId>

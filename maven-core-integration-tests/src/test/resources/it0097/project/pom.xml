@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it0097</groupId>
+  <groupId>org.apache.maven.its.it0097</groupId>
   <version>1</version>
-  <artifactId>maven-it0097-project-level1</artifactId>
+  <artifactId>project</artifactId>
   <packaging>pom</packaging>
   <modules>
     <module>project-level2</module>
@@ -11,7 +11,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.it0097</groupId>
+        <groupId>org.apache.maven.its.it0097</groupId>
         <artifactId>maven-it0097-plugin</artifactId>
         <version>1</version>
         <executions>
