@@ -5,13 +5,10 @@
     <groupId>org.apache.maven.its.it0080</groupId>
     <version>0.1</version>
   </parent>
-
-  <groupId>test</groupId>
   <artifactId>test-component-b</artifactId>
   <version>0.1</version>
   <name>Test Component B</name>
   <packaging>war</packaging>
-
   <dependencies>
     <dependency>
       <groupId>test</groupId>

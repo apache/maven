@@ -1,12 +1,10 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>test-components</artifactId>
-		<groupId>test</groupId>
-		<version>0.1</version>
-	</parent>
-
-  <groupId>test</groupId>
+   <parent>
+     <artifactId>maven-it-it0083</artifactId>
+     <groupId>org.apache.maven.its.it0083</groupId>
+     <version>0.1</version>
+  </parent>
   <artifactId>test-component-a</artifactId>
   <version>0.1</version>
   <name>Test Component A</name>
