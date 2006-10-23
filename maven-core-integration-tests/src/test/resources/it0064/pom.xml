@@ -19,9 +19,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-core-it-plugin</artifactId>
-        <version>1.0</version>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-setter</artifactId>
+        <version>1.0-SNAPSHOT</version>
         <configuration>
           <foo>fooValue</foo>
           <bar>barValue</bar>
