@@ -5,13 +5,12 @@
   <artifactId>maven-it-it0044</artifactId>
   <description>Test --settings CLI option</description>
   <version>1.0-SNAPSHOT</version>
-  
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-core-it-plugin</artifactId>
-        <version>1.0</version>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
         <configuration>
           <pluginItem>${test}</pluginItem>
         </configuration>
