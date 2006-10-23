@@ -7,10 +7,11 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-core-it-plugin</artifactId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <groupId>org.apache.maven.its.plugins</groupId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
-					<outputDirectory>${basedir}/target/</outputDirectory>
+		<outputDirectory>${basedir}/target/</outputDirectory>
           <pluginFile>child-touch-${version}.txt</pluginFile>
         </configuration>
       </plugin>
