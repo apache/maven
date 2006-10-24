@@ -5,7 +5,7 @@
 		<groupId>org.apache.maven.its.it0042</groupId>
 		<version>0.1</version>
 	</parent>
-  <artifactId>it0042-test-plugin</artifactId>
+  <artifactId>test-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>0.1</version>
   <name>Test Plugin</name>

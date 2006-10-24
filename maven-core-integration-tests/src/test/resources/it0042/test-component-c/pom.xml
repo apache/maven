@@ -22,7 +22,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.it0042</groupId>
-        <artifactId>it0042-test-plugin</artifactId>
+        <artifactId>test-plugin</artifactId>
         <version>0.1</version>
         <configuration>
           <value>my-test</value>
