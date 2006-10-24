@@ -21,17 +21,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-
         <executions>
           <execution>
             <id>test</id>
             <phase>generate-sources</phase>
-
             <configuration>
               <source>1.4</source>
               <target>1.4</target>
             </configuration>
-
             <goals>
               <goal>compile</goal>
             </goals>

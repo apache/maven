@@ -9,7 +9,7 @@
     </file>
     <file>
       <location>pom.xml</location>
-      <contains>Maven.*Plugin Test</contains>
+      <contains>Maven.*Integration Test</contains>
     </file>
   </files>
 </verifications>
