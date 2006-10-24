@@ -5,8 +5,7 @@
     <artifactId>maven-it-it0029</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.apache.maven.it</groupId>
-  <artifactId>maven-core-it0029-child</artifactId>
+  <artifactId>child-project</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <dependencies>
