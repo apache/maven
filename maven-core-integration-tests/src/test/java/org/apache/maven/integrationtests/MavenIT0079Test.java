@@ -20,8 +20,8 @@ public class MavenIT0079Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0079" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "deploy" );
-        verifier.assertFilePresent( "target/test-repo/org/apache/maven/it/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
-        verifier.assertFilePresent( "target/test-repo/org/apache/maven/it/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-sources.jar" );
+        verifier.assertFilePresent( "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
+        verifier.assertFilePresent( "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-sources.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         System.out.println( "it0079 PASS" );
