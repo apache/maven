@@ -1,4 +1,4 @@
-package org.apache.maven.it00065;
+package org.apache.maven.it0065;
 
 import junit.framework.TestCase;
 

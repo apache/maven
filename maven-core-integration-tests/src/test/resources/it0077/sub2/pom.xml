@@ -9,14 +9,14 @@
   <version>1.0</version>
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven.it</groupId>
-      <artifactId>maven-it0077-sub1</artifactId>
+      <groupId>org.apache.maven.its.it0077</groupId>
+      <artifactId>sub1</artifactId>
       <version>1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.it</groupId>
-      <artifactId>maven-it0077-sub1</artifactId>
+      <groupId>org.apache.maven.its.it0077</groupId>
+      <artifactId>sub1</artifactId>
       <type>test-jar</type>
       <version>1.0</version>
       <scope>test</scope>

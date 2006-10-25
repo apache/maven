@@ -1,4 +1,4 @@
-package it0039.project2.src.test.java.org.apache.maven.it0039;
+package org.apache.maven.it0039;
 
 import junit.framework.TestCase;
 
@@ -7,7 +7,7 @@ public class Person2Test
 {
     public void testPerson()
     {
-        Person person = new Person();
+        Person2 person = new Person2();
 
         person.setName( "foo" );
 

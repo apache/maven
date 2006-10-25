@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.it0039</groupId>
-  <artifactId>maven-core-it0039-p2</artifactId>
+  <artifactId>maven-it-it0039-p2</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
   <dependencies>
