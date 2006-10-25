@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -18,11 +17,7 @@ public class MavenIT0080Test
     public void testit0080()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0080 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0080", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0080" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );
@@ -35,7 +30,7 @@ public class MavenIT0080Test
         verifier.assertFileNotPresent( "test-component-c/target/test-component-c-0.1/test-component-a-0.1.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0080 PASS" );
     }
 }
 

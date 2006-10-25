@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -19,11 +18,7 @@ public class MavenIT0018Test
     public void testit0018()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0018 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0018", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0018" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "commons-logging", "commons-logging", "1.0.3", "jar" );
         verifier.executeGoal( "package" );
@@ -31,7 +26,7 @@ public class MavenIT0018Test
         verifier.assertArtifactPresent( "commons-logging", "commons-logging", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0018 PASS" );
     }
 }
 

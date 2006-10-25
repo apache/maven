@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -19,20 +18,16 @@ public class MavenIT0060Test
     public void testit0060()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0060 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0060", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0060" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "test" );
-        verifier.assertFilePresent( "subproject/target/classes/org/apache/maven/it0001/Person.class" );
-        verifier.assertFilePresent( "subproject/target/test-classes/org/apache/maven/it0001/PersonTest.class" );
-        verifier.assertFileNotPresent( "subproject/target/test-classes/org/apache/maven/it0001/PersonTwoTest.class" );
-        verifier.assertFileNotPresent( "subproject/target/test-classes/org/apache/maven/it0001/PersonThreeTest.class" );
+        verifier.assertFilePresent( "subproject/target/classes/org/apache/maven/it0060/Person.class" );
+        verifier.assertFilePresent( "subproject/target/test-classes/org/apache/maven/it0060/PersonTest.class" );
+        verifier.assertFileNotPresent( "subproject/target/test-classes/org/apache/maven/it0060/PersonTwoTest.class" );
+        verifier.assertFileNotPresent( "subproject/target/test-classes/org/apache/maven/it0060/PersonThreeTest.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0060 PASS" );
     }
 }
 

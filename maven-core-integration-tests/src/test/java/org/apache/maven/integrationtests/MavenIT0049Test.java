@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -17,18 +16,15 @@ public class MavenIT0049Test
     public void testit0049()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0049 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0049", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0049" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-core-it-plugin", "1.0", "maven-plugin" );
-        verifier.executeGoal( "core-it:touch" );
+        //todo: i don't think we need to delete this plugin
+        //verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.assertFilePresent( "target/touchFile.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0049 PASS" );
     }
 }
 

@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -18,20 +17,14 @@ public class MavenIT0079Test
     public void testit0079()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0079 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0079", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0079" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "deploy" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/it/maven-core-it0079/SNAPSHOT/maven-core-it0079-*-1.jar" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/it/maven-core-it0079/SNAPSHOT/maven-core-it0079-*-1-sources.jar" );
+        verifier.assertFilePresent( "target/test-repo/org/apache/maven/it/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
+        verifier.assertFilePresent( "target/test-repo/org/apache/maven/it/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-sources.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0079 PASS" );
     }
 }
 

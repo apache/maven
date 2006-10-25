@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -19,11 +18,7 @@ public class MavenIT0021Test
     public void testit0021()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0021 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0021", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0021" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
         Properties systemProperties = new Properties();
@@ -33,7 +28,7 @@ public class MavenIT0021Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0021 PASS" );
     }
 }
 

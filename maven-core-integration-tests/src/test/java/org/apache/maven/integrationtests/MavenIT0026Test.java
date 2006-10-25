@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -18,21 +17,17 @@ public class MavenIT0026Test
     public void testit0026()
         throws Exception
     {
-        String basedir = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
-        File testDir = new File( basedir, getName() );
-        FileUtils.deleteDirectory( testDir );
-        System.out.println( "Extracting it0026 to " + testDir.getAbsolutePath() );
-        ResourceExtractor.extractResourcePath( getClass(), "/it0026", testDir );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0026" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         Properties systemProperties = new Properties();
         systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
         systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "core-it:touch" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "PASS" );
+        System.out.println( "it0026 PASS" );
     }
 }
 
