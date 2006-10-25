@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0084</name> 
+  <name>Maven Integration Test :: it0084</name>
   <groupId>org.apache.maven.its.it0084</groupId>
   <artifactId>maven-it-it0084</artifactId>
   <description>Verify that the collector selecting a particular version gets the correct subtree</description>
