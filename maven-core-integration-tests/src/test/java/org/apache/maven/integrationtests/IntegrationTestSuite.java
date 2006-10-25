@@ -53,7 +53,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0040Test.class );
         suite.addTestSuite( MavenIT0041Test.class );
         suite.addTestSuite( MavenIT0042Test.class );
-        // suite.addTestSuite(MavenIT0043Test.class);
+        suite.addTestSuite(MavenIT0043Test.class);
         suite.addTestSuite( MavenIT0044Test.class );
         suite.addTestSuite( MavenIT0045Test.class );
         suite.addTestSuite( MavenIT0046Test.class );
@@ -105,8 +105,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0092Test.class );
         suite.addTestSuite( MavenIT0094Test.class );
         suite.addTestSuite( MavenIT0095Test.class );
-        // suite.addTestSuite(MavenIT0096Test.class);
-        // suite.addTestSuite(MavenIT0097Test.class);
+        suite.addTestSuite(MavenIT0096Test.class);
+        suite.addTestSuite(MavenIT0097Test.class);
         // suite.addTestSuite(MavenIT0098Test.class);
         suite.addTestSuite( MavenIT0099Test.class );
         suite.addTestSuite( MavenIT0100Test.class );

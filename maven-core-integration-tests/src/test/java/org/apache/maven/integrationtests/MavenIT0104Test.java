@@ -6,6 +6,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * #it0104 Commenting out, not fixed until post-2.0.4, due to dependency on new plexus-container-default version.                      
+ */
 public class MavenIT0104Test
     extends TestCase /*extends AbstractMavenIntegrationTest*/
 {
