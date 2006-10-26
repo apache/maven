@@ -1,22 +1,21 @@
-
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.integrationtests</groupId>
-  <artifactId>maven-core-integrationtests</artifactId> 
+  <artifactId>maven-core-integrationtests</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Maven Integration Tests</name> 
+  <name>Maven Integration Tests</name>
   <build>
     <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-                <includes>
-                    <include>**/IntegrationTestSuite.java</include>
-                 </includes>
-                 <forkMode>never</forkMode>
-            </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/IntegrationTestSuite.java</include>
+          </includes>
+          <forkMode>never</forkMode>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
