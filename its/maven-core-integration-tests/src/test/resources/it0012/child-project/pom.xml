@@ -1,0 +1,20 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>child-project</artifactId>
+  <packaging>jar</packaging>
+  <version>3.0.3</version>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+		<outputDirectory>${basedir}/target/</outputDirectory>
+          <pluginFile>child-touch-${version}.txt</pluginFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

@@ -1,0 +1,20 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0073</name> 
+  <groupId>org.apache.maven.its.it0073</groupId>
+  <artifactId>maven-it-it0073</artifactId>
+  <description>Tests context passing between mojos in the same plugin.</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-context-passing</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <value>thrown-value</value>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

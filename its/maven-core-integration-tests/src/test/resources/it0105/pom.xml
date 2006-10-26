@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0105</name> 
+  <groupId>org.apache.maven.its.it0105</groupId>
+  <artifactId>maven-it-it0105</artifactId>
+  <description>MRESOURCES-18</description>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+		<!-- Enabling this will fix the problem for
+			maven-resources-plugin 2.2-20060403.015736-1 and earlier.
+		<filters>
+			<filter>filter.properties</filter>
+		</filters>
+		-->
+		<resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		</resource>
+		</resources>
+  </build>
+ 
+	<properties>
+  	<my.property>foo</my.property>
+	</properties>
+</project>

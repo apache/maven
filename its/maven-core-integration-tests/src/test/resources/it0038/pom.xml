@@ -1,0 +1,19 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0038</name> 
+  <groupId>org.apache.maven.its.it0038</groupId>
+  <artifactId>maven-it-it0038</artifactId>
+  <description>Test building project from outside the project directory using '-f'
+        option</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</model>

@@ -1,0 +1,32 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0064</name> 
+  <groupId>org.apache.maven.its.it0064</groupId>
+  <artifactId>maven-it-it0064</artifactId>
+  <description>Test the use of a mojo that uses setters instead of private fields
+        for the population of configuration values.</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-setter</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <foo>fooValue</foo>
+          <bar>barValue</bar>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

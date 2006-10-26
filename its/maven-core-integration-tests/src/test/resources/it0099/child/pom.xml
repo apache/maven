@@ -1,0 +1,9 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.it0099</groupId>
+    <artifactId>maven-it-it0099</artifactId>
+    <version>1</version>
+  </parent>
+  <artifactId>child</artifactId>
+</project>

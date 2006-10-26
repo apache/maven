@@ -1,0 +1,14 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0058</name> 
+  <groupId>org.apache.maven.its.it0058</groupId>
+  <artifactId>maven-it-it0058</artifactId>
+  <description>Verify that profiles from settings.xml do not pollute module lists
+        across projects in a reactorized build.</description>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+
+  <modules>
+    <module>subproject</module>
+  </modules>
+</model>

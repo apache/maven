@@ -1,0 +1,32 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0010</name> 
+  <groupId>org.apache.maven.its.it0010</groupId>
+  <artifactId>maven-it-it0010</artifactId>
+  <description>Since the artifact resolution does not use the project builder, we must
+        ensure that the full hierarchy of all dependencies is resolved. This
+        includes the dependencies of the parent-pom's of dependencies. This test
+        will check this, by depending on classworlds, which is a dependency of
+        maven-component, which is the parent of maven-plugin, which is an
+        explicit dependency of this test.
+        # TODO: must correct the assumptions of this test
+        </description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0-beta-1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</model>

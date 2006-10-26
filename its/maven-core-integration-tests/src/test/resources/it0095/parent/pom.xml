@@ -1,0 +1,19 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0095</groupId>
+  <artifactId>parent</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x/maven-core-it/it0095/parent</connection>
+  </scm>
+  <distributionManagement>
+    <site>
+      <id>website</id>
+      <url>scp://host/path/parent</url>
+    </site>
+  </distributionManagement>
+  <modules>
+    <module>../sub1</module>
+  </modules>
+</project>

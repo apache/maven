@@ -1,0 +1,20 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0044</name> 
+  <groupId>org.apache.maven.its.it0044</groupId>
+  <artifactId>maven-it-it0044</artifactId>
+  <description>Test --settings CLI option</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <pluginItem>${test}</pluginItem>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

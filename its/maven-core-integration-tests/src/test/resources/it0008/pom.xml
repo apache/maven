@@ -1,0 +1,38 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0008</name> 
+  <groupId>org.apache.maven.its.it0008</groupId>
+  <artifactId>maven-it-it0008</artifactId>
+  <description>Simple goal decoration where a plugin binds to a phase and the plugin must
+        be downloaded from a remote repository before it can be executed. This
+        test also checks to make sure that mojo parameters are aligned to the 
+        project basedir when their type is "java.io.File".
+        </description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</model>

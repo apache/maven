@@ -1,0 +1,8 @@
+it0071 touch
+it0073 context-passing
+it0082 touch
+it0086 loadable
+it0087 loadable
+it0088 generate-properties
+it0090 interpolated-pom-configuration
+it0107 parameter-implementation

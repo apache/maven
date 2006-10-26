@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0081</name> 
+  <groupId>org.apache.maven.its.it0081</groupId>
+  <artifactId>maven-it-it0081</artifactId>
+  <description>Test per-plugin dependencies.</description>
+  <version>0.1</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>test-component-c</module>
+    <module>test-plugin</module>
+  </modules>
+</project>

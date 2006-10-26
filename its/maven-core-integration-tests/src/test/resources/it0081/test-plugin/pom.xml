@@ -1,0 +1,19 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven-it-it0081</artifactId>
+    <groupId>org.apache.maven.its.it0081</groupId>
+    <version>0.1</version>
+  </parent>
+  <artifactId>test-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>0.1</version>
+  <name>Test Plugin</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0-beta-1</version>
+    </dependency>
+  </dependencies>
+</project>

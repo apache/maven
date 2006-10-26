@@ -1,0 +1,22 @@
+<model>
+  <parent>
+    <artifactId>maven-plugin-parent</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>2.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>maven-it-it0007</artifactId>
+  <description>We specify a parent in the POM and make sure that it is downloaded as
+        part of the process.        </description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</model>

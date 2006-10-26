@@ -1,0 +1,24 @@
+<project>
+  <parent>
+    <artifactId>integration-tests</artifactId>
+    <groupId>org.apache.maven.its</groupId>
+    <version>1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.plugins</groupId>
+  <artifactId>maven-it-plugins</artifactId>
+  <version>1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>maven-it-plugin-context-passing</module>
+    <module>maven-it-plugin-fork</module>      
+    <module>maven-it-plugin-generate-envar-properties</module>
+    <module>maven-it-plugin-generate-properties</module>    
+    <module>maven-it-plugin-loadable</module>      
+    <module>maven-it-plugin-no-project</module>          
+    <module>maven-it-plugin-packaging</module>      
+    <module>maven-it-plugin-parameter-implementation</module>
+    <module>maven-it-plugin-setter</module>        
+    <module>maven-it-plugin-touch</module>
+  </modules>
+</project>

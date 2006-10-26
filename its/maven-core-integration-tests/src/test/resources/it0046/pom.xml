@@ -1,0 +1,14 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0046</name> 
+  <groupId>org.apache.maven.its.it0046</groupId>
+  <artifactId>maven-it-it0046</artifactId>
+  <description>Test fail-never reactor behavior. Forces an exception to be thrown in
+        the first module, but checks that the second modules is built.</description>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <modules>
+    <module>subproject</module>
+    <module>subproject2</module>
+  </modules>
+</model>

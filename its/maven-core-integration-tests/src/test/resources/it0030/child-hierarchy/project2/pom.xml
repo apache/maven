@@ -1,0 +1,16 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.it0030</groupId>
+    <artifactId>child-hierarchy</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>project2</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0030</groupId>
+      <artifactId>project1</artifactId>
+    </dependency>
+  </dependencies>
+</model>

@@ -1,0 +1,22 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.it0046</groupId>
+    <artifactId>maven-it-it0046</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>subproject</artifactId>
+  <packaging>jar</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <fail>true</fail>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

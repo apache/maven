@@ -1,0 +1,10 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.it0045</groupId>
+    <artifactId>maven-it-it0045</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>subproject</artifactId>
+  <packaging>jar</packaging>
+</model>

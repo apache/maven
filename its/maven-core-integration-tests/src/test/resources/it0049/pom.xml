@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0049</name> 
+  <groupId>org.apache.maven.its.it0049</groupId>
+  <artifactId>maven-it-it0049</artifactId>
+  <description>Test parameter alias usage.</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <pluginFile>touchFile.txt</pluginFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

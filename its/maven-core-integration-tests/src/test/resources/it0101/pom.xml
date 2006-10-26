@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0101</name> 
+  <groupId>org.apache.maven.its.it0101</groupId>
+  <artifactId>maven-it-it0101</artifactId>
+  <description>Test that properties defined in an active profile in the user's
+        settings are available for interpolation of systemPath in a dependency.
+        [MNG-2052]</description>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0101</groupId>
+      <artifactId>test-dependency</artifactId>
+      <version>1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/${libdir}/test-dep.txt</systemPath>
+    </dependency>
+  </dependencies>
+</project>
+

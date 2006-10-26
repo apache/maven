@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0089</name> 
+  <groupId>org.apache.maven.its.it0089</groupId>
+  <artifactId>maven-it-it0089</artifactId>
+  <description>Test that Checkstyle PackageNamesLoader.loadModuleFactory(..) method will complete as-is with
+        the context classloader available to the plugin.
+       </description>
+  <version>1.0</version>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>plugin</module>
+    <module>project</module>
+  </modules>
+</project>

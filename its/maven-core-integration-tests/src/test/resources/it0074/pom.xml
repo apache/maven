@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0074</name> 
+  <groupId>org.apache.maven.its.it0074</groupId>
+  <artifactId>maven-it-it0074</artifactId>
+  <description>Test that plugin-level configuration instances are not nullified by
+        execution-level configuration instances.</description>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
+ 
+  <build>
+    <plugins> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>precompile</id>
+            <phase>initialize</phase>
+            <configuration>
+              <includes >
+                <include implementation="java.lang.String">org/apache/maven/it0074/Person.java</include>
+              </includes>
+            </configuration>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>    
+  </build>
+</project>

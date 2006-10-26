@@ -1,0 +1,16 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0047</name> 
+  <groupId>org.apache.maven.its.it0047</groupId>
+  <artifactId>maven-it-it0047</artifactId>
+  <description>Test the use case for having a compile time dependency be transitive: 
+        when you extend a class you need its dependencies at compile time.</description>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-7</version>
+    </dependency>
+  </dependencies>
+</model>

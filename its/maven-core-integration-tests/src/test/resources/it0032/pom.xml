@@ -1,0 +1,22 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0032</name> 
+  <groupId>org.apache.maven.its.it0032</groupId>
+  <artifactId>maven-it-it0032</artifactId>
+  <description>Tests that a specified Maven version requirement that is lower doesn't cause any problems</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <prerequesites>
+    <maven>2.0-alpha-3</maven>
+  </prerequesites>
+</model>

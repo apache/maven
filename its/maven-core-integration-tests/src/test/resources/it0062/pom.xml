@@ -1,0 +1,15 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0062</name> 
+  <groupId>org.apache.maven.its.it0062</groupId>
+  <artifactId>maven-it-it0062</artifactId>
+  <description>Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
+        specified.</description>
+  <version>1.0-SNAPSHOT</version>
+  <distributionManagement>
+    <repository>
+      <id>repo</id>
+      <url>file://localhost/${project.basedir}/target/test-repo</url>
+    </repository>
+  </distributionManagement>
+</project>

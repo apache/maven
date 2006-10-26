@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0076</name> 
+  <groupId>org.apache.maven.its.it0076</groupId>
+  <artifactId>maven-it-it0076</artifactId> 
+  <description>Test that plugins in pluginManagement aren't included in the build
+        unless they are referenced by groupId/artifactId within the plugins
+        section of a pom.</description> 
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+
+          <executions>
+            <execution>
+              <id>exec1</id>
+              <phase>package</phase>
+              <goals>
+                <goal>war</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

@@ -1,0 +1,32 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0107</name> 
+  <groupId>org.apache.maven.its.it0107</groupId>
+  <artifactId>maven-it-it0107</artifactId>
+  <description>Verify that default implementation of an implementation for a complex object works as 
+        expected [MNG-2293]</description>
+  <packaging>pom</packaging>
+  <version>3.8.1</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-parameter-implementation</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <goals>
+          <goal>param-implementation</goal>
+        </goals>
+        <configuration>
+          <bla><field>foobar</field></bla>
+          <expected>class org.apache.maven.plugin.coreit.sub.MyBla-foobar</expected>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <pluginsRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>http://people.apache.org/maven-snapshot-repository</url>
+    </pluginRepository>
+  </pluginsRepositories>
+</model>

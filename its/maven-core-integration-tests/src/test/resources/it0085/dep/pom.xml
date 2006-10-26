@@ -1,0 +1,15 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.it0085</groupId>
+    <artifactId>maven-it-it0085</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>dep</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0085</groupId>
+      <artifactId>pom-dep</artifactId>
+    </dependency>
+  </dependencies>
+</project>

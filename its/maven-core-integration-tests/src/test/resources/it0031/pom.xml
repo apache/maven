@@ -1,0 +1,22 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0031</name> 
+  <groupId>org.apache.maven.its.it0031</groupId>
+  <artifactId>maven-it-it0031</artifactId>
+  <description>Test usage of plugins.xml mapping file on the repository to resolve
+        plugin artifactId from it's prefix using the pluginGroups in
+        the provided settings.xml.</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <pluginItem>${test}</pluginItem>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

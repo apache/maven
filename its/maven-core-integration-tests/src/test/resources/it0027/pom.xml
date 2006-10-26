@@ -1,0 +1,18 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0027</name> 
+  <groupId>org.apache.maven.its.it0027</groupId>
+  <artifactId>maven-it-it0027</artifactId>
+  <description>Test @execute with a custom lifecycle, including configuration</description>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-fork</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build>
+</model>

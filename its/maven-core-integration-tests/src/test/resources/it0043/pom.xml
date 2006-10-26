@@ -1,0 +1,52 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0043</name> 
+  <groupId>org.apache.maven.its.it0043</groupId>
+  <artifactId>maven-it-it0043</artifactId>
+  <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
+  <version>1.0-SNAPSHOT</version>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Empty Repository</name>
+      <url>file:/tmp/emptyRepo</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Empty Repository</name>
+      <url>file:/tmp/emptyRepo</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+
+  <dependencies>
+    <dependency>
+      <artifactId>junit</artifactId>
+      <groupId>junit</groupId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-help-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>effective-pom</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/effective-pom.xml</output>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,31 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0018</name> 
+  <groupId>org.apache.maven.its.it0018</groupId>
+  <artifactId>maven-it-it0018</artifactId>
+  <description>Ensure that managed dependencies for dependency POMs are calculated
+        correctly when resolved. Removes commons-logging-1.0.3 and checks it is
+        redownloaded.</description>
+  <version>1.0</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>marmalade</groupId>
+      <artifactId>marmalade-el-commons</artifactId>
+      <version>1.0-alpha-2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>servletapi</groupId>
+          <artifactId>servletapi</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</model>
