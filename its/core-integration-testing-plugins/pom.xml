@@ -1,6 +1,6 @@
 <project>
   <parent>
-    <artifactId>integration-tests</artifactId>
+    <artifactId>core-integration-testing</artifactId>
     <groupId>org.apache.maven.its</groupId>
     <version>1-SNAPSHOT</version>
   </parent>
