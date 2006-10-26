@@ -7,15 +7,15 @@
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <groupId>org.apache.maven.its</groupId>
-  <artifactId>integration-tests</artifactId>
+  <artifactId>core-integration-testing</artifactId>
   <version>1-SNAPSHOT</version>
   <name>Maven Integration Testing</name>
   <packaging>pom</packaging>
   <url>http://maven.apache.org</url>
   <scm>                                                                                                                                  
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/integration-tests/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/integration-tests/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/integration-tests/trunk</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk</url>
   </scm>     
   <issueManagement>
     <system>jira</system>
