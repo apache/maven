@@ -95,37 +95,25 @@
     <path id="pre.classpath">
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/3.8.1/junit-3.8.1.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.jar"/>
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/1.0/commons-cli-1.0.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
       <pathelement location="${maven.repo.local}/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-6/wagon-http-lightweight-1.0-alpha-6.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/1.0-alpha-6/wagon-ssh-external-1.0-alpha-6.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/1.0-alpha-7/wagon-ssh-1.0-alpha-7.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9-SNAPSHOT/doxia-sink-api-1.0-alpha-9-20060810.220042-2.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-6/wagon-http-lightweight-1.0-alpha-6.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/1.0-alpha-6/wagon-ssh-external-1.0-alpha-6.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/1.0-alpha-7/wagon-ssh-1.0-alpha-7.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9-SNAPSHOT/doxia-sink-api-1.0-alpha-9-SNAPSHOT.jar"/>
     </path>
     <!-- DGF Need to keep these modello classes out of the system classpath at runtime, because different parts of the build
-need different versions of modello.  -->
+         need different versions of modello.  -->
     <path id="modello.classpath">
       <path refid="pre.classpath"/>
-      <pathelement
-          location="${maven.repo.local}/org/codehaus/modello/modello-core/1.0-alpha-7/modello-core-1.0-alpha-7.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/1.0-alpha-8/modello-plugin-xml-1.0-alpha-8.jar"/>
-      <pathelement
-          location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/1.0-alpha-8/modello-plugin-xpp3-1.0-alpha-8.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/1.0-alpha-7/modello-core-1.0-alpha-7.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/1.0-alpha-8/modello-plugin-xml-1.0-alpha-8.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/1.0-alpha-8/modello-plugin-xpp3-1.0-alpha-8.jar"/>
     </path>
     <!-- DGF pathconvert immediately so we can validate the classpath -->
     <pathconvert property="pre.classpath.str" refid="pre.classpath" pathsep="&#xa;"/>
@@ -212,6 +200,7 @@ need different versions of modello.  -->
       <sysproperty key="maven.test.skip" value="true"/>
       <arg value="-e"/>
       <arg value="-X"/>
+      <arg value="-o"/>
       <arg value="clean"/>
       <arg value="install"/>
     </java>
@@ -223,6 +212,7 @@ need different versions of modello.  -->
       <classpath refid="maven.classpath"/>
       <sysproperty key="maven.test.skip" value="true"/>
       <arg value="-e"/>
+      <arg value="-o"/>
       <arg value="clean"/>
       <arg value="assembly:assembly"/>
     </java>
@@ -232,8 +222,7 @@ need different versions of modello.  -->
         <available file="${maven.assembly}"/>
       </not>
     </condition>
-    <fail if="build.failed"
-          message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
+    <fail if="build.failed" message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
   </target>
 
   <target name="extract-assembly" depends="init,maven-assembly"
@@ -248,6 +237,7 @@ need different versions of modello.  -->
     </chmod>
   </target>
 
+  <!--
   <target name="mits"
           description="Run the Maven integration tests."
           depends="init">
@@ -261,8 +251,9 @@ need different versions of modello.  -->
       <arg value="test"/>
     </java>
   </target>
+  -->
 
-  <target name="all" depends="clean-bootstrap,init,extract-assembly,mits"/>
+  <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
 
   <target name="run-full-maven" depends="init,extract-assembly"
           description="runs the full extracted Maven, now with tests">
