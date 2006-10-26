@@ -10,7 +10,7 @@ public class IntegrationTestSuite
 {
     public static Test suite()
     {
-        TestSuite suite = new MavenTestSuite();
+        TestSuite suite = new TestSuite();
         suite.addTestSuite( MavenIT0000Test.class );
         suite.addTestSuite( MavenIT0001Test.class );
         suite.addTestSuite( MavenIT0002Test.class );
@@ -118,16 +118,5 @@ public class IntegrationTestSuite
         // suite.addTestSuite(MavenIT0106Test.class);
         // suite.addTestSuite(MavenIT0107Test.class);
         return suite;
-    }
-
-    static class MavenTestSuite
-        extends TestSuite
-    {
-        public void runTest( Test test, TestResult testResult )
-        {
-            String name = test.getClass().getName();
-            System.out.println( "name = " + name );
-            super.runTest( test, testResult );
-        }
     }
 }
