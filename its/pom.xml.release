@@ -49,6 +49,6 @@
     </mailingList>
   </mailingLists>
   <modules>
-    <module>maven-it-plugins</module>
+    <module>core-integration-testing-plugins</module>
   </modules>
 </project>
