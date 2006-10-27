@@ -26,11 +26,9 @@
     <relativePath>../../pom.xml</relativePath>    
   </parent>   
   <artifactId>maven-core-it-support-old-location</artifactId>
-  <packaging>jar</packaging>
   <version>1.1</version>
-    <relocation>
-      <artifactId>maven-core-it-support</artifactId>
-      <message>Testing</message>
-    </relocation>
-  </distributionManagement>
+  <relocation>
+    <artifactId>maven-core-it-support</artifactId>
+    <message>Testing</message>
+  </relocation>
 </project>
