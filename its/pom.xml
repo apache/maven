@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>1</version>
+    <version>3</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <groupId>org.apache.maven.its</groupId>
@@ -12,7 +12,7 @@
   <name>Maven Integration Testing</name>
   <packaging>pom</packaging>
   <url>http://maven.apache.org</url>
-  <scm>                                                                                                                                  
+  <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk</url>
@@ -51,4 +51,30 @@
   <modules>
     <module>core-integration-testing-plugins</module>
   </modules>
+  
+  <distributionManagement>
+    <repository>
+      <id>apache.releases</id>
+      <url>${repositoryUrl}</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots</id>
+      <url>${repositoryUrl}</url>
+    </snapshotRepository>    
+  </distributionManagement>
+  
+  <profiles>
+    <profile>
+      <id>mode-local-offline</id>
+      <properties>
+        <repositoryUrl>file:///tmp/mits/repository-remote</repositoryUrl> 
+      </properties>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>${repositoryUrl}</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>  
 </project>
