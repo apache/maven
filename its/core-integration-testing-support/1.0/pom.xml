@@ -26,6 +26,5 @@
     <relativePath>../../pom.xml</relativePath>    
   </parent>     
   <artifactId>maven-core-it-support</artifactId>
-  <packaging>jar</packaging>
   <version>1.0</version>
 </project>
