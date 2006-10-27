@@ -10,7 +10,7 @@ OPTS="--settings settings.xml -Pmode-local-offline"
 # This will gather all the requirements for the integration tests. After downloading, build and
 # installing all the modules you should have a local repository with everything you need so that
 # you can work offline
-mvn --settings settings.xml install
+#mvn --settings settings.xml install
 
 # This should deploy all the integration testing artifacts into out filesystem-based, offline
 # remote repository. This is just sitting in your filesystem.
@@ -28,7 +28,7 @@ mvn $OPTS -f core-integration-testing-support/1.4/pom.xml deploy
 
 # Remove all integration testing artifacts that were installed in the local repository as many tests
 # download and verify the download.
-rm -rf /tmp/mits/repository-local/org/apache/maven/its
+#rm -rf /tmp/mits/repository-local/org/apache/maven/its
 
 # Now run the integration tests
-mvn $OPTS deploy
+#mvn $OPTS deploy
