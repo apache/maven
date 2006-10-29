@@ -1,4 +1,4 @@
-package org.apache.maven.it0023;
+package org.apache.maven.it0044;
 
 public class Person
 {

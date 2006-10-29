@@ -1,4 +1,4 @@
-package org.apache.maven.it0001;
+package org.apache.maven.it0063;
 
 import com.sun.tools.javac.Main;
 

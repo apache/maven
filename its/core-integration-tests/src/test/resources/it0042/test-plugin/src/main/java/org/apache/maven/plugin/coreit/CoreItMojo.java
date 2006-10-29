@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.coreit;
+package org.apache.maven.plugin.coreit.it0042;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.

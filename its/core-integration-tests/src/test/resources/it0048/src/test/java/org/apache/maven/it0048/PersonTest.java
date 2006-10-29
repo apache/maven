@@ -1,4 +1,4 @@
-package org.apache.maven.it0001;
+package org.apache.maven.it0048;
 
 import junit.framework.TestCase;
 import java.net.URL;

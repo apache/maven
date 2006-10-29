@@ -1,4 +1,4 @@
-package com.stchome.mavenTest;
+package com.stchome.mavenTest.it0096;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
