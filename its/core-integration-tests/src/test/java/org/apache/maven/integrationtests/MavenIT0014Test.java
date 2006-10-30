@@ -20,7 +20,7 @@ public class MavenIT0014Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0014" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "test" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0001/Person.class" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0014/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         System.out.println( "it0014 PASS" );

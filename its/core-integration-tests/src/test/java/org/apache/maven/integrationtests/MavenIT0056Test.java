@@ -20,12 +20,12 @@ public class MavenIT0056Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0056" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "test-compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0001/Person.class" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0001/PersonTwo.class" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0001/PersonThree.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0001/PersonTest.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0001/PersonTwoTest.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0001/PersonThreeTest.class" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/Person.class" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/PersonTwo.class" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/PersonThree.class" );
+        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonTest.class" );
+        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonTwoTest.class" );
+        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonThreeTest.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         System.out.println( "it0056 PASS" );
