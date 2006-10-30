@@ -1,22 +1,25 @@
 #!/bin/bash
 
-
-echo
-echo "*********************************************************"
-echo if you are running in windows, run $0 windows
-echo "*********************************************************"
-echo
-
-
 rm -Rf target
 
 mkdir target
 
 svnadmin create --fs-type fsfs target/svnroot
 
-dir=`readlink -f ${PWD}`
+cygwin=false;
+darwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true ;;
+esac
 
-if [ "$1" == "windows" ]; then
+if $darwin; then
+  dir=$PWD
+else
+  dir=`readlink -f ${PWD}`
+fi
+
+if $cygwin; then
   dir=`cygpath -m $dir`
   echo setting dir to $dir
 fi
