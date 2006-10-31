@@ -36,6 +36,15 @@
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
+
+  <!-- Adding for assembly plugin snapshot -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>

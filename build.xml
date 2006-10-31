@@ -43,7 +43,19 @@
   </target>
 
   <target name="init" depends="checkMavenHome">
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+    <xmlproperty file="${user.home}/.m2/settings.xml"/>
+
+    <condition property="maven.repo.local" value="${settings.localRepository}">
+      <isset property="settings.localRepository"/>
+    </condition>
+
+    <condition property="maven.repo.local" value="${user.home}/.m2/repository">
+      <not>
+        <isset property="maven.repo.local"/>
+      </not>
+    </condition>
+
+    <echo>Using Local Repository: ${maven.repo.local}</echo>
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
@@ -59,6 +71,8 @@
       <attribute name="orgpath"/>
       <attribute name="name"/>
       <attribute name="version"/>
+      <attribute name="repository" default="maven"/>
+      <attribute name="type" default="jar"/>
       <sequential>
         <!-- call an ant task to download the artifact. The script cannot be
           defined in here, because you cannot re-initialize properties.
@@ -69,6 +83,8 @@
           <param name="orgpath" value="@{orgpath}"/>
           <param name="name" value="@{name}"/>
           <param name="version" value="@{version}"/>
+          <param name="repository" value="@{repository}"/>
+          <param name="type" value="@{type}"/>
         </antcall>
       </sequential>
     </macrodef>
@@ -78,6 +94,13 @@
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
     <pull orgpath="classworlds/classworlds" version="1.1-alpha-2" name="classworlds"/>
     <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="1.0-alpha-4" name="plexus-interactivity-api"/>
+
+    <pull orgpath="org/codehaus/plexus/plexus-archiver" version="1.0-alpha-8-SNAPSHOT" 
+          name="plexus-archiver" repository="codehaus"/>
+
+    <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
+    <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
+    <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/maven/wagon/wagon-file" version="1.0-alpha-7" name="wagon-file"/>
     <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="1.0-alpha-6" name="wagon-http-lightweight"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
@@ -199,8 +222,12 @@
       <classpath refid="maven.classpath"/>
       <sysproperty key="maven.test.skip" value="true"/>
       <arg value="-e"/>
+      <arg value="-B"/>
       <arg value="-X"/>
+<!-- JDC: Commenting out offline mode until all plugins and their dependencies 
+          can be pre-resolved before this call.
       <arg value="-o"/>
+ -->
       <arg value="clean"/>
       <arg value="install"/>
     </java>
@@ -212,7 +239,11 @@
       <classpath refid="maven.classpath"/>
       <sysproperty key="maven.test.skip" value="true"/>
       <arg value="-e"/>
+      <arg value="-B"/>
+
+<!-- JDC: Removing offline switch until we can pre-resolve all plugins, dependencies and associated POMs.
       <arg value="-o"/>
+ -->
       <arg value="clean"/>
       <arg value="assembly:assembly"/>
     </java>
@@ -281,9 +312,21 @@
   <target name="download-artifact">
 
     <!-- choose the proper repository -->
+    <condition property="repo" value="http://snapshots.repository.codehaus.org">
+      <and>
+        <equals arg1="${repository}" arg2="codehaus"/>
+        <contains string="${version}" substring="SNAPSHOT"/>
+      </and>
+    </condition>
+
     <condition property="repo" value="http://people.apache.org/repo/m2-snapshot-repository"
                else="http://repo1.maven.org/maven2">
-      <contains string="${version}" substring="SNAPSHOT"/>
+      <and>
+        <not>
+          <isset property="repo"/>
+        </not>
+        <contains string="${version}" substring="SNAPSHOT"/>
+      </and>
     </condition>
 
     <mkdir dir="${maven.repo.local}/${orgpath}/${version}"/>
@@ -307,14 +350,14 @@
 
     <echo>Resolved version ${fileversion} (given=${version})</echo>
 
-    <!-- download the final jar -->
-    <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.jar"
-         dest="${maven.repo.local}/${orgpath}/${version}/${name}-${fileversion}.jar" usetimestamp="true"
+    <!-- download the final artifact -->
+    <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.${type}"
+         dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
          ignoreerrors="false"
         />
     <condition property="build.failed">
       <not>
-        <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${fileversion}.jar"/>
+        <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}"/>
       </not>
     </condition>
     <fail if="build.failed" message="Couldn't pull dependency ${orgpath}/${name}/${version}"/>
