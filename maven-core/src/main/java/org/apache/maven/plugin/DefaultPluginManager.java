@@ -615,10 +615,14 @@ public class DefaultPluginManager
 
             Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
             dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
+            
+            List repositories = new ArrayList();
+            repositories.addAll( resolutionGroup.getResolutionRepositories() );
+            repositories.addAll( project.getRemoteArtifactRepositories() );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                     localRepository,
-                                                                                    resolutionGroup.getResolutionRepositories(),
+                                                                                    repositories,
                                                                                     artifactMetadataSource,
                                                                                     artifactFilter );
 
