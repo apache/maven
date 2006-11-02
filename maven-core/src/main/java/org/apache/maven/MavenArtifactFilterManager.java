@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id:$
+ * @version $Id$
  * @todo this should probably be a component with some dynamic control of filtering
  */
 public class MavenArtifactFilterManager

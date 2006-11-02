@@ -4,7 +4,7 @@ import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface MavenTransferListener
     extends TransferListener
