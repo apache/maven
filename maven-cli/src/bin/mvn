@@ -18,6 +18,22 @@
 #   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
 #   reserved.
 
+# ----------------------------------------------------------------------------
+# Maven2 Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+# ----------------------------------------------------------------------------
+
+
 QUOTED_ARGS=""
 while [ "$1" != "" ] ; do
 
@@ -60,15 +76,6 @@ if [ -z "$JAVA_HOME" ] ; then
 fi
 
 if [ -z "$M2_HOME" ] ; then
-  # try to find MAVEN
-  if [ -d /opt/m2 ] ; then
-    MAVEN_HOME=/opt/m2
-  fi
-
-  if [ -d "$HOME/m2" ] ; then
-    MAVEN_HOME="$HOME/m2"
-  fi
-
   ## resolve links - $0 may be a link to maven's home
   PRG="$0"
 
