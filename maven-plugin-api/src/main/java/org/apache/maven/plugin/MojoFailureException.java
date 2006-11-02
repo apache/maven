@@ -17,7 +17,9 @@ package org.apache.maven.plugin;
  */
 
 /**
- * An exception occuring during the execution of a plugin.
+ * An exception occuring during the execution of a plugin (such as a compilation failure).
+ * <br/>
+ * Throwing this exception causes a "BUILD FAILURE" message to be displayed.
  *
  * @author Brett Porter
  * @version $Id$
@@ -25,6 +27,13 @@ package org.apache.maven.plugin;
 public class MojoFailureException
     extends AbstractMojoExecutionException
 {
+    /**
+     * Construct a new <code>MojoFailureException</code> exception providing the source and a short and long message.
+     *
+     * @param source
+     * @param shortMessage
+     * @param longMessage
+     */
     public MojoFailureException( Object source, String shortMessage, String longMessage )
     {
         super( shortMessage );
@@ -32,9 +41,13 @@ public class MojoFailureException
         this.longMessage = longMessage;
     }
 
+    /**
+     * Construct a new <code>MojoFailureException</code> exception providing a message.
+     *
+     * @param message
+     */
     public MojoFailureException( String message )
     {
         super( message );
     }
-
 }
