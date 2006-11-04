@@ -677,7 +677,7 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
                 "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
             options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
-                "Update all snapshots regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
+                "Update all SNAPSHOT dependencies, including releases, regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
             options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
                 "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
 
