@@ -138,7 +138,7 @@ public class Verifier
     {
         Properties properties = new Properties();
 
-        FileInputStream fis;
+        FileInputStream fis = null;
         try
         {
             File propertiesFile = new File( basedir, filename );
@@ -155,6 +155,20 @@ public class Verifier
         catch ( IOException e )
         {
             throw new VerificationException( "Error reading properties file", e );
+        }
+        finally
+        {
+            if ( fis != null )
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch ( IOException e )
+                {
+                    throw new VerificationException( "Error reading properties file", e );
+                }
+            }
         }
 
         return properties;
@@ -173,9 +187,10 @@ public class Verifier
 
         if ( file.exists() )
         {
+            BufferedReader reader = null;
             try
             {
-                BufferedReader reader = new BufferedReader( new FileReader( file ) );
+                reader = new BufferedReader( new FileReader( file ) );
 
                 String line = reader.readLine();
 
@@ -189,8 +204,6 @@ public class Verifier
                     }
                     line = reader.readLine();
                 }
-
-                reader.close();
             }
             catch ( FileNotFoundException e )
             {
@@ -199,6 +212,20 @@ public class Verifier
             catch ( IOException e )
             {
                 throw new VerificationException( e );
+            }
+            finally
+            {
+                if ( reader != null )
+                {
+                    try
+                    {
+                        reader.close();
+                    }
+                    catch ( IOException e )
+                    {
+                        throw new VerificationException( e );
+                    }
+                }
             }
         }
 
