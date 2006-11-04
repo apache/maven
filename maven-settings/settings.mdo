@@ -4,10 +4,15 @@
   <id>settings</id>
   <name>Settings</name>
   <description><![CDATA[
-    User-specific configuration for maven. Includes things that should not 
-    be distributed with the pom.xml file, such as developer identity, along with 
-    local settings, like proxy information. The default location for the
-    settings file is ~/.m2/settings.xml]]></description>
+    <p>This is a reference for the user-specific configuration for Maven.</p>
+    <p>Includes things that should not be distributed with the pom.xml file, such as developer identity, along with
+    local settings, like proxy information.</p>
+    <p>The default location for the settings file is <i>~/.m2/settings.xml</i></p>
+    <p>An XSD is available at:</p>
+    <ul>
+      <li><a href="http://maven.apache.org/xsd/settings-1.0.0.xsd">http://maven.apache.org/xsd/settings-1.0.0.xsd</a>.</li>
+    </ul>
+    ]]></description>
   <defaults>
     <default>
       <key>package</key>
@@ -26,10 +31,10 @@
           <code><![CDATA[
     public static final String USER_LEVEL = "user-level";
     public static final String GLOBAL_LEVEL = "global-level";
-    
+
     private String sourceLevel = USER_LEVEL;
     private boolean sourceLevelSet = false;
-    
+
     public void setSourceLevel( String sourceLevel )
     {
         if ( sourceLevelSet )
@@ -46,7 +51,7 @@
             this.sourceLevelSet = true;
         }
     }
-    
+
     public String getSourceLevel()
     {
         return sourceLevel;
@@ -119,7 +124,7 @@
           <name>jdks</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	Configuration for different java environment profiles. One good use
+              Configuration for different java environment profiles. One good use
             for this might be to configure both JDK 1.4 and JDK 1.5 to work with
             maven. Profiles will allow switching of entire java environments
             based on the profile id, either in the defaults section below, or on
@@ -134,9 +139,9 @@
           <name>proxies</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	Configuration for different proxy profiles. Multiple proxy profiles
-            might come in handy for anyone working from a notebook or other 
-            mobile platform, to enable easy switching of entire proxy 
+              Configuration for different proxy profiles. Multiple proxy profiles
+            might come in handy for anyone working from a notebook or other
+            mobile platform, to enable easy switching of entire proxy
             configurations by simply specifying the profile id, again either from
             the command line or from the defaults section below.
           ]]></description>
@@ -149,7 +154,7 @@
           <name>servers</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	Configuration of server-specific settings, mainly authentication
+              Configuration of server-specific settings, mainly authentication
             method. This allows configuration of authentication on a per-server
             basis.
           ]]></description>
@@ -172,7 +177,7 @@
           <name>profiles</name>
           <version>1.0.0</version>
           <description><![CDATA[
-            Configuration of build profiles for adjusting the build 
+            Configuration of build profiles for adjusting the build
             according to environmental parameters
           ]]></description>
           <association>
@@ -211,9 +216,9 @@
     {
         return Boolean.valueOf( isInteractiveMode() );
     }
-          
+
     private Proxy activeProxy;
-    
+
     public void flushActiveProxy()
     {
         this.activeProxy = null;
@@ -248,7 +253,7 @@
 
         return activeProxy;
     }
-    
+
     public Server getServer( String serverId )
     {
         Server match = null;
@@ -269,7 +274,7 @@
 
         return match;
     }
-    
+
     public Mirror getMirrorOf( String repositoryId )
     {
         Mirror match = null;
@@ -290,41 +295,41 @@
 
         return match;
     }
-    
+
     private java.util.Map profileMap;
-    
+
     public void flushProfileMap()
     {
         this.profileMap = null;
     }
-    
+
     public java.util.Map getProfilesAsMap()
     {
         if ( profileMap == null )
         {
             profileMap = new java.util.HashMap();
-            
+
             if ( getProfiles() != null )
             {
                 for ( java.util.Iterator it = getProfiles().iterator(); it.hasNext(); )
                 {
                     Profile profile = (Profile) it.next();
-                    
+
                     profileMap.put( profile.getId(), profile );
                 }
             }
         }
-        
+
         return profileMap;
     }
-    
+
     private RuntimeInfo runtimeInfo;
-    
+
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
     {
         this.runtimeInfo = runtimeInfo;
     }
-    
+
     public RuntimeInfo getRuntimeInfo()
     {
         return runtimeInfo;
@@ -416,7 +421,7 @@
           <name>nonProxyHosts</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The list of non-proxied hosts (delimited by |).
+              The list of non-proxied hosts (delimited by |).
           ]]></description>
           <type>String</type>
         </field>
@@ -438,7 +443,7 @@
           <name>password</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The password used in conjunction with the username to authenticate.
+              The password used in conjunction with the username to authenticate.
           ]]></description>
           <type>String</type>
         </field>
@@ -453,7 +458,7 @@
           <name>passphrase</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The passphrase used in conjunction with the privateKey to authenticate.
+              The passphrase used in conjunction with the privateKey to authenticate.
           ]]></description>
           <type>String</type>
         </field>
@@ -461,7 +466,7 @@
           <name>filePermissions</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The permissions for files when they are created.
+              The permissions for files when they are created.
           ]]></description>
           <type>String</type>
         </field>
@@ -469,7 +474,7 @@
           <name>directoryPermissions</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	The permissions for directories when they are created.
+              The permissions for directories when they are created.
           ]]></description>
           <type>String</type>
         </field>
@@ -477,7 +482,7 @@
           <name>configuration</name>
           <type>DOM</type>
           <description><![CDATA[
-          	Extra configuration for the transport layer.
+              Extra configuration for the transport layer.
           ]]></description>
         </field>
       </fields>
@@ -530,14 +535,14 @@
       <version>1.0.0</version>
       <superClass>IdentifiableBase</superClass>
       <description><![CDATA[
-        Modifications to the build process which is keyed on some 
+        Modifications to the build process which is keyed on some
         sort of environmental parameter.
       ]]></description>
       <fields>
         <field>
           <name>activation</name>
           <version>1.0.0</version>
-          <description><![CDATA[The conditional logic which will automatically 
+          <description><![CDATA[The conditional logic which will automatically
             trigger the inclusion of this profile.]]></description>
           <association>
             <type>Activation</type>
@@ -573,8 +578,8 @@
             <type>Repository</type>
             <multiplicity>*</multiplicity>
           </association>
-          <comment><![CDATA[ This may be removed or relocated in the near 
-            future. It is undecided whether plugins really need a remote 
+          <comment><![CDATA[ This may be removed or relocated in the near
+            future. It is undecided whether plugins really need a remote
             repository set of their own. ]]></comment>
         </field>
       </fields>
@@ -583,7 +588,7 @@
       <name>Activation</name>
       <version>1.0.0</version>
       <description><![CDATA[
-        The conditions within the build runtime environment which will trigger 
+        The conditions within the build runtime environment which will trigger
         the automatic inclusion of the parent build profile.
       ]]></description>
       <fields>
@@ -772,7 +777,7 @@
       <name>ActivationProperty</name>
       <version>1.0.0</version>
       <description><![CDATA[
-        This is the property specification used to activate a profile. If the value field is empty, 
+        This is the property specification used to activate a profile. If the value field is empty,
         then the existence of the named property will activate the profile, otherwise it does a case-sensitive
         match against the property value as well.
       ]]></description>
@@ -831,7 +836,7 @@
       <version>1.0.0</version>
       <description><![CDATA[
         This is the file specification used to activate a profile. The missing value will be a the location
-        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test 
+        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test
         for the existence of the file and if it is there will run the profile.
       ]]></description>
       <fields>
