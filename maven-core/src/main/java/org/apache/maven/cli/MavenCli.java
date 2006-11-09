@@ -1,7 +1,7 @@
 package org.apache.maven.cli;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,11 +94,17 @@ public class MavenCli
         }
 
         // TODO: maybe classworlds could handle this requirement...
-        if ( System.getProperty( "java.class.version", "44.0" ).compareTo( "48.0" ) < 0 )
+        if ( "1.4".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
         {
-            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven" );
-            System.err.println(
-                "You appear to be using Java version: " + System.getProperty( "java.version", "<unknown>" ) );
+            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven. You appear to be using "
+                + "Java:" );
+            System.err.println( "java version \"" + System.getProperty( "java.version", "<unknown java version>" )
+                + "\"" );
+            System.err.println( System.getProperty( "java.runtime.name", "<unknown runtime name>" ) + " (build "
+                + System.getProperty( "java.runtime.version", "<unknown runtime version>" ) + ")" );
+            System.err.println( System.getProperty( "java.vm.name", "<unknown vm name>" ) + " (build "
+                + System.getProperty( "java.vm.version", "<unknown vm version>" ) + ", "
+                + System.getProperty( "java.vm.info", "<unknown vm info>" ) + ")" );
 
             return 1;
         }
@@ -121,7 +127,7 @@ public class MavenCli
             cliManager.displayHelp();
             return 0;
         }
-        
+
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
             showVersion();
@@ -515,15 +521,15 @@ public class MavenCli
             resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream(
                 "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
             properties.load( resourceAsStream );
-            
+
             if( properties.getProperty( "builtOn" ) != null )
             {
-            	System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) 
-            		+ " built on " + properties.getProperty( "builtOn" ) );
+                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" )
+                    + " built on " + properties.getProperty( "builtOn" ) );
             }
             else
             {
-            	System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
+                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
             }
         }
         catch ( IOException e )
@@ -719,25 +725,25 @@ public class MavenCli
         {
             // We need to eat any quotes surrounding arguments...
             String[] cleanArgs = cleanArgs( args );
-            
+
             CommandLineParser parser = new GnuParser();
             return parser.parse( options, cleanArgs );
         }
-        
+
         private String[] cleanArgs( String[] args )
         {
             List cleaned = new ArrayList();
-            
+
             StringBuffer currentArg = null;
-            
+
             for ( int i = 0; i < args.length; i++ )
             {
                 String arg = args[i];
-                
+
 //                System.out.println( "Processing raw arg: " + arg );
-                
+
                 boolean addedToBuffer = false;
-                
+
                 if ( arg.startsWith( "\"" ) )
                 {
                     // if we're in the process of building up another arg, push it and start over.
@@ -747,17 +753,17 @@ public class MavenCli
 //                        System.out.println( "Flushing last arg buffer: \'" + currentArg + "\' to cleaned list." );
                         cleaned.add( currentArg.toString() );
                     }
-                    
+
                     // start building an argument here.
                     currentArg = new StringBuffer( arg.substring( 1 ) );
                     addedToBuffer = true;
                 }
-                
+
                 // this has to be a separate "if" statement, to capture the case of: "-Dfoo=bar"
                 if ( arg.endsWith( "\"" ) )
                 {
                     String cleanArgPart = arg.substring( 0, arg.length() - 1 );
-                    
+
                     // if we're building an argument, keep doing so.
                     if ( currentArg != null )
                     {
@@ -774,9 +780,9 @@ public class MavenCli
                             // TODO: introducing a space here...not sure what else to do but collapse whitespace
                             currentArg.append( ' ' ).append( cleanArgPart );
                         }
-                        
+
 //                        System.out.println( "Flushing completed arg buffer: \'" + currentArg + "\' to cleaned list." );
-                        
+
                         // we're done with this argument, so add it.
                         cleaned.add( currentArg.toString() );
                     }
@@ -786,13 +792,13 @@ public class MavenCli
                         // this is a simple argument...just add it.
                         cleaned.add( cleanArgPart );
                     }
-                    
+
 //                    System.out.println( "Clearing arg buffer." );
                     // the currentArg MUST be finished when this completes.
                     currentArg = null;
                     continue;
                 }
-                
+
                 // if we haven't added this arg to the buffer, and we ARE building an argument
                 // buffer, then append it with a preceding space...again, not sure what else to
                 // do other than collapse whitespace.
@@ -813,17 +819,17 @@ public class MavenCli
                     }
                 }
             }
-            
+
             // clean up.
             if ( currentArg != null )
             {
 //                System.out.println( "Adding unterminated arg buffer: \'" + currentArg + "\' to cleaned list." );
                 cleaned.add( currentArg.toString() );
             }
-            
+
             int cleanedSz = cleaned.size();
             String[] cleanArgs = null;
-            
+
             if ( cleanedSz == 0 )
             {
                 // if we didn't have any arguments to clean, simply pass the original array through
@@ -834,7 +840,7 @@ public class MavenCli
 //                System.out.println( "Cleaned argument list:\n" + cleaned );
                 cleanArgs = (String[]) cleaned.toArray( new String[cleanedSz] );
             }
-            
+
             return cleanArgs;
         }
 
