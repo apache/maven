@@ -1,7 +1,7 @@
 package org.apache.maven.cli;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class MavenCli
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
-        
+
         int result = main( args, classWorld );
         System.exit(result);
     }
@@ -75,11 +75,17 @@ public class MavenCli
         }
 
         // TODO: maybe classworlds could handle this requirement...
-        if ( System.getProperty( "java.class.version", "44.0" ).compareTo( "48.0" ) < 0 )
+        if ( "1.4".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
         {
-            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven" );
-            System.err.println(
-                "You appear to be using Java version: " + System.getProperty( "java.version", "<unknown>" ) );
+            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven. You appear to be using "
+                + "Java:" );
+            System.err.println( "java version \"" + System.getProperty( "java.version", "<unknown java version>" )
+                + "\"" );
+            System.err.println( System.getProperty( "java.runtime.name", "<unknown runtime name>" ) + " (build "
+                + System.getProperty( "java.runtime.version", "<unknown runtime version>" ) + ")" );
+            System.err.println( System.getProperty( "java.vm.name", "<unknown vm name>" ) + " (build "
+                + System.getProperty( "java.vm.version", "<unknown vm version>" ) + ", "
+                + System.getProperty( "java.vm.info", "<unknown vm info>" ) + ")" );
 
             return 1;
         }
@@ -345,7 +351,7 @@ public class MavenCli
             }
 
             Properties executionProperties = getExecutionProperties( commandLine );
-            
+
             File userSettingsPath = mavenEmbedder.getUserSettingsPath( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
 
             File globalSettingsFile = mavenEmbedder.getGlobalSettingsPath();
