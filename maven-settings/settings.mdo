@@ -750,7 +750,7 @@
         <field>
           <name>enabled</name>
           <version>1.0.0</version>
-          <description>Whether to use this repository for downloading this type of artifact</description>
+          <description>Whether to use this repository for downloading this type of artifact.</description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
