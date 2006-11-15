@@ -166,7 +166,7 @@ public class RegexBasedModelInterpolator
             // if the expression refers to itself, skip it.
             if ( String.valueOf( value ).indexOf( wholeExpr ) > -1 )
             {
-                throw new ModelInterpolationException( wholeExpr, model.getId() + " references itself." );
+                throw new ModelInterpolationException( wholeExpr, "Expression value '" + value + "' references itself in '" + model.getId() + "'." );
             }
 
             if ( value != null )
