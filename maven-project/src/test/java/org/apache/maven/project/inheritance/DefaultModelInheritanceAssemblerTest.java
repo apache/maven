@@ -63,7 +63,7 @@ public class DefaultModelInheritanceAssemblerTest
         
         parent.addModule( "../child" );
         
-        assembler.assembleModelInheritance( child, parent, ".." );
+        assembler.assembleModelInheritance( child, parent, "..", "child" );
         
         String resultingUrl = child.getUrl();
         
@@ -86,8 +86,8 @@ public class DefaultModelInheritanceAssemblerTest
         
         middle.addModule( "../bottom" );
         
-        assembler.assembleModelInheritance( middle, top, ".." );
-        assembler.assembleModelInheritance( bottom, middle, ".." );
+        assembler.assembleModelInheritance( middle, top, "..", "middle" );
+        assembler.assembleModelInheritance( bottom, middle, "..", "bottom" );
         
         String resultingUrl = bottom.getUrl();
         
@@ -122,9 +122,9 @@ public class DefaultModelInheritanceAssemblerTest
         
         bottom.setDependencyManagement( bottomMgmt );
         
-        assembler.assembleModelInheritance( mid, top );
+        assembler.assembleModelInheritance( mid, top, null );
         
-        assembler.assembleModelInheritance( bottom, mid );
+        assembler.assembleModelInheritance( bottom, mid, null );
         
         DependencyManagement result = bottom.getDependencyManagement();
         
@@ -153,9 +153,9 @@ public class DefaultModelInheritanceAssemblerTest
         
         Model bottom = makeBaseModel( "bottom" );
         
-        assembler.assembleModelInheritance( mid, top );
+        assembler.assembleModelInheritance( mid, top, null );
         
-        assembler.assembleModelInheritance( bottom, mid );
+        assembler.assembleModelInheritance( bottom, mid, null );
         
         DependencyManagement result = bottom.getDependencyManagement();
         
@@ -250,7 +250,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setDistributionManagement( distributionManagement );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         DistributionManagement childDistMgmt = child.getDistributionManagement();
         assertNotNull( "Check distMgmt inherited", childDistMgmt );
@@ -320,7 +320,7 @@ public class DefaultModelInheritanceAssemblerTest
         Build childBuild = new Build();
         child.setBuild( childBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertEquals( "source directory should be from parent", "src/main/java",
                       child.getBuild().getSourceDirectory() );
@@ -362,6 +362,9 @@ public class DefaultModelInheritanceAssemblerTest
      *   |--artifact2 (in another directory called a2 so it has it's own scm section)
      *             |
      *             |--artifact2-1
+     *   |--artifact3 (in another directory called a3 and artifactId called artifact3 without it's own scm section)
+     *             |
+     *             |--artifact3-1
      * </pre>
      */
     public void testScmInheritance()
@@ -379,14 +382,22 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model artifact2_1 = makeScmModel( "artifact2-1" );
 
+        Model artifact3 = makeScmModel( "artifact3" );
+
+        Model artifact3_1 = makeScmModel( "artifact3-1" );
+
         // Assemble
-        assembler.assembleModelInheritance( artifact1, root );
+        assembler.assembleModelInheritance( artifact1, root, null );
 
-        assembler.assembleModelInheritance( artifact1_1, artifact1 );
+        assembler.assembleModelInheritance( artifact1_1, artifact1, null );
 
-        assembler.assembleModelInheritance( artifact2, root );
+        assembler.assembleModelInheritance( artifact2, root, null );
 
-        assembler.assembleModelInheritance( artifact2_1, artifact2 );
+        assembler.assembleModelInheritance( artifact2_1, artifact2, null );
+
+        assembler.assembleModelInheritance( artifact3, root, "a3" );
+
+        assembler.assembleModelInheritance( artifact3_1, artifact3, null );
 
         // --- -- -
 
@@ -399,6 +410,11 @@ public class DefaultModelInheritanceAssemblerTest
 
         assertConnection( "scm:foo:/scm-root/yay-artifact2/artifact2-1",
                           "scm:foo:/scm-dev-root/yay-artifact2/artifact2-1", artifact2_1 );
+
+        assertConnection( "scm:foo:/scm-root/a3", "scm:foo:/scm-dev-root/a3", artifact3 );
+
+        assertConnection( "scm:foo:/scm-root/a3/artifact3-1", "scm:foo:/scm-dev-root/a3/artifact3-1",
+                          artifact3_1 );
     }
 
     public void testScmInheritanceWhereParentHasConnectionAndTheChildDoesnt()
@@ -407,7 +423,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child" );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( "scm:foo:bar:/scm-root/child", null, null, child.getScm() );
     }
@@ -418,7 +434,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child", "scm:foo:bar:/another-root", null, null );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( "scm:foo:bar:/another-root", null, null, child.getScm() );
     }
@@ -429,7 +445,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child" );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( null, "scm:foo:bar:/scm-dev-root/child", null, child.getScm() );
     }
@@ -440,7 +456,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child", null, "scm:foo:bar:/another-dev-root", null );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( null, "scm:foo:bar:/another-dev-root", null, child.getScm() );
     }
@@ -451,7 +467,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child" );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( null, null, "http://foo/bar/child", child.getScm() );
     }
@@ -462,7 +478,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeScmModel( "child", null, null, "http://bar/foo/" );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertScm( null, null, "http://bar/foo/", child.getScm() );
     }
@@ -475,7 +491,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeBaseModel( "child" );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         // TODO: a lot easier if modello generated equals() :)
         assertRepositories( repos, child.getRepositories() );
@@ -491,7 +507,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         repos.addAll( child.getRepositories() );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         // TODO: a lot easier if modello generated equals() :)
         assertRepositories( repos, child.getRepositories() );
@@ -506,7 +522,7 @@ public class DefaultModelInheritanceAssemblerTest
         // We want to get the child repository here.
         List repos = new ArrayList( child.getRepositories() );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         // TODO: a lot easier if modello generated equals() :)
         assertRepositories( repos, child.getRepositories() );
@@ -530,7 +546,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setBuild( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertPlugins( parentPlugins, child );
     }
@@ -554,7 +570,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setBuild( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertPlugins( parentPlugins, child );
     }
@@ -578,7 +594,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setBuild( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertPlugins( new ArrayList(), child );
     }
@@ -659,7 +675,7 @@ public class DefaultModelInheritanceAssemblerTest
         parentBuild.setExcludeDefaults( false );
         parent.setReporting( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertFalse( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
 
@@ -667,7 +683,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parentBuild.setExcludeDefaults( true );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertTrue( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
     }
@@ -690,7 +706,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setReporting( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertReports( parentPlugins, child );
     }
@@ -714,7 +730,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setReporting( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertReports( parentPlugins, child );
     }
@@ -738,7 +754,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         parent.setReporting( parentBuild );
 
-        assembler.assembleModelInheritance( child, parent );
+        assembler.assembleModelInheritance( child, parent, null );
 
         assertReports( new ArrayList(), child );
     }

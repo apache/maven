@@ -731,7 +731,14 @@ public class DefaultMavenProjectBuilder
                 getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
-            modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
+            if ( currentProject.getFile() != null )
+            {
+                modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment, currentProject.getFile().getName() );
+            }
+            else
+            {
+                modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
+            }
 
             previous = current;
             previousProject = currentProject;

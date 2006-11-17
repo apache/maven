@@ -51,20 +51,20 @@ public class DefaultModelInheritanceAssembler
 {
     public void copyModel( Model dest, Model source )
     {
-        assembleModelInheritance( dest, source, null, false );
+        assembleModelInheritance( dest, source, null, null, false );
     }
 
-    public void assembleModelInheritance( Model child, Model parent, String childPathAdjustment )
+    public void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, String moduleName )
     {
-        assembleModelInheritance( child, parent, childPathAdjustment, true );
+        assembleModelInheritance( child, parent, childPathAdjustment, moduleName, true );
     }
 
-    public void assembleModelInheritance( Model child, Model parent )
+    public void assembleModelInheritance( Model child, Model parent, String moduleName )
     {
-        assembleModelInheritance( child, parent, null, true );
+        assembleModelInheritance( child, parent, null, moduleName, true );
     }
 
-    private void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, String moduleName, boolean appendPaths )
     {
         // cannot inherit from null parent.
         if ( parent == null )
@@ -130,7 +130,7 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Scm
-        assembleScmInheritance( child, parent, childPathAdjustment, appendPaths );
+        assembleScmInheritance( child, parent, childPathAdjustment, moduleName, appendPaths );
 
         // ciManagement
         if ( child.getCiManagement() == null )
@@ -363,7 +363,7 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleScmInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleScmInheritance( Model child, Model parent, String childPathAdjustment, String moduleName, boolean appendPaths )
     {
         if ( parent.getScm() != null )
         {
@@ -378,24 +378,31 @@ public class DefaultModelInheritanceAssembler
                 child.setScm( childScm );
             }
 
+            String childPath = moduleName;
+
+            if ( StringUtils.isEmpty( moduleName ) )
+            {
+                childPath = child.getArtifactId();
+            }
+
             if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
                 childScm.setConnection(
-                    appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                    appendPath( parentScm.getConnection(), childPath, childPathAdjustment, appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
                 !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
-                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),
+                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), childPath,
                                                          childPathAdjustment, appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
             {
                 childScm.setUrl(
-                    appendPath( parentScm.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+                    appendPath( parentScm.getUrl(), childPath, childPathAdjustment, appendPaths ) );
             }
         }
     }
