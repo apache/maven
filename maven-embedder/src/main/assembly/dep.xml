@@ -15,6 +15,7 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
+      <outputFileNameMapping></outputFileNameMapping>
       <unpack>true</unpack>
       <scope>runtime</scope>
       <excludes>
