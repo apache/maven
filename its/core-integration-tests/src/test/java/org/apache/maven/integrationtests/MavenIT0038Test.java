@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MavenIT0038Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

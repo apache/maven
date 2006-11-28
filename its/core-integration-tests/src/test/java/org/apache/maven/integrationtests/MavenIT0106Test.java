@@ -10,7 +10,7 @@ import java.io.File;
  * #it0106 MNG-2318 not yet fixed
  */
 public class MavenIT0106Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

@@ -12,7 +12,7 @@ import java.util.List;
  * # it0098 - something started failing here, not yet identified. MNG-2322                                                             
  */
 public class MavenIT0098Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

@@ -7,7 +7,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 public class MavenIT0024Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

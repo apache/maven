@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class MavenIT0090Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

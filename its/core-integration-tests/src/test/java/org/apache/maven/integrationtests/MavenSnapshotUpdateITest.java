@@ -27,7 +27,7 @@ import java.io.File;
  * Test to verify that a snapshot can be updated, even if the
  */
 public class MavenSnapshotUpdateITest
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**

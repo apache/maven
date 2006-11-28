@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.Properties;
 
 public class MavenIT0059Test
-    extends TestCase /*extends AbstractMavenIntegrationTest*/
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**
