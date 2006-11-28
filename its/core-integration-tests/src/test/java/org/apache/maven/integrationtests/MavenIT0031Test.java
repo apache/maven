@@ -33,7 +33,7 @@ public class MavenIT0031Test
         verifier.assertFilePresent( "target/generated-sources/modello/org/apache/maven/it/it0031/Root.java" );
 // don't verify error free log
         verifier.resetStreams();
-        System.out.println( "it0031 PASS" );
+
     }
 }
 

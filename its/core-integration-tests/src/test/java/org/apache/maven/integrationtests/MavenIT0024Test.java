@@ -23,7 +23,7 @@ public class MavenIT0024Test
         verifier.assertFilePresent( "target/classes/org/apache/maven/it0024/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0024 PASS" );
+
     }
 }
 

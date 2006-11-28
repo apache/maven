@@ -25,7 +25,7 @@ public class MavenIT0057Test
         verifier.assertFilePresent( "target/maven-it-it0057-1.0.jar!/it0057.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0057 PASS" );
+
     }
 }
 

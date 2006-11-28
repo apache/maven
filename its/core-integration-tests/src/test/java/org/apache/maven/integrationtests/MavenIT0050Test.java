@@ -23,7 +23,7 @@ public class MavenIT0050Test
         verifier.assertFilePresent( "target/defaultTestTouchFile.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0050 PASS" );
+
     }
 }
 

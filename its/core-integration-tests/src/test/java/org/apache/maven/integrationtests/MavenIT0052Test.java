@@ -29,7 +29,7 @@ public class MavenIT0052Test
         verifier.assertFileNotPresent( "target/maven-it-it0052-1.0-sources.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0052 PASS" );
+
     }
 }
 

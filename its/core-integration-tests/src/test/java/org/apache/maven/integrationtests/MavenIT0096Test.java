@@ -21,7 +21,7 @@ public class MavenIT0096Test
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0096 PASS" );
+
     }
 }
 

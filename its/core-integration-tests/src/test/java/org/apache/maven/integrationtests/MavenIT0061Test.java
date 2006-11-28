@@ -25,7 +25,7 @@ public class MavenIT0061Test
         verifier.assertFilePresent( "target/test-repo/org.apache.maven.its.it0061/poms/maven-it-it0061-1.0.pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0061 PASS" );
+
     }
 }
 

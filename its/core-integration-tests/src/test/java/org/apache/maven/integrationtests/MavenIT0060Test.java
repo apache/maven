@@ -27,7 +27,7 @@ public class MavenIT0060Test
         verifier.assertFileNotPresent( "subproject/target/test-classes/org/apache/maven/it0060/PersonThreeTest.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0060 PASS" );
+
     }
 }
 

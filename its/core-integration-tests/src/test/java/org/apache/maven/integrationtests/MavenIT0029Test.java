@@ -24,7 +24,7 @@ public class MavenIT0029Test
         verifier.assertFilePresent( "child-project/target/classes/org/apache/maven/it0029/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0029 PASS" );
+
     }
 }
 

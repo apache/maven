@@ -23,7 +23,7 @@ public class MavenIT0088Test
         verifier.assertFilePresent( "target/mojo-generated.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0088 PASS" );
+
     }
 }
 

@@ -23,7 +23,7 @@ public class MavenIT0048Test
         verifier.assertFilePresent( "target/testFileOutput.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0048 PASS" );
+
     }
 }
 

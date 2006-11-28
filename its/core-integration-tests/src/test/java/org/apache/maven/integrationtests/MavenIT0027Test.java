@@ -20,15 +20,14 @@ public class MavenIT0027Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0027" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List goals = Arrays.asList( new String[]{
-            "org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
+        List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
             "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
         verifier.executeGoals( goals );
         verifier.assertFilePresent( "target/forked/touch.txt" );
         verifier.assertFilePresent( "target/forked2/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0027 PASS" );
+
     }
 }
 

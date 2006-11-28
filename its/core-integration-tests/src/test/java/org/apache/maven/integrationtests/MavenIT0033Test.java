@@ -24,7 +24,7 @@ public class MavenIT0033Test
         verifier.assertFilePresent( "target/maven-it-it0033-1.0.ear!/META-INF/appserver-application.xml" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0033 PASS" );
+
     }
 }
 

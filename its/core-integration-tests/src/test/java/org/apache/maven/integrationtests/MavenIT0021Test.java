@@ -28,7 +28,7 @@ public class MavenIT0021Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0021 PASS" );
+
     }
 }
 

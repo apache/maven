@@ -25,7 +25,7 @@ public class MavenIT0032Test
         verifier.assertFilePresent( "target/maven-it-it0032-1.0.jar!/it0032.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0032 PASS" );
+
     }
 }
 

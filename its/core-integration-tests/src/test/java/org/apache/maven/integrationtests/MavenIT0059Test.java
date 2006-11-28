@@ -27,7 +27,7 @@ public class MavenIT0059Test
         verifier.assertFilePresent( "target/maven-it-it0059-1.0.jar" );
 // don't verify error free log
         verifier.resetStreams();
-        System.out.println( "it0059 PASS" );
+
     }
 }
 

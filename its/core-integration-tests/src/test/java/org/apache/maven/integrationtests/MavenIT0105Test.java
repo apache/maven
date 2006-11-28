@@ -27,7 +27,7 @@ public class MavenIT0105Test
         verifier.assertFilePresent( "target/classes/test.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0105 PASS" );
+
     }
 }
 

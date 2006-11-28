@@ -24,7 +24,7 @@ public class MavenIT0049Test
         verifier.assertFilePresent( "target/touchFile.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0049 PASS" );
+
     }
 }
 

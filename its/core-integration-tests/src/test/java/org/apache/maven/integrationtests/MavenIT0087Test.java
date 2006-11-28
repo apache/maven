@@ -23,7 +23,7 @@ public class MavenIT0087Test
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0087 PASS" );
+
     }
 }
 

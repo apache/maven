@@ -30,7 +30,7 @@ public class MavenIT0080Test
         verifier.assertFileNotPresent( "test-component-c/target/test-component-c-0.1/test-component-a-0.1.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0080 PASS" );
+
     }
 }
 

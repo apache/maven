@@ -23,7 +23,7 @@ public class MavenIT0012Test
         verifier.assertFilePresent( "child-project/target/child-touch-3.0.3.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0012 PASS" );
+
     }
 }
 

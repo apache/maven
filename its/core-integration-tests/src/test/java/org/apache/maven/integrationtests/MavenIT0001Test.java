@@ -26,7 +26,7 @@ public class MavenIT0001Test
         verifier.assertFilePresent( "target/maven-it-it0001-1.0.jar!/it0001.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0001 PASS" );
+
     }
 }
 

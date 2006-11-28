@@ -24,7 +24,7 @@ public class MavenIT0089Test
         verifier.assertFilePresent( "project/target/output.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0089 PASS" );
+
     }
 }
 

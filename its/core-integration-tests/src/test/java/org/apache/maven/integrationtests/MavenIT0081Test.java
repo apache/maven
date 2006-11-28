@@ -22,7 +22,7 @@ public class MavenIT0081Test
         verifier.assertFilePresent( "test-component-c/target/org.apache.maven.wagon.providers.ftp.FtpWagon" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0081 PASS" );
+
     }
 }
 

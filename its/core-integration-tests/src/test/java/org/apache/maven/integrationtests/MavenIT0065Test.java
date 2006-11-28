@@ -23,7 +23,7 @@ public class MavenIT0065Test
         verifier.assertFilePresent( "parent-basedir" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0065 PASS" );
+
     }
 }
 

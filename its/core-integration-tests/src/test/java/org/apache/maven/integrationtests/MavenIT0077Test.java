@@ -28,7 +28,7 @@ public class MavenIT0077Test
         verifier.assertArtifactPresent( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0077 PASS" );
+
     }
 }
 

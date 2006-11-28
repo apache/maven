@@ -29,7 +29,7 @@ public class MavenIT0013Test
         verifier.assertFilePresent( "target/it0013-verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0013 PASS" );
+
     }
 }
 

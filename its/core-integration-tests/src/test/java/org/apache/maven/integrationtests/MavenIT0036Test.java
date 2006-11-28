@@ -22,7 +22,7 @@ public class MavenIT0036Test
         verifier.assertFilePresent( "target/maven-it-it0036-1.0.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0036 PASS" );
+
     }
 }
 

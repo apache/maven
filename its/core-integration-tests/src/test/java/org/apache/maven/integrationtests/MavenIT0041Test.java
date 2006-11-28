@@ -25,7 +25,7 @@ public class MavenIT0041Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0041 PASS" );
+
     }
 }
 

@@ -21,7 +21,7 @@ public class MavenIT0095Test
         verifier.executeGoal( "integration-test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0095 PASS" );
+
     }
 }
 

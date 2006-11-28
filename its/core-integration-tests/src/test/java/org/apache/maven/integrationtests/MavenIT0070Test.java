@@ -24,7 +24,7 @@ public class MavenIT0070Test
         verifier.assertFilePresent( "target/maven-it-it0070-1.0.rar!/SomeResource.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0070 PASS" );
+
     }
 }
 

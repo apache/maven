@@ -27,7 +27,7 @@ public class MavenIT0035Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0035 PASS" );
+
     }
 }
 

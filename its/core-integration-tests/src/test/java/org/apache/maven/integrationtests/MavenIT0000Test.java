@@ -7,7 +7,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 public class MavenIT0000Test
-    extends AbstractMavenIntegrationTestCase 
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**
@@ -28,7 +28,7 @@ public class MavenIT0000Test
         verifier.assertFilePresent( "target/surefire-reports/org.apache.maven.it0000.PersonTest.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0000 PASS" );
+
     }
 }
 

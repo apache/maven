@@ -22,7 +22,7 @@ public class MavenIT0043Test
         verifier.assertFilePresent( "target/maven-it-it0043-1.0-SNAPSHOT.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0043 PASS" );
+
     }
 }
 

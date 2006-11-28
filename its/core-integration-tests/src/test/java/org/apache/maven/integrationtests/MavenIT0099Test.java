@@ -23,7 +23,7 @@ public class MavenIT0099Test
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0099 PASS" );
+
     }
 }
 

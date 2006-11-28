@@ -22,7 +22,7 @@ public class MavenIT0102Test
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0102 PASS" );
+
     }
 }
 

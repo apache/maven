@@ -24,7 +24,7 @@ public class MavenIT0005Test
         verifier.assertArtifactPresent( "org.apache.maven.its.it0005", "maven-it-it0005", "1.0-SNAPSHOT", "pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0005 PASS" );
+
     }
 }
 

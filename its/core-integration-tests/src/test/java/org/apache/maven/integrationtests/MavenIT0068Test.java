@@ -27,7 +27,7 @@ public class MavenIT0068Test
         verifier.assertFilePresent( "target/generated-sources/modello/org/apache/maven/settings/Settings.java" );
 // don't verify error free log
         verifier.resetStreams();
-        System.out.println( "it0068 PASS" );
+
     }
 }
 

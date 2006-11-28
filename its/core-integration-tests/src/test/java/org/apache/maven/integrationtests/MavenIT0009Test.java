@@ -26,7 +26,7 @@ public class MavenIT0009Test
         verifier.assertFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0009 PASS" );
+
     }
 }
 

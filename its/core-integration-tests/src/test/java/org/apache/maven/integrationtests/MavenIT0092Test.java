@@ -23,7 +23,7 @@ public class MavenIT0092Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0092 PASS" );
+
     }
 }
 

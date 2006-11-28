@@ -23,7 +23,7 @@ public class MavenIT0076Test
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0076 PASS" );
+
     }
 }
 

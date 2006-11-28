@@ -22,7 +22,7 @@ public class MavenIT0040Test
         verifier.assertFilePresent( "target/maven-it-it0040-1.0-it.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0040 PASS" );
+
     }
 }
 

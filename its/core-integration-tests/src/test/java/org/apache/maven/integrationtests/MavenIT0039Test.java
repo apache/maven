@@ -30,7 +30,7 @@ public class MavenIT0039Test
         verifier.assertFilePresent( "project2/target/maven-it-it0039-p2-1.0.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0039 PASS" );
+
     }
 }
 

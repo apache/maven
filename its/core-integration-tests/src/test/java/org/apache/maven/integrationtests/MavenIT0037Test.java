@@ -27,7 +27,7 @@ public class MavenIT0037Test
         verifier.assertFilePresent( "target/maven-it-it0037-1.0-build2.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0037 PASS" );
+
     }
 }
 

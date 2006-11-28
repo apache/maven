@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * #it0107 requires a snapshot version of maven-plugin-plugin, which indicates it doesn't belong here                                  
+ * #it0107 requires a snapshot version of maven-plugin-plugin, which indicates it doesn't belong here
  */
 public class MavenIT0107Test
     extends AbstractMavenIntegrationTestCase
@@ -29,7 +29,7 @@ public class MavenIT0107Test
         verifier.executeGoal( "core-it:param-implementation" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0107 PASS" );
+
     }
 }
 

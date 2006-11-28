@@ -21,7 +21,7 @@ public class MavenIT0094Test
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0094 PASS" );
+
     }
 }
 

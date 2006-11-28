@@ -25,7 +25,7 @@ public class MavenIT0034Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.4", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0034 PASS" );
+
     }
 }
 

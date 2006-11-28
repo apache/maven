@@ -25,7 +25,7 @@ public class MavenIT0054Test
         verifier.assertFilePresent( "target/maven-it-it0054-1.0.jar!/it0054.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0054 PASS" );
+
     }
 }
 

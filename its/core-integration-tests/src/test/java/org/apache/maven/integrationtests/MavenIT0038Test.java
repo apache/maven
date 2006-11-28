@@ -28,7 +28,7 @@ public class MavenIT0038Test
         verifier.assertFilePresent( "project/target/maven-it-it0038-1.0-build2.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0038 PASS" );
+
     }
 }
 

@@ -24,7 +24,7 @@ public class MavenIT0071Test
         verifier.assertFilePresent( "target/foo2" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0071 PASS" );
+
     }
 }
 

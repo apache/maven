@@ -28,7 +28,7 @@ public class MavenIT0051Test
         verifier.assertFilePresent( "target/maven-it-it0051-1.0-sources.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0051 PASS" );
+
     }
 }
 

@@ -30,7 +30,7 @@ public class MavenIT0053Test
         verifier.assertFileNotPresent( "target/maven-it-it0053-1.0-SNAPSHOT-sources.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0053 PASS" );
+
     }
 }
 

@@ -7,7 +7,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * # it0091 currrently fails. Not sure if there is an associated JIRA.                                                                 
+ * # it0091 currrently fails. Not sure if there is an associated JIRA.
  */
 public class MavenIT0091Test
     extends AbstractMavenIntegrationTestCase
@@ -27,7 +27,7 @@ public class MavenIT0091Test
         verifier.assertFilePresent( "target/classes/test.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0091 PASS" );
+
     }
 }
 

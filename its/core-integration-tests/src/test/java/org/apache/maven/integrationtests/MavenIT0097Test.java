@@ -24,7 +24,7 @@ public class MavenIT0097Test
         verifier.assertFilePresent( "project/project-sibling-level2/target/it0097.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0097 PASS" );
+
     }
 }
 

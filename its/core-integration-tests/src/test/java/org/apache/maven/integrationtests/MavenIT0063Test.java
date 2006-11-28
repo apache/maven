@@ -25,7 +25,7 @@ public class MavenIT0063Test
         verifier.assertFilePresent( "target/maven-it-it0063-1.0.jar!/it0063.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0063 PASS" );
+
     }
 }
 

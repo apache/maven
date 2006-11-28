@@ -22,7 +22,7 @@ public class MavenIT0011Test
         verifier.assertFilePresent( "target/classes/org/apache/maven/it0011/PersonFinder.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0011 PASS" );
+
     }
 }
 

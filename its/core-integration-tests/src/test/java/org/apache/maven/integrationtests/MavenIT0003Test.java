@@ -28,7 +28,7 @@ public class MavenIT0003Test
         verifier.assertArtifactPresent( "org.apache.maven.its.it0003", "maven-it-it0003", "1.0", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0003 PASS" );
+
     }
 }
 

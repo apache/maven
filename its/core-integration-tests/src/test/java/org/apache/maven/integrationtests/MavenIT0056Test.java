@@ -28,7 +28,7 @@ public class MavenIT0056Test
         verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonThreeTest.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0056 PASS" );
+
     }
 }
 

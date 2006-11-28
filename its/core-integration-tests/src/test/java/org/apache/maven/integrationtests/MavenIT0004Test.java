@@ -7,7 +7,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 public class MavenIT0004Test
-    extends AbstractMavenIntegrationTestCase 
+    extends AbstractMavenIntegrationTestCase
 {
 
     /**
@@ -24,7 +24,7 @@ public class MavenIT0004Test
         verifier.assertArtifactPresent( "org.apache.maven.its.it0004", "maven-it-it0004", "1.0", "pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0004 PASS" );
+
     }
 }
 

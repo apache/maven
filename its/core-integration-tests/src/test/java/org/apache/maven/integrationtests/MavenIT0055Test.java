@@ -26,7 +26,7 @@ public class MavenIT0055Test
         verifier.assertFileNotPresent( "target/test-classes/org/apache/maven/it0055/PersonTwoTest.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0055 PASS" );
+
     }
 }
 

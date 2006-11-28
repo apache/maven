@@ -23,7 +23,7 @@ public class MavenIT0082Test
         verifier.assertFilePresent( "test-component-c/target/my-test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0082 PASS" );
+
     }
 }
 

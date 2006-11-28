@@ -31,7 +31,7 @@ public class MavenIT0075Test
         verifier.assertFileNotPresent( "sub2/target/maven-it-it0075-sub2-1.0.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0075 PASS" );
+
     }
 }
 

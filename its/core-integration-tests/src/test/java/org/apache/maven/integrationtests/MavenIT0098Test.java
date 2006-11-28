@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * # it0098 - something started failing here, not yet identified. MNG-2322                                                             
+ * # it0098 - something started failing here, not yet identified. MNG-2322
  */
 public class MavenIT0098Test
     extends AbstractMavenIntegrationTestCase
@@ -29,7 +29,7 @@ public class MavenIT0098Test
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0098 PASS" );
+
     }
 }
 

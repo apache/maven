@@ -26,7 +26,7 @@ public class MavenIT0018Test
         verifier.assertArtifactPresent( "commons-logging", "commons-logging", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0018 PASS" );
+
     }
 }
 

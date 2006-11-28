@@ -27,7 +27,7 @@ public class MavenIT0022Test
         verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0022 PASS" );
+
     }
 }
 

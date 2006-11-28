@@ -25,7 +25,7 @@ public class MavenIT0017Test
         verifier.assertFilePresent( "target/maven-it-it0017-1.0.jar!/org/apache/maven/it0017/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0017 PASS" );
+
     }
 }
 

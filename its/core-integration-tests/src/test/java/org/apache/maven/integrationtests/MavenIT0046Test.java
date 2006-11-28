@@ -31,7 +31,7 @@ public class MavenIT0046Test
         verifier.assertFilePresent( "subproject2/target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0046 PASS" );
+
     }
 }
 

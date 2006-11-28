@@ -28,7 +28,7 @@ public class MavenIT0058Test
         verifier.assertFilePresent( "subproject/target/subproject-1.0.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0058 PASS" );
+
     }
 }
 

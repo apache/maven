@@ -23,7 +23,7 @@ public class MavenIT0074Test
         verifier.assertFilePresent( ".classpath" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0074 PASS" );
+
     }
 }
 

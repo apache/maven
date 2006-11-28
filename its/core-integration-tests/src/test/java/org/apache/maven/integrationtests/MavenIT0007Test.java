@@ -28,7 +28,7 @@ public class MavenIT0007Test
         verifier.assertArtifactPresent( "org.apache.maven.plugins", "maven-plugin-parent", "2.0", "pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0007 PASS" );
+
     }
 }
 

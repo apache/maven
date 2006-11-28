@@ -29,7 +29,7 @@ public class MavenIT0045Test
         verifier.assertFileNotPresent( "subproject/target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0045 PASS" );
+
     }
 }
 

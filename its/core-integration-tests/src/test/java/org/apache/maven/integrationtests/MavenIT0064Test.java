@@ -25,7 +25,7 @@ public class MavenIT0064Test
         verifier.assertFilePresent( "target/barValue.baz" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0064 PASS" );
+
     }
 }
 

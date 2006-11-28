@@ -24,7 +24,7 @@ public class MavenIT0106Test
         verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0106 PASS" );
+
     }
 }
 

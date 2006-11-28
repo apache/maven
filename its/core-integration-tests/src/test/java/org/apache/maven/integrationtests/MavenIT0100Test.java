@@ -21,7 +21,7 @@ public class MavenIT0100Test
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0100 PASS" );
+
     }
 }
 

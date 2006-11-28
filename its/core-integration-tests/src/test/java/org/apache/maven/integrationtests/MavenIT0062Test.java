@@ -25,7 +25,7 @@ public class MavenIT0062Test
         verifier.assertFilePresent( "target/maven-it-it0062-1.0-SNAPSHOT.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0062 PASS" );
+
     }
 }
 

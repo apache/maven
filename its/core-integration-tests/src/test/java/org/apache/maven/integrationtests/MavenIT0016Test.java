@@ -21,8 +21,7 @@ public class MavenIT0016Test
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "target/classes/org/apache/maven/it0016/Person.class" );
         verifier.assertFilePresent( "target/maven-it-it0016-1.0/index.html" );
-        verifier.assertFilePresent(
-            "target/maven-it-it0016-1.0/WEB-INF/classes/org/apache/maven/it0016/Person.class" );
+        verifier.assertFilePresent( "target/maven-it-it0016-1.0/WEB-INF/classes/org/apache/maven/it0016/Person.class" );
         verifier.assertFilePresent( "target/maven-it-it0016-1.0/WEB-INF/lib/commons-logging-1.0.3.jar" );
         verifier.assertFileNotPresent( "target/maven-it-it0016-1.0/WEB-INF/lib/servletapi-2.4-20040521.jar" );
         verifier.assertFilePresent( "target/maven-it-it0016-1.0.war" );
@@ -32,7 +31,7 @@ public class MavenIT0016Test
         verifier.assertFilePresent( "target/maven-it-it0016-1.0.war!/WEB-INF/lib/commons-logging-1.0.3.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0016 PASS" );
+
     }
 }
 

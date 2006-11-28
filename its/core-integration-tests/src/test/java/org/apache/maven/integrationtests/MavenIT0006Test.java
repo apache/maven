@@ -21,7 +21,7 @@ public class MavenIT0006Test
         verifier.executeGoal( "integration-test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0006 PASS" );
+
     }
 }
 

@@ -28,7 +28,7 @@ public class MavenIT0101Test
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0101 PASS" );
+
     }
 }
 

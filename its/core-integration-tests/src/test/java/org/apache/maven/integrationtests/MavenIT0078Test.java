@@ -24,7 +24,7 @@ public class MavenIT0078Test
         verifier.assertFileNotPresent( "target/classes/Test.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0078 PASS" );
+
     }
 }
 

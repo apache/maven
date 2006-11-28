@@ -27,7 +27,7 @@ public class MavenIT0069Test
         verifier.assertFilePresent( "target/classes/org/apache/maven/it0069/ClassworldBasedThing.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0069 PASS" );
+
     }
 }
 

@@ -27,7 +27,7 @@ public class MavenIT0066Test
         verifier.assertFilePresent( "" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0066 PASS" );
+
     }
 }
 

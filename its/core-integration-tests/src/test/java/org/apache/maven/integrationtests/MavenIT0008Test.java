@@ -27,7 +27,7 @@ public class MavenIT0008Test
         verifier.assertFilePresent( "target/test-basedir-alignment/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0008 PASS" );
+
     }
 }
 

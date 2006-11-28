@@ -27,7 +27,7 @@ public class MavenIT0085Test
         verifier.assertFilePresent( "war/target/war-1.0/WEB-INF/lib/junit-3.8.1.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "it0085 PASS" );
+
     }
 }
 
