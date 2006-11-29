@@ -29,6 +29,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -1190,4 +1191,11 @@ public class DefaultPluginManager
         return pluginContainer.lookupMap( role );
     }
 
+    public void addToArtifactFilter( ArtifactFilter filter )
+    {
+        AndArtifactFilter newFilter = new AndArtifactFilter();
+        newFilter.add( filter );
+        newFilter.add( artifactFilter );
+        artifactFilter = newFilter;
+    }
 }

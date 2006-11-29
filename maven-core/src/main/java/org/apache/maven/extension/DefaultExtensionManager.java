@@ -16,6 +16,7 @@ package org.apache.maven.extension;
  * limitations under the License.
  */
 
+import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -25,9 +26,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.model.Extension;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.MavenArtifactFilterManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -37,6 +39,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Used to locate extensions.
@@ -54,6 +58,8 @@ public class DefaultExtensionManager
 
     private PlexusContainer container;
 
+    private PluginManager pluginManager;
+
     private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createStandardFilter();
 
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
@@ -65,22 +71,26 @@ public class DefaultExtensionManager
 
         if ( artifact != null )
         {
-        		ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
-        		
+            ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
+
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
                                                                                     project.getArtifact(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
-                                                                                    artifactMetadataSource,
-                                                                                    filter );
+                                                                                    artifactMetadataSource, filter );
+
+            List excludedArtifacts = new ArrayList( result.getArtifacts().size() );
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
+
+                excludedArtifacts.add( ArtifactUtils.versionlessKey( a ) );
 
                 a = project.replaceWithActiveArtifact( a );
 
                 container.addJarResource( a.getFile() );
             }
+            pluginManager.addToArtifactFilter( new ExcludesArtifactFilter( excludedArtifacts )  );
         }
     }
 
@@ -89,23 +99,25 @@ public class DefaultExtensionManager
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
-    private static final class ProjectArtifactExceptionFilter implements ArtifactFilter
-    {
-    		private ArtifactFilter passThroughFilter;
-    		private String projectDependencyConflictId;
-    		
-    		ProjectArtifactExceptionFilter( ArtifactFilter passThroughFilter, Artifact projectArtifact )
-    		{
-				this.passThroughFilter = passThroughFilter;
-				this.projectDependencyConflictId = projectArtifact.getDependencyConflictId();
-    		}
 
-		public boolean include(Artifact artifact) {
-			String depConflictId = artifact.getDependencyConflictId();
-			
-			return projectDependencyConflictId.equals( depConflictId )
-					|| passThroughFilter.include( artifact );
-		}
+    private static final class ProjectArtifactExceptionFilter
+        implements ArtifactFilter
+    {
+        private ArtifactFilter passThroughFilter;
+
+        private String projectDependencyConflictId;
+
+        ProjectArtifactExceptionFilter( ArtifactFilter passThroughFilter, Artifact projectArtifact )
+        {
+            this.passThroughFilter = passThroughFilter;
+            this.projectDependencyConflictId = projectArtifact.getDependencyConflictId();
+        }
+
+        public boolean include( Artifact artifact )
+        {
+            String depConflictId = artifact.getDependencyConflictId();
+
+            return projectDependencyConflictId.equals( depConflictId ) || passThroughFilter.include( artifact );
+        }
     }
 }
