@@ -44,6 +44,9 @@
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
       </requirements>
     </component>
 
