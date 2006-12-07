@@ -118,7 +118,8 @@ public class InstallWagonProviderTask
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
-                getEmbedder().getContainer().addJarResource( a.getFile() );
+
+                getContainer().addJarResource( a.getFile() );
             }
         }
         catch ( PlexusContainerException e )

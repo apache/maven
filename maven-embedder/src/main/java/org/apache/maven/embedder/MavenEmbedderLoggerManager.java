@@ -78,6 +78,13 @@ public class MavenEmbedderLoggerManager
         this.currentThreshold = currentThreshold;
     }
 
+    public void setThresholds( int currentThreshold )
+    {
+        this.currentThreshold = currentThreshold;
+
+        logger.setThreshold( currentThreshold );
+    }
+
     /**
      * @return Returns the threshold.
      */

@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-bsh-factory</artifactId>
-      <version>1.0-alpha-7</version>
+      <version>1.0-alpha-9-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

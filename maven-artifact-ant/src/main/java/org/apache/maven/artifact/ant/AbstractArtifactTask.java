@@ -35,12 +35,13 @@ import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -60,7 +61,7 @@ public abstract class AbstractArtifactTask
 {
     private Settings settings;
 
-    private Embedder embedder;
+    private PlexusContainer container;
 
     private Pom pom;
 
@@ -120,7 +121,7 @@ public abstract class AbstractArtifactTask
         {
             try
             {
-                getEmbedder().release( repositoryFactory );
+                getContainer().release( repositoryFactory );
             }
             catch ( ComponentLifecycleException e )
             {
@@ -261,7 +262,7 @@ public abstract class AbstractArtifactTask
     {
         try
         {
-            return getEmbedder().lookup( role );
+            return getContainer().lookup( role );
         }
         catch ( ComponentLookupException e )
         {
@@ -273,7 +274,7 @@ public abstract class AbstractArtifactTask
     {
         try
         {
-            return getEmbedder().lookup( role, roleHint );
+            return getContainer().lookup( role, roleHint );
         }
         catch ( ComponentLookupException e )
         {
@@ -293,23 +294,22 @@ public abstract class AbstractArtifactTask
         return remoteRepository;
     }
 
-    protected synchronized Embedder getEmbedder()
+    protected synchronized PlexusContainer getContainer()
     {
-        if ( embedder == null )
+        if ( container == null )
         {
-            embedder = (Embedder) getProject().getReference( Embedder.class.getName() );
+            container = (PlexusContainer) getProject().getReference( PlexusContainer.class.getName() );
 
-            if ( embedder == null )
+            if ( container == null )
             {
-                embedder = new Embedder();
-
                 try
                 {
                     ClassWorld classWorld = new ClassWorld();
 
                     classWorld.newRealm( "plexus.core", getClass().getClassLoader() );
 
-                    embedder.start( classWorld );
+                    container = new DefaultPlexusContainer( null, null, null, classWorld );
+
                 }
                 catch ( PlexusContainerException e )
                 {
@@ -320,10 +320,11 @@ public abstract class AbstractArtifactTask
                     throw new BuildException( "Unable to create embedder ClassRealm", e );
                 }
 
-                getProject().addReference( Embedder.class.getName(), embedder );
+                getProject().addReference( PlexusContainer.class.getName(),container );
             }
         }
-        return embedder;
+
+        return container;
     }
 
     public Pom buildPom( MavenProjectBuilder projectBuilder, ArtifactRepository localArtifactRepository )
@@ -372,7 +373,7 @@ public abstract class AbstractArtifactTask
     {
         try
         {
-            ErrorDiagnostics diagnostics = (ErrorDiagnostics) embedder.lookup( ErrorDiagnostics.ROLE );
+            ErrorDiagnostics diagnostics = (ErrorDiagnostics) container.lookup( ErrorDiagnostics.ROLE );
 
             StringBuffer message = new StringBuffer();
 

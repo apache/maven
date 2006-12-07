@@ -48,15 +48,16 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.embed.Embedder;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -85,7 +86,7 @@ public class MavenEmbedder
     // Embedder
     // ----------------------------------------------------------------------
 
-    private Embedder embedder;
+    private PlexusContainer container;
 
     // ----------------------------------------------------------------------
     // Components
@@ -444,7 +445,7 @@ public class MavenEmbedder
         checkStarted();
         List phases = new ArrayList();
 
-        ComponentDescriptor descriptor = embedder.getContainer().getComponentDescriptor( LifecycleExecutor.ROLE );
+        ComponentDescriptor descriptor = container.getComponentDescriptor( LifecycleExecutor.ROLE );
 
         PlexusConfiguration configuration = descriptor.getConfiguration();
 
@@ -568,11 +569,19 @@ public class MavenEmbedder
             throw new IllegalStateException( "A classWorld or classloader must be specified using setClassLoader|World(ClassLoader)." );
         }
 
-        embedder = new Embedder();
+        try
+        {
+            container = new DefaultPlexusContainer( null, null, null, classWorld );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new MavenEmbedderException( "Error starting Maven embedder.", e );
+        }
+        
         
         if ( logger != null )
         {
-            embedder.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
+            container.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
         }
 
         try
@@ -584,11 +593,12 @@ public class MavenEmbedder
                 classWorld.newRealm( "plexus.core", classLoader );
             }
 
-            embedder.start( classWorld );
+// TODO verify that this is not needed...
+//            embedder.start( classWorld );
             
             if (req.getContainerCustomizer() != null) 
             {
-                req.getContainerCustomizer().customize(embedder.getContainer());
+                req.getContainerCustomizer().customize(container);
             }
             
             // ----------------------------------------------------------------------
@@ -600,35 +610,35 @@ public class MavenEmbedder
 
             modelWriter = new MavenXpp3Writer();
 
-            maven = (Maven) embedder.lookup( Maven.ROLE );
+            maven = (Maven) container.lookup( Maven.ROLE );
 
-            mavenTools = (MavenTools) embedder.lookup( MavenTools.ROLE );
+            mavenTools = (MavenTools) container.lookup( MavenTools.ROLE );
 
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
-            profileManager = new DefaultProfileManager( embedder.getContainer(), req.getSystemProperties() );
+            profileManager = new DefaultProfileManager( container, req.getSystemProperties() );
             
             profileManager.explicitlyActivate(req.getActiveProfiles());
             
             profileManager.explicitlyDeactivate(req.getInactiveProfiles());
 
-            mavenProjectBuilder = (MavenProjectBuilder) embedder.lookup( MavenProjectBuilder.ROLE );
+            mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
             // ----------------------------------------------------------------------
             // Artifact related components
             // ----------------------------------------------------------------------
 
-            artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
+            artifactRepositoryFactory = (ArtifactRepositoryFactory) container.lookup( ArtifactRepositoryFactory.ROLE );
 
-            artifactFactory = (ArtifactFactory) embedder.lookup( ArtifactFactory.ROLE );
+            artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-            artifactResolver = (ArtifactResolver) embedder.lookup( ArtifactResolver.ROLE );
+            artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
-            defaultArtifactRepositoryLayout = (ArtifactRepositoryLayout) embedder.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
+            defaultArtifactRepositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
 
-            lifecycleExecutor = (LifecycleExecutor) embedder.lookup( LifecycleExecutor.ROLE );
+            lifecycleExecutor = (LifecycleExecutor) container.lookup( LifecycleExecutor.ROLE );
 
-            wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
+            wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
             
             settings = mavenTools.buildSettings( req.getUserSettingsFile(), 
                                                  req.getGlobalSettingsFile(), 
@@ -642,10 +652,6 @@ public class MavenEmbedder
             
             localRepository = createLocalRepository( settings );
             
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new MavenEmbedderException( "Cannot start Plexus embedder.", e );
         }
         catch ( DuplicateRealmException e )
         {
@@ -723,11 +729,11 @@ public class MavenEmbedder
         started = false;
         try
         {
-            embedder.release( mavenProjectBuilder );
+            container.release( mavenProjectBuilder );
 
-            embedder.release( artifactRepositoryFactory );
+            container.release( artifactRepositoryFactory );
 
-            embedder.release( lifecycleExecutor );
+            container.release( lifecycleExecutor );
         }
         catch ( ComponentLifecycleException e )
         {

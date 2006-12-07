@@ -50,7 +50,7 @@ public class MavenPluginCollector
         if ( componentSetDescriptor instanceof PluginDescriptor )
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-            
+
             // TODO: see comment in getPluginDescriptor
             String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
             
@@ -68,6 +68,11 @@ public class MavenPluginCollector
                 }
             }
         }
+    }
+
+    public String getId()
+    {
+        return "maven-plugin-collector";    
     }
 
     public PluginDescriptor getPluginDescriptor( Plugin plugin )

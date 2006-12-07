@@ -37,7 +37,6 @@
       <outputDirectory>conf</outputDirectory>
     </fileSet>
     <fileSet>
-      <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
@@ -53,22 +52,25 @@
       <outputDirectory>core</outputDirectory>
       <includes>
         <include>org.codehaus.plexus:plexus-container-default</include>
+        <include>org.codehaus.plexus:plexus-component-api</include>      
         <include>org.codehaus.plexus:plexus-utils</include>
       </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>core/boot</outputDirectory>
       <includes>
-        <include>classworlds:classworlds</include>
+        <include>org.codehaus.plexus:plexus-classworlds</include>
       </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
+        <!-- Where is this coming from -->
+        <exclude>classworlds:classworlds</exclude>      
         <exclude>org.codehaus.plexus:plexus-container-default</exclude>
-        <exclude>classworlds:classworlds</exclude>
+        <exclude>org.codehaus.plexus:plexus-component-api</exclude>        
+        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>org.codehaus.plexus:plexus-utils</exclude>
-        <!-- transitively picked up via default container - not needed -->
         <exclude>plexus:plexus-utils</exclude>
         <exclude>junit:junit</exclude>
       </excludes>

@@ -158,9 +158,18 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <!-- We need to upgrade this to 1.0-alpha-10-SNAPSHOT for >= 2.0.5, to correct MNG-2201 -->
-        <version>1.0-alpha-9</version>
+        <version>1.0-alpha-12</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-api</artifactId>
+        <version>1.0-alpha-12</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>1.2-alpha-5</version>
+      </dependency>      
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>

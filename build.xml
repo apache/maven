@@ -14,6 +14,12 @@
     local repository for the bootstrap process.
   </description>
 
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath>
+      <pathelement path="ant-contrib-1.0b2.jar"/>
+    </classpath>
+  </taskdef>
+
   <target name="isMavenHomeSet">
     <property environment="env"/>
     <condition property="maven.home" value="${env.M2_HOME}">
@@ -88,17 +94,15 @@
         </antcall>
       </sequential>
     </macrodef>
-    <pull orgpath="org/codehaus/plexus/plexus-utils" version="1.1" name="plexus-utils"/>
-    <pull orgpath="org/codehaus/plexus/plexus-container-default" version="1.0-alpha-9" name="plexus-container-default"/>
     <pull orgpath="commons-cli/commons-cli" version="1.0" name="commons-cli"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
-    <pull orgpath="classworlds/classworlds" version="1.1-alpha-2" name="classworlds"/>
+    <pull orgpath="org/codehaus/plexus/plexus-utils" version="1.1" name="plexus-utils"/>
+    <pull orgpath="org/codehaus/plexus/plexus-container-default" version="1.0-alpha-12" name="plexus-container-default"/>
+    <pull orgpath="org/codehaus/plexus/plexus-component-api" version="1.0-alpha-12" name="plexus-component-api"/>
+    <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="1.2-alpha-5" name="plexus-classworlds"/>
     <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="1.0-alpha-4" name="plexus-interactivity-api"/>
-
-    <pull orgpath="org/codehaus/plexus/plexus-archiver" version="1.0-alpha-8-SNAPSHOT" 
-          name="plexus-archiver" repository="codehaus"/>
-
+    <pull orgpath="org/codehaus/plexus/plexus-archiver" version="1.0-alpha-8-SNAPSHOT" name="plexus-archiver" repository="codehaus"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/maven/wagon/wagon-file" version="1.0-alpha-7" name="wagon-file"/>
@@ -107,36 +111,40 @@
     <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="1.0-alpha-6" name="wagon-ssh-external"/>
     <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="1.0-alpha-7" name="wagon-ssh"/>
     <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="1.0-alpha-9-SNAPSHOT" name="doxia-sink-api"/>
-    <pull orgpath="org/codehaus/modello/modello-core" version="1.0-alpha-7" name="modello-core"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="1.0-alpha-8" name="modello-plugin-xml"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="1.0-alpha-8" name="modello-plugin-xpp3"/>
+    <pull orgpath="org/codehaus/modello/modello-core" version="1.0-alpha-12-SNAPSHOT" name="modello-core"/>
+    <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="1.0-alpha-12-SNAPSHOT" name="modello-plugin-xml"/>
+    <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="1.0-alpha-12-SNAPSHOT" name="modello-plugin-xpp3"/>
     <pull orgpath="junit/junit" version="3.8.1" name="junit"/>
   </target>
 
   <target name="classpath-pre" depends="init,pull"
           description="constructs a classpath reference containing our dependencies, and verifies that all files are present">
     <path id="pre.classpath">
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.jar"/>
-      <pathelement location="${maven.repo.local}/junit/junit/3.8.1/junit-3.8.1.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.jar"/>
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/1.0/commons-cli-1.0.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
-      <pathelement location="${maven.repo.local}/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/1.0-alpha-12/plexus-container-default-1.0-alpha-12.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-component-api/1.0-alpha-12/plexus-component-api-1.0-alpha-12.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/1.2-alpha-5-SNAPSHOT/plexus-classworlds-1.2-alpha-5-SNAPSHOT.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-6/wagon-http-lightweight-1.0-alpha-6.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/1.0-alpha-6/wagon-ssh-external-1.0-alpha-6.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/1.0-alpha-7/wagon-ssh-1.0-alpha-7.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9-SNAPSHOT/doxia-sink-api-1.0-alpha-9-SNAPSHOT.jar"/>
+      <pathelement location="${maven.repo.local}/junit/junit/3.8.1/junit-3.8.1.jar"/>
     </path>
     <!-- DGF Need to keep these modello classes out of the system classpath at runtime, because different parts of the build
          need different versions of modello.  -->
     <path id="modello.classpath">
       <path refid="pre.classpath"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/1.0-alpha-7/modello-core-1.0-alpha-7.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/1.0-alpha-8/modello-plugin-xml-1.0-alpha-8.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/1.0-alpha-8/modello-plugin-xpp3-1.0-alpha-8.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/1.0-alpha-12-SNAPSHOT/modello-core-1.0-alpha-12-SNAPSHOT.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/1.0-alpha-12-SNAPSHOT/modello-plugin-xml-1.0-alpha-12-SNAPSHOT.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/1.0-alpha-12-SNAPSHOT/modello-plugin-xpp3-1.0-alpha-12-SNAPSHOT.jar"/>
+      <!--
+      <pathelement location="modello.jar"/>
+      -->
     </path>
     <!-- DGF pathconvert immediately so we can validate the classpath -->
     <pathconvert property="pre.classpath.str" refid="pre.classpath" pathsep="&#xa;"/>
@@ -154,7 +162,7 @@
       <attribute name="mode"/>
       <attribute name="version"/>
       <sequential>
-        <java fork="false" classname="org.codehaus.modello.ModelloCli" failonerror="true">
+        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
           <classpath refid="modello.classpath"/>
           <arg file="@{file}"/>
           <arg value="@{mode}"/>
@@ -224,10 +232,10 @@
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="-X"/>
-<!-- JDC: Commenting out offline mode until all plugins and their dependencies 
-          can be pre-resolved before this call.
-      <arg value="-o"/>
- -->
+      <!-- JDC: Commenting out offline mode until all plugins and their dependencies
+               can be pre-resolved before this call.
+           <arg value="-o"/>
+      -->
       <arg value="clean"/>
       <arg value="install"/>
     </java>
@@ -241,9 +249,9 @@
       <arg value="-e"/>
       <arg value="-B"/>
 
-<!-- JDC: Removing offline switch until we can pre-resolve all plugins, dependencies and associated POMs.
-      <arg value="-o"/>
- -->
+      <!-- JDC: Removing offline switch until we can pre-resolve all plugins, dependencies and associated POMs.
+           <arg value="-o"/>
+      -->
       <arg value="clean"/>
       <arg value="assembly:assembly"/>
     </java>
@@ -253,11 +261,13 @@
         <available file="${maven.assembly}"/>
       </not>
     </condition>
-    <fail if="build.failed" message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
+    <fail if="build.failed"
+          message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
   </target>
 
   <target name="extract-assembly" depends="init,maven-assembly"
           description="extracts the maven assembly into maven.home">
+    <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
     <delete dir="${maven.home}"/>
     <unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
     <chmod perm="+x">
@@ -340,21 +350,38 @@
     <!-- Replace 'SNAPSHOT' with 'timestamp-buildnumber'. This is ugly but
       ant doesn't allow updating of properties.
     -->
-    <xmlproperty file="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml"/>
-    <echo file="deleteme.version.properties" message="${version}"/>
-    <replaceregexp file="deleteme.version.properties"
-                   match="SNAPSHOT"
-                   replace="${metadata.versioning.snapshot.timestamp}-${metadata.versioning.snapshot.buildNumber}"
-                   byline="true"/>
-    <loadfile srcFile="deleteme.version.properties" property="fileversion"/>
+
+    <condition property="localSnapshot" value="false">
+      <not>
+        <available file="${maven.repo.local}/${orgpath}/${version}/maven-metadata-local.xml"/>
+      </not>
+    </condition>
+
+    <if>
+      <equals arg1="${localSnapshot}" arg2="false"/>
+      <then>
+        <xmlproperty file="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml"/>
+        <echo file="deleteme.version.properties" message="${version}"/>
+        <replaceregexp file="deleteme.version.properties"
+                       match="SNAPSHOT"
+                       replace="${metadata.versioning.snapshot.timestamp}-${metadata.versioning.snapshot.buildNumber}"
+                       byline="true"/>
+        <loadfile srcFile="deleteme.version.properties" property="fileversion"/>
+
+        <!-- download the final artifact -->
+        <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.${type}"
+             dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
+             ignoreerrors="false"
+            />
+      </then>
+      <else>
+        <property name="fileversion" value="SNAPSHOT"/>
+      </else>
+    </if>
 
     <echo>Resolved version ${fileversion} (given=${version})</echo>
 
-    <!-- download the final artifact -->
-    <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.${type}"
-         dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
-         ignoreerrors="false"
-        />
+
     <condition property="build.failed">
       <not>
         <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}"/>
