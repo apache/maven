@@ -26,22 +26,41 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
+  <properties>
+    <bundleVersion>2.1.0.v20061129-1142</bundleVersion>
+  </properties>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>        
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.1</version>
         <configuration>
+          <finalName>${artifactId}-${bundleVersion}</finalName>
           <descriptor>src/main/assembly/dep.xml</descriptor>
+          <archive>
+            <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
+            <!--
+
+            This doesn't work and should
+
+            <manifestEntries>
+              <Manifest-Version>1.0</Manifest-Version>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>Maven 2.x Embedder Plug-in</Bundle-Name>
+              <Bundle-Vendor>org.apache.maven</Bundle-Vendor>
+              <Bundle-SymbolicName>org.maven.ide.embedder</Bundle-SymbolicName>
+              <Bundle-Version>${project.version}</Bundle-Version>
+              <Bundle-ClassPath>.</Bundle-ClassPath>
+            </manifestEntries>
+            -->
+          </archive>
         </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -57,22 +76,16 @@
       <version>2.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
-  <reporting>
-    <plugins>
-<!--
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-clover-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-pmd-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-      </plugin>
- -->
-    </plugins>
-  </reporting>
+  <distributionManagement>
+    <repository>
+      <id>apache.releases</id>
+      <name>Apache Release Distribution Repository</name>
+      <url>scp://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots</id>
+      <name>Apache Development Snapshot Repository</name>
+      <url>file:///tmp/embedder</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
