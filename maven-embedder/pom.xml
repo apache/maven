@@ -26,40 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
-  <properties>
-    <bundleVersion>2.1.0.v20061129-1142</bundleVersion>
-  </properties>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>        
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.1</version>
         <configuration>
-          <finalName>${artifactId}-${bundleVersion}</finalName>
           <descriptor>src/main/assembly/dep.xml</descriptor>
-          <archive>
-            <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
-            <!--
-
-            This doesn't work and should
-
-            <manifestEntries>
-              <Manifest-Version>1.0</Manifest-Version>
-              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-              <Bundle-Name>Maven 2.x Embedder Plug-in</Bundle-Name>
-              <Bundle-Vendor>org.apache.maven</Bundle-Vendor>
-              <Bundle-SymbolicName>org.maven.ide.embedder</Bundle-SymbolicName>
-              <Bundle-Version>${project.version}</Bundle-Version>
-              <Bundle-ClassPath>.</Bundle-ClassPath>
-            </manifestEntries>
-            -->
-          </archive>
         </configuration>
         <executions>
           <execution>
