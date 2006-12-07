@@ -11,7 +11,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>test</groupId>
+        <groupId>org.apache.maven.its.it0081</groupId>
         <artifactId>test-plugin</artifactId>
         <version>0.1</version>
         <dependencies>
