@@ -178,7 +178,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
-      <version>1.2-alpha-4-SNAPSHOT</version>
+      <version>1.2-alpha-5</version>
     </dependency>
   </dependencies>
 </project>

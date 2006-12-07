@@ -124,7 +124,7 @@
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/1.0-alpha-12/plexus-container-default-1.0-alpha-12.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-component-api/1.0-alpha-12/plexus-component-api-1.0-alpha-12.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/1.2-alpha-5-SNAPSHOT/plexus-classworlds-1.2-alpha-5-SNAPSHOT.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/1.2-alpha-5/plexus-classworlds-1.2-alpha-5.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
