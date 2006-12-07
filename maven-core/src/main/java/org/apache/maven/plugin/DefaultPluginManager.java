@@ -656,10 +656,6 @@ public class DefaultPluginManager
             repositories.addAll( resolutionGroup.getResolutionRepositories() );
             repositories.addAll( project.getRemoteArtifactRepositories() );
 
-            List repositories = new ArrayList();
-            repositories.addAll( resolutionGroup.getResolutionRepositories() );
-            repositories.addAll( project.getRemoteArtifactRepositories() );
-
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                     localRepository, repositories,
                                                                                     artifactMetadataSource,
