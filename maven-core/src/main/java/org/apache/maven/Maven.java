@@ -17,6 +17,7 @@ package org.apache.maven;
  */
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.reactor.MavenExecutionException;
 
 /**
@@ -47,8 +48,6 @@ public interface Maven
 
     static final int LOGGING_LEVEL_DISABLE = 5;
 
-    
-
-    void execute( MavenExecutionRequest request )
+    MavenExecutionResult execute( MavenExecutionRequest request )
         throws MavenExecutionException;
 }

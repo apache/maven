@@ -28,9 +28,10 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -48,7 +49,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
@@ -58,7 +58,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.AbstractLogger;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
@@ -120,7 +119,7 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public void execute( MavenExecutionRequest request )
+    public MavenExecutionResult execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
         boolean snapshotPolicySet = false;
@@ -142,28 +141,18 @@ public class DefaultMaven
             request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
         }
 
-        // FIXME: This will not touch the core maven logger, since it's already been initialized for
-        // this component.
+        Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
+                
+        if ( request.getEventMonitors() == null )
+        {
+            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+        }
+
         loggerManager.setThreshold( request.getLoggingLevel() );
-        
-        Logger myLogger = getLogger();
-        
-        // TODO: When the above problem is fixed, remove this.
-        if ( myLogger instanceof AbstractLogger )
-        {
-            ((AbstractLogger) myLogger).setThreshold( request.getLoggingLevel() );
-        }
-
-        Logger mojoLogger = loggerManager.getLoggerForComponent( Mojo.ROLE );
-
-        if ( request.isDefaultEventMonitorActive() )
-        {
-            request.addEventMonitor( new DefaultEventMonitor( mojoLogger ) );
-        }
 
         request.setStartTime( new Date() );
 
-        wagonManager.setInteractive( request.isInteractive() );
+        wagonManager.setInteractive( request.isInteractiveMode() );
 
         wagonManager.setDownloadMonitor( request.getTransferListener() );
 
@@ -253,7 +242,9 @@ public class DefaultMaven
 
         line();
 
-        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+        dispatcher.dispatchEnd( event, request.getBaseDirectory() );                
+
+        return new DefaultMavenExecutionResult( rm.getTopLevelProject(), null );
     }
 
     private void logErrors( ReactorManager rm, boolean showErrors )
@@ -358,7 +349,7 @@ public class DefaultMaven
         {
             rm = new ReactorManager( projects );
 
-            String requestFailureBehavior = request.getFailureBehavior();
+            String requestFailureBehavior = request.getReactorFailureBehavior();
 
             if ( requestFailureBehavior != null )
             {
@@ -425,7 +416,7 @@ public class DefaultMaven
                                         request.isRecursive(),
                                         request.getSettings(),
                                         globalProfileManager,
-                                        !request.isReactorActive() );
+                                        !request.useReactor() );
 
         }
         catch ( IOException e )
@@ -617,8 +608,6 @@ public class DefaultMaven
      * them in. It doesn't feel quite right.
      * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
      * the wagons, shouldn't we?
-     * @todo [mkleint] as part of fix MNG-1884, I've copied this code into 
-     * MavenEmbedder. if rewritten, needs to be rewritten there too
      */
     private void resolveParameters( Settings settings )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
@@ -891,7 +880,7 @@ public class DefaultMaven
         List files = Collections.EMPTY_LIST;
 
         File userDir = new File( System.getProperty( "user.dir" ) );
-        if ( request.isReactorActive() )
+        if ( request.useReactor() )
         {
             // TODO: should we now include the pom.xml in the current directory?
 //            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );

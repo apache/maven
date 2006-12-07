@@ -34,34 +34,51 @@ import java.io.File;
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
-    private File basedir;
+    // ----------------------------------------------------------------------------
+    // Settings equivalents
+    // ----------------------------------------------------------------------------
 
-    /**
-     * @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession).
-     */
     private ArtifactRepository localRepository;
-
+    
     private File localRepositoryPath;
 
-    private  List goals;
+    private boolean offline;
 
-    protected MavenSession session;
+    private boolean interactiveMode;
 
-    private  Settings settings;
+    private List proxies;
 
-    private boolean recursive = true;
+    private List servers;
 
-    private boolean reactorActive;
+    private List mirrors;
 
-    private String pomFilename;
+    private List profiles;
 
-    private String failureBehavior;
+    private List pluginGroups;
 
-    private  Properties properties;
+    private boolean usePluginRegistry;
 
-    private  Date startTime;
+    // ----------------------------------------------------------------------------
+    // Request
+    // ----------------------------------------------------------------------------
 
-    private  boolean showErrors;
+    private File basedir;
+
+    private List goals;
+
+    private Settings settings;
+
+    private boolean useReactor;
+
+    private String pomFile;
+
+    private String reactorFailureBehavior;
+
+    private Properties properties;
+
+    private Date startTime;
+
+    private boolean showErrors;
 
     private List eventMonitors;
 
@@ -69,19 +86,15 @@ public class DefaultMavenExecutionRequest
 
     private List inactiveProfiles;
 
-    private boolean interactive;
-
     private TransferListener transferListener;
 
     private int loggingLevel;
 
-    private boolean activateDefaultEventMonitor;
-
-    private boolean offline;
-
     private boolean updateSnapshots;
 
     private String globalChecksumPolicy;
+
+    private boolean recursive;
 
     // ----------------------------------------------------------------------
     //
@@ -95,11 +108,6 @@ public class DefaultMavenExecutionRequest
     public Settings getSettings()
     {
         return settings;
-    }
-
-    public boolean isRecursive()
-    {
-        return recursive;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -122,19 +130,14 @@ public class DefaultMavenExecutionRequest
         return properties;
     }
 
-    public MavenSession getSession()
-    {
-        return session;
-    }
-
     public String getPomFile()
     {
-        return pomFilename;
+        return pomFile;
     }
 
-    public String getFailureBehavior()
+    public String getReactorFailureBehavior()
     {
-        return failureBehavior;
+        return reactorFailureBehavior;
     }
 
     public Date getStartTime()
@@ -147,9 +150,9 @@ public class DefaultMavenExecutionRequest
         return showErrors;
     }
 
-    public boolean isInteractive()
+    public boolean isInteractiveMode()
     {
-        return interactive;
+        return interactiveMode;
     }
 
     public List getEventMonitors()
@@ -180,19 +183,9 @@ public class DefaultMavenExecutionRequest
         return transferListener;
     }
 
-    public boolean isDefaultEventMonitorActivated()
-    {
-        return activateDefaultEventMonitor;
-    }
-
     public int getLoggingLevel()
     {
         return loggingLevel;
-    }
-
-    public boolean isDefaultEventMonitorActive()
-    {
-        return activateDefaultEventMonitor;
     }
 
     public boolean isOffline()
@@ -210,6 +203,11 @@ public class DefaultMavenExecutionRequest
         return globalChecksumPolicy;
     }
 
+    public boolean isRecursive()
+    {
+        return recursive;
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -223,7 +221,7 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setStartTime( Date startTime )
     {
-        this.startTime= startTime;
+        this.startTime = startTime;
 
         return this;
     }
@@ -277,16 +275,9 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest setFailureBehavior( String failureBehavior )
+    public MavenExecutionRequest setReactorFailureBehavior( String failureBehavior )
     {
-        this.failureBehavior = failureBehavior;
-
-        return this;
-    }
-
-    public MavenExecutionRequest setSession( MavenSession session )
-    {
-        this.session = session;
+        this.reactorFailureBehavior = failureBehavior;
 
         return this;
     }
@@ -319,7 +310,6 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-
     public MavenExecutionRequest addEventMonitor( EventMonitor monitor )
     {
         if ( eventMonitors == null )
@@ -332,42 +322,28 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest activateDefaultEventMonitor()
+    public MavenExecutionRequest setUseReactor( boolean reactorActive )
     {
-        activateDefaultEventMonitor = true;
+        this.useReactor = reactorActive;
 
         return this;
     }
 
-    public MavenExecutionRequest setReactorActive( boolean reactorActive )
+    public boolean useReactor()
     {
-        this.reactorActive = reactorActive;
-
-        return this;
-    }
-
-    public boolean isReactorActive()
-    {
-        return reactorActive;
+        return useReactor;
     }
 
     public MavenExecutionRequest setPomFile( String pomFilename )
     {
-        this.pomFilename = pomFilename;
+        this.pomFile = pomFilename;
 
         return this;
     }
 
-    public MavenExecutionRequest setRecursive( boolean recursive )
+    public MavenExecutionRequest setInteractiveMode( boolean interactive )
     {
-        this.recursive = recursive;
-
-        return this;
-    }
-
-    public MavenExecutionRequest setInteractive( boolean interactive )
-    {
-        this.interactive = interactive;
+        this.interactiveMode = interactive;
 
         return this;
     }
@@ -406,4 +382,88 @@ public class DefaultMavenExecutionRequest
 
         return this;
     }
+
+    // ----------------------------------------------------------------------------
+    // Settings equivalents 
+    // ----------------------------------------------------------------------------
+
+    public List getProxies()
+    {
+        return proxies;
+    }
+
+    public MavenExecutionRequest setProxies( List proxies )
+    {
+        this.proxies = proxies;
+
+        return this;
+    }
+
+    public List getServers()
+    {
+        return servers;
+    }
+
+    public MavenExecutionRequest setServers( List servers )
+    {
+        this.servers = servers;
+
+        return this;
+    }
+
+    public List getMirrors()
+    {
+        return mirrors;
+    }
+
+    public MavenExecutionRequest setMirrors( List mirrors )
+    {
+        this.mirrors = mirrors;
+
+        return this;
+    }
+
+    public List getProfiles()
+    {
+        return profiles;
+    }
+
+    public MavenExecutionRequest setProfiles( List profiles )
+    {
+        this.profiles = profiles;
+
+        return this;
+    }
+
+    public List getPluginGroups()
+    {
+        return pluginGroups;
+    }
+
+    public MavenExecutionRequest setPluginGroups( List pluginGroups )
+    {
+        this.pluginGroups = pluginGroups;
+
+        return this;
+    }
+
+    public boolean isUsePluginRegistry()
+    {
+        return usePluginRegistry;
+    }
+
+    public MavenExecutionRequest setUsePluginRegistry( boolean usePluginRegistry )
+    {
+        this.usePluginRegistry = usePluginRegistry;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setRecursive( boolean recursive )
+    {
+        this.recursive = recursive;
+
+        return this;
+    }
+
 }

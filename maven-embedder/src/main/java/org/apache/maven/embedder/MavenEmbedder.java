@@ -30,6 +30,8 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -72,6 +74,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -339,6 +342,48 @@ public class MavenEmbedder
     {
         checkStarted();
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
+    }
+
+    /**
+     * This method is used to grab the list of dependencies that belong to a project so that a UI
+     * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
+     * IntelliJ project.
+     */
+    // Not well formed exceptions to point people at errors
+    // line number in the originating POM so that errors can be shown
+    // Need to walk down the tree of dependencies and find all the errors and report in the result
+    // validate the request
+    // for dependency errors: identifier, path
+    // unable to see why you can't get a resource from the repository
+    // short message or error id
+    // completely obey the same settings used by the CLI, should work exactly the same as the
+    //   command line. right now they are very different
+    public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
+    {
+        MavenProject project = null;
+
+        // How can we get rid of the profile manager from the request
+
+        try
+        {
+            project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
+                                                                 request.getLocalRepository(), profileManager,
+                                                                 request.getTransferListener() );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+        }
+
+        return new DefaultMavenExecutionResult( project, Collections.EMPTY_LIST );
     }
 
     public List collectProjects( File basedir, String[] includes, String[] excludes )

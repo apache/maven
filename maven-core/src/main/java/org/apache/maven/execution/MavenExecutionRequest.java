@@ -31,53 +31,10 @@ import java.util.Properties;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @todo merge Settings,RuntimeInfo,MavenSession into this. make adapters for everything
  */
 public interface MavenExecutionRequest
 {
-    File getLocalRepositoryPath();
-
-    ArtifactRepository getLocalRepository();
-
-    List getGoals();
-
-    Settings getSettings();
-
-    String getBaseDirectory();
-
-    boolean isRecursive();
-
-    boolean isInteractive();
-
-    boolean isReactorActive();
-
-    String getPomFile();
-
-    String getFailureBehavior();
-
-    Properties getProperties();
-
-    Date getStartTime();
-
-    boolean isShowErrors();
-
-    List getEventMonitors();
-
-    List getActiveProfiles();
-
-    List getInactiveProfiles();
-
-    TransferListener getTransferListener();
-
-    int getLoggingLevel();
-
-    boolean isDefaultEventMonitorActive();
-
-    boolean isOffline();
-
-    boolean isUpdateSnapshots();
-
-    String getGlobalChecksumPolicy();
-
     // ----------------------------------------------------------------------
     // Logging
     // ----------------------------------------------------------------------
@@ -107,7 +64,7 @@ public interface MavenExecutionRequest
     // ----------------------------------------------------------------------
     // Artifactr repository policies
     // ----------------------------------------------------------------------
-    
+
     static final String CHECKSUM_POLICY_FAIL = ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL;
 
     static final String CHECKSUM_POLICY_WARN = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
@@ -116,55 +73,146 @@ public interface MavenExecutionRequest
     //
     // ----------------------------------------------------------------------
 
+    // Base directory
+
     MavenExecutionRequest setBasedir( File basedir );
 
+    String getBaseDirectory();
+
+    // Settings
     MavenExecutionRequest setSettings( Settings settings );
 
+    Settings getSettings();
+
+    // Timing (remove this)
     MavenExecutionRequest setStartTime( Date start );
 
+    Date getStartTime();
+
+    // Goals
     MavenExecutionRequest setGoals( List goals );
 
-    MavenExecutionRequest setLocalRepository( ArtifactRepository localRepository );
+    List getGoals();
+
+    // Properties
+    MavenExecutionRequest setProperties( Properties properties );
+
+    Properties getProperties();
+
+    // Reactor
+    MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
+
+    String getReactorFailureBehavior();
+
+    MavenExecutionRequest setUseReactor( boolean useReactor );
+
+    boolean useReactor();
+
+    // Recursive (really to just process the top-level POM)
+    MavenExecutionRequest setRecursive( boolean recursive );
+
+    boolean isRecursive();
+
+    // Event monitors
+    MavenExecutionRequest addEventMonitor( EventMonitor monitor );
+
+    List getEventMonitors();
+
+    // Pom
+    MavenExecutionRequest setPomFile( String pomFilename );
+
+    String getPomFile();
+
+    // Errors
+    MavenExecutionRequest setShowErrors( boolean showErrors );
+
+    boolean isShowErrors();
+
+    // Transfer listeners
+    MavenExecutionRequest setTransferListener( TransferListener transferListener );
+
+    TransferListener getTransferListener();
+
+    // Logging
+    MavenExecutionRequest setLoggingLevel( int loggingLevel );
+
+    int getLoggingLevel();
+
+    // Update snapshots
+    MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots );
+
+    boolean isUpdateSnapshots();
+
+    // Checksum policy
+    MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
+
+    String getGlobalChecksumPolicy();
+
+    // ----------------------------------------------------------------------------
+    // Settings equivalents
+    // ----------------------------------------------------------------------------
+
+    // Local repository
 
     MavenExecutionRequest setLocalRepositoryPath( String localRepository );
 
     MavenExecutionRequest setLocalRepositoryPath( File localRepository );
 
-    MavenExecutionRequest setProperties( Properties properties );
+    File getLocalRepositoryPath();
 
-    MavenExecutionRequest setFailureBehavior( String failureBehavior );
+    MavenExecutionRequest setLocalRepository( ArtifactRepository repository );
 
-    MavenExecutionRequest setSession( MavenSession session );
+    ArtifactRepository getLocalRepository();
+
+    // Interactive
+    MavenExecutionRequest setInteractiveMode( boolean interactive );
+
+    boolean isInteractiveMode();
+
+    // Offline
+    MavenExecutionRequest setOffline( boolean offline );
+
+    boolean isOffline();
+
+    // Profiles
+    List getProfiles();
+
+    MavenExecutionRequest setProfiles( List profiles );
 
     MavenExecutionRequest addActiveProfile( String profile );
 
-    MavenExecutionRequest addInactiveProfile( String profile );
-
     MavenExecutionRequest addActiveProfiles( List profiles );
+
+    List getActiveProfiles();
+
+    MavenExecutionRequest addInactiveProfile( String profile );
 
     MavenExecutionRequest addInactiveProfiles( List profiles );
 
-    MavenExecutionRequest addEventMonitor( EventMonitor monitor );
+    List getInactiveProfiles();
 
-    MavenExecutionRequest setReactorActive( boolean reactorActive );
+    // Proxies
+    List getProxies();
 
-    MavenExecutionRequest setPomFile( String pomFilename );
+    MavenExecutionRequest setProxies( List proxies );
 
-    MavenExecutionRequest setRecursive( boolean recursive );
+    // Servers
+    List getServers();
 
-    MavenExecutionRequest setShowErrors( boolean showErrors );
+    MavenExecutionRequest setServers( List servers );
 
-    MavenExecutionRequest setInteractive( boolean interactive );
+    // Mirrors
+    List getMirrors();
 
-    MavenExecutionRequest setTransferListener( TransferListener transferListener );
+    MavenExecutionRequest setMirrors( List mirrors );
 
-    MavenExecutionRequest setLoggingLevel( int loggingLevel );
+    // Plugin groups
+    List getPluginGroups();
 
-    MavenExecutionRequest activateDefaultEventMonitor();
+    MavenExecutionRequest setPluginGroups( List pluginGroups );
 
-    MavenExecutionRequest setOffline( boolean offline );
+    // Plugin registry
+    boolean isUsePluginRegistry();
 
-    MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots );
-
-    MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
+    MavenExecutionRequest setUsePluginRegistry( boolean usePluginRegistry );
 }

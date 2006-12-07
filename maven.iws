@@ -19,13 +19,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven.iws" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/maven-embedder/run.sh" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/maven-embedder/Plugin.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-embedder/src/main/assembly/dep.xml" afterPath="$PROJECT_DIR$/maven-embedder/src/main/assembly/dep.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-embedder/pom.xml" afterPath="$PROJECT_DIR$/maven-embedder/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/MavenEmbedderConfiguration.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/user" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven.ipr" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/maven-embedder/notes.txt" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/DefaultMaven.java" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/DefaultMaven.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/Maven.java" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/Maven.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/user/SettingsAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven.iws" afterPath="$PROJECT_DIR$/maven.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionRequest.java" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionRequest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/DefaultMavenEmbedderConfiguration.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/MavenEmbedder.java" afterPath="$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/MavenEmbedder.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/DefaultMavenExecutionResult.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionResult.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/DefaultMavenExecutionRequest.java" afterPath="$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/DefaultMavenExecutionRequest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/maven-cli/src/main/java/org/apache/maven/cli/MavenCli.java" afterPath="$PROJECT_DIR$/maven-cli/src/main/java/org/apache/maven/cli/MavenCli.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -234,38 +241,31 @@
   <component name="FavoritesProjectViewPane" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/maven-embedder/pom.xml">
+      <file leaf-file-name="MavenCli.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/maven-cli/src/main/java/org/apache/maven/cli/MavenCli.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="39" selection-start="1187" selection-end="1187" vertical-scroll-proportion="0.21661721">
+            <state line="386" column="18" selection-start="14904" selection-end="14904" vertical-scroll-proportion="6.482549">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MavenEmbedder.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/MavenEmbedder.java">
+      <file leaf-file-name="MavenExecutionResult.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionResult.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="294" column="17" selection-start="8823" selection-end="8823" vertical-scroll-proportion="0.3505311">
+            <state line="9" column="17" selection-start="158" selection-end="158" vertical-scroll-proportion="0.12462908">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MANIFEST.MF" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/resources/META-INF/MANIFEST.MF">
+      <file leaf-file-name="MavenExecutionRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="5" column="31" selection-start="188" selection-end="188" vertical-scroll-proportion="0.089020774">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dep.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/assembly/dep.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="9" selection-start="69" selection-end="69" vertical-scroll-proportion="0.03560831">
-              <folding />
+            <state line="18" column="37" selection-start="696" selection-end="696" vertical-scroll-proportion="0.2106825">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -311,7 +311,16 @@
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
   <component name="NamedScopeManager" />
-  <component name="PackagesPane" />
+  <component name="PackagesPane">
+    <subPane>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="maven.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+    </subPane>
+  </component>
   <component name="PerforceChangeBrowserSettings">
     <option name="USE_CLIENT_FILTER" value="true" />
     <option name="CLIENT" value="" />
@@ -392,7 +401,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -402,11 +411,11 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -416,15 +425,15 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -434,27 +443,19 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main/resources" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main/resources/META-INF" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -464,27 +465,27 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main/java" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main/java" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -494,23 +495,31 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="maven-embedder" />
+          <option name="myItemId" value="maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-embedder/src/main/assembly" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main/java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -527,7 +536,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" Scope="false" />
+      <showStructure PackagesPane="false" Scope="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -555,6 +564,13 @@
   <component name="RecentsManager" />
   <component name="RestoreUpdateTree" />
   <component name="RunManager">
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -564,6 +580,18 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <module name="" />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
@@ -580,25 +608,6 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
     </configuration>
   </component>
   <component name="ScopeViewComponent">
@@ -676,40 +685,48 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="3" y="22" width="1440" height="821" extended-state="0" />
+    <frame x="0" y="22" width="1440" height="821" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
+      <window_info id="Clover" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="4" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24946082" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="Dependency Cycles" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
-      <window_info id="Dependency Cycles" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3301105" order="8" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="TrackLink" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
-      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Clover" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="4" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="0" />
       <window_info id="Aspects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="3" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="5" />
     </layout>
   </component>
+  <component name="TrackLink.CheckinHandlerFactory" checkbox="false" filtering="false" dialogWidth="700" dialogHeight="580" />
+  <component name="TrackLink.DashboardWindow" wasConnectedAlready="false" ViewIsTable="true" autoStart="false" discoverWorkspace="true" workspace="" integrate="0" codelinks_default_selection="true" vcslinks_default_selection="true" open_in_new_tab="true" splitterPosition="0.67">
+    <DashboardRootNode />
+    <ExpandedNodes />
+    <DetailsPanel filtered="true" />
+  </component>
+  <component name="Tracklink.VCSCache" url_records="url-442962577.rec" url_rIndex="url-442962577.rid" rev_records="rev-442962577.rec" rev_rIndex="rev-442962577.rid" storageName="map-442962577.dat" />
   <component name="VCS.FileViewConfiguration">
     <option name="SELECTED_STATUSES" value="DEFAULT" />
     <option name="SELECTED_COLUMNS" value="DEFAULT" />
@@ -792,30 +809,25 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/assembly/dep.xml">
+    <entry file="file://$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionResult.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="9" selection-start="69" selection-end="69" vertical-scroll-proportion="0.03560831">
+        <state line="9" column="17" selection-start="158" selection-end="158" vertical-scroll-proportion="0.12462908">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/resources/META-INF/MANIFEST.MF">
+    <entry file="file://$PROJECT_DIR$/maven-core/src/main/java/org/apache/maven/execution/MavenExecutionRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="31" selection-start="188" selection-end="188" vertical-scroll-proportion="0.089020774">
-          <folding />
+        <state line="18" column="37" selection-start="696" selection-end="696" vertical-scroll-proportion="0.2106825">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/maven-embedder/pom.xml">
+    <entry file="file://$PROJECT_DIR$/maven-cli/src/main/java/org/apache/maven/cli/MavenCli.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="39" selection-start="1187" selection-end="1187" vertical-scroll-proportion="0.21661721">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/maven-embedder/src/main/java/org/apache/maven/embedder/MavenEmbedder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="294" column="17" selection-start="8823" selection-end="8823" vertical-scroll-proportion="0.3505311">
+        <state line="386" column="18" selection-start="14904" selection-end="14904" vertical-scroll-proportion="6.482549">
           <folding />
         </state>
       </provider>
