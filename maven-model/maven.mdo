@@ -2257,7 +2257,6 @@
           <description>The group ID of the plugin in the repository.</description>
           <version>4.0.0</version>
           <type>String</type>
-          <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
         </field>
         <field>
@@ -2270,7 +2269,6 @@
         <field>
           <name>version</name>
           <version>4.0.0</version>
-          <required>true</required>
           <description><![CDATA[The version (or valid range of verisons) of the plugin to be used.]]></description>
           <type>String</type>
         </field>
@@ -2390,7 +2388,6 @@
         <field>
           <name>id</name>
           <version>4.0.0</version>
-          <required>true</required>
           <type>String</type>
           <defaultValue>default</defaultValue>
           <description>The identifier of this execution for labelling the goals during the build, and for matching
