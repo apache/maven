@@ -143,8 +143,12 @@ public interface MavenExecutionRequest
 
     boolean isUpdateSnapshots();
 
+    MavenExecutionRequest setNoSnapshotUpdates( boolean noSnapshotUpdates );
+
     // Checksum policy
     MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
+
+    boolean isNoSnapshotUpdates();
 
     String getGlobalChecksumPolicy();
 

@@ -54,6 +54,8 @@ public class CLIManager
 
     public static final String SUPPRESS_PLUGIN_REGISTRY = "npr";
 
+    public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
+
     public static final char CHECKSUM_FAILURE_POLICY = 'C';
 
     public static final char CHECKSUM_WARNING_POLICY = 'c';
@@ -112,6 +114,10 @@ public class CLIManager
             "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
             "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
+
+        options.addOption(OptionBuilder.withLongOpt("no-snapshot-updates")
+                .withDescription("Supress SNAPSHOT updates")
+                .create(SUPRESS_SNAPSHOT_UPDATES));
 
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
             "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );

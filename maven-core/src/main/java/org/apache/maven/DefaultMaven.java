@@ -129,9 +129,16 @@ public class DefaultMaven
             snapshotPolicySet = true;
         }
 
-        if ( !snapshotPolicySet && request.isUpdateSnapshots() )
-        {
-            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+        if ( !snapshotPolicySet ) {
+            if ( request.isUpdateSnapshots() )
+            {
+                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+            }
+            else if ( request.isNoSnapshotUpdates() )
+            {
+                getLogger().info( "+ Supressing SNAPSHOT updates.");
+                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
+            }
         }
 
         artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );

@@ -169,6 +169,11 @@ public class MavenCli
             pluginUpdateOverride = Boolean.FALSE;
         }
 
+        boolean noSnapshotUpdates = false;
+        if (commandLine.hasOption(CLIManager.SUPRESS_SNAPSHOT_UPDATES)) {
+            noSnapshotUpdates = true;
+        }
+
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
@@ -389,6 +394,7 @@ public class MavenCli
                 .setTransferListener( transferListener )
                 .setOffline( offline )
                 .setUpdateSnapshots( updateSnapshots )
+                .setNoSnapshotUpdates( noSnapshotUpdates )
                 .setGlobalChecksumPolicy( globalChecksumPolicy );
 
             mavenEmbedder.execute( request );

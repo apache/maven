@@ -96,6 +96,8 @@ public class DefaultMavenExecutionRequest
 
     private boolean recursive;
 
+    private boolean noSnapshotUpdates;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -196,6 +198,11 @@ public class DefaultMavenExecutionRequest
     public boolean isUpdateSnapshots()
     {
         return updateSnapshots;
+    }
+
+    public boolean isNoSnapshotUpdates()
+    {
+        return noSnapshotUpdates;
     }
 
     public String getGlobalChecksumPolicy()
@@ -372,6 +379,13 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots )
     {
         this.updateSnapshots = updateSnapshots;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setNoSnapshotUpdates( boolean noSnapshotUpdates )
+    {
+        this.noSnapshotUpdates = noSnapshotUpdates;
 
         return this;
     }
