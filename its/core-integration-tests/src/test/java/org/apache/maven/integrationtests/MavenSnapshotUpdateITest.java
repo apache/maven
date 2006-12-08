@@ -22,6 +22,8 @@ import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Test to verify that a snapshot can be updated, even if the
@@ -41,8 +43,10 @@ public class MavenSnapshotUpdateITest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
 
+
         // create a repository (TODO: into verifier)
         File repository = new File( testDir, "repository" );
+
         repository.mkdirs();
 
         // create artifact in repository (TODO: into verifier)
@@ -60,17 +64,16 @@ public class MavenSnapshotUpdateITest
         File localRepoFile =
             new File( verifier.getArtifactPath( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" ) );
         // set in the past to ensure it is downloaded
-        localRepoFile.setLastModified( System.currentTimeMillis() - 2000 );
+        localRepoFile.setLastModified( System.currentTimeMillis() - 5000 );
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
+
         verifier.executeGoal( "package" );
 
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
-        verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar",
-                                         "updatedArtifact" );
+        verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        System.out.println( "snapshotUpdate PASS" );
     }
 }

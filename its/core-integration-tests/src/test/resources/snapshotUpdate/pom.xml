@@ -35,7 +35,7 @@
   <repositories>
     <repository>
       <id>it.snapshots</id>
-      <url>file://localhost/${basedir}/repository</url>
+      <url>file:///${basedir}/repository</url>
       <snapshots>
         <updatePolicy>always</updatePolicy>
       </snapshots>      
