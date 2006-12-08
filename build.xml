@@ -14,6 +14,8 @@
     local repository for the bootstrap process.
   </description>
 
+  <property name="modello.version" value="1.0-alpha-13-SNAPSHOT" />
+
   <taskdef resource="net/sf/antcontrib/antlib.xml">
     <classpath>
       <pathelement path="ant-contrib-1.0b2.jar"/>
@@ -111,9 +113,9 @@
     <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="1.0-alpha-6" name="wagon-ssh-external"/>
     <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="1.0-alpha-7" name="wagon-ssh"/>
     <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="1.0-alpha-9-SNAPSHOT" name="doxia-sink-api"/>
-    <pull orgpath="org/codehaus/modello/modello-core" version="1.0-alpha-12-SNAPSHOT" name="modello-core" repository="codehaus"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="1.0-alpha-12-SNAPSHOT" name="modello-plugin-xml" repository="codehaus"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="1.0-alpha-12-SNAPSHOT" name="modello-plugin-xpp3" repository="codehaus"/>
+    <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
+    <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
+    <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="${modello.version}" name="modello-plugin-xpp3" repository="codehaus"/>
     <pull orgpath="junit/junit" version="3.8.1" name="junit"/>
   </target>
 
@@ -139,9 +141,9 @@
          need different versions of modello.  -->
     <path id="modello.classpath">
       <path refid="pre.classpath"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/1.0-alpha-12-SNAPSHOT/modello-core-1.0-alpha-12-SNAPSHOT.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/1.0-alpha-12-SNAPSHOT/modello-plugin-xml-1.0-alpha-12-SNAPSHOT.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/1.0-alpha-12-SNAPSHOT/modello-plugin-xpp3-1.0-alpha-12-SNAPSHOT.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/${modello.version}/modello-core-${modello.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/${modello.version}/modello-plugin-xml-${modello.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/${modello.version}/modello-plugin-xpp3-${modello.version}.jar"/>
       <!--
       <pathelement location="modello.jar"/>
       -->
