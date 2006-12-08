@@ -14,7 +14,7 @@
     local repository for the bootstrap process.
   </description>
 
-  <property name="modello.version" value="1.0-alpha-13-SNAPSHOT" />
+  <property name="modello.version" value="1.0-alpha-13" />
 
   <taskdef resource="net/sf/antcontrib/antlib.xml">
     <classpath>
