@@ -294,7 +294,7 @@ public class DefaultPluginManager
         catch ( PlexusContainerException e )
         {
             throw new PluginManagerException(
-                "Failed to create plugin container for plugin '" + plugin + "': " + e.getMessage(), e );
+                "Failed to create realm for plugin '" + plugin + ".", e );
         }
 
         // this plugin's descriptor should have been discovered in the child creation, so we should be able to
@@ -327,6 +327,7 @@ public class DefaultPluginManager
                 projectPlugin = plugin;
             }
 
+            //PLXAPI: These need to be discovered!!!!!
             Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null,
                                                                  null, project );
 
