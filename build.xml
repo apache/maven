@@ -104,14 +104,14 @@
     <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api"/>
     <pull orgpath="org/codehaus/plexus/plexus-archiver" version="${plexus-archiver.version}" name="plexus-archiver" repository="codehaus"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-file" version="1.0-alpha-7" name="wagon-file"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="1.0-alpha-6" name="wagon-http-lightweight"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="1.0-beta-1" name="wagon-provider-api"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="1.0-alpha-6" name="wagon-ssh-external"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="1.0-alpha-7" name="wagon-ssh"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-file" version="${wagon.version}" name="wagon-file"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="${wagon.version}" name="wagon-http-lightweight"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="${wagon.version}" name="wagon-ssh-external"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="${wagon.version}" name="wagon-ssh"/>
     <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="${doxia.version}" name="doxia-sink-api"/>
     <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
@@ -129,12 +129,12 @@
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/${classworlds.version}/plexus-classworlds-${classworlds.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/${plexus-interactivity-api.version}/plexus-interactivity-api-${plexus-interactivity-api.version}.jar"/>
       
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/1.0-alpha-7/wagon-file-1.0-alpha-7.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-6/wagon-http-lightweight-1.0-alpha-6.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-1/wagon-provider-api-1.0-beta-1.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/1.0-alpha-6/wagon-ssh-external-1.0-alpha-6.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/1.0-alpha-7/wagon-ssh-1.0-alpha-7.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/${wagon.version}/wagon-file-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/${wagon.version}/wagon-http-lightweight-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/${wagon.version}/wagon-ssh-external-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/${wagon.version}/wagon-ssh-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
     </path>
