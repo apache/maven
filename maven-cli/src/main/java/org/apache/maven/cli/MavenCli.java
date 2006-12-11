@@ -48,6 +48,7 @@ public class MavenCli
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
 
         int result = main( args, classWorld );
+
         System.exit(result);
     }
 
@@ -150,7 +151,7 @@ public class MavenCli
             interactive = false;
         }
 
-        boolean usePluginRegistry = true;
+        boolean usePluginRegistry = false;
 
         if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
         {

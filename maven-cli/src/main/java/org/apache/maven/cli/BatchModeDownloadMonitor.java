@@ -33,6 +33,8 @@ public class BatchModeDownloadMonitor
 
         String url = transferEvent.getWagon().getRepository().getUrl();
 
+        System.out.println( "url = " + url );
+
         // TODO: can't use getLogger() because this isn't currently instantiated as a component
         System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
     }
