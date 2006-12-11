@@ -145,6 +145,9 @@
     <module>maven-embedder</module>
     <module>maven-tools</module>
   </modules>
+  <properties>
+    <wagonVersion>1.0-beta-1</wagonVersion>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -178,27 +181,27 @@
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-beta-1</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>1.0-beta-1</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-1</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-file</artifactId>
-        <version>1.0-beta-1</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-beta-1</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
