@@ -56,7 +56,8 @@ public class DefaultMavenExecutionRequest
 
     private List pluginGroups;
 
-    private boolean usePluginRegistry;
+    // This is off by default because it causes so many problem. It should just be extracted and redone.
+    private boolean usePluginRegistry = false;
 
     // ----------------------------------------------------------------------------
     // Request

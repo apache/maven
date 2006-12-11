@@ -151,6 +151,8 @@ public class MavenCli
             interactive = false;
         }
 
+        // This is now off by default and should just be removed as it causes too many problems and
+        // is turned off in 2.0.4.
         boolean usePluginRegistry = false;
 
         if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
