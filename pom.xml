@@ -146,7 +146,8 @@
     <module>maven-tools</module>
   </modules>
   <properties>
-    <wagonVersion>1.0-beta-1</wagonVersion>
+    <wagonVersion>1.0-beta-2-SNAPSHOT</wagonVersion>
+    <plexusVersion>1.0-alpha-13</plexusVersion>
   </properties>
   <dependencies>
     <dependency>
@@ -161,12 +162,12 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-12</version>
+        <version>${plexusVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-api</artifactId>
-        <version>1.0-alpha-12</version>
+        <version>${plexusVersion}</version>
       </dependency>      
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
