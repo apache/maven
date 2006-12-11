@@ -282,11 +282,12 @@ public class MavenCli
                 transferListener = new BatchModeDownloadMonitor();
             }
 
-            boolean reactorActive = false;
+            // This means to scan a directory structure for POMs and process them.
+            boolean useReactor = false;
 
             if ( commandLine.hasOption( CLIManager.REACTOR ) )
             {
-                reactorActive = true;
+                useReactor = true;
             }
 
             String alternatePomFile = null;
@@ -323,7 +324,7 @@ public class MavenCli
             //  -> showErrors (this is really CLI is but used inside Maven internals
             //  -> recursive
             //  -> updateSnapshots
-            //  -> reactorActive
+            //  -> useReactor
             //  -> transferListener: in the CLI this is batch or console
 
             // We have a general problem with plexus components that are singletons in that they use
@@ -382,7 +383,7 @@ public class MavenCli
                 .setProperties( executionProperties )
                 .setReactorFailureBehavior( reactorFailureBehaviour )
                 .setRecursive( recursive )
-                //.setReactorActive( reactorActive )
+                .setUseReactor( useReactor )
                 .setPomFile( alternatePomFile )
                 .setShowErrors( showErrors )
                 .setInteractiveMode( interactive )
