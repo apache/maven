@@ -132,38 +132,45 @@ public class Enhance
     {
         ClassLoader sysClassLoader = Thread.currentThread().getContextClassLoader();
         URL[] urls = null;
-        Field field;
-        try
+        
+        if ( sysClassLoader instanceof URLClassLoader )
         {
+            urls = ( (URLClassLoader) sysClassLoader ).getURLs();
+        }
+        else
+        {
+            Field field;
+            try
+            {
 
-            field = sysClassLoader.getClass().getDeclaredField( "realm" );
-            field.setAccessible( true );
-            ClassRealm realm = (ClassRealm) field.get( sysClassLoader );
+                field = sysClassLoader.getClass().getDeclaredField( "realm" );
+                field.setAccessible( true );
+                ClassRealm realm = (ClassRealm) field.get( sysClassLoader );
 
-            urls = realm.getConstituents();
+                urls = realm.getConstituents();
+            }
+            catch ( SecurityException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch ( NoSuchFieldException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch ( IllegalArgumentException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch ( IllegalAccessException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        catch ( SecurityException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( NoSuchFieldException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( IllegalAccessException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        //URL[] urls = ( (URLClassLoader) sysClassLoader ).getURLs();
+        
         this.getLog().info( "Initial Classpath:" );
         for ( int i = 0; i < urls.length; i++ )
         {
