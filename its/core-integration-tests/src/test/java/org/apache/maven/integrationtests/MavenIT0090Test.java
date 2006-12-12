@@ -1,12 +1,11 @@
 package org.apache.maven.integrationtests;
 
-import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MavenIT0090Test
     extends AbstractMavenIntegrationTestCase

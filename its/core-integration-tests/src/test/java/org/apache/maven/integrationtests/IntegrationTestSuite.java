@@ -1,12 +1,7 @@
 package org.apache.maven.integrationtests;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import junit.framework.TestResult;
-import org.apache.maven.it.util.FileUtils;
-
-import java.io.IOException;
 
 public class IntegrationTestSuite
     extends AbstractMavenIntegrationTestCase

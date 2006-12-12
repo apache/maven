@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 

@@ -16,14 +16,11 @@ package org.apache.maven.integrationtests;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Test to verify that a snapshot can be updated, even if the
