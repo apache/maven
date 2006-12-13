@@ -34,10 +34,6 @@ echo "<settings>" >> $settings
 echo "  <localRepository>/tmp/maven/repository</localRepository>" >> $settings
 echo "</settings>" >> $settings
 
-export M2_HOME=$mavenHome
-
-mavenVersionString=`$maven -v`
-
 echo "   Maven version: $mavenVersion"
 echo "Maven executable: $maven"
 
@@ -54,7 +50,10 @@ mkdir -p $buildDirectory
     cd maven-trunk
     ant
   )  
-  
+
+  mavenVersionString=`$maven -v`
+  echo "Maven version: $mavenVersionString (verify)" 
+
   # Build the Maven Integration Tests
   (
     cd mits-trunk
