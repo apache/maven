@@ -272,13 +272,13 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                getLogger().warn(
-                    "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
+                getLogger().warn( "Unable to get resource '" + artifact.getId() + "' from repository " +
+                    repository.getId() + " (" + repository.getUrl() + ")" );
             }
             catch ( TransferFailedException e )
             {
-                getLogger().warn(
-                    "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
+                getLogger().warn( "Unable to get resource '" + artifact.getId() + "' from repository " +
+                    repository.getId() + " (" + repository.getUrl() + ")" );
             }
         }
 
@@ -324,7 +324,7 @@ public class DefaultWagonManager
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                                   TransferListener downloadMonitor, String checksumPolicy )
+                                TransferListener downloadMonitor, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO: better excetpions - transfer failed is not enough?
@@ -398,7 +398,21 @@ public class DefaultWagonManager
                 // This should take care of creating destination directory now on
                 if ( destination.exists() )
                 {
-                    downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+                    try
+                    {
+                        downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+                        if ( !downloaded )
+                        {
+                            // prevent additional checks of this artifact until it expires again
+                            destination.setLastModified( System.currentTimeMillis() );
+                        }
+                    }
+                    catch ( UnsupportedOperationException e )
+                    {
+                        // older wagons throw this. Just get() instead
+                        wagon.get( remotePath, temp );
+                        downloaded = true;
+                    }
                 }
                 else
                 {

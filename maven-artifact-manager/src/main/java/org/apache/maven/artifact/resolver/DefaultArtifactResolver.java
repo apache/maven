@@ -20,8 +20,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -105,12 +110,36 @@ public class DefaultArtifactResolver
 
                 transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
+                boolean localCopy = false;
+                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                {
+                    ArtifactMetadata m = (ArtifactMetadata) i.next();
+                    if ( m instanceof SnapshotArtifactRepositoryMetadata )
+                    {
+                        SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
+
+                        Metadata metadata = snapshotMetadata.getMetadata();
+                        if ( metadata != null )
+                        {
+                            Versioning versioning = metadata.getVersioning();
+                            if ( versioning != null )
+                            {
+                                Snapshot snapshot = versioning.getSnapshot();
+                                if ( snapshot != null )
+                                {
+                                    localCopy = snapshot.isLocalCopy();
+                                }
+                            }
+                        }
+                    }
+                }
+
                 File destination = artifact.getFile();
                 List repositories = remoteRepositories;
 
                 // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
                 if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                    destination.exists() )
+                    destination.exists() && !localCopy )
                 {
                     Date comparisonDate = new Date( destination.lastModified() );
 
