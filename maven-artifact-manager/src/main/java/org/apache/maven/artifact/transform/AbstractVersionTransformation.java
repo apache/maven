@@ -61,6 +61,8 @@ public abstract class AbstractVersionTransformation
 
         repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
 
+        artifact.addMetadata( metadata );
+
         Metadata repoMetadata = metadata.getMetadata();
         String version = null;
         if ( repoMetadata != null && repoMetadata.getVersioning() != null )

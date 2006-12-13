@@ -100,6 +100,7 @@ public class DefaultRepositoryMetadataManager
                         }
                     }
 
+                    // TODO: should this be inside the above check?
                     // touch file so that this is not checked again until interval has passed
                     if ( file.exists() )
                     {
