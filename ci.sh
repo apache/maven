@@ -29,6 +29,8 @@ mavenHome=$buildDirectory/$mavenVersion
 settings=$buildDirectory/settings.xml
 maven="$mavenHome/bin/mvn -s $settings"
 
+export M2_HOME=$mavenHome
+
 echo "<?xml version="1.0"?>" > $settings
 echo "<settings>" >> $settings
 echo "  <localRepository>/tmp/maven/repository</localRepository>" >> $settings
