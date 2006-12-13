@@ -36,6 +36,11 @@ echo "</settings>" >> $settings
 
 export M2_HOME=$mavenHome
 
+mavenVersionString=`$maven -v`
+
+echo "   Maven version: $mavenVersion"
+echo "Maven executable: $maven"
+
 rm -rf $buildDirectory > /dev/null 2>&1
 mkdir -p $buildDirectory
 
