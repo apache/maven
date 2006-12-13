@@ -1242,6 +1242,7 @@ public class MavenProject
             injectPluginManagementInfo( plugin );
 
             build.addPlugin( plugin );
+
             build.flushPluginMap();
         }
     }
