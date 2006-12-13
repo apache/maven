@@ -1,9 +1,0 @@
-- matrix of everything to test
-- tool to figure out what tests use what plugins
-- how to map an IT to JIRA
-- how to group tests
-- offline mode
-- self contained repository
-- teach the invoker/verifier about different versions of maven
-  - where to put the stanard versions of maven
-  - how to use the embedder
