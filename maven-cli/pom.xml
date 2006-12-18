@@ -32,7 +32,9 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.1</version>
         <configuration>
-          <descriptor>src/assemble/bin.xml</descriptor>
+          <descriptors>
+            <descriptor>src/assemble/bin.xml</descriptor>
+          </descriptors>
           <finalName>maven-${version}</finalName>
         </configuration>
       </plugin>
