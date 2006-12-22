@@ -28,7 +28,22 @@ import java.io.IOException;
 public interface MavenSettingsBuilder
 {
     String ROLE = MavenSettingsBuilder.class.getName();
-    
+
+    /**
+     * @deprecated
+     */
+    Settings buildSettings()
+        throws IOException, XmlPullParserException;
+
+    /**
+     * @deprecated
+     */
+    Settings buildSettings( File userSettingsFile )
+        throws IOException, XmlPullParserException;
+
+    /**
+     * @since 2.1
+     */
     Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException;
 }

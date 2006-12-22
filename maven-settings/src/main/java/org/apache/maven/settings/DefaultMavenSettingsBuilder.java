@@ -19,7 +19,6 @@ package org.apache.maven.settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -44,6 +43,9 @@ public class DefaultMavenSettingsBuilder
     // MavenProfilesBuilder Implementation
     // ----------------------------------------------------------------------
 
+    /**
+     * @since 2.1
+     */
     public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException
     {
@@ -69,6 +71,25 @@ public class DefaultMavenSettingsBuilder
 
         return userSettings;
     }
+
+    /**
+     * @deprecated
+     */
+    public Settings buildSettings()
+        throws IOException, XmlPullParserException
+    {
+        return buildSettings( new File( new File( System.getProperty( "user.home" ) ), ".m2/settings.xml" ) );
+    }
+
+    /**
+     * @deprecated
+     */
+    public Settings buildSettings( File userSettingsFile )
+        throws IOException, XmlPullParserException
+    {
+        return buildSettings( userSettingsFile, null );
+    }
+
 
     private Settings readSettings( File settingsFile )
         throws IOException, XmlPullParserException
