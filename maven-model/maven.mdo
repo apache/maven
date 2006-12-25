@@ -1978,7 +1978,6 @@
           <version>3.0.0</version>
           <description><![CDATA[
             A unique identifier for a version. This is usually identical to the name.
-            </a> builds.
           ]]></description>
           <type>String</type>
         </field>
