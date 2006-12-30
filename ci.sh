@@ -23,7 +23,12 @@
 # Need to override the local repo
 # Need a command line option for this
 
+# 2.1-SNAPSHOT https://svn.apache.org/repos/asf/maven/components/trunk ant
+# 2.0.5-SNAPSHOT https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x bootstrap.sh 
+# 2.0.4 https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.4 bootstrap.sh 
+
 buildDirectory=/tmp/maven
+
 mavenVersion=maven-2.1-SNAPSHOT
 mavenHome=$buildDirectory/$mavenVersion
 settings=$buildDirectory/settings.xml
@@ -45,6 +50,7 @@ mkdir -p $buildDirectory
 ( 
   cd $buildDirectory
   svn co https://svn.apache.org/repos/asf/maven/components/trunk maven-trunk
+  svn co https://svn.apache.org/repos/asf/maven/components/branches/2.0.x maven-2.0.x  
   svn co https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk mits-trunk
   
   # Build the selected version of Maven
