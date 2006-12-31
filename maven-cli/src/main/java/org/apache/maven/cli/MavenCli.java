@@ -19,13 +19,11 @@ package org.apache.maven.cli;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.MavenTransferListener;
-import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -49,13 +47,12 @@ public class MavenCli
 
         int result = main( args, classWorld );
 
-        System.exit(result);
+        System.exit( result );
     }
 
-    /**
-     * @noinspection ConfusingMainMethod
-     */
-    public static int main( String[] args, ClassWorld classWorld )
+    /** @noinspection ConfusingMainMethod */
+    public static int main( String[] args,
+                            ClassWorld classWorld )
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -78,15 +75,15 @@ public class MavenCli
         // TODO: maybe classworlds could handle this requirement...
         if ( "1.4".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
         {
-            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven. You appear to be using "
-                + "Java:" );
-            System.err.println( "java version \"" + System.getProperty( "java.version", "<unknown java version>" )
-                + "\"" );
-            System.err.println( System.getProperty( "java.runtime.name", "<unknown runtime name>" ) + " (build "
-                + System.getProperty( "java.runtime.version", "<unknown runtime version>" ) + ")" );
-            System.err.println( System.getProperty( "java.vm.name", "<unknown vm name>" ) + " (build "
-                + System.getProperty( "java.vm.version", "<unknown vm version>" ) + ", "
-                + System.getProperty( "java.vm.info", "<unknown vm info>" ) + ")" );
+            System.err.println(
+                "Sorry, but JDK 1.4 or above is required to execute Maven. You appear to be using " + "Java:" );
+            System.err.println(
+                "java version \"" + System.getProperty( "java.version", "<unknown java version>" ) + "\"" );
+            System.err.println( System.getProperty( "java.runtime.name", "<unknown runtime name>" ) + " (build " +
+                System.getProperty( "java.runtime.version", "<unknown runtime version>" ) + ")" );
+            System.err.println( System.getProperty( "java.vm.name", "<unknown vm name>" ) + " (build " +
+                System.getProperty( "java.vm.version", "<unknown vm version>" ) + ", " +
+                System.getProperty( "java.vm.info", "<unknown vm info>" ) + ")" );
 
             return 1;
         }
@@ -129,13 +126,11 @@ public class MavenCli
 
         //** use CLI option values directly in request where possible
 
-        MavenEmbedder mavenEmbedder = new MavenEmbedder();
+        MavenEmbedder mavenEmbedder;
 
         try
         {
-            mavenEmbedder.setClassWorld( classWorld );
-
-            mavenEmbedder.start();
+            mavenEmbedder = new MavenEmbedder( classWorld );            
         }
         catch ( MavenEmbedderException e )
         {
@@ -160,20 +155,21 @@ public class MavenCli
             usePluginRegistry = false;
         }
 
-        Boolean pluginUpdateOverride = Boolean.FALSE;
+        boolean pluginUpdateOverride = false;
 
         if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
             commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
         {
-            pluginUpdateOverride = Boolean.TRUE;
+            pluginUpdateOverride = true;
         }
         else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
         {
-            pluginUpdateOverride = Boolean.FALSE;
+            pluginUpdateOverride = false;
         }
 
         boolean noSnapshotUpdates = false;
-        if (commandLine.hasOption(CLIManager.SUPRESS_SNAPSHOT_UPDATES)) {
+        if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
+        {
             noSnapshotUpdates = true;
         }
 
@@ -361,52 +357,32 @@ public class MavenCli
 
             Properties executionProperties = getExecutionProperties( commandLine );
 
-            File userSettingsPath = mavenEmbedder.getUserSettingsPath( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-
-            File globalSettingsFile = mavenEmbedder.getGlobalSettingsPath();
-
-            Settings settings = mavenEmbedder.buildSettings( userSettingsPath,
-                                                             globalSettingsFile,
-                                                             interactive,
-                                                             offline,
-                                                             usePluginRegistry,
-                                                             pluginUpdateOverride );
-
-            String localRepositoryPath = mavenEmbedder.getLocalRepositoryPath( settings );
-
-            // @todo we either make Settings the official configuration mechanism or allow the indiviaul setting in the request
-            // for each of the things in the settings object. Seems redundant to configure some things via settings and
-            // some via the request. The Settings object is used in about 16 different places in the core so something
-            // to consider.
-
             MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setBasedir( baseDirectory )
                 .setGoals( goals )
-                .setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
                 .setProperties( executionProperties ) // optional
                 .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
-                .setRecursive( recursive ) // default: false
-                .setUseReactor( useReactor ) // default: true
+                .setRecursive( recursive ) // default: true
+                .setUseReactor( useReactor ) // default: false
                 .setPomFile( alternatePomFile ) // optional
                 .setShowErrors( showErrors ) // default: false
+                    // Settings
+                .setSettingsFile( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) )
+                    //.setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
                 .setInteractiveMode( interactive ) // default: false
+                .setUsePluginRegistry( usePluginRegistry )
+                .setOffline( offline ) // default: false
+                .setUsePluginUpdateOverride( pluginUpdateOverride )
                 .addActiveProfiles( activeProfiles ) // optional
                 .addInactiveProfiles( inactiveProfiles ) // optional
+                    //
                 .setLoggingLevel( loggingLevel ) // default: info
-                .setSettings( settings ) // default: ~/.m2/settings.xml
                 .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
-                .setOffline( offline ) // default: false
                 .setUpdateSnapshots( updateSnapshots ) // default: false
                 .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
                 .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
 
             mavenEmbedder.execute( request );
-        }
-        catch ( SettingsConfigurationException e )
-        {
-            showError( "Error reading settings.xml: " + e.getMessage(), e, showErrors );
-
-            return 1;
         }
         catch ( MavenExecutionException e )
         {
@@ -418,7 +394,9 @@ public class MavenCli
         return 0;
     }
 
-    private static void showFatalError( String message, Exception e, boolean show )
+    private static void showFatalError( String message,
+                                        Exception e,
+                                        boolean show )
     {
         System.err.println( "FATAL ERROR: " + message );
         if ( show )
@@ -433,7 +411,9 @@ public class MavenCli
         }
     }
 
-    private static void showError( String message, Exception e, boolean show )
+    private static void showError( String message,
+                                   Exception e,
+                                   boolean show )
     {
         System.err.println( message );
         if ( show )
@@ -456,8 +436,8 @@ public class MavenCli
 
             if ( properties.getProperty( "builtOn" ) != null )
             {
-                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" )
-                    + " built on " + properties.getProperty( "builtOn" ) );
+                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) + " built on " +
+                    properties.getProperty( "builtOn" ) );
             }
             else
             {
@@ -499,7 +479,8 @@ public class MavenCli
         return executionProperties;
     }
 
-    private static void setCliProperty( String property, Properties executionProperties )
+    private static void setCliProperty( String property,
+                                        Properties executionProperties )
     {
         String name;
 

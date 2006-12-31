@@ -56,12 +56,12 @@ public interface MavenTools
                             boolean interactive,
                             boolean offline,
                             boolean usePluginRegistry,
-                            Boolean pluginUpdateOverride )
+                            boolean pluginUpdateOverride )
         throws SettingsConfigurationException;
     
     Settings buildSettings( File userSettingsPath,
                             File globalSettingsPath,
-                            Boolean pluginUpdateOverride )
+                            boolean pluginUpdateOverride )
         throws SettingsConfigurationException;
 
     // ----------------------------------------------------------------------------

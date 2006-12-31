@@ -16,16 +16,16 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.ArrayList;
-import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -38,13 +38,17 @@ public class DefaultMavenExecutionRequest
     // Settings equivalents
     // ----------------------------------------------------------------------------
 
+    private Settings settings;
+
+    private String settingsFile;
+
     private ArtifactRepository localRepository;
     
     private File localRepositoryPath;
 
-    private boolean offline;
+    private boolean offline = false;
 
-    private boolean interactiveMode;
+    private boolean interactiveMode = true;
 
     private List proxies;
 
@@ -59,6 +63,8 @@ public class DefaultMavenExecutionRequest
     // This is off by default because it causes so many problem. It should just be extracted and redone.
     private boolean usePluginRegistry = false;
 
+    private boolean usePluginUpdateOverride;
+
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -67,19 +73,17 @@ public class DefaultMavenExecutionRequest
 
     private List goals;
 
-    private Settings settings;
-
-    private boolean useReactor;
+    private boolean useReactor = false;
 
     private String pomFile;
 
-    private String reactorFailureBehavior;
+    private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
     private Properties properties;
 
     private Date startTime;
 
-    private boolean showErrors;
+    private boolean showErrors = false;
 
     private List eventMonitors;
 
@@ -89,19 +93,35 @@ public class DefaultMavenExecutionRequest
 
     private TransferListener transferListener;
 
-    private int loggingLevel;
+    private int loggingLevel = LOGGING_LEVEL_INFO;
 
-    private boolean updateSnapshots;
+    private String globalChecksumPolicy = CHECKSUM_POLICY_WARN;
 
-    private String globalChecksumPolicy;
+    private boolean recursive = true;
+        
+    private boolean updateSnapshots = false;
 
-    private boolean recursive;
-
+    /**
+     * Suppress SNAPSHOT updates. 
+     * @issue MNG-2681
+     */
     private boolean noSnapshotUpdates;
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
+
+    public String getSettingsFile()
+    {
+        return settingsFile;
+    }
+
+    public MavenExecutionRequest setSettingsFile( String settingsFile )
+    {
+        this.settingsFile = settingsFile;
+
+        return this;
+    }
 
     public String getBaseDirectory()
     {
@@ -473,6 +493,20 @@ public class DefaultMavenExecutionRequest
 
         return this;
     }
+
+    public boolean isUsePluginUpdateOverride()
+    {
+        return usePluginUpdateOverride;
+    }
+
+    public MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride )
+    {
+        this.usePluginUpdateOverride = usePluginUpdateOverride;
+
+        return this;
+    }
+
+    //
 
     public MavenExecutionRequest setRecursive( boolean recursive )
     {

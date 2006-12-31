@@ -53,6 +53,7 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -63,7 +64,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,8 +81,6 @@ import java.util.List;
  */
 public class MavenEmbedder
 {
-    public static final String userHome = System.getProperty( "user.home" );
-
     private PlexusContainer container;
 
     // ----------------------------------------------------------------------
@@ -90,8 +88,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private MavenProjectBuilder mavenProjectBuilder;
-
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private WagonManager wagonManager;
 
@@ -102,6 +98,8 @@ public class MavenEmbedder
     private ProfileManager profileManager;
 
     private PluginDescriptorBuilder pluginDescriptorBuilder;
+
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private ArtifactFactory artifactFactory;
 
@@ -121,9 +119,9 @@ public class MavenEmbedder
 
     private ArtifactRepository localRepository;
 
-    private ClassLoader classLoader;
-
     private ClassWorld classWorld;
+
+    private ClassRealm realm;
 
     private MavenEmbedderLogger logger;
 
@@ -131,28 +129,43 @@ public class MavenEmbedder
     // User options
     // ----------------------------------------------------------------------
 
-    private boolean started = false;
-
     private MavenEmbedRequest embedderRequest;
+
+    // ----------------------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------------------
+
+    public MavenEmbedder( ClassWorld classWorld )
+        throws MavenEmbedderException
+    {
+        this( classWorld, null );
+    }
+
+    public MavenEmbedder( ClassWorld classWorld, MavenEmbedderLogger logger )
+        throws MavenEmbedderException
+    {
+        this.classWorld = classWorld;
+
+        this.logger = logger;
+
+        start();
+    }
+
+    public MavenEmbedder( ClassLoader classLoader )
+        throws MavenEmbedderException
+    {
+        this( classLoader, null );
+    }
+
+    public MavenEmbedder( ClassLoader classLoader, MavenEmbedderLogger logger )
+        throws MavenEmbedderException
+    {
+        this( new ClassWorld( "plexus.core", classLoader ), logger );
+    }
 
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
-
-    public void setClassLoader( ClassLoader classLoader )
-    {
-        this.classLoader = classLoader;
-    }
-
-    public ClassLoader getClassLoader()
-    {
-        return classLoader;
-    }
-
-    public void setClassWorld( ClassWorld classWorld )
-    {
-        this.classWorld = classWorld;
-    }
 
     public ClassWorld getClassWorld()
     {
@@ -177,7 +190,6 @@ public class MavenEmbedder
     public Model readModel( File model )
         throws XmlPullParserException, IOException
     {
-        checkStarted();
         return modelReader.read( new FileReader( model ) );
     }
 
@@ -185,7 +197,6 @@ public class MavenEmbedder
                             Model model )
         throws IOException
     {
-        checkStarted();
         modelWriter.write( writer, model );
     }
 
@@ -196,77 +207,62 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
     {
-        checkStarted();
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
 
-    /** @deprecated */
+    /** @deprecated  */
     public MavenProject readProjectWithDependencies( File mavenProject,
                                                      TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        checkStarted();
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager,
                                                           transferListener );
     }
 
-    /** @deprecated */
+    /** @deprecated  */
     public MavenProject readProjectWithDependencies( File mavenProject )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        checkStarted();
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
     }
 
-    private MavenExecutionRequest populateMavenExecutionRequestWithDefaults( MavenExecutionRequest request )
+    private MavenExecutionRequest populateMavenExecutionRequestWithDefaults( MavenExecutionRequest r )
+        throws MavenEmbedderException
     {
-        // Local repository    	    	
-        if ( request.getLocalRepository() == null )
+        // Settings        
+        // Local repository  
+        // TransferListener
+        // EventMonitor
+
+        if ( r.getSettings() == null )
         {
-            request.setLocalRepository( localRepository );
+            File userSettingsPath = mavenTools.getUserSettingsPath( r.getSettingsFile() );
 
-            File localRepository = new File( request.getLocalRepository().getBasedir() );
+            File globalSettingsFile = mavenTools.getGlobalSettingsPath();
 
-            if ( !localRepository.exists() )
+            try
             {
-                localRepository.mkdirs();
+                r.setSettings( mavenTools.buildSettings( userSettingsPath, globalSettingsFile, r.isInteractiveMode(),
+                                                         r.isOffline(), r.isUsePluginRegistry(),
+                                                         r.isUsePluginUpdateOverride() ) );
+            }
+            catch ( SettingsConfigurationException e )
+            {
+                throw new MavenEmbedderException( "Error processing settings.xml.", e );
             }
         }
 
-        // Settings
-
-        if ( request.getSettings() == null )
+        if ( r.getLocalRepository() == null )
         {
-            request.setSettings( settings );
+            String localRepositoryPath = mavenTools.getLocalRepositoryPath( r.getSettings() );
+
+            if ( r.getLocalRepository() == null )
+            {
+                r.setLocalRepository( mavenTools.createLocalRepository( new File( localRepositoryPath ) ) );
+            }
         }
 
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBasedir( baseDirectory )
-            .setGoals( goals )
-            .setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
-            .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
-            .setRecursive( recursive ) // default: false
-            .setUseReactor( useReactor ) // default: true
-            .setShowErrors( showErrors ) // default: false
-            .setInteractiveMode( interactive ) // default: false
-            .setLoggingLevel( loggingLevel ) // default: info
-            .setSettings( settings ) // default: ~/.m2/settings.xml
-            .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
-            .setOffline( offline ) // default: false
-            .setUpdateSnapshots( updateSnapshots ) // default: false
-            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
-        */
-
-        // Classify settings as being used for the life of session or request
-
-        if ( request.getLocalRepository() == null )
-        {
-        }
-
-
-        return request;
+        return r;
     }
 
     /**
@@ -287,13 +283,17 @@ public class MavenEmbedder
     {
         MavenProject project = null;
 
-        request = populateMavenExecutionRequestWithDefaults( request );
-
         try
         {
+            request = populateMavenExecutionRequestWithDefaults( request );
+
             project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
                                                                  request.getLocalRepository(), profileManager,
                                                                  request.getTransferListener() );
+        }
+        catch ( MavenEmbedderException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
         catch ( ProjectBuildingException e )
         {
@@ -321,7 +321,6 @@ public class MavenEmbedder
                                     String scope,
                                     String type )
     {
-        checkStarted();
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
     }
 
@@ -331,7 +330,6 @@ public class MavenEmbedder
                                                   String type,
                                                   String classifier )
     {
-        checkStarted();
         return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
 
@@ -340,7 +338,6 @@ public class MavenEmbedder
                          ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        checkStarted();
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }
 
@@ -367,7 +364,7 @@ public class MavenEmbedder
         try
         {
             InputStream is =
-                classLoader.getResourceAsStream( "/plugins/" + summaryPluginDescriptor.getArtifactId() + ".xml" );
+                realm.getResourceAsStream( "/plugins/" + summaryPluginDescriptor.getArtifactId() + ".xml" );
 
             pluginDescriptor = pluginDescriptorBuilder.build( new InputStreamReader( is ) );
         }
@@ -397,7 +394,6 @@ public class MavenEmbedder
     public List getLifecyclePhases()
         throws MavenEmbedderException
     {
-        checkStarted();
         List phases = new ArrayList();
 
         ComponentDescriptor descriptor = container.getComponentDescriptor( LifecycleExecutor.ROLE );
@@ -459,7 +455,6 @@ public class MavenEmbedder
     public ArtifactRepository createRepository( String url,
                                                 String repositoryId )
     {
-        checkStarted();
         // snapshots vs releases
         // offline = to turning the update policy off
 
@@ -483,7 +478,7 @@ public class MavenEmbedder
     //  Lifecycle
     // ----------------------------------------------------------------------
 
-    public void start()
+    private void start()
         throws MavenEmbedderException
     {
         start( new DefaultMavenEmbedRequest() );
@@ -493,31 +488,6 @@ public class MavenEmbedder
         throws MavenEmbedderException
     {
         this.embedderRequest = req;
-
-        // ----------------------------------------------------------------------
-        // Set the maven.home system property which is need by components like
-        // the plugin registry builder.
-        // ----------------------------------------------------------------------
-
-        if ( classWorld == null && classLoader == null )
-        {
-            throw new IllegalStateException(
-                "A classWorld or classloader must be specified using setClassLoader|World(ClassLoader)." );
-        }
-
-        if ( classWorld == null )
-        {
-            classWorld = new ClassWorld();
-
-            try
-            {
-                classWorld.newRealm( "plexus.core", classLoader );
-            }
-            catch ( DuplicateRealmException e )
-            {
-                // won't happen
-            }
-        }
 
         try
         {
@@ -578,8 +548,6 @@ public class MavenEmbedder
 
             wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-            started = true;
-            
             // ----------------------------------------------------------------------------
             // Settings
             //
@@ -597,7 +565,7 @@ public class MavenEmbedder
                 req.setGlobalSettingsFile( mavenTools.getGlobalSettingsPath() );
             }
 
-            settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), null );
+            settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false );
 
             resolveParameters( settings );
 
@@ -671,7 +639,6 @@ public class MavenEmbedder
     public void stop()
         throws MavenEmbedderException
     {
-        started = false;
         try
         {
             container.release( mavenProjectBuilder );
@@ -688,82 +655,18 @@ public class MavenEmbedder
     // Start of new embedder API
     // ----------------------------------------------------------------------
 
-    public void execute( MavenExecutionRequest request )
+    public MavenExecutionResult execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        checkStarted();
-
-        maven.execute( request );
-    }
-
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean interactive,
-                                   boolean offline,
-                                   boolean usePluginRegistry,
-                                   Boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        checkStarted();
-        return mavenTools.buildSettings( userSettingsPath, globalSettingsPath, interactive, offline, usePluginRegistry,
-                                         pluginUpdateOverride );
-    }
-
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean interactive,
-                                   boolean offline,
-                                   boolean usePluginRegistry,
-                                   boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        checkStarted();
-        return mavenTools.buildSettings( userSettingsPath, globalSettingsPath, interactive, offline, usePluginRegistry,
-                                         Boolean.valueOf( pluginUpdateOverride ) );
-    }
-
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   Boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        checkStarted();
-        return mavenTools.buildSettings( userSettingsPath, globalSettingsPath, pluginUpdateOverride );
-    }
-
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        checkStarted();
-        return mavenTools.buildSettings( userSettingsPath, globalSettingsPath, Boolean.valueOf( pluginUpdateOverride ) );
-    }
-
-    public File getUserSettingsPath( String optionalSettingsPath )
-    {
-        checkStarted();
-        return mavenTools.getUserSettingsPath( optionalSettingsPath );
-    }
-
-    public File getGlobalSettingsPath()
-    {
-        checkStarted();
-        return mavenTools.getGlobalSettingsPath();
-    }
-
-    public String getLocalRepositoryPath( Settings settings )
-    {
-        checkStarted();
-        return mavenTools.getLocalRepositoryPath( settings );
-    }
-
-    private void checkStarted()
-    {
-        if ( !started )
+        try
         {
-            throw new IllegalStateException(
-                "The embedder is not started, you need to call start() on the embedder prior to calling this method" );
+            request = populateMavenExecutionRequestWithDefaults( request );
         }
+        catch ( MavenEmbedderException e )
+        {
+            throw new MavenExecutionException( "Error populating request with default values.", e );
+        }
+
+        return maven.execute( request );
     }
 }

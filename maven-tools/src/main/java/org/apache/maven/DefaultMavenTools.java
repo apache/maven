@@ -81,7 +81,7 @@ public class DefaultMavenTools
                                    boolean interactive,
                                    boolean offline,
                                    boolean usePluginRegistry,
-                                   Boolean pluginUpdateOverride )
+                                   boolean pluginUpdateOverride )
         throws SettingsConfigurationException
     {
         Settings settings = buildSettings(userSettingsPath,
@@ -101,7 +101,7 @@ public class DefaultMavenTools
     
     public Settings buildSettings( File userSettingsPath,
                                    File globalSettingsPath,
-                                   Boolean pluginUpdateOverride )
+                                   boolean pluginUpdateOverride )
         throws SettingsConfigurationException
     {
         Settings settings;
@@ -122,7 +122,7 @@ public class DefaultMavenTools
 
         RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
 
-        runtimeInfo.setPluginUpdateOverride( pluginUpdateOverride );
+        runtimeInfo.setPluginUpdateOverride( Boolean.valueOf( pluginUpdateOverride ) );
 
         settings.setRuntimeInfo( runtimeInfo );
 
@@ -326,7 +326,7 @@ public class DefaultMavenTools
                                                       false,
                                                       true,
                                                       false,
-                                                      Boolean.FALSE) );
+                                                      false ) );
     }
 
     public ArtifactRepository getLocalRepository()

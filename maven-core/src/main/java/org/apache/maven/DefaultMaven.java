@@ -122,6 +122,7 @@ public class DefaultMaven
     public MavenExecutionResult execute( MavenExecutionRequest request )
         throws MavenExecutionException
     {
+        //*** Move this stuff to the embedder                 
         boolean snapshotPolicySet = false;
 
         if ( request.isOffline() )
@@ -143,11 +144,6 @@ public class DefaultMaven
 
         artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
         
-        if ( request.getLocalRepository() == null )
-        {
-            request.setLocalRepository( mavenTools.createLocalRepository( request.getLocalRepositoryPath() ) );
-        }
-
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
                 
         if ( request.getEventMonitors() == null )
@@ -164,6 +160,8 @@ public class DefaultMaven
         wagonManager.setDownloadMonitor( request.getTransferListener() );
 
         wagonManager.setOnline( !request.getSettings().isOffline() );
+
+        //***
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
 
