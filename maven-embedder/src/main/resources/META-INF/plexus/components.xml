@@ -1,0 +1,16 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator</role>
+      <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestDefaultsPopulator</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.MavenTools</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>        
+      </requirements>
+    </component>
+  </components>
+</component-set>
