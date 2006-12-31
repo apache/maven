@@ -21,7 +21,6 @@ import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -45,9 +44,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -55,13 +51,11 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -72,7 +66,6 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -89,8 +82,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private MavenProjectBuilder mavenProjectBuilder;
-
-    private WagonManager wagonManager;
 
     private MavenXpp3Reader modelReader;
 
@@ -502,14 +493,11 @@ public class MavenEmbedder
             defaultArtifactRepositoryLayout =
                 (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
 
-            wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
             defaultsPopulator = (MavenExecutionRequestDefaultsPopulator) container.lookup(
                 MavenExecutionRequestDefaultsPopulator.ROLE );
 
+            // These three things can be cached for a single session of the embedder
             settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false );
-
-            resolveParameters( settings );
 
             localRepository = createLocalRepository( settings );
 
@@ -522,54 +510,6 @@ public class MavenEmbedder
         catch ( SettingsConfigurationException e )
         {
             throw new MavenEmbedderException( "Cannot create settings configuration", e );
-        }
-    }
-
-    /**
-     * MKLEINT: copied from DefaultMaven. the wagonManager was not injected with proxy info
-     * when called in non-execute mode..
-     *
-     * @todo [BP] this might not be required if there is a better way to pass
-     * them in. It doesn't feel quite right.
-     * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
-     * the wagons, shouldn't we?
-     */
-    private void resolveParameters( Settings settings )
-        throws SettingsConfigurationException
-    {
-        Proxy proxy = settings.getActiveProxy();
-
-        if ( proxy != null )
-        {
-            if ( proxy.getHost() == null )
-            {
-                throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-            }
-            wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                   proxy.getPassword(), proxy.getNonProxyHosts() );
-        }
-
-        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
-        {
-            Server server = (Server) i.next();
-
-            wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                server.getPrivateKey(), server.getPassphrase() );
-
-            wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
-                                            server.getDirectoryPermissions() );
-
-            if ( server.getConfiguration() != null )
-            {
-                wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
-            }
-        }
-
-        for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-        {
-            Mirror mirror = (Mirror) i.next();
-
-            wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
         }
     }
 

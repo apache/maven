@@ -1,24 +1,42 @@
 package org.apache.maven.embedder.execution;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class DefaultMavenExecutionRequestDefaultsPopulator
     extends AbstractLogEnabled
-	implements MavenExecutionRequestDefaultsPopulator
+	implements MavenExecutionRequestDefaultsPopulator, Contextualizable
 {
 	private MavenTools mavenTools;
 	
 	private ArtifactRepositoryFactory artifactRepositoryFactory;
-	
-	public MavenExecutionRequest populateDefaults(MavenExecutionRequest request) 
+
+    private PlexusContainer container;
+
+    public MavenExecutionRequest populateDefaults(MavenExecutionRequest request)
         throws MavenEmbedderException
     {
         // Settings        
@@ -82,6 +100,113 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
         artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );        
 
+        // Wagon
+
+        if ( request.getSettings().isOffline() )
+        {
+            getLogger().info( SystemWarnings.getOfflineWarning() );
+
+            WagonManager wagonManager = null;
+
+            try
+            {
+                wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+
+                wagonManager.setOnline( false );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new MavenEmbedderException( "Cannot retrieve WagonManager in order to set offline mode.", e );
+            }
+            finally
+            {
+                try
+                {
+                    container.release( wagonManager );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().warn( "Cannot release WagonManager.", e );
+                }
+            }
+        }
+
+        try
+        {
+            resolveParameters( request.getSettings() );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
+        }
+        catch ( ComponentLifecycleException e )
+        {
+            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
+        }
+        catch ( SettingsConfigurationException e )
+        {
+            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
+        }
+
         return request;
-    }	
+    }
+
+    private void resolveParameters( Settings settings )
+        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
+    {
+        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+
+        try
+        {
+            Proxy proxy = settings.getActiveProxy();
+
+            if ( proxy != null )
+            {
+                if ( proxy.getHost() == null )
+                {
+                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                }
+
+                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                       proxy.getPassword(), proxy.getNonProxyHosts() );
+            }
+
+            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            {
+                Server server = (Server) i.next();
+
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
+                                                    server.getPrivateKey(), server.getPassphrase() );
+
+                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
+                                                server.getDirectoryPermissions() );
+
+                if ( server.getConfiguration() != null )
+                {
+                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
+                }
+            }
+
+            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+            {
+                Mirror mirror = (Mirror) i.next();
+
+                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+            }
+        }
+        finally
+        {
+            container.release( wagonManager );
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Lifecycle
+    // ----------------------------------------------------------------------------
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
 }

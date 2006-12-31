@@ -20,16 +20,15 @@ package org.apache.maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -49,7 +48,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -260,52 +258,6 @@ public class DefaultMaven
     private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
         throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
     {
-        if ( request.getSettings().isOffline() )
-        {
-            getLogger().info( SystemWarnings.getOfflineWarning() );
-
-            WagonManager wagonManager = null;
-
-            try
-            {
-                wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-                wagonManager.setOnline( false );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new MavenExecutionException( "Cannot retrieve WagonManager in order to set offline mode.", e );
-            }
-            finally
-            {
-                try
-                {
-                    container.release( wagonManager );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().warn( "Cannot release WagonManager.", e );
-                }
-            }
-        }
-
-        try
-        {
-            resolveParameters( request.getSettings() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
-        }
-        catch ( ComponentLifecycleException e )
-        {
-            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
-        }
-        catch ( SettingsConfigurationException e )
-        {
-            throw new MavenExecutionException( "Unable to configure Maven for execution", e );
-        }
-
         ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
 
         globalProfileManager.loadSettingsProfiles( request.getSettings() );
@@ -583,61 +535,6 @@ public class DefaultMaven
                                  request.getStartTime() );
     }
 
-    /**
-     * @todo [BP] this might not be required if there is a better way to pass
-     * them in. It doesn't feel quite right.
-     * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
-     * the wagons, shouldn't we?
-     */
-    private void resolveParameters( Settings settings )
-        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
-    {
-        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-        try
-        {
-            Proxy proxy = settings.getActiveProxy();
-
-            if ( proxy != null )
-            {
-                if ( proxy.getHost() == null )
-                {
-                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-                }
-
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       proxy.getPassword(), proxy.getNonProxyHosts() );
-            }
-
-            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
-            {
-                Server server = (Server) i.next();
-
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                    server.getPrivateKey(), server.getPassphrase() );
-
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
-                                                server.getDirectoryPermissions() );
-
-                if ( server.getConfiguration() != null )
-                {
-                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
-                }
-            }
-
-            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-            {
-                Mirror mirror = (Mirror) i.next();
-
-                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
-            }
-        }
-        finally
-        {
-            container.release( wagonManager );
-        }
-    }
-
     // ----------------------------------------------------------------------
     // Lifecylce Management
     // ----------------------------------------------------------------------
@@ -660,6 +557,7 @@ public class DefaultMaven
             throw new InitializationException( "Cannot lookup logger manager.", e );
         }
     }
+    
     // ----------------------------------------------------------------------
     // Reporting / Logging
     // ----------------------------------------------------------------------
