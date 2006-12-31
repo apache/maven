@@ -636,7 +636,6 @@ public class MavenEmbedder
             {
                 throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
             }
-            System.out.println( "setting proxy to=" + proxy.getHost() );
             wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
                                    proxy.getPassword(), proxy.getNonProxyHosts() );
         }
