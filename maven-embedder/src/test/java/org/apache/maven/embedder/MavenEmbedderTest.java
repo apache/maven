@@ -2,7 +2,6 @@ package org.apache.maven.embedder;
 
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
-//import org.apache.maven.cli.ConsoleDownloadMonitor;
 import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
@@ -10,6 +9,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -33,13 +33,7 @@ public class MavenEmbedderTest
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        maven = new MavenEmbedder();
-
-        maven.setClassLoader( classLoader );
-
-        maven.setLogger( new MavenEmbedderConsoleLogger() );
-
-        maven.start();
+        maven = new MavenEmbedder( classLoader, new MavenEmbedderConsoleLogger() );
     }
 
     protected void tearDown()
@@ -73,7 +67,7 @@ public class MavenEmbedderTest
             .setBasedir( targetDirectory )
             .setGoals( Arrays.asList( new String[]{ "package" } ) );
 
-        maven.execute( request );
+        MavenExecutionResult result = maven.execute( request );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
