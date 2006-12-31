@@ -36,7 +36,6 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -60,7 +59,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -79,7 +77,7 @@ import java.util.List;
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  */
 public class MavenEmbedder
 {
@@ -183,7 +181,7 @@ public class MavenEmbedder
     }
 
     public Model readModel( File model )
-        throws XmlPullParserException, FileNotFoundException, IOException
+        throws XmlPullParserException, IOException
     {
         checkStarted();
         return modelReader.read( new FileReader( model ) );
