@@ -31,7 +31,6 @@ import org.apache.maven.settings.Settings;
 public class DefaultMavenEmbedRequest
     implements MavenEmbedRequest
 {
-
     private List inactives;
 
     private List actives;

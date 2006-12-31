@@ -8,11 +8,14 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -45,7 +48,7 @@ public class MavenEmbedderTest
         maven.stop();
     }
 
-    public void xtestMavenEmbedder()
+    public void testMavenEmbedder()
         throws Exception
     {
         modelReadingTest();
@@ -66,20 +69,11 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        File pomFile = new File( targetDirectory, "pom.xml" );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setBasedir( targetDirectory )
+            .setGoals( Arrays.asList( new String[]{ "package" } ) );
 
-        MavenProject pom = maven.readProjectWithDependencies( pomFile );
-
-        EventMonitor eventMonitor = new DefaultEventMonitor( new PlexusLoggerAdapter( new MavenEmbedderConsoleLogger() ) );
-
-        /*
-        maven.execute( pom,
-                       Collections.singletonList( "package" ),
-                       eventMonitor,
-                       new ConsoleDownloadMonitor(),
-                       new Properties(),
-                       targetDirectory );
-                       */
+        maven.execute( request );
 
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
@@ -110,10 +104,10 @@ public class MavenEmbedderTest
     // Lifecycle phases
     // ----------------------------------------------------------------------
 
-    public void xtestRetrievingLifecyclePhases()
+    public void testRetrievingLifecyclePhases()
         throws Exception
     {
-        List phases = maven.getLifecyclePhases();       
+        List phases = maven.getLifecyclePhases();
 
         assertEquals( "validate", (String) phases.get( 0 ) );
 
@@ -126,12 +120,11 @@ public class MavenEmbedderTest
     // Repository
     // ----------------------------------------------------------------------
 
-    public void xtestLocalRepositoryRetrieval()
+    public void testLocalRepositoryRetrieval()
         throws Exception
     {
         assertNotNull( maven.getLocalRepository().getBasedir() );
     }
-
 
     // ----------------------------------------------------------------------
     //

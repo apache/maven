@@ -19,64 +19,64 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+
 import org.apache.maven.settings.Settings;
 
 /**
  * Configuration of embedder, used when starting up.
+ *
  * @author mkleint
  */
-public interface MavenEmbedRequest {
-    
+public interface MavenEmbedRequest
+{
     /*
-     * Add profile to activate.
-     */
+    * Add profile to activate.
+    */
     MavenEmbedRequest addActiveProfile( String profile );
 
     /*
      * Add profile to inactivate.
      */
     MavenEmbedRequest addInactiveProfile( String profile );
+
     /*
-     * Add a list of String instances with names of profiles to activate.
-     */
+    * Add a list of String instances with names of profiles to activate.
+    */
     MavenEmbedRequest addActiveProfiles( List profiles );
+
     /*
-     * Add a list of String instances with names of profiles to inactivate.
-     */
+    * Add a list of String instances with names of profiles to inactivate.
+    */
     MavenEmbedRequest addInactiveProfiles( List profiles );
-    
+
     /*
-     * Set location of the user settings file to use for the embedder.
-     */
-    MavenEmbedRequest setUserSettingsFile(File user);
+    * Set location of the user settings file to use for the embedder.
+    */
+    MavenEmbedRequest setUserSettingsFile( File user );
 
     /*
      * Set location of the global settings file to use for the embedder.
      */
-    MavenEmbedRequest setGlobalSettingsFile(File global);
-    
+    MavenEmbedRequest setGlobalSettingsFile( File global );
+
     /**
      * Set a customizer callback implemetation that will be given a chance to modify the plexus container
      * on startup.
      */
-    MavenEmbedRequest setConfigurationCustomizer(ContainerCustomizer customizer);
-    
-    /**
-     * set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used.
-     */
+    MavenEmbedRequest setConfigurationCustomizer( ContainerCustomizer customizer );
+
+    /** set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used. */
     MavenEmbedRequest setSystemProperties( Properties properties );
-    
+
     List getActiveProfiles();
 
     List getInactiveProfiles();
-    
+
     File getUserSettingsFile();
-    
+
     File getGlobalSettingsFile();
-    
+
     ContainerCustomizer getContainerCustomizer();
-    
+
     Properties getSystemProperties();
-    
-    
 }

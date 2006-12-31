@@ -382,24 +382,23 @@ public class MavenCli
             MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setBasedir( baseDirectory )
                 .setGoals( goals )
-                .setLocalRepositoryPath( localRepositoryPath )
-                .setProperties( executionProperties )
-                .setReactorFailureBehavior( reactorFailureBehaviour )
-                .setRecursive( recursive )
-                .setUseReactor( useReactor )
-                .setPomFile( alternatePomFile )
-                .setShowErrors( showErrors )
-                .setInteractiveMode( interactive )
-                .addActiveProfiles( activeProfiles )
-                .addInactiveProfiles( inactiveProfiles )
-                .setLoggingLevel( loggingLevel )
-                //.activateDefaultEventMonitor()
-                .setSettings( settings )
-                .setTransferListener( transferListener )
-                .setOffline( offline )
-                .setUpdateSnapshots( updateSnapshots )
-                .setNoSnapshotUpdates( noSnapshotUpdates )
-                .setGlobalChecksumPolicy( globalChecksumPolicy );
+                .setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
+                .setProperties( executionProperties ) // optional
+                .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
+                .setRecursive( recursive ) // default: false
+                .setUseReactor( useReactor ) // default: true
+                .setPomFile( alternatePomFile ) // optional
+                .setShowErrors( showErrors ) // default: false
+                .setInteractiveMode( interactive ) // default: false
+                .addActiveProfiles( activeProfiles ) // optional
+                .addInactiveProfiles( inactiveProfiles ) // optional
+                .setLoggingLevel( loggingLevel ) // default: info
+                .setSettings( settings ) // default: ~/.m2/settings.xml
+                .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
+                .setOffline( offline ) // default: false
+                .setUpdateSnapshots( updateSnapshots ) // default: false
+                .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
+                .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
 
             mavenEmbedder.execute( request );
         }
