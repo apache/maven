@@ -1,8 +1,0 @@
-<component-set>
-  <components>
-    <component>
-      <role>org.apache.maven.it2002.Thing</role>
-      <implementation>org.apache.maven.it2002.Thing</implementation>
-    </component>
-  </components>
-</component-set>

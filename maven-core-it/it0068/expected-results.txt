@@ -1,1 +1,0 @@
-target/generated-sources/modello/org/apache/maven/settings/Settings.java

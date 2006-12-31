@@ -1,2 +1,0 @@
-project/project-level2/project-level3/target/it0097.txt
-project/project-sibling-level2/target/it0097.txt

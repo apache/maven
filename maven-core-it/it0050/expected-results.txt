@@ -1,2 +1,0 @@
-target/testTouchFile.txt
-target/defaultTestTouchFile.txt

@@ -1,5 +1,0 @@
-target/classes/org/apache/maven/it0002/Person.class
-target/test-classes/org/apache/maven/it0002/PersonTest.class
-target/maven-core-it0002-1.0.jar
-target/maven-core-it0002-1.0.jar!/it0002.properties
-${artifact:org.apache.maven:maven-core-it-support:1.0:jar}

@@ -1,1 +1,0 @@
-test-component-c/target/my-test

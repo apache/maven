@@ -1,2 +1,0 @@
-target/touch-3.8.1.txt
-child-project/target/child-touch-3.0.3.txt

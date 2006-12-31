@@ -1,4 +1,0 @@
-target/classes/org/apache/maven/it0001/Person.class
-target/test-classes/org/apache/maven/it0001/PersonTest.class
-!target/classes/org/apache/maven/it0001/PersonTwo.class
-!target/test-classes/org/apache/maven/it0001/PersonTwoTest.class

@@ -1,1 +1,0 @@
-${artifact:org.apache.maven:maven-core-it0005:1.0-SNAPSHOT:pom}

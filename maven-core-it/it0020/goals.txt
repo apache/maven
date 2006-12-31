@@ -1,2 +1,0 @@
-install
-it0020:it0020
