@@ -83,10 +83,6 @@ public class MavenEmbedder
 {
     public static final String userHome = System.getProperty( "user.home" );
 
-    // ----------------------------------------------------------------------
-    // Embedder
-    // ----------------------------------------------------------------------
-
     private PlexusContainer container;
 
     // ----------------------------------------------------------------------
@@ -96,8 +92,6 @@ public class MavenEmbedder
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    private LifecycleExecutor lifecycleExecutor;
 
     private WagonManager wagonManager;
 
@@ -226,12 +220,7 @@ public class MavenEmbedder
 
     private MavenExecutionRequest populateMavenExecutionRequestWithDefaults( MavenExecutionRequest request )
     {
-        // populate the request from
-        // 1. embed request
-        // 2. defaults
-
-        // Local repository
-
+        // Local repository    	    	
         if ( request.getLocalRepository() == null )
         {
             request.setLocalRepository( localRepository );
@@ -256,15 +245,11 @@ public class MavenEmbedder
             .setBasedir( baseDirectory )
             .setGoals( goals )
             .setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
-            .setProperties( executionProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: false
             .setUseReactor( useReactor ) // default: true
-            .setPomFile( alternatePomFile ) // optional
             .setShowErrors( showErrors ) // default: false
             .setInteractiveMode( interactive ) // default: false
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
             .setLoggingLevel( loggingLevel ) // default: info
             .setSettings( settings ) // default: ~/.m2/settings.xml
             .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
@@ -591,8 +576,6 @@ public class MavenEmbedder
             defaultArtifactRepositoryLayout =
                 (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
 
-            lifecycleExecutor = (LifecycleExecutor) container.lookup( LifecycleExecutor.ROLE );
-
             wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
             started = true;
@@ -695,8 +678,6 @@ public class MavenEmbedder
             container.release( mavenProjectBuilder );
 
             container.release( artifactRepositoryFactory );
-
-            container.release( lifecycleExecutor );
         }
         catch ( ComponentLifecycleException e )
         {
