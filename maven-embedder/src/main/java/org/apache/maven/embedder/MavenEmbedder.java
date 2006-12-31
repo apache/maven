@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -111,6 +112,8 @@ public class MavenEmbedder
 
     private MavenTools mavenTools;
 
+    private MavenExecutionRequestDefaultsPopulator defaultsPopulator;
+
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -141,7 +144,8 @@ public class MavenEmbedder
         this( classWorld, null );
     }
 
-    public MavenEmbedder( ClassWorld classWorld, MavenEmbedderLogger logger )
+    public MavenEmbedder( ClassWorld classWorld,
+                          MavenEmbedderLogger logger )
         throws MavenEmbedderException
     {
         this.classWorld = classWorld;
@@ -157,7 +161,8 @@ public class MavenEmbedder
         this( classLoader, null );
     }
 
-    public MavenEmbedder( ClassLoader classLoader, MavenEmbedderLogger logger )
+    public MavenEmbedder( ClassLoader classLoader,
+                          MavenEmbedderLogger logger )
         throws MavenEmbedderException
     {
         this( new ClassWorld( "plexus.core", classLoader ), logger );
@@ -226,66 +231,18 @@ public class MavenEmbedder
         return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
     }
 
-    private MavenExecutionRequest populateMavenExecutionRequestWithDefaults( MavenExecutionRequest r )
-        throws MavenEmbedderException
-    {
-        // Settings        
-        // Local repository  
-        // TransferListener
-        // EventMonitor
-
-        if ( r.getSettings() == null )
-        {
-            File userSettingsPath = mavenTools.getUserSettingsPath( r.getSettingsFile() );
-
-            File globalSettingsFile = mavenTools.getGlobalSettingsPath();
-
-            try
-            {
-                r.setSettings( mavenTools.buildSettings( userSettingsPath, globalSettingsFile, r.isInteractiveMode(),
-                                                         r.isOffline(), r.isUsePluginRegistry(),
-                                                         r.isUsePluginUpdateOverride() ) );
-            }
-            catch ( SettingsConfigurationException e )
-            {
-                throw new MavenEmbedderException( "Error processing settings.xml.", e );
-            }
-        }
-
-        if ( r.getLocalRepository() == null )
-        {
-            String localRepositoryPath = mavenTools.getLocalRepositoryPath( r.getSettings() );
-
-            if ( r.getLocalRepository() == null )
-            {
-                r.setLocalRepository( mavenTools.createLocalRepository( new File( localRepositoryPath ) ) );
-            }
-        }
-
-        return r;
-    }
-
     /**
      * This method is used to grab the list of dependencies that belong to a project so that a UI
      * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
      * IntelliJ project.
      */
-    // Not well formed exceptions to point people at errors
-    // line number in the originating POM so that errors can be shown
-    // Need to walk down the tree of dependencies and find all the errors and report in the result
-    // validate the request
-    // for dependency errors: identifier, path
-    // unable to see why you can't get a resource from the repository
-    // short message or error id
-    // completely obey the same settings used by the CLI, should work exactly the same as the
-    //   command line. right now they are very different
     public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
     {
         MavenProject project = null;
 
         try
         {
-            request = populateMavenExecutionRequestWithDefaults( request );
+            request = defaultsPopulator.populateDefaults( request );
 
             project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
                                                                  request.getLocalRepository(), profileManager,
@@ -386,7 +343,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Execution of phases/goals
     // ----------------------------------------------------------------------
-
     // ----------------------------------------------------------------------
     // Lifecycle information
     // ----------------------------------------------------------------------
@@ -548,22 +504,8 @@ public class MavenEmbedder
 
             wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-            // ----------------------------------------------------------------------------
-            // Settings
-            //
-            // If the settings file and the global settings file are null then we will use
-            // the defaults that Maven provides.
-            // ----------------------------------------------------------------------------
-
-            if ( req.getUserSettingsFile() == null )
-            {
-                req.setUserSettingsFile( mavenTools.getUserSettingsPath( null ) );
-            }
-
-            if ( req.getGlobalSettingsFile() == null )
-            {
-                req.setGlobalSettingsFile( mavenTools.getGlobalSettingsPath() );
-            }
+            defaultsPopulator = (MavenExecutionRequestDefaultsPopulator) container.lookup(
+                MavenExecutionRequestDefaultsPopulator.ROLE );
 
             settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false );
 
@@ -595,7 +537,6 @@ public class MavenEmbedder
     private void resolveParameters( Settings settings )
         throws SettingsConfigurationException
     {
-
         Proxy proxy = settings.getActiveProxy();
 
         if ( proxy != null )
@@ -660,7 +601,7 @@ public class MavenEmbedder
     {
         try
         {
-            request = populateMavenExecutionRequestWithDefaults( request );
+            request = defaultsPopulator.populateDefaults( request );
         }
         catch ( MavenEmbedderException e )
         {

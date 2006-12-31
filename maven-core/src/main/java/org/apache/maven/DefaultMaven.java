@@ -121,29 +121,7 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
         throws MavenExecutionException
-    {
-        //*** Move this stuff to the embedder                 
-        boolean snapshotPolicySet = false;
-
-        if ( request.isOffline() )
-        {
-            snapshotPolicySet = true;
-        }
-
-        if ( !snapshotPolicySet ) {
-            if ( request.isUpdateSnapshots() )
-            {
-                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-            }
-            else if ( request.isNoSnapshotUpdates() )
-            {
-                getLogger().info( "+ Supressing SNAPSHOT updates.");
-                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-            }
-        }
-
-        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
-        
+    {        
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
                 
         if ( request.getEventMonitors() == null )
@@ -152,16 +130,14 @@ public class DefaultMaven
         }
 
         loggerManager.setThreshold( request.getLoggingLevel() );
-
-        request.setStartTime( new Date() );
-
+                
         wagonManager.setInteractive( request.isInteractiveMode() );
 
         wagonManager.setDownloadMonitor( request.getTransferListener() );
 
         wagonManager.setOnline( !request.getSettings().isOffline() );
 
-        //***
+        request.setStartTime( new Date() );
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
 
@@ -279,7 +255,6 @@ public class DefaultMaven
 
             line();
         }
-
     }
 
     private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
