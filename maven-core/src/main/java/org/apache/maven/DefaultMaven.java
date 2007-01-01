@@ -764,13 +764,10 @@ public class DefaultMaven
     {
         List files = Collections.EMPTY_LIST;
 
-        File userDir = new File( System.getProperty( "user.dir" ) );
+        File userDir = new File( request.getBaseDirectory() );
+
         if ( request.useReactor() )
         {
-            // TODO: should we now include the pom.xml in the current directory?
-//            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
-//            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
-
             String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
 
