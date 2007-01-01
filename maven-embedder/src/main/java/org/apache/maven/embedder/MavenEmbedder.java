@@ -206,22 +206,6 @@ public class MavenEmbedder
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
 
-    /** @deprecated  */
-    public MavenProject readProjectWithDependencies( File mavenProject,
-                                                     TransferListener transferListener )
-        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager,
-                                                          transferListener );
-    }
-
-    /** @deprecated  */
-    public MavenProject readProjectWithDependencies( File mavenProject )
-        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return mavenProjectBuilder.buildWithDependencies( mavenProject, localRepository, profileManager );
-    }
-
     /**
      * This method is used to grab the list of dependencies that belong to a project so that a UI
      * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
