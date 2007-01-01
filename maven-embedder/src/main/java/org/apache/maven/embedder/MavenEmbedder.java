@@ -537,7 +537,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
-        throws MavenExecutionException
     {
         try
         {
@@ -545,7 +544,7 @@ public class MavenEmbedder
         }
         catch ( MavenEmbedderException e )
         {
-            throw new MavenExecutionException( "Error populating request with default values.", e );
+            return new DefaultMavenExecutionResult( Collections.singletonList( e ) );
         }
 
         return maven.execute( request );

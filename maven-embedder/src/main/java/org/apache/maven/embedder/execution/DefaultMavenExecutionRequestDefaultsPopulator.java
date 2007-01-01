@@ -39,16 +39,12 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
     public MavenExecutionRequest populateDefaults(MavenExecutionRequest request)
         throws MavenEmbedderException
     {
-        // Settings        
-        // Local repository  
-        // TransferListener
-        // EventMonitor
-		// Proxy
-
 		// Settings
-		
+
         if ( request.getSettings() == null )
         {
+            // A local repository set in the request should win over what's in a settings.xml file.
+
             File userSettingsPath = mavenTools.getUserSettingsPath( request.getSettingsFile() );
 
             File globalSettingsFile = mavenTools.getGlobalSettingsPath();

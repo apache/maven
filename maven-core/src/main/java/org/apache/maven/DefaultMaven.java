@@ -29,7 +29,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
@@ -44,14 +43,10 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -63,7 +58,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,7 +98,7 @@ public class DefaultMaven
     protected LoggerManager loggerManager;
 
     protected MavenTools mavenTools;
-    
+
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private static final long MB = 1024 * 1024;
@@ -118,17 +112,16 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
-        throws MavenExecutionException
-    {        
+    {
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
-                
+
         if ( request.getEventMonitors() == null )
         {
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
         }
 
         loggerManager.setThreshold( request.getLoggingLevel() );
-                
+
         wagonManager.setInteractive( request.isInteractiveMode() );
 
         wagonManager.setDownloadMonitor( request.getTransferListener() );
@@ -143,59 +136,36 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
-        ReactorManager rm;
+        MavenExecutionResult result;
 
-        try
+        result = doExecute( request, dispatcher );
+
+        if ( result.hasExceptions() )
         {
-            rm = doExecute( request, dispatcher );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
+            {
+                Exception e = (Exception) i.next();
 
-            logError( e, request.isShowErrors() );
+                dispatcher.dispatchError( event, request.getBaseDirectory(), e );
 
-            stats( request.getStartTime() );
+                logError( e, request.isShowErrors() );
 
-            line();
+                stats( request.getStartTime() );
 
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
-        catch ( BuildFailureException e )
-        {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            logFailure( e, request.isShowErrors() );
-
-            stats( request.getStartTime() );
-
-            line();
-
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
-        catch ( Throwable t )
-        {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), t );
-
-            logFatal( t );
-
-            stats( request.getStartTime() );
-
-            line();
-
-            throw new MavenExecutionException( "Error executing project within the reactor", t );
+                line();
+            }
         }
 
         // Either the build was successful, or it was a fail_at_end/fail_never reactor build
 
         // TODO: should all the logging be left to the CLI?
-        logReactorSummary( rm );
+        logReactorSummary( result.getReactorManager() );
 
-        if ( rm.hasBuildFailures() )
+        if ( result.getReactorManager().hasBuildFailures() )
         {
-            logErrors( rm, request.isShowErrors() );
+            logErrors( result.getReactorManager(), request.isShowErrors() );
 
-            if ( !ReactorManager.FAIL_NEVER.equals( rm.getFailureBehavior() ) )
+            if ( !result.getReactorManager().FAIL_NEVER.equals( result.getReactorManager().getFailureBehavior() ) )
             {
                 dispatcher.dispatchError( event, request.getBaseDirectory(), null );
 
@@ -207,7 +177,7 @@ public class DefaultMaven
 
                 line();
 
-                throw new MavenExecutionException( "Some builds failed" );
+                return new DefaultMavenExecutionResult( Collections.singletonList( new MavenExecutionException( "Some builds failed" ) ) );
             }
             else
             {
@@ -215,18 +185,19 @@ public class DefaultMaven
             }
         }
 
-        logSuccess( rm );
+        logSuccess( result.getReactorManager() );
 
         stats( request.getStartTime() );
 
         line();
 
-        dispatcher.dispatchEnd( event, request.getBaseDirectory() );                
+        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
-        return new DefaultMavenExecutionResult( rm.getTopLevelProject(), null );
+        return new DefaultMavenExecutionResult( result.getReactorManager() );
     }
 
-    private void logErrors( ReactorManager rm, boolean showErrors )
+    private void logErrors( ReactorManager rm,
+                            boolean showErrors )
     {
         for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
@@ -255,9 +226,11 @@ public class DefaultMaven
         }
     }
 
-    private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
-        throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
+    private MavenExecutionResult doExecute( MavenExecutionRequest request,
+                                            EventDispatcher dispatcher )
     {
+        List executionExceptions = new ArrayList();
+
         ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
 
         globalProfileManager.loadSettingsProfiles( request.getSettings() );
@@ -269,14 +242,29 @@ public class DefaultMaven
         getLogger().info( "Scanning for projects..." );
 
         boolean foundProjects = true;
-        List projects = getProjects( request, globalProfileManager );
-        if ( projects.isEmpty() )
+
+        List projects;
+
+        try
         {
-            projects.add( getSuperProject( request ) );
-            foundProjects = false;
+            projects = getProjects( request, globalProfileManager );
+
+            if ( projects.isEmpty() )
+            {
+                projects.add( getSuperProject( request ) );
+
+                foundProjects = false;
+            }
+        }
+        catch ( Exception e )
+        {
+            executionExceptions.add( e );
+
+            return new DefaultMavenExecutionResult( executionExceptions );
         }
 
         ReactorManager rm;
+
         try
         {
             rm = new ReactorManager( projects );
@@ -290,12 +278,16 @@ public class DefaultMaven
         }
         catch ( CycleDetectedException e )
         {
-            throw new BuildFailureException(
-                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e );
+            executionExceptions.add( new BuildFailureException(
+                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e ) );
+
+            return new DefaultMavenExecutionResult( executionExceptions );
         }
         catch ( DuplicateProjectException e )
         {
-            throw new BuildFailureException( e.getMessage(), e );
+            executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
+
+            return new DefaultMavenExecutionResult( executionExceptions );
         }
 
         if ( rm.hasMultipleProjects() )
@@ -305,6 +297,7 @@ public class DefaultMaven
             for ( Iterator i = rm.getSortedProjects().iterator(); i.hasNext(); )
             {
                 MavenProject project = (MavenProject) i.next();
+
                 getLogger().info( "  " + project.getName() );
             }
         }
@@ -313,9 +306,16 @@ public class DefaultMaven
 
         session.setUsingPOMsFromFilesystem( foundProjects );
 
-        lifecycleExecutor.execute( session, rm, dispatcher );
+        try
+        {
+            lifecycleExecutor.execute( session, rm, dispatcher );
+        }
+        catch ( Exception e )
+        {
+            executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
+        }
 
-        return rm;
+        return new DefaultMavenExecutionResult( executionExceptions, rm );
     }
 
     private MavenProject getSuperProject( MavenExecutionRequest request )
@@ -324,8 +324,9 @@ public class DefaultMaven
         MavenProject superProject;
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), 
-                                                   new DefaultProfileManager( container, request.getProperties()) );
+            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
+                                                                       new DefaultProfileManager( container,
+                                                                                                  request.getProperties() ) );
 
         }
         catch ( ProjectBuildingException e )
@@ -335,7 +336,8 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request,
+                              ProfileManager globalProfileManager )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
@@ -343,12 +345,8 @@ public class DefaultMaven
         {
             List files = getProjectFiles( request );
 
-            projects = collectProjects( files,
-                                        request.getLocalRepository(),
-                                        request.isRecursive(),
-                                        request.getSettings(),
-                                        globalProfileManager,
-                                        !request.useReactor() );
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
+                                        request.getSettings(), globalProfileManager, !request.useReactor() );
 
         }
         catch ( IOException e )
@@ -370,12 +368,15 @@ public class DefaultMaven
         return projects;
     }
 
-    private void logReactorSummaryLine( String name, String status )
+    private void logReactorSummaryLine( String name,
+                                        String status )
     {
         logReactorSummaryLine( name, status, -1 );
     }
 
-    private void logReactorSummaryLine( String name, String status, long time )
+    private void logReactorSummaryLine( String name,
+                                        String status,
+                                        long time )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
@@ -424,8 +425,12 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                  ProfileManager globalProfileManager, boolean isRoot )
+    private List collectProjects( List files,
+                                  ArtifactRepository localRepository,
+                                  boolean recursive,
+                                  Settings settings,
+                                  ProfileManager globalProfileManager,
+                                  boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
@@ -498,7 +503,9 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
+    public MavenProject getProject( File pom,
+                                    ArtifactRepository localRepository,
+                                    Settings settings,
                                     ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
@@ -523,15 +530,12 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm, EventDispatcher dispatcher )
+    protected MavenSession createSession( MavenExecutionRequest request,
+                                          ReactorManager rpm,
+                                          EventDispatcher dispatcher )
     {
-        return new MavenSession( container,
-                                 request.getSettings(),
-                                 request.getLocalRepository(),
-                                 dispatcher,
-                                 rpm, request.getGoals(),
-                                 request.getBaseDirectory(),
-                                 request.getProperties(),
+        return new MavenSession( container, request.getSettings(), request.getLocalRepository(), dispatcher, rpm,
+                                 request.getGoals(), request.getBaseDirectory(), request.getProperties(),
                                  request.getStartTime() );
     }
 
@@ -557,7 +561,7 @@ public class DefaultMaven
             throw new InitializationException( "Cannot lookup logger manager.", e );
         }
     }
-    
+
     // ----------------------------------------------------------------------
     // Reporting / Logging
     // ----------------------------------------------------------------------
@@ -575,7 +579,8 @@ public class DefaultMaven
         logTrace( error, true );
     }
 
-    protected void logError( Exception e, boolean showErrors )
+    protected void logError( Exception e,
+                             boolean showErrors )
     {
         line();
 
@@ -595,7 +600,8 @@ public class DefaultMaven
         }
     }
 
-    protected void logFailure( BuildFailureException e, boolean showErrors )
+    protected void logFailure( BuildFailureException e,
+                               boolean showErrors )
     {
         line();
 
@@ -608,7 +614,8 @@ public class DefaultMaven
         logTrace( e, showErrors );
     }
 
-    private void logTrace( Throwable t, boolean showErrors )
+    private void logTrace( Throwable t,
+                           boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -717,7 +724,7 @@ public class DefaultMaven
     {
         getLogger().info( "------------------------------------------------------------------------" );
     }
-    
+
     protected static String formatTime( long ms )
     {
         long secs = ms / MS_PER_SEC;

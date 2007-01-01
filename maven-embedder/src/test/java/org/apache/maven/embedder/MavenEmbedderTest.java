@@ -54,7 +54,7 @@ public class MavenEmbedderTest
     // Goal/Phase execution tests
     // ----------------------------------------------------------------------
 
-    public void xtestPhaseExecution()
+    public void testPhaseExecution()
         throws Exception
     {
         File testDirectory = new File( basedir, "src/test/embedder-test-project" );

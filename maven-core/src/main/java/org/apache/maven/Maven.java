@@ -48,6 +48,5 @@ public interface Maven
 
     static final int LOGGING_LEVEL_DISABLE = 5;
 
-    MavenExecutionResult execute( MavenExecutionRequest request )
-        throws MavenExecutionException;
+    MavenExecutionResult execute( MavenExecutionRequest request );
 }

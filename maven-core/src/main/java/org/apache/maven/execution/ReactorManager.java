@@ -63,6 +63,7 @@ public class ReactorManager
         if ( pluginContextsByKey == null )
         {
             pluginContextsByKey = new HashMap();
+
             pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
         }
 

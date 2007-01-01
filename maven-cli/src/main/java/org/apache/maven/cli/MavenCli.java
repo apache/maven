@@ -23,7 +23,7 @@ import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -177,8 +177,6 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-        try
-        {
             List goals = commandLine.getArgList();
 
             boolean recursive = true;
@@ -295,47 +293,10 @@ public class MavenCli
                 alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
             }
 
-            // ----------------------------------------------------------------------
-            // From here we are CLI free
-            // ----------------------------------------------------------------------
-
-            //  -> baseDirectory
-            //  -> goals
-            //  -> debug: use to set the threshold on the logger manager
-            //  -> active profiles (settings)
-            //  -> inactive profiles (settings)
-            //  -> offline (settings)
-            //  -> interactive (settings)
-            //  -> Settings
-            //     -> localRepository
-            //     -> interactiveMode
-            //     -> usePluginRegistry
-            //     -> offline
-            //     -> proxies
-            //     -> servers
-            //     -> mirrors
-            //     -> profiles
-            //     -> activeProfiles
-            //     -> pluginGroups
-            //  -> executionProperties
-            //  -> reactorFailureBehaviour: fail fast, fail at end, fail never
-            //  -> globalChecksumPolicy: fail, warn
-            //  -> showErrors (this is really CLI is but used inside Maven internals
-            //  -> recursive
-            //  -> updateSnapshots
-            //  -> useReactor
-            //  -> transferListener: in the CLI this is batch or console
-
             // We have a general problem with plexus components that are singletons in that they use
             // the same logger for their lifespan. This is not good in that many requests may be fired
             // off and the singleton plexus component will continue to funnel their output to the same
             // logger. We need to be able to swap the logger.
-
-            // the local repository should just be a path and we should look here:
-            // in the system property
-            // user specified settings.xml
-            // default ~/.m2/settings.xml
-            // and with that maven internals should contruct the ArtifactRepository object
 
             int loggingLevel;
 
@@ -382,11 +343,11 @@ public class MavenCli
                 .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
                 .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
 
-            mavenEmbedder.execute( request );
-        }
-        catch ( MavenExecutionException e )
-        {
-            showFatalError( "Unable to configure the Maven application", e, showErrors );
+        MavenExecutionResult result = mavenEmbedder.execute( request );
+
+        if ( result.hasExceptions() )
+        {                        
+            showFatalError( "Unable to configure the Maven application", (Exception) result.getExceptions().get( 0 ), showErrors );
 
             return 1;
         }
