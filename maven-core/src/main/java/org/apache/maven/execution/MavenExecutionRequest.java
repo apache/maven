@@ -163,6 +163,7 @@ public interface MavenExecutionRequest
     MavenExecutionRequest addActiveProfile( String profile );
     MavenExecutionRequest addActiveProfiles( List profiles );
     List getActiveProfiles();
+    //MAPI: do we really need to do this? deactivate active profile? seems confusing.
     MavenExecutionRequest addInactiveProfile( String profile );
     MavenExecutionRequest addInactiveProfiles( List profiles );
     List getInactiveProfiles();

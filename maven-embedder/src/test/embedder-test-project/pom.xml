@@ -15,4 +15,14 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>embedderProfile</id>
+      <properties>
+        <embedderProfile>true</embedderProfile>
+        <name>jason</name>
+        <occupation>somnambulance</occupation>
+      </properties>
+    </profile>
+  </profiles>
 </project>

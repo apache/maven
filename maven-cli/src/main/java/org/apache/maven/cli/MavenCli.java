@@ -293,11 +293,6 @@ public class MavenCli
                 alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
             }
 
-            // We have a general problem with plexus components that are singletons in that they use
-            // the same logger for their lifespan. This is not good in that many requests may be fired
-            // off and the singleton plexus component will continue to funnel their output to the same
-            // logger. We need to be able to swap the logger.
-
             int loggingLevel;
 
             if ( debug )

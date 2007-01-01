@@ -52,7 +52,7 @@ public class MavenEmbedderTest
     // Goal/Phase execution tests
     // ----------------------------------------------------------------------
 
-    public void testSimplePhaseExecutionUsingABaseDirectory()
+    public void testExecutionUsingABaseDirectory()
         throws Exception
     {
         File testDirectory = new File( basedir, "src/test/embedder-test-project" );
@@ -76,7 +76,7 @@ public class MavenEmbedderTest
         assertTrue( jar.exists() );
     }
 
-    public void testSimplePhaseExecutionUsingAPomFile()
+    public void testExecutionUsingAPomFile()
         throws Exception
     {
         File testDirectory = new File( basedir, "src/test/embedder-test-project" );
@@ -99,6 +99,50 @@ public class MavenEmbedderTest
 
         assertTrue( jar.exists() );
     }
+
+    public void testExecutionUsingAProfileWhichSetsAProperty()
+        throws Exception
+    {
+        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
+
+        File targetDirectory = new File( basedir, "target/embedder-test-project2" );
+
+        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
+
+        // Check with profile not active
+
+        MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
+            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() )
+            .setGoals( Arrays.asList( new String[]{ "validate" } ) );
+
+        MavenExecutionResult r0 = maven.execute( requestWithoutProfile );
+
+        MavenProject p0 = r0.getMavenProject();
+
+        assertNull( p0.getProperties().getProperty( "embedderProfile" ) );
+
+        assertNull( p0.getProperties().getProperty( "name" ) );
+
+        assertNull( p0.getProperties().getProperty( "occupation" ) );
+
+        // Check with profile activated
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() )
+            .setGoals( Arrays.asList( new String[]{ "validate" } ) )
+            .addActiveProfile( "embedderProfile" );
+
+        MavenExecutionResult r1 = maven.execute( request );
+
+        MavenProject p1 = r1.getMavenProject();
+
+        assertEquals( "true", p1.getProperties().getProperty( "embedderProfile" ) );
+
+        assertEquals( "jason", p1.getProperties().getProperty( "name" ) );
+
+        assertEquals( "somnambulance", p1.getProperties().getProperty( "occupation" ) );
+    }
+
 
     // ----------------------------------------------------------------------
     // Test mock plugin metadata

@@ -447,7 +447,9 @@ public class MavenEmbedder
 
         if ( logger != null )
         {
-            container.setLoggerManager( new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) ) );
+            MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
+
+            container.setLoggerManager( loggerManager );
         }
 
         try
