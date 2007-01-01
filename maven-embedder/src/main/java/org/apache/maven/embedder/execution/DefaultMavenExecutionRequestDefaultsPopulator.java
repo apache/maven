@@ -144,6 +144,13 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
             throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
         }
 
+        // BaseDirectory in MavenExecutionRequest
+
+        if ( request.getPomFile() != null && request.getBaseDirectory() == null )
+        {
+            request.setBasedir( new File( request.getPomFile() ) );
+        }
+
         return request;
     }
 

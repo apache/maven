@@ -125,6 +125,11 @@ public class DefaultMavenExecutionRequest
 
     public String getBaseDirectory()
     {
+        if ( basedir == null )
+        {
+            return null;
+        }
+
         return basedir.getAbsolutePath();
     }
 

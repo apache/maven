@@ -311,7 +311,7 @@ public class DefaultMaven
             lifecycleExecutor.execute( session, rm, dispatcher );
         }
         catch ( Exception e )
-        {
+        {                        
             executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
         }
 
