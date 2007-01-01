@@ -143,27 +143,6 @@ public class MavenEmbedderTest
         assertEquals( "somnambulance", p1.getProperties().getProperty( "occupation" ) );
     }
 
-
-    // ----------------------------------------------------------------------
-    // Test mock plugin metadata
-    // ----------------------------------------------------------------------
-
-    public void xtestMockPluginMetadata()
-        throws Exception
-    {
-        List plugins = maven.getAvailablePlugins();
-
-        SummaryPluginDescriptor spd = (SummaryPluginDescriptor) plugins.get( 0 );
-
-        assertNotNull( spd );
-
-        PluginDescriptor pd = maven.getPluginDescriptor( spd );
-
-        assertNotNull( pd );
-
-        assertEquals( "org.apache.maven.plugins", pd.getGroupId() );
-    }
-
     // ----------------------------------------------------------------------
     // Lifecycle phases
     // ----------------------------------------------------------------------
@@ -209,15 +188,19 @@ public class MavenEmbedderTest
     protected void projectReadingTest()
         throws Exception
     {
-        MavenProject project = maven.readProjectWithDependencies( getPomFile() );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile( getPomFile().getAbsolutePath() );
 
-        assertEquals( "org.apache.maven", project.getGroupId() );
+        MavenExecutionResult result = maven.readProjectWithDependencies( request );
 
-        Set artifacts = project.getArtifacts();
+        assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
+
+        Set artifacts = result.getMavenProject().getArtifacts();
 
         assertEquals( 1, artifacts.size() );
 
         Artifact artifact = (Artifact) artifacts.iterator().next();
+
+        System.out.println( "artifact = " + artifact );
     }
 
     // ----------------------------------------------------------------------
@@ -227,9 +210,5 @@ public class MavenEmbedderTest
     protected File getPomFile()
     {
         return new File( basedir, "src/test/resources/pom.xml" );
-    }
-
-    public void testNothing()
-    {
     }
 }

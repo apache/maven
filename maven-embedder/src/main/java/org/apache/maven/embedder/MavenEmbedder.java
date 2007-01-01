@@ -276,45 +276,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Plugins
     // ----------------------------------------------------------------------
-
-    public List getAvailablePlugins()
-    {
-        List plugins = new ArrayList();
-
-        plugins.add( makeMockPlugin( "org.apache.maven.plugins", "maven-jar-plugin", "Maven Jar Plug-in" ) );
-
-        plugins.add( makeMockPlugin( "org.apache.maven.plugins", "maven-compiler-plugin", "Maven Compiler Plug-in" ) );
-
-        return plugins;
-    }
-
-    public PluginDescriptor getPluginDescriptor( SummaryPluginDescriptor summaryPluginDescriptor )
-        throws MavenEmbedderException
-    {
-        PluginDescriptor pluginDescriptor;
-
-        try
-        {
-            InputStream is =
-                realm.getResourceAsStream( "/plugins/" + summaryPluginDescriptor.getArtifactId() + ".xml" );
-
-            pluginDescriptor = pluginDescriptorBuilder.build( new InputStreamReader( is ) );
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new MavenEmbedderException( "Error retrieving plugin descriptor.", e );
-        }
-
-        return pluginDescriptor;
-    }
-
-    private SummaryPluginDescriptor makeMockPlugin( String groupId,
-                                                    String artifactId,
-                                                    String name )
-    {
-        return new SummaryPluginDescriptor( groupId, artifactId, name );
-    }
-
     // ----------------------------------------------------------------------
     // Execution of phases/goals
     // ----------------------------------------------------------------------
@@ -352,7 +313,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Remote Repository
     // ----------------------------------------------------------------------
-
     // ----------------------------------------------------------------------
     // Local Repository
     // ----------------------------------------------------------------------
