@@ -319,7 +319,7 @@ public class MavenCli
             Properties executionProperties = getExecutionProperties( commandLine );
 
             MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-                .setBasedir( baseDirectory )
+                .setBaseDirectory( baseDirectory )
                 .setGoals( goals )
                 .setProperties( executionProperties ) // optional
                 .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast

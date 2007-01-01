@@ -3,8 +3,6 @@ package org.apache.maven.embedder;
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -64,7 +62,7 @@ public class MavenEmbedderTest
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBasedir( targetDirectory )
+            .setBaseDirectory( targetDirectory )
             .setGoals( Arrays.asList( new String[]{ "package" } ) );
 
         MavenExecutionResult result = maven.execute( request );

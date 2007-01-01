@@ -9,7 +9,6 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -148,7 +147,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
         if ( request.getPomFile() != null && request.getBaseDirectory() == null )
         {
-            request.setBasedir( new File( request.getPomFile() ) );
+            request.setBaseDirectory( new File( request.getPomFile() ) );
         }
 
         return request;

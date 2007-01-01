@@ -73,7 +73,7 @@ public interface MavenExecutionRequest
     // ----------------------------------------------------------------------
 
     // Base directory
-    MavenExecutionRequest setBasedir( File basedir );
+    MavenExecutionRequest setBaseDirectory( File basedir );
     String getBaseDirectory();
 
     // Settings

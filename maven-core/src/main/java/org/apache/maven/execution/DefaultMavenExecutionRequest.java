@@ -245,7 +245,7 @@ public class DefaultMavenExecutionRequest
     //
     // ----------------------------------------------------------------------
 
-    public MavenExecutionRequest setBasedir( File basedir )
+    public MavenExecutionRequest setBaseDirectory( File basedir )
     {
         this.basedir = basedir;
 
