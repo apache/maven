@@ -235,14 +235,7 @@ public class DefaultMaven
 
         try
         {
-            rm = new ReactorManager( projects );
-
-            String requestFailureBehavior = request.getReactorFailureBehavior();
-
-            if ( requestFailureBehavior != null )
-            {
-                rm.setFailureBehavior( requestFailureBehavior );
-            }
+            rm = new ReactorManager( projects, request.getReactorFailureBehavior() );
         }
         catch ( CycleDetectedException e )
         {

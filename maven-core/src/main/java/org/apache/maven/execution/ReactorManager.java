@@ -50,10 +50,12 @@ public class ReactorManager
 
     private Map buildSuccessesByProject = new HashMap();
 
-    public ReactorManager( List projects )
+    public ReactorManager( List projects, String failureBehavior )
         throws CycleDetectedException, DuplicateProjectException
     {
         this.sorter = new ProjectSorter( projects );
+
+        this.failureBehavior = failureBehavior;
     }
 
     public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
@@ -76,20 +78,6 @@ public class ReactorManager
         }
 
         return pluginContext;
-    }
-
-    public void setFailureBehavior( String failureBehavior )
-    {
-        if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior ) ||
-            FAIL_NEVER.equals( failureBehavior ) )
-        {
-            this.failureBehavior = failureBehavior;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Invalid failure behavior (must be one of: \'" + FAIL_FAST + "\', \'" +
-                FAIL_AT_END + "\', \'" + FAIL_NEVER + "\')." );
-        }
     }
 
     public String getFailureBehavior()
