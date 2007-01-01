@@ -17,7 +17,6 @@ package org.apache.maven;
  */
 
 
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -93,11 +92,7 @@ public class DefaultMaven
 
     protected RuntimeInformation runtimeInformation;
 
-    protected WagonManager wagonManager;
-
     protected LoggerManager loggerManager;
-
-    protected MavenTools mavenTools;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
@@ -121,12 +116,6 @@ public class DefaultMaven
         }
 
         loggerManager.setThreshold( request.getLoggingLevel() );
-
-        wagonManager.setInteractive( request.isInteractiveMode() );
-
-        wagonManager.setDownloadMonitor( request.getTransferListener() );
-
-        wagonManager.setOnline( !request.getSettings().isOffline() );
 
         request.setStartTime( new Date() );
 

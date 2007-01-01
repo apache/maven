@@ -95,7 +95,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
         artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );        
 
-        // Wagon
+        // Wagon        
 
         if ( request.getSettings().isOffline() )
         {
@@ -107,7 +107,18 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
             {
                 wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-                wagonManager.setOnline( false );
+                if ( request.isOffline() )
+                {
+                    wagonManager.setOnline( false );
+                }
+                else
+                {
+                    wagonManager.setInteractive( request.isInteractiveMode() );
+
+                    wagonManager.setDownloadMonitor( request.getTransferListener() );
+
+                    wagonManager.setOnline( true );
+                }
             }
             catch ( ComponentLookupException e )
             {
