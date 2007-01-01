@@ -18,7 +18,6 @@ package org.apache.maven;
 
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
@@ -30,10 +29,8 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -46,15 +43,10 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
@@ -76,7 +68,7 @@ import java.util.TimeZone;
  */
 public class DefaultMaven
     extends AbstractLogEnabled
-    implements Maven, Contextualizable, Initializable
+    implements Maven, Contextualizable
 {
     // ----------------------------------------------------------------------
     // Components
@@ -92,10 +84,6 @@ public class DefaultMaven
 
     protected RuntimeInformation runtimeInformation;
 
-    protected LoggerManager loggerManager;
-
-    protected ArtifactRepositoryFactory artifactRepositoryFactory;
-
     private static final long MB = 1024 * 1024;
 
     private static final int MS_PER_SEC = 1000;
@@ -108,15 +96,6 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
-        Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
-
-        if ( request.getEventMonitors() == null )
-        {
-            request.addEventMonitor( new DefaultEventMonitor( logger ) );
-        }
-
-        loggerManager.setThreshold( request.getLoggingLevel() );
-
         request.setStartTime( new Date() );
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
@@ -536,19 +515,6 @@ public class DefaultMaven
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        try
-        {
-            loggerManager = (LoggerManager) container.lookup( LoggerManager.ROLE );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InitializationException( "Cannot lookup logger manager.", e );
-        }
     }
 
     // ----------------------------------------------------------------------

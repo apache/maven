@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -16,6 +18,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
@@ -160,6 +163,17 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         {
             request.setBaseDirectory( new File( request.getPomFile() ) );
         }
+
+        // EventMonitor/Logger
+
+        Logger logger = container.getLoggerManager().getLoggerForComponent( Mojo.ROLE );
+
+        if ( request.getEventMonitors() == null )
+        {
+            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+        }
+
+        container.getLoggerManager().setThreshold( request.getLoggingLevel() );
 
         return request;
     }

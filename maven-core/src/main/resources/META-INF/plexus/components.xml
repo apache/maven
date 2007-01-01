@@ -82,15 +82,6 @@
         <requirement>
           <role>org.apache.maven.execution.RuntimeInformation</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.MavenTools</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-        </requirement>
       </requirements>
     </component>
 
