@@ -90,9 +90,8 @@ public class DefaultExtensionManager
             PlexusContainer extensionContainer = getExtensionContainer();
             if ( extensionContainer == null )
             {
-                extensionContainer = container.createChildContainer( CONTAINER_NAME,
-                                                                     Collections.singletonList( artifact.getFile() ),
-                                                                     Collections.EMPTY_MAP );
+                extensionContainer =
+                    container.createChildContainer( CONTAINER_NAME, Collections.EMPTY_LIST, Collections.EMPTY_MAP );
             }
 
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
