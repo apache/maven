@@ -23,7 +23,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * Test to verify that a snapshot can be updated, even if the
+ * Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be
+ * updated. See MNG-1908.
  */
 public class MavenSnapshotUpdateITest
     extends AbstractMavenIntegrationTestCase

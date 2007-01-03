@@ -24,6 +24,9 @@
   <groupId>org.apache.maven.its.releaseUpdate</groupId>
   <artifactId>maven-it-release-update</artifactId>
   <version>1.0</version>
+  <description>
+    Test to verify that a plugin can be successfully updated to the latest release. See MNG-1908.
+  </description>
   <build>
     <plugins>
       <plugin>

@@ -25,11 +25,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Test to verify that a release can be updated.
+ * Test to verify that a plugin can be successfully updated to the latest release.
+ * See MNG-1908.
  */
 public class MavenReleaseUpdateITest
     extends AbstractMavenIntegrationTestCase
@@ -72,12 +71,7 @@ public class MavenReleaseUpdateITest
         verifier.assertArtifactNotPresent( GROUPID, ARTIFACTID, OLD_VERSION, TYPE );
         verifier.assertArtifactNotPresent( GROUPID, ARTIFACTID, NEW_VERSION, TYPE );
 
-        Map m = new HashMap();
-/*
-        m.put( "MAVEN_OPTS",
-               "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005" );
-*/
-        verifier.executeGoal( "package", m );
+        verifier.executeGoal( "package" );
 
         verifier.assertArtifactNotPresent( GROUPID, ARTIFACTID, OLD_VERSION, TYPE );
         verifier.assertArtifactPresent( GROUPID, ARTIFACTID, NEW_VERSION, TYPE );

@@ -22,7 +22,7 @@
   <artifactId>maven-it-snapshot-update</artifactId>
   <description>
     Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be
-    updated.
+    updated. See MNG-1908.
   </description>
   <version>1.0</version>
   <dependencies>
@@ -38,7 +38,7 @@
       <url>file:///${basedir}/repository</url>
       <snapshots>
         <updatePolicy>always</updatePolicy>
-      </snapshots>      
+      </snapshots>
     </repository>
   </repositories>
 </project>
