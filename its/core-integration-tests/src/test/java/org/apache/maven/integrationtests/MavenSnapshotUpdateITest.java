@@ -29,17 +29,12 @@ public class MavenSnapshotUpdateITest
     extends AbstractMavenIntegrationTestCase
 {
 
-    /**
-     * Test plugin configuration and goal configuration that overrides what the
-     * mojo has specified.
-     */
     public void testSnapshotUpdated()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/snapshotUpdate" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
-
 
         // create a repository (TODO: into verifier)
         File repository = new File( testDir, "repository" );
@@ -68,7 +63,8 @@ public class MavenSnapshotUpdateITest
         verifier.executeGoal( "package" );
 
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
-        verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "updatedArtifact" );
+        verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar",
+                                         "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
