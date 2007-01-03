@@ -168,6 +168,8 @@ public class DefaultLifecycleExecutor
                 }
             }
 
+            extensionManager.registerWagons();
+
             try
             {
                 Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );

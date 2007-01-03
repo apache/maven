@@ -1198,12 +1198,4 @@ public class DefaultPluginManager
     {
         return container.lookupMap( role );
     }
-
-    public void addToArtifactFilter( ArtifactFilter filter )
-    {
-        AndArtifactFilter newFilter = new AndArtifactFilter();
-        newFilter.add( filter );
-        newFilter.add( artifactFilter );
-        artifactFilter = newFilter;
-    }
 }

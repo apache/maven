@@ -45,7 +45,7 @@
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.plugin.PluginManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
       </requirements>
     </component>
@@ -328,7 +328,8 @@
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>
@@ -357,7 +358,8 @@
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>
@@ -391,7 +393,8 @@
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>
@@ -419,7 +422,8 @@
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>org.apache.maven.plugins:maven-war-plugin:war</package>
@@ -443,7 +447,8 @@
             <!-- START SNIPPET: ear-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-ear-plugin:generate-application-xml</generate-resources>
+                org.apache.maven.plugins:maven-ear-plugin:generate-application-xml
+              </generate-resources>
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <package>org.apache.maven.plugins:maven-ear-plugin:ear</package>
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
@@ -468,7 +473,8 @@
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>org.apache.maven.plugins:maven-rar-plugin:rar</package>
@@ -480,7 +486,7 @@
         </lifecycles>
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>par</role-hint>
@@ -502,7 +508,7 @@
         <!-- END SNIPPET: par-lifecycle -->
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>ejb3</role-hint>
@@ -524,7 +530,7 @@
         <!-- END SNIPPET: ejb3-lifecycle -->
       </configuration>
     </component>
- 
+
     <component>
       <role>org.apache.maven.plugin.version.PluginVersionManager</role>
       <role-hint>default</role-hint>
