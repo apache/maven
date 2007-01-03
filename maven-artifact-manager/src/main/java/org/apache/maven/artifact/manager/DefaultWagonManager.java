@@ -324,7 +324,8 @@ public class DefaultWagonManager
         else
         {
             getLogger().debug( "Trying repository " + repository.getId() );
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy() );
+            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(),
+                           false );
             getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
@@ -337,11 +338,11 @@ public class DefaultWagonManager
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
 
-        getRemoteFile( repository, destination, remotePath, null, checksumPolicy );
+        getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                                TransferListener downloadMonitor, String checksumPolicy )
+                                TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO: better excetpions - transfer failed is not enough?
@@ -412,7 +413,7 @@ public class DefaultWagonManager
                 retry = false;
 
                 // This should take care of creating destination directory now on
-                if ( destination.exists() )
+                if ( destination.exists() && !force )
                 {
                     try
                     {
