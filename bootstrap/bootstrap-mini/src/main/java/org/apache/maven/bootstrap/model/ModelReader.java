@@ -18,6 +18,7 @@ package org.apache.maven.bootstrap.model;
 
 import org.apache.maven.bootstrap.download.ArtifactResolver;
 import org.apache.maven.bootstrap.util.AbstractReader;
+import org.apache.maven.bootstrap.util.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -26,7 +27,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -325,7 +328,7 @@ public class ModelReader
             }
             else if ( rawName.equals( "version" ) )
             {
-                currentDependency.setVersion( getBodyText() );
+                currentDependency.setVersion( interpolate( getBodyText() ) );
             }
             else if ( rawName.equals( "jar" ) )
             {
@@ -337,7 +340,7 @@ public class ModelReader
             }
             else if ( rawName.equals( "groupId" ) )
             {
-                currentDependency.setGroupId( getBodyText() );
+                currentDependency.setGroupId( interpolate( getBodyText() ) );
             }
             else if ( rawName.equals( "artifactId" ) )
             {
@@ -459,4 +462,11 @@ public class ModelReader
         depth--;
     }
 
+    private String interpolate( String text )
+    {
+        Map map = new HashMap();
+        map.put( "pom.groupId", model.getGroupId() );
+
+        return StringUtils.interpolate( text, map );
+    }
 }
