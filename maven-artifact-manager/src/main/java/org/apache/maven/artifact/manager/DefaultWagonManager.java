@@ -53,6 +53,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,6 +90,9 @@ public class DefaultWagonManager
 
     private boolean interactive = true;
 
+    private Map availableWagons = new HashMap();
+
+    // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
     {
@@ -109,26 +113,39 @@ public class DefaultWagonManager
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
-        Wagon wagon;
+        PlexusContainer container = getWagonContainer( protocol );
 
+        Wagon wagon;
         try
         {
             wagon = (Wagon) container.lookup( Wagon.ROLE, protocol );
-            wagon.setInteractive( interactive );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException e1 )
         {
             throw new UnsupportedProtocolException(
-                "Cannot find wagon which supports the requested protocol: " + protocol, e );
+                "Cannot find wagon which supports the requested protocol: " + protocol, e1 );
         }
+
+        wagon.setInteractive( interactive );
 
         return wagon;
     }
 
-    public void putArtifact( File source, Artifact artifact, ArtifactRepository repository )
+    private PlexusContainer getWagonContainer( String protocol )
+    {
+        PlexusContainer container = this.container;
+
+        if ( availableWagons.containsKey( protocol ) )
+        {
+            container = (PlexusContainer) availableWagons.get( protocol );
+        }
+        return container;
+    }
+
+    public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws TransferFailedException
     {
-        putRemoteFile( repository, source, repository.pathOf( artifact ), downloadMonitor );
+        putRemoteFile( deploymentRepository, source, deploymentRepository.pathOf( artifact ), downloadMonitor );
     }
 
     public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
@@ -248,7 +265,7 @@ public class DefaultWagonManager
         {
             disconnectWagon( wagon );
 
-            releaseWagon( wagon );
+            releaseWagon( protocol, wagon );
         }
     }
 
@@ -331,8 +348,6 @@ public class DefaultWagonManager
 
         failIfNotOnline();
 
-        Wagon wagon;
-
         ArtifactRepository mirror = getMirror( repository.getId() );
         if ( mirror != null )
         {
@@ -342,6 +357,7 @@ public class DefaultWagonManager
         }
 
         String protocol = repository.getProtocol();
+        Wagon wagon;
         try
         {
             wagon = getWagon( protocol );
@@ -507,7 +523,7 @@ public class DefaultWagonManager
         {
             disconnectWagon( wagon );
 
-            releaseWagon( wagon );
+            releaseWagon( protocol, wagon );
         }
 
         if ( downloaded )
@@ -631,8 +647,9 @@ public class DefaultWagonManager
         }
     }
 
-    private void releaseWagon( Wagon wagon )
+    private void releaseWagon( String protocol, Wagon wagon )
     {
+        PlexusContainer container = getWagonContainer( protocol );
         try
         {
             container.release( wagon );
@@ -765,6 +782,13 @@ public class DefaultWagonManager
         this.interactive = interactive;
     }
 
+    public void registerWagons( Collection wagons, PlexusContainer extensionContainer )
+    {
+        for ( Iterator i = wagons.iterator(); i.hasNext(); )
+        {
+            availableWagons.put( i.next(), extensionContainer );
+        }
+    }
 
     /**
      * Applies the server configuration to the wagon

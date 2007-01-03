@@ -19,8 +19,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -73,5 +71,4 @@ public interface PluginManager
     Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException;
 
-    void addToArtifactFilter( ArtifactFilter filter );
 }

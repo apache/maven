@@ -27,14 +27,16 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
- * 
+ *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
@@ -45,12 +47,11 @@ public interface WagonManager
     /**
      * Get a Wagon provider that understands the protocol passed as argument.
      * It doesn't configure the Wagon.
-     * 
-     * @deprecated prone to errors. use {@link #getWagon(Repository)} instead.
-     * 
+     *
      * @param protocol the protocol the {@link Wagon} will handle
      * @return the {@link Wagon} instance able to handle the protocol provided
      * @throws UnsupportedProtocolException if there is no provider able to handle the protocol
+     * @deprecated prone to errors. use {@link #getWagon(Repository)} instead.
      */
     Wagon getWagon( String protocol )
         throws UnsupportedProtocolException;
@@ -58,11 +59,11 @@ public interface WagonManager
     /**
      * Get a Wagon provider for the provided repository.
      * It will configure the Wagon for that repository.
-     * 
+     *
      * @param repository the repository
      * @return the {@link Wagon} instance that can be used to connect to the repository
      * @throws UnsupportedProtocolException if there is no provider able to handle the protocol
-     * @throws WagonConfigurationException if the wagon can't be configured for the repository
+     * @throws WagonConfigurationException  if the wagon can't be configured for the repository
      */
     Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException;
@@ -82,9 +83,9 @@ public interface WagonManager
     void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
                               String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
-    
+
     void setOnline( boolean online );
-    
+
     boolean isOnline();
 
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
@@ -103,12 +104,14 @@ public interface WagonManager
     AuthenticationInfo getAuthenticationInfo( String id );
 
     /**
-     * Set the configuration for a repository 
-     * 
-     * @param repositoryId id of the repository to set the configuration to
-     * @param configuration dom tree of the xml with the configuration for the {@link Wagon} 
+     * Set the configuration for a repository
+     *
+     * @param repositoryId  id of the repository to set the configuration to
+     * @param configuration dom tree of the xml with the configuration for the {@link Wagon}
      */
     void addConfiguration( String repositoryId, Xpp3Dom configuration );
 
     void setInteractive( boolean interactive );
+
+    void registerWagons( Collection wagons, PlexusContainer extensionContainer );
 }

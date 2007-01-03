@@ -29,7 +29,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -610,14 +609,13 @@ public class DefaultPluginManager
 
             Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
             dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
-            
+
             List repositories = new ArrayList();
             repositories.addAll( resolutionGroup.getResolutionRepositories() );
             repositories.addAll( project.getRemoteArtifactRepositories() );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
-                                                                                    localRepository,
-                                                                                    repositories,
+                                                                                    localRepository, repositories,
                                                                                     artifactMetadataSource,
                                                                                     artifactFilter );
 
@@ -925,15 +923,14 @@ public class DefaultPluginManager
 
                 if ( toAdd != null )
                 {
-                    if ( implementation != null
-                        && toAdd.getAttribute( "implementation", null ) == null )
+                    if ( implementation != null && toAdd.getAttribute( "implementation", null ) == null )
                     {
 
                         XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
 
                         implementationConf.setAttribute( "implementation", parameter.getImplementation() );
 
-                        toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf  );
+                        toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf );
                     }
 
                     result.addChild( toAdd );
@@ -1183,13 +1180,5 @@ public class DefaultPluginManager
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
 
         return pluginContainer.lookupMap( role );
-    }
-
-    public void addToArtifactFilter( ArtifactFilter filter )
-    {
-        AndArtifactFilter newFilter = new AndArtifactFilter();
-        newFilter.add( filter );
-        newFilter.add( artifactFilter );
-        artifactFilter = newFilter;
     }
 }
