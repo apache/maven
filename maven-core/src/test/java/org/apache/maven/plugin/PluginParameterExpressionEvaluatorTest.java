@@ -199,8 +199,8 @@ public class PluginParameterExpressionEvaluatorTest
         throws CycleDetectedException, DuplicateProjectException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".",
-                                 new Properties(), new Date() );
+                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ),
+                                 Collections.EMPTY_LIST, ".", new Properties(), new Date() );
     }
 
     public void testLocalRepositoryExtraction()
