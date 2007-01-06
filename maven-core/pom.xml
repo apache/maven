@@ -26,17 +26,6 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-core</artifactId>
   <name>Maven Core</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptor>src/assemble/bin.xml</descriptor>
-          <finalName>maven-${version}</finalName>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
