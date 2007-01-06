@@ -308,7 +308,7 @@ public abstract class AbstractArtifactTask
 
                     classWorld.newRealm( "plexus.core", getClass().getClassLoader() );
 
-                    container = new DefaultPlexusContainer( null, null, null, classWorld );
+                    container = new DefaultPlexusContainer( null, null, classWorld );
 
                 }
                 catch ( PlexusContainerException e )

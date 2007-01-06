@@ -382,7 +382,7 @@ public class MavenEmbedder
 
         try
         {
-            container = new DefaultPlexusContainer( null, null, null, classWorld );
+            container = new DefaultPlexusContainer( null, null, classWorld );
         }
         catch ( PlexusContainerException e )
         {
