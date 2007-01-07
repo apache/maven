@@ -22,10 +22,16 @@ import org.apache.maven.model.io.jdom.MavenJDOMWriter;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.nio.channels.FileLock;
 
 //TODO: turn this into a component
 
@@ -75,4 +81,63 @@ public class WriterUtils
 
         writer.write( newModel, doc, w, format );
     }
+
+    /*
+    public static void writePomModel( FileObject pom,
+                                      Model newModel )
+        throws IOException
+    {
+        InputStream inStr = null;
+
+        FileLock lock = null;
+
+        OutputStreamWriter outStr = null;
+
+        try
+        {
+            inStr = pom.getInputStream();
+
+            SAXBuilder builder = new SAXBuilder();
+
+            Document doc = builder.build( inStr );
+
+            inStr.close();
+
+            inStr = null;
+
+            lock = pom.lock();
+
+            MavenJDOMWriter writer = new MavenJDOMWriter();
+
+            String encoding = newModel.getModelEncoding() != null ? newModel.getModelEncoding() : "UTF-8";
+
+            outStr = new OutputStreamWriter( pom.getOutputStream( lock ), encoding );
+
+            Format form = Format.getRawFormat().setEncoding( encoding );
+
+            writer.write( newModel, doc, outStr, form );
+
+            outStr.close();
+
+            outStr = null;
+        }
+        catch ( JDOMException exc )
+        {
+            exc.printStackTrace();
+            throw (IOException) new IOException( "Cannot parse the POM by JDOM." ).initCause( exc );
+        }
+        finally
+        {
+            IOUtil.close( inStr );
+
+            IOUtil.close( outStr );
+
+            if ( lock != null )
+            {
+                lock.releaseLock();
+            }
+
+        }
+    }
+    */
 }
