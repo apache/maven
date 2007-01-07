@@ -31,28 +31,18 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0-alpha-7</version>
-        <executions>
-          <execution>
-            <id>site-docs</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>xdoc</goal>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-          <execution>
-            <goals>
-              <goal>xpp3-writer</goal>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <version>1.0.0</version>
           <model>profiles.mdo</model>
         </configuration>
+        <executions>
+          <execution>
+            <id>jdom</id>
+            <goals>
+              <goal>jdom-writer</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -64,11 +54,16 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <!-- Generate model code -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
 </project>

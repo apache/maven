@@ -86,10 +86,20 @@
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
           </configuration>
         </plugin>
+        <!--
+        ./maven-model/maven.mdo
+        ./maven-plugin-descriptor/src/main/mdo/lifecycle.mdo
+        ./maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo
+        ./maven-plugin-registry/plugin-registry.mdo
+        ./maven-profile/profiles.mdo
+        ./maven-repository-metadata/src/main/mdo/metadata.mdo
+        ./maven-repository-metadata/src/main/mdo/plugins.mdo
+        ./maven-settings/settings.mdo
+        -->
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>1.0-alpha-8</version>
+          <version>1.0-alpha-13</version>
           <executions>
             <execution>
               <id>site-docs</id>
@@ -100,6 +110,7 @@
               </goals>
             </execution>
             <execution>
+              <id>standard</id>
               <goals>
                 <goal>java</goal>
                 <goal>xpp3-reader</goal>
@@ -209,6 +220,11 @@
         <artifactId>easymock</artifactId>
         <version>1.2_Java1.3</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

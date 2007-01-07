@@ -29,23 +29,21 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator;
+import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.model.io.jdom.MavenJDOMWriter;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -61,8 +59,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +81,7 @@ public class MavenEmbedder
 
     private MavenXpp3Reader modelReader;
 
-    private MavenXpp3Writer modelWriter;
+    private MavenJDOMWriter modelWriter;
 
     private ProfileManager profileManager;
 
@@ -119,6 +115,8 @@ public class MavenEmbedder
 
     private MavenEmbedderLogger logger;
 
+    private boolean activateSystemManager;
+
     // ----------------------------------------------------------------------
     // User options
     // ----------------------------------------------------------------------
@@ -142,6 +140,23 @@ public class MavenEmbedder
         this.classWorld = classWorld;
 
         this.logger = logger;
+
+        // ----------------------------------------------------------------------------
+        // Don't override any existing SecurityManager if one has been installed. Our
+        // SecurityManager just checks to make sure
+        // ----------------------------------------------------------------------------
+
+        try
+        {
+            if ( System.getSecurityManager() == null && activateSystemManager )
+            {
+                System.setSecurityManager( new MavenEmbedderSecurityManager() );
+            }
+        }
+        catch ( RuntimeException e )
+        {
+            logger.warn( "Error trying to set the SecurityManager: " + e.getMessage() );
+        }
 
         start();
     }
@@ -190,10 +205,18 @@ public class MavenEmbedder
     }
 
     public void writeModel( Writer writer,
+                            Model model,
+                            boolean namespaceDeclaration )
+        throws IOException
+    {
+        WriterUtils.write( writer, model, true );
+    }
+
+    public void writeModel( Writer writer,
                             Model model )
         throws IOException
     {
-        modelWriter.write( writer, model );
+        WriterUtils.write( writer, model, false );
     }
 
     // ----------------------------------------------------------------------
@@ -391,7 +414,8 @@ public class MavenEmbedder
 
         if ( logger != null )
         {
-            MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
+            MavenEmbedderLoggerManager loggerManager =
+                new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
 
             container.setLoggerManager( loggerManager );
         }
@@ -410,7 +434,7 @@ public class MavenEmbedder
 
             modelReader = new MavenXpp3Reader();
 
-            modelWriter = new MavenXpp3Writer();
+            modelWriter = new MavenJDOMWriter();
 
             maven = (Maven) container.lookup( Maven.ROLE );
 

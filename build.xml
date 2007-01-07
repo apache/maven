@@ -116,7 +116,9 @@
     <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="${modello.version}" name="modello-plugin-xpp3" repository="codehaus"/>
+    <pull orgpath="org/codehaus/modello/modello-plugin-jdom" version="${modello.version}" name="modello-plugin-jdom" repository="codehaus"/>
     <pull orgpath="junit/junit" version="${junit.version}" name="junit"/>
+    <pull orgpath="jdom/jdom" version="${jdom.version}" name="jdom"/>    
   </target>
 
   <target name="classpath-pre" depends="init,pull"
@@ -128,7 +130,6 @@
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-component-api/${plexus.version}/plexus-component-api-${plexus.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/${classworlds.version}/plexus-classworlds-${classworlds.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/${plexus-interactivity-api.version}/plexus-interactivity-api-${plexus-interactivity-api.version}.jar"/>
-      
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/${wagon.version}/wagon-file-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/${wagon.version}/wagon-http-lightweight-${wagon.version}.jar"/>
@@ -137,6 +138,7 @@
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/${wagon.version}/wagon-ssh-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
+      <pathelement location="${maven.repo.local}/jdom/jdom/${jdom.version}/jdom-${jdom.version}.jar"/>
     </path>
     <!-- DGF Need to keep these modello classes out of the system classpath at runtime, because different parts of the build
          need different versions of modello.  -->
@@ -145,6 +147,7 @@
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/${modello.version}/modello-core-${modello.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/${modello.version}/modello-plugin-xml-${modello.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/${modello.version}/modello-plugin-xpp3-${modello.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-jdom/${modello.version}/modello-plugin-jdom-${modello.version}.jar"/>
       <!--
       <pathelement location="modello.jar"/>
       -->
@@ -184,6 +187,7 @@
         <modello-single-mode file="@{file}" version="@{version}" mode="java"/>
         <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-reader"/>
         <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-writer"/>
+        <modello-single-mode file="@{file}" version="@{version}" mode="jdom-writer"/>
       </sequential>
     </macrodef>
 
@@ -280,22 +284,6 @@
       </fileset>
     </chmod>
   </target>
-
-  <!--
-  <target name="mits"
-          description="Run the Maven integration tests."
-          depends="init">
-    <java fork="true"
-          dir="maven-core-integration-tests"
-          classname="org.apache.maven.cli.MavenCli"
-          failonerror="true">
-      <classpath refid="maven.classpath"/>
-      <arg value="-e"/>
-      <arg value="clean"/>
-      <arg value="test"/>
-    </java>
-  </target>
-  -->
 
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
 

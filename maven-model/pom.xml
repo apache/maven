@@ -36,6 +36,14 @@
           <version>4.0.0</version>
           <model>maven.mdo</model>
         </configuration>
+        <executions>
+          <execution>
+            <id>jdom</id>
+            <goals>
+              <goal>jdom-writer</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -51,8 +59,8 @@
               <execution>
                 <id>v3</id>
                 <goals>
-                  <goal>xpp3-writer</goal>
                   <goal>java</goal>
+                  <goal>xpp3-writer</goal>
                   <goal>xpp3-reader</goal>
                   <goal>xsd</goal>
                 </goals>
@@ -85,6 +93,10 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
 </project>

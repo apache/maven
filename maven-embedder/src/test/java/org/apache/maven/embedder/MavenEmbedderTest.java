@@ -11,6 +11,8 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
+import java.io.Writer;
+import java.io.FileWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.Arrays;
@@ -38,14 +40,6 @@ public class MavenEmbedderTest
         throws Exception
     {
         maven.stop();
-    }
-
-    public void testMavenEmbedder()
-        throws Exception
-    {
-        modelReadingTest();
-
-        projectReadingTest();
     }
 
     // ----------------------------------------------------------------------
@@ -170,10 +164,10 @@ public class MavenEmbedderTest
     }
 
     // ----------------------------------------------------------------------
-    //
+    // Model Reading
     // ----------------------------------------------------------------------
 
-    protected void modelReadingTest()
+    public void testModelReading()
         throws Exception
     {
         // ----------------------------------------------------------------------
@@ -185,7 +179,7 @@ public class MavenEmbedderTest
         assertEquals( "org.apache.maven", model.getGroupId() );
     }
 
-    protected void projectReadingTest()
+    public void testProjectReading()
         throws Exception
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile( getPomFile().getAbsolutePath() );
@@ -201,6 +195,30 @@ public class MavenEmbedderTest
         Artifact artifact = (Artifact) artifacts.iterator().next();
 
         System.out.println( "artifact = " + artifact );
+    }
+
+    // ----------------------------------------------------------------------------
+    // Model Writing
+    // ----------------------------------------------------------------------------
+
+     public void testModelWriting()
+        throws Exception
+    {
+        Model model = maven.readModel( getPomFile() );
+
+        model.setGroupId( "org.apache.maven.new" );
+
+        File file = new File( basedir, "target/model.xml" );
+
+        Writer writer = new FileWriter( file );
+
+        maven.writeModel( writer, model );
+
+        writer.close();
+
+        model = maven.readModel( file );
+
+        assertEquals( "org.apache.maven.new", model.getGroupId() );
     }
 
     // ----------------------------------------------------------------------

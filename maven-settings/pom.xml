@@ -35,6 +35,14 @@
           <version>1.0.0</version>
           <model>settings.mdo</model>
         </configuration>
+        <executions>
+          <execution>
+            <id>jdom</id>
+            <goals>
+              <goal>jdom-writer</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -46,11 +54,16 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <!-- Generated model code -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
 </project>
