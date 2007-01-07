@@ -158,10 +158,16 @@ public class RegexBasedModelInterpolator
                 }
             }
 
+            /*
+
+            MNG-2745: don't interpolate system properties in the POM. Bad dog!
+
             if ( value == null )
             {
                 value = envars.getProperty( realExpr );
             }
+
+            */
 
             // if the expression refers to itself, skip it.
             if ( String.valueOf( value ).indexOf( wholeExpr ) > -1 )
