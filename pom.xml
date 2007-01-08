@@ -45,6 +45,14 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <!-- For plexus snapshots -->
+  <repositories>
+    <repository>
+      <id>codehaus.snapshots</id>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </repository>
+  </repositories>
+
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
