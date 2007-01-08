@@ -1092,20 +1092,22 @@ public class DefaultMavenProjectBuilder
                         {
                             getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " + project.getId() + " cannot be loaded from relative path: " + parentDescriptor + "; path does not exist." );
                         }
-
-                        parentDescriptor = null;
                     }
                 }
 
-                try
+                if ( parentDescriptor != null )
                 {
-                    parentDescriptor = parentDescriptor.getCanonicalFile();
-                }
-                catch ( IOException e )
-                {
-                    getLogger().debug( "Failed to canonicalize potential parent POM: \'" + parentDescriptor + "\'", e );
+                    try
+                    {
+                        parentDescriptor = parentDescriptor.getCanonicalFile();
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().debug( "Failed to canonicalize potential parent POM: \'" + parentDescriptor + "\'",
+                                           e );
 
-                    parentDescriptor = null;
+                        parentDescriptor = null;
+                    }
                 }
 
                 if ( parentDescriptor != null && parentDescriptor.exists() )
