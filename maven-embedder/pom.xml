@@ -45,20 +45,6 @@
           <descriptor>src/main/assembly/dep.xml</descriptor>
           <archive>
             <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
-            <!--
-
-            This doesn't work and should
-
-            <manifestEntries>
-              <Manifest-Version>1.0</Manifest-Version>
-              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-              <Bundle-Name>Maven 2.x Embedder Plug-in</Bundle-Name>
-              <Bundle-Vendor>org.apache.maven</Bundle-Vendor>
-              <Bundle-SymbolicName>org.maven.ide.embedder</Bundle-SymbolicName>
-              <Bundle-Version>${project.version}</Bundle-Version>
-              <Bundle-ClassPath>.</Bundle-ClassPath>
-            </manifestEntries>
-            -->
           </archive>
         </configuration>
       </plugin>
@@ -84,16 +70,4 @@
       <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
-  <distributionManagement>
-    <repository>
-      <id>apache.releases</id>
-      <name>Apache Release Distribution Repository</name>
-      <url>scp://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-    </repository>
-    <snapshotRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Development Snapshot Repository</name>
-      <url>file:///tmp/embedder</url>
-    </snapshotRepository>
-  </distributionManagement>
 </project>
