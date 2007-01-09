@@ -33,7 +33,7 @@ public class MavenSnapshotUpdateITest
     public void testSnapshotUpdated()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/snapshotUpdate" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0108-snapshotUpdate" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
 
