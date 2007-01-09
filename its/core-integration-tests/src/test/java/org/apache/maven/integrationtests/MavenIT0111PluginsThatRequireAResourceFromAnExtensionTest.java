@@ -2,9 +2,10 @@ package org.apache.maven.integrationtests;
 
 import java.io.File;
 
-/**
- * #it0104 Commenting out, not fixed until post-2.0.4, due to dependency on new plexus-container-default version.
- */
+import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.ResourceExtractor;
+
+/** #it0104 Commenting out, not fixed until post-2.0.4, due to dependency on new plexus-container-default version. */
 public class MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -17,7 +18,8 @@ public class MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest
     public void testit0111()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0111-pluginThatRequiresResourceFromAnExtension" );
+        File testDir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/it0111-pluginThatRequiresResourceFromAnExtension" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
