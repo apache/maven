@@ -19,7 +19,7 @@ public class MavenIT0110PluginDependenciesComeFromPluginReposTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0110-pluginDependenciesComeFromPluginRepos" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
+        verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

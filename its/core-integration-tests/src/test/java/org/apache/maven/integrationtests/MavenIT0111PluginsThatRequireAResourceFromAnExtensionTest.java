@@ -19,7 +19,7 @@ public class MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0111-pluginThatRequiresResourceFromAnExtension" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
+        verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
