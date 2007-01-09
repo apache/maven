@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<!--
+
+  Checkstyle configuration that checks the sun coding conventions from:
+
+    - the Java Language Specification at
+      http://java.sun.com/docs/books/jls/second_edition/html/index.html
+
+    - the Sun Code Conventions at http://java.sun.com/docs/codeconv/
+
+    - the Javadoc guidelines at
+      http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
+
+    - the JDK Api documentation http://java.sun.com/j2se/docs/api/index.html
+
+    - some best practices
+
+  Checkstyle is very configurable. Be sure to read the documentation at
+  http://checkstyle.sf.net (or in your downloaded distribution).
+
+  Most Checks are configurable, be sure to consult the documentation.
+
+  To completely disable a check, just comment it out or delete it from the file.
+
+  Finally, it is worth reading the documentation.
+
+-->
+
+<module name="Checker">
+  <module name="TreeWalker">
+
+    <!-- Checks for imports                              -->
+    <!-- See http://checkstyle.sf.net/config_import.html -->
+    <module name="AvoidStarImport"/>
+    <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+
+
+    <!-- Checks for Size Violations.                    -->
+    <!-- See http://checkstyle.sf.net/config_sizes.html -->
+
+
+
+    <!-- Modifier Checks                                    -->
+    <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+
+    <!-- Checks for blocks. You know, those {}'s         -->
+    <!-- See http://checkstyle.sf.net/config_blocks.html -->
+    <module name="LeftCurly">
+      <property name="option" value="nl"/>
+    </module>
+    <module name="RightCurly">
+      <property name="option" value="alone"/>
+    </module>
+
+    <module name="TabCharacter"/>
+    <module name="WhitespaceAfter"/>
+
+    <module name="ParenPad"/>
+    <module name="TypecastParenPad"/>
+    <module name="NoWhitespaceBefore"/>
+    <module name="PackageName"/>
+
+
+    <!-- Checks for class design                         -->
+    <!-- See http://checkstyle.sf.net/config_design.html -->
+
+
+    <!-- Miscellaneous other checks.                   -->
+    <!-- See http://checkstyle.sf.net/config_misc.html -->
+    <module name="DoubleCheckedLocking"/>    <!-- MY FAVOURITE -->
+    <module name="EmptyStatement"/>
+
+
+    <module name="GenericIllegalRegexp"> 
+      <!-- \s matches whitespace character, $ matches end of line. --> 
+      <property name="format" value="(?:\x66\x75\x63\x6B)|(?:\x73\x68\x69\x74)|(?:\x63\x75\x6E\x74)"/>
+      <property name="ignoreCase" value="true" />
+      <property name="message" value="Code contains inappropriate language"/>
+
+    </module>
+
+    <!--http://checkstyle.sourceforge.net/config_sizes.html-->
+    <!-- eclipse formatting does not shorten lines -->
+   <!-- <module name="LineLength">
+      <property name="severity" value="warning"/>
+      <property name="max" value="132"/>
+    </module> -->
+
+    <!-- the following exist in sufficent abundance that enforcing and even warning on these is impractical -->
+    <!--
+    <module name="ParameterName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]*" />
+    </module> -->
+
+
+    <!-- http://checkstyle.sourceforge.net/config_coding.html#IllegalCatch-->
+   <!-- <module name="IllegalCatch">
+      <property name="severity" value="warning"/>
+    </module>   
+
+    <module name="IllegalThrows">
+      <property name="severity" value="warning"/>
+    </module>  
+
+    <module name="DefaultComesLast"/>
+
+    <module name="FallThrough">
+      <property name="severity" value="warning"/>
+    </module>  --> 
+
+
+
+
+  </module>
+</module>
