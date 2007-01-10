@@ -200,44 +200,6 @@ public class RegexBasedModelInterpolatorTest
         assertEquals( "file://localhost/myBasedir/temp-repo", ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
     }
 
-    public void testEnvars()
-        throws Exception
-    {
-        Properties envars = new Properties();
-
-        envars.setProperty( "HOME", "/path/to/home" );
-
-        Model model = new Model();
-
-        Properties modelProperties = new Properties();
-
-        modelProperties.setProperty( "outputDirectory", "${env.HOME}" );
-
-        model.setProperties( modelProperties );
-
-        Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
-
-        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "/path/to/home" );
-    }
-
-    public void testEnvarExpressionThatEvaluatesToNullReturnsTheLiteralString()
-        throws Exception
-    {
-        Properties envars = new Properties();
-
-        Model model = new Model();
-
-        Properties modelProperties = new Properties();
-
-        modelProperties.setProperty( "outputDirectory", "${env.DOES_NOT_EXIST}" );
-
-        model.setProperties( modelProperties );
-
-        Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
-
-        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
-    }
-
     public void testExpressionThatEvaluatesToNullReturnsTheLiteralString()
         throws Exception
     {
