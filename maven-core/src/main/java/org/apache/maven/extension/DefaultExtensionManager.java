@@ -94,15 +94,31 @@ public class DefaultExtensionManager
                     container.createChildContainer( CONTAINER_NAME, Collections.EMPTY_LIST, Collections.EMPTY_MAP );
             }
 
-            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            // gross hack for some backwards compat (MNG-2749)
+            // if it is a lone artifact, then we assume it to be a resource package, and put it in the main container
+            // as before. If it has dependencies, that's when we risk conflict and exile to the child container
+            if ( result.getArtifacts().size() == 1 )
             {
-                Artifact a = (Artifact) i.next();
+                Artifact a = (Artifact) result.getArtifacts().iterator().next();
 
                 a = project.replaceWithActiveArtifact( a );
 
-                getLogger().debug( "Adding to extension classpath: " + a.getFile() );
+                getLogger().debug( "Adding extension to core container: " + a.getFile() );
 
-                extensionContainer.addJarResource( a.getFile() );
+                container.addJarResource( a.getFile() );
+            }
+            else
+            {
+                for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+                {
+                    Artifact a = (Artifact) i.next();
+    
+                    a = project.replaceWithActiveArtifact( a );
+    
+                    getLogger().debug( "Adding to extension classpath: " + a.getFile() );
+    
+                    extensionContainer.addJarResource( a.getFile() );
+                }
             }
         }
     }
