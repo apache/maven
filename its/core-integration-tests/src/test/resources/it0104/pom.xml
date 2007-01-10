@@ -7,6 +7,9 @@
   <description>
     Verify that plugin configurations are interpolated correctly.
   </description>
+  <organization>
+    <name>Apache</name>
+  </organization>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
@@ -26,14 +29,19 @@
           <groupId>org.apache.maven.its.plugins</groupId>
           <artifactId>maven-it-plugin-configuration</artifactId>
           <configuration>
+            <outputDirectory>${project.build.directory}/config-output</outputDirectory>
             <dom>
+              <basedir>${basedir}</basedir>
               <modelVersion>${project.modelVersion}</modelVersion>
               <name>${project.name}</name>
               <groupId>${project.groupId}</groupId>
-              <description>$project.description}</description>
+              <description>${project.description}</description>
               <packaging>${project.packaging}</packaging>
               <version>${project.version}</version>
-              <url>${project.url</url>
+              <url>${project.url}</url>
+              <organization>
+                <name>${project.organization.name}</name>
+              </organization>
               <build>
                 <directory>${project.build.directory}</directory>
                 <outputDirectory>${project.build.outputDirectory}</outputDirectory>
