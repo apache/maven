@@ -4,9 +4,9 @@
   <name>Maven Integration Test :: it0104</name> 
   <groupId>org.apache.maven.its.it0104</groupId>
   <artifactId>maven-it-it0104</artifactId>
-  <description>Verify that plugin configurations are resolved correctly, particularly
-        when they contain ${project.build.directory} in the string value of a 
-        Map.Entry.</description>
+  <description>
+    Verify that plugin configurations are interpolated correctly.
+  </description>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
@@ -27,13 +27,17 @@
           <artifactId>maven-it-plugin-configuration</artifactId>
           <configuration>
             <dom>
+              <modelVersion>${project.modelVersion}</modelVersion>
               <name>${project.name}</name>
-              <systemProperties>
-                <property>
-                  <name>target.dir</name>
-                  <value>${project.build.directory}</value>
-                </property>
-              </systemProperties>
+              <groupId>${project.groupId}</groupId>
+              <description>$project.description}</description>
+              <packaging>${project.packaging}</packaging>
+              <version>${project.version}</version>
+              <url>${project.url</url>
+              <build>
+                <directory>${project.build.directory}</directory>
+                <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              </build>
             </dom>
           </configuration>
           <executions>
