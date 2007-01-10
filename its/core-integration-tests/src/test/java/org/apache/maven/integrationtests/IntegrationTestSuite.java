@@ -112,7 +112,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0101Test.class );
         suite.addTestSuite( MavenIT0102Test.class );
         suite.addTestSuite( MavenIT0103Test.class );
-        // suite.addTestSuite(MavenIT0104Test.class);
+        suite.addTestSuite(MavenIT0104Test.class);
         suite.addTestSuite( MavenIT0105Test.class );
         // suite.addTestSuite(MavenIT0106Test.class);
         // suite.addTestSuite(MavenIT0107Test.class);
