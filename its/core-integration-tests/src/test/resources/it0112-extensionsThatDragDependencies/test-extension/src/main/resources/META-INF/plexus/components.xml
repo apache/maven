@@ -1,0 +1,18 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>scm</role-hint>
+      <implementation>org.apache.maven.wagon.providers.scm.ScmWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.scm.manager.ScmManager</role>
+        </requirement>
+      </requirements>
+      <configuration>
+        <checkoutDirectory>target/checkout</checkoutDirectory>
+      </configuration>
+    </component>
+  </components>
+</component-set>
