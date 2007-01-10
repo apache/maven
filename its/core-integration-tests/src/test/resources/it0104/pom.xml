@@ -9,7 +9,6 @@
         Map.Entry.</description>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
@@ -24,15 +23,26 @@
     <!-- pluginManagement -->
       <plugins>
         <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-configuration</artifactId>
           <configuration>
-            <systemProperties>
-              <property>
-                <name>target.dir</name>
-                <value>${project.build.directory}</value>
-              </property>
-            </systemProperties>
+            <dom>
+              <name>${project.name}</name>
+              <systemProperties>
+                <property>
+                  <name>target.dir</name>
+                  <value>${project.build.directory}</value>
+                </property>
+              </systemProperties>
+            </dom>
           </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>config</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     <!-- /pluginManagement -->
