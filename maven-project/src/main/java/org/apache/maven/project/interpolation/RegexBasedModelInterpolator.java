@@ -47,17 +47,9 @@ public class RegexBasedModelInterpolator
 {
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.|env\\.)?([^}]+)\\}" );
 
-    private Properties envars;
-
-    public RegexBasedModelInterpolator( Properties envars )
-    {
-        this.envars = envars;
-    }
-
     public RegexBasedModelInterpolator()
         throws IOException
     {
-        envars = CommandLineUtils.getSystemEnvVars();
     }
 
     public Model interpolate( Model model, Map context )
@@ -157,17 +149,6 @@ public class RegexBasedModelInterpolator
                     }
                 }
             }
-
-            /*
-
-            MNG-2745: don't interpolate system properties in the POM. Bad dog!
-
-            if ( value == null )
-            {
-                value = envars.getProperty( realExpr );
-            }
-
-            */
 
             // if the expression refers to itself, skip it.
             if ( String.valueOf( value ).indexOf( wholeExpr ) > -1 )
