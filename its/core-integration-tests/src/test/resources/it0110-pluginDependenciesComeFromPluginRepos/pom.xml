@@ -12,21 +12,21 @@
     <issue>MNG-2539</issue>
   </properties>
 
+  <!--
   <repositories>
     <repository>
       <id>javamail-local</id>
       <url>file://${basedir}/repository</url>
     </repository>
   </repositories>
+  -->
 
-  <!--
   <pluginRepositories>
     <pluginRepository>
       <id>javamail-local</id>
       <url>file://${basedir}/repository</url>
     </pluginRepository>
   </pluginRepositories>
-  -->
 
   <build>
     <plugins>

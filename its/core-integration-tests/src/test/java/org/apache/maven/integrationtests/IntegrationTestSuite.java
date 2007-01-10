@@ -117,6 +117,8 @@ public class IntegrationTestSuite
         // suite.addTestSuite(MavenIT0106Test.class);
         // suite.addTestSuite(MavenIT0107Test.class);
         suite.addTestSuite( MavenIT0109SnapshotUpdateTest.class );
+        suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
+        suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         return suite;
     }
 }

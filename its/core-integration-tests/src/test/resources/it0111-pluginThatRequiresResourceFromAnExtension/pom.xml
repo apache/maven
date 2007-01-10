@@ -5,8 +5,10 @@
   <packaging>pom</packaging>
   <version>1</version>
   <name>Checkstyle</name>
+  <!--
   <modules>
     <module>checkstyle-assembly</module>
     <module>checkstyle-test</module>
   </modules>
+  -->
 </project>
