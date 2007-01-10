@@ -29,7 +29,7 @@
           <groupId>org.apache.maven.its.plugins</groupId>
           <artifactId>maven-it-plugin-configuration</artifactId>
           <configuration>
-            <outputDirectory>${project.build.directory}/config-output</outputDirectory>
+            <directory>${project.build.directory}</directory>
             <dom>
               <basedir>${basedir}</basedir>
               <modelVersion>${project.modelVersion}</modelVersion>
