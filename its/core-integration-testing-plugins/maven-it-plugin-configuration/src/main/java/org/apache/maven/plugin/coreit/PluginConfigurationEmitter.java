@@ -18,16 +18,26 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomWriter;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 //MAPI: This is a canidate for the internal state dump (ISD). This is probably similar to what is in the help plugin.
+
+// Compare:
+//   MavenProject
+//   PluginExpressionEvaluator
+//   Raw DOM
+//
+// Currently we don't have the means to easily test this inside the core. So this will be a model to drive
+// making the core more testable.
 
 /**
  * @goal config
@@ -37,26 +47,99 @@ import java.io.Writer;
 public class PluginConfigurationEmitter
     extends AbstractMojo
 {
-    /** @parameter expression="${dom}" */
+    /**
+     * The MavenProject we will use for comparision.
+     *
+     * @parameter expression="${project}"
+     */
+    private MavenProject project;
+
+    // How to enumerate all the possible expressions that can be used.
+
+    /**
+     * This is the raw interpolated DOM will be used for comparison.
+     *
+     * @parameter expression="${dom}"
+     */
     private PlexusConfiguration dom;
 
-    /** @parameter expression="${outputDirectory}" default-value="${project.build.directory}" */
-    private File outputDirectory;
+    /** @parameter expression="${directory}" default-value="${project.build.directory}" */
+    private File directory;
 
-    /** @parameter expression="${fileName}" default-value="plugin-configuration.txt" */
+    /**
+     * Where to place the serialized version of the DOM for analysis.
+     *
+     * @parameter expression="${fileName}" default-value="interpolated-plugin-configuration.xml"
+     */
     private String fileName;
 
     public void execute()
         throws MojoExecutionException
     {
+        if ( !directory.exists() )
+        {
+            directory.mkdirs();
+        }
+
+        emitMavenProjectValues();
+
+        emitExpressionEvaluatorValues();
+
+        emitRawDomValues();
+    }
+
+    private void emitMavenProjectValues()
+        throws MojoExecutionException
+    {
         try
         {
-            File file = new File( outputDirectory, fileName );
+            Properties p = new Properties();
 
-            if ( !outputDirectory.exists() )
-            {
-                outputDirectory.mkdirs();
-            }
+            p.setProperty( "project.build.directory", directory.getAbsolutePath() );
+
+            File file = new File( directory, "maven-project-output.txt" );
+
+            OutputStream os = new FileOutputStream( file );
+
+            p.store( os, "expression evaluator values" );
+
+            os.close();
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error writing out plugin configuration.", e );
+        }
+    }
+
+    private void emitExpressionEvaluatorValues()
+        throws MojoExecutionException
+    {
+        try
+        {
+            Properties p = new Properties();
+
+            p.setProperty( "project.build.directory", directory.getAbsolutePath() );
+
+            File file = new File( directory, "expression-evaluator-output.txt" );
+
+            OutputStream os = new FileOutputStream( file );
+
+            p.store( os, "expression evaluator values" );
+
+            os.close();
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error writing out plugin configuration.", e );
+        }
+    }
+
+    private void emitRawDomValues()
+        throws MojoExecutionException
+    {
+        try
+        {
+            File file = new File( directory, fileName );
 
             Writer writer = new FileWriter( file );
 
