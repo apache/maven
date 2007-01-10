@@ -34,7 +34,7 @@ import java.io.Writer;
  * @phase generate-resources
  * @description Goal produces a raw string with contains full interpolated plugin configurations.
  */
-public class CoreItMojo
+public class PluginConfigurationEmitter
     extends AbstractMojo
 {
     /** @parameter expression="${dom}" */
