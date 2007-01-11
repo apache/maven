@@ -86,7 +86,7 @@ public class DefaultArtifactResolver
             {
                 File systemFile = artifact.getFile();
 
-                if ( !systemFile.exists() )
+                if ( systemFile == null || !systemFile.exists() )
                 {
                     throw new ArtifactNotFoundException(
                         "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
