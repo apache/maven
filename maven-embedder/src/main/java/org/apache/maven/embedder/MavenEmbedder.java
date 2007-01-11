@@ -20,6 +20,8 @@ import org.apache.maven.Maven;
 import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -94,6 +96,8 @@ public class MavenEmbedder
     private ArtifactResolver artifactResolver;
 
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
+
+    private ArtifactHandlerManager artifactHandlerManager;
 
     private Maven maven;
 
@@ -296,6 +300,11 @@ public class MavenEmbedder
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }
 
+    public ArtifactHandler getArtifactHandler( Artifact artifact )
+    {
+        return artifactHandlerManager.getArtifactHandler( artifact.getType() );
+    }
+
     // ----------------------------------------------------------------------
     // Plugins
     // ----------------------------------------------------------------------
@@ -465,6 +474,8 @@ public class MavenEmbedder
 
             defaultsPopulator = (MavenExecutionRequestDefaultsPopulator) container.lookup(
                 MavenExecutionRequestDefaultsPopulator.ROLE );
+
+            artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
             // These three things can be cached for a single session of the embedder
             settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false );
