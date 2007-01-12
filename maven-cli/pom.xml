@@ -37,6 +37,14 @@
           </descriptors>
           <finalName>maven-${version}</finalName>
         </configuration>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>        
       </plugin>
     </plugins>
   </build>
