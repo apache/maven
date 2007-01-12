@@ -97,11 +97,11 @@
       </sequential>
     </macrodef>
     <pull orgpath="commons-cli/commons-cli" version="${commons-cli.version}" name="commons-cli"/>
-    <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils"/>
-    <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default"/>
-    <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api"/>
-    <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds"/>
-    <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api"/>
+    <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
+    <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
+    <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api" repository="codehaus"/>
+    <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
+    <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-archiver" version="${plexus-archiver.version}" name="plexus-archiver" repository="codehaus"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
