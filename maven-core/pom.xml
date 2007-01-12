@@ -36,6 +36,14 @@ under the License.
           <descriptor>src/assemble/bin.xml</descriptor>
           <finalName>maven-${version}</finalName>
         </configuration>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>        
       </plugin>
     </plugins>
   </build>
