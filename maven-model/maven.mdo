@@ -2000,7 +2000,7 @@
       <version>4.0.0</version>
       <description><![CDATA[
          A repository contains the information needed
-         for establishing connections with remote repoistory.
+         for establishing connections with remote repository.
       ]]></description>
       <fields>
         <field>
@@ -2066,7 +2066,7 @@
       <superClass>RepositoryBase</superClass>
       <version>4.0.0</version>
       <description>
-        A repository contains the information needed for establishing connections with remote repoistory.
+        A repository contains the information needed for establishing connections with remote repository.
       </description>
       <fields>
         <field>
@@ -2105,7 +2105,7 @@
       <superClass>RepositoryBase</superClass>
       <version>4.0.0</version>
       <description>
-        Repository contains the information needed for deploying to the remote repoistory.
+        Repository contains the information needed for deploying to the remote repository.
       </description>
       <fields>
         <field>
@@ -2134,7 +2134,7 @@
     <class>
       <name>RepositoryPolicy</name>
       <version>4.0.0</version>
-      <description>Download policy</description>
+      <description>Download policy.</description>
       <fields>
         <field>
           <name>enabled</name>
@@ -2187,7 +2187,7 @@
           <name>id</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            A unique identifier for a deployment locataion. This is used to match the site to configuration in
+            A unique identifier for a deployment location. This is used to match the site to configuration in
             the <code>settings.xml</code> file, for example.
           ]]></description>
           <type>String</type>
