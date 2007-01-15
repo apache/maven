@@ -81,6 +81,8 @@ public class DefaultRepositoryMetadataManager
                     File file = new File( localRepository.getBasedir(),
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
+
+
                     boolean checkForUpdates =
                         policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
@@ -109,7 +111,7 @@ public class DefaultRepositoryMetadataManager
                     {
                         file.setLastModified( System.currentTimeMillis() );
                     }
-                    else if ( !metadataIsEmpty )
+                    else
                     {
                         // this ensures that files are not continuously checked when they don't exist remotely
                         try

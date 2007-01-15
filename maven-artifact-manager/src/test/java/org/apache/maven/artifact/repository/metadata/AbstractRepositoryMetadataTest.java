@@ -37,63 +37,67 @@ public class AbstractRepositoryMetadataTest
 
     private MockManager mm = new MockManager();
     private TestFileManager fileManager = new TestFileManager( "AbstractRepositoryMetadataTest.test.", "" );
-    
+
     public void tearDown() throws IOException
     {
         fileManager.cleanUp();
     }
 
-    public void testUpdateRepositoryMetadata_ShouldNotStoreIfMainVersionIsLATEST()
+    public void testUpdateRepositoryMetadata_NoVersionTagIfMainVersionIsLATEST()
         throws IOException, XmlPullParserException
     {
         MockAndControlForArtifactRepository local = new MockAndControlForArtifactRepository();
         MockAndControlForArtifactRepository remote = new MockAndControlForArtifactRepository();
-        
+
         File basedir = fileManager.createTempDir();
-        
+
         String path = "metadata.xml";
-        
+
         Metadata m = new Metadata();
         m.setVersion( Artifact.LATEST_VERSION );
-        
+
         TestRepoMetadata trm = new TestRepoMetadata( m );
-        
+
         local.expectGetBasedir( basedir );
         local.expectPathOfLocalRepositoryMetadata( trm, remote.repository, path );
-        
+
         mm.replayAll();
-        
+
         trm.updateRepositoryMetadata( local.repository, remote.repository );
-        
-        fileManager.assertFileExistence( basedir, path, false );
-        
+
+        fileManager.assertFileExistence( basedir, path, true );
+        assertTrue( fileManager.getFileContents( new File( basedir, path ) ).indexOf( "<version>"
+            + Artifact.LATEST_VERSION + "</version>" ) < 0 );
+
         mm.verifyAll();
     }
 
-    public void testUpdateRepositoryMetadata_ShouldNotStoreIfMainVersionIsRELEASE()
+    public void testUpdateRepositoryMetadata_NoVersionTagIfVersionIsRELEASE()
         throws IOException, XmlPullParserException
     {
         MockAndControlForArtifactRepository local = new MockAndControlForArtifactRepository();
         MockAndControlForArtifactRepository remote = new MockAndControlForArtifactRepository();
-        
+
         File basedir = fileManager.createTempDir();
-        
+
         String path = "metadata.xml";
-        
+
         Metadata m = new Metadata();
         m.setVersion( Artifact.RELEASE_VERSION );
-        
+
         TestRepoMetadata trm = new TestRepoMetadata( m );
-        
+
         local.expectGetBasedir( basedir );
         local.expectPathOfLocalRepositoryMetadata( trm, remote.repository, path );
-        
+
         mm.replayAll();
-        
+
         trm.updateRepositoryMetadata( local.repository, remote.repository );
-        
-        fileManager.assertFileExistence( basedir, path, false );
-        
+
+        fileManager.assertFileExistence( basedir, path, true );
+        assertTrue( fileManager.getFileContents( new File( basedir, path ) ).indexOf( "<version>"
+            + Artifact.RELEASE_VERSION + "</version>" ) < 0 );
+
         mm.verifyAll();
     }
 
