@@ -420,7 +420,7 @@ public class MavenEmbedder
         {
             throw new MavenEmbedderException( "Error starting Maven embedder.", e );
         }
-
+        
         if ( logger != null )
         {
             MavenEmbedderLoggerManager loggerManager =

@@ -94,16 +94,6 @@
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
           </configuration>
         </plugin>
-        <!--
-        ./maven-model/maven.mdo
-        ./maven-plugin-descriptor/src/main/mdo/lifecycle.mdo
-        ./maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo
-        ./maven-plugin-registry/plugin-registry.mdo
-        ./maven-profile/profiles.mdo
-        ./maven-repository-metadata/src/main/mdo/metadata.mdo
-        ./maven-repository-metadata/src/main/mdo/plugins.mdo
-        ./maven-settings/settings.mdo
-        -->
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
@@ -129,8 +119,22 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <!--
     <plugins>
+      <!--
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <aggregate>false</aggregate>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>  
+            <goals>
+              <goal>jar</goal>
+            </goals>          
+          </execution>
+        </executions>
+      </plugin>    
       <plugin>
         <artifactId>maven-doap-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
@@ -139,8 +143,8 @@
           <language>Java</language>
         </configuration>
       </plugin>
+      -->
     </plugins>
-    -->
   </build>
   <modules>
     <module>maven-artifact</module>
