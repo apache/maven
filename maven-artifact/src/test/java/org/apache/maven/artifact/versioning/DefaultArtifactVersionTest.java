@@ -240,5 +240,11 @@ public class DefaultArtifactVersionTest
 
         version = new DefaultArtifactVersion( "2.0-1" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "2.0.1" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "1.10" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1.2" ) ) > 0 );
+
+        // version = new DefaultArtifactVersion( "1.1-foo-10" );
+        // assertTrue( version.compareTo( new DefaultArtifactVersion( "1.1-foo-2" ) ) > 0 );
     }
 }
