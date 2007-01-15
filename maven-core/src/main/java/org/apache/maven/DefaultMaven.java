@@ -126,14 +126,16 @@ public class DefaultMaven
 
         // Either the build was successful, or it was a fail_at_end/fail_never reactor build
 
+        ReactorManager reactorManager = result.getReactorManager();
+        
         // TODO: should all the logging be left to the CLI?
-        logReactorSummary( result.getReactorManager() );
+        logReactorSummary( reactorManager );
 
-        if ( result.getReactorManager().hasBuildFailures() )
+        if ( reactorManager != null && reactorManager.hasBuildFailures() )
         {
-            logErrors( result.getReactorManager(), request.isShowErrors() );
+            logErrors( reactorManager, request.isShowErrors() );
 
-            if ( !result.getReactorManager().FAIL_NEVER.equals( result.getReactorManager().getFailureBehavior() ) )
+            if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
             {
                 dispatcher.dispatchError( event, request.getBaseDirectory(), null );
 
@@ -153,7 +155,7 @@ public class DefaultMaven
             }
         }
 
-        logSuccess( result.getReactorManager() );
+        logSuccess( reactorManager );
 
         stats( request.getStartTime() );
 
@@ -608,7 +610,7 @@ public class DefaultMaven
 
     private void logReactorSummary( ReactorManager rm )
     {
-        if ( rm.hasMultipleProjects() && rm.executedMultipleProjects() )
+        if ( rm != null && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
         {
             getLogger().info( "" );
             getLogger().info( "" );
