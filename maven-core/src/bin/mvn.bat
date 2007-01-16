@@ -80,7 +80,7 @@ echo.
 goto error
 
 :valMHome
-if exist "%M2_HOME%\bin\m2.bat" goto init
+if exist "%M2_HOME%\bin\mvn.bat" goto init
 
 echo.
 echo ERROR: M2_HOME is set to an invalid directory.
