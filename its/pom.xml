@@ -50,6 +50,7 @@
   </mailingLists>
   <modules>
     <module>core-integration-testing-plugins</module>
+    <module>core-integration-testing-support</module>    
   </modules>
   
   <distributionManagement>
