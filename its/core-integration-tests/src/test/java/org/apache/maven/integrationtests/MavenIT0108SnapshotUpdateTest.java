@@ -26,7 +26,7 @@ import java.io.File;
  * Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be
  * updated. See MNG-1908.
  */
-public class MavenIT0109SnapshotUpdateTest
+public class MavenIT0108SnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
 

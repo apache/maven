@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Test to verify that a release can be updated.
  */
-public class MavenIT0108ReleaseUpdateTest
+public class MavenIT0109ReleaseUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
     private static final String GROUPID = "org.apache.maven.it";
