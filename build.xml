@@ -1,4 +1,4 @@
-<project default="all" basedir=".">
+<project default="run-full-maven" basedir=".">
 
   <description>
     The first time you build Maven from source, you have to build Maven without Maven.
@@ -336,12 +336,12 @@ load ${bootstrapDir}/target/classes
 
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
 
-  <target name="run-full-maven" depends="init,extract-assembly"
+  <target name="run-full-maven" depends="all"
           description="runs the full extracted Maven, now with tests">
     <property name="maven.goals" value="clean install"/>
     <java classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
       <classpath>
-        <fileset dir="${maven.home}/core/boot" includes="classworlds-*.jar"/>
+        <fileset dir="${maven.home}/core/boot" includes="plexus-classworlds-*.jar"/>
       </classpath>
       <sysproperty key="classworlds.conf" value="${maven.home}/bin/m2.conf"/>
       <sysproperty key="maven.home" value="${maven.home}"/>
