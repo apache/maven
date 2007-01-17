@@ -11,10 +11,11 @@ public abstract class AbstractMavenIntegrationTestCase
     private boolean printed = false;
 
     protected void setUp()
+        throws Exception
     {
         if ( !printed )
         {
-            String simpleName = getClass().getSimpleName();
+            String simpleName = getClass().getName();
             simpleName = simpleName.startsWith( "MavenIT" ) ? simpleName.substring( "MavenIT".length() ) : simpleName;
             simpleName = simpleName.endsWith( "Test" ) ? simpleName.substring(0, simpleName.length() -4 ) : simpleName;
 
