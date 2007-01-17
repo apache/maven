@@ -338,7 +338,7 @@ load ${bootstrapDir}/target/classes
 
   <target name="run-full-maven" depends="all"
           description="runs the full extracted Maven, now with tests">
-    <property name="maven.goals" value="clean install"/>
+    <property name="maven.goals" value="clean test"/>
     <java classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
       <classpath>
         <fileset dir="${maven.home}/core/boot" includes="plexus-classworlds-*.jar"/>
