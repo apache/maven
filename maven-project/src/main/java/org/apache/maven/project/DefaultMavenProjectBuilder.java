@@ -16,6 +16,7 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -38,11 +39,9 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.MavenProfilesBuilder;
@@ -51,6 +50,10 @@ import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.build.model.DefaultModelLineage;
+import org.apache.maven.project.build.model.ModelLineage;
+import org.apache.maven.project.build.model.ModelLineageBuilder;
+import org.apache.maven.project.build.profile.ProfileAdvisor;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
@@ -60,7 +63,6 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.MavenTools;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -166,6 +168,10 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+    
+    private ModelLineageBuilder modelLineageBuilder;
+    
+    private ProfileAdvisor profileAdvisor;
 
     private MavenTools mavenTools;
 
@@ -420,6 +426,12 @@ public class DefaultMavenProjectBuilder
                                                       boolean checkDistributionManagementStatus )
         throws ProjectBuildingException
     {
+        // TODO: Remove this once we have build-context stuff working...
+        if ( !container.getContext().contains( "SystemProperties" ) )
+        {
+            container.addContextValue("SystemProperties", System.getProperties());
+        }
+        
         Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
         MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(),
@@ -613,76 +625,44 @@ public class DefaultMavenProjectBuilder
 
         Model superModel = getSuperModel();
 
-        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
-        // shall the ProfileManager intefrace expose the properties?
-        
-        ProfileManager superProjectProfileManager;
-        if (externalProfileManager instanceof DefaultProfileManager) {
-            superProjectProfileManager = new DefaultProfileManager( container, ((DefaultProfileManager) externalProfileManager).getSystemProperties() );
-        } else {
-            superProjectProfileManager = new DefaultProfileManager( container );
-        }
-
-        List activeProfiles;
-
-        superProjectProfileManager.addProfiles( superModel.getProfiles() );
-
-        activeProfiles = injectActiveProfiles( superProjectProfileManager, superModel );
-
         MavenProject superProject = new MavenProject( superModel );
+        
+        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-        superProject.setActiveProfiles( activeProfiles );
+        List explicitlyActive;
+        List explicitlyInactive;
+        
+        if ( externalProfileManager != null )
+        {
+            // used to trigger the caching of SystemProperties in the container context...
+            try
+            {
+                externalProfileManager.getActiveProfiles();
+            }
+            catch ( ProfileActivationException e )
+            {
+                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", e );
+            }
+            
+            explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
+            explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
+        }
+        else
+        {
+            explicitlyActive = Collections.EMPTY_LIST;
+            explicitlyInactive = Collections.EMPTY_LIST;
+        }
+        
+        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, null, explicitlyActive, explicitlyInactive ) );
 
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
 
-        // TODO: the aRWR can get out of sync with project.model.repositories. We should do all the processing of
-        // profiles, etc on the models then recreate the aggregated sets at the end from the project repositories (they
-        // must still be created along the way so that parent poms can be discovered, however)
-        // Use a TreeSet to ensure ordering is retained
-        Set aggregatedRemoteWagonRepositories = new LinkedHashSet();
-
-        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-        List activeExternalProfiles;
-        try
-        {
-            if ( externalProfileManager != null )
-            {
-                activeExternalProfiles = externalProfileManager.getActiveProfiles();
-            }
-            else
-            {
-                activeExternalProfiles = Collections.EMPTY_LIST;
-            }
-        }
-        catch ( ProfileActivationException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed to calculate active external profiles.", e );
-        }
-
-        for ( Iterator i = activeExternalProfiles.iterator(); i.hasNext(); )
-        {
-            Profile externalProfile = (Profile) i.next();
-
-            for ( Iterator repoIterator = externalProfile.getRepositories().iterator(); repoIterator.hasNext(); )
-            {
-                Repository mavenRepo = (Repository) repoIterator.next();
-
-                ArtifactRepository artifactRepo = null;
-                try
-                {
-                    artifactRepo = mavenTools.buildArtifactRepository( mavenRepo );
-                }
-                catch ( InvalidRepositoryException e )
-                {
-                    throw new ProjectBuildingException( projectId, e.getMessage(), e );
-                }
-
-                aggregatedRemoteWagonRepositories.add( artifactRepo );
-            }
-        }
-
+        LinkedHashSet aggregatedRemoteWagonRepositories = collectInitialRepositories( model, superModel,
+                                                                                      parentSearchRepositories,
+                                                                                      projectDir, explicitlyActive,
+                                                                                      explicitlyInactive );
+        
         Model originalModel = ModelUtils.cloneModel( model );
 
         MavenProject project = null;
@@ -801,6 +781,62 @@ public class DefaultMavenProjectBuilder
         return project;
     }
     
+    /*
+     * Order is:
+     * 
+     * 1. model profile repositories
+     * 2. model repositories
+     * 3. superModel profile repositories
+     * 4. superModel repositories
+     * 5. parentSearchRepositories
+     */
+    private LinkedHashSet collectInitialRepositories( Model model, Model superModel, List parentSearchRepositories,
+                                                      File projectDir, List explicitlyActive, List explicitlyInactive )
+        throws ProjectBuildingException
+    {
+        LinkedHashSet collected = new LinkedHashSet();
+        
+        collectInitialRepositoriesFromModel( collected, model, projectDir, explicitlyActive, explicitlyInactive );
+
+        collectInitialRepositoriesFromModel( collected, superModel, projectDir, explicitlyActive, explicitlyInactive );
+
+        if ( parentSearchRepositories != null && !parentSearchRepositories.isEmpty() )
+        {
+            collected.addAll( parentSearchRepositories );
+        }
+        
+        return collected;
+    }
+
+    private void collectInitialRepositoriesFromModel( LinkedHashSet collected, Model model, File projectDir,
+                                                      List explicitlyActive, List explicitlyInactive )
+        throws ProjectBuildingException
+    {
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
+                                                                                          explicitlyActive,
+                                                                                          explicitlyInactive );
+
+        if ( reposFromProfiles != null && !reposFromProfiles.isEmpty() )
+        {
+            collected.addAll( reposFromProfiles );
+        }
+
+        List modelRepos = model.getRepositories();
+        if ( modelRepos != null && !modelRepos.isEmpty() )
+        {
+            try
+            {
+                collected.addAll( mavenTools.buildArtifactRepositories( modelRepos ) );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new ProjectBuildingException( safeVersionlessKey( model.getGroupId(), model.getArtifactId() ),
+                                                    "Failed to construct ArtifactRepository instances for repositories declared in: "
+                                                        + model.getId(), e );
+            }
+        }
+    }
+
     private String safeVersionlessKey( String groupId, String artifactId )
     {
         String gid = groupId;
@@ -851,16 +887,29 @@ public class DefaultMavenProjectBuilder
     {
         Model model = project.getModel();
 
-        List activeProfiles = project.getActiveProfiles();
-
-        if ( activeProfiles == null )
+        List explicitlyActive;
+        List explicitlyInactive;
+        
+        if ( profileMgr != null )
         {
-            activeProfiles = new ArrayList();
+            explicitlyActive = profileMgr.getExplicitlyActivatedIds();
+            explicitlyInactive = profileMgr.getExplicitlyDeactivatedIds();
         }
-
-        List injectedProfiles = injectActiveProfiles( profileMgr, model );
-
-        activeProfiles.addAll( injectedProfiles );
+        else
+        {
+            explicitlyActive = Collections.EMPTY_LIST;
+            explicitlyInactive = Collections.EMPTY_LIST;
+        }
+        
+        List active = profileAdvisor.applyActivatedProfiles( model, projectDir, explicitlyActive, explicitlyInactive );
+        
+        LinkedHashSet activated = new LinkedHashSet();
+        
+        activated.addAll( project.getActiveProfiles() );
+        activated.addAll( active );
+        
+        List activeProfiles = new ArrayList( activated );
+        project.setActiveProfiles( activeProfiles );
 
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
         //  [BP] - Can this above comment be explained?
@@ -971,251 +1020,69 @@ public class DefaultMavenProjectBuilder
                                           boolean strict )
         throws ProjectBuildingException, InvalidRepositoryException
     {
-        if ( !model.getRepositories().isEmpty() )
-        {
-            List respositories = buildArtifactRepositories( model );
-
-            for ( Iterator it = respositories.iterator(); it.hasNext(); )
-            {
-                ArtifactRepository repository = (ArtifactRepository) it.next();
-
-                if ( !aggregatedRemoteWagonRepositories.contains( repository ) )
-                {
-                    aggregatedRemoteWagonRepositories.add( repository );
-                }
-            }
-        }
-
-        //TODO mkleint - use the (Container, Properties constructor to make system properties embeddable
-        ProfileManager profileManager;
-        if (externalProfileManager != null && externalProfileManager instanceof DefaultProfileManager ) {
-            profileManager = new DefaultProfileManager( container, ((DefaultProfileManager)externalProfileManager).getSystemProperties() );
-        } else {
-            profileManager = new DefaultProfileManager( container );
-        }
-
+        ModelLineage modelLineage = new DefaultModelLineage();
+        modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
+        
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager );
+        
+        List explicitlyActive;
+        List explicitlyInactive;
+        
         if ( externalProfileManager != null )
         {
-            profileManager.explicitlyActivate( externalProfileManager.getExplicitlyActivatedIds() );
-
-            profileManager.explicitlyDeactivate( externalProfileManager.getExplicitlyDeactivatedIds() );
+            explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
+            explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
         }
-
-        List activeProfiles;
-
-        try
+        else
         {
-            profileManager.addProfiles( model.getProfiles() );
-
-            loadProjectExternalProfiles( profileManager, projectDir );
-
-            activeProfiles = injectActiveProfiles( profileManager, model );
+            explicitlyActive = Collections.EMPTY_LIST;
+            explicitlyInactive = Collections.EMPTY_LIST;
         }
-        catch ( ProfileActivationException e )
+        
+        List models = modelLineage.getModelsInDescendingOrder();
+        List poms = modelLineage.getFilesInDescendingOrder();
+        
+        MavenProject lastProject = null;
+        for( int i = 0; i < models.size(); i++ )
         {
-            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles: " + e.getMessage(), e );
-        }
-
-        MavenProject project = new MavenProject( model );
-
-        project.setActiveProfiles( activeProfiles );
-
-        lineage.addFirst( project );
-
-        Parent parentModel = model.getParent();
-
-        if ( parentModel != null )
-        {
-            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-            if ( StringUtils.isEmpty( parentModel.getGroupId() ) )
-            {
-                throw new ProjectBuildingException( projectId, "Missing groupId element from parent element" );
-            }
-            else if ( StringUtils.isEmpty( parentModel.getArtifactId() ) )
-            {
-                throw new ProjectBuildingException( projectId, "Missing artifactId element from parent element" );
-            }
-            else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&
-                parentModel.getArtifactId().equals( model.getArtifactId() ) )
-            {
-                throw new ProjectBuildingException( projectId, "Parent element is a duplicate of " + "the current project " );
-            }
-            else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
-            {
-                throw new ProjectBuildingException( projectId, "Missing version element from parent element" );
-            }
-
-            // the only way this will have a value is if we find the parent on disk...
-            File parentDescriptor = null;
-
-            model = null;
+            Model currentModel = (Model) models.get( i );
+            File currentPom = (File) poms.get( i );
             
-            String parentKey = createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
-            MavenProject parentProject = (MavenProject) rawProjectCache.get( parentKey );
-    
-            if ( parentProject != null )
+            MavenProject project = new MavenProject( currentModel );
+            project.setFile( currentPom );
+
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( model, projectDir, explicitlyActive,
+                                                                              explicitlyInactive ) );
+            
+            if ( lastProject != null )
             {
-                model = ModelUtils.cloneModel( parentProject.getModel() );
+                project.setParent( lastProject );
                 
-                parentDescriptor = parentProject.getFile();
+                project.setParentArtifact( artifactFactory.createParentArtifact( lastProject.getGroupId(), lastProject
+                    .getArtifactId(), lastProject.getVersion() ) );
             }
             
-            String parentRelativePath = parentModel.getRelativePath();
-
-            // if we can't find a cached model matching the parent spec, then let's try to look on disk using
-            // <relativePath/>
-            if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
-            {
-                parentDescriptor = new File( projectDir, parentRelativePath );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " + project.getId() + " in relative path: " + parentRelativePath );
-                }
-
-                if ( parentDescriptor.isDirectory() )
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Path specified in <relativePath/> (" + parentRelativePath +
-                            ") is a directory. Searching for 'pom.xml' within this directory." );
-                    }
-
-                    parentDescriptor = new File( parentDescriptor, "pom.xml" );
-
-                    if ( !parentDescriptor.exists() )
-                    {
-                        if ( getLogger().isDebugEnabled() )
-                        {
-                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " + project.getId() + " cannot be loaded from relative path: " + parentDescriptor + "; path does not exist." );
-                        }
-                    }
-                }
-
-                if ( parentDescriptor != null )
-                {
-                    try
-                    {
-                        parentDescriptor = parentDescriptor.getCanonicalFile();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().debug( "Failed to canonicalize potential parent POM: \'" + parentDescriptor + "\'",
-                                           e );
-
-                        parentDescriptor = null;
-                    }
-                }
-
-                if ( parentDescriptor != null && parentDescriptor.exists() )
-                {
-                    Model candidateParent = readModel( projectId, parentDescriptor, strict );
-
-                    String candidateParentGroupId = candidateParent.getGroupId();
-                    if ( candidateParentGroupId == null && candidateParent.getParent() != null )
-                    {
-                        candidateParentGroupId = candidateParent.getParent().getGroupId();
-                    }
-
-                    String candidateParentVersion = candidateParent.getVersion();
-                    if ( candidateParentVersion == null && candidateParent.getParent() != null )
-                    {
-                        candidateParentVersion = candidateParent.getParent().getVersion();
-                    }
-
-                    if ( parentModel.getGroupId().equals( candidateParentGroupId ) &&
-                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) &&
-                        parentModel.getVersion().equals( candidateParentVersion ) )
-                    {
-                        model = candidateParent;
-
-                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'" +
-                            parentModel.getRelativePath() + "\' for project: " + project.getId() );
-                    }
-                    else
-                    {
-                        getLogger().debug( "Invalid parent-POM referenced by relative path '" +
-                            parentModel.getRelativePath() + "' in parent specification in " + project.getId() + ":" +
-                            "\n  Specified: " + parentModel.getId() + "\n  Found:     " + candidateParent.getId() );
-                    }
-                }
-                else if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Parent-POM: " + parentModel.getId() + " not found in relative path: " + parentRelativePath );
-                }
-            }
-
-            Artifact parentArtifact = null;
-
-            // only resolve the parent model from the repository system if we didn't find it on disk...
-            if ( model == null )
-            {
-                // MNG-2302: parent's File was being populated incorrectly when parent is loaded from repo.
-                // keep this in line with other POMs loaded from the repository...the file should be null.
-                parentDescriptor = null;
-                
-                //!! (**)
-                // ----------------------------------------------------------------------
-                // Do we have the necessary information to actually find the parent
-                // POMs here?? I don't think so ... Say only one remote repository is
-                // specified and that is ibiblio then this model that we just read doesn't
-                // have any repository information ... I think we might have to inherit
-                // as we go in order to do this.
-                // ----------------------------------------------------------------------
-
-                // we must add the repository this POM was found in too, by chance it may be located where the parent is
-                // we can't query the parent to ask where it is :)
-                List remoteRepositories = new ArrayList( aggregatedRemoteWagonRepositories );
-                remoteRepositories.addAll( parentSearchRepositories );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                                       "Retrieving parent-POM: " + parentModel.getId() + " for project: "
-                                           + project.getId() + " from the repository." );
-                }
-
-                parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
-                                                                       parentModel.getArtifactId(),
-                                                                       parentModel.getVersion() );
-
-                try
-                {
-                    model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
-                }
-                catch( ProjectBuildingException e )
-                {
-                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId() + " for project: " + project.getId(), e );
-                }
-            }
-
-            if ( model != null && !"pom".equals( model.getPackaging() ) )
-            {
-                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " +
-                    projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
-            }
-
-            File parentProjectDir = null;
-            if ( parentDescriptor != null )
-            {
-                parentProjectDir = parentDescriptor.getParentFile();
-            }
+            lineage.addLast( project );
             
-            MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
-                                                   parentSearchRepositories, aggregatedRemoteWagonRepositories,
-                                                   externalProfileManager, strict );
-            
-            parent.setFile( parentDescriptor );
-
-            project.setParent( parent );
-
-            project.setParentArtifact( parentArtifact );
+            lastProject = project;
         }
 
-        return project;
+        MavenProject result = (MavenProject) lineage.get( lineage.size() - 1 );
+        
+        if ( externalProfileManager != null )
+        {
+            LinkedHashSet active = new LinkedHashSet();
+            
+            List existingActiveProfiles = result.getActiveProfiles();
+            if ( existingActiveProfiles != null && !existingActiveProfiles.isEmpty() )
+            {
+                active.addAll( existingActiveProfiles );
+            }
+            
+            profileAdvisor.applyActivatedExternalProfiles( result.getModel(), projectDir, externalProfileManager );
+        }
+        
+        return result;
     }
 
     private List injectActiveProfiles( ProfileManager profileManager, Model model )

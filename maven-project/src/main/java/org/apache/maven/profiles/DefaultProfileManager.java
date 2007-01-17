@@ -246,7 +246,7 @@ public class DefaultProfileManager
         throws ProfileActivationException
     {
         List activators = null;
-        container.addContextValue("SystemProperties", systemProperties);
+        
         try
         {
             activators = container.lookupList( ProfileActivator.ROLE );
