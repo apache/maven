@@ -14,7 +14,9 @@ public abstract class AbstractMavenIntegrationTestCase
     protected void runTest()
         throws Throwable
     {
-        String simpleName = getClass().getSimpleName();
+        String simpleName = getClass().getName();
+        int idx = simpleName.lastIndexOf( '.' );
+        simpleName = idx >= 0 ? simpleName.substring( idx + 1 ) : simpleName;
         simpleName = simpleName.startsWith( "MavenIT" ) ? simpleName.substring( "MavenIT".length() ) : simpleName;
         simpleName = simpleName.endsWith( "Test" ) ? simpleName.substring( 0, simpleName.length() - 4 ) : simpleName;
 
