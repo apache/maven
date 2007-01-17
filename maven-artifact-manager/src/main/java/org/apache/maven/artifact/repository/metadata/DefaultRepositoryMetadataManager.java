@@ -203,7 +203,7 @@ public class DefaultRepositoryMetadataManager
                     {
                         m.getVersioning().setSnapshot( new Snapshot() );
                     }
-
+/*
                     if ( !m.getVersioning().getSnapshot().isLocalCopy() )
                     {
                         // TODO: I think this is incorrect (it results in localCopy set in a remote profile). Probably
@@ -212,6 +212,7 @@ public class DefaultRepositoryMetadataManager
                         metadata.setMetadata( m );
                         metadata.storeInLocalRepository( localRepository, repository );
                     }
+*/
                 }
                 else
                 {
