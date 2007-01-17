@@ -1,4 +1,4 @@
-<project default="all">
+<project default="all" basedir=".">
 
   <description>
     The first time you build Maven from source, you have to build Maven without Maven.
@@ -67,7 +67,7 @@
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
-    <delete dir="bootstrap/target"/>
+    <delete dir="bootstrap"/>
   </target>
 
   <!-- DGF TODO Make a simple Java Ant task that pulls dependencies and adds them to a path reference, so we don't have to copy-and-paste -->
@@ -102,7 +102,9 @@
     <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api" repository="codehaus"/>
+    <!--
     <pull orgpath="org/codehaus/plexus/plexus-archiver" version="${plexus-archiver.version}" name="plexus-archiver" repository="codehaus"/>
+    -->
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
@@ -161,6 +163,7 @@
           description="generates Java sources from Modello mdo model files"
       >
     <mkdir dir="bootstrap/target"/>
+    <mkdir dir="bootstrap/lib"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
 
     <macrodef name="modello-single-mode">
@@ -203,6 +206,14 @@
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
+    <echo>
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    COMPILE-BOOT
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    </echo>
+  
     <path id="sources">
       <dirset dir=".">
         <include name="bootstrap/target/generated-sources"/>
@@ -233,39 +244,73 @@
 
   <target name="maven-compile" depends="compile-boot"
           description="compiles Maven using the bootstrap Maven, skipping automated tests">
+          
+    <echo>
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    MAVEN-COMPILE
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
+    </echo>                    
+          
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
-<!--
-      <sysproperty key="maven.test.skip" value="true"/>
--->
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="-X"/>
-      <!-- JDC: Commenting out offline mode until all plugins and their dependencies
-               can be pre-resolved before this call.
-           <arg value="-o"/>
-      -->
       <arg value="clean"/>
-      <arg value="install"/>
+      <arg value="compile"/>
     </java>
   </target>
 
   <target name="maven-assembly" depends="maven-compile"
           description="generates the Maven installation assembly using the bootstrap Maven">
-    <java fork="true" dir="maven-cli" classname="org.apache.maven.cli.MavenCli" failonerror="true">
-      <classpath refid="maven.classpath"/>
-<!--
-      <sysproperty key="maven.test.skip" value="true"/>
--->
+    <echo>
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    MAVEN-ASSEMBLY
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
+    </echo>
+          
+    <delete>      <fileset dir="bootstrap/lib" includes="*.pom,maven*.jar,modello*.jar,junit*.jar"/>        
+    </delete>
+        
+    <mkdir dir="bootstrap/boot"/>
+    <copy todir="bootstrap/boot">
+      <fileset dir="bootstrap/lib">
+        <include name="plexus-classworlds*.jar"/>
+      </fileset>
+    </copy>
+    
+    <delete>
+      <fileset dir="bootstrap/lib">
+        <include name="plexus-classworlds*.jar"/>
+      </fileset>
+    </delete>
+    
+    
+<echo file="bootstrap/m2.conf">
+main is org.apache.maven.cli.MavenCli from plexus.core                                                                                                                     
+                                                                                                                                                                           
+[plexus.core]                                                                                                                                                              
+load ${bootstrapDir}/lib/*.jar    
+load ${bootstrapDir}/target/classes
+</echo>    
+          
+    <property name="maven.goals" value="clean assembly:assembly"/>
+    <property name="bootstrapDir" value="${basedir}/bootstrap"/>
+    <java dir="maven-cli" classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
+      <classpath>
+        <fileset dir="${bootstrapDir}/boot" includes="plexus-classworlds-*.jar"/>
+        <path refid="sources"/>
+      </classpath>
+      <sysproperty key="classworlds.conf" value="${bootstrapDir}/m2.conf"/>
+      <sysproperty key="bootstrapDir" value="${bootstrapDir}"/>
       <arg value="-e"/>
-      <arg value="-B"/>
-
-      <!-- JDC: Removing offline switch until we can pre-resolve all plugins, dependencies and associated POMs.
-           <arg value="-o"/>
-      -->
-      <arg value="clean"/>
-      <arg value="assembly:assembly"/>
-    </java>
+      <arg line="${maven.goals}"/>
+    </java>                    
+              
     <property name="maven.assembly" location="maven-cli/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
@@ -295,10 +340,6 @@
           description="runs the full extracted Maven, now with tests">
     <property name="maven.goals" value="clean install"/>
     <java classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
-      <!--<jvmarg value="-Xdebug"/>
-       <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
-       <jvmarg value="-Xnoagent"/>
-       <jvmarg value="-Djava.compiler=NONE"/>-->
       <classpath>
         <fileset dir="${maven.home}/core/boot" includes="classworlds-*.jar"/>
       </classpath>
@@ -308,7 +349,6 @@
       <arg line="${maven.goals}"/>
     </java>
   </target>
-
 
   <!--
     Downloads an artifact, detecting wheter it's a snapshot, and uses the maven-metadata.xml to retrieve
@@ -368,11 +408,14 @@
              dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
              ignoreerrors="false"
             />
+                    
       </then>
       <else>
         <property name="fileversion" value="SNAPSHOT"/>
       </else>
     </if>
+        
+    <copy file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" todir="bootstrap/lib"/>
 
     <echo>Resolved version ${fileversion} (given=${version})</echo>
 
