@@ -1,26 +1,36 @@
 package org.apache.maven.integrationtests;
 
+import java.io.PrintStream;
+
 import junit.framework.TestCase;
 
 /**
  * @author Jason van Zyl
+ * @author Kenney Westerhof
  */
 public abstract class AbstractMavenIntegrationTestCase
     extends TestCase
 {
-    private boolean printed = false;
-
-    protected void setUp()
-        throws Exception
+    protected void runTest()
+        throws Throwable
     {
-        if ( !printed )
-        {
-            String simpleName = getClass().getName();
-            simpleName = simpleName.startsWith( "MavenIT" ) ? simpleName.substring( "MavenIT".length() ) : simpleName;
-            simpleName = simpleName.endsWith( "Test" ) ? simpleName.substring(0, simpleName.length() -4 ) : simpleName;
+        String simpleName = getClass().getSimpleName();
+        simpleName = simpleName.startsWith( "MavenIT" ) ? simpleName.substring( "MavenIT".length() ) : simpleName;
+        simpleName = simpleName.endsWith( "Test" ) ? simpleName.substring( 0, simpleName.length() - 4 ) : simpleName;
 
-            System.out.println( simpleName + ".." );
-            printed = true;
+        PrintStream out = System.out;
+
+        out.print( simpleName + ".." );
+
+        try
+        {
+            super.runTest();
+            out.println( " Ok" );
+        }
+        catch ( Throwable t )
+        {
+            out.println( " Failure" );
+            throw t;
         }
     }
 }
