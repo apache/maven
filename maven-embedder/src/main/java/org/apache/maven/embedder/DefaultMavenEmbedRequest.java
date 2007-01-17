@@ -46,6 +46,11 @@ public class DefaultMavenEmbedRequest
     private Properties systemProperties;
 
     /**
+     * List&lt;URL>.
+     */
+    private List extensions = new ArrayList();
+
+    /**
      * Creates a new instance of DefaultMavenEmbedRequest
      */
     public DefaultMavenEmbedRequest()
@@ -138,4 +143,13 @@ public class DefaultMavenEmbedRequest
         return systemProperties != null ? systemProperties : System.getProperties();
     }
 
+    public void addExtension( URL url )
+    {
+        extensions.add( url );
+    }
+
+    public List getExtensions()
+    {
+        return extensions;
+    }
 }

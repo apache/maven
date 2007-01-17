@@ -1,0 +1,8 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.embedder.CustomArtifactFactory</implementation>
+    </component>
+  </components>
+</component-set>

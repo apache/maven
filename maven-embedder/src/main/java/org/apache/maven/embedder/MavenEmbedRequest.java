@@ -79,4 +79,8 @@ public interface MavenEmbedRequest
     ContainerCustomizer getContainerCustomizer();
 
     Properties getSystemProperties();
+
+    void addExtension( URL url );
+
+    List getExtensions();
 }

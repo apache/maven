@@ -20,9 +20,9 @@ import org.apache.maven.Maven;
 import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -37,8 +37,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
@@ -47,13 +47,16 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -62,8 +65,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,7 +78,7 @@ import java.util.List;
  */
 public class MavenEmbedder
 {
-    private PlexusContainer container;
+    private MutablePlexusContainer container;
 
     // ----------------------------------------------------------------------
     // Components
@@ -420,7 +425,7 @@ public class MavenEmbedder
         {
             throw new MavenEmbedderException( "Error starting Maven embedder.", e );
         }
-        
+
         if ( logger != null )
         {
             MavenEmbedderLoggerManager loggerManager =
@@ -435,6 +440,8 @@ public class MavenEmbedder
             {
                 req.getContainerCustomizer().customize( container );
             }
+
+            handleExtensions( req.getExtensions() );
 
             // ----------------------------------------------------------------------
             // Lookup each of the components we need to provide the desired
@@ -497,6 +504,45 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Lifecycle
     // ----------------------------------------------------------------------
+
+    private void handleExtensions( List extensions )
+        throws MavenEmbedderException
+    {
+        ClassRealm childRealm;
+        try
+        {
+            childRealm = container.getContainerRealm().createChildRealm( "embedder-extensions" );
+        }
+        catch ( DuplicateRealmException e1 )
+        {
+            try
+            {
+                childRealm = classWorld.getRealm( "embedder-extensions" );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                throw new MavenEmbedderException( "Cannot create realm 'extensions'", e );
+            }
+        }
+
+        for ( Iterator it = extensions.iterator(); it.hasNext(); )
+        {
+            childRealm.addURL( (URL) it.next() );
+        }
+
+        try
+        {
+            container.discoverComponents( childRealm, true );
+        }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new MavenEmbedderException( "Configuration error while discovering extension components", e );
+        }
+        catch ( ComponentRepositoryException e )
+        {
+            throw new MavenEmbedderException( "Component repository error while discovering extension components", e );
+        }
+    }
 
     public void stop()
         throws MavenEmbedderException
