@@ -54,8 +54,7 @@ public interface PluginManager
 
     Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
 
-    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                   ArtifactRepository localRepository )
+    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;

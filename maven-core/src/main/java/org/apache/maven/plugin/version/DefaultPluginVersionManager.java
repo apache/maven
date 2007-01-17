@@ -28,6 +28,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.InvalidPluginException;
@@ -80,24 +81,35 @@ public class DefaultPluginVersionManager
     // TODO: Revisit to remove this piece of state. PLUGIN REGISTRY MAY BE UPDATED ON DISK OUT-OF-PROCESS!
     private Map resolvedMetaVersions = new HashMap();
 
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                        ArtifactRepository localRepository )
+    public String resolvePluginVersion( String groupId,
+                                        String artifactId,
+                                        MavenProject project,
+                                        MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
+        return resolvePluginVersion( groupId, artifactId, project, session, false );
     }
 
-    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project,
-                                              Settings settings, ArtifactRepository localRepository )
+    public String resolveReportPluginVersion( String groupId,
+                                              String artifactId,
+                                              MavenProject project,
+                                              MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
+        return resolvePluginVersion( groupId, artifactId, project, session, true );
     }
 
-    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                         ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+    private String resolvePluginVersion( String groupId,
+                                         String artifactId,
+                                         MavenProject project,
+                                         MavenSession session,
+                                         boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
+        Settings settings = session.getSettings();
+
+        ArtifactRepository localRepository = session.getLocalRepository();
+
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
@@ -302,7 +314,8 @@ public class DefaultPluginVersionManager
         return version;
     }
 
-    private boolean shouldCheckForUpdates( String groupId, String artifactId )
+    private boolean shouldCheckForUpdates( String groupId,
+                                           String artifactId )
         throws PluginVersionResolutionException
     {
         PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
@@ -343,7 +356,9 @@ public class DefaultPluginVersionManager
         }
     }
 
-    private boolean checkForRejectedStatus( String groupId, String artifactId, String version )
+    private boolean checkForRejectedStatus( String groupId,
+                                            String artifactId,
+                                            String version )
         throws PluginVersionResolutionException
     {
         PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
@@ -353,8 +368,11 @@ public class DefaultPluginVersionManager
         return plugin.getRejectedVersions().contains( version );
     }
 
-    private boolean promptToPersistPluginUpdate( String version, String updatedVersion, String groupId,
-                                                 String artifactId, Settings settings )
+    private boolean promptToPersistPluginUpdate( String version,
+                                                 String updatedVersion,
+                                                 String groupId,
+                                                 String artifactId,
+                                                 Settings settings )
         throws PluginVersionResolutionException
     {
         try
@@ -440,7 +458,9 @@ public class DefaultPluginVersionManager
         }
     }
 
-    private void addNewVersionToRejectedListInExisting( String groupId, String artifactId, String rejectedVersion )
+    private void addNewVersionToRejectedListInExisting( String groupId,
+                                                        String artifactId,
+                                                        String rejectedVersion )
         throws PluginVersionResolutionException
     {
         PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
@@ -465,7 +485,8 @@ public class DefaultPluginVersionManager
         }
     }
 
-    private String resolveExistingFromPluginRegistry( String groupId, String artifactId )
+    private String resolveExistingFromPluginRegistry( String groupId,
+                                                      String artifactId )
         throws PluginVersionResolutionException
     {
         PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
@@ -482,7 +503,8 @@ public class DefaultPluginVersionManager
         return version;
     }
 
-    private org.apache.maven.plugin.registry.Plugin getPlugin( String groupId, String artifactId,
+    private org.apache.maven.plugin.registry.Plugin getPlugin( String groupId,
+                                                               String artifactId,
                                                                PluginRegistry pluginRegistry )
     {
         Map pluginsByKey;
@@ -501,12 +523,15 @@ public class DefaultPluginVersionManager
         return (org.apache.maven.plugin.registry.Plugin) pluginsByKey.get( pluginKey );
     }
 
-    private String constructPluginKey( String groupId, String artifactId )
+    private String constructPluginKey( String groupId,
+                                       String artifactId )
     {
         return groupId + ":" + artifactId;
     }
 
-    private String getVersionFromPluginConfig( String groupId, String artifactId, MavenProject project,
+    private String getVersionFromPluginConfig( String groupId,
+                                               String artifactId,
+                                               MavenProject project,
                                                boolean resolveAsReportPlugin )
     {
         String version = null;
@@ -545,7 +570,9 @@ public class DefaultPluginVersionManager
         return version;
     }
 
-    private void updatePluginVersionInRegistry( String groupId, String artifactId, String version )
+    private void updatePluginVersionInRegistry( String groupId,
+                                                String artifactId,
+                                                String version )
         throws PluginVersionResolutionException
     {
         PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
@@ -587,7 +614,9 @@ public class DefaultPluginVersionManager
         writeUserRegistry( groupId, artifactId, pluginRegistry );
     }
 
-    private void writeUserRegistry( String groupId, String artifactId, PluginRegistry pluginRegistry )
+    private void writeUserRegistry( String groupId,
+                                    String artifactId,
+                                    PluginRegistry pluginRegistry )
     {
         File pluginRegistryFile = pluginRegistry.getRuntimeInfo().getFile();
 
@@ -620,7 +649,8 @@ public class DefaultPluginVersionManager
         }
     }
 
-    private PluginRegistry getPluginRegistry( String groupId, String artifactId )
+    private PluginRegistry getPluginRegistry( String groupId,
+                                              String artifactId )
         throws PluginVersionResolutionException
     {
         if ( pluginRegistry == null )
@@ -649,8 +679,11 @@ public class DefaultPluginVersionManager
         return pluginRegistry;
     }
 
-    private String resolveMetaVersion( String groupId, String artifactId, MavenProject project,
-                                       ArtifactRepository localRepository, String metaVersionId )
+    private String resolveMetaVersion( String groupId,
+                                       String artifactId,
+                                       MavenProject project,
+                                       ArtifactRepository localRepository,
+                                       String metaVersionId )
         throws PluginVersionResolutionException, InvalidPluginException
     {
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
