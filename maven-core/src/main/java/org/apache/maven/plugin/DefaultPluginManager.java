@@ -1207,20 +1207,31 @@ public class DefaultPluginManager
         }
     }
 
-    public Object getPluginComponent( Plugin plugin,
-                                      String role,
-                                      String roleHint )
+    public Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws PluginManagerException, ComponentLookupException
     {
-        // XXX this needs the plugin realm!
-        return container.lookup( role, roleHint );
+        ClassRealm pluginRealm = pluginCollector.getPluginDescriptor( plugin ).getClassRealm();
+
+        if ( pluginRealm == null )
+        {
+            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+            pluginRealm = DefaultPlexusContainer.getLookupRealm();
+        }
+
+        return container.lookup( role, roleHint, pluginRealm );
     }
 
-    public Map getPluginComponents( Plugin plugin,
-                                    String role )
+    public Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException
     {
-        // XXX this needs the plugin realm!
-        return container.lookupMap( role );
+        ClassRealm pluginRealm = pluginCollector.getPluginDescriptor( plugin ).getClassRealm();
+
+        if ( pluginRealm == null )
+        {
+            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+            pluginRealm = DefaultPlexusContainer.getLookupRealm();
+        }
+
+        return container.lookupMap( role, pluginRealm );
     }
 }
