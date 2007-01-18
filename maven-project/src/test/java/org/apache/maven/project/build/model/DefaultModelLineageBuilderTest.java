@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class DefaultModelLineageBuilderTest
     extends PlexusTestCase
@@ -66,7 +68,7 @@ public class DefaultModelLineageBuilderTest
             IOUtil.close( writer );
         }
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null, new HashMap() );
 
         assertEquals( 1, lineage.size() );
 
@@ -124,7 +126,7 @@ public class DefaultModelLineageBuilderTest
             .toExternalForm(), defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null );
+                                                                      Collections.EMPTY_LIST, null, new HashMap() );
 
         assertEquals( 3, lineage.size() );
 
@@ -196,7 +198,7 @@ public class DefaultModelLineageBuilderTest
             .toExternalForm(), defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository, Collections
-            .singletonList( remoteRepository ), null );
+            .singletonList( remoteRepository ), null, new HashMap() );
 
         assertEquals( 3, lineage.size() );
 
@@ -217,11 +219,11 @@ public class DefaultModelLineageBuilderTest
         projectRootDirectory.mkdirs();
 
         deleteDirOnExit( projectRootDirectory );
-        
+
         // 2. create dir for parent POM within project root directory.
         File parentDir = new File( projectRootDirectory, "parent" );
         parentDir.mkdirs();
-        
+
         // 2. create dir for child project within project root directory.
         File childDir = new File( projectRootDirectory, "child" );
         childDir.mkdirs();
@@ -250,8 +252,8 @@ public class DefaultModelLineageBuilderTest
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", projectRootDirectory.toURL()
             .toExternalForm(), defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository, Collections
-            .EMPTY_LIST, null );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
+                                                                      Collections.EMPTY_LIST, null, new HashMap() );
 
         assertEquals( 2, lineage.size() );
 
@@ -298,6 +300,51 @@ public class DefaultModelLineageBuilderTest
         }
 
         System.out.println( "Verifying that: " + file.getAbsolutePath() + " exists: " + file.exists() );
+    }
+
+    public void testReadPOMWithParentInOtherLocalFileWithBadRelativePath()
+        throws IOException, ProjectBuildingException
+    {
+        // 1. create the parent model in a "local" POM file.
+        File parentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+        parentPOM.deleteOnExit();
+
+        Model parent = createModel( "group", "parent", "1" );
+
+        // 4. write the parent model to the local repo directory
+        writeModel( parent, parentPOM );
+        
+        Map cache = new HashMap();
+        cache.put( "group:parent:1", parentPOM );
+
+        // 5. create the current pom with a parent-ref on the parent model
+        Model current = createModel( "group", "current", "1" );
+
+        Parent currentParent = new Parent();
+        currentParent.setGroupId( "group" );
+        currentParent.setArtifactId( "parent" );
+        currentParent.setVersion( "1" );
+        currentParent.setRelativePath( "../parent/pom.xml" );
+
+        current.setParent( currentParent );
+
+        // 6. write the current pom somewhere
+        File currentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+        currentPOM.deleteOnExit();
+
+        writeModel( current, currentPOM );
+
+        // 7. build the lineage.
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, null, Collections
+            .EMPTY_LIST, null, cache );
+
+        assertEquals( 2, lineage.size() );
+
+        Iterator modelIterator = lineage.modelIterator();
+
+        assertEquals( 2, cache.size() );
+        assertEquals( current.getId(), ( (Model) modelIterator.next() ).getId() );
+        assertEquals( parent.getId(), ( (Model) modelIterator.next() ).getId() );
     }
 
     private Model createModel( String groupId, String artifactId, String version )

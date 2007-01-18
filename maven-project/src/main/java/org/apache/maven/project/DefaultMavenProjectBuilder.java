@@ -154,9 +154,9 @@ public class DefaultMavenProjectBuilder
 
     private ModelValidator validator;
     
-    private Map rawProjectCache = new HashMap();
-
     private Map processedProjectCache = new HashMap();
+    
+    private Map cachedPomFilesByModelId = new HashMap();
 
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
@@ -683,8 +683,6 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setOriginalModel( originalModel );
-        
-        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), new MavenProject( project ) );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         MavenProject previousProject = superProject;
@@ -1023,7 +1021,7 @@ public class DefaultMavenProjectBuilder
         ModelLineage modelLineage = new DefaultModelLineage();
         modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
         
-        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager );
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, cachedPomFilesByModelId );
         
         List explicitlyActive;
         List explicitlyInactive;
