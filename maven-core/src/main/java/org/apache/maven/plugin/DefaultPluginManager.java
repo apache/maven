@@ -310,24 +310,23 @@ public class DefaultPluginManager
 
             // Now here we need the artifact coreArtifactFilter stuff
 
-            componentRealm = container.createComponentRealm( plugin.getKey(), jars );
-
+            componentRealm = container.createComponentRealm( projectPlugin.getKey(), jars );
         }
         catch ( PlexusContainerException e )
         {
-            throw new PluginManagerException( "Failed to create realm for plugin '" + plugin + ".", e );
+            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin + ".", e );
         }
 
         // ----------------------------------------------------------------------------
         // The PluginCollector will now know about the plugin we are trying to load
         // ----------------------------------------------------------------------------
 
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( projectPlugin );
 
         if ( pluginDescriptor == null )
         {
             throw new IllegalStateException(
-                "The PluginDescriptor for the plugin " + plugin.getKey() + " was not found" );
+                "The PluginDescriptor for the plugin " + projectPlugin.getKey() + " was not found" );
         }
 
         pluginDescriptor.setPluginArtifact( pluginArtifact );
@@ -348,14 +347,14 @@ public class DefaultPluginManager
                                     Plugin plugin,
                                     MavenProject project,
                                     MavenSession session )
-        throws InvalidPluginException, ArtifactNotFoundException, PluginManagerException, ArtifactResolutionException
+        throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
-        Set artifacts;
+        Set projectPluginDependencies;
 
         try
         {
 
-            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null,
+            projectPluginDependencies = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null,
                                                              coreArtifactFilter, project );
         }
         catch ( InvalidDependencyVersionException e )
@@ -392,6 +391,14 @@ public class DefaultPluginManager
                                                                                 artifactFilter );
 
         Set resolved = result.getArtifacts();
+
+        // Also resolve the plugin dependencies specified in <plugin><dependencies>:
+        resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
+                                                               pluginArtifact,
+                                                               localRepository,
+                                                               repositories,
+                                                               artifactMetadataSource,
+                                                               artifactFilter ).getArtifacts() );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
