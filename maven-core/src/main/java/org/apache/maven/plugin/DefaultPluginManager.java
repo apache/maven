@@ -513,7 +513,6 @@ public class DefaultPluginManager
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
-        ;
 
         try
         {
@@ -521,7 +520,11 @@ public class DefaultPluginManager
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
+            ClassRealm oldRealm = DefaultPlexusContainer.setLookupRealm( pluginRealm );
+
             plugin.execute();
+
+            DefaultPlexusContainer.setLookupRealm( oldRealm );
 
             dispatcher.dispatchEnd( event, goalExecId );
         }
