@@ -885,29 +885,7 @@ public class DefaultMavenProjectBuilder
     {
         Model model = project.getModel();
 
-        List explicitlyActive;
-        List explicitlyInactive;
-        
-        if ( profileMgr != null )
-        {
-            explicitlyActive = profileMgr.getExplicitlyActivatedIds();
-            explicitlyInactive = profileMgr.getExplicitlyDeactivatedIds();
-        }
-        else
-        {
-            explicitlyActive = Collections.EMPTY_LIST;
-            explicitlyInactive = Collections.EMPTY_LIST;
-        }
-        
-        List active = profileAdvisor.applyActivatedProfiles( model, projectDir, explicitlyActive, explicitlyInactive );
-        
-        LinkedHashSet activated = new LinkedHashSet();
-        
-        activated.addAll( project.getActiveProfiles() );
-        activated.addAll( active );
-        
-        List activeProfiles = new ArrayList( activated );
-        project.setActiveProfiles( activeProfiles );
+        List activeProfiles = project.getActiveProfiles();
 
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
         //  [BP] - Can this above comment be explained?
