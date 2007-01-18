@@ -144,7 +144,13 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException
     {
-        if ( loadedSettings == null )
+        return buildSettings( userSettingsFile, true );
+    }
+
+    public Settings buildSettings( File userSettingsFile, boolean useCachedSettings )
+        throws IOException, XmlPullParserException
+    {
+        if ( !useCachedSettings || loadedSettings == null )
         {
             Settings globalSettings = readSettings( globalSettingsFile );
             Settings userSettings = readSettings( userSettingsFile );

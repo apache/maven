@@ -41,4 +41,7 @@ public interface MavenSettingsBuilder
     
     Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException;
+
+    public Settings buildSettings( File userSettingsFile, boolean useCachedSettings )
+        throws IOException, XmlPullParserException;
 }
