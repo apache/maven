@@ -340,7 +340,7 @@ public class DefaultPluginManager
         pluginDescriptor.setArtifacts( new ArrayList( artifacts ) );
 
         getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + componentRealm );
-        
+
         pluginDescriptor.setClassRealm( componentRealm );
     }
 
@@ -392,9 +392,9 @@ public class DefaultPluginManager
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
         List resolved = new ArrayList( result.getArtifacts() );
-        
-        getLogger().info( "Main plugin artifacts: " + resolved );
-        
+
+        getLogger().info( "Main plugin artifacts: " + resolved.toString().replace( ',', '\n' ) );
+
         // Also resolve the plugin dependencies specified in <plugin><dependencies>:
         resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
                                                                pluginArtifact,
@@ -402,9 +402,9 @@ public class DefaultPluginManager
                                                                repositories,
                                                                artifactMetadataSource,
                                                                coreArtifactFilterManager.getArtifactFilter() ).getArtifacts() );
-        
-        getLogger().info( "After adding project-level plugin dependencies: " + resolved );
-        
+
+        getLogger().info( "After adding project-level plugin dependencies: " + resolved.toString().replace( ',', '\n' ) );
+
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
@@ -415,20 +415,20 @@ public class DefaultPluginManager
             }
         }
 
-        List unresolved = new ArrayList( dependencies );
+        // List unresolved = new ArrayList();// dependencies );
 
-        unresolved.removeAll( resolved );
+        // unresolved.removeAll( resolved );
 
-        resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
+        // resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
 
-        Set allResolved = new LinkedHashSet( resolved.size() + unresolved.size() );
-        
+        Set allResolved = new LinkedHashSet( resolved.size() ); // + unresolved.size() );
+
         Set seenVersionlessKeys = new HashSet();
-        
+
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
             Artifact resolvedArtifact = (Artifact) it.next();
-            
+
             String versionlessKey = ArtifactUtils.versionlessKey( resolvedArtifact );
             if ( !seenVersionlessKeys.contains( versionlessKey ) )
             {
@@ -440,23 +440,23 @@ public class DefaultPluginManager
                 getLogger().info( "NOT including: " + resolvedArtifact.getId() + " in plugin dependencies." );
             }
         }
-        
-        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
-        {
-            Artifact unresolvedArtifact = (Artifact) it.next();
-            
-            String versionlessKey = ArtifactUtils.versionlessKey( unresolvedArtifact );
-            if ( !seenVersionlessKeys.contains( versionlessKey ) )
-            {
-                allResolved.add( unresolvedArtifact );
-                seenVersionlessKeys.add( versionlessKey );
-            }
-            else
-            {
-                getLogger().info( "NOT including: " + unresolvedArtifact.getId() + " in plugin dependencies." );
-            }
-        }
-        
+
+//        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
+//        {
+//            Artifact unresolvedArtifact = (Artifact) it.next();
+//
+//            String versionlessKey = ArtifactUtils.versionlessKey( unresolvedArtifact );
+//            if ( !seenVersionlessKeys.contains( versionlessKey ) )
+//            {
+//                allResolved.add( unresolvedArtifact );
+//                seenVersionlessKeys.add( versionlessKey );
+//            }
+//            else
+//            {
+//                getLogger().info( "NOT including: " + unresolvedArtifact.getId() + " in plugin dependencies." );
+//            }
+//        }
+
         getLogger().info( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
 
         return allResolved;
