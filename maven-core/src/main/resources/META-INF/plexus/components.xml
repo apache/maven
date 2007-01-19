@@ -1,9 +1,16 @@
 <component-set>
   <components>
     <component>
+      <role>org.apache.maven.ArtifactFilterManager</role>
+      <implementation>org.apache.maven.DefaultArtifactFilterManager</implementation>
+    </component>
+    <component>
       <role>org.apache.maven.plugin.PluginManager</role>
       <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.ArtifactFilterManager</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
@@ -38,6 +45,9 @@
       <role>org.apache.maven.extension.ExtensionManager</role>
       <implementation>org.apache.maven.extension.DefaultExtensionManager</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.ArtifactFilterManager</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>

@@ -19,6 +19,7 @@ package org.apache.maven;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -27,11 +28,13 @@ import java.util.HashSet;
  * @version $Id$
  * @todo this should probably be a component with some dynamic control of filtering
  */
-public class MavenArtifactFilterManager
+public class DefaultArtifactFilterManager implements ArtifactFilterManager
 {
-    public static ArtifactFilter createStandardFilter()
+    
+    private static final Set DEFAULT_EXCLUSIONS;
+    
+    static
     {
-        // TODO: configure this from bootstrap or scan lib
         Set artifacts = new HashSet();
 
         artifacts.add( "classworlds" );
@@ -62,7 +65,35 @@ public class MavenArtifactFilterManager
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-ssh" );
         artifacts.add( "wagon-ssh-external" );
-
-        return new ExclusionSetFilter( artifacts );
+        
+        DEFAULT_EXCLUSIONS = artifacts;
     }
+    
+    private Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
+    
+    /**
+     * @deprecated Use this class as a component instead, and then use getArtifactFilter().
+     */
+    public static ArtifactFilter createStandardFilter()
+    {
+        // TODO: configure this from bootstrap or scan lib
+        return new ExclusionSetFilter( DEFAULT_EXCLUSIONS );
+    }
+    
+    /* (non-Javadoc)
+     * @see org.apache.maven.ArtifactFilterManager#getArtifactFilter()
+     */
+    public ArtifactFilter getArtifactFilter()
+    {
+        return new ExclusionSetFilter( excludedArtifacts );
+    }
+    
+    /* (non-Javadoc)
+     * @see org.apache.maven.ArtifactFilterManager#excludeArtifact(java.lang.String)
+     */
+    public void excludeArtifact( String artifactId )
+    {
+        excludedArtifacts.add( artifactId );
+    }
+    
 }

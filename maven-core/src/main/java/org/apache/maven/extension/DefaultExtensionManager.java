@@ -16,7 +16,7 @@ package org.apache.maven.extension;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenArtifactFilterManager;
+import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -54,17 +54,16 @@ public class DefaultExtensionManager
     extends AbstractLogEnabled
     implements ExtensionManager, Contextualizable
 {
+    
     private ArtifactResolver artifactResolver;
 
     private ArtifactMetadataSource artifactMetadataSource;
 
     private PlexusContainer container;
 
-    private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createStandardFilter();
+    private ArtifactFilterManager artifactFilterManager;
 
     private WagonManager wagonManager;
-
-    private static final String CONTAINER_NAME = "extensions";
 
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
@@ -77,22 +76,13 @@ public class DefaultExtensionManager
 
         if ( artifact != null )
         {
-            ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
+            ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), project.getArtifact() );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
                                                                                     project.getArtifact(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource, filter );
-
-            // create a child container for the extension
-            // TODO: this could surely be simpler/different on trunk with the new classworlds
-            PlexusContainer extensionContainer = getExtensionContainer();
-            if ( extensionContainer == null )
-            {
-                extensionContainer =
-                    container.createChildContainer( CONTAINER_NAME, Collections.EMPTY_LIST, Collections.EMPTY_MAP );
-            }
 
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
@@ -102,33 +92,23 @@ public class DefaultExtensionManager
 
                 getLogger().debug( "Adding to extension classpath: " + a.getFile() );
 
-                extensionContainer.addJarResource( a.getFile() );
+                container.addJarResource( a.getFile() );
+                artifactFilterManager.excludeArtifact( a.getArtifactId() );
             }
         }
     }
 
     public void registerWagons()
     {
-        PlexusContainer extensionContainer = getExtensionContainer();
-        if ( extensionContainer != null )
+        try
         {
-            try
-            {
-                Map wagons = extensionContainer.lookupMap( Wagon.ROLE );
-                wagonManager.registerWagons( wagons.keySet(), extensionContainer );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // now wagons found in the extension
-            }
+            Map wagons = container.lookupMap( Wagon.ROLE );
+            wagonManager.registerWagons( wagons.keySet(), container );
         }
-    }
-
-    private PlexusContainer getExtensionContainer()
-    {
-        // note: ideally extensions would live in their own realm, but this would mean that things like wagon-scm would
-        // have no way to obtain SCM extensions
-        return container.getChildContainer( CONTAINER_NAME );
+        catch ( ComponentLookupException e )
+        {
+            // now wagons found in the extension
+        }
     }
 
     public void contextualize( Context context )

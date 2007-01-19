@@ -16,7 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenArtifactFilterManager;
+import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -54,10 +54,10 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -72,7 +72,6 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -90,13 +89,13 @@ import java.util.Set;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
-    implements PluginManager, Initializable, Contextualizable
+    implements PluginManager, Contextualizable
 {
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
-    protected ArtifactFilter artifactFilter;
+    protected ArtifactFilterManager coreArtifactFilterManager;
 
     private Log mojoLogger;
 
@@ -265,8 +264,6 @@ public class DefaultPluginManager
         }
     }
 
-    ArtifactFilter coreArtifactFilter = MavenArtifactFilterManager.createStandardFilter();
-
     protected void addPlugin( Plugin plugin,
                               Artifact pluginArtifact,
                               MavenProject project,
@@ -355,7 +352,7 @@ public class DefaultPluginManager
         {
 
             projectPluginDependencies = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null,
-                                                             coreArtifactFilter, project );
+                                                             coreArtifactFilterManager.getArtifactFilter(), project );
         }
         catch ( InvalidDependencyVersionException e )
         {
@@ -388,7 +385,7 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                 localRepository, repositories,
                                                                                 artifactMetadataSource,
-                                                                                artifactFilter );
+                                                                                coreArtifactFilterManager.getArtifactFilter() );
 
         Set resolved = result.getArtifacts();
 
@@ -398,7 +395,7 @@ public class DefaultPluginManager
                                                                localRepository,
                                                                repositories,
                                                                artifactMetadataSource,
-                                                               artifactFilter ).getArtifacts() );
+                                                               coreArtifactFilterManager.getArtifactFilter() ).getArtifacts() );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
@@ -1155,11 +1152,6 @@ public class DefaultPluginManager
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
 
         mojoLogger = new DefaultLog( container.getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
-    }
-
-    public void initialize()
-    {
-        artifactFilter = MavenArtifactFilterManager.createStandardFilter();
     }
 
     // ----------------------------------------------------------------------
