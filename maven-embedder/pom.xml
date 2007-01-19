@@ -48,14 +48,6 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/*.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
