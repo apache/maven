@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -83,6 +84,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -337,6 +339,8 @@ public class DefaultPluginManager
 
         pluginDescriptor.setArtifacts( new ArrayList( artifacts ) );
 
+        getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + componentRealm );
+        
         pluginDescriptor.setClassRealm( componentRealm );
     }
 
@@ -387,8 +391,10 @@ public class DefaultPluginManager
                                                                                 artifactMetadataSource,
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
-        Set resolved = result.getArtifacts();
-
+        List resolved = new ArrayList( result.getArtifacts() );
+        
+        getLogger().info( "Main plugin artifacts: " + resolved );
+        
         // Also resolve the plugin dependencies specified in <plugin><dependencies>:
         resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
                                                                pluginArtifact,
@@ -396,7 +402,9 @@ public class DefaultPluginManager
                                                                repositories,
                                                                artifactMetadataSource,
                                                                coreArtifactFilterManager.getArtifactFilter() ).getArtifacts() );
-
+        
+        getLogger().info( "After adding project-level plugin dependencies: " + resolved );
+        
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
@@ -413,13 +421,45 @@ public class DefaultPluginManager
 
         resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
 
-        List allResolved = new ArrayList( resolved.size() + unresolved.size() );
+        Set allResolved = new LinkedHashSet( resolved.size() + unresolved.size() );
+        
+        Set seenVersionlessKeys = new HashSet();
+        
+        for ( Iterator it = resolved.iterator(); it.hasNext(); )
+        {
+            Artifact resolvedArtifact = (Artifact) it.next();
+            
+            String versionlessKey = ArtifactUtils.versionlessKey( resolvedArtifact );
+            if ( !seenVersionlessKeys.contains( versionlessKey ) )
+            {
+                allResolved.add( resolvedArtifact );
+                seenVersionlessKeys.add( versionlessKey );
+            }
+            else
+            {
+                getLogger().info( "NOT including: " + resolvedArtifact.getId() + " in plugin dependencies." );
+            }
+        }
+        
+        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
+        {
+            Artifact unresolvedArtifact = (Artifact) it.next();
+            
+            String versionlessKey = ArtifactUtils.versionlessKey( unresolvedArtifact );
+            if ( !seenVersionlessKeys.contains( versionlessKey ) )
+            {
+                allResolved.add( unresolvedArtifact );
+                seenVersionlessKeys.add( versionlessKey );
+            }
+            else
+            {
+                getLogger().info( "NOT including: " + unresolvedArtifact.getId() + " in plugin dependencies." );
+            }
+        }
+        
+        getLogger().info( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
 
-        allResolved.addAll( resolved );
-
-        allResolved.addAll( unresolved );
-
-        return resolved;
+        return allResolved;
     }
 
     // ----------------------------------------------------------------------
@@ -624,7 +664,7 @@ public class DefaultPluginManager
 
             ClassRealm oldRealm = DefaultPlexusContainer.setLookupRealm( realm );
 
-            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
 
             DefaultPlexusContainer.setLookupRealm( oldRealm );
 

@@ -1243,6 +1243,8 @@ public class DefaultLifecycleExecutor
     private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
+        getLogger().debug( "Verifying plugin: " + plugin.getKey() );
+        
         PluginDescriptor pluginDescriptor;
         try
         {
