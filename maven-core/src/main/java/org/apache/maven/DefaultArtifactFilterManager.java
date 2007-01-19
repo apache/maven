@@ -19,9 +19,8 @@ package org.apache.maven;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -30,9 +29,9 @@ import java.util.HashSet;
  */
 public class DefaultArtifactFilterManager implements ArtifactFilterManager
 {
-    
+
     private static final Set DEFAULT_EXCLUSIONS;
-    
+
     static
     {
         Set artifacts = new HashSet();
@@ -65,12 +64,12 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-ssh" );
         artifacts.add( "wagon-ssh-external" );
-        
+
         DEFAULT_EXCLUSIONS = artifacts;
     }
-    
+
     private Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
-    
+
     /**
      * @deprecated Use this class as a component instead, and then use getArtifactFilter().
      */
@@ -79,15 +78,27 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         // TODO: configure this from bootstrap or scan lib
         return new ExclusionSetFilter( DEFAULT_EXCLUSIONS );
     }
-    
-    /* (non-Javadoc)
+
+    /**
+     * Returns the artifact filter for the core + extension artifacts.
+     *
      * @see org.apache.maven.ArtifactFilterManager#getArtifactFilter()
      */
     public ArtifactFilter getArtifactFilter()
     {
         return new ExclusionSetFilter( excludedArtifacts );
     }
-    
+
+    /**
+     * Returns the artifact filter for the standard core artifacts.
+     *
+     * @see org.apache.maven.ArtifactFilterManager#getExtensionArtifactFilter()
+     */
+    public ArtifactFilter getCoreArtifactFilter()
+    {
+        return new ExclusionSetFilter( DEFAULT_EXCLUSIONS );
+    }
+
     /* (non-Javadoc)
      * @see org.apache.maven.ArtifactFilterManager#excludeArtifact(java.lang.String)
      */
@@ -95,5 +106,5 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
     {
         excludedArtifacts.add( artifactId );
     }
-    
+
 }

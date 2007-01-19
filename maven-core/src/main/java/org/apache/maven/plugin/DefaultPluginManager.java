@@ -354,9 +354,8 @@ public class DefaultPluginManager
 
         try
         {
-
             projectPluginDependencies = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null,
-                                                             coreArtifactFilterManager.getArtifactFilter(), project );
+                                                             coreArtifactFilterManager.getCoreArtifactFilter(), project );
         }
         catch ( InvalidDependencyVersionException e )
         {
@@ -439,7 +438,7 @@ public class DefaultPluginManager
             }
         }
 
-        getLogger().info( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
+        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
 
         return allResolved;
     }
