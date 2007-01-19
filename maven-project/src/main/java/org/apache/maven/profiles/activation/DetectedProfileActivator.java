@@ -1,5 +1,6 @@
 package org.apache.maven.profiles.activation;
 
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Profile;
 
 /*
@@ -21,11 +22,18 @@ import org.apache.maven.model.Profile;
 public abstract class DetectedProfileActivator
     implements ProfileActivator
 {
+    private BuildContextManager buildContextManager;
+
     public boolean canDetermineActivation( Profile profile )
     {
         return canDetectActivation( profile );
     }
 
     protected abstract boolean canDetectActivation( Profile profile );
+    
+    protected BuildContextManager getBuildContextManager()
+    {
+        return buildContextManager;
+    }
 
 }

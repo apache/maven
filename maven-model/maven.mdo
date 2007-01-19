@@ -2629,6 +2629,16 @@
             <type>ActivationFile</type>
           </association>
         </field>
+        <field>
+          <name>custom</name>
+          <version>4.0.0</version>
+          <description>
+            Describes a custom profile activation trigger, brought in via build extension.
+          </description>
+          <association>
+            <type>ActivationCustom</type>
+          </association>
+        </field>
       </fields>
     </class>
     <class>
@@ -2711,6 +2721,32 @@
           <version>4.0.0</version>
           <type>String</type>
           <description>The name of the file that must exist to activate the profile.</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationCustom</name>
+      <version>4.0.0</version>
+      <description><![CDATA[
+        This activation allows users to specify their own custom trigger for a profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <type>DOM</type>
+          <description><![CDATA[
+            The specification for triggering the profile according to the rules of the custom
+            activation type.
+          ]]></description>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            The type (role-hint) of activation which is to be used to activate the profile.
+          ]]></description>
         </field>
       </fields>
     </class>

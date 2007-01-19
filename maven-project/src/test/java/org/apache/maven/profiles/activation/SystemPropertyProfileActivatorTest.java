@@ -1,21 +1,37 @@
 package org.apache.maven.profiles.activation;
 
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.context.DefaultBuildContextManager;
+import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.context.DefaultContext;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 public class SystemPropertyProfileActivatorTest
-    extends TestCase
+    extends PlexusTestCase
 {
+    
+    private BuildContextManager buildContextManager;
+    private SystemPropertyProfileActivator activator;
+    
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        buildContextManager = (BuildContextManager) lookup( BuildContextManager.ROLE, DefaultBuildContextManager.ROLE_HINT );
+        
+        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        sysContext.store( buildContextManager );
+        
+        activator = (SystemPropertyProfileActivator) lookup( ProfileActivator.ROLE, "system-property" );
+    }
 
     public void testCanDetect_ShouldReturnTrueWhenActivationPropertyIsPresent()
-        throws ContextException
+        throws Exception
     {
         ActivationProperty prop = new ActivationProperty();
         prop.setName( "test" );
@@ -28,11 +44,11 @@ public class SystemPropertyProfileActivatorTest
 
         profile.setActivation( activation );
 
-        assertTrue( buildProfileActivator().canDetermineActivation( profile ) );
+        assertTrue( activator.canDetermineActivation( profile ) );
     }
 
     public void testCanDetect_ShouldReturnFalseWhenActivationPropertyIsNotPresent()
-        throws ContextException
+        throws Exception
     {
         Activation activation = new Activation();
 
@@ -40,11 +56,11 @@ public class SystemPropertyProfileActivatorTest
 
         profile.setActivation( activation );
 
-        assertFalse( buildProfileActivator().canDetermineActivation( profile ) );
+        assertFalse( activator.canDetermineActivation( profile ) );
     }
 
     public void testIsActive_ShouldReturnTrueWhenPropertyNameSpecifiedAndPresent()
-        throws ContextException
+        throws Exception
     {
         ActivationProperty prop = new ActivationProperty();
         prop.setName( "test" );
@@ -59,11 +75,11 @@ public class SystemPropertyProfileActivatorTest
 
         System.setProperty( "test", "true" );
 
-        assertTrue( buildProfileActivator().isActive( profile ) );
+        assertTrue( activator.isActive( profile ) );
     }
 
     public void testIsActive_ShouldReturnFalseWhenPropertyNameSpecifiedAndMissing()
-        throws ContextException
+        throws Exception
     {
         ActivationProperty prop = new ActivationProperty();
         prop.setName( "test" );
@@ -80,16 +96,7 @@ public class SystemPropertyProfileActivatorTest
         props.remove( "test" );
         System.setProperties( props );
 
-        assertFalse( buildProfileActivator().isActive( profile ) );
-    }
-
-    private SystemPropertyProfileActivator buildProfileActivator()
-        throws ContextException
-    {
-        SystemPropertyProfileActivator activator = new SystemPropertyProfileActivator();
-        activator.contextualize( new DefaultContext() );
-
-        return activator;
+        assertFalse( activator.isActive( profile ) );
     }
 
 }

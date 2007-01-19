@@ -1,0 +1,9 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.context.BuildContextManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.context.DefaultBuildContextManager</implementation>
+    </component>
+  </components>
+</component-set>

@@ -1,9 +1,12 @@
 package org.apache.maven.profiles;
 
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.context.DefaultBuildContextManager;
+import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.ActivationOS;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -13,8 +16,20 @@ public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
     
+    private BuildContextManager buildContextManager;
+    
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        buildContextManager = (BuildContextManager) lookup( BuildContextManager.ROLE, DefaultBuildContextManager.ROLE_HINT );
+    }
+    
     public void testShouldActivateDefaultProfile() throws ProfileActivationException
     {
+        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        sysContext.store( buildContextManager );
+        
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
         
@@ -47,6 +62,9 @@ public class DefaultProfileManagerTest
 
     public void testShouldNotActivateDefaultProfile() throws ProfileActivationException
     {
+        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        sysContext.store( buildContextManager );
+        
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
         
@@ -82,6 +100,9 @@ public class DefaultProfileManagerTest
 
     public void testShouldNotActivateReversalOfPresentSystemProperty() throws ProfileActivationException
     {
+        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        sysContext.store( buildContextManager );
+        
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
         

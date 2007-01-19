@@ -88,6 +88,14 @@ public interface ModelLineage
      * that of the deepest parent at the zero index, and that of the current POM at the last index.
      */
     List getArtifactRepositoryListsInDescendingOrder();
+    
+    /**
+     * Retrieve an Iterator derivative that functions in the simplest sense just like the return 
+     * value of the modelIterator() method. However, the ModelLineageIterator also gives access to
+     * the current POM file and current remote ArtifactRepository instances used to resolve the 
+     * current Model...along with a method to give explicit access to the current Model instance.
+     */
+    ModelLineageIterator lineageIterator();
 
     /**
      * Iterate over the lineage of Model instances, starting with the child (current) Model, 

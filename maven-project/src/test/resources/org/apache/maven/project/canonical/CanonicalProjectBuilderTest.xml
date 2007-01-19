@@ -38,6 +38,23 @@
       </requirements>
     </component>
     <component>
+      <role>org.apache.maven.project.build.profile.ProfileAdvisor</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.project.build.profile.DefaultProfileAdvisor</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.MavenTools</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.injection.ProfileInjector</role>
+          <role-hint>test</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
       <role>org.apache.maven.project.MavenProjectBuilder</role>
       <role-hint>test</role-hint>
       <implementation>org.apache.maven.project.TestProjectBuilder</implementation>
@@ -55,10 +72,6 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.injection.ProfileInjector</role>
-          <role-hint>test</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
@@ -79,10 +92,11 @@
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+          <role>org.apache.maven.MavenTools</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.MavenTools</role>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>

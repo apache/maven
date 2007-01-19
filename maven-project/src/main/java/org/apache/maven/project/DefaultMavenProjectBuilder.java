@@ -33,6 +33,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -40,16 +41,14 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.ProfilesConversionUtils;
-import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.build.ProjectBuildContext;
 import org.apache.maven.project.build.model.DefaultModelLineage;
 import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
@@ -150,8 +149,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
 
-    private ProfileInjector profileInjector;
-
     private ModelValidator validator;
     
     private Map processedProjectCache = new HashMap();
@@ -167,11 +164,11 @@ public class DefaultMavenProjectBuilder
 
     private ModelInterpolator modelInterpolator;
 
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-    
     private ModelLineageBuilder modelLineageBuilder;
     
     private ProfileAdvisor profileAdvisor;
+    
+    private BuildContextManager buildContextManager;
 
     private MavenTools mavenTools;
 
@@ -263,18 +260,31 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
-
-        List activeProfiles;
-
-        profileManager.addProfiles( superModel.getProfiles() );
-
+        MavenProject project = new MavenProject( superModel );
+        
+        ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
+        
+        projectContext.setCurrentProject( project );
+        projectContext.store( buildContextManager );
+        
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
-        activeProfiles = injectActiveProfiles( profileManager, superModel );
+        List activeProfiles = profileAdvisor.applyActivatedProfiles( superModel, null, profileManager.getExplicitlyActivatedIds(), profileManager.getExplicitlyDeactivatedIds() );
+        List activeExternalProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
+        
+        LinkedHashSet profiles = new LinkedHashSet();
+        
+        if ( activeProfiles != null && !activeProfiles.isEmpty() )
+        {
+            profiles.addAll( activeProfiles );
+        }
+        
+        if ( activeExternalProfiles != null && !activeExternalProfiles.isEmpty() )
+        {
+            profiles.addAll( activeExternalProfiles );
+        }
 
-        MavenProject project = new MavenProject( superModel );
-
-        project.setActiveProfiles( activeProfiles );
+        project.setActiveProfiles( new ArrayList( profiles ) );
 
         project.setOriginalModel( superModel );
 
@@ -295,6 +305,7 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( projectId, e.getMessage(), e );
         }
     }
+
 
     public MavenProject buildWithDependencies( File projectDescriptor,
                                                ArtifactRepository localRepository,
@@ -1001,6 +1012,11 @@ public class DefaultMavenProjectBuilder
         
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, cachedPomFilesByModelId );
         
+        ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
+        
+        projectContext.setModelLineage( modelLineage );
+        projectContext.store( buildContextManager );
+        
         List explicitlyActive;
         List explicitlyInactive;
         
@@ -1026,6 +1042,9 @@ public class DefaultMavenProjectBuilder
             
             MavenProject project = new MavenProject( currentModel );
             project.setFile( currentPom );
+            
+            projectContext.setCurrentProject( project );
+            projectContext.store( buildContextManager );
 
             project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( model, projectDir, explicitlyActive,
                                                                               explicitlyInactive ) );
@@ -1059,80 +1078,6 @@ public class DefaultMavenProjectBuilder
         }
         
         return result;
-    }
-
-    private List injectActiveProfiles( ProfileManager profileManager, Model model )
-        throws ProjectBuildingException
-    {
-        List activeProfiles;
-
-        if ( profileManager != null )
-        {
-            try
-            {
-                activeProfiles = profileManager.getActiveProfiles();
-            }
-            catch ( ProfileActivationException e )
-            {
-                String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-                throw new ProjectBuildingException( projectId, e.getMessage(), e );
-            }
-
-            for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
-            {
-                Profile profile = (Profile) it.next();
-
-                profileInjector.inject( profile, model );
-            }
-        }
-        else
-        {
-            activeProfiles = Collections.EMPTY_LIST;
-        }
-
-        return activeProfiles;
-    }
-
-    private void loadProjectExternalProfiles( ProfileManager profileManager, File projectDir )
-        throws ProfileActivationException
-    {
-        if ( projectDir != null )
-        {
-            try
-            {
-                ProfilesRoot root = profilesBuilder.buildProfiles( projectDir );
-
-                if ( root != null )
-                {
-                    List active = root.getActiveProfiles();
-
-                    if ( active != null && !active.isEmpty() )
-                    {
-                        profileManager.explicitlyActivate( root.getActiveProfiles() );
-                    }
-
-                    for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
-                    {
-                        org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
-
-                        Profile converted = ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile );
-
-                        profileManager.addProfile( converted );
-                    }
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new ProfileActivationException( "Cannot read profiles.xml resource from directory: " + projectDir,
-                                                      e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new ProfileActivationException(
-                    "Cannot parse profiles.xml resource from directory: " + projectDir, e );
-            }
-        }
     }
 
     private Model readModel( String projectId, File file, boolean strict )

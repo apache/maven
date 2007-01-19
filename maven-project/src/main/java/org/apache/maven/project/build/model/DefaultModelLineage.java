@@ -328,4 +328,44 @@ public class DefaultModelLineage
         }
     }
 
+    public ModelLineageIterator lineageIterator()
+    {
+        return new ModelLineageIterator()
+        {
+
+            private int idx = -1;
+
+            public boolean hasNext()
+            {
+                return tuples.size() > idx + 1;
+            }
+
+            public Object next()
+            {
+                return ( (ModelLineageTuple) tuples.get( ( ++idx ) ) ).model;
+            }
+
+            public void remove()
+            {
+                tuples.remove( idx );
+            }
+
+            public List getArtifactRepositories()
+            {
+                return ( (ModelLineageTuple) tuples.get( idx ) ).remoteRepositories;
+            }
+
+            public Model getModel()
+            {
+                return ( (ModelLineageTuple) tuples.get( idx ) ).model;
+            }
+
+            public File getPOMFile()
+            {
+                return ( (ModelLineageTuple) tuples.get( idx ) ).file;
+            }
+
+        };
+    }
+
 }

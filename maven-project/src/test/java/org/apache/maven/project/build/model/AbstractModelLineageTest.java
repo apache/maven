@@ -71,6 +71,54 @@ public abstract class AbstractModelLineageTest
         assertEquals( 1, ml.size() );
     }
 
+    public void testLineageIterator_ShouldAddTwoEntriesAndIterateInFIFOOrder()
+        throws IOException
+    {
+        ModelLineage ml = newModelLineage();
+
+        String gOne = "group1";
+        String aOne = "artifact1";
+        String vOne = "1";
+
+        Model mOne = new Model();
+
+        mOne.setGroupId( gOne );
+        mOne.setArtifactId( aOne );
+        mOne.setVersion( vOne );
+
+        File fOne = File.createTempFile( "ModelLineageTest.modelLineageIterator-test.", "" );
+        fOne.deleteOnExit();
+
+        ml.setOrigin( mOne, fOne, null );
+
+        String gTwo = "group2";
+        String aTwo = "artifact2";
+        String vTwo = "2";
+
+        Model mTwo = new Model();
+
+        mOne.setGroupId( gTwo );
+        mOne.setArtifactId( aTwo );
+        mOne.setVersion( vTwo );
+
+        File fTwo = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
+        fTwo.deleteOnExit();
+        
+        ml.addParent( mTwo, fTwo, null );
+
+        ModelLineageIterator it = ml.lineageIterator();
+
+        assertTrue( it.hasNext() );
+        assertEquals( mOne.getId(), ( (Model) it.next() ).getId() );
+        assertEquals( mOne.getId(), it.getModel().getId() );
+        assertEquals( fOne, it.getPOMFile() );
+
+        assertTrue( it.hasNext() );
+        assertEquals( mTwo.getId(), ( (Model) it.next() ).getId() );
+        assertEquals( mTwo.getId(), it.getModel().getId() );
+        assertEquals( fTwo, it.getPOMFile() );
+    }
+
     public void testModelIterator_ShouldAddTwoModelsAndIterateInFIFOOrder()
     {
         ModelLineage ml = newModelLineage();
@@ -162,7 +210,7 @@ public abstract class AbstractModelLineageTest
 
         File fOne = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fOne.deleteOnExit();
-        
+
         Model mOne = new Model();
 
         String gOne = "group";
@@ -272,7 +320,7 @@ public abstract class AbstractModelLineageTest
 
         assertSame( arOne, ml.getOriginatingArtifactRepositoryList().get( 0 ) );
     }
-    
+
     public void testGetModelsInDescendingOrder_ShouldAddTwoAndRetrieveInLIFOOrder()
     {
         ModelLineage ml = newModelLineage();
@@ -302,7 +350,7 @@ public abstract class AbstractModelLineageTest
         ml.addParent( mTwo, null, null );
 
         Iterator it = ml.getModelsInDescendingOrder().iterator();
-        
+
         assertTrue( it.hasNext() );
         assertEquals( mTwo.getId(), ( (Model) it.next() ).getId() );
 

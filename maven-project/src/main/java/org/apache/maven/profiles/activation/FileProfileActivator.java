@@ -22,13 +22,14 @@ import org.codehaus.plexus.util.FileUtils;
  */
 
 public class FileProfileActivator
-    extends DetectedProfileActivator
+    implements ProfileActivator
 {
-    protected boolean canDetectActivation( Profile profile )
+    
+    public boolean canDetermineActivation( Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getFile() != null;
     }
-
+    
     public boolean isActive( Profile profile )
     {
         Activation activation = profile.getActivation();
@@ -56,4 +57,5 @@ public class FileProfileActivator
 
         return false;
     }
+
 }

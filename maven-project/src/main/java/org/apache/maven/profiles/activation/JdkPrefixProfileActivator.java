@@ -1,5 +1,6 @@
 package org.apache.maven.profiles.activation;
 
+import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.StringUtils;
@@ -23,7 +24,8 @@ import org.codehaus.plexus.util.StringUtils;
 public class JdkPrefixProfileActivator
     extends DetectedProfileActivator
 {
-    private static final String JDK_VERSION = System.getProperty( "java.version" );
+    
+    public static final String JDK_VERSION = "java.version";
 
     public boolean isActive( Profile profile )
     {
@@ -38,9 +40,12 @@ public class JdkPrefixProfileActivator
             reverse = true;
             jdk = jdk.substring( 1 );
         }
+        
+        SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext( getBuildContextManager(), true );
+        String javaVersion = systemContext.getSystemProperty( JDK_VERSION );
 
         // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
-        boolean result = JDK_VERSION.startsWith( jdk );
+        boolean result = javaVersion.startsWith( jdk );
         
         if ( reverse )
         {

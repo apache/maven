@@ -20,8 +20,11 @@ package org.apache.maven;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.ExecutionBuildContext;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -74,6 +77,8 @@ public class DefaultMaven
     // Components
     // ----------------------------------------------------------------------
 
+    protected BuildContextManager buildContextManager;
+    
     protected MavenProjectBuilder projectBuilder;
 
     protected LifecycleExecutor lifecycleExecutor;
@@ -97,6 +102,8 @@ public class DefaultMaven
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
+        
+        initializeBuildContext( request );
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
 
@@ -164,6 +171,21 @@ public class DefaultMaven
         dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
         return new DefaultMavenExecutionResult( result.getReactorManager() );
+    }
+
+    /**
+     * Initialize some context objects to be stored in the container's context map for reference by
+     * other Maven components (including custom components that need more information about the 
+     * build than is supplied to them by the APIs).
+     */
+    private void initializeBuildContext( MavenExecutionRequest request )
+    {
+        new ExecutionBuildContext( request ).store( buildContextManager );
+        
+        SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        
+        systemContext.setSystemProperties( request.getProperties() );
+        systemContext.store( buildContextManager );
     }
 
     private void logErrors( ReactorManager rm,
@@ -304,17 +326,22 @@ public class DefaultMaven
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
+        
+        List files;
         try
         {
-            List files = getProjectFiles( request );
-
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), globalProfileManager, !request.useReactor() );
-
+            files = getProjectFiles( request );
         }
         catch ( IOException e )
         {
-            throw new MavenExecutionException( "Error processing projects for the reactor: " + e.getMessage(), e );
+            throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
+        }
+        
+        try
+        {
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
+                                        request.getSettings(), globalProfileManager, !request.useReactor() );
+
         }
         catch ( ArtifactResolutionException e )
         {
