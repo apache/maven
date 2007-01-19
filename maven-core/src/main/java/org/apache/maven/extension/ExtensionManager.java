@@ -20,8 +20,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Extension;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainerException;
+
+import java.util.List;
 
 /**
  * Used to locate extensions.
@@ -35,4 +38,8 @@ public interface ExtensionManager
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
 
     void registerWagons();
+
+    void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
+                       ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
 }

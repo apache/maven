@@ -49,6 +49,9 @@
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
         <requirement>
@@ -80,6 +83,13 @@
       <role>org.apache.maven.Maven</role>
       <implementation>org.apache.maven.DefaultMaven</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.extension.ExtensionManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
+          <role-hint>default</role-hint>
+        </requirement>
         <requirement>
           <role>org.apache.maven.context.BuildContextManager</role>
           <role-hint>default</role-hint>
@@ -205,9 +215,6 @@
       <requirements>
         <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.extension.ExtensionManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>

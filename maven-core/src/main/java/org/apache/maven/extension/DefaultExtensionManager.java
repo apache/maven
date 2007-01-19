@@ -19,6 +19,7 @@ package org.apache.maven.extension;
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,6 +29,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Extension;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusConstants;
@@ -41,6 +44,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +59,8 @@ public class DefaultExtensionManager
     implements ExtensionManager, Contextualizable
 {
     
+    private ArtifactFactory artifactFactory;
+    
     private ArtifactResolver artifactResolver;
 
     private ArtifactMetadataSource artifactMetadataSource;
@@ -65,6 +71,33 @@ public class DefaultExtensionManager
 
     private WagonManager wagonManager;
 
+    public void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
+                              ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+    {
+        Artifact extensionArtifact = artifactFactory.createBuildArtifact( extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), "jar" );
+        
+        Parent originatingParent = originatingModel.getParent();
+        
+        String groupId = originatingModel.getGroupId();
+        if ( groupId == null && originatingParent != null )
+        {
+            groupId = originatingParent.getGroupId();
+        }
+        
+        String artifactId = originatingModel.getArtifactId();
+        
+        String version = originatingModel.getVersion();
+        if ( version == null && originatingParent != null )
+        {
+            version = originatingParent.getVersion();
+        }
+        
+        Artifact projectArtifact = artifactFactory.createProjectArtifact( groupId, artifactId, version );
+
+        addExtension( extensionArtifact, projectArtifact, remoteRepositories, localRepository, null );
+    }
+    
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
@@ -73,22 +106,33 @@ public class DefaultExtensionManager
         getLogger().debug( "Initialising extension: " + extensionId );
 
         Artifact artifact = (Artifact) project.getExtensionArtifactMap().get( extensionId );
-
-        if ( artifact != null )
+        
+        addExtension( artifact, project.getArtifact(), project.getRemoteArtifactRepositories(), localRepository,
+                      new ActiveArtifactResolver( project ) );
+    }
+    
+    private void addExtension( Artifact extensionArtifact, Artifact projectArtifact, List remoteRepositories,
+                               ArtifactRepository localRepository, ActiveArtifactResolver activeArtifactResolver )
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+    {
+        if ( extensionArtifact != null )
         {
-            ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), project.getArtifact() );
+            ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
-                                                                                    project.getArtifact(),
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( extensionArtifact ),
+                                                                                    projectArtifact,
                                                                                     localRepository,
-                                                                                    project.getRemoteArtifactRepositories(),
+                                                                                    remoteRepositories,
                                                                                     artifactMetadataSource, filter );
 
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
 
-                a = project.replaceWithActiveArtifact( a );
+                if ( activeArtifactResolver != null )
+                {
+                    a = activeArtifactResolver.replaceWithActiveArtifact( a );
+                }
 
                 getLogger().debug( "Adding to extension classpath: " + a.getFile() );
 
@@ -116,6 +160,21 @@ public class DefaultExtensionManager
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+    
+    private static final class ActiveArtifactResolver
+    {
+        private MavenProject project;
+        
+        ActiveArtifactResolver( MavenProject project )
+        {
+            this.project = project;
+        }
+        
+        Artifact replaceWithActiveArtifact( Artifact artifact )
+        {
+            return project.replaceWithActiveArtifact( artifact );
+        }
+    }
 
     private static final class ProjectArtifactExceptionFilter
         implements ArtifactFilter
@@ -137,4 +196,5 @@ public class DefaultExtensionManager
             return projectDependencyConflictId.equals( depConflictId ) || passThroughFilter.include( artifact );
         }
     }
+
 }

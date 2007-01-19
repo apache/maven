@@ -24,9 +24,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.extension.ExtensionManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.model.Extension;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
@@ -51,7 +49,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
@@ -84,8 +81,6 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
 
     private PluginManager pluginManager;
-
-    private ExtensionManager extensionManager;
 
     private List lifecycles;
 
@@ -134,52 +129,18 @@ public class DefaultLifecycleExecutor
         List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
 
         // TODO: probably don't want to do all this up front
-        findExtensions( session );
+        try
+        {
+            Map handlers = findArtifactTypeHandlers( session );
+
+            artifactHandlerManager.addHandlers( handlers );
+        }
+        catch ( PluginNotFoundException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
 
         executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
-    }
-
-    private void findExtensions( MavenSession session )
-        throws LifecycleExecutionException
-    {
-        for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
-        {
-            MavenProject project = (MavenProject) i.next();
-
-            for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
-            {
-                Extension extension = (Extension) j.next();
-                try
-                {
-                    extensionManager.addExtension( extension, project, session.getLocalRepository() );
-                }
-                catch ( PlexusContainerException e )
-                {
-                    throw new LifecycleExecutionException( "Unable to initialise extensions", e );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
-                }
-            }
-
-            extensionManager.registerWagons();
-
-            try
-            {
-                Map handlers = findArtifactTypeHandlers( project, session );
-
-                artifactHandlerManager.addHandlers( handlers );
-            }
-            catch ( PluginNotFoundException e )
-            {
-                throw new LifecycleExecutionException( e.getMessage(), e );
-            }
-        }
     }
 
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
@@ -1154,42 +1115,49 @@ public class DefaultLifecycleExecutor
     /**
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      * lookup directly, or have them passed in
+     * 
+     * @todo Move this sort of thing to the tail end of the project-building process
      */
-    private Map findArtifactTypeHandlers( MavenProject project, MavenSession session )
+    private Map findArtifactTypeHandlers( MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Map map = new HashMap();
-        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+        for ( Iterator projectIterator = session.getSortedProjects().iterator(); projectIterator.hasNext(); )
         {
-            Plugin plugin = (Plugin) i.next();
-
-            if ( plugin.isExtensions() )
+            MavenProject project = (MavenProject) projectIterator.next();
+            
+            for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
             {
-                verifyPlugin( plugin, project, session );
+                Plugin plugin = (Plugin) i.next();
 
-                // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
-                try
+                if ( plugin.isExtensions() )
                 {
-                    Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
-                    map.putAll( components );
-                }
-                catch ( ComponentLookupException e )
-                {
-                    getLogger().debug( "Unable to find the lifecycle component in the extension", e );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new LifecycleExecutionException( "Error looking up available components from plugin '" +
-                        plugin.getKey() + "': " + e.getMessage(), e );
-                }
+                    verifyPlugin( plugin, project, session );
 
-                // shudder...
-                for ( Iterator j = map.values().iterator(); j.hasNext(); )
-                {
-                    ArtifactHandler handler = (ArtifactHandler) j.next();
-                    if ( project.getPackaging().equals( handler.getPackaging() ) )
+                    // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
+                    try
                     {
-                        project.getArtifact().setArtifactHandler( handler );
+                        Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
+                        map.putAll( components );
+                    }
+                    catch ( ComponentLookupException e )
+                    {
+                        getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                    }
+                    catch ( PluginManagerException e )
+                    {
+                        throw new LifecycleExecutionException( "Error looking up available components from plugin '" +
+                            plugin.getKey() + "': " + e.getMessage(), e );
+                    }
+
+                    // shudder...
+                    for ( Iterator j = map.values().iterator(); j.hasNext(); )
+                    {
+                        ArtifactHandler handler = (ArtifactHandler) j.next();
+                        if ( project.getPackaging().equals( handler.getPackaging() ) )
+                        {
+                            project.getArtifact().setArtifactHandler( handler );
+                        }
                     }
                 }
             }
