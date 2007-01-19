@@ -25,7 +25,7 @@ import org.apache.maven.scm.manager.plexus.DefaultScmManager;
  * Test for classpath issues
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id: ScmReport.java 385830 2006-03-14 16:51:44Z brett $
+ * @version $Id$
  * @goal test
  */
 public class ScmTestMojo

@@ -51,7 +51,7 @@ import java.io.IOException;
  * @author <a href="brett@apache.org">Brett Porter</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="carlos@apache.org">Carlos Sanchez</a>
- * @version $Id: ScmWagon.java 480335 2006-11-29 02:20:53Z brett $
+ * @version $Id$
  */
 public class ScmWagon
     extends AbstractWagon
