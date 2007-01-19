@@ -141,6 +141,12 @@ public class DefaultMavenSettingsBuilder
         return buildSettings( userSettingsFile );
     }
 
+    public Settings buildSettings( boolean useCachedSettings )
+        throws IOException, XmlPullParserException
+    {
+        return buildSettings( userSettingsFile, useCachedSettings );
+    }
+
     public Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException
     {
