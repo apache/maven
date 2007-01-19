@@ -18,7 +18,8 @@ public class MavenIT0043Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0043" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/maven-it-it0043-1.0-SNAPSHOT.jar" );
+        verifier.assertFilePresent( "child1/target/maven-it-it0043-child1-1.0-SNAPSHOT.jar" );
+        verifier.assertFilePresent( "child2/target/maven-it-it0043-child2-1.0-SNAPSHOT.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
