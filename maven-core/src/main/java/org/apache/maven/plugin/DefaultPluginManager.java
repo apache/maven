@@ -393,7 +393,7 @@ public class DefaultPluginManager
 
         List resolved = new ArrayList( result.getArtifacts() );
 
-        getLogger().info( "Main plugin artifacts: " + resolved.toString().replace( ',', '\n' ) );
+        getLogger().debug( "Main plugin artifacts: " + resolved.toString().replace( ',', '\n' ) );
 
         // Also resolve the plugin dependencies specified in <plugin><dependencies>:
         resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
@@ -403,7 +403,7 @@ public class DefaultPluginManager
                                                                artifactMetadataSource,
                                                                coreArtifactFilterManager.getArtifactFilter() ).getArtifacts() );
 
-        getLogger().info( "After adding project-level plugin dependencies: " + resolved.toString().replace( ',', '\n' ) );
+        getLogger().debug( "After adding project-level plugin dependencies: " + resolved.toString().replace( ',', '\n' ) );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
@@ -415,13 +415,11 @@ public class DefaultPluginManager
             }
         }
 
-        // List unresolved = new ArrayList();// dependencies );
+        // This code below removes dependencies added by the project
+        // with the same group/artifactId as those specified
+        // by the plugin itself.
 
-        // unresolved.removeAll( resolved );
-
-        // resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
-
-        Set allResolved = new LinkedHashSet( resolved.size() ); // + unresolved.size() );
+        Set allResolved = new LinkedHashSet( resolved.size() );
 
         Set seenVersionlessKeys = new HashSet();
 
@@ -437,25 +435,9 @@ public class DefaultPluginManager
             }
             else
             {
-                getLogger().info( "NOT including: " + resolvedArtifact.getId() + " in plugin dependencies." );
+                getLogger().warn( "NOT including: " + resolvedArtifact.getId() + " in plugin dependencies." );
             }
         }
-
-//        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
-//        {
-//            Artifact unresolvedArtifact = (Artifact) it.next();
-//
-//            String versionlessKey = ArtifactUtils.versionlessKey( unresolvedArtifact );
-//            if ( !seenVersionlessKeys.contains( versionlessKey ) )
-//            {
-//                allResolved.add( unresolvedArtifact );
-//                seenVersionlessKeys.add( versionlessKey );
-//            }
-//            else
-//            {
-//                getLogger().info( "NOT including: " + unresolvedArtifact.getId() + " in plugin dependencies." );
-//            }
-//        }
 
         getLogger().info( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
 
@@ -728,61 +710,6 @@ public class DefaultPluginManager
         populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, container, expressionEvaluator );
 
         return plugin;
-    }
-
-    private void resolveCoreArtifacts( List unresolved,
-                                       ArtifactRepository localRepository,
-                                       List resolutionRepositories )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
-        {
-            Artifact artifact = (Artifact) it.next();
-
-            File artifactFile = (File) resolvedCoreArtifactFiles.get( artifact.getId() );
-
-            if ( artifactFile == null )
-            {
-                String resource =
-                    "/META-INF/maven/" + artifact.getGroupId() + "/" + artifact.getArtifactId() + "/pom.xml";
-
-                URL resourceUrl = container.getContainerRealm().getResource( resource );
-
-                if ( resourceUrl == null )
-                {
-                    artifactResolver.resolve( artifact, resolutionRepositories, localRepository );
-
-                    artifactFile = artifact.getFile();
-                }
-                else
-                {
-                    String artifactPath = resourceUrl.getPath();
-
-                    if ( artifactPath.startsWith( "file:" ) )
-                    {
-                        artifactPath = artifactPath.substring( "file:".length() );
-                    }
-
-                    artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
-
-                    if ( artifactPath.endsWith( "/" ) )
-                    {
-                        artifactPath = artifactPath.substring( 0, artifactPath.length() - 1 );
-                    }
-
-                    if ( artifactPath.endsWith( "!" ) )
-                    {
-                        artifactPath = artifactPath.substring( 0, artifactPath.length() - 1 );
-                    }
-
-                    artifactFile = new File( artifactPath ).getAbsoluteFile();
-                }
-
-                resolvedCoreArtifactFiles.put( artifact.getId(), artifactFile );
-            }
-
-            artifact.setFile( artifactFile );
-        }
     }
 
     private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration,
