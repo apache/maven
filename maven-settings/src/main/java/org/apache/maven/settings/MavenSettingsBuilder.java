@@ -40,7 +40,7 @@ public interface MavenSettingsBuilder
         throws IOException, XmlPullParserException;
     
     Settings buildSettings( boolean useCachedSettings )
-        throws IOException, XmlPullParserException
+        throws IOException, XmlPullParserException;
 
     Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException;
