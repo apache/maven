@@ -565,6 +565,9 @@ public class MavenEmbedder
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
+        
+        container.getLoggerManager().setThresholds( request.getLoggingLevel() );
+        
         try
         {
             request = defaultsPopulator.populateDefaults( request );
