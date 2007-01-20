@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  * @todo this should probably be a component with some dynamic control of filtering
  */
@@ -36,7 +36,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
     {
         Set artifacts = new HashSet();
 
-        artifacts.add( "classworlds" );
+        artifacts.add( "plexus-classworlds" );
         artifacts.add( "commons-cli" );
         artifacts.add( "doxia-sink-api" );
         artifacts.add( "jsch" );
