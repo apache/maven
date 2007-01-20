@@ -50,7 +50,8 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin
         // Build the test project that uses the plugin.
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "test-project" ).getAbsolutePath() );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
