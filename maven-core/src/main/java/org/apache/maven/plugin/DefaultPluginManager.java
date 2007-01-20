@@ -201,6 +201,7 @@ public class DefaultPluginManager
         throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
+        getLogger().debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
@@ -225,10 +226,10 @@ public class DefaultPluginManager
 
             artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-            if ( !pluginCollector.isPluginInstalled( plugin ) )
-            {
-                addPlugin( plugin, pluginArtifact, project, localRepository );
-            }
+//            if ( !pluginCollector.isPluginInstalled( plugin ) )
+//            {
+//            }
+            addPlugin( plugin, pluginArtifact, project, localRepository );
 
             project.addPlugin( plugin );
         }
@@ -345,6 +346,16 @@ public class DefaultPluginManager
     private void addPlugin( Plugin plugin, Plugin projectPlugin, Artifact pluginArtifact, Set artifacts )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
     {
+        // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the 
+        // POM), we need to undo this somehow.
+        ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
+        
+        if ( pluginRealm != null && pluginRealm != container.getContainerRealm() )
+        {
+            getLogger().debug( "Realm already exists for: " + projectPlugin.getKey() + ". Skipping addition..." );
+            // we've already discovered this plugin, and configured it, so skip it this time.
+            return;
+        }
 
         // ----------------------------------------------------------------------------
         // Realm creation for a plugin
@@ -1253,6 +1264,8 @@ public class DefaultPluginManager
     public Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException
     {
+        getLogger().debug( "Looking for plugin realm: " + plugin + " using: " + pluginCollector );
+        
         ClassRealm pluginRealm = pluginCollector.getPluginDescriptor( plugin ).getClassRealm();
 
         if ( pluginRealm == null )
