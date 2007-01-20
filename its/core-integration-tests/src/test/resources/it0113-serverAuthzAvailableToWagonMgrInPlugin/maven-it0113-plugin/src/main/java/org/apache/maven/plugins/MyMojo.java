@@ -65,7 +65,7 @@ public class MyMojo
             throw new MojoExecutionException( "Cannot find AuthenticationInfo for: " + serverId + "." );
         }
         
-        if ( username.equals( authInfo.getUserName() ) )
+        if ( !username.equals( authInfo.getUserName() ) )
         {
             getLog().error( "Expected username: " + username + "; found: " + authInfo.getUserName() );
             throw new MojoExecutionException( "Expected username: " + username + "; found: " + authInfo.getUserName() );
