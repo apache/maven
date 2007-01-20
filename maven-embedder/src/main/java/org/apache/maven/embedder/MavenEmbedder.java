@@ -59,6 +59,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -565,18 +566,27 @@ public class MavenEmbedder
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
-        
-        container.getLoggerManager().setThresholds( request.getLoggingLevel() );
+        LoggerManager loggerManager = container.getLoggerManager();
+        int oldThreshold = loggerManager.getThreshold();
         
         try
         {
-            request = defaultsPopulator.populateDefaults( request );
-        }
-        catch ( MavenEmbedderException e )
-        {
-            return new DefaultMavenExecutionResult( Collections.singletonList( e ) );
-        }
+            loggerManager.setThresholds( request.getLoggingLevel() );
+            
+            try
+            {
+                request = defaultsPopulator.populateDefaults( request );
+            }
+            catch ( MavenEmbedderException e )
+            {
+                return new DefaultMavenExecutionResult( Collections.singletonList( e ) );
+            }
 
-        return maven.execute( request );
+            return maven.execute( request );
+        }
+        finally
+        {
+            loggerManager.setThresholds( oldThreshold );
+        }
     }
 }
