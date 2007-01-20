@@ -87,7 +87,11 @@ public class DefaultPluginVersionManager
                                         MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, session, false );
+        Settings settings = session.getSettings();
+
+        ArtifactRepository localRepository = session.getLocalRepository();
+        
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
     }
 
     public String resolveReportPluginVersion( String groupId,
@@ -96,19 +100,47 @@ public class DefaultPluginVersionManager
                                               MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, session, true );
+        Settings settings = session.getSettings();
+
+        ArtifactRepository localRepository = session.getLocalRepository();
+        
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
+    }
+
+    /**
+     * @deprecated
+     */
+    public String resolvePluginVersion( String groupId,
+                                        String artifactId,
+                                        MavenProject project,
+                                        Settings settings,
+                                        ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
+    {
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
+    }
+
+    /**
+     * @deprecated
+     */
+    public String resolveReportPluginVersion( String groupId,
+                                              String artifactId,
+                                              MavenProject project,
+                                              Settings settings,
+                                              ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
+    {
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, true );
     }
 
     private String resolvePluginVersion( String groupId,
                                          String artifactId,
                                          MavenProject project,
-                                         MavenSession session,
+                                         Settings settings,
+                                         ArtifactRepository localRepository,
                                          boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        Settings settings = session.getSettings();
-
-        ArtifactRepository localRepository = session.getLocalRepository();
 
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );

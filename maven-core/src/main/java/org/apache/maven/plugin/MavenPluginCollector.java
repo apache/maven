@@ -58,6 +58,8 @@ public class MavenPluginCollector
             {
                 pluginsInProcess.add( key );
 
+                getLogger().debug( this + ": Discovered plugin: " + key );
+                
                 pluginDescriptors.put( key, pluginDescriptor );
 
                 // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere

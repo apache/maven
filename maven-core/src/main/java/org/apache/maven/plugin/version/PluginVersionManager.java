@@ -16,9 +16,11 @@ package org.apache.maven.plugin.version;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 
 public interface PluginVersionManager
 {
@@ -27,7 +29,21 @@ public interface PluginVersionManager
     String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
 
+    /**
+     * @deprecated
+     */
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                 ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
+
     String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
+
+    /**
+     * @deprecated
+     */
+    String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                       ArtifactRepository localRepository )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
 
 }
