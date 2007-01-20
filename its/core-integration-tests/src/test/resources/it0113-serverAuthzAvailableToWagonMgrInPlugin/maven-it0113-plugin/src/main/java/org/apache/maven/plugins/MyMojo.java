@@ -67,13 +67,13 @@ public class MyMojo
         
         if ( !username.equals( authInfo.getUserName() ) )
         {
-            getLog().error( "Expected username: " + username + "; found: " + authInfo.getUserName() );
+            getLog().error( "Expected username: '" + username + "'; found: '" + authInfo.getUserName() + "'" );
             throw new MojoExecutionException( "Expected username: " + username + "; found: " + authInfo.getUserName() );
         }
         
-        if ( password.equals( authInfo.getPassword() ) )
+        if ( !password.equals( authInfo.getPassword() ) )
         {
-            getLog().error( "Expected password: " + password + "; found: " + authInfo.getPassword() );
+            getLog().error( "Expected password: '" + password + "'; found: '" + authInfo.getPassword() + "'" );
             throw new MojoExecutionException( "Expected password: " + password + "; found: " + authInfo.getPassword() );
         }
     }
