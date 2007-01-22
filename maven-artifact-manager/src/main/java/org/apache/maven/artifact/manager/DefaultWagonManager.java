@@ -122,6 +122,8 @@ public class DefaultWagonManager
         }
         catch ( ComponentLookupException e1 )
         {
+            e1.printStackTrace();
+
             throw new UnsupportedProtocolException(
                 "Cannot find wagon which supports the requested protocol: " + protocol, e1 );
         }

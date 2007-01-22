@@ -194,7 +194,7 @@
       </sequential>
     </macrodef>
 
-    <modello file="maven-model/maven.mdo" version="4.0.0"/>
+    <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0"/>
     <!-- DGF TODO turn this into a big <apply> task? write a custom task? -->
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
@@ -202,7 +202,7 @@
     <modello file="maven-profile/profiles.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/plugins.mdo"/>
-    <modello file="maven-settings/settings.mdo"/>
+    <modello file="maven-settings/src/main/mdo/settings.mdo"/>
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
