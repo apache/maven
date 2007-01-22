@@ -53,7 +53,7 @@ under the License.
         </executions>
         <configuration>
           <version>1.0.0</version>
-          <model>settings.mdo</model>
+          <model>src/main/mdo/settings.mdo</model>
         </configuration>
       </plugin>
     </plugins>

@@ -55,7 +55,7 @@ under the License.
         </executions>
         <configuration>
           <version>4.0.0</version>
-          <model>maven.mdo</model>
+          <model>src/main/mdo/maven.mdo</model>
         </configuration>
       </plugin>
     </plugins>

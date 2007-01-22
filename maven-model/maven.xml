@@ -23,12 +23,12 @@ under the License.
     <maven:addPath id="maven.compile.src.set" refid="modello.sources" />
     <j:set var="sourcesPresent" value="true" />
 
-    <modello:generate model="maven.mdo" type="java" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
-    <modello:generate model="maven.mdo" type="xpp3-reader" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
-    <modello:generate model="maven.mdo" type="xpp3-writer" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+    <modello:generate model="${maven.modello.model}" type="java" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+    <modello:generate model="${maven.modello.model}" type="xpp3-reader" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+    <modello:generate model="${maven.modello.model}" type="xpp3-writer" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
 
     <!-- Need the original package as well -->
-    <ant:copy tofile="target/maven.mdo.m1" file="maven.mdo" />
+    <ant:copy tofile="target/maven.mdo.m1" file="${maven.modello.model}" />
     <ant:replace file="target/maven.mdo.m1" token="org.apache.maven.model" value="org.apache.maven.project" />
 
     <modello:generate model="target/maven.mdo.m1" type="java" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
