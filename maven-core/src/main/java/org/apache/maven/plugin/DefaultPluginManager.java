@@ -165,7 +165,7 @@ public class DefaultPluginManager
 
         return verifyVersionedPlugin( plugin, project, localRepository );
     }
-    
+
     public PluginDescriptor verifyPlugin( Plugin plugin,
                                           MavenProject project,
                                           MavenSession session )
@@ -192,10 +192,10 @@ public class DefaultPluginManager
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
-        
+
         return verifyVersionedPlugin( plugin, project, localRepository );
     }
-    
+
     private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project,
                                                     ArtifactRepository localRepository )
         throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException,
@@ -314,10 +314,10 @@ public class DefaultPluginManager
         }
 
         Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project, localRepository );
-        
+
         addPlugin( plugin, projectPlugin, pluginArtifact, artifacts );
     }
-    
+
     protected void addPlugin( Plugin plugin,
                               Artifact pluginArtifact,
                               MavenProject project,
@@ -339,17 +339,17 @@ public class DefaultPluginManager
         }
 
         Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
-        
+
         addPlugin( plugin, projectPlugin, pluginArtifact, artifacts );
     }
-    
+
     private void addPlugin( Plugin plugin, Plugin projectPlugin, Artifact pluginArtifact, Set artifacts )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
     {
-        // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the 
+        // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the
         // POM), we need to undo this somehow.
         ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
-        
+
         if ( pluginRealm != null && pluginRealm != container.getContainerRealm() )
         {
             getLogger().debug( "Realm already exists for: " + projectPlugin.getKey() + ". Skipping addition..." );
@@ -390,7 +390,7 @@ public class DefaultPluginManager
         // ----------------------------------------------------------------------------
 
         getLogger().debug( "Checking for plugin descriptor for: " + plugin.getKey() + " in collector: " + pluginCollector );
-        
+
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( projectPlugin );
 
         if ( pluginDescriptor == null )
@@ -613,11 +613,11 @@ public class DefaultPluginManager
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
-            ClassRealm oldRealm = DefaultPlexusContainer.setLookupRealm( pluginRealm );
+            ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
 
             plugin.execute();
 
-            DefaultPlexusContainer.setLookupRealm( oldRealm );
+            container.setLookupRealm( oldRealm );
 
             dispatcher.dispatchEnd( event, goalExecId );
         }
@@ -711,18 +711,35 @@ public class DefaultPluginManager
             // the lifecycle that is part of the lookup. Here we are specifically trying to keep
             // lookups that occur in contextualize calls in line with the right realm.
 
-            ClassRealm oldRealm = DefaultPlexusContainer.setLookupRealm( realm );
-
             if ( realm != null )
             {
+                ClassRealm oldRealm = container.setLookupRealm( realm );
+
+                getLogger().info( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + realm.getId() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
+
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
+
+                if ( plugin != null )
+                getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                else// not needed i guess.
+                    getLogger().warn("No luck.");
+
+                container.setLookupRealm( oldRealm );
             }
             else
             {
+                getLogger().info( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in default realm " + container.getLookupRealm() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
+
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+
+                if ( plugin != null )
+                getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                else// not needed i guess.
+                    getLogger().warn("No luck.");
+
             }
 
-            DefaultPlexusContainer.setLookupRealm( oldRealm );
+
 
             if ( report && !( plugin instanceof MavenReport ) )
             {
@@ -1255,7 +1272,7 @@ public class DefaultPluginManager
         if ( pluginRealm == null )
         {
             getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
-            pluginRealm = DefaultPlexusContainer.getLookupRealm();
+            pluginRealm = container.getLookupRealm();
         }
 
         return container.lookup( role, roleHint, pluginRealm );
@@ -1265,13 +1282,13 @@ public class DefaultPluginManager
         throws ComponentLookupException, PluginManagerException
     {
         getLogger().debug( "Looking for plugin realm: " + plugin + " using: " + pluginCollector );
-        
+
         ClassRealm pluginRealm = pluginCollector.getPluginDescriptor( plugin ).getClassRealm();
 
         if ( pluginRealm == null )
         {
             getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
-            pluginRealm = DefaultPlexusContainer.getLookupRealm();
+            pluginRealm = container.getLookupRealm();
         }
 
         return container.lookupMap( role, pluginRealm );
