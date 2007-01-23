@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator;
 import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -39,7 +40,10 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
@@ -61,7 +65,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -69,8 +72,14 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -238,6 +247,80 @@ public class MavenEmbedder
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
+    
+    /**
+     * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
+     *  from remote repositories (if they prohibit by default on project loading)
+     */ 
+    protected void verifyPlugin( Plugin plugin, MavenProject project ) 
+            throws ComponentLookupException, 
+                   ArtifactResolutionException, 
+                   PluginVersionResolutionException, 
+                   ArtifactNotFoundException, 
+                   InvalidVersionSpecificationException, 
+                   InvalidPluginException, 
+                   PluginManagerException, 
+                   PluginNotFoundException, 
+                   PluginVersionNotFoundException 
+    {
+        PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
+        pluginManager.verifyPlugin(plugin, project, settings, localRepository);
+    }
+    
+    /**
+     * protected for tests only..
+     */
+    protected Map getPluginExtensionComponents(Plugin plugin) throws PluginManagerException 
+    {
+        try
+        {
+            PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
+            return pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+            return new HashMap();
+        }
+    }
+    
+    /**
+     * mkleint: copied from DefaultLifecycleExecutor
+     * 
+     * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
+     * lookup directly, or have them passed in
+     * 
+     * @todo Move this sort of thing to the tail end of the project-building process
+     */
+    private Map findArtifactTypeHandlers( MavenProject project )
+        throws Exception
+    {
+        Map map = new HashMap();
+            
+        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+
+            if ( plugin.isExtensions() )
+            {
+                verifyPlugin( plugin, project);
+                map.putAll( getPluginExtensionComponents(plugin));
+
+
+                // shudder...
+                for ( Iterator j = map.values().iterator(); j.hasNext(); )
+                {
+                    ArtifactHandler handler = (ArtifactHandler) j.next();
+                    if ( project.getPackaging().equals( handler.getPackaging() ) )
+                    {
+                        project.getArtifact().setArtifactHandler( handler );
+                    }
+                }
+            }
+        }
+        return map;
+    }
+    
 
     /**
      * This method is used to grab the list of dependencies that belong to a project so that a UI
@@ -251,10 +334,26 @@ public class MavenEmbedder
         try
         {
             request = defaultsPopulator.populateDefaults( request );
-
+        
+            project = readProject( new File (request.getPomFile()) );
+            //mkleint: copied from DefaultLifecycleExecutor    
+            Map handlers = findArtifactTypeHandlers( project );
+            //is this necessary in this context, I doubt it..mkleint
+            artifactHandlerManager.addHandlers( handlers );
+            
             project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
                                                                  request.getLocalRepository(), profileManager,
                                                                  request.getTransferListener() );
+
+            
+        }
+        catch (PluginManagerException e) 
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+        }
+        catch ( PluginNotFoundException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
         catch ( MavenEmbedderException e )
         {
@@ -269,6 +368,11 @@ public class MavenEmbedder
             return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
         catch ( ArtifactNotFoundException e )
+        {
+            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+        }
+        //mkleint: why do we have so many various exception handlings with same result?
+        catch (Exception e) 
         {
             return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
