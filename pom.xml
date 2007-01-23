@@ -169,7 +169,7 @@
   </modules>
   <properties>
     <wagonVersion>1.0-beta-3-SNAPSHOT</wagonVersion>
-    <plexusVersion>1.0-alpha-16-SNAPSHOT</plexusVersion>
+    <plexusVersion>1.0-alpha-16</plexusVersion>
   </properties>
   <dependencies>
     <dependency>
@@ -194,12 +194,12 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
-        <version>1.2-alpha-7-SNAPSHOT</version>
+        <version>1.2-alpha-7</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.4-alpha-1</version>
+        <version>1.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
