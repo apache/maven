@@ -410,7 +410,7 @@ public class DefaultPluginManager
 
         pluginDescriptor.setArtifacts( new ArrayList( artifacts ) );
 
-        getLogger().info( "Realm for plugin: " + plugin.getKey() + ":\n" + componentRealm );
+        getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + componentRealm );
 
         pluginDescriptor.setClassRealm( componentRealm );
     }
@@ -715,12 +715,12 @@ public class DefaultPluginManager
             {
                 ClassRealm oldRealm = container.setLookupRealm( realm );
 
-                getLogger().info( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + realm.getId() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
+                getLogger().debug( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + realm.getId() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
 
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
 
                 if ( plugin != null )
-                getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                getLogger().debug( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
                 else// not needed i guess.
                     getLogger().warn("No luck.");
 
