@@ -128,6 +128,7 @@
             if ( v.getLastUpdated() == null || v.getLastUpdated().length() == 0 ||
                  versioning.getLastUpdated().compareTo( v.getLastUpdated() ) >= 0 )
             {
+                changed = true;
                 v.setLastUpdated( versioning.getLastUpdated() );
 
                 if ( versioning.getRelease() != null )
