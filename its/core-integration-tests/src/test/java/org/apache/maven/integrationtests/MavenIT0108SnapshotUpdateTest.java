@@ -113,11 +113,54 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.resetStreams();
     }
 
+    public void testSnapshotUpdatedWithLocalMetadata()
+        throws Exception
+    {
+        File localMetadata =
+            getMetadataFile( "org/apache/maven/its/snapshotUpdate", "maven-it-snapshot-update", "1.0-SNAPSHOT" );
+
+        localMetadata.delete();
+        assertFalse( localMetadata.exists() );
+
+        File metadata =
+            new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
+        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "1", System.currentTimeMillis() - 5000 ) );
+
+        verifier.executeGoal( "package" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        assertArtifactContents( "originalArtifact" );
+        assertFalse( localMetadata.exists() );
+
+        FileUtils.fileWrite( artifact.getAbsolutePath(), "localArtifact" );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( System.currentTimeMillis() ) );
+
+        verifier.executeGoal( "package" );
+
+        assertArtifactContents( "localArtifact" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.YEAR, -1 );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( cal.getTimeInMillis() ) );
+
+        verifier.executeGoal( "package" );
+
+        assertArtifactContents( "localArtifact" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
     public void testSnapshotLocalMetadataUpdatedOnInstall()
         throws Exception
     {
-        File localMetadata = new File( verifier.localRepo,
-                                       "org/apache/maven/its/snapshotUpdate/maven-it-snapshot-update/1.0-SNAPSHOT/maven-metadata-local.xml" );
+        File localMetadata =
+            getMetadataFile( "org/apache/maven/its/snapshotUpdate", "maven-it-snapshot-update", "1.0-SNAPSHOT" );
 
         localMetadata.delete();
         assertFalse( localMetadata.exists() );
@@ -139,6 +182,11 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+    }
+
+    private File getMetadataFile( String groupId, String artifactId, String version )
+    {
+        return new File( verifier.localRepo, groupId + "/" + artifactId + "/" + version + "/maven-metadata-local.xml" );
     }
 
     private void assertLocalMetadataIsToday( File localMetadata )
