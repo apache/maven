@@ -25,7 +25,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -52,10 +51,10 @@ import org.apache.maven.project.build.ProjectBuildContext;
 import org.apache.maven.project.build.model.DefaultModelLineage;
 import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
+import org.apache.maven.project.build.model.ModelLineageIterator;
 import org.apache.maven.project.build.profile.ProfileAdvisor;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
-import org.apache.maven.project.injection.ProfileInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
@@ -1031,14 +1030,11 @@ public class DefaultMavenProjectBuilder
             explicitlyInactive = Collections.EMPTY_LIST;
         }
         
-        List models = modelLineage.getModelsInDescendingOrder();
-        List poms = modelLineage.getFilesInDescendingOrder();
-        
         MavenProject lastProject = null;
-        for( int i = 0; i < models.size(); i++ )
+        for ( ModelLineageIterator it = modelLineage.lineageIterator(); it.hasNext(); )
         {
-            Model currentModel = (Model) models.get( i );
-            File currentPom = (File) poms.get( i );
+            Model currentModel = (Model) it.next();
+            File currentPom = it.getPOMFile();
             
             MavenProject project = new MavenProject( currentModel );
             project.setFile( currentPom );
@@ -1046,23 +1042,23 @@ public class DefaultMavenProjectBuilder
             projectContext.setCurrentProject( project );
             projectContext.store( buildContextManager );
 
-            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( model, projectDir, explicitlyActive,
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, projectDir, explicitlyActive,
                                                                               explicitlyInactive ) );
             
             if ( lastProject != null )
             {
-                project.setParent( lastProject );
+                lastProject.setParent( project );
                 
-                project.setParentArtifact( artifactFactory.createParentArtifact( lastProject.getGroupId(), lastProject
-                    .getArtifactId(), lastProject.getVersion() ) );
+                lastProject.setParentArtifact( artifactFactory.createParentArtifact( project.getGroupId(), project
+                    .getArtifactId(), project.getVersion() ) );
             }
             
-            lineage.addLast( project );
+            lineage.addFirst( project );
             
             lastProject = project;
         }
 
-        MavenProject result = (MavenProject) lineage.get( lineage.size() - 1 );
+        MavenProject result = (MavenProject) lineage.getLast();
         
         if ( externalProfileManager != null )
         {

@@ -157,9 +157,16 @@ public class DefaultModelLineageBuilder
      * Model instance in the given Map before returning it. The skipCache flag controls whether the
      * Model instance is actually cached.
      */
-    private Model readModel( File pomFile, Map cachedPomFilesByModelId, boolean skipCache )
+    private Model readModel( File pom, Map cachedPomFilesByModelId, boolean skipCache )
         throws ProjectBuildingException
     {
+        File pomFile = pom;
+        if ( pom.isDirectory() )
+        {
+            pomFile = new File( pom, "pom.xml" );
+            getLogger().debug( "readModel(..): POM: " + pom + " is a directory. Trying: " + pomFile + " instead." );
+        }
+        
         Model model;
         FileReader reader = null;
 
