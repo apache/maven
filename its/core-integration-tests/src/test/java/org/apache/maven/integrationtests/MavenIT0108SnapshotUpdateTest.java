@@ -23,6 +23,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -112,6 +113,48 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.resetStreams();
     }
 
+    public void testSnapshotLocalMetadataUpdatedOnInstall()
+        throws Exception
+    {
+        File localMetadata = new File( verifier.localRepo,
+                                       "org/apache/maven/its/snapshotUpdate/maven-it-snapshot-update/1.0-SNAPSHOT/maven-metadata-local.xml" );
+
+        localMetadata.delete();
+        assertFalse( localMetadata.exists() );
+
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        assertLocalMetadataIsToday( localMetadata );
+
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.YEAR, -1 );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( cal.getTimeInMillis() ) );
+
+        verifier.executeGoal( "install" );
+
+        assertLocalMetadataIsToday( localMetadata );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    private void assertLocalMetadataIsToday( File localMetadata )
+        throws IOException
+    {
+        String actual = stripTime( FileUtils.fileRead( localMetadata ) );
+        String expected = stripTime( constructLocalMetadata( System.currentTimeMillis() ) );
+
+        assertEquals( expected, actual );
+    }
+
+    private static String stripTime( String s )
+    {
+        return s.replaceAll( "(.*)[0-9]{6}(</lastUpdated>.*)", "$1$2" );
+    }
+
     private void assertArtifactContents( String s )
         throws IOException
     {
@@ -147,9 +190,20 @@ public class MavenIT0108SnapshotUpdateTest
     {
         String ts = new SimpleDateFormat( "yyyyMMddHHmmss", Locale.US ).format( new Date( timestamp ) );
 
-        return "<?xml version='1.0' encoding='UTF-8'?><metadata>\n" + "<groupId>org.apache.maven</groupId>\n" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata>\n" + "<groupId>org.apache.maven</groupId>\n" +
             "<artifactId>maven-core-it-support</artifactId>\n" + "<version>1.0-SNAPSHOT</version>\n" +
             "<versioning>\n" + "<snapshot>\n" + "<buildNumber>" + buildNumber + "</buildNumber>\n" + "</snapshot>\n" +
             "<lastUpdated>" + ts + "</lastUpdated>\n" + "</versioning>\n" + "</metadata>";
+    }
+
+    private String constructLocalMetadata( long timestamp )
+    {
+        String ts = new SimpleDateFormat( "yyyyMMddHHmmss", Locale.US ).format( new Date( timestamp ) );
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata>\n" +
+            "  <groupId>org.apache.maven.its.snapshotUpdate</groupId>\n" +
+            "  <artifactId>maven-it-snapshot-update</artifactId>\n" + "  <version>1.0-SNAPSHOT</version>\n" +
+            "  <versioning>\n" + "    <snapshot>\n" + "      <localCopy>true</localCopy>\n" + "    </snapshot>\n" +
+            "    <lastUpdated>" + ts + "</lastUpdated>\n" + "  </versioning>\n" + "</metadata>";
     }
 }

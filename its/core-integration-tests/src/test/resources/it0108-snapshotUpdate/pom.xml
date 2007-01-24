@@ -24,7 +24,7 @@
     Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be
     updated. See MNG-1908.
   </description>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
