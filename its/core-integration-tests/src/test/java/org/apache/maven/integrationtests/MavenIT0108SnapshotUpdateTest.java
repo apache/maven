@@ -42,6 +42,8 @@ public class MavenIT0108SnapshotUpdateTest
 
     private File localRepoFile;
 
+    private static final int TIME_OFFSET = 50000;
+
     protected void setUp()
         throws Exception
     {
@@ -75,7 +77,7 @@ public class MavenIT0108SnapshotUpdateTest
         assertArtifactContents( "originalArtifact" );
 
         // set in the past to ensure it is downloaded
-        localRepoFile.setLastModified( System.currentTimeMillis() - 5000 );
+        localRepoFile.setLastModified( System.currentTimeMillis() - TIME_OFFSET );
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
 
@@ -92,7 +94,8 @@ public class MavenIT0108SnapshotUpdateTest
     {
         File metadata =
             new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
-        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "1", System.currentTimeMillis() - 5000 ) );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, true ) );
 
         verifier.executeGoal( "package" );
 
@@ -103,7 +106,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
         metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
-        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "2", System.currentTimeMillis() ) );
+        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "2", System.currentTimeMillis(), true ) );
 
         verifier.executeGoal( "package" );
 
@@ -116,15 +119,16 @@ public class MavenIT0108SnapshotUpdateTest
     public void testSnapshotUpdatedWithLocalMetadata()
         throws Exception
     {
-        File localMetadata =
-            getMetadataFile( "org/apache/maven/its/snapshotUpdate", "maven-it-snapshot-update", "1.0-SNAPSHOT" );
+        File localMetadata = getMetadataFile( "org/apache/maven", "maven-core-it-support", "1.0-SNAPSHOT" );
 
-        localMetadata.delete();
-        assertFalse( localMetadata.exists() );
+        FileUtils.deleteDirectory( localMetadata.getParentFile() );
+        assertFalse( localMetadata.getParentFile().exists() );
+        localMetadata.getParentFile().mkdirs();
 
         File metadata =
             new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
-        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "1", System.currentTimeMillis() - 5000 ) );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, true ) );
 
         verifier.executeGoal( "package" );
 
@@ -134,8 +138,13 @@ public class MavenIT0108SnapshotUpdateTest
         assertArtifactContents( "originalArtifact" );
         assertFalse( localMetadata.exists() );
 
-        FileUtils.fileWrite( artifact.getAbsolutePath(), "localArtifact" );
-        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( System.currentTimeMillis() ) );
+        FileUtils.fileWrite( localRepoFile.getAbsolutePath(), "localArtifact" );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( "org.apache.maven",
+                                                                                      "maven-core-it-support",
+                                                                                      System.currentTimeMillis(),
+                                                                                      true ) );
+        // update the remote file, but we shouldn't be looking
+        artifact.setLastModified( System.currentTimeMillis() );
 
         verifier.executeGoal( "package" );
 
@@ -146,11 +155,104 @@ public class MavenIT0108SnapshotUpdateTest
 
         Calendar cal = Calendar.getInstance();
         cal.add( Calendar.YEAR, -1 );
-        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( cal.getTimeInMillis() ) );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( "org.apache.maven",
+                                                                                      "maven-core-it-support",
+                                                                                      cal.getTimeInMillis(), true ) );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "2", System.currentTimeMillis() - 2000, true ) );
+        artifact.setLastModified( System.currentTimeMillis() );
+
+        verifier.executeGoal( "package" );
+
+        assertArtifactContents( "originalArtifact" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testSnapshotUpdatedWithMetadataUsingFileTimestamp()
+        throws Exception
+    {
+        File metadata =
+            new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, false ) );
+        metadata.setLastModified( System.currentTimeMillis() - TIME_OFFSET );
+
+        verifier.executeGoal( "package" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        assertArtifactContents( "originalArtifact" );
+
+        FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
+        metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
+        FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "2", System.currentTimeMillis(), false ) );
+
+        verifier.executeGoal( "package" );
+
+        assertArtifactContents( "updatedArtifact" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testSnapshotUpdatedWithLocalMetadataUsingFileTimestamp()
+        throws Exception
+    {
+        File localMetadata = getMetadataFile( "org/apache/maven", "maven-core-it-support", "1.0-SNAPSHOT" );
+
+        FileUtils.deleteDirectory( localMetadata.getParentFile() );
+        assertFalse( localMetadata.getParentFile().exists() );
+        localMetadata.getParentFile().mkdirs();
+
+        File metadata =
+            new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, false ) );
+        metadata.setLastModified( System.currentTimeMillis() - TIME_OFFSET );
+
+        verifier.executeGoal( "package" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        assertArtifactContents( "originalArtifact" );
+        assertFalse( localMetadata.exists() );
+
+        FileUtils.fileWrite( localRepoFile.getAbsolutePath(), "localArtifact" );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( "org.apache.maven",
+                                                                                      "maven-core-it-support",
+                                                                                      System.currentTimeMillis(),
+                                                                                      false ) );
+        // update the remote file, but we shouldn't be looking
+        artifact.setLastModified( System.currentTimeMillis() );
 
         verifier.executeGoal( "package" );
 
         assertArtifactContents( "localArtifact" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.YEAR, -1 );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( "org.apache.maven",
+                                                                                      "maven-core-it-support",
+                                                                                      cal.getTimeInMillis(), false ) );
+        localMetadata.setLastModified( cal.getTimeInMillis() );
+        localRepoFile.setLastModified( cal.getTimeInMillis() );
+        new File( localMetadata.getParentFile(), "maven-metadata-it.snapshots.xml" ).setLastModified(
+            cal.getTimeInMillis() );
+        FileUtils.fileWrite( metadata.getAbsolutePath(),
+                             constructMetadata( "2", System.currentTimeMillis() - 2000, false ) );
+        metadata.setLastModified( System.currentTimeMillis() - 2000 );
+        artifact.setLastModified( System.currentTimeMillis() );
+
+        verifier.executeGoal( "package" );
+
+        assertArtifactContents( "originalArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -174,7 +276,8 @@ public class MavenIT0108SnapshotUpdateTest
 
         Calendar cal = Calendar.getInstance();
         cal.add( Calendar.YEAR, -1 );
-        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata( cal.getTimeInMillis() ) );
+        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata(
+            "org.apache.maven.its.snapshotUpdate", "maven-it-snapshot-update", cal.getTimeInMillis(), true ) );
 
         verifier.executeGoal( "install" );
 
@@ -193,7 +296,9 @@ public class MavenIT0108SnapshotUpdateTest
         throws IOException
     {
         String actual = stripTime( FileUtils.fileRead( localMetadata ) );
-        String expected = stripTime( constructLocalMetadata( System.currentTimeMillis() ) );
+        String expected = stripTime( constructLocalMetadata( "org.apache.maven.its.snapshotUpdate",
+                                                             "maven-it-snapshot-update", System.currentTimeMillis(),
+                                                             true ) );
 
         assertEquals( expected, actual );
     }
@@ -234,24 +339,24 @@ public class MavenIT0108SnapshotUpdateTest
         repository.mkdirs();
     }
 
-    private String constructMetadata( String buildNumber, long timestamp )
+    private String constructMetadata( String buildNumber, long timestamp, boolean writeLastUpdated )
     {
         String ts = new SimpleDateFormat( "yyyyMMddHHmmss", Locale.US ).format( new Date( timestamp ) );
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata>\n" + "<groupId>org.apache.maven</groupId>\n" +
             "<artifactId>maven-core-it-support</artifactId>\n" + "<version>1.0-SNAPSHOT</version>\n" +
             "<versioning>\n" + "<snapshot>\n" + "<buildNumber>" + buildNumber + "</buildNumber>\n" + "</snapshot>\n" +
-            "<lastUpdated>" + ts + "</lastUpdated>\n" + "</versioning>\n" + "</metadata>";
+            ( writeLastUpdated ? "<lastUpdated>" + ts + "</lastUpdated>\n" : "" ) + "</versioning>\n" + "</metadata>";
     }
 
-    private String constructLocalMetadata( long timestamp )
+    private String constructLocalMetadata( String groupId, String artifactId, long timestamp, boolean writeLastUpdated )
     {
         String ts = new SimpleDateFormat( "yyyyMMddHHmmss", Locale.US ).format( new Date( timestamp ) );
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata>\n" +
-            "  <groupId>org.apache.maven.its.snapshotUpdate</groupId>\n" +
-            "  <artifactId>maven-it-snapshot-update</artifactId>\n" + "  <version>1.0-SNAPSHOT</version>\n" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata>\n" + "  <groupId>" + groupId + "</groupId>\n" +
+            "  <artifactId>" + artifactId + "</artifactId>\n" + "  <version>1.0-SNAPSHOT</version>\n" +
             "  <versioning>\n" + "    <snapshot>\n" + "      <localCopy>true</localCopy>\n" + "    </snapshot>\n" +
-            "    <lastUpdated>" + ts + "</lastUpdated>\n" + "  </versioning>\n" + "</metadata>";
+            ( writeLastUpdated ? "    <lastUpdated>" + ts + "</lastUpdated>\n" : "" ) + "  </versioning>\n" +
+            "</metadata>";
     }
 }
