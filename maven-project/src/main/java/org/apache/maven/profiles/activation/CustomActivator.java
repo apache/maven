@@ -1,5 +1,6 @@
 package org.apache.maven.profiles.activation;
 
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationCustom;
 import org.apache.maven.model.Profile;
@@ -49,7 +50,10 @@ public class CustomActivator
 
     private Logger logger;
 
+    private BuildContextManager buildContextManager;
+
     public boolean canDetermineActivation( Profile profile )
+        throws ProfileActivationException
     {
         Activation activation = profile.getActivation();
 
@@ -60,8 +64,11 @@ public class CustomActivator
             if ( custom != null )
             {
                 ProfileActivator activator = loadProfileActivator( custom );
-
-                return activator.canDetermineActivation( profile );
+                
+                if ( activator != null )
+                {
+                    return activator.canDetermineActivation( profile );
+                }
             }
         }
 
@@ -69,10 +76,14 @@ public class CustomActivator
     }
 
     private ProfileActivator loadProfileActivator( ActivationCustom custom )
+        throws ProfileActivationException
     {
+        CustomActivatorAdvice advice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
+
         String type = custom.getType();
 
-        ProfileActivator activator;
+        ProfileActivator activator = null;
+
         try
         {
             activator = (ProfileActivator) container.lookup( ProfileActivator.ROLE, type );
@@ -81,8 +92,11 @@ public class CustomActivator
         {
             getLogger().debug( "Failed to lookup ProfileActivator \'" + type + "\'", e );
 
-            throw new IllegalArgumentException( "Cannot find ProfileActivator with role-hint: " + type
-                + ". \nPerhaps you're missing a build extension? \nSee debug output for more information." );
+            if ( !advice.failQuietly() )
+            {
+                throw new ProfileActivationException( "Cannot find ProfileActivator with role-hint: " + type
+                    + ". \nPerhaps you're missing a build extension?", e );
+            }
         }
 
         PlexusConfiguration configuration = new XmlPlexusConfiguration( (Xpp3Dom) custom.getConfiguration() );
@@ -97,14 +111,18 @@ public class CustomActivator
         {
             getLogger().debug( "Failed to configure ProfileActivator \'" + type + "\'", e );
 
-            throw new IllegalArgumentException( "Failed to configure ProfileActivator with role-hint: " + type
-                + ". Turn on debug mode for more information." );
+            if ( !advice.failQuietly() )
+            {
+                throw new ProfileActivationException( "Failed to configure ProfileActivator with role-hint: " + type
+                    + ".", e );
+            }
         }
 
         return activator;
     }
 
     public boolean isActive( Profile profile )
+        throws ProfileActivationException
     {
         ActivationCustom custom = profile.getActivation().getCustom();
 

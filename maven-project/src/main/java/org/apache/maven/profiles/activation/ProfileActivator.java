@@ -22,8 +22,8 @@ public interface ProfileActivator
 {
     static final String ROLE = ProfileActivator.class.getName();
 
-    boolean canDetermineActivation( Profile profile );
+    boolean canDetermineActivation( Profile profile ) throws ProfileActivationException;
 
-    boolean isActive( Profile profile );
+    boolean isActive( Profile profile ) throws ProfileActivationException;
 
 }

@@ -205,6 +205,12 @@
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>custom</role-hint>
       <implementation>org.apache.maven.profiles.activation.CustomActivator</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
     </component>
 <!--
      |

@@ -17,6 +17,7 @@ package org.apache.maven;
  */
 
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -41,6 +42,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.CustomActivatorAdvice;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
@@ -381,83 +383,101 @@ public class DefaultMaven
                                             ProfileManager globalProfileManager )
         throws MavenExecutionException
     {
-        MavenProject superProject;
+        // setup the CustomActivatorAdvice to fail quietly while we discover extensions...then, we'll
+        // reset it.
+        CustomActivatorAdvice activatorAdvice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
+        activatorAdvice.setFailQuietly( true );
+        activatorAdvice.store( buildContextManager );
+        
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
-                                                                                    globalProfileManager );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new MavenExecutionException( "Error building super-POM for retrieving the default remote repository list: " + e.getMessage(), e );
-        }
-        
-        List originalRemoteRepositories = superProject.getRemoteArtifactRepositories();
-        Map cache = new HashMap();
-        
-        for ( Iterator it = files.iterator(); it.hasNext(); )
-        {
-            File pom = (File) it.next();
-            
-            ModelLineage lineage;
+            MavenProject superProject;
             try
             {
-                lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories, globalProfileManager, cache );
+                superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
+                                                                                        globalProfileManager );
             }
             catch ( ProjectBuildingException e )
             {
-                throw new MavenExecutionException( "Error building model lineage in order to pre-scan for extensions: " + e.getMessage(), e );
+                throw new MavenExecutionException( "Error building super-POM for retrieving the default remote repository list: " + e.getMessage(), e );
             }
             
-            for ( ModelLineageIterator lineageIterator = lineage.lineageIterator(); lineageIterator.hasNext(); )
+            List originalRemoteRepositories = superProject.getRemoteArtifactRepositories();
+            Map cache = new HashMap();
+            
+            for ( Iterator it = files.iterator(); it.hasNext(); )
             {
-                Model model = (Model) lineageIterator.next();
+                File pom = (File) it.next();
                 
-                Build build = model.getBuild();
-                
-                if ( build != null )
+                ModelLineage lineage;
+                try
                 {
-                    List extensions = build.getExtensions();
+                    getLogger().debug( "Building model-lineage for: " + pom + " to pre-scan for extensions." );
                     
-                    if ( extensions != null && !extensions.isEmpty() )
+                    lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories, globalProfileManager, cache );
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    throw new MavenExecutionException( "Error building model lineage in order to pre-scan for extensions: " + e.getMessage(), e );
+                }
+                
+                for ( ModelLineageIterator lineageIterator = lineage.lineageIterator(); lineageIterator.hasNext(); )
+                {
+                    Model model = (Model) lineageIterator.next();
+                    
+                    Build build = model.getBuild();
+                    
+                    if ( build != null )
                     {
-                        List remoteRepositories = lineageIterator.getArtifactRepositories();
+                        List extensions = build.getExtensions();
                         
-                        // thankfully, we don't have to deal with dependencyManagement here, yet.
-                        // TODO Revisit if/when extensions are made to use the info in dependencyManagement
-                        for ( Iterator extensionIterator = extensions.iterator(); extensionIterator.hasNext(); )
+                        if ( extensions != null && !extensions.isEmpty() )
                         {
-                            Extension extension = (Extension) extensionIterator.next();
+                            List remoteRepositories = lineageIterator.getArtifactRepositories();
                             
-                            try
+                            // thankfully, we don't have to deal with dependencyManagement here, yet.
+                            // TODO Revisit if/when extensions are made to use the info in dependencyManagement
+                            for ( Iterator extensionIterator = extensions.iterator(); extensionIterator.hasNext(); )
                             {
-                                extensionManager.addExtension( extension, model, remoteRepositories, request.getLocalRepository() );
-                            }
-                            catch ( ArtifactResolutionException e )
-                            {
-                                throw new MavenExecutionException( "Cannot resolve pre-scanned extension artifact: "
-                                    + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                   e );
-                            }
-                            catch ( ArtifactNotFoundException e )
-                            {
-                                throw new MavenExecutionException( "Cannot find pre-scanned extension artifact: "
-                                                                   + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                                                  e );
-                            }
-                            catch ( PlexusContainerException e )
-                            {
-                                throw new MavenExecutionException( "Failed to add pre-scanned extension: "
-                                                                   + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                                                  e );
+                                Extension extension = (Extension) extensionIterator.next();
+                                
+                                getLogger().debug( "Adding extension: " + ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() ) + " from model: " + model.getId() );
+                                
+                                try
+                                {
+                                    extensionManager.addExtension( extension, model, remoteRepositories, request.getLocalRepository() );
+                                }
+                                catch ( ArtifactResolutionException e )
+                                {
+                                    throw new MavenExecutionException( "Cannot resolve pre-scanned extension artifact: "
+                                        + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
+                                                                       e );
+                                }
+                                catch ( ArtifactNotFoundException e )
+                                {
+                                    throw new MavenExecutionException( "Cannot find pre-scanned extension artifact: "
+                                                                       + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
+                                                                                                      e );
+                                }
+                                catch ( PlexusContainerException e )
+                                {
+                                    throw new MavenExecutionException( "Failed to add pre-scanned extension: "
+                                                                       + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
+                                                                                                      e );
+                                }
                             }
                         }
                     }
                 }
             }
+            
+            extensionManager.registerWagons();
         }
-        
-        extensionManager.registerWagons();
+        finally
+        {
+            activatorAdvice.reset();
+            activatorAdvice.store( buildContextManager );
+        }
     }
 
     private void logReactorSummaryLine( String name,
