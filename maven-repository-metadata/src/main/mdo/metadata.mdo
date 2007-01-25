@@ -226,10 +226,15 @@
           <code>
             public void updateTimestamp()
             {
-            java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
-            java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
-            fmt.setTimeZone( timezone );
-            setLastUpdated( fmt.format( new java.util.Date() ) );
+                setLastUpdatedTimestamp( new java.util.Date() );
+            }
+
+            public void setLastUpdatedTimestamp( java.util.Date date )
+            {
+                java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
+                java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
+                fmt.setTimeZone( timezone );
+                setLastUpdated( fmt.format( date ) );
             }
           </code>
         </codeSegment>
