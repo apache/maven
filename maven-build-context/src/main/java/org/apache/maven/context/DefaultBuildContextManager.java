@@ -18,9 +18,19 @@ public class DefaultBuildContextManager
 {
     public static final String ROLE_HINT = "default";
     
-    protected static final String BUILD_CONTEXT_MAP_KEY = "org.apache.maven.context:DefaultBuildContextManager:contextMap";
+    protected static final String BUILD_CONTEXT_MAP_KEY = ROLE + ":" + ROLE_HINT + ":contextMap";
     
     private Context context;
+    
+    public DefaultBuildContextManager()
+    {
+        // used for plexus initialization
+    }
+    
+    public DefaultBuildContextManager( Context context )
+    {
+        this.context = context;
+    }
     
     /**
      * Create a new instance of DefaultBuildContext, and return it. Each method call creates a brand
