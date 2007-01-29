@@ -17,7 +17,7 @@ public class CustomActivatorAdvice
     
     public static final String BUILD_CONTEXT_KEY = CustomActivatorAdvice.class.getName();
     
-    private static final boolean DEFAULT_FAIL_QUIETLY = true;
+    private static final boolean DEFAULT_FAIL_QUIETLY = false;
     
     /**
      * If set to false, this tells the CustomProfileActivator to fail quietly when the specified 

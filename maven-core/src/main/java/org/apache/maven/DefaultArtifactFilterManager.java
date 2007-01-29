@@ -42,6 +42,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
+        artifacts.add( "maven-build-context" );
         artifacts.add( "maven-core" );
         artifacts.add( "maven-error-diagnoser" );
         artifacts.add( "maven-model" );

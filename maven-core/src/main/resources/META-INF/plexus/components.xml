@@ -1,6 +1,31 @@
 <component-set>
   <components>
     <component>
+      <role>org.apache.maven.extension.BuildExtensionScanner</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.extension.DefaultBuildExtensionScanner</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.extension.ExtensionManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
       <role>org.apache.maven.ArtifactFilterManager</role>
       <implementation>org.apache.maven.DefaultArtifactFilterManager</implementation>
     </component>
@@ -84,10 +109,7 @@
       <implementation>org.apache.maven.DefaultMaven</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.extension.ExtensionManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
+          <role>org.apache.maven.extension.BuildExtensionScanner</role>
           <role-hint>default</role-hint>
         </requirement>
         <requirement>

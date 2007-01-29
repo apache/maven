@@ -98,6 +98,14 @@ public interface ModelLineage
     ModelLineageIterator lineageIterator();
 
     /**
+     * Retrieve an Iterator derivative that functions in the simplest sense just like the return 
+     * value of the modelIterator() method. However, the ModelLineageIterator also gives access to
+     * the current POM file and current remote ArtifactRepository instances used to resolve the 
+     * current Model...along with a method to give explicit access to the current Model instance.
+     */
+    ModelLineageIterator reversedLineageIterator();
+
+    /**
      * Iterate over the lineage of Model instances, starting with the child (current) Model, 
      * and ending with the deepest ancestor.
      */

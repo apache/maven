@@ -257,7 +257,14 @@ public class DefaultProfileManager
 
                 if ( activator.canDetermineActivation( profile ) )
                 {
-                    return activator.isActive( profile );
+                    boolean result = activator.isActive( profile );
+                    
+                    if ( result )
+                    {
+                        container.getLogger().debug( "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
+                    }
+                    
+                    return result;
                 }
             }
 

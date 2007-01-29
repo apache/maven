@@ -90,11 +90,9 @@ public class CustomActivator
         }
         catch ( ComponentLookupException e )
         {
-            getLogger().debug( "Failed to lookup ProfileActivator \'" + type + "\'", e );
-
             if ( !advice.failQuietly() )
             {
-                throw new ProfileActivationException( "Cannot find ProfileActivator with role-hint: " + type
+                throw new ProfileActivationException( "Cannot find custom ProfileActivator: " + type
                     + ". \nPerhaps you're missing a build extension?", e );
             }
         }
@@ -109,11 +107,9 @@ public class CustomActivator
         }
         catch ( ComponentConfigurationException e )
         {
-            getLogger().debug( "Failed to configure ProfileActivator \'" + type + "\'", e );
-
             if ( !advice.failQuietly() )
             {
-                throw new ProfileActivationException( "Failed to configure ProfileActivator with role-hint: " + type
+                throw new ProfileActivationException( "Failed to configure custom ProfileActivator: " + type
                     + ".", e );
             }
         }

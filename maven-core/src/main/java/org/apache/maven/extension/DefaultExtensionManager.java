@@ -124,6 +124,8 @@ public class DefaultExtensionManager
                                ActiveArtifactResolver activeArtifactResolver )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
+        getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
+        
         if ( extensionArtifact != null )
         {
             ArtifactFilter filter =
@@ -142,7 +144,7 @@ public class DefaultExtensionManager
                     a = activeArtifactResolver.replaceWithActiveArtifact( a );
                 }
 
-                getLogger().debug( "Adding to extension classpath: " + a.getFile() );
+                getLogger().debug( "Adding to extension classpath: " + a.getFile() + " in classRealm: " + container.getContainerRealm().getId() );
 
                 container.addJarResource( a.getFile() );
                 

@@ -17,9 +17,7 @@ package org.apache.maven;
  */
 
 
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.context.BuildContextManager;
@@ -32,31 +30,26 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionManager;
+import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Extension;
-import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.activation.CustomActivatorAdvice;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
-import org.apache.maven.project.build.model.ModelLineageIterator;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -90,10 +83,6 @@ public class DefaultMaven
     // Components
     // ----------------------------------------------------------------------
 
-    protected ExtensionManager extensionManager;
-    
-    protected ModelLineageBuilder modelLineageBuilder;
-    
     protected BuildContextManager buildContextManager;
     
     protected MavenProjectBuilder projectBuilder;
@@ -105,6 +94,8 @@ public class DefaultMaven
     protected ErrorDiagnostics errorDiagnostics;
 
     protected RuntimeInformation runtimeInformation;
+
+    private BuildExtensionScanner buildExtensionScanner;
 
     private static final long MB = 1024 * 1024;
 
@@ -354,7 +345,23 @@ public class DefaultMaven
             throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
         }
         
-        scanProjectsForExtensions( files, request, globalProfileManager );
+        // TODO: We should probably do this discovery just-in-time, if we can move to building project
+        // instances just-in-time.
+        Map cache = new HashMap();
+        
+        for ( Iterator it = files.iterator(); it.hasNext(); )
+        {
+            File pom = (File) it.next();
+
+            try
+            {
+                buildExtensionScanner.scanForBuildExtensions( pom, request.getLocalRepository(), globalProfileManager, cache );
+            }
+            catch ( ExtensionScanningException e )
+            {
+                throw new MavenExecutionException( "Error scanning: " + pom + " for extensions: " + e.getMessage(), e );
+            }
+        }
         
         try
         {
@@ -375,109 +382,6 @@ public class DefaultMaven
             throw new MavenExecutionException( e.getMessage(), e );
         }
         return projects;
-    }
-
-    // TODO: We should probably do this discovery just-in-time, if we can move to building project
-    // instances just-in-time.
-    private void scanProjectsForExtensions( List files, MavenExecutionRequest request,
-                                            ProfileManager globalProfileManager )
-        throws MavenExecutionException
-    {
-        // setup the CustomActivatorAdvice to fail quietly while we discover extensions...then, we'll
-        // reset it.
-        CustomActivatorAdvice activatorAdvice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
-        activatorAdvice.setFailQuietly( true );
-        activatorAdvice.store( buildContextManager );
-        
-        try
-        {
-            MavenProject superProject;
-            try
-            {
-                superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
-                                                                                        globalProfileManager );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new MavenExecutionException( "Error building super-POM for retrieving the default remote repository list: " + e.getMessage(), e );
-            }
-            
-            List originalRemoteRepositories = superProject.getRemoteArtifactRepositories();
-            Map cache = new HashMap();
-            
-            for ( Iterator it = files.iterator(); it.hasNext(); )
-            {
-                File pom = (File) it.next();
-                
-                ModelLineage lineage;
-                try
-                {
-                    getLogger().debug( "Building model-lineage for: " + pom + " to pre-scan for extensions." );
-                    
-                    lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories, globalProfileManager, cache );
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    throw new MavenExecutionException( "Error building model lineage in order to pre-scan for extensions: " + e.getMessage(), e );
-                }
-                
-                for ( ModelLineageIterator lineageIterator = lineage.lineageIterator(); lineageIterator.hasNext(); )
-                {
-                    Model model = (Model) lineageIterator.next();
-                    
-                    Build build = model.getBuild();
-                    
-                    if ( build != null )
-                    {
-                        List extensions = build.getExtensions();
-                        
-                        if ( extensions != null && !extensions.isEmpty() )
-                        {
-                            List remoteRepositories = lineageIterator.getArtifactRepositories();
-                            
-                            // thankfully, we don't have to deal with dependencyManagement here, yet.
-                            // TODO Revisit if/when extensions are made to use the info in dependencyManagement
-                            for ( Iterator extensionIterator = extensions.iterator(); extensionIterator.hasNext(); )
-                            {
-                                Extension extension = (Extension) extensionIterator.next();
-                                
-                                getLogger().debug( "Adding extension: " + ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() ) + " from model: " + model.getId() );
-                                
-                                try
-                                {
-                                    extensionManager.addExtension( extension, model, remoteRepositories, request.getLocalRepository() );
-                                }
-                                catch ( ArtifactResolutionException e )
-                                {
-                                    throw new MavenExecutionException( "Cannot resolve pre-scanned extension artifact: "
-                                        + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                       e );
-                                }
-                                catch ( ArtifactNotFoundException e )
-                                {
-                                    throw new MavenExecutionException( "Cannot find pre-scanned extension artifact: "
-                                                                       + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                                                      e );
-                                }
-                                catch ( PlexusContainerException e )
-                                {
-                                    throw new MavenExecutionException( "Failed to add pre-scanned extension: "
-                                                                       + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(),
-                                                                                                      e );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            extensionManager.registerWagons();
-        }
-        finally
-        {
-            activatorAdvice.reset();
-            activatorAdvice.store( buildContextManager );
-        }
     }
 
     private void logReactorSummaryLine( String name,
