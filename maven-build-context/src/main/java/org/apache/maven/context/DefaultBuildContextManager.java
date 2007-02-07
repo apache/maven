@@ -33,15 +33,6 @@ public class DefaultBuildContextManager
     }
     
     /**
-     * Create a new instance of DefaultBuildContext, and return it. Each method call creates a brand
-     * new instance.
-     */
-    public BuildContext newUnstoredInstance()
-    {
-        return new DefaultBuildContext();
-    }
-
-    /**
      * Clear the contents of the build context inside the container context.
      */
     public void clearBuildContext()
@@ -126,6 +117,14 @@ public class DefaultBuildContextManager
         throws ContextException
     {
         this.context = context;
+    }
+
+    public Context reorientToContext( Context context )
+    {
+        Context oldContext = this.context;
+        this.context = context;
+        
+        return oldContext;
     }
 
 }

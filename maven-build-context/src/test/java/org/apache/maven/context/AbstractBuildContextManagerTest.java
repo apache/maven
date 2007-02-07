@@ -9,6 +9,8 @@ public abstract class AbstractBuildContextManagerTest
     
     protected abstract String getRoleHintBeforeSetUp();
     
+    protected abstract BuildContext createBuildContext();
+    
     protected BuildContextManager getBuildContextManager()
     {
         return mgr;
@@ -21,28 +23,10 @@ public abstract class AbstractBuildContextManagerTest
         mgr = (BuildContextManager) lookup( BuildContextManager.ROLE, getRoleHintBeforeSetUp() );
     }
     
-    public void testNewUnstoredInstance_ShouldReturnValidContextInstance()
-    {
-        BuildContext context = mgr.newUnstoredInstance();
-        
-        assertNotNull( context );
-        
-        String key = "key";
-        String value = "value";
-        
-        context.put( key, value );
-        
-        assertEquals( value, context.get( key ) );
-        
-        context.delete( key );
-        
-        assertNull( context.get( key ) );
-    }
-
     public void testNewUnstoredInstance_SuccessiveCallsShouldReturnDistinctContextInstances()
     {
-        BuildContext context = mgr.newUnstoredInstance();
-        BuildContext context2 = mgr.newUnstoredInstance();
+        BuildContext context = createBuildContext();
+        BuildContext context2 = createBuildContext();
         
         assertNotNull( context );
         assertNotNull( context2 );
@@ -51,7 +35,7 @@ public abstract class AbstractBuildContextManagerTest
     
     public void testStoreAndRead_ShouldRetrieveStoredValueAfterRead()
     {
-        BuildContext ctx = mgr.newUnstoredInstance();
+        BuildContext ctx = createBuildContext();
         
         String key = "key";
         String value = "value";
@@ -68,7 +52,7 @@ public abstract class AbstractBuildContextManagerTest
 
     public void testStoreAndClear_ShouldNotRetrieveStoredValueAfterClear()
     {
-        BuildContext ctx = mgr.newUnstoredInstance();
+        BuildContext ctx = createBuildContext();
         
         String key = "key";
         String value = "value";

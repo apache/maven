@@ -9,4 +9,9 @@ public class DefaultBuildContextManagerTest
         return DefaultBuildContextManager.ROLE_HINT;
     }
 
+    protected BuildContext createBuildContext()
+    {
+        return new DefaultBuildContext();
+    }
+
 }
