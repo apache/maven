@@ -208,11 +208,6 @@
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>${wagonVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-manager</artifactId>
         <version>${wagonVersion}</version>
       </dependency>

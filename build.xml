@@ -15,7 +15,7 @@
   </description>
 
   <property file="build.properties"/>
-  
+
   <taskdef resource="net/sf/antcontrib/antlib.xml">
     <classpath>
       <pathelement path="ant-contrib-1.0b2.jar"/>
@@ -105,39 +105,51 @@
     <!--
     <pull orgpath="org/codehaus/plexus/plexus-archiver" version="${plexus-archiver.version}" name="plexus-archiver" repository="codehaus"/>
     -->
-    <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
+    <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
+    <!-- Wagon Deps (Start) -->
+    <pull orgpath="org/apache/maven/wagon/wagon-manager" version="${wagon.version}" name="wagon-manager"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/wagon/wagon-file" version="${wagon.version}" name="wagon-file"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-http-shared" version="${wagon.version}" name="wagon-http-shared"/>
     <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="${wagon.version}" name="wagon-http-lightweight"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="${wagon.version}" name="wagon-ssh-external"/>
+    <pull orgpath="org/apache/maven/wagon/wagon-ssh-common" version="${wagon.version}" name="wagon-ssh-common"/>
     <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="${wagon.version}" name="wagon-ssh"/>
+    <pull orgpath="commons-lang/commons-lang" version="${commons-lang.version}" name="commons-lang"/>
+    <pull orgpath="com/jcraft/jsch" version="${jsch.version}" name="jsch"/>
+    <!-- Wagon Deps (End) -->
     <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="${doxia.version}" name="doxia-sink-api"/>
     <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="${modello.version}" name="modello-plugin-xpp3" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-jdom" version="${modello.version}" name="modello-plugin-jdom" repository="codehaus"/>
     <pull orgpath="junit/junit" version="${junit.version}" name="junit"/>
-    <pull orgpath="jdom/jdom" version="${jdom.version}" name="jdom"/>    
+    <pull orgpath="jdom/jdom" version="${jdom.version}" name="jdom"/>
   </target>
 
   <target name="classpath-pre" depends="init,pull"
           description="constructs a classpath reference containing our dependencies, and verifies that all files are present">
     <path id="pre.classpath">
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
+      <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/${plexus.version}/plexus-container-default-${plexus.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-component-api/${plexus.version}/plexus-component-api-${plexus.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/${classworlds.version}/plexus-classworlds-${classworlds.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/${plexus-interactivity-api.version}/plexus-interactivity-api-${plexus-interactivity-api.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-manager/${wagon.version}/wagon-manager-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/${wagon.version}/wagon-file-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-shared/${wagon.version}/wagon-http-shared-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/${wagon.version}/wagon-http-lightweight-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/${wagon.version}/wagon-ssh-external-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-common/${wagon.version}/wagon-ssh-common-${wagon.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/${wagon.version}/wagon-ssh-${wagon.version}.jar"/>
+      <pathelement location="${maven.repo.local}/com/jcraft/jsch/${jsch.version}/jsch-${jsch.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
       <pathelement location="${maven.repo.local}/jdom/jdom/${jdom.version}/jdom-${jdom.version}.jar"/>
@@ -208,12 +220,12 @@
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
     <echo>
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+
     COMPILE-BOOT
-    
+
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     </echo>
-  
+
     <path id="sources">
       <dirset dir=".">
         <include name="bootstrap/target/generated-sources"/>
@@ -244,15 +256,15 @@
 
   <target name="maven-compile" depends="compile-boot"
           description="compiles Maven using the bootstrap Maven, skipping automated tests">
-          
+
     <echo>
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+
     MAVEN-COMPILE
-    
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
-    </echo>                    
-          
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    </echo>
+
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
@@ -267,38 +279,37 @@
           description="generates the Maven installation assembly using the bootstrap Maven">
     <echo>
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+
     MAVEN-ASSEMBLY
-    
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!          
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     </echo>
-          
-    <delete>      
-      <fileset dir="bootstrap/lib" includes="*.pom,maven*.jar,modello*.jar,junit*.jar"/>        
+
+    <delete>
+      <fileset dir="bootstrap/lib" includes="*.pom,maven*.jar,modello*.jar,junit*.jar"/>
     </delete>
-        
+
     <mkdir dir="bootstrap/boot"/>
     <copy todir="bootstrap/boot">
       <fileset dir="bootstrap/lib">
         <include name="plexus-classworlds*.jar"/>
       </fileset>
     </copy>
-    
+
     <delete>
       <fileset dir="bootstrap/lib">
         <include name="plexus-classworlds*.jar"/>
       </fileset>
     </delete>
-    
-    
+
 <echo file="bootstrap/m2.conf">
-main is org.apache.maven.cli.MavenCli from plexus.core                                                                                                                     
-                                                                                                                                                                           
-[plexus.core]                                                                                                                                                              
-load ${bootstrapDir}/lib/*.jar    
+main is org.apache.maven.cli.MavenCli from plexus.core
+
+[plexus.core]
+load ${bootstrapDir}/lib/*.jar
 load ${bootstrapDir}/target/classes
-</echo>    
-          
+</echo>
+
     <property name="maven.goals" value="clean assembly:assembly"/>
     <property name="bootstrapDir" value="${basedir}/bootstrap"/>
     <java dir="maven-cli" classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
@@ -310,8 +321,8 @@ load ${bootstrapDir}/target/classes
       <sysproperty key="bootstrapDir" value="${bootstrapDir}"/>
       <arg value="-e"/>
       <arg line="${maven.goals}"/>
-    </java>                    
-              
+    </java>
+
     <property name="maven.assembly" location="maven-cli/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
@@ -409,13 +420,13 @@ load ${bootstrapDir}/target/classes
              dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
              ignoreerrors="false"
             />
-                    
+
       </then>
       <else>
         <property name="fileversion" value="SNAPSHOT"/>
       </else>
     </if>
-        
+
     <copy file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" todir="bootstrap/lib"/>
 
     <echo>Resolved version ${fileversion} (given=${version})</echo>
