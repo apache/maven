@@ -24,7 +24,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -94,8 +93,6 @@ public class DefaultBuildExtensionScanner
             }
 
             getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
-
-            extensionManager.registerWagons();
         }
         catch ( ModelInterpolationException e )
         {

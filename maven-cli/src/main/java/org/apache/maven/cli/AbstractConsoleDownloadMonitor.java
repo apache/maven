@@ -16,6 +16,7 @@ package org.apache.maven.cli;
  * limitations under the License.
  */
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
@@ -32,9 +33,37 @@ public abstract class AbstractConsoleDownloadMonitor
     extends AbstractLogEnabled
     implements MavenTransferListener
 {
+    private boolean showChecksumEvents = false;
+    
+    protected boolean showEvent( TransferEvent event )
+    {
+        if ( event.getResource() == null )
+        {
+            return true;
+        }
+
+        String resource = event.getResource().getName();
+
+        if ( StringUtils.isBlank( resource ) )
+        {
+            return true;
+        }
+
+        if ( resource.endsWith( ".sha1" ) || resource.endsWith( ".md5" ) )
+        {
+            return showChecksumEvents;
+        }
+
+        return true;
+    }
 
     public void transferInitiated( TransferEvent transferEvent )
     {
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+        
         String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
         String url = transferEvent.getWagon().getRepository().getUrl();
@@ -85,4 +114,13 @@ public abstract class AbstractConsoleDownloadMonitor
 //        getLogger().debug( message );
     }
 
+    public boolean isShowChecksumEvents()
+    {
+        return showChecksumEvents;
+    }
+
+    public void setShowChecksumEvents( boolean showChecksumEvents )
+    {
+        this.showChecksumEvents = showChecksumEvents;
+    }
 }

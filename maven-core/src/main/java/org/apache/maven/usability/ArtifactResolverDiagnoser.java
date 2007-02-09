@@ -16,7 +16,7 @@ package org.apache.maven.usability;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.ArtifactManager;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.usability.diagnostics.DiagnosisUtils;
 import org.apache.maven.usability.diagnostics.ErrorDiagnoser;
@@ -27,7 +27,7 @@ public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
 {
 
-    private WagonManager wagonManager;
+    private ArtifactManager artifactManager;
 
     public boolean canDiagnose( Throwable error )
     {
@@ -52,7 +52,7 @@ public class ArtifactResolverDiagnoser
             message.append( "\n\nCaused by I/O exception: " ).append( ioe.getMessage() );
         }
 
-        if ( !wagonManager.isOnline() )
+        if ( !artifactManager.isOnline() )
         {
             message.append( "\n" ).append( SystemWarnings.getOfflineWarning() );
         }

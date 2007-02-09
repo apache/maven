@@ -41,6 +41,12 @@ public class ConsoleDownloadMonitor
     {
         long total = transferEvent.getResource().getContentLength();
         complete += length;
+        
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+        
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {

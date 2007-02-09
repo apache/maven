@@ -127,7 +127,7 @@
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
+          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.MavenTools</role>

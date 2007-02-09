@@ -29,6 +29,11 @@ public class BatchModeDownloadMonitor
 {
     public void transferInitiated( TransferEvent transferEvent )
     {
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+        
         String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
         String url = transferEvent.getWagon().getRepository().getUrl();

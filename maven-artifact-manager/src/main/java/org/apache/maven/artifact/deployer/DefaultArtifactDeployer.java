@@ -17,7 +17,7 @@ package org.apache.maven.artifact.deployer;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.ArtifactManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
@@ -35,7 +35,7 @@ public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
-    private WagonManager wagonManager;
+    private ArtifactManager artifactManager;
 
     private ArtifactTransformationManager transformationManager;
 
@@ -57,7 +57,7 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        if ( !wagonManager.isOnline() )
+        if ( !artifactManager.isOnline() )
         {
             // deployment shouldn't silently fail when offline
             throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
@@ -74,7 +74,7 @@ public class DefaultArtifactDeployer
                 FileUtils.copyFile( source, artifactFile );
             }
 
-            wagonManager.putArtifact( source, artifact, deploymentRepository );
+            artifactManager.putArtifact( source, artifact, deploymentRepository );
 
             // must be after the artifact is installed
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )

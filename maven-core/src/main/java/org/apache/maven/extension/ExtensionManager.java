@@ -37,8 +37,6 @@ public interface ExtensionManager
     void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
 
-    void registerWagons();
-
     void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
                        ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;

@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
+ * @deprecated in favor of {@link ArtifactManager} and {@link org.apache.maven.wagon.manager.WagonManager}
  */
 public interface WagonManager
 {
@@ -66,7 +67,7 @@ public interface WagonManager
      * @throws WagonConfigurationException  if the wagon can't be configured for the repository
      */
     Wagon getWagon( Repository repository )
-        throws UnsupportedProtocolException, WagonConfigurationException;
+        throws UnsupportedProtocolException;
 
     void getArtifact( Artifact artifact, List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;

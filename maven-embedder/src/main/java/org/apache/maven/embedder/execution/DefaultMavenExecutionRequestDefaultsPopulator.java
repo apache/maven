@@ -1,47 +1,75 @@
 package org.apache.maven.embedder.execution;
 
-import java.io.File;
-import java.util.Iterator;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.plugin.Mojo;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.usability.SystemWarnings;
+import org.apache.maven.wagon.manager.RepositorySettings;
+import org.apache.maven.wagon.manager.WagonManager;
+import org.apache.maven.wagon.repository.Repository;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.io.File;
+import java.util.Iterator;
+
+/**
+ * DefaultMavenExecutionRequestDefaultsPopulator 
+ *
+ * @version $Id$
+ */
 public class DefaultMavenExecutionRequestDefaultsPopulator
     extends AbstractLogEnabled
-	implements MavenExecutionRequestDefaultsPopulator, Contextualizable
+    implements MavenExecutionRequestDefaultsPopulator, Contextualizable
 {
-	private MavenTools mavenTools;
-	
-	private ArtifactRepositoryFactory artifactRepositoryFactory;
+    private MavenTools mavenTools;
+
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private PlexusContainer container;
 
-    public MavenExecutionRequest populateDefaults(MavenExecutionRequest request)
+    private WagonManager wagonManager;
+
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-		// Settings
+        // Settings
 
         if ( request.getSettings() == null )
         {
@@ -53,9 +81,9 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
             try
             {
-                request.setSettings( mavenTools.buildSettings( userSettingsPath, globalSettingsFile, request.isInteractiveMode(),
-                                                         request.isOffline(), request.isUsePluginRegistry(),
-                                                         request.isUsePluginUpdateOverride() ) );
+                request.setSettings( mavenTools.buildSettings( userSettingsPath, globalSettingsFile, request
+                    .isInteractiveMode(), request.isOffline(), request.isUsePluginRegistry(), request
+                    .isUsePluginUpdateOverride() ) );
             }
             catch ( SettingsConfigurationException e )
             {
@@ -64,7 +92,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         }
 
         // Local repository
-        
+
         if ( request.getLocalRepository() == null )
         {
             String localRepositoryPath = mavenTools.getLocalRepositoryPath( request.getSettings() );
@@ -72,11 +100,11 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
             if ( request.getLocalRepository() == null )
             {
                 request.setLocalRepository( mavenTools.createLocalRepository( new File( localRepositoryPath ) ) );
-            }                        
+            }
         }
-        
+
         // Repository update policies
-        
+
         boolean snapshotPolicySet = false;
 
         if ( request.isOffline() )
@@ -84,73 +112,46 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
             snapshotPolicySet = true;
         }
 
-        if ( !snapshotPolicySet ) {
+        if ( !snapshotPolicySet )
+        {
             if ( request.isUpdateSnapshots() )
             {
                 artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
             }
             else if ( request.isNoSnapshotUpdates() )
             {
-                getLogger().info( "+ Supressing SNAPSHOT updates.");
+                getLogger().info( "+ Supressing SNAPSHOT updates." );
                 artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
             }
         }
 
-        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );        
+        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
 
-        // Wagon        
+        // Wagon
+
+        wagonManager.setOnline( !request.isOffline() );
 
         if ( request.getSettings().isOffline() )
         {
             getLogger().info( SystemWarnings.getOfflineWarning() );
 
-            WagonManager wagonManager = null;
-
-            try
+            if ( request.isOffline() )
             {
-                wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-                if ( request.isOffline() )
-                {
-                    wagonManager.setOnline( false );
-                }
-                else
-                {
-                    wagonManager.setInteractive( request.isInteractiveMode() );
-
-                    wagonManager.setDownloadMonitor( request.getTransferListener() );
-
-                    wagonManager.setOnline( true );
-                }
+                wagonManager.setOnline( false );
             }
-            catch ( ComponentLookupException e )
+            else
             {
-                throw new MavenEmbedderException( "Cannot retrieve WagonManager in order to set offline mode.", e );
-            }
-            finally
-            {
-                try
-                {
-                    container.release( wagonManager );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().warn( "Cannot release WagonManager.", e );
-                }
+                wagonManager.setInteractive( request.isInteractiveMode() );
+
+                wagonManager.addTransferListener( request.getTransferListener() );
+
+                wagonManager.setOnline( true );
             }
         }
 
         try
         {
             resolveParameters( request.getSettings() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
-        }
-        catch ( ComponentLifecycleException e )
-        {
-            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
         }
         catch ( SettingsConfigurationException e )
         {
@@ -179,51 +180,52 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
     }
 
     private void resolveParameters( Settings settings )
-        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
+        throws SettingsConfigurationException
     {
-        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+        Proxy proxy = settings.getActiveProxy();
 
-        try
+        if ( proxy != null )
         {
-            Proxy proxy = settings.getActiveProxy();
-
-            if ( proxy != null )
+            if ( proxy.getHost() == null )
             {
-                if ( proxy.getHost() == null )
-                {
-                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-                }
-
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       proxy.getPassword(), proxy.getNonProxyHosts() );
+                throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
             }
 
-            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy
+                .getPassword(), proxy.getNonProxyHosts() );
+        }
+
+        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        {
+            Server server = (Server) i.next();
+
+            RepositorySettings repoSetting = wagonManager.getRepositorySettings( server.getId() );
+
+            repoSetting.setAuthentication( server.getUsername(), server.getPassword(), server.getPrivateKey(), server
+                .getPassphrase() );
+
+            repoSetting
+                .setPermissions( /* group */null, server.getFilePermissions(), server.getDirectoryPermissions() );
+
+            if ( server.getConfiguration() != null )
             {
-                Server server = (Server) i.next();
-
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                    server.getPrivateKey(), server.getPassphrase() );
-
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
-                                                server.getDirectoryPermissions() );
-
-                if ( server.getConfiguration() != null )
-                {
-                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
-                }
-            }
-
-            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-            {
-                Mirror mirror = (Mirror) i.next();
-
-                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+                repoSetting.setConfiguration( new XmlPlexusConfiguration( (Xpp3Dom) server.getConfiguration() ) );
             }
         }
-        finally
+
+        for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
         {
-            container.release( wagonManager );
+            Mirror mirror = (Mirror) i.next();
+            
+            try
+            {
+                wagonManager.addRepositoryMirror( mirror.getMirrorOf(), mirror.getId(), mirror.getUrl() );
+            }
+            catch ( IllegalArgumentException e )
+            {
+                throw new SettingsConfigurationException( "Unable to configure mirror " + mirror + ": "
+                    + e.getMessage(), e );
+            }
         }
     }
 

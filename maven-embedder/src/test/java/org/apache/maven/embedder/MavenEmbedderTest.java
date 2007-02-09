@@ -47,6 +47,26 @@ public class MavenEmbedderTest
         maven.stop();
     }
 
+    private void assertNoExceptions( MavenExecutionResult result )
+    {
+        List exceptions = result.getExceptions();
+        if ( ( exceptions == null ) || exceptions.isEmpty() )
+        {
+            // everything is a-ok.
+            return;
+        }
+
+        System.err.println( "Encountered " + exceptions.size() + " exception(s)." );
+        Iterator it = exceptions.iterator();
+        while ( it.hasNext() )
+        {
+            Exception exception = (Exception) it.next();
+            exception.printStackTrace( System.err );
+        }
+
+        fail( "Encountered Exceptions in MavenExecutionResult during " + getName() );
+    }
+
     // ----------------------------------------------------------------------
     // Goal/Phase execution tests
     // ----------------------------------------------------------------------
@@ -60,12 +80,12 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( targetDirectory )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{ "package" } ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
 
         MavenExecutionResult result = maven.execute( request );
+
+        assertNoExceptions( result );
 
         MavenProject project = result.getMavenProject();
 
@@ -85,13 +105,16 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{ "package" } ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile(
+                                                                                       new File( targetDirectory,
+                                                                                                 "pom.xml" )
+                                                                                           .getAbsolutePath() )
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
 
         MavenExecutionResult result = maven.execute( request );
 
+        assertNoExceptions( result );
+        
         MavenProject project = result.getMavenProject();
 
         assertEquals( "embedder-test-project", project.getArtifactId() );
@@ -113,11 +136,12 @@ public class MavenEmbedderTest
         // Check with profile not active
 
         MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
-            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{ "validate" } ) );
+            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() ).setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "validate" } ) );
 
         MavenExecutionResult r0 = maven.execute( requestWithoutProfile );
+        
+        assertNoExceptions( r0 );
 
         MavenProject p0 = r0.getMavenProject();
 
@@ -129,10 +153,11 @@ public class MavenEmbedderTest
 
         // Check with profile activated
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{ "validate" } ) )
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile(
+                                                                                       new File( targetDirectory,
+                                                                                                 "pom.xml" )
+                                                                                           .getAbsolutePath() )
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "validate" } ) )
             .addActiveProfile( "embedderProfile" );
 
         MavenExecutionResult r1 = maven.execute( request );
@@ -191,11 +216,12 @@ public class MavenEmbedderTest
     public void testProjectReading()
         throws Exception
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setShowErrors( true )
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
             .setPomFile( getPomFile().getAbsolutePath() );
 
         MavenExecutionResult result = maven.readProjectWithDependencies( request );
+        
+        assertNoExceptions( result );
 
         assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
 
@@ -207,34 +233,34 @@ public class MavenEmbedderTest
 
         System.out.println( "artifact = " + artifact );
     }
-    
+
     public void testProjectWithExtensionsReading()
         throws Exception
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setShowErrors( true )
-            .setPomFile(new File( basedir, "src/test/resources/pom2.xml" ).getAbsolutePath());
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
+            .setPomFile( new File( basedir, "src/test/resources/pom2.xml" ).getAbsolutePath() );
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        MavenExecutionResult result = new ExtendableMavenEmbedder(classLoader).readProjectWithDependencies( request );
+        MavenExecutionResult result = new ExtendableMavenEmbedder( classLoader ).readProjectWithDependencies( request );
         
-//        Iterator it = result.getMavenProject().getTestClasspathElements().iterator();
-//        while(it.hasNext()) {
-//            Object object = (Object) it.next();
-//            System.out.println(" element=" + object);
-//        }
-        
+        assertNoExceptions( result );
+
+        //        Iterator it = result.getMavenProject().getTestClasspathElements().iterator();
+        //        while(it.hasNext()) {
+        //            Object object = (Object) it.next();
+        //            System.out.println(" element=" + object);
+        //        }
+
         // sources, test sources, and the junit jar..
-        assertEquals( 3, result.getMavenProject().getTestClasspathElements().size());
-        
+        assertEquals( 3, result.getMavenProject().getTestClasspathElements().size() );
+
     }
-    
 
     // ----------------------------------------------------------------------------
     // Model Writing
     // ----------------------------------------------------------------------------
 
-     public void testModelWriting()
+    public void testModelWriting()
         throws Exception
     {
         Model model = maven.readModel( getPomFile() );
@@ -262,52 +288,68 @@ public class MavenEmbedderTest
     {
         return new File( basedir, "src/test/resources/pom.xml" );
     }
-    
-    private class ExtendableMavenEmbedder extends MavenEmbedder {
-        
-        public ExtendableMavenEmbedder(ClassLoader classLoader) throws MavenEmbedderException {
-            super( classLoader, new MavenEmbedderConsoleLogger());
+
+    private class ExtendableMavenEmbedder
+        extends MavenEmbedder
+    {
+
+        public ExtendableMavenEmbedder( ClassLoader classLoader )
+            throws MavenEmbedderException
+        {
+            super( classLoader, new MavenEmbedderConsoleLogger() );
         }
-        
-        protected Map getPluginExtensionComponents(Plugin plugin) throws PluginManagerException  {
-            Map toReturn  = new HashMap();
+
+        protected Map getPluginExtensionComponents( Plugin plugin )
+            throws PluginManagerException
+        {
+            Map toReturn = new HashMap();
             MyArtifactHandler handler = new MyArtifactHandler();
-            toReturn.put("mkleint", handler);
+            toReturn.put( "mkleint", handler );
             return toReturn;
         }
-        
-        protected void verifyPlugin( Plugin plugin, MavenProject project ) {
+
+        protected void verifyPlugin( Plugin plugin, MavenProject project )
+        {
             //ignore don't want to actually verify in test
         }
     }
-    
-    private class MyArtifactHandler implements ArtifactHandler {
-        
-        public String getExtension() {
+
+    private class MyArtifactHandler
+        implements ArtifactHandler
+    {
+
+        public String getExtension()
+        {
             return "jar";
         }
 
-        public String getDirectory() {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public String getDirectory()
+        {
+            throw new UnsupportedOperationException( "Not supported yet." );
         }
 
-        public String getClassifier() {
+        public String getClassifier()
+        {
             return null;
         }
 
-        public String getPackaging() {
+        public String getPackaging()
+        {
             return "mkleint";
         }
 
-        public boolean isIncludesDependencies() {
+        public boolean isIncludesDependencies()
+        {
             return false;
         }
 
-        public String getLanguage() {
+        public String getLanguage()
+        {
             return "java";
         }
 
-        public boolean isAddedToClasspath() {
+        public boolean isAddedToClasspath()
+        {
             return true;
         }
     }

@@ -278,6 +278,8 @@ public class MavenCli
             {
                 transferListener = new BatchModeDownloadMonitor();
             }
+            
+            transferListener.setShowChecksumEvents( false );
 
             // This means to scan a directory structure for POMs and process them.
             boolean useReactor = false;

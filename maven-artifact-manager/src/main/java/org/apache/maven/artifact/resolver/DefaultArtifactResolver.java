@@ -18,7 +18,7 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.ArtifactManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -52,7 +52,7 @@ public class DefaultArtifactResolver
     // Components
     // ----------------------------------------------------------------------
 
-    private WagonManager wagonManager;
+    private ArtifactManager artifactManager;
 
     private ArtifactTransformationManager transformationManager;
 
@@ -164,7 +164,7 @@ public class DefaultArtifactResolver
                 boolean resolved = false;
                 if ( !destination.exists() || force )
                 {
-                    if ( !wagonManager.isOnline() )
+                    if ( !artifactManager.isOnline() )
                     {
                         throw new ArtifactNotFoundException( "System is offline.", artifact );
                     }
@@ -175,11 +175,11 @@ public class DefaultArtifactResolver
                         if ( artifact.getRepository() != null )
                         {
                             // the transformations discovered the artifact - so use it exclusively
-                            wagonManager.getArtifact( artifact, artifact.getRepository() );
+                            artifactManager.getArtifact( artifact, artifact.getRepository() );
                         }
                         else
                         {
-                            wagonManager.getArtifact( artifact, repositories );
+                            artifactManager.getArtifact( artifact, repositories );
                         }
 
                         if ( !artifact.isResolved() && !destination.exists() )

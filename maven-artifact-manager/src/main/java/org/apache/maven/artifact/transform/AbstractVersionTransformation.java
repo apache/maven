@@ -43,8 +43,6 @@ public abstract class AbstractVersionTransformation
 {
     protected RepositoryMetadataManager repositoryMetadataManager;
 
-    protected WagonManager wagonManager;
-
     protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws RepositoryMetadataResolutionException
     {

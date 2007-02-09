@@ -82,9 +82,6 @@
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
       </requirements>
     </component>
 
@@ -196,7 +193,7 @@
       <implementation>org.apache.maven.usability.ArtifactNotFoundDiagnoser</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
+          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
         </requirement>
       </requirements>
     </component>
@@ -211,7 +208,7 @@
       <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
+          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
         </requirement>
       </requirements>
     </component>

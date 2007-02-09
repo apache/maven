@@ -5,11 +5,15 @@
       <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestDefaultsPopulator</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.wagon.manager.WagonManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.MavenTools</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-        </requirement>        
+        </requirement>
       </requirements>
     </component>
   </components>

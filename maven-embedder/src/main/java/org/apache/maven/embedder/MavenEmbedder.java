@@ -344,8 +344,6 @@ public class MavenEmbedder
             project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
                                                                  request.getLocalRepository(), profileManager,
                                                                  request.getTransferListener() );
-
-            
         }
         catch (PluginManagerException e) 
         {

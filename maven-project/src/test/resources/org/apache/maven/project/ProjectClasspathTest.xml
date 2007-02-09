@@ -41,7 +41,7 @@
       <implementation>org.apache.maven.project.TestArtifactResolver</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
+          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
