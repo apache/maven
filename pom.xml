@@ -169,6 +169,7 @@
   </modules>
   <properties>
     <plexusVersion>1.0-alpha-16</plexusVersion>
+    <wagonVersion>1.0-beta-3-SNAPSHOT</wagonVersion>
   </properties>
   <dependencies>
     <dependency>
@@ -208,12 +209,12 @@
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-beta-3-SNAPSHOT</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-manager</artifactId>
-        <version>1.0-beta-3-SNAPSHOT</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
