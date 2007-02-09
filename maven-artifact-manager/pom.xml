@@ -23,7 +23,7 @@ under the License.
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>2.0.6-SNAPSHOT</version>
+    <version>2.0.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-artifact-manager</artifactId>
@@ -32,7 +32,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
-      <version>2.0.6-SNAPSHOT</version>
+      <version>2.0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
@@ -46,7 +46,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>2.0.6-SNAPSHOT</version>
+      <version>2.0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
