@@ -230,8 +230,6 @@ public class MavenEmbedderTest
         assertEquals( 1, artifacts.size() );
 
         Artifact artifact = (Artifact) artifacts.iterator().next();
-
-        System.out.println( "artifact = " + artifact );
     }
 
     public void testProjectWithExtensionsReading()

@@ -142,7 +142,7 @@ public class MavenEmbedder
     // User options
     // ----------------------------------------------------------------------
 
-    private MavenEmbedRequest embedderRequest;
+    private MavenEmbedderConfiguration embedderRequest;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -158,7 +158,7 @@ public class MavenEmbedder
                           MavenEmbedderLogger logger )
         throws MavenEmbedderException
     {
-        this( new DefaultMavenEmbedRequest().setClassWorld( classWorld ).setMavenEmbedderLogger( logger ) );
+        this( new DefaultMavenEmbedderConfiguration().setClassWorld( classWorld ).setMavenEmbedderLogger( logger ) );
     }
 
     public MavenEmbedder( ClassLoader classLoader )
@@ -174,10 +174,10 @@ public class MavenEmbedder
         this( new ClassWorld( "plexus.core", classLoader ), logger );
     }
 
-    public MavenEmbedder( MavenEmbedRequest req )
+    public MavenEmbedder( MavenEmbedderConfiguration embedderConfiguration )
         throws MavenEmbedderException
     {
-        start( req );
+        start( embedderConfiguration );
     }
 
     // ----------------------------------------------------------------------
@@ -488,7 +488,7 @@ public class MavenEmbedder
     //  Lifecycle
     // ----------------------------------------------------------------------
 
-    private void start( MavenEmbedRequest req )
+    private void start( MavenEmbedderConfiguration req )
         throws MavenEmbedderException
     {
         this.classWorld = req.getClassWorld();

@@ -25,12 +25,12 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
- * Default implementation of MavenEmbedRequest intefrace.
+ * Default implementation of MavenEmbedderConfiguration intefrace.
  *
  * @author mkleint
  */
-public class DefaultMavenEmbedRequest
-    implements MavenEmbedRequest
+public class DefaultMavenEmbedderConfiguration
+    implements MavenEmbedderConfiguration
 {
     private List inactives;
 
@@ -53,30 +53,30 @@ public class DefaultMavenEmbedRequest
 
     private ClassWorld classWorld;
 
-    /** Creates a new instance of DefaultMavenEmbedRequest */
-    public DefaultMavenEmbedRequest()
+    /** Creates a new instance of DefaultMavenEmbedderConfiguration */
+    public DefaultMavenEmbedderConfiguration()
     {
     }
 
-    public MavenEmbedRequest addActiveProfile( String profile )
+    public MavenEmbedderConfiguration addActiveProfile( String profile )
     {
         getActiveProfiles().add( profile );
         return this;
     }
 
-    public MavenEmbedRequest addInactiveProfile( String profile )
+    public MavenEmbedderConfiguration addInactiveProfile( String profile )
     {
         getInactiveProfiles().add( profile );
         return this;
     }
 
-    public MavenEmbedRequest addActiveProfiles( List profiles )
+    public MavenEmbedderConfiguration addActiveProfiles( List profiles )
     {
         getActiveProfiles().addAll( profiles );
         return this;
     }
 
-    public MavenEmbedRequest addInactiveProfiles( List profiles )
+    public MavenEmbedderConfiguration addInactiveProfiles( List profiles )
     {
         getInactiveProfiles().addAll( profiles );
         return this;
@@ -100,13 +100,13 @@ public class DefaultMavenEmbedRequest
         return inactives;
     }
 
-    public MavenEmbedRequest setUserSettingsFile( File user )
+    public MavenEmbedderConfiguration setUserSettingsFile( File user )
     {
         userSettings = user;
         return this;
     }
 
-    public MavenEmbedRequest setGlobalSettingsFile( File global )
+    public MavenEmbedderConfiguration setGlobalSettingsFile( File global )
     {
         globalSettings = global;
         return this;
@@ -122,7 +122,7 @@ public class DefaultMavenEmbedRequest
         return globalSettings;
     }
 
-    public MavenEmbedRequest setConfigurationCustomizer( ContainerCustomizer customizer )
+    public MavenEmbedderConfiguration setConfigurationCustomizer( ContainerCustomizer customizer )
     {
         this.customizer = customizer;
         return this;
@@ -133,7 +133,7 @@ public class DefaultMavenEmbedRequest
         return customizer;
     }
 
-    public MavenEmbedRequest setSystemProperties( Properties properties )
+    public MavenEmbedderConfiguration setSystemProperties( Properties properties )
     {
         systemProperties = properties;
         return this;
@@ -154,7 +154,7 @@ public class DefaultMavenEmbedRequest
         return extensions;
     }
 
-    public MavenEmbedRequest setMavenEmbedderLogger( MavenEmbedderLogger logger )
+    public MavenEmbedderConfiguration setMavenEmbedderLogger( MavenEmbedderLogger logger )
     {
         this.logger = logger;
         return this;
@@ -170,13 +170,13 @@ public class DefaultMavenEmbedRequest
         return classWorld;
     }
 
-    public MavenEmbedRequest setClassWorld( ClassWorld classWorld )
+    public MavenEmbedderConfiguration setClassWorld( ClassWorld classWorld )
     {
         this.classWorld = classWorld;
         return this;
     }
 
-    public MavenEmbedRequest setClassLoader( ClassLoader loader )
+    public MavenEmbedderConfiguration setClassLoader( ClassLoader loader )
     {
         this.classWorld = new ClassWorld( "plexus.core", loader );
         return this;

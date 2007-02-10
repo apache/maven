@@ -27,46 +27,46 @@ import org.codehaus.plexus.classworlds.ClassWorld;
  *
  * @author mkleint
  */
-public interface MavenEmbedRequest
+public interface MavenEmbedderConfiguration
 {
     /*
     * Add profile to activate.
     */
-    MavenEmbedRequest addActiveProfile( String profile );
+    MavenEmbedderConfiguration addActiveProfile( String profile );
 
     /*
      * Add profile to inactivate.
      */
-    MavenEmbedRequest addInactiveProfile( String profile );
+    MavenEmbedderConfiguration addInactiveProfile( String profile );
 
     /*
     * Add a list of String instances with names of profiles to activate.
     */
-    MavenEmbedRequest addActiveProfiles( List profiles );
+    MavenEmbedderConfiguration addActiveProfiles( List profiles );
 
     /*
     * Add a list of String instances with names of profiles to inactivate.
     */
-    MavenEmbedRequest addInactiveProfiles( List profiles );
+    MavenEmbedderConfiguration addInactiveProfiles( List profiles );
 
     /*
     * Set location of the user settings file to use for the embedder.
     */
-    MavenEmbedRequest setUserSettingsFile( File user );
+    MavenEmbedderConfiguration setUserSettingsFile( File user );
 
     /*
      * Set location of the global settings file to use for the embedder.
      */
-    MavenEmbedRequest setGlobalSettingsFile( File global );
+    MavenEmbedderConfiguration setGlobalSettingsFile( File global );
 
     /**
      * Set a customizer callback implemetation that will be given a chance to modify the plexus container
      * on startup.
      */
-    MavenEmbedRequest setConfigurationCustomizer( ContainerCustomizer customizer );
+    MavenEmbedderConfiguration setConfigurationCustomizer( ContainerCustomizer customizer );
 
     /** set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used. */
-    MavenEmbedRequest setSystemProperties( Properties properties );
+    MavenEmbedderConfiguration setSystemProperties( Properties properties );
 
     List getActiveProfiles();
 
@@ -84,13 +84,13 @@ public interface MavenEmbedRequest
 
     List getExtensions();
 
-    public MavenEmbedRequest setMavenEmbedderLogger( MavenEmbedderLogger logger );
+    public MavenEmbedderConfiguration setMavenEmbedderLogger( MavenEmbedderLogger logger );
 
     public MavenEmbedderLogger getMavenEmbedderLogger();
 
     public ClassWorld getClassWorld();
 
-    public MavenEmbedRequest setClassWorld( ClassWorld classWorld );
+    public MavenEmbedderConfiguration setClassWorld( ClassWorld classWorld );
 
-    public MavenEmbedRequest setClassLoader( ClassLoader loader );
+    public MavenEmbedderConfiguration setClassLoader( ClassLoader loader );
 }

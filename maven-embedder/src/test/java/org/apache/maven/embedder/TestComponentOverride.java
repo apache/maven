@@ -25,7 +25,7 @@ public class TestComponentOverride
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        MavenEmbedRequest request = new DefaultMavenEmbedRequest();
+        MavenEmbedderConfiguration request = new DefaultMavenEmbedderConfiguration();
 
         request.setClassLoader( loader );
 
