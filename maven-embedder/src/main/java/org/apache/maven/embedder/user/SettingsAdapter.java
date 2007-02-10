@@ -6,7 +6,7 @@ import org.apache.maven.settings.Settings;
 import java.util.List;
 
 /**
- * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core. 
+ * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
  *
  * @author Jason van Zyl
  */

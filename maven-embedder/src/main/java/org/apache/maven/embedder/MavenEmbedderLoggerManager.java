@@ -85,29 +85,32 @@ public class MavenEmbedderLoggerManager
         logger.setThreshold( currentThreshold );
     }
 
-    /**
-     * @return Returns the threshold.
-     */
+    /** @return Returns the threshold. */
     public int getThreshold()
     {
         return currentThreshold;
     }
 
-    public void setThreshold( String role, String roleHint, int threshold )
+    public void setThreshold( String role,
+                              String roleHint,
+                              int threshold )
     {
     }
 
-    public int getThreshold( String role, String roleHint )
+    public int getThreshold( String role,
+                             String roleHint )
     {
         return currentThreshold;
     }
 
-    public Logger getLoggerForComponent( String role, String roleHint )
+    public Logger getLoggerForComponent( String role,
+                                         String roleHint )
     {
         return logger;
     }
 
-    public void returnComponentLogger( String role, String roleHint )
+    public void returnComponentLogger( String role,
+                                       String roleHint )
     {
     }
 

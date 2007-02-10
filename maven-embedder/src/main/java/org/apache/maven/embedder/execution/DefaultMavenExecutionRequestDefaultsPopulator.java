@@ -50,7 +50,7 @@ import java.io.File;
 import java.util.Iterator;
 
 /**
- * DefaultMavenExecutionRequestDefaultsPopulator 
+ * DefaultMavenExecutionRequestDefaultsPopulator
  *
  * @version $Id$
  */
@@ -216,15 +216,15 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
         {
             Mirror mirror = (Mirror) i.next();
-            
+
             try
             {
                 wagonManager.addRepositoryMirror( mirror.getMirrorOf(), mirror.getId(), mirror.getUrl() );
             }
             catch ( IllegalArgumentException e )
             {
-                throw new SettingsConfigurationException( "Unable to configure mirror " + mirror + ": "
-                    + e.getMessage(), e );
+                throw new SettingsConfigurationException(
+                    "Unable to configure mirror " + mirror + ": " + e.getMessage(), e );
             }
         }
     }

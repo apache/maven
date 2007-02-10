@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Default implementation of MavenEmbedRequest intefrace.
@@ -45,14 +46,14 @@ public class DefaultMavenEmbedRequest
 
     private Properties systemProperties;
 
-    /**
-     * List&lt;URL>.
-     */
+    /** List&lt;URL>. */
     private List extensions = new ArrayList();
 
-    /**
-     * Creates a new instance of DefaultMavenEmbedRequest
-     */
+    private MavenEmbedderLogger logger;
+
+    private ClassWorld classWorld;
+
+    /** Creates a new instance of DefaultMavenEmbedRequest */
     public DefaultMavenEmbedRequest()
     {
     }
@@ -132,13 +133,13 @@ public class DefaultMavenEmbedRequest
         return customizer;
     }
 
-    public MavenEmbedRequest setSystemProperties(Properties properties) 
+    public MavenEmbedRequest setSystemProperties( Properties properties )
     {
         systemProperties = properties;
         return this;
     }
 
-    public Properties getSystemProperties() 
+    public Properties getSystemProperties()
     {
         return systemProperties != null ? systemProperties : System.getProperties();
     }
@@ -151,5 +152,33 @@ public class DefaultMavenEmbedRequest
     public List getExtensions()
     {
         return extensions;
+    }
+
+    public MavenEmbedRequest setMavenEmbedderLogger( MavenEmbedderLogger logger )
+    {
+        this.logger = logger;
+        return this;
+    }
+
+    public MavenEmbedderLogger getMavenEmbedderLogger()
+    {
+        return logger;
+    }
+
+    public ClassWorld getClassWorld()
+    {
+        return classWorld;
+    }
+
+    public MavenEmbedRequest setClassWorld( ClassWorld classWorld )
+    {
+        this.classWorld = classWorld;
+        return this;
+    }
+
+    public MavenEmbedRequest setClassLoader( ClassLoader loader )
+    {
+        this.classWorld = new ClassWorld( "plexus.core", loader );
+        return this;
     }
 }

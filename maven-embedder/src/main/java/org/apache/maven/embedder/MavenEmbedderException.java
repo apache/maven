@@ -33,7 +33,8 @@ public class MavenEmbedderException
         super( cause );
     }
 
-    public MavenEmbedderException( String message, Throwable cause )
+    public MavenEmbedderException( String message,
+                                   Throwable cause )
     {
         super( message, cause );
     }

@@ -23,7 +23,7 @@ import java.io.File;
  * @version $Id$
  */
 public abstract class AbstractMavenEmbedderLogger
-        implements MavenEmbedderLogger
+    implements MavenEmbedderLogger
 {
     private int threshold = MavenEmbedderLogger.LEVEL_INFO;
 
@@ -43,7 +43,7 @@ public abstract class AbstractMavenEmbedderLogger
     {
         return name;
     }
-    
+
     public void debug( String message )
     {
         debug( message, null );

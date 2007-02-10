@@ -35,7 +35,8 @@ public class PlexusLoggerAdapter
         logger.debug( message );
     }
 
-    public void debug( String message, Throwable throwable )
+    public void debug( String message,
+                       Throwable throwable )
     {
         logger.debug( message, throwable );
     }
@@ -50,7 +51,8 @@ public class PlexusLoggerAdapter
         logger.info( message );
     }
 
-    public void info( String message, Throwable throwable )
+    public void info( String message,
+                      Throwable throwable )
     {
         logger.info( message, throwable );
     }
@@ -65,7 +67,8 @@ public class PlexusLoggerAdapter
         logger.warn( message );
     }
 
-    public void warn( String message, Throwable throwable )
+    public void warn( String message,
+                      Throwable throwable )
     {
         logger.warn( message, throwable );
     }
@@ -80,7 +83,8 @@ public class PlexusLoggerAdapter
         logger.error( message );
     }
 
-    public void error( String message, Throwable throwable )
+    public void error( String message,
+                       Throwable throwable )
     {
         logger.error( message );
     }
@@ -95,7 +99,8 @@ public class PlexusLoggerAdapter
         logger.fatalError( message );
     }
 
-    public void fatalError( String message, Throwable throwable )
+    public void fatalError( String message,
+                            Throwable throwable )
     {
         logger.fatalError( message, throwable );
     }

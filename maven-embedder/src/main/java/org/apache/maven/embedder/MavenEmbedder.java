@@ -65,6 +65,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -76,6 +77,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -156,28 +158,7 @@ public class MavenEmbedder
                           MavenEmbedderLogger logger )
         throws MavenEmbedderException
     {
-        this.classWorld = classWorld;
-
-        this.logger = logger;
-
-        // ----------------------------------------------------------------------------
-        // Don't override any existing SecurityManager if one has been installed. Our
-        // SecurityManager just checks to make sure
-        // ----------------------------------------------------------------------------
-
-        try
-        {
-            if ( System.getSecurityManager() == null && activateSystemManager )
-            {
-                System.setSecurityManager( new MavenEmbedderSecurityManager() );
-            }
-        }
-        catch ( RuntimeException e )
-        {
-            logger.warn( "Error trying to set the SecurityManager: " + e.getMessage() );
-        }
-
-        start();
+        this( new DefaultMavenEmbedRequest().setClassWorld( classWorld ).setMavenEmbedderLogger( logger ) );
     }
 
     public MavenEmbedder( ClassLoader classLoader )
@@ -191,6 +172,12 @@ public class MavenEmbedder
         throws MavenEmbedderException
     {
         this( new ClassWorld( "plexus.core", classLoader ), logger );
+    }
+
+    public MavenEmbedder( MavenEmbedRequest req )
+        throws MavenEmbedderException
+    {
+        start( req );
     }
 
     // ----------------------------------------------------------------------
@@ -247,30 +234,24 @@ public class MavenEmbedder
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
-    
+
     /**
      * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
-     *  from remote repositories (if they prohibit by default on project loading)
-     */ 
-    protected void verifyPlugin( Plugin plugin, MavenProject project ) 
-            throws ComponentLookupException, 
-                   ArtifactResolutionException, 
-                   PluginVersionResolutionException, 
-                   ArtifactNotFoundException, 
-                   InvalidVersionSpecificationException, 
-                   InvalidPluginException, 
-                   PluginManagerException, 
-                   PluginNotFoundException, 
-                   PluginVersionNotFoundException 
+     * from remote repositories (if they prohibit by default on project loading)
+     */
+    protected void verifyPlugin( Plugin plugin,
+                                 MavenProject project )
+        throws ComponentLookupException, ArtifactResolutionException, PluginVersionResolutionException,
+        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
+        PluginNotFoundException, PluginVersionNotFoundException
     {
         PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
-        pluginManager.verifyPlugin(plugin, project, settings, localRepository);
+        pluginManager.verifyPlugin( plugin, project, settings, localRepository );
     }
-    
-    /**
-     * protected for tests only..
-     */
-    protected Map getPluginExtensionComponents(Plugin plugin) throws PluginManagerException 
+
+    /** protected for tests only.. */
+    protected Map getPluginExtensionComponents( Plugin plugin )
+        throws PluginManagerException
     {
         try
         {
@@ -283,29 +264,27 @@ public class MavenEmbedder
             return new HashMap();
         }
     }
-    
+
     /**
      * mkleint: copied from DefaultLifecycleExecutor
-     * 
+     *
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      * lookup directly, or have them passed in
-     * 
      * @todo Move this sort of thing to the tail end of the project-building process
      */
     private Map findArtifactTypeHandlers( MavenProject project )
         throws Exception
     {
         Map map = new HashMap();
-            
+
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
             if ( plugin.isExtensions() )
             {
-                verifyPlugin( plugin, project);
-                map.putAll( getPluginExtensionComponents(plugin));
-
+                verifyPlugin( plugin, project );
+                map.putAll( getPluginExtensionComponents( plugin ) );
 
                 // shudder...
                 for ( Iterator j = map.values().iterator(); j.hasNext(); )
@@ -320,7 +299,7 @@ public class MavenEmbedder
         }
         return map;
     }
-    
+
 
     /**
      * This method is used to grab the list of dependencies that belong to a project so that a UI
@@ -334,18 +313,18 @@ public class MavenEmbedder
         try
         {
             request = defaultsPopulator.populateDefaults( request );
-        
-            project = readProject( new File (request.getPomFile()) );
+
+            project = readProject( new File( request.getPomFile() ) );
             //mkleint: copied from DefaultLifecycleExecutor    
             Map handlers = findArtifactTypeHandlers( project );
             //is this necessary in this context, I doubt it..mkleint
             artifactHandlerManager.addHandlers( handlers );
-            
+
             project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
                                                                  request.getLocalRepository(), profileManager,
                                                                  request.getTransferListener() );
         }
-        catch (PluginManagerException e) 
+        catch ( PluginManagerException e )
         {
             return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
@@ -370,7 +349,7 @@ public class MavenEmbedder
             return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
         //mkleint: why do we have so many various exception handlings with same result?
-        catch (Exception e) 
+        catch ( Exception e )
         {
             return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
         }
@@ -509,15 +488,30 @@ public class MavenEmbedder
     //  Lifecycle
     // ----------------------------------------------------------------------
 
-    private void start()
+    private void start( MavenEmbedRequest req )
         throws MavenEmbedderException
     {
-        start( new DefaultMavenEmbedRequest() );
-    }
+        this.classWorld = req.getClassWorld();
 
-    public void start( MavenEmbedRequest req )
-        throws MavenEmbedderException
-    {
+        this.logger = req.getMavenEmbedderLogger();
+
+        // ----------------------------------------------------------------------------
+        // Don't override any existing SecurityManager if one has been installed. Our
+        // SecurityManager just checks to make sure
+        // ----------------------------------------------------------------------------
+
+        try
+        {
+            if ( System.getSecurityManager() == null && activateSystemManager )
+            {
+                System.setSecurityManager( new MavenEmbedderSecurityManager() );
+            }
+        }
+        catch ( RuntimeException e )
+        {
+            logger.warn( "Error trying to set the SecurityManager: " + e.getMessage() );
+        }
+
         this.embedderRequest = req;
 
         try
@@ -670,11 +664,11 @@ public class MavenEmbedder
     {
         LoggerManager loggerManager = container.getLoggerManager();
         int oldThreshold = loggerManager.getThreshold();
-        
+
         try
         {
             loggerManager.setThresholds( request.getLoggingLevel() );
-            
+
             try
             {
                 request = defaultsPopulator.populateDefaults( request );

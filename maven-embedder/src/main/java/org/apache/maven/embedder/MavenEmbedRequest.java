@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Configuration of embedder, used when starting up.
@@ -83,4 +83,14 @@ public interface MavenEmbedRequest
     void addExtension( URL url );
 
     List getExtensions();
+
+    public MavenEmbedRequest setMavenEmbedderLogger( MavenEmbedderLogger logger );
+
+    public MavenEmbedderLogger getMavenEmbedderLogger();
+
+    public ClassWorld getClassWorld();
+
+    public MavenEmbedRequest setClassWorld( ClassWorld classWorld );
+
+    public MavenEmbedRequest setClassLoader( ClassLoader loader );
 }

@@ -25,7 +25,8 @@ package org.apache.maven.embedder;/*
 public final class MavenEmbedderConsoleLogger
     extends AbstractMavenEmbedderLogger
 {
-    public void debug( String message, Throwable throwable )
+    public void debug( String message,
+                       Throwable throwable )
     {
         if ( isDebugEnabled() )
         {
@@ -39,7 +40,8 @@ public final class MavenEmbedderConsoleLogger
         }
     }
 
-    public void info( String message, Throwable throwable )
+    public void info( String message,
+                      Throwable throwable )
     {
         if ( isInfoEnabled() )
         {
@@ -53,7 +55,8 @@ public final class MavenEmbedderConsoleLogger
         }
     }
 
-    public void warn( String message, Throwable throwable )
+    public void warn( String message,
+                      Throwable throwable )
     {
         if ( isWarnEnabled() )
         {
@@ -67,7 +70,8 @@ public final class MavenEmbedderConsoleLogger
         }
     }
 
-    public void error( String message, Throwable throwable )
+    public void error( String message,
+                       Throwable throwable )
     {
         if ( isErrorEnabled() )
         {
@@ -81,7 +85,8 @@ public final class MavenEmbedderConsoleLogger
         }
     }
 
-    public void fatalError( String message, Throwable throwable )
+    public void fatalError( String message,
+                            Throwable throwable )
     {
         if ( isFatalErrorEnabled() )
         {

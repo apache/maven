@@ -26,7 +26,9 @@ public class SummaryPluginDescriptor
 
     private String name;
 
-    public SummaryPluginDescriptor( String groupId, String artifactId, String name )
+    public SummaryPluginDescriptor( String groupId,
+                                    String artifactId,
+                                    String name )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;

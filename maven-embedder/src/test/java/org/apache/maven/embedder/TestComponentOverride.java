@@ -8,11 +8,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-/**
- *
- * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- *
- */
+/** @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a> */
 public class TestComponentOverride
     extends TestCase
 {
@@ -27,9 +23,13 @@ public class TestComponentOverride
     {
         basedir = System.getProperty( "basedir" );
 
-        maven = new MavenEmbedder( Thread.currentThread().getContextClassLoader(), new MavenEmbedderConsoleLogger() );
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         MavenEmbedRequest request = new DefaultMavenEmbedRequest();
+
+        request.setClassLoader( loader );
+
+        request.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
 
         request.addExtension( new File( basedir, "src/test/extensions" ).toURI().toURL() );
 
@@ -42,7 +42,7 @@ public class TestComponentOverride
             }
         } );
 
-        maven.start( request );
+        maven = new MavenEmbedder( request );
     }
 
     public void testComponentOverride()
