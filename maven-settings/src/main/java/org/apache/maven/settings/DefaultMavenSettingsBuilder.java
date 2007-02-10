@@ -51,6 +51,11 @@ public class DefaultMavenSettingsBuilder
     {
         Settings globalSettings = readSettings( globalSettingsFile );
 
+        if ( userSettingsFile == null )
+        {
+            userSettingsFile = new File( new File( System.getProperty( "user.home" ) ), ".m2/settings.xml" );
+        }
+
         Settings userSettings = readSettings( userSettingsFile );
 
         if ( globalSettings == null )
