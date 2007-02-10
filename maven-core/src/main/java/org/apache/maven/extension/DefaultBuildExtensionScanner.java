@@ -24,6 +24,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -125,17 +126,45 @@ public class DefaultBuildExtensionScanner
                 
                 getLogger().debug( "Scanning module: " + moduleSubpath );
 
-                File modulePom = new File( basedir, moduleSubpath );
+                File modulePomDirectory;
 
-                if ( modulePom.isDirectory() )
+                try
+                {
+                    modulePomDirectory = new File( basedir, moduleSubpath ).getCanonicalFile();
+
+                    // ----------------------------------------------------------------------------
+                    // We need to make sure we don't loop infinitely in the case where we have
+                    // something like:
+                    //
+                    // <modules>
+                    //    <module>../MNGECLIPSE-256web</module>
+                    //    <module>../MNGECLIPSE-256utility</module>
+                    // </modules>
+                    //
+                    // Where once we walk into the first module it will just get its parent dir
+                    // containing its POM over and over again unless we make a comparison to
+                    // basedir and the modulePomDirectory.
+                    // ----------------------------------------------------------------------------
+
+                    if ( modulePomDirectory.equals( basedir.getCanonicalFile() ) )
+                    {
+                        break;
+                    }
+                }
+                catch ( IOException e )
+                {
+                    throw new ExtensionScanningException( "Error getting canonical path for modulePomDirectory.",  e );
+                }
+
+                if ( modulePomDirectory.isDirectory() )
                 {
                     getLogger().debug(
                                        "Assuming POM file 'pom.xml' in module: " + moduleSubpath + " under basedir: "
                                            + basedir );
-                    modulePom = new File( modulePom, "pom.xml" );
+                    modulePomDirectory = new File( modulePomDirectory, "pom.xml" );
                 }
 
-                if ( !modulePom.exists() )
+                if ( !modulePomDirectory.exists() )
                 {
                     getLogger().debug(
                                        "Cannot find POM for module: " + moduleSubpath
@@ -143,7 +172,7 @@ public class DefaultBuildExtensionScanner
                     continue;
                 }
 
-                scanForBuildExtensions( modulePom, localRepository, globalProfileManager, pomFilesById );
+                scanForBuildExtensions( modulePomDirectory, localRepository, globalProfileManager, pomFilesById );
             }
         }
     }
