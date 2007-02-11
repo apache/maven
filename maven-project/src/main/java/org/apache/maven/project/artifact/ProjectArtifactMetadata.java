@@ -17,25 +17,20 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Attach a POM to an artifact.
@@ -53,7 +48,8 @@ public class ProjectArtifactMetadata
         this( artifact, null );
     }
 
-    public ProjectArtifactMetadata( Artifact artifact, File file )
+    public ProjectArtifactMetadata( Artifact artifact,
+                                    File file )
     {
         super( artifact );
         this.file = file;
@@ -74,42 +70,31 @@ public class ProjectArtifactMetadata
         return getArtifactId() + "-" + artifact.getVersion() + ".pom";
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository,
+                                        ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
         File destination = new File( localRepository.getBasedir(),
                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
-        destination.getParentFile().mkdirs();
+        // ----------------------------------------------------------------------------
+        // I'm fully aware that the file could just be moved using File.rename but
+        // there are bugs in various JVM that have problems doing this across
+        // different filesystem. So we'll incur the small hit to actually copy
+        // here and be safe. jvz.
+        // ----------------------------------------------------------------------------
 
-        FileReader reader = null;
-        FileWriter writer = null;
+        Reader reader = null;
+
+        Writer writer = null;
+
         try
         {
             reader = new FileReader( file );
-            StringWriter sWriter = new StringWriter();
-            IOUtil.copy( reader, sWriter );
-            
-            String modelSrc = sWriter.toString().replaceAll( "\\$\\{(pom\\.|project\\.)?version\\}", artifact.getBaseVersion() );
-            
-            StringReader sReader = new StringReader( modelSrc );
-            
+
             writer = new FileWriter( destination );
 
-            MavenXpp3Reader modelReader = new MavenXpp3Reader();
-            Model model = modelReader.read( sReader, false );
-            model.setVersion( artifact.getVersion() );
-
-            DistributionManagement distributionManagement = model.getDistributionManagement();
-            if ( distributionManagement == null )
-            {
-                distributionManagement = new DistributionManagement();
-                model.setDistributionManagement( distributionManagement );
-            }
-            distributionManagement.setStatus( ArtifactStatus.DEPLOYED.toString() );
-
-            MavenXpp3Writer modelWriter = new MavenXpp3Writer();
-            modelWriter.write( writer, model );
+            IOUtil.copy( reader, writer );
         }
         catch ( FileNotFoundException e )
         {
@@ -119,13 +104,10 @@ public class ProjectArtifactMetadata
         {
             throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
         }
-        catch ( XmlPullParserException e )
-        {
-            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
-        }
         finally
         {
             IOUtil.close( reader );
+
             IOUtil.close( writer );
         }
     }
