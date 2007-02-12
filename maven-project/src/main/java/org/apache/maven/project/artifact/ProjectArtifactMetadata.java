@@ -87,31 +87,13 @@ public class ProjectArtifactMetadata
         // here and be safe. jvz.
         // ----------------------------------------------------------------------------
 
-        Reader reader = null;
-
-        Writer writer = null;
-
         try
         {
-            reader = new FileReader( file );
-
-            writer = new FileWriter( destination );
-
-            IOUtil.copy( reader, writer );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
+            FileUtils.copyFile( file, destination );
         }
         catch ( IOException e )
         {
-            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-
-            IOUtil.close( writer );
+            throw new RepositoryMetadataStoreException( "Error copying POM to the local repository.", e );
         }
     }
 
