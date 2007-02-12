@@ -164,7 +164,7 @@ public class DefaultModelLineageBuilder
         if ( pom.isDirectory() )
         {
             pomFile = new File( pom, "pom.xml" );
-            getLogger().debug( "readModel(..): POM: " + pom + " is a directory. Trying: " + pomFile + " instead." );
+//            getLogger().debug( "readModel(..): POM: " + pom + " is a directory. Trying: " + pomFile + " instead." );
         }
         
         Model model;
@@ -281,7 +281,7 @@ public class DefaultModelLineageBuilder
 
             String cacheKey = createCacheKey( modelParent );
             
-            getLogger().debug( "Looking for cached parent POM under: " + cacheKey );
+//            getLogger().debug( "Looking for cached parent POM under: " + cacheKey );
             
             pomFile = (File) cachedModelsById.get( cacheKey );
 
@@ -365,9 +365,9 @@ public class DefaultModelLineageBuilder
         Artifact parentPomArtifact = artifactFactory.createBuildArtifact( modelParent.getGroupId(), modelParent
             .getArtifactId(), modelParent.getVersion(), "pom" );
 
-        getLogger().debug( "Looking for parent: " + modelParent.getId() + " using artifact: " + parentPomArtifact );
-        getLogger().debug( "\tLocal repository: " + localRepository.getBasedir() + "\n" );
-        getLogger().debug( "\tRemote repositories:\n" + remoteRepositories.toString().replace( ',', '\n' ) + "\n" );
+//        getLogger().debug( "Looking for parent: " + modelParent.getId() + " using artifact: " + parentPomArtifact );
+//        getLogger().debug( "\tLocal repository: " + localRepository.getBasedir() + "\n" );
+//        getLogger().debug( "\tRemote repositories:\n" + remoteRepositories.toString().replace( ',', '\n' ) + "\n" );
 
         try
         {
@@ -404,11 +404,11 @@ public class DefaultModelLineageBuilder
 
         if ( parentPomFile.isDirectory() )
         {
-            getLogger().debug( "Parent relative-path is a directory; assuming \'pom.xml\' file exists within." );
+//            getLogger().debug( "Parent relative-path is a directory; assuming \'pom.xml\' file exists within." );
             parentPomFile = new File( parentPomFile, "pom.xml" );
         }
 
-        getLogger().debug( "Looking for parent: " + modelParent.getId() + " in: " + parentPomFile );
+//        getLogger().debug( "Looking for parent: " + modelParent.getId() + " in: " + parentPomFile );
 
         if ( parentPomFile.exists() )
         {
