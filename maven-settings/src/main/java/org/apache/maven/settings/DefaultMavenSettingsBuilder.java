@@ -22,7 +22,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,6 +29,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.maven.settings.validation.SettingsValidationResult;
+import org.apache.maven.settings.validation.SettingsValidator;
 
 /**
  * @author jdcasey
@@ -39,6 +40,9 @@ public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
     implements MavenSettingsBuilder
 {
+    
+    private SettingsValidator validator;
+    
     // ----------------------------------------------------------------------
     // MavenProfilesBuilder Implementation
     // ----------------------------------------------------------------------
@@ -50,7 +54,7 @@ public class DefaultMavenSettingsBuilder
         throws IOException, XmlPullParserException
     {
         Settings globalSettings = readSettings( globalSettingsFile );
-
+        
         if ( userSettingsFile == null )
         {
             userSettingsFile = new File( new File( System.getProperty( "user.home" ) ), ".m2/settings.xml" );
@@ -69,6 +73,10 @@ public class DefaultMavenSettingsBuilder
 
             userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
         }
+        
+        validateSettings( globalSettings, globalSettingsFile );
+        
+        validateSettings( userSettings, userSettingsFile );
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
@@ -166,5 +174,16 @@ public class DefaultMavenSettingsBuilder
                 settings.addActiveProfile( profile.getId() );
             }
         }
+    }
+    
+    private void validateSettings(Settings settings, File location) throws IOException {
+        SettingsValidationResult validationResult = validator.validate( settings );
+
+        if ( validationResult.getMessageCount() > 0 )
+        {
+            throw new IOException( "Failed to validate Settings file at " + location + 
+                                    "\n" + validationResult.render("\n") );
+        }
+        
     }
 }

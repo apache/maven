@@ -1,9 +1,19 @@
 <component-set>
   <components>
+      
+    <component>
+      <role>org.apache.maven.settings.validation.SettingsValidator</role>
+      <implementation>org.apache.maven.settings.validation.DefaultSettingsValidator</implementation>
+    </component>
 
     <component>
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.settings.validation.SettingsValidator</role>
+        </requirement>
+      </requirements>
       <!--
       <configuration>
         <globalSettingsPath>${maven.home}/conf/settings.xml</globalSettingsPath>
