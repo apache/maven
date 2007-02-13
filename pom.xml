@@ -40,6 +40,12 @@
     <pluginRepository>
       <id>apache.snapshots</id>
       <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </pluginRepository>
   </pluginRepositories>
 
@@ -47,7 +53,13 @@
   <repositories>
     <repository>
       <id>codehaus.snapshots</id>
-      <url>http://snapshots.repository.codehaus.org/</url>
+      <url>http://snapshots.repository.codehaus.org</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 

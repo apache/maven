@@ -82,6 +82,10 @@
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
+        <requirement>
+	      <role>org.apache.maven.wagon.manager.WagonManager</role>
+    	  <role-hint>default</role-hint>
+        </requirement>
       </requirements>
     </component>
 

@@ -94,6 +94,8 @@ public class DefaultBuildExtensionScanner
             }
 
             getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
+            
+            extensionManager.registerWagons();
         }
         catch ( ModelInterpolationException e )
         {

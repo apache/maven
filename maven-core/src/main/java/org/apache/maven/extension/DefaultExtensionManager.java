@@ -31,9 +31,11 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.wagon.manager.WagonManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -64,6 +66,8 @@ public class DefaultExtensionManager
     private PlexusContainer container;
 
     private ArtifactFilterManager artifactFilterManager;
+    
+    private WagonManager wagonManager;
 
     public void addExtension( Extension extension,
                               Model originatingModel,
@@ -144,6 +148,18 @@ public class DefaultExtensionManager
                 
                 artifactFilterManager.excludeArtifact( a.getArtifactId() );
             }
+        }
+    }
+
+    public void registerWagons()
+    {
+        try
+        {
+            wagonManager.registerExtensionContainer( container );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // no wagons found in the extension
         }
     }
 
