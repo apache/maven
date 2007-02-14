@@ -94,7 +94,6 @@ under the License.
     </profile>
   </profiles>
   <modules>
-    <module>maven-archiver</module>
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
     <module>maven-artifact-test</module>
