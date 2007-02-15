@@ -133,7 +133,16 @@ public class PluginParameterExpressionEvaluator
                     }
                     else
                     {
-                        retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                        Object subResult = evaluate( expr.substring( index, lastIndex + 1 ) );
+                        
+                        if ( subResult != null )
+                        {
+                            retVal += subResult;
+                        }
+                        else
+                        {
+                            retVal += "$" + expr.substring( index + 1, lastIndex + 1 );
+                        }
                     }
                     
                     retVal += evaluate( expr.substring( lastIndex + 1 ) );
