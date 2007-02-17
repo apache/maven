@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<package>
+  <infos>
+    <name>Backup</name>
+    <description>on Fri Jan 26 09:55:02 CET 2007 by XWiki.Admin</description>
+    <licence></licence>
+    <author>XWiki.Admin</author>
+    <version></version>
+    <backupPack>true</backupPack>
+  </infos>
+  <files/>
+</package>
