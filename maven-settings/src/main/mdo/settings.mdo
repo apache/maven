@@ -69,7 +69,7 @@
           <name>id</name>
           <version>1.0.0</version>
           <type>String</type>
-          <default>default</default>
+          <defaultValue>default</defaultValue>
           <required>true</required>
         </field>
       </fields>

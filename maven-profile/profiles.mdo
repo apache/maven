@@ -56,6 +56,7 @@
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
+          <defaultValue>default</defaultValue>
           <description>The ID of this build profile, for activation
             purposes.</description>
         </field>

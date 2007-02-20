@@ -2528,6 +2528,7 @@
           <required>true</required>
           <version>4.0.0</version>
           <type>String</type>
+          <defaultValue>default</defaultValue>
           <description>The identifier of this build profile. This used both for command line activation, and identifies
             identical profiles to merge with during inheritance.</description>
         </field>
