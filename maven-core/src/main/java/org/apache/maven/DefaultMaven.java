@@ -343,18 +343,13 @@ public class DefaultMaven
         
         // TODO: We should probably do this discovery just-in-time, if we can move to building project
         // instances just-in-time.
-        for ( Iterator it = files.iterator(); it.hasNext(); )
+        try
         {
-            File pom = (File) it.next();
-
-            try
-            {
-                buildExtensionScanner.scanForBuildExtensions( pom, request.getLocalRepository(), globalProfileManager );
-            }
-            catch ( ExtensionScanningException e )
-            {
-                throw new MavenExecutionException( "Error scanning: " + pom + " for extensions: " + e.getMessage(), e );
-            }
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), globalProfileManager );
+        }
+        catch ( ExtensionScanningException e )
+        {
+            throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
         
         try

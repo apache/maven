@@ -27,6 +27,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -46,21 +47,37 @@ public class DefaultBuildExtensionScanner
     private MavenProjectBuilder projectBuilder;
 
     private ModelLineageBuilder modelLineageBuilder;
-    
+
     private ModelInterpolator modelInterpolator;
+
+    public void scanForBuildExtensions( List files, ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager )
+        throws ExtensionScanningException
+    {
+        List visited = new ArrayList();
+
+        for ( Iterator it = files.iterator(); it.hasNext(); )
+        {
+            File pom = (File) it.next();
+
+            scanInternal( pom, localRepository, globalProfileManager, visited, files );
+        }
+    }
 
     public void scanForBuildExtensions( File pom, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
         throws ExtensionScanningException
     {
-        scanInternal( pom, localRepository, globalProfileManager, new ArrayList() );
+        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ) );
     }
-    
+
+    // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles, 
+    //       once we move to just-in-time project scanning.
     private void scanInternal( File pom, ArtifactRepository localRepository, ProfileManager globalProfileManager,
-                               List visitedModelIds )
+                               List visitedModelIds, List reactorFiles )
         throws ExtensionScanningException
     {
-        
+
         // setup the CustomActivatorAdvice to fail quietly while we discover extensions...then, we'll
         // reset it.
         CustomActivatorAdvice activatorAdvice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
@@ -77,35 +94,47 @@ public class DefaultBuildExtensionScanner
                                                       globalProfileManager );
 
             Map inheritedInterpolationValues = new HashMap();
-            
+
             for ( ModelLineageIterator lineageIterator = lineage.reversedLineageIterator(); lineageIterator.hasNext(); )
             {
                 Model model = (Model) lineageIterator.next();
+                File modelPom = lineageIterator.getPOMFile();
+
                 String key = createKey( model );
-                
+
                 if ( visitedModelIds.contains( key ) )
                 {
                     getLogger().debug( "Already visited: " + key + "; continuing." );
                     continue;
                 }
-                
-                visitedModelIds.add( key );
-                
-                File modelPom = lineageIterator.getPOMFile();
 
-                getLogger().debug( "Checking: " + model.getId() + " for extensions. (It has " + model.getModules().size() + " modules.)" );
-                
+                visitedModelIds.add( key );
+
+                getLogger().debug(
+                                   "Checking: " + model.getId() + " for extensions. (It has "
+                                       + model.getModules().size() + " modules.)" );
+
                 if ( inheritedInterpolationValues == null )
                 {
                     inheritedInterpolationValues = new HashMap();
                 }
-                
+
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
                 checkModelBuildForExtensions( model, localRepository, lineageIterator.getArtifactRepositories() );
 
-                checkModulesForExtensions( modelPom, model, localRepository, originalRemoteRepositories, globalProfileManager, visitedModelIds );
-                
+                if ( !reactorFiles.contains( modelPom ) )
+                {
+                    getLogger().debug(
+                                       "POM: " + modelPom
+                                           + " is not in the current reactor. Its modules will not be scanned." );
+                }
+                else
+                {
+                    checkModulesForExtensions( modelPom, model, localRepository, originalRemoteRepositories,
+                                               globalProfileManager, visitedModelIds, reactorFiles );
+                }
+
                 Properties modelProps = model.getProperties();
                 if ( modelProps != null )
                 {
@@ -114,12 +143,13 @@ public class DefaultBuildExtensionScanner
             }
 
             getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
-            
+
             extensionManager.registerWagons();
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ExtensionScanningException( "Failed to interpolate model from: " + pom + " prior to scanning for extensions.", e );
+            throw new ExtensionScanningException( "Failed to interpolate model from: " + pom
+                + " prior to scanning for extensions.", e );
         }
         finally
         {
@@ -131,21 +161,21 @@ public class DefaultBuildExtensionScanner
     private String createKey( Model model )
     {
         Parent parent = model.getParent();
-        
+
         String groupId = model.getGroupId();
         if ( groupId == null )
         {
             groupId = parent.getGroupId();
         }
-        
+
         String artifactId = model.getArtifactId();
-        
+
         return groupId + ":" + artifactId;
     }
 
     private void checkModulesForExtensions( File containingPom, Model model, ArtifactRepository localRepository,
                                             List originalRemoteRepositories, ProfileManager globalProfileManager,
-                                            List visitedModelIds )
+                                            List visitedModelIds, List reactorFiles )
         throws ExtensionScanningException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
@@ -161,7 +191,7 @@ public class DefaultBuildExtensionScanner
             {
                 // TODO: change this if we ever find a way to replace module definitions with g:a:v
                 String moduleSubpath = (String) it.next();
-                
+
                 getLogger().debug( "Scanning module: " + moduleSubpath );
 
                 File modulePomDirectory;
@@ -191,7 +221,7 @@ public class DefaultBuildExtensionScanner
                 }
                 catch ( IOException e )
                 {
-                    throw new ExtensionScanningException( "Error getting canonical path for modulePomDirectory.",  e );
+                    throw new ExtensionScanningException( "Error getting canonical path for modulePomDirectory.", e );
                 }
 
                 if ( modulePomDirectory.isDirectory() )
@@ -206,11 +236,12 @@ public class DefaultBuildExtensionScanner
                 {
                     getLogger().debug(
                                        "Cannot find POM for module: " + moduleSubpath
-                                           + "; continuing scan with next module. (Full path was: " + modulePomDirectory + ")" );
+                                           + "; continuing scan with next module. (Full path was: "
+                                           + modulePomDirectory + ")" );
                     continue;
                 }
 
-                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds );
+                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles );
             }
         }
     }
