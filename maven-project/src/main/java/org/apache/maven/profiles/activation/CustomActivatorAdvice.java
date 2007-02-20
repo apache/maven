@@ -4,6 +4,9 @@ import org.apache.maven.context.BuildContext;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.ManagedBuildData;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * Advice for the custom profile activator, which tells how to handle cases where custom activators
  * cannot be found or configured. This is used to suppress missing activators when pre-scanning for
@@ -16,6 +19,8 @@ public class CustomActivatorAdvice
 {
     
     public static final String BUILD_CONTEXT_KEY = CustomActivatorAdvice.class.getName();
+    
+    private static final String FAIL_QUIETLY_KEY = "fail-quietly";
     
     private static final boolean DEFAULT_FAIL_QUIETLY = false;
     
@@ -54,16 +59,11 @@ public class CustomActivatorAdvice
     {
         BuildContext buildContext = buildContextManager.readBuildContext( false );
         
-        CustomActivatorAdvice advice = null;
+        CustomActivatorAdvice advice = new CustomActivatorAdvice();
         
         if ( buildContext != null )
         {
-            advice = (CustomActivatorAdvice) buildContext.get( BUILD_CONTEXT_KEY );
-        }
-        
-        if ( advice == null )
-        {
-            advice = new CustomActivatorAdvice();
+            buildContext.retrieve( advice );
         }
         
         return advice;
@@ -73,8 +73,18 @@ public class CustomActivatorAdvice
     {
         BuildContext buildContext = buildContextManager.readBuildContext( true );
         
-        buildContext.put( this );
+        buildContext.store( this );
         
         buildContextManager.storeBuildContext( buildContext );
+    }
+
+    public Map getData()
+    {
+        return Collections.singletonMap( FAIL_QUIETLY_KEY, Boolean.valueOf( failQuietly ) );
+    }
+
+    public void setData( Map data )
+    {
+        this.failQuietly = ((Boolean) data.get( FAIL_QUIETLY_KEY )).booleanValue();
     }
 }

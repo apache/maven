@@ -76,10 +76,41 @@ public class DefaultBuildContext
     /**
      * Add a new piece of managed data to the build context, using the key supplied by 
      * managedData.getStorageKey().
+     * 
+     * @deprecated Use store(..) instead
      */
     public void put( ManagedBuildData managedData )
     {
-        contextMap.put( managedData.getStorageKey(), managedData );
+        store( managedData );
+    }
+    
+    /**
+     * Add a new piece of managed data to the build context, using the key supplied by 
+     * managedData.getStorageKey().
+     */
+    public void store( ManagedBuildData managedData )
+    {
+        contextMap.put( managedData.getStorageKey(), managedData.getData() );
+    }
+
+    /**
+     * Retrieve the data map for a given type of managed build data, and use this to restore this
+     * instance's state to that which was stored in the build context.
+     * 
+     * @param managedData The managed data instance to restore from the build context.
+     * @return true if the data was retrieved from the build context, false otherwise
+     */
+    public boolean retrieve( ManagedBuildData managedData )
+    {
+        Map dataMap = (Map) contextMap.get( managedData.getStorageKey() );
+        
+        if ( dataMap != null )
+        {
+            managedData.setData( dataMap );
+            return true;
+        }
+        
+        return false;
     }
 
 }

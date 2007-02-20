@@ -50,6 +50,7 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+          <role-hint>project-cache-aware</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
@@ -78,6 +79,7 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+          <role-hint>project-cache-aware</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>

@@ -1,5 +1,7 @@
 package org.apache.maven.context;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class SystemBuildContext
@@ -7,6 +9,10 @@ public class SystemBuildContext
 {
     
     public static final String BUILD_CONTEXT_KEY = SystemBuildContext.class.getName();
+
+    private static final String SYSTEM_PROPERTIES_KEY = "system-properties";
+
+    private static final String ENVIRONMENT_VARIABLES_KEY = "environment-variables";
     
     private Properties systemProperties;
     private Properties envars;
@@ -50,11 +56,16 @@ public class SystemBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( false );
         
-        SystemBuildContext systemContext = null;
+        SystemBuildContext systemContext = new SystemBuildContext();
         
         if ( buildContext != null )
         {
-            systemContext = (SystemBuildContext) buildContext.get( BUILD_CONTEXT_KEY );
+            SystemBuildContext ctx = new SystemBuildContext();
+            
+            if ( buildContext.retrieve( ctx ) || create )
+            {
+                systemContext = ctx;
+            }
         }
         
         if ( create && systemContext == null )
@@ -69,8 +80,23 @@ public class SystemBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( true );
         
-        buildContext.put( this );
+        buildContext.store( this );
         
         buildContextManager.storeBuildContext( buildContext );
+    }
+
+    public Map getData()
+    {
+        Map data = new HashMap( 2 );
+        data.put( SYSTEM_PROPERTIES_KEY, systemProperties );
+        data.put( ENVIRONMENT_VARIABLES_KEY, envars );
+        
+        return data;
+    }
+
+    public void setData( Map data )
+    {
+        this.systemProperties = (Properties) data.get( SYSTEM_PROPERTIES_KEY );
+        this.envars = (Properties) data.get( ENVIRONMENT_VARIABLES_KEY );
     }
 }

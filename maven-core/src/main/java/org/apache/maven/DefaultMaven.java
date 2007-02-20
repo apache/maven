@@ -31,7 +31,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.extension.BuildExtensionScanner;
-import org.apache.maven.extension.ExtensionManager;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -44,7 +43,6 @@ import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.model.ModelLineageBuilder;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
@@ -64,10 +62,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -347,15 +343,13 @@ public class DefaultMaven
         
         // TODO: We should probably do this discovery just-in-time, if we can move to building project
         // instances just-in-time.
-        Map cache = new HashMap();
-        
         for ( Iterator it = files.iterator(); it.hasNext(); )
         {
             File pom = (File) it.next();
 
             try
             {
-                buildExtensionScanner.scanForBuildExtensions( pom, request.getLocalRepository(), globalProfileManager, cache );
+                buildExtensionScanner.scanForBuildExtensions( pom, request.getLocalRepository(), globalProfileManager );
             }
             catch ( ExtensionScanningException e )
             {

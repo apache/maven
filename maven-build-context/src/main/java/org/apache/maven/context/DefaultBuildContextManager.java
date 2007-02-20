@@ -1,8 +1,6 @@
 package org.apache.maven.context;
 
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,22 +12,25 @@ import java.util.Map;
  * @author jdcasey
  */
 public class DefaultBuildContextManager
-    implements BuildContextManager, Contextualizable
+    implements BuildContextManager
 {
     public static final String ROLE_HINT = "default";
     
     protected static final String BUILD_CONTEXT_MAP_KEY = ROLE + ":" + ROLE_HINT + ":contextMap";
     
-    private Context context;
+    private InheritableThreadLocal tl = new InheritableThreadLocal();
     
     public DefaultBuildContextManager()
     {
         // used for plexus initialization
     }
     
+    /**
+     * @deprecated Using ThreadLocal now, not container context, for thread safety.
+     */
     public DefaultBuildContextManager( Context context )
     {
-        this.context = context;
+        // obsolete, does nothing...
     }
     
     /**
@@ -37,7 +38,7 @@ public class DefaultBuildContextManager
      */
     public void clearBuildContext()
     {
-        clearContextContainerMap();
+        tl.set( null );
     }
 
     /**
@@ -49,7 +50,7 @@ public class DefaultBuildContextManager
     {
         Map contextMap = getContextContainerMap( create );
         
-        if ( !create && contextMap == null )
+        if ( contextMap == null && !create )
         {
             return null;
         }
@@ -66,7 +67,7 @@ public class DefaultBuildContextManager
     {
         if ( context instanceof DefaultBuildContext )
         {
-            this.context.put( BUILD_CONTEXT_MAP_KEY, ((DefaultBuildContext)context).getContextMap() );
+            tl.set( ((DefaultBuildContext)context).getContextMap() );
         }
         else
         {
@@ -76,25 +77,12 @@ public class DefaultBuildContextManager
 
     protected Map getContextContainerMap( boolean create )
     {
-        Map containerMap = null;
+        Map containerMap = (Map) tl.get();
 
-        if ( context.contains( BUILD_CONTEXT_MAP_KEY ) )
-        {
-            try
-            {
-                containerMap = (Map) context.get( BUILD_CONTEXT_MAP_KEY );
-            }
-            catch ( ContextException e )
-            {
-                throw new IllegalStateException( "Failed to retrieve BuildAdvisor "
-                                + "serialization map from context, though the context claims it exists. Error: "
-                                + e.getMessage() );
-            }
-        }
-        else if ( create )
+        if ( containerMap == null && create )
         {
             containerMap = new HashMap();
-            context.put( BUILD_CONTEXT_MAP_KEY, containerMap );
+            tl.set( containerMap );
         }
 
         return containerMap;
@@ -111,20 +99,12 @@ public class DefaultBuildContextManager
     }
 
     /**
-     * Retrieve the container context for storing the BuildContext data.
+     * @deprecated Using ThreadLocal now, not container context, for thread safety.
      */
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        this.context = context;
-    }
-
     public Context reorientToContext( Context context )
     {
-        Context oldContext = this.context;
-        this.context = context;
-        
-        return oldContext;
+        // obsolete, does nothing...
+        return context;
     }
 
 }

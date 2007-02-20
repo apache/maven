@@ -109,6 +109,7 @@
     <component>
       <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
+      <role-hint>default</role-hint>
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.ArtifactManager</role>

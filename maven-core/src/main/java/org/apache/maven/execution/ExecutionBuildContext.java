@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /*
@@ -39,7 +40,13 @@ public class ExecutionBuildContext
     
     public static final String BUILD_CONTEXT_KEY = ExecutionBuildContext.class.getName();
     
-    private final MavenExecutionRequest request;
+    private static final String REQUEST_KEY = "request";
+    
+    private MavenExecutionRequest request;
+    
+    private ExecutionBuildContext()
+    {
+    }
 
     public ExecutionBuildContext( MavenExecutionRequest request )
     {
@@ -195,11 +202,14 @@ public class ExecutionBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( false );
         
-        ExecutionBuildContext executionContext = null;
+        ExecutionBuildContext executionContext = new ExecutionBuildContext();
         
         if ( buildContext != null )
         {
-            executionContext = (ExecutionBuildContext) buildContext.get( BUILD_CONTEXT_KEY );
+            if ( !buildContext.retrieve( executionContext ) )
+            {
+                return null;
+            }
         }
         
         return executionContext;
@@ -209,8 +219,18 @@ public class ExecutionBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( true );
         
-        buildContext.put( this );
+        buildContext.store( this );
         
         buildContextManager.storeBuildContext( buildContext );
+    }
+
+    public Map getData()
+    {
+        return Collections.singletonMap( REQUEST_KEY, request );
+    }
+
+    public void setData( Map data )
+    {
+        this.request = (MavenExecutionRequest) data.get( REQUEST_KEY );
     }
 }

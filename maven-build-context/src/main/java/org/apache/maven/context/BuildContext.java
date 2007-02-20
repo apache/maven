@@ -28,7 +28,24 @@ public interface BuildContext
     /**
      * Add a new piece of managed build data to the build context. Managed data elements supply their
      * own storage key.
+     * 
+     * @deprecated Use store(..) instead.
      */
     void put( ManagedBuildData managedData );
+    
+    /**
+     * Add a new piece of managed build data to the build context. Managed data elements supply their
+     * own storage key.
+     */
+    void store( ManagedBuildData managedData );
+    
+    /**
+     * Retrieve the data map for a given type of managed build data, and use this to restore this
+     * instance's state to that which was stored in the build context.
+     * 
+     * @param managedData The managed data instance to restore from the build context.
+     * @return true if the data was retrieved from the build context, false otherwise
+     */
+    boolean retrieve( ManagedBuildData managedData );
     
 }

@@ -23,7 +23,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.ArtifactManager;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -48,6 +47,7 @@ import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.build.ProjectBuildContext;
 import org.apache.maven.project.build.model.DefaultModelLineage;
 import org.apache.maven.project.build.model.ModelLineage;
@@ -151,10 +151,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelValidator validator;
     
-    private Map processedProjectCache = new HashMap();
-    
-    private Map cachedPomFilesByModelId = new HashMap();
-
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
 
@@ -220,9 +216,9 @@ public class DefaultMavenProjectBuilder
                                              boolean allowStubModel )
         throws ProjectBuildingException
     {
-        String cacheKey = createCacheKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-
-        MavenProject project = (MavenProject) processedProjectCache.get( cacheKey );
+        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
+        
+        MavenProject project = (MavenProject) projectBuildCache.getCachedProject( artifact );
 
         if ( project != null )
         {
@@ -753,7 +749,9 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
         }
 
-        processedProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
+        projectBuildCache.cacheProject( project );
+        projectBuildCache.store( buildContextManager );
 
         // jvz:note
         // this only happens if we are building from a source file
@@ -778,9 +776,7 @@ public class DefaultMavenProjectBuilder
         
         if ( rawParent != null )
         {
-            String cacheKey = createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
-            
-            MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
+            MavenProject processedParent = (MavenProject) projectBuildCache.getCachedProject( rawParent );
             
             // yeah, this null check might be a bit paranoid, but better safe than sorry...
             if ( processedParent != null )
@@ -1012,7 +1008,7 @@ public class DefaultMavenProjectBuilder
         ModelLineage modelLineage = new DefaultModelLineage();
         modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
         
-        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, cachedPomFilesByModelId );
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager );
         
         ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
         

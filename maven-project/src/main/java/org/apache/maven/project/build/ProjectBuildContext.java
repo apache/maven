@@ -6,6 +6,9 @@ import org.apache.maven.context.ManagedBuildData;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.build.model.ModelLineage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -34,6 +37,10 @@ public class ProjectBuildContext
 {
     
     public static final String BUILD_CONTEXT_KEY = ProjectBuildContext.class.getName();
+
+    private static final String MODEL_LINEAGE = "model-lineage";
+
+    private static final String CURRENT_PROJECT = "current-project";
     
     private ModelLineage modelLineage;
     
@@ -72,16 +79,14 @@ public class ProjectBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( false );
         
-        ProjectBuildContext projectContext = null;
+        ProjectBuildContext projectContext = new ProjectBuildContext();
         
         if ( buildContext != null )
         {
-            projectContext = (ProjectBuildContext) buildContext.get( BUILD_CONTEXT_KEY );
-        }
-        
-        if ( create && projectContext == null )
-        {
-            projectContext = new ProjectBuildContext();
+            if ( !buildContext.retrieve( projectContext ) && !create )
+            {
+                return null;
+            }
         }
         
         return projectContext;
@@ -91,8 +96,24 @@ public class ProjectBuildContext
     {
         BuildContext buildContext = buildContextManager.readBuildContext( true );
         
-        buildContext.put( this );
+        buildContext.store( this );
         
         buildContextManager.storeBuildContext( buildContext );
+    }
+
+    public Map getData()
+    {
+        Map data = new HashMap( 2 );
+        
+        data.put( MODEL_LINEAGE, modelLineage );
+        data.put( CURRENT_PROJECT, currentProject );
+        
+        return data;
+    }
+
+    public void setData( Map data )
+    {
+        this.modelLineage = (ModelLineage) data.get( MODEL_LINEAGE );
+        this.currentProject = (MavenProject) data.get( CURRENT_PROJECT );
     }
 }

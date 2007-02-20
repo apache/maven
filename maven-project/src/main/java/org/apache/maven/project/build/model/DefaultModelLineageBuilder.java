@@ -8,11 +8,13 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.build.profile.ProfileAdvisor;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,6 +48,8 @@ public class DefaultModelLineageBuilder
     private MavenTools mavenTools;
 
     private ProfileAdvisor profileAdvisor;
+    
+    private BuildContextManager buildContextManager;
 
     private Logger logger;
 
@@ -54,19 +57,22 @@ public class DefaultModelLineageBuilder
     {
     }
 
-    public DefaultModelLineageBuilder( ArtifactResolver resolver, ArtifactFactory artifactFactory )
+    public DefaultModelLineageBuilder( ArtifactResolver resolver, ArtifactFactory artifactFactory, BuildContextManager buildContextManager )
     {
         this.artifactResolver = resolver;
         this.artifactFactory = artifactFactory;
+        this.buildContextManager = buildContextManager;
     }
 
     /**
      * @see org.apache.maven.project.build.model.ModelLineageBuilder#buildModelLineage(java.io.File, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List)
      */
     public ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository, List remoteRepositories,
-                                           ProfileManager profileManager, Map cachedPomFilesByModelId )
+                                           ProfileManager profileManager )
         throws ProjectBuildingException
     {
+        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
+        
         ModelLineage lineage = new DefaultModelLineage();
 
         File pomFile = pom;
@@ -75,7 +81,7 @@ public class DefaultModelLineageBuilder
 
         while ( pomFile != null )
         {
-            Model model = readModel( pomFile, cachedPomFilesByModelId );
+            Model model = readModel( pomFile, projectBuildCache );
 
             if ( lineage.size() == 0 )
             {
@@ -89,16 +95,18 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = updateRepositorySet( model, currentRemoteRepositories, pomFile, profileManager );
 
             pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile,
-                                        cachedPomFilesByModelId );
+                                        projectBuildCache );
         }
 
         return lineage;
     }
 
     public void resumeBuildingModelLineage( ModelLineage lineage, ArtifactRepository localRepository,
-                                            ProfileManager profileManager, Map cachedPomFilesByModelId )
+                                            ProfileManager profileManager )
         throws ProjectBuildingException
     {
+        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
+        
         File pomFile = lineage.getDeepestFile();
         List currentRemoteRepositories = lineage.getDeepestArtifactRepositoryList();
 
@@ -110,11 +118,11 @@ public class DefaultModelLineageBuilder
         Model model = lineage.getDeepestModel();
 
         // use the above information to re-bootstrap the resolution chain...
-        pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile, cachedPomFilesByModelId );
+        pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile, projectBuildCache );
 
         while ( pomFile != null )
         {
-            model = readModel( pomFile, cachedPomFilesByModelId );
+            model = readModel( pomFile, projectBuildCache );
 
             if ( lineage.size() == 0 )
             {
@@ -128,7 +136,7 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = updateRepositorySet( model, currentRemoteRepositories, pomFile, profileManager );
 
             pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile,
-                                        cachedPomFilesByModelId );
+                                        projectBuildCache );
         }
     }
 
@@ -146,10 +154,10 @@ public class DefaultModelLineageBuilder
      * Read the Model instance from the given POM file, and cache it in the given Map before 
      * returning it.
      */
-    private Model readModel( File pomFile, Map cachedPomFilesByModelId )
+    private Model readModel( File pomFile, ProjectBuildCache projectBuildCache )
         throws ProjectBuildingException
     {
-        return readModel( pomFile, cachedPomFilesByModelId, false );
+        return readModel( pomFile, projectBuildCache, false );
     }
 
     /**
@@ -157,7 +165,7 @@ public class DefaultModelLineageBuilder
      * Model instance in the given Map before returning it. The skipCache flag controls whether the
      * Model instance is actually cached.
      */
-    private Model readModel( File pom, Map cachedPomFilesByModelId, boolean skipCache )
+    private Model readModel( File pom, ProjectBuildCache projectBuildCache, boolean skipCache )
         throws ProjectBuildingException
     {
         File pomFile = pom;
@@ -190,7 +198,8 @@ public class DefaultModelLineageBuilder
 
         if ( !skipCache )
         {
-            cachedPomFilesByModelId.put( createCacheKey( model, pomFile ), pomFile );
+            projectBuildCache.cacheModelFileForModel( pomFile, model );
+            projectBuildCache.store( buildContextManager );
         }
 
         return model;
@@ -265,10 +274,10 @@ public class DefaultModelLineageBuilder
     /**
      * Pull the parent specification out of the given model, construct an Artifact instance, and
      * resolve that artifact...then, return the resolved POM file for the parent.
-     * @param cachedModelsById 
+     * @param projectBuildCache 
      */
     private File resolveParentPom( Model model, List remoteRepositories, ArtifactRepository localRepository,
-                                   File modelPomFile, Map cachedModelsById )
+                                   File modelPomFile, ProjectBuildCache projectBuildCache )
         throws ProjectBuildingException
     {
         Parent modelParent = model.getParent();
@@ -279,11 +288,9 @@ public class DefaultModelLineageBuilder
         {
             validateParentDeclaration( modelParent, model );
 
-            String cacheKey = createCacheKey( modelParent );
-            
 //            getLogger().debug( "Looking for cached parent POM under: " + cacheKey );
             
-            pomFile = (File) cachedModelsById.get( cacheKey );
+            pomFile = (File) projectBuildCache.getCachedModelFile( modelParent );
 
             if ( pomFile == null )
             {
@@ -297,42 +304,6 @@ public class DefaultModelLineageBuilder
         }
 
         return pomFile;
-    }
-
-    private String createCacheKey( Parent modelParent )
-    {
-        return modelParent.getGroupId() + ":" + modelParent.getArtifactId() + ":" + modelParent.getVersion();
-    }
-
-    private String createCacheKey( Model model, File pomFile )
-        throws ProjectBuildingException
-    {
-        Parent modelParent = model.getParent();
-
-        String groupId = model.getGroupId();
-
-        if ( groupId == null && modelParent != null )
-        {
-            groupId = modelParent.getGroupId();
-        }
-
-        String artifactId = model.getArtifactId();
-
-        String version = model.getVersion();
-
-        if ( version == null && modelParent != null )
-        {
-            version = modelParent.getVersion();
-        }
-
-        if ( groupId == null || version == null )
-        {
-            throw new ProjectBuildingException( model.getId(),
-                                                "Invalid model. Must either specify groupId and version directly, or specify a parent groupId and version.\nIn POM: "
-                                                    + pomFile );
-        }
-
-        return groupId + ":" + artifactId + ":" + version;
     }
 
     private void validateParentDeclaration( Parent modelParent, Model model )

@@ -1,5 +1,38 @@
 <component-set>
   <components>
+    <!--
+     |
+     | Resolver
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+      <implementation>org.apache.maven.project.artifact.CacheAwareArtifactResolver</implementation>
+      <role-hint>project-cache-aware</role-hint>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+
     <component>
       <role>org.apache.maven.project.build.profile.ProfileAdvisor</role>
       <role-hint>default</role-hint>
@@ -37,6 +70,11 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+          <role-hint>project-cache-aware</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>
@@ -264,6 +302,10 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>

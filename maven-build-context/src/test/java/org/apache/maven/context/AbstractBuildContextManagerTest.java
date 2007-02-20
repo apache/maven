@@ -71,7 +71,7 @@ public abstract class AbstractBuildContextManagerTest
         
         BuildContext ctx3 = mgr.readBuildContext( false );
         
-        assertNull( ctx3.get( key ) );
+        assertNull( ctx3 );
     }
 
 }

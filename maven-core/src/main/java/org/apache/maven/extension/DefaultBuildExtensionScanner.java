@@ -8,6 +8,7 @@ import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.CustomActivatorAdvice;
 import org.apache.maven.project.MavenProject;
@@ -25,6 +26,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,9 +50,17 @@ public class DefaultBuildExtensionScanner
     private ModelInterpolator modelInterpolator;
 
     public void scanForBuildExtensions( File pom, ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager, Map pomFilesById )
+                                        ProfileManager globalProfileManager )
         throws ExtensionScanningException
     {
+        scanInternal( pom, localRepository, globalProfileManager, new ArrayList() );
+    }
+    
+    private void scanInternal( File pom, ArtifactRepository localRepository, ProfileManager globalProfileManager,
+                               List visitedModelIds )
+        throws ExtensionScanningException
+    {
+        
         // setup the CustomActivatorAdvice to fail quietly while we discover extensions...then, we'll
         // reset it.
         CustomActivatorAdvice activatorAdvice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
@@ -64,15 +74,26 @@ public class DefaultBuildExtensionScanner
             getLogger().debug( "Pre-scanning POM lineage of: " + pom + " for build extensions." );
 
             ModelLineage lineage = buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                      globalProfileManager, pomFilesById );
+                                                      globalProfileManager );
 
             Map inheritedInterpolationValues = new HashMap();
             
             for ( ModelLineageIterator lineageIterator = lineage.reversedLineageIterator(); lineageIterator.hasNext(); )
             {
                 Model model = (Model) lineageIterator.next();
+                String key = createKey( model );
+                
+                if ( visitedModelIds.contains( key ) )
+                {
+                    getLogger().debug( "Already visited: " + key + "; continuing." );
+                    continue;
+                }
+                
+                visitedModelIds.add( key );
+                
+                File modelPom = lineageIterator.getPOMFile();
 
-                getLogger().debug( "Checking: " + model.getId() + " for extensions." );
+                getLogger().debug( "Checking: " + model.getId() + " for extensions. (It has " + model.getModules().size() + " modules.)" );
                 
                 if ( inheritedInterpolationValues == null )
                 {
@@ -83,8 +104,7 @@ public class DefaultBuildExtensionScanner
 
                 checkModelBuildForExtensions( model, localRepository, lineageIterator.getArtifactRepositories() );
 
-                checkModulesForExtensions( pom, model, localRepository, originalRemoteRepositories, globalProfileManager,
-                                           pomFilesById );
+                checkModulesForExtensions( modelPom, model, localRepository, originalRemoteRepositories, globalProfileManager, visitedModelIds );
                 
                 Properties modelProps = model.getProperties();
                 if ( modelProps != null )
@@ -108,9 +128,24 @@ public class DefaultBuildExtensionScanner
         }
     }
 
+    private String createKey( Model model )
+    {
+        Parent parent = model.getParent();
+        
+        String groupId = model.getGroupId();
+        if ( groupId == null )
+        {
+            groupId = parent.getGroupId();
+        }
+        
+        String artifactId = model.getArtifactId();
+        
+        return groupId + ":" + artifactId;
+    }
+
     private void checkModulesForExtensions( File containingPom, Model model, ArtifactRepository localRepository,
                                             List originalRemoteRepositories, ProfileManager globalProfileManager,
-                                            Map pomFilesById )
+                                            List visitedModelIds )
         throws ExtensionScanningException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
@@ -120,6 +155,7 @@ public class DefaultBuildExtensionScanner
         if ( modules != null )
         {
             File basedir = containingPom.getParentFile();
+            getLogger().debug( "Basedir is: " + basedir );
 
             for ( Iterator it = modules.iterator(); it.hasNext(); )
             {
@@ -170,11 +206,11 @@ public class DefaultBuildExtensionScanner
                 {
                     getLogger().debug(
                                        "Cannot find POM for module: " + moduleSubpath
-                                           + "; continuing scan with next module." );
+                                           + "; continuing scan with next module. (Full path was: " + modulePomDirectory + ")" );
                     continue;
                 }
 
-                scanForBuildExtensions( modulePomDirectory, localRepository, globalProfileManager, pomFilesById );
+                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds );
             }
         }
     }
@@ -226,8 +262,7 @@ public class DefaultBuildExtensionScanner
     }
 
     private ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository,
-                                            List originalRemoteRepositories, ProfileManager globalProfileManager,
-                                            Map cache )
+                                            List originalRemoteRepositories, ProfileManager globalProfileManager )
         throws ExtensionScanningException
     {
         ModelLineage lineage;
@@ -236,7 +271,7 @@ public class DefaultBuildExtensionScanner
             getLogger().debug( "Building model-lineage for: " + pom + " to pre-scan for extensions." );
 
             lineage = modelLineageBuilder.buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                             globalProfileManager, cache );
+                                                             globalProfileManager );
         }
         catch ( ProjectBuildingException e )
         {

@@ -269,7 +269,9 @@
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
+<!--
       <arg value="-X"/>
+ -->
       <arg value="clean"/>
       <arg value="install"/>
     </java>
