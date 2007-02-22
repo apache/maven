@@ -16,6 +16,8 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.settings.cache.SettingsCache;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
@@ -43,21 +45,28 @@ public class DefaultMavenSettingsBuilder
     
     private SettingsValidator validator;
     
-    // ----------------------------------------------------------------------
-    // MavenProfilesBuilder Implementation
-    // ----------------------------------------------------------------------
-
+    private BuildContextManager buildContextManager;
+    
     /**
      * @since 2.1
      */
     public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException
     {
+        SettingsCache cache = SettingsCache.read( buildContextManager, userSettingsFile, globalSettingsFile );
+        
+        if ( cache != null )
+        {
+            return cache.getSettings();
+        }
+        
+        // NOTE: We're allowing users to hang themselves here...if the global settings file is null,
+        // the default location is NOT read.
         Settings globalSettings = readSettings( globalSettingsFile );
         
         if ( userSettingsFile == null )
         {
-            userSettingsFile = new File( new File( System.getProperty( "user.home" ) ), ".m2/settings.xml" );
+            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
         Settings userSettings = readSettings( userSettingsFile );
@@ -81,6 +90,9 @@ public class DefaultMavenSettingsBuilder
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         activateDefaultProfiles( userSettings );
+        
+        cache = new SettingsCache( userSettingsFile, globalSettingsFile, userSettings );
+        cache.store( buildContextManager );
 
         return userSettings;
     }
@@ -91,7 +103,7 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings()
         throws IOException, XmlPullParserException
     {
-        return buildSettings( new File( new File( System.getProperty( "user.home" ) ), ".m2/settings.xml" ) );
+        return buildSettings( DEFAULT_USER_SETTINGS_FILE );
     }
 
     /**

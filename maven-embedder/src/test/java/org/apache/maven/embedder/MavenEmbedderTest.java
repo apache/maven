@@ -1,14 +1,28 @@
 package org.apache.maven.embedder;
 
+import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,11 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.TestCase;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginManagerException;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -276,6 +287,169 @@ public class MavenEmbedderTest
         model = maven.readModel( file );
 
         assertEquals( "org.apache.maven.new", model.getGroupId() );
+    }
+    
+    // ----------------------------------------------------------------------
+    // Settings-File Handling
+    // ----------------------------------------------------------------------
+    
+    public void testReadSettings()
+        throws IOException, SettingsConfigurationException, MavenEmbedderException
+    {
+        Settings s = new Settings();
+        s.setOffline( true );
+        
+        String localRepoPath = "/path/to/local/repo";
+        
+        s.setLocalRepository( localRepoPath );
+        
+        File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
+        settingsFile.deleteOnExit();
+        
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( settingsFile );
+            new SettingsXpp3Writer().write( writer, s );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+        
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader( settingsFile );
+            Settings result = MavenEmbedder.readSettingsFromFile( reader );
+            
+            assertEquals( localRepoPath, result.getLocalRepository() );
+            assertTrue( result.isOffline() );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+    }
+
+    public void testReadSettings_shouldFailToValidate()
+        throws IOException, SettingsConfigurationException, MavenEmbedderException
+    {
+        Settings s = new Settings();
+        
+        Profile p = new Profile();
+        
+        Repository r = new Repository();
+        r.setUrl( "http://example.com" );
+        
+        p.addRepository( r );
+        s.addProfile( p );
+
+        File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
+        settingsFile.deleteOnExit();
+
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( settingsFile );
+            new SettingsXpp3Writer().write( writer, s );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader( settingsFile );
+            Settings result = MavenEmbedder.readSettingsFromFile( reader );
+
+            fail( "Settings should not pass validation when being read." );
+        }
+        catch( IOException e )
+        {
+            String message = e.getMessage();
+            assertTrue( message.indexOf( "Failed to validate" ) > -1 );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+    }
+
+    public void testWriteSettings()
+        throws IOException, SettingsConfigurationException, MavenEmbedderException, XmlPullParserException
+    {
+        Settings s = new Settings();
+        s.setOffline( true );
+
+        String localRepoPath = "/path/to/local/repo";
+
+        s.setLocalRepository( localRepoPath );
+
+        File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
+        settingsFile.deleteOnExit();
+
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( settingsFile );
+            MavenEmbedder.writeSettings( writer, s );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader( settingsFile );
+            Settings result = new SettingsXpp3Reader().read( reader );
+
+            assertEquals( localRepoPath, result.getLocalRepository() );
+            assertTrue( result.isOffline() );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+    }
+
+    public void testWriteSettings_shouldFailToValidate()
+        throws IOException, SettingsConfigurationException, MavenEmbedderException
+    {
+        Settings s = new Settings();
+
+        Profile p = new Profile();
+
+        Repository r = new Repository();
+        r.setUrl( "http://example.com" );
+
+        p.addRepository( r );
+        s.addProfile( p );
+
+        File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
+        settingsFile.deleteOnExit();
+
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( settingsFile );
+            MavenEmbedder.writeSettings( writer, s );
+            
+            fail( "Validation of settings should fail before settings are written." );
+        }
+        catch ( IOException e )
+        {
+            String message = e.getMessage();
+            assertTrue( message.indexOf( "Failed to validate" ) > -1 );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
     }
 
     // ----------------------------------------------------------------------

@@ -29,6 +29,11 @@ public interface MavenSettingsBuilder
 {
     String ROLE = MavenSettingsBuilder.class.getName();
 
+    File DEFAULT_USER_SETTINGS_FILE = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
+
+    File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
+        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+
     /**
      * @deprecated
      */

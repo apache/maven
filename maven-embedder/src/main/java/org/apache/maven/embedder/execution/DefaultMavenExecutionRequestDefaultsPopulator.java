@@ -23,6 +23,8 @@ import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.MavenEmbedderConfiguration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
@@ -34,7 +36,6 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.wagon.manager.RepositorySettings;
 import org.apache.maven.wagon.manager.WagonManager;
-import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -43,7 +44,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -66,7 +66,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
     private WagonManager wagonManager;
 
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, MavenEmbedderConfiguration embedderConfiguration )
         throws MavenEmbedderException
     {
         // Settings
@@ -74,10 +74,27 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         if ( request.getSettings() == null )
         {
             // A local repository set in the request should win over what's in a settings.xml file.
+            String userSettingsLocation = request.getSettingsFile();
+            if ( userSettingsLocation == null )
+            {
+                File userSettingsFile = embedderConfiguration.getUserSettingsFile();
+                if ( userSettingsFile != null )
+                {
+                    userSettingsLocation = userSettingsFile.getAbsolutePath();
+                }
+            }
 
-            File userSettingsPath = mavenTools.getUserSettingsPath( request.getSettingsFile() );
+            File userSettingsPath = mavenTools.getUserSettingsPath( userSettingsLocation );
 
             File globalSettingsFile = mavenTools.getGlobalSettingsPath();
+            if ( globalSettingsFile.equals( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE ) )
+            {
+                File configGlobalSettings = embedderConfiguration.getGlobalSettingsFile();
+                if ( configGlobalSettings != null )
+                {
+                    globalSettingsFile = configGlobalSettings;
+                }
+            }
 
             try
             {

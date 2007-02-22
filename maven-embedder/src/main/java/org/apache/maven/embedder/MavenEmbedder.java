@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator;
 import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -49,6 +50,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -69,6 +71,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
@@ -144,6 +147,8 @@ public class MavenEmbedder
 
     private MavenEmbedderConfiguration embedderRequest;
 
+    private BuildContextManager buildContextManager;
+
     // ----------------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------------
@@ -209,7 +214,7 @@ public class MavenEmbedder
     {
         return modelReader.read( new FileReader( model ) );
     }
-
+    
     public void writeModel( Writer writer,
                             Model model,
                             boolean namespaceDeclaration )
@@ -233,6 +238,112 @@ public class MavenEmbedder
         throws ProjectBuildingException
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
+    }
+    
+    // ----------------------------------------------------------------------
+    // Settings
+    // ----------------------------------------------------------------------
+
+    public static Settings readSettingsFromFile( Reader reader )
+        throws SettingsConfigurationException, MavenEmbedderException, IOException
+    {
+        return readSettingsFromFile( reader, null );
+    }
+
+    public static Settings readSettingsFromFile( Reader reader, MavenEmbedderLogger logger )
+        throws SettingsConfigurationException, MavenEmbedderException, IOException
+    {
+        DefaultPlexusContainer container = null;
+
+        try
+        {
+            try
+            {
+                container = new DefaultPlexusContainer();
+            }
+            catch ( PlexusContainerException e )
+            {
+                throw new MavenEmbedderException( "Error starting container.", e );
+            }
+
+            if ( logger != null )
+            {
+                MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager(
+                                                                                           new PlexusLoggerAdapter(
+                                                                                                                    logger ) );
+
+                container.setLoggerManager( loggerManager );
+            }
+
+            MavenTools mavenTools;
+            try
+            {
+                mavenTools = (MavenTools) container.lookup( MavenTools.ROLE, container.getContainerRealm() );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new MavenEmbedderException( "Error retrieving Maven tools.", e );
+            }
+
+            return mavenTools.readSettings( reader );
+        }
+        finally
+        {
+            if ( container != null )
+            {
+                container.dispose();
+            }
+        }
+    }
+
+    public static void writeSettings( Writer writer, Settings settings )
+        throws IOException, MavenEmbedderException
+    {
+        writeSettings( writer, settings, null );
+    }
+    
+    public static void writeSettings( Writer writer, Settings settings, MavenEmbedderLogger logger )
+        throws IOException, MavenEmbedderException
+    {
+        DefaultPlexusContainer container = null;
+
+        try
+        {
+            try
+            {
+                container = new DefaultPlexusContainer();
+            }
+            catch ( PlexusContainerException e )
+            {
+                throw new MavenEmbedderException( "Error starting container.", e );
+            }
+
+            if ( logger != null )
+            {
+                MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
+
+                container.setLoggerManager( loggerManager );
+            }
+
+            MavenTools mavenTools;
+            try
+            {
+                mavenTools = (MavenTools) container.lookup( MavenTools.ROLE, container.getContainerRealm() );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new MavenEmbedderException( "Error retrieving Maven tools.", e );
+            }
+
+            mavenTools.writeSettings( settings, writer );
+        }
+        finally
+        {
+            if ( container != null )
+            {
+                container.dispose();
+            }
+        }
     }
 
     /**
@@ -312,7 +423,7 @@ public class MavenEmbedder
 
         try
         {
-            request = defaultsPopulator.populateDefaults( request );
+            request = defaultsPopulator.populateDefaults( request, embedderRequest );
 
             project = readProject( new File( request.getPomFile() ) );
             //mkleint: copied from DefaultLifecycleExecutor    
@@ -440,6 +551,10 @@ public class MavenEmbedder
 
     public static final String DEFAULT_LAYOUT_ID = "default";
 
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = MavenSettingsBuilder.DEFAULT_GLOBAL_SETTINGS_FILE;
+    
+    public static final File DEFAULT_USER_SETTINGS_FILE = MavenSettingsBuilder.DEFAULT_USER_SETTINGS_FILE;
+
     public ArtifactRepository createLocalRepository( File localRepository )
         throws ComponentLookupException
     {
@@ -562,6 +677,8 @@ public class MavenEmbedder
             profileManager.explicitlyDeactivate( req.getInactiveProfiles() );
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
+            
+            buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE );
 
             // ----------------------------------------------------------------------
             // Artifact related components
@@ -646,6 +763,10 @@ public class MavenEmbedder
     {
         try
         {
+            buildContextManager.clearBuildContext();
+            
+            container.release( buildContextManager );
+            
             container.release( mavenProjectBuilder );
 
             container.release( artifactRepositoryFactory );
@@ -671,7 +792,7 @@ public class MavenEmbedder
 
             try
             {
-                request = defaultsPopulator.populateDefaults( request );
+                request = defaultsPopulator.populateDefaults( request, embedderRequest );
             }
             catch ( MavenEmbedderException e )
             {

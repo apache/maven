@@ -13,6 +13,10 @@
         <requirement>
           <role>org.apache.maven.settings.validation.SettingsValidator</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
       </requirements>
       <!--
       <configuration>

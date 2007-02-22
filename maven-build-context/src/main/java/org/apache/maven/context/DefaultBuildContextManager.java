@@ -18,7 +18,8 @@ public class DefaultBuildContextManager
     
     protected static final String BUILD_CONTEXT_MAP_KEY = ROLE + ":" + ROLE_HINT + ":contextMap";
     
-    private InheritableThreadLocal tl = new InheritableThreadLocal();
+    // NOTE: this needs to be static so it can be found by new ctxMgr instances.
+    private static InheritableThreadLocal tl = new InheritableThreadLocal();
     
     public DefaultBuildContextManager()
     {

@@ -4,9 +4,13 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -26,9 +30,9 @@ public interface MavenTools
     // Settings
     // ----------------------------------------------------------------------
 
-    File defaultUserSettingsFile = new File( userMavenConfigurationHome, "settings.xml" );
+    File defaultUserSettingsFile = MavenSettingsBuilder.DEFAULT_USER_SETTINGS_FILE;
 
-    File defaultGlobalSettingsFile = new File( mavenHome, "conf/settings.xml" );
+    File defaultGlobalSettingsFile = MavenSettingsBuilder.DEFAULT_GLOBAL_SETTINGS_FILE;
 
     String ALT_USER_SETTINGS_XML_LOCATION = "org.apache.maven.user-settings";
 
@@ -69,7 +73,7 @@ public interface MavenTools
     // ----------------------------------------------------------------------------
 
     File getUserSettingsPath( String optionalSettingsPath );
-
+    
     File getGlobalSettingsPath();
 
     String getLocalRepositoryPath( Settings settings );
@@ -89,5 +93,11 @@ public interface MavenTools
 
     ArtifactRepository buildArtifactRepository( Repository repo )
         throws InvalidRepositoryException;
+
+    void writeSettings( Settings settings, Writer writer )
+        throws IOException;
+
+    Settings readSettings( Reader reader )
+        throws IOException, SettingsConfigurationException;
 
 }

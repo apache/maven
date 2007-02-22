@@ -9,6 +9,10 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.validation.SettingsValidationResult;
+import org.apache.maven.settings.validation.SettingsValidator;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -20,9 +24,14 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +48,8 @@ public class DefaultMavenTools
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private MavenSettingsBuilder settingsBuilder;
+    
+    private SettingsValidator settingsValidator;
 
     private PlexusContainer container;
 
@@ -344,4 +355,51 @@ public class DefaultMavenTools
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+
+    public void writeSettings( Settings settings, Writer w )
+        throws IOException
+    {
+        SettingsValidationResult validationResult = settingsValidator.validate( settings );
+
+        if ( validationResult.getMessageCount() > 0 )
+        {
+            throw new IOException( "Failed to validate Settings.\n" + validationResult.render("\n") );
+        }
+        
+        Element root = new Element( "settings" );
+
+        Document doc = new Document( root );
+
+        SettingsJDOMWriter writer = new SettingsJDOMWriter();
+
+        String encoding = settings.getModelEncoding() != null ? settings.getModelEncoding() : "UTF-8";
+
+        Format format = Format.getPrettyFormat().setEncoding( encoding );
+
+        writer.write( settings, doc, w, format );
+    }
+
+    public Settings readSettings( Reader r )
+        throws IOException, SettingsConfigurationException
+    {
+        SettingsXpp3Reader reader = new SettingsXpp3Reader();
+        try
+        {
+            Settings settings = reader.read( r );
+            
+            SettingsValidationResult validationResult = settingsValidator.validate( settings );
+
+            if ( validationResult.getMessageCount() > 0 )
+            {
+                throw new IOException( "Failed to validate Settings.\n" + validationResult.render("\n") );
+            }
+            
+            return settings;
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new SettingsConfigurationException( "Failed to parse settings.", e );
+        }
+    }
+
 }

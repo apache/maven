@@ -19,19 +19,15 @@ package org.apache.maven.embedder.writer;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.InputStream;
-import java.nio.channels.FileLock;
 
 //TODO: turn this into a component
 

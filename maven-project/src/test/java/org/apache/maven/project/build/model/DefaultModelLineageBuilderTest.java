@@ -39,6 +39,15 @@ public class DefaultModelLineageBuilderTest
 
         defaultLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
     }
+    
+    public void tearDown()
+        throws Exception
+    {
+        BuildContextManager ctxMgr = (BuildContextManager) lookup( BuildContextManager.ROLE );
+        ctxMgr.clearBuildContext();
+        
+        super.tearDown();
+    }
 
     public void testShouldReadSinglePomWithNoParents()
         throws IOException, ProjectBuildingException
