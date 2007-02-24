@@ -45,38 +45,10 @@
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
-  <mailingLists>
-    <mailingList>
-      <name>Maven User List</name>
-      <subscribe>users-subscribe@maven.apache.org</subscribe>
-      <unsubscribe>users-unsubscribe@maven.apache.org</unsubscribe>
-      <post>users@maven.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/maven-users</archive>
-      <otherArchives>
-        <otherArchive>http://www.mail-archive.com/users@maven.apache.org/</otherArchive>
-        <otherArchive>http://www.nabble.com/Maven---Users-f178.html</otherArchive>
-      </otherArchives>
-    </mailingList>
-    <mailingList>
-      <name>Maven Developer List</name>
-      <subscribe>dev-subscribe@maven.apache.org</subscribe>
-      <unsubscribe>dev-unsubscribe@maven.apache.org</unsubscribe>
-      <post>dev@maven.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
-    </mailingList>
-    <mailingList>
-      <name>Maven Commits List</name>
-      <subscribe>commits-subscribe@maven.apache.org</subscribe>
-      <unsubscribe>commits-unsubscribe@maven.apache.org</unsubscribe>
-      <post>commits@maven.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
-    </mailingList>
-  </mailingLists>
   <modules>
     <module>core-integration-testing-plugins</module>
     <module>core-integration-testing-support</module>    
-  </modules>
-  
+  </modules>  
   <distributionManagement>
     <repository>
       <id>apache.releases</id>
@@ -87,12 +59,10 @@
       <url>${repositoryUrl}</url>
     </snapshotRepository>    
   </distributionManagement>
-
   <!-- TODO this needs to be improved, right now it doesn't deploy to releases repo -->
   <properties>
     <repositoryUrl>scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</repositoryUrl> 
   </properties>
-
   <profiles>
     <profile>
       <id>mode-local-offline</id>
