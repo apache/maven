@@ -78,6 +78,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -209,12 +210,25 @@ public class MavenEmbedder
         this.logger = logger;
     }
 
-    public Model readModel( File model )
+    public Model readModel( File file )
         throws XmlPullParserException, IOException
     {
-        return modelReader.read( new FileReader( model ) );
+        Reader reader = new FileReader( file );
+
+        Model model;
+
+        try
+        {
+            model = modelReader.read( reader );
+        }
+        finally
+        {
+            reader.close();
+        }
+
+        return model;
     }
-    
+
     public void writeModel( Writer writer,
                             Model model,
                             boolean namespaceDeclaration )
@@ -239,18 +253,19 @@ public class MavenEmbedder
     {
         return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
     }
-    
+
     // ----------------------------------------------------------------------
     // Settings
     // ----------------------------------------------------------------------
-    
+
     public static Settings readSettings( File settingsFile )
         throws SettingsConfigurationException, MavenEmbedderException, IOException
     {
         return readSettings( settingsFile, null );
     }
 
-    public static Settings readSettings( File settingsFile, MavenEmbedderLogger logger )
+    public static Settings readSettings( File settingsFile,
+                                         MavenEmbedderLogger logger )
         throws SettingsConfigurationException, MavenEmbedderException, IOException
     {
         DefaultPlexusContainer container = null;
@@ -259,7 +274,7 @@ public class MavenEmbedder
         try
         {
             reader = new FileReader( settingsFile );
-            
+
             try
             {
                 container = new DefaultPlexusContainer();
@@ -271,9 +286,8 @@ public class MavenEmbedder
 
             if ( logger != null )
             {
-                MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager(
-                                                                                           new PlexusLoggerAdapter(
-                                                                                                                    logger ) );
+                MavenEmbedderLoggerManager loggerManager =
+                    new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
 
                 container.setLoggerManager( loggerManager );
             }
@@ -293,7 +307,7 @@ public class MavenEmbedder
         finally
         {
             IOUtil.close( reader );
-            
+
             if ( container != null )
             {
                 container.dispose();
@@ -301,13 +315,16 @@ public class MavenEmbedder
         }
     }
 
-    public static void writeSettings( File settingsFile, Settings settings )
+    public static void writeSettings( File settingsFile,
+                                      Settings settings )
         throws IOException, MavenEmbedderException
     {
         writeSettings( settingsFile, settings, null );
     }
-    
-    public static void writeSettings( File settingsFile, Settings settings, MavenEmbedderLogger logger )
+
+    public static void writeSettings( File settingsFile,
+                                      Settings settings,
+                                      MavenEmbedderLogger logger )
         throws IOException, MavenEmbedderException
     {
         DefaultPlexusContainer container = null;
@@ -316,7 +333,7 @@ public class MavenEmbedder
         try
         {
             writer = new FileWriter( settingsFile );
-            
+
             try
             {
                 container = new DefaultPlexusContainer();
@@ -328,7 +345,8 @@ public class MavenEmbedder
 
             if ( logger != null )
             {
-                MavenEmbedderLoggerManager loggerManager = new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
+                MavenEmbedderLoggerManager loggerManager =
+                    new MavenEmbedderLoggerManager( new PlexusLoggerAdapter( logger ) );
 
                 container.setLoggerManager( loggerManager );
             }
@@ -347,8 +365,8 @@ public class MavenEmbedder
         }
         finally
         {
-            IOUtil.close(  writer );
-            
+            IOUtil.close( writer );
+
             if ( container != null )
             {
                 container.dispose();
@@ -562,7 +580,7 @@ public class MavenEmbedder
     public static final String DEFAULT_LAYOUT_ID = "default";
 
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE = MavenSettingsBuilder.DEFAULT_GLOBAL_SETTINGS_FILE;
-    
+
     public static final File DEFAULT_USER_SETTINGS_FILE = MavenSettingsBuilder.DEFAULT_USER_SETTINGS_FILE;
 
     public ArtifactRepository createLocalRepository( File localRepository )
@@ -687,7 +705,7 @@ public class MavenEmbedder
             profileManager.explicitlyDeactivate( req.getInactiveProfiles() );
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-            
+
             buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE );
 
             // ----------------------------------------------------------------------
@@ -775,9 +793,9 @@ public class MavenEmbedder
         try
         {
             buildContextManager.clearBuildContext();
-            
+
             container.release( buildContextManager );
-            
+
             container.release( mavenProjectBuilder );
 
             container.release( artifactRepositoryFactory );
