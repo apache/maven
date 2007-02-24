@@ -3,7 +3,9 @@
           can be understood by looking in one place, in one Maven
           project.
     - [ ] We should be able to create an Archetype so that users can
-          easily create ITs for us
+          easily create ITs for us. The is not completed but we do have the
+          core-integration-test-sample directory with has a sample I 
+          offered to users.
     - [+] The ITs should be in a project of their own so that we can
           reuse them across versions of Maven. We could actually run
           new versions of integration tests against old versions of
@@ -21,6 +23,11 @@
           testing.
     - [ ] We need to have a file system based remote repository for
           testing
+    - [ ] We need a primary run that can done entirely offline to simply test
+          the guts of Maven from a baseline, then a secondary run possibly using
+          the exact same repository except served via different means like http,
+          ftp, scp which would allow us to find all the holes in the transport
+          mechanisms.
     - [ ] We need to standardize on integration testing in general. We
           have people going all over the place and it's a disaster.
         - [ ] We have too many IT plugins (3)
@@ -88,7 +95,7 @@
     - [ ] it0087 uses prodcution dependency of commons-logging to test
           classloading
     - [ ] it0089 is an integration test for the checkstyle plugin
-    - [ ] it0094 has a test that attempts to access a protected field
+    - [x] it0094 has a test that attempts to access a protected field
           in a ClassRealm
     - [ ] it0095 uses the help and verifier plugins to test URL
           calculation
