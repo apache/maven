@@ -51,4 +51,11 @@ public interface MavenSettingsBuilder
      */
     Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException;
+
+    /**
+     * @since 2.1
+     */
+    Settings buildSettings( File userSettingsPath, File globalSettingsPath, SettingsBuilderAdvice advice )
+        throws IOException, XmlPullParserException;
+    
 }

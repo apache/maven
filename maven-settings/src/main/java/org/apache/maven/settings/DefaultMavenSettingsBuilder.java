@@ -16,14 +16,15 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.settings.cache.SettingsCache;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.validation.SettingsValidationResult;
+import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -31,8 +32,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.maven.settings.validation.SettingsValidationResult;
-import org.apache.maven.settings.validation.SettingsValidator;
 
 /**
  * @author jdcasey
@@ -42,57 +41,62 @@ public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
     implements MavenSettingsBuilder
 {
-    
+
     private SettingsValidator validator;
-    
-    private BuildContextManager buildContextManager;
-    
+
     /**
      * @since 2.1
      */
     public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException
     {
-        SettingsCache cache = SettingsCache.read( buildContextManager, userSettingsFile, globalSettingsFile );
-        
-        if ( cache != null )
-        {
-            return cache.getSettings();
-        }
-        
-        // NOTE: We're allowing users to hang themselves here...if the global settings file is null,
-        // the default location is NOT read.
-        Settings globalSettings = readSettings( globalSettingsFile );
-        
-        if ( userSettingsFile == null )
+        return buildSettings( userSettingsFile, globalSettingsFile, new SettingsBuilderAdvice() );
+    }
+
+    /**
+     * @since 2.1
+     */
+    public Settings buildSettings( File userSettingsFile, File globalSettingsFile, SettingsBuilderAdvice advice )
+        throws IOException, XmlPullParserException
+    {
+        if ( advice.isDefaultUserLocationEnabled() && userSettingsFile == null )
         {
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
-        Settings userSettings = readSettings( userSettingsFile );
+        if ( advice.isDefaultGlobalLocationEnabled() && globalSettingsFile == null )
+        {
+            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
+        }
+
+        if ( globalSettingsFile == null && userSettingsFile == null )
+        {
+            getLogger().debug(
+                               "No settings files provided, and default locations are disabled for this request. Returning empty Settings instance." );
+            return new Settings();
+        }
+
+        Settings globalSettings = readSettings( globalSettingsFile );
 
         if ( globalSettings == null )
         {
             globalSettings = new Settings();
         }
 
+        Settings userSettings = readSettings( userSettingsFile );
+
         if ( userSettings == null )
         {
             userSettings = new Settings();
-
-            userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
         }
-        
+
         validateSettings( globalSettings, globalSettingsFile );
-        
+
         validateSettings( userSettings, userSettingsFile );
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         activateDefaultProfiles( userSettings );
-        
-        cache = new SettingsCache( userSettingsFile, globalSettingsFile, userSettings );
-        cache.store( buildContextManager );
 
         return userSettings;
     }
@@ -114,7 +118,6 @@ public class DefaultMavenSettingsBuilder
     {
         return buildSettings( userSettingsFile, null );
     }
-
 
     private Settings readSettings( File settingsFile )
         throws IOException, XmlPullParserException
@@ -148,7 +151,8 @@ public class DefaultMavenSettingsBuilder
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
+                                      "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
+                    
                     getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
                 }
 
@@ -160,9 +164,21 @@ public class DefaultMavenSettingsBuilder
 
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 
-                rtInfo.setFile( settingsFile );
+                rtInfo.addLocation( settingsFile.getAbsolutePath() );
 
                 settings.setRuntimeInfo( rtInfo );
+            }
+            catch ( XmlPullParserException e )
+            {
+                getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing XmlPullParserException..." );
+                
+                throw e;
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing IOException..." );
+                
+                throw e;
             }
             finally
             {
@@ -187,15 +203,16 @@ public class DefaultMavenSettingsBuilder
             }
         }
     }
-    
-    private void validateSettings(Settings settings, File location) throws IOException {
+
+    private void validateSettings( Settings settings, File location )
+        throws IOException
+    {
         SettingsValidationResult validationResult = validator.validate( settings );
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new IOException( "Failed to validate Settings file at " + location + 
-                                    "\n" + validationResult.render("\n") );
+            throw new IOException( "Failed to validate Settings file at " + location + "\n" + validationResult.render( "\n" ) );
         }
-        
+
     }
 }

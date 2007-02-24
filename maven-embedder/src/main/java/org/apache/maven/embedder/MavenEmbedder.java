@@ -39,9 +39,13 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.InvalidPluginException;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -66,12 +70,13 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
@@ -80,11 +85,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -243,20 +243,23 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     // Settings
     // ----------------------------------------------------------------------
-
-    public static Settings readSettingsFromFile( Reader reader )
+    
+    public static Settings readSettings( File settingsFile )
         throws SettingsConfigurationException, MavenEmbedderException, IOException
     {
-        return readSettingsFromFile( reader, null );
+        return readSettings( settingsFile, null );
     }
 
-    public static Settings readSettingsFromFile( Reader reader, MavenEmbedderLogger logger )
+    public static Settings readSettings( File settingsFile, MavenEmbedderLogger logger )
         throws SettingsConfigurationException, MavenEmbedderException, IOException
     {
         DefaultPlexusContainer container = null;
 
+        FileReader reader = null;
         try
         {
+            reader = new FileReader( settingsFile );
+            
             try
             {
                 container = new DefaultPlexusContainer();
@@ -289,6 +292,8 @@ public class MavenEmbedder
         }
         finally
         {
+            IOUtil.close( reader );
+            
             if ( container != null )
             {
                 container.dispose();
@@ -296,19 +301,22 @@ public class MavenEmbedder
         }
     }
 
-    public static void writeSettings( Writer writer, Settings settings )
+    public static void writeSettings( File settingsFile, Settings settings )
         throws IOException, MavenEmbedderException
     {
-        writeSettings( writer, settings, null );
+        writeSettings( settingsFile, settings, null );
     }
     
-    public static void writeSettings( Writer writer, Settings settings, MavenEmbedderLogger logger )
+    public static void writeSettings( File settingsFile, Settings settings, MavenEmbedderLogger logger )
         throws IOException, MavenEmbedderException
     {
         DefaultPlexusContainer container = null;
 
+        FileWriter writer = null;
         try
         {
+            writer = new FileWriter( settingsFile );
+            
             try
             {
                 container = new DefaultPlexusContainer();
@@ -339,6 +347,8 @@ public class MavenEmbedder
         }
         finally
         {
+            IOUtil.close(  writer );
+            
             if ( container != null )
             {
                 container.dispose();
@@ -699,7 +709,8 @@ public class MavenEmbedder
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
             // These three things can be cached for a single session of the embedder
-            settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false );
+            settings = mavenTools.buildSettings( req.getUserSettingsFile(), req.getGlobalSettingsFile(), false,
+                                                 req.getSettingsBuilderAdvice() );
 
             localRepository = createLocalRepository( settings );
 

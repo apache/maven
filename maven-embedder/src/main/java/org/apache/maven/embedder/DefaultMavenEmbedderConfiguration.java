@@ -15,14 +15,14 @@ package org.apache.maven.embedder;
  * limitations under the License.
  */
 
+import org.apache.maven.settings.SettingsBuilderAdvice;
+import org.codehaus.plexus.classworlds.ClassWorld;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Default implementation of MavenEmbedderConfiguration intefrace.
@@ -35,8 +35,6 @@ public class DefaultMavenEmbedderConfiguration
     private List inactives;
 
     private List actives;
-
-    private Settings settings;
 
     private File userSettings;
 
@@ -52,6 +50,8 @@ public class DefaultMavenEmbedderConfiguration
     private MavenEmbedderLogger logger;
 
     private ClassWorld classWorld;
+
+    private SettingsBuilderAdvice advice;
 
     /** Creates a new instance of DefaultMavenEmbedderConfiguration */
     public DefaultMavenEmbedderConfiguration()
@@ -180,5 +180,15 @@ public class DefaultMavenEmbedderConfiguration
     {
         this.classWorld = new ClassWorld( "plexus.core", loader );
         return this;
+    }
+
+    public SettingsBuilderAdvice getSettingsBuilderAdvice()
+    {
+        return advice;
+    }
+
+    public void setSettingsBuilderAdvice( SettingsBuilderAdvice advice )
+    {
+        this.advice = advice;
     }
 }

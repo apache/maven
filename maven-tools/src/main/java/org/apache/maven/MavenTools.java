@@ -6,6 +6,7 @@ import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsBuilderAdvice;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,9 +61,24 @@ public interface MavenTools
                             boolean interactive,
                             boolean offline,
                             boolean usePluginRegistry,
+                            boolean pluginUpdateOverride,
+                            SettingsBuilderAdvice advice )
+        throws SettingsConfigurationException;
+    
+    Settings buildSettings( File userSettingsPath,
+                            File globalSettingsPath,
+                            boolean interactive,
+                            boolean offline,
+                            boolean usePluginRegistry,
                             boolean pluginUpdateOverride )
         throws SettingsConfigurationException;
     
+    Settings buildSettings( File userSettingsPath,
+                            File globalSettingsPath,
+                            boolean pluginUpdateOverride,
+                            SettingsBuilderAdvice advice )
+        throws SettingsConfigurationException;
+
     Settings buildSettings( File userSettingsPath,
                             File globalSettingsPath,
                             boolean pluginUpdateOverride )

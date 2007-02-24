@@ -1,7 +1,6 @@
 package org.apache.maven.embedder;
 
 import org.apache.maven.SettingsConfigurationException;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -240,7 +239,7 @@ public class MavenEmbedderTest
 
         assertEquals( 1, artifacts.size() );
 
-        Artifact artifact = (Artifact) artifacts.iterator().next();
+        artifacts.iterator().next();
     }
 
     public void testProjectWithExtensionsReading()
@@ -317,19 +316,10 @@ public class MavenEmbedderTest
             IOUtil.close( writer );
         }
         
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader( settingsFile );
-            Settings result = MavenEmbedder.readSettingsFromFile( reader );
-            
-            assertEquals( localRepoPath, result.getLocalRepository() );
-            assertTrue( result.isOffline() );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
+        Settings result = MavenEmbedder.readSettings( settingsFile );
+        
+        assertEquals( localRepoPath, result.getLocalRepository() );
+        assertTrue( result.isOffline() );
     }
 
     public void testReadSettings_shouldFailToValidate()
@@ -359,11 +349,9 @@ public class MavenEmbedderTest
             IOUtil.close( writer );
         }
 
-        FileReader reader = null;
         try
         {
-            reader = new FileReader( settingsFile );
-            Settings result = MavenEmbedder.readSettingsFromFile( reader );
+            MavenEmbedder.readSettings( settingsFile );
 
             fail( "Settings should not pass validation when being read." );
         }
@@ -371,10 +359,6 @@ public class MavenEmbedderTest
         {
             String message = e.getMessage();
             assertTrue( message.indexOf( "Failed to validate" ) > -1 );
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
     }
 
@@ -391,16 +375,7 @@ public class MavenEmbedderTest
         File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
         settingsFile.deleteOnExit();
 
-        FileWriter writer = null;
-        try
-        {
-            writer = new FileWriter( settingsFile );
-            MavenEmbedder.writeSettings( writer, s );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
+        MavenEmbedder.writeSettings( settingsFile, s );
 
         FileReader reader = null;
         try
@@ -433,11 +408,9 @@ public class MavenEmbedderTest
         File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
         settingsFile.deleteOnExit();
 
-        FileWriter writer = null;
         try
         {
-            writer = new FileWriter( settingsFile );
-            MavenEmbedder.writeSettings( writer, s );
+            MavenEmbedder.writeSettings( settingsFile, s );
             
             fail( "Validation of settings should fail before settings are written." );
         }
@@ -445,10 +418,6 @@ public class MavenEmbedderTest
         {
             String message = e.getMessage();
             assertTrue( message.indexOf( "Failed to validate" ) > -1 );
-        }
-        finally
-        {
-            IOUtil.close( writer );
         }
     }
 

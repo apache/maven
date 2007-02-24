@@ -60,8 +60,22 @@ public final class SettingsUtils
                 {
                     dominantActiveProfiles.add( profileId );
 
-                    dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
+                    if ( dominant.getRuntimeInfo() != null )
+                    {
+                        dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
+                    }
                 }
+            }
+        }
+        
+        if ( dominant.getRuntimeInfo() != null && recessive.getRuntimeInfo() != null )
+        {
+            List recessiveLocations = recessive.getRuntimeInfo().getLocations();
+            for ( Iterator it = recessiveLocations.iterator(); it.hasNext(); )
+            {
+                String path = (String) it.next();
+                
+                dominant.getRuntimeInfo().addLocation( path );
             }
         }
 
@@ -84,7 +98,10 @@ public final class SettingsUtils
                 {
                     dominantPluginGroupIds.add( pluginGroupId );
 
-                    dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
+                    if ( dominant.getRuntimeInfo() != null )
+                    {
+                        dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
+                    }
                 }
             }
         }
@@ -93,7 +110,10 @@ public final class SettingsUtils
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
 
-            dominant.getRuntimeInfo().setLocalRepositorySourceLevel( recessiveSourceLevel );
+            if ( dominant.getRuntimeInfo() != null )
+            {
+                dominant.getRuntimeInfo().setLocalRepositorySourceLevel( recessiveSourceLevel );
+            }
         }
 
         shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );

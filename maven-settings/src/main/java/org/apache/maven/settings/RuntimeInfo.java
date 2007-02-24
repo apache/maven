@@ -1,7 +1,8 @@
 package org.apache.maven.settings;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -23,7 +24,7 @@ import java.util.Map;
 public class RuntimeInfo
 {
 
-    private File file;
+    private List locations = new ArrayList();
     
     // using Boolean for 3VL (null for not-set, otherwise override with value)
     private Boolean pluginUpdateForced;
@@ -49,14 +50,14 @@ public class RuntimeInfo
         this.settings = settings;
     }
     
-    public void setFile( File file )
+    public void addLocation( String path )
     {
-        this.file = file;
+        this.locations.add( path );
     }
     
-    public File getFile()
+    public List getLocations()
     {
-        return file;
+        return locations;
     }
     
     public void setPluginUpdateOverride( Boolean pluginUpdateForced )
@@ -126,5 +127,5 @@ public class RuntimeInfo
     {
         return localRepositorySourceLevel;
     }
-    
+
 }

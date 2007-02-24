@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -84,13 +85,17 @@ public interface MavenEmbedderConfiguration
 
     List getExtensions();
 
-    public MavenEmbedderConfiguration setMavenEmbedderLogger( MavenEmbedderLogger logger );
+    MavenEmbedderConfiguration setMavenEmbedderLogger( MavenEmbedderLogger logger );
 
-    public MavenEmbedderLogger getMavenEmbedderLogger();
+    MavenEmbedderLogger getMavenEmbedderLogger();
 
-    public ClassWorld getClassWorld();
+    ClassWorld getClassWorld();
 
-    public MavenEmbedderConfiguration setClassWorld( ClassWorld classWorld );
+    MavenEmbedderConfiguration setClassWorld( ClassWorld classWorld );
 
-    public MavenEmbedderConfiguration setClassLoader( ClassLoader loader );
+    MavenEmbedderConfiguration setClassLoader( ClassLoader loader );
+
+    SettingsBuilderAdvice getSettingsBuilderAdvice();
+    
+    void setSettingsBuilderAdvice( SettingsBuilderAdvice advice );
 }
