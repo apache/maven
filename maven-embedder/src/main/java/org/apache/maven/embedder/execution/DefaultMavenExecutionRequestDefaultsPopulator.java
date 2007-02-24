@@ -23,7 +23,6 @@ import org.apache.maven.MavenTools;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderConfiguration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -84,23 +83,25 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
                 }
             }
 
-            File userSettingsPath = mavenTools.getUserSettingsPath( userSettingsLocation );
-
-            File globalSettingsFile = mavenTools.getGlobalSettingsPath();
-            if ( globalSettingsFile.equals( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE ) )
+            File userSettingsPath = null; //mavenTools.getUserSettingsPath( userSettingsLocation );
+            if ( userSettingsLocation != null )
             {
-                File configGlobalSettings = embedderConfiguration.getGlobalSettingsFile();
-                if ( configGlobalSettings != null )
-                {
-                    globalSettingsFile = configGlobalSettings;
-                }
+                userSettingsPath = new File( userSettingsLocation );
+            }
+
+            File globalSettingsFile = null; //mavenTools.getGlobalSettingsPath();
+            
+            File configGlobalSettings = embedderConfiguration.getGlobalSettingsFile();
+            if ( configGlobalSettings != null )
+            {
+                globalSettingsFile = configGlobalSettings;
             }
 
             try
             {
                 request.setSettings( mavenTools.buildSettings( userSettingsPath, globalSettingsFile, request
                     .isInteractiveMode(), request.isOffline(), request.isUsePluginRegistry(), request
-                    .isUsePluginUpdateOverride() ) );
+                    .isUsePluginUpdateOverride(), request.getSettingsBuilderAdvice() ) );
             }
             catch ( SettingsConfigurationException e )
             {

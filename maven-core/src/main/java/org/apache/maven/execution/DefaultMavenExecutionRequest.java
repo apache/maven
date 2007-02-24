@@ -19,6 +19,7 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
@@ -106,6 +107,8 @@ public class DefaultMavenExecutionRequest
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
+
+    private SettingsBuilderAdvice advice;
 
     // ----------------------------------------------------------------------
     //
@@ -518,6 +521,16 @@ public class DefaultMavenExecutionRequest
         this.recursive = recursive;
 
         return this;
+    }
+
+    public SettingsBuilderAdvice getSettingsBuilderAdvice()
+    {
+        return advice;
+    }
+
+    public void setSettingsBuilderAdvice( SettingsBuilderAdvice advice )
+    {
+        this.advice = advice;
     }
 
 }
