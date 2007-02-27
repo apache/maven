@@ -1,13 +1,26 @@
 package org.apache.maven.integrationtests;
 
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
+
+import java.io.PrintStream;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class IntegrationTestSuite
     extends AbstractMavenIntegrationTestCase
 {
-    public static Test suite()
+    private static PrintStream out = System.out;
+
+    public static Test suite() throws VerificationException
     {
+        String mavenVersion = new Verifier( "" ).getMavenVersion();
+
+        out.println( "Running integration tests for Maven " + mavenVersion );
+
+        System.setProperty( "maven.version", mavenVersion );
+
         TestSuite suite = new TestSuite();
         suite.addTestSuite( MavenIT0000Test.class );
         suite.addTestSuite( MavenIT0001Test.class );

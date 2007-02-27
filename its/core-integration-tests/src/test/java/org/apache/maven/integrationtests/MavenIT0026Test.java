@@ -1,5 +1,6 @@
 package org.apache.maven.integrationtests;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -9,6 +10,11 @@ import java.util.Properties;
 public class MavenIT0026Test
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0026Test()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[,2.1-SNAPSHOT)" );
+    }
 
     /**
      * Test merging of global- and user-level settings.xml files.
@@ -29,4 +35,3 @@ public class MavenIT0026Test
 
     }
 }
-

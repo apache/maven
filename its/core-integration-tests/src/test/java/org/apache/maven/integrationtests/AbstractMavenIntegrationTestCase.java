@@ -1,5 +1,8 @@
 package org.apache.maven.integrationtests;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.it.util.FileUtils;
 
 import java.io.File;
@@ -15,18 +18,57 @@ import junit.framework.TestCase;
 public abstract class AbstractMavenIntegrationTestCase
     extends TestCase
 {
+    /**
+     * Save System.out for progress reports etc.
+     */
+    private static PrintStream out = System.out;
+
+    private boolean skip;
+
+    private DefaultArtifactVersion version;
+
+    private VersionRange versionRange;
+
+    protected AbstractMavenIntegrationTestCase()
+    {
+    }
+
+    protected AbstractMavenIntegrationTestCase( String versionRangeStr )
+        throws InvalidVersionSpecificationException
+    {
+        this.versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+
+        String v = System.getProperty( "maven.version" );
+        if ( v != null )
+        {
+            this.version = new DefaultArtifactVersion( v );
+            if ( !versionRange.containsVersion( this.version ) )
+            {
+                skip = true;
+            }
+        }
+        else
+        {
+            out.print( "WARNING: " + getITName() + ": version range '" + versionRange
+                + "' supplied but no maven version - not skipping test." );
+        }
+    }
+
     protected void runTest()
         throws Throwable
     {
+        out.print( getITName() + "(" + getName() + ").." );
+
+        if ( skip )
+        {
+            out.println( " Skipping (version " + version + " not in range " + versionRange + ")" );
+            return;
+        }
+
         if ( "true".equals( System.getProperty( "useEmptyLocalRepository", "false" ) ) )
         {
             setupLocalRepo();
         }
-
-        // save System.out since running the test will replace it
-        PrintStream out = System.out;
-
-        out.print( getITName() + "(" + getName() + ").." );
 
         try
         {

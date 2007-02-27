@@ -1,5 +1,6 @@
 package org.apache.maven.integrationtests;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -9,11 +10,15 @@ import java.util.Properties;
 public class MavenIT0031Test
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0031Test()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[,2.1-SNAPSHOT)" );
+    }
 
     /**
-     * Test usage of plugins.xml mapping file on the repository to resolve
-     * plugin artifactId from it's prefix using the pluginGroups in
-     * the provided settings.xml.
+     * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
+     * pluginGroups in the provided settings.xml.
      */
     public void testit0031()
         throws Exception
@@ -30,9 +35,8 @@ public class MavenIT0031Test
         verifier.setVerifierProperties( verifierProperties );
         verifier.executeGoal( "modello:java" );
         verifier.assertFilePresent( "target/generated-sources/modello/org/apache/maven/it/it0031/Root.java" );
-// don't verify error free log
+        // don't verify error free log
         verifier.resetStreams();
 
     }
 }
-
