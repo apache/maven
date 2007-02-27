@@ -193,5 +193,5 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
     
     SettingsBuilderAdvice getSettingsBuilderAdvice();
-    void setSettingsBuilderAdvice( SettingsBuilderAdvice advice );
+    MavenExecutionRequest setSettingsBuilderAdvice( SettingsBuilderAdvice advice );
 }

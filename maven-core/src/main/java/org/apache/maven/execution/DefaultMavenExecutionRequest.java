@@ -528,9 +528,11 @@ public class DefaultMavenExecutionRequest
         return advice;
     }
 
-    public void setSettingsBuilderAdvice( SettingsBuilderAdvice advice )
+    public MavenExecutionRequest setSettingsBuilderAdvice( SettingsBuilderAdvice advice )
     {
         this.advice = advice;
+        
+        return this;
     }
 
 }

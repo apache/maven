@@ -76,6 +76,8 @@ public class DefaultMavenSettingsBuilder
             return new Settings();
         }
 
+        getLogger().debug( "Reading global settings from: " + globalSettingsFile );
+        
         Settings globalSettings = readSettings( globalSettingsFile );
 
         if ( globalSettings == null )
@@ -83,6 +85,8 @@ public class DefaultMavenSettingsBuilder
             globalSettings = new Settings();
         }
 
+        getLogger().debug( "Reading user settings from: " + userSettingsFile );
+        
         Settings userSettings = readSettings( userSettingsFile );
 
         if ( userSettings == null )
@@ -124,6 +128,7 @@ public class DefaultMavenSettingsBuilder
     {
         if ( settingsFile == null )
         {
+            getLogger().debug( "Settings file is null. Returning." );
             return null;
         }
 
@@ -131,6 +136,8 @@ public class DefaultMavenSettingsBuilder
 
         if ( settingsFile.exists() && settingsFile.isFile() )
         {
+            getLogger().debug( "Settings file is a proper file. Reading." );
+            
             FileReader reader = null;
             try
             {

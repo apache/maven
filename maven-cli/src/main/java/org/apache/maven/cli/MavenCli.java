@@ -24,6 +24,7 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -314,6 +315,11 @@ public class MavenCli
             }
 
             Properties executionProperties = getExecutionProperties( commandLine );
+            
+            SettingsBuilderAdvice settingsAdvice = new SettingsBuilderAdvice();
+            
+            settingsAdvice.setDefaultGlobalLocationEnabled( true );
+            settingsAdvice.setDefaultUserLocationEnabled( true );
 
             MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setBaseDirectory( baseDirectory )
@@ -326,6 +332,7 @@ public class MavenCli
                 .setShowErrors( showErrors ) // default: false
                     // Settings
                 .setSettingsFile( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) )
+                .setSettingsBuilderAdvice( settingsAdvice )
                     //.setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
                 .setInteractiveMode( interactive ) // default: false
                 .setUsePluginRegistry( usePluginRegistry )

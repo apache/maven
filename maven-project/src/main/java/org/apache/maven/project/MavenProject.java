@@ -539,7 +539,7 @@ public class MavenProject
     public List getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List list = new ArrayList( getArtifacts().size() + 1 );
+        List list = new ArrayList( getArtifacts().size() + 2 );
 
         list.add( getBuild().getOutputDirectory() );
 
