@@ -18,9 +18,8 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.settings.Settings;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,14 +34,6 @@ import java.util.Properties;
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
-    // ----------------------------------------------------------------------------
-    // Settings equivalents
-    // ----------------------------------------------------------------------------
-
-    private Settings settings;
-
-    private String settingsFile;
-
     private ArtifactRepository localRepository;
     
     private File localRepositoryPath;
@@ -108,24 +99,6 @@ public class DefaultMavenExecutionRequest
      */
     private boolean noSnapshotUpdates;
 
-    private SettingsBuilderAdvice advice;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public String getSettingsFile()
-    {
-        return settingsFile;
-    }
-
-    public MavenExecutionRequest setSettingsFile( String settingsFile )
-    {
-        this.settingsFile = settingsFile;
-
-        return this;
-    }
-
     public String getBaseDirectory()
     {
         if ( basedir == null )
@@ -134,11 +107,6 @@ public class DefaultMavenExecutionRequest
         }
 
         return basedir.getAbsolutePath();
-    }
-
-    public Settings getSettings()
-    {
-        return settings;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -265,13 +233,6 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setShowErrors( boolean showErrors )
     {
         this.showErrors = showErrors;
-
-        return this;
-    }
-
-    public MavenExecutionRequest setSettings( Settings settings )
-    {
-        this.settings = settings;
 
         return this;
     }
@@ -514,8 +475,6 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    //
-
     public MavenExecutionRequest setRecursive( boolean recursive )
     {
         this.recursive = recursive;
@@ -523,16 +482,17 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public SettingsBuilderAdvice getSettingsBuilderAdvice()
-    {
-        return advice;
-    }
+    private Settings settings;
 
-    public MavenExecutionRequest setSettingsBuilderAdvice( SettingsBuilderAdvice advice )
+    public MavenExecutionRequest setSettings( Settings settings )
     {
-        this.advice = advice;
-        
+        this.settings = settings;
+
         return this;
     }
 
+    public Settings getSettings()
+    {
+        return settings;
+    }
 }
