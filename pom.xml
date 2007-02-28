@@ -129,32 +129,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <!--
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <configuration>
-          <aggregate>false</aggregate>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>  
-            <goals>
-              <goal>jar</goal>
-            </goals>          
-          </execution>
-        </executions>
-      </plugin>    
-      <plugin>
-        <artifactId>maven-doap-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration>
-          <category>build-management</category>
-          <language>Java</language>
-        </configuration>
-      </plugin>
-      -->
-    </plugins>
   </build>
   <modules>
     <module>maven-artifact</module>
