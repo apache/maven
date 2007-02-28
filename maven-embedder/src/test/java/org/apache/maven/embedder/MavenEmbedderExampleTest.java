@@ -78,4 +78,23 @@ public class MavenEmbedderExampleTest
 
         // END SNIPPET: simple-embedder-example
     }
+
+    public void testEmbedderExampleThatShowsHowToMimicTheMavenCLI()
+        throws Exception
+    {
+
+        // START SNIPPET: mimic-cli
+        Configuration configuration = new DefaultConfiguration()
+            .setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE )
+            .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
+            .setClassLoader( Thread.currentThread().getContextClassLoader() );
+
+        ConfigurationValidationResult validationResult = MavenEmbedder.validateConfiguration( configuration );
+
+        if ( validationResult.isValid() )
+        {
+            // If the configuration is valid then do your thang ...
+        }
+        // END SNIPPET: mimic-cli
+    }
 }

@@ -1,41 +1,18 @@
 package org.apache.maven.embedder;
 
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.PlexusTestCase;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.Arrays;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
-public abstract class AbstractMavenEmbedderTestCase
-    extends PlexusTestCase
+public abstract class AbstractEmbedderExecutionTestCase
+    extends AbstractEmbedderTestCase
 {
-    protected MavenEmbedder maven;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        Configuration configuration = new DefaultConfiguration()
-            .setClassLoader( classLoader )
-            .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
-
-        maven = new MavenEmbedder( configuration );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        maven.stop();
-    }
-
     protected MavenExecutionRequest request( File basedir,
                                              List goals )
     {

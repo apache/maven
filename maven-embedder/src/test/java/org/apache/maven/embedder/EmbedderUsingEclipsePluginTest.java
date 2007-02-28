@@ -3,8 +3,8 @@ package org.apache.maven.embedder;
 import java.io.File;
 
 /** @author Jason van Zyl */
-public class MavenEmbedderUsingEclipsePluginTest
-    extends AbstractMavenEmbedderTestCase
+public class EmbedderUsingEclipsePluginTest
+    extends AbstractEmbedderExecutionTestCase
 {
     protected String getId()
     {
