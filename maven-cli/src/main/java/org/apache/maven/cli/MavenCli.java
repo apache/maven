@@ -43,9 +43,6 @@ import java.util.StringTokenizer;
  */
 public class MavenCli
 {
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
-        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
-
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
     public static void main( String[] args )
@@ -342,7 +339,7 @@ public class MavenCli
 
         Configuration configuration = new DefaultConfiguration()
             .setUserSettingsFile( userSettingsFile )
-            .setGlobalSettingsFile( DEFAULT_GLOBAL_SETTINGS_FILE )
+            .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
             .setClassWorld( classWorld );
 
         String localRepoProperty = executionProperties.getProperty( LOCAL_REPO_PROPERTY );
