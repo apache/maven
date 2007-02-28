@@ -14,4 +14,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <properties>
+    <environment>development</environment>
+  </properties>
 </project>

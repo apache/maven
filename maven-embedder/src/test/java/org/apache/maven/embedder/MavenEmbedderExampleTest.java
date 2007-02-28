@@ -40,7 +40,7 @@ public class MavenEmbedderExampleTest
     {
         // START SNIPPET: simple-embedder-example
 
-        File projectDirectory = new File( getBasedir(), "examples/simple-project" );
+        File projectDirectory = new File( getBasedir(), "src/examples/simple-project" );
 
         File user = new File( projectDirectory, "settings.xml" );
 
@@ -72,6 +72,31 @@ public class MavenEmbedderExampleTest
             MavenProject project = result.getMavenProject();
 
             // Do something with the project
+
+            String groupId = project.getGroupId();
+
+            String artifactId = project.getArtifactId();
+
+            String version = project.getVersion();
+
+            String name = project.getName();
+
+            String environment = project.getProperties().getProperty( "environment" );
+
+            assertEquals( "development", environment );
+
+            System.out.println( "You are working in the '" + environment + "' environment!" );
+        }
+        else
+        {
+            if ( ! validationResult.isUserSettingsFilePresent() )
+            {
+                System.out.println( "The specific user settings file '" + user + "' is not present." );
+            }
+            else if ( ! validationResult.isUserSettingsFileParses() )
+            {
+                System.out.println( "Please check your settings file, it is not well formed XML." );
+            }
         }
 
         // END SNIPPET: simple-embedder-example

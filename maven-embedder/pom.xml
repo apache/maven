@@ -74,4 +74,13 @@
       <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <site>
+      <id>apache.website</id>
+      <!--
+      <url>scp://people.apache.org/www/maven.apache.org/embedder/${project.version}/</url>
+      -->
+      <url>scp://people.apache.org/home/jvanzyl/public_html/embedder/</url>
+    </site>
+  </distributionManagement>
 </project>
