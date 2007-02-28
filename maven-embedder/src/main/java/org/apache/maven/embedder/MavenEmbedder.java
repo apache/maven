@@ -96,6 +96,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
