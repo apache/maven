@@ -86,7 +86,7 @@ public class PlexusLoggerAdapter
     public void error( String message,
                        Throwable throwable )
     {
-        logger.error( message );
+        logger.error( message, throwable );
     }
 
     public boolean isErrorEnabled()
