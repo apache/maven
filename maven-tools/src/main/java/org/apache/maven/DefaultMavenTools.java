@@ -11,9 +11,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.validation.SettingsValidationResult;
@@ -37,32 +35,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author Jason van Zyl
- */
+/** @author Jason van Zyl */
 public class DefaultMavenTools
-    implements MavenTools,
-    Contextualizable
+    implements MavenTools, Contextualizable
 {
     private ArtifactRepositoryLayout repositoryLayout;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    private MavenSettingsBuilder settingsBuilder;
-    
-    private SettingsValidator settingsValidator;
 
     private PlexusContainer container;
 
     // ----------------------------------------------------------------------------
     // ArtifactRepository
     // ----------------------------------------------------------------------------
-
-    public ArtifactRepository createDefaultLocalRepository()
-        throws SettingsConfigurationException
-    {
-        return createLocalRepository( new File( getLocalRepositoryPath() ) );
-    }
 
     public ArtifactRepository createLocalRepository( File directory )
     {
@@ -73,98 +58,15 @@ public class DefaultMavenTools
             localRepositoryUrl = "file://" + localRepositoryUrl;
         }
 
-        return createRepository( "local", localRepositoryUrl);
+        return createRepository( "local", localRepositoryUrl );
     }
 
     private ArtifactRepository createRepository( String repositoryId,
-                                                String repositoryUrl)
+                                                 String repositoryUrl )
     {
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( repositoryId, repositoryUrl, repositoryLayout );
         return localRepository;
-    }
-
-    // ----------------------------------------------------------------------------
-    // Settings
-    // ----------------------------------------------------------------------------
-
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean interactive,
-                                   boolean offline,
-                                   boolean usePluginRegistry,
-                                   boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        return buildSettings( userSettingsPath, globalSettingsPath, interactive, offline, usePluginRegistry,
-                              pluginUpdateOverride, new SettingsBuilderAdvice() );
-    }
-    
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean interactive,
-                                   boolean offline,
-                                   boolean usePluginRegistry,
-                                   boolean pluginUpdateOverride,
-                                   SettingsBuilderAdvice advice )
-        throws SettingsConfigurationException
-    {
-        Settings settings = buildSettings( userSettingsPath, globalSettingsPath, pluginUpdateOverride, advice );
-        
-        if ( offline )
-        {
-            settings.setOffline( true );
-        }
-        
-        settings.setInteractiveMode( interactive );
-        
-        settings.setUsePluginRegistry( usePluginRegistry );
-        
-        return settings;
-    }
-    
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean pluginUpdateOverride )
-        throws SettingsConfigurationException
-    {
-        return buildSettings( userSettingsPath, globalSettingsPath, pluginUpdateOverride, new SettingsBuilderAdvice() );
-    }
-    
-    public Settings buildSettings( File userSettingsPath,
-                                   File globalSettingsPath,
-                                   boolean pluginUpdateOverride,
-                                   SettingsBuilderAdvice advice )
-        throws SettingsConfigurationException
-    {
-        Settings settings;
-        
-        if ( advice == null )
-        {
-            advice = new SettingsBuilderAdvice();
-        }
-
-        try
-        {
-            settings = settingsBuilder.buildSettings( userSettingsPath, globalSettingsPath, advice );
-        }
-        catch ( IOException e )
-        {
-            throw new SettingsConfigurationException( "Error reading settings file", e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new SettingsConfigurationException( e.getMessage(), e.getDetail(), e.getLineNumber(),
-                                                      e.getColumnNumber() );
-        }
-
-        RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
-
-        runtimeInfo.setPluginUpdateOverride( Boolean.valueOf( pluginUpdateOverride ) );
-
-        settings.setRuntimeInfo( runtimeInfo );
-
-        return settings;
     }
 
     // ----------------------------------------------------------------------------
@@ -237,12 +139,15 @@ public class DefaultMavenTools
     public ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
     {
         boolean enabled = true;
+
         String updatePolicy = null;
+
         String checksumPolicy = null;
 
         if ( policy != null )
         {
             enabled = policy.isEnabled();
+
             if ( policy.getUpdatePolicy() != null )
             {
                 updatePolicy = policy.getUpdatePolicy();
@@ -275,105 +180,6 @@ public class DefaultMavenTools
     }
 
     // ----------------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------------
-
-    /**
-     * Retrieve the user settings path using the followiwin search pattern:
-     * <p/>
-     * 1. System Property
-     * 2. Optional path
-     * 3. ${user.home}/.m2/settings.xml
-     */
-    public File getUserSettingsPath( String optionalSettingsPath )
-    {
-        File userSettingsPath = new File( System.getProperty( ALT_USER_SETTINGS_XML_LOCATION ) + "" );
-
-        if ( !userSettingsPath.exists() )
-        {
-            if ( optionalSettingsPath != null )
-            {
-                File optionalSettingsPathFile = new File( optionalSettingsPath );
-
-                if ( optionalSettingsPathFile.exists() )
-                {
-                    userSettingsPath = optionalSettingsPathFile;
-                }
-                else
-                {
-                    userSettingsPath = defaultUserSettingsFile;
-                }
-            }
-            else
-            {
-                userSettingsPath = defaultUserSettingsFile;
-            }
-        }
-
-        return userSettingsPath;
-    }
-
-    /**
-     * Retrieve the global settings path using the followiwin search pattern:
-     * <p/>
-     * 1. System Property
-     * 2. CLI Option
-     * 3. ${maven.home}/conf/settings.xml
-     */
-    public File getGlobalSettingsPath()
-    {
-        File globalSettingsFile = new File( System.getProperty( ALT_GLOBAL_SETTINGS_XML_LOCATION ) + "" );
-
-        if ( !globalSettingsFile.exists() )
-        {
-            globalSettingsFile = defaultGlobalSettingsFile;
-        }
-
-        return globalSettingsFile;
-    }
-
-    /**
-     * Retrieve the local repository path using the followiwin search pattern:
-     * <p/>
-     * 1. System Property
-     * 2. localRepository specified in user settings file
-     * 3. ${user.home}/.m2/repository
-     */
-    public String getLocalRepositoryPath( Settings settings )
-    {
-        String localRepositoryPath = System.getProperty( ALT_LOCAL_REPOSITORY_LOCATION );
-
-        if ( localRepositoryPath == null )
-        {
-            localRepositoryPath = settings.getLocalRepository();
-        }
-
-        if ( localRepositoryPath == null )
-        {
-            localRepositoryPath = defaultUserLocalRepository.getAbsolutePath();
-        }
-
-        return localRepositoryPath;
-    }
-
-    public String getLocalRepositoryPath()
-        throws SettingsConfigurationException
-    {
-        return getLocalRepositoryPath( buildSettings( getUserSettingsPath( null ),
-                                                      getGlobalSettingsPath(),
-                                                      false,
-                                                      true,
-                                                      false,
-                                                      false ) );
-    }
-
-    public ArtifactRepository getLocalRepository()
-        throws SettingsConfigurationException
-    {
-        return createLocalRepository( new File( getLocalRepositoryPath() ) );
-    }
-
-    // ----------------------------------------------------------------------------
     // Lifecycle
     // ----------------------------------------------------------------------------
 
@@ -382,51 +188,4 @@ public class DefaultMavenTools
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-
-    public void writeSettings( Settings settings, Writer w )
-        throws IOException
-    {
-        SettingsValidationResult validationResult = settingsValidator.validate( settings );
-
-        if ( validationResult.getMessageCount() > 0 )
-        {
-            throw new IOException( "Failed to validate Settings.\n" + validationResult.render("\n") );
-        }
-        
-        Element root = new Element( "settings" );
-
-        Document doc = new Document( root );
-
-        SettingsJDOMWriter writer = new SettingsJDOMWriter();
-
-        String encoding = settings.getModelEncoding() != null ? settings.getModelEncoding() : "UTF-8";
-
-        Format format = Format.getPrettyFormat().setEncoding( encoding );
-
-        writer.write( settings, doc, w, format );
-    }
-
-    public Settings readSettings( Reader r )
-        throws IOException, SettingsConfigurationException
-    {
-        SettingsXpp3Reader reader = new SettingsXpp3Reader();
-        try
-        {
-            Settings settings = reader.read( r );
-            
-            SettingsValidationResult validationResult = settingsValidator.validate( settings );
-
-            if ( validationResult.getMessageCount() > 0 )
-            {
-                throw new IOException( "Failed to validate Settings.\n" + validationResult.render("\n") );
-            }
-            
-            return settings;
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new SettingsConfigurationException( "Failed to parse settings.", e );
-        }
-    }
-
 }
