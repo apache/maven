@@ -119,6 +119,9 @@ public class MavenEmbedder
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
 
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
+        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+
     // ----------------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------------
@@ -613,13 +616,10 @@ public class MavenEmbedder
 
             try
             {
-                if ( configuration.getUserSettingsFile() == null )
-                {
-                    configuration.setUserSettingsFile( DEFAULT_USER_SETTINGS_FILE );
-                }
-
                 settings = settingsBuilder.buildSettings( configuration.getUserSettingsFile(),
                                                           configuration.getGlobalSettingsFile() );
+
+                System.out.println( "settings.getLocalRepository() = " + settings.getLocalRepository() );
             }
             catch ( Exception e )
             {
@@ -721,32 +721,30 @@ public class MavenEmbedder
     {
         ConfigurationValidationResult result = new DefaultConfigurationValidationResult();
 
-        if ( configuration.getUserSettingsFile() == null )
-        {
-            configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
-        }
-
         Reader fileReader;
 
         // User settings
 
-        try
+        if ( configuration.getUserSettingsFile() != null )
         {
-            fileReader = new FileReader( configuration.getUserSettingsFile() );
+            try
+            {
+                fileReader = new FileReader( configuration.getUserSettingsFile() );
 
-            new SettingsXpp3Reader().read( fileReader );
-        }
-        catch ( FileNotFoundException e )
-        {
-            result.setUserSettingsFilePresent( false );
-        }
-        catch ( IOException e )
-        {
-            result.setUserSettingsFileParses( false );
-        }
-        catch ( XmlPullParserException e )
-        {
-            result.setUserSettingsFileParses( false );
+                new SettingsXpp3Reader().read( fileReader );
+            }
+            catch ( FileNotFoundException e )
+            {
+                result.setUserSettingsFilePresent( false );
+            }
+            catch ( IOException e )
+            {
+                result.setUserSettingsFileParses( false );
+            }
+            catch ( XmlPullParserException e )
+            {
+                result.setUserSettingsFileParses( false );
+            }
         }
 
         // Global settings
