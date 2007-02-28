@@ -1,6 +1,8 @@
 package org.apache.maven.embedder;
 
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.embedder.configuration.Configuration;
+import org.apache.maven.embedder.configuration.DefaultConfiguration;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -48,7 +50,11 @@ public class MavenEmbedderTest
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        maven = new MavenEmbedder( classLoader, new MavenEmbedderConsoleLogger() );
+        Configuration configuration = new DefaultConfiguration()
+            .setClassLoader( classLoader )
+            .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
+
+        maven = new MavenEmbedder( configuration );
     }
 
     protected void tearDown()
@@ -91,7 +97,7 @@ public class MavenEmbedderTest
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"package"} ) );
 
         MavenExecutionResult result = maven.execute( request );
 
@@ -115,16 +121,15 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile(
-                                                                                       new File( targetDirectory,
-                                                                                                 "pom.xml" )
-                                                                                           .getAbsolutePath() )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
+        MavenExecutionRequest request =
+            new DefaultMavenExecutionRequest().setPomFile( new File( targetDirectory, "pom.xml" )
+                .getAbsolutePath() )
+                .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"package"} ) );
 
         MavenExecutionResult result = maven.execute( request );
 
         assertNoExceptions( result );
-        
+
         MavenProject project = result.getMavenProject();
 
         assertEquals( "embedder-test-project", project.getArtifactId() );
@@ -147,10 +152,10 @@ public class MavenEmbedderTest
 
         MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
             .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() ).setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "validate" } ) );
+            .setGoals( Arrays.asList( new String[]{"validate"} ) );
 
         MavenExecutionResult r0 = maven.execute( requestWithoutProfile );
-        
+
         assertNoExceptions( r0 );
 
         MavenProject p0 = r0.getMavenProject();
@@ -163,12 +168,11 @@ public class MavenEmbedderTest
 
         // Check with profile activated
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile(
-                                                                                       new File( targetDirectory,
-                                                                                                 "pom.xml" )
-                                                                                           .getAbsolutePath() )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "validate" } ) )
-            .addActiveProfile( "embedderProfile" );
+        MavenExecutionRequest request =
+            new DefaultMavenExecutionRequest().setPomFile( new File( targetDirectory, "pom.xml" )
+                .getAbsolutePath() )
+                .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"validate"} ) )
+                .addActiveProfile( "embedderProfile" );
 
         MavenExecutionResult r1 = maven.execute( request );
 
@@ -230,7 +234,7 @@ public class MavenEmbedderTest
             .setPomFile( getPomFile().getAbsolutePath() );
 
         MavenExecutionResult result = maven.readProjectWithDependencies( request );
-        
+
         assertNoExceptions( result );
 
         assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
@@ -249,8 +253,9 @@ public class MavenEmbedderTest
             .setPomFile( new File( basedir, "src/test/resources/pom2.xml" ).getAbsolutePath() );
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
         MavenExecutionResult result = new ExtendableMavenEmbedder( classLoader ).readProjectWithDependencies( request );
-        
+
         assertNoExceptions( result );
 
         //        Iterator it = result.getMavenProject().getTestClasspathElements().iterator();
@@ -261,7 +266,6 @@ public class MavenEmbedderTest
 
         // sources, test sources, and the junit jar..
         assertEquals( 3, result.getMavenProject().getTestClasspathElements().size() );
-
     }
 
     // ----------------------------------------------------------------------------
@@ -287,24 +291,24 @@ public class MavenEmbedderTest
 
         assertEquals( "org.apache.maven.new", model.getGroupId() );
     }
-    
+
     // ----------------------------------------------------------------------
     // Settings-File Handling
     // ----------------------------------------------------------------------
-    
+
     public void testReadSettings()
         throws IOException, SettingsConfigurationException, MavenEmbedderException
     {
         Settings s = new Settings();
         s.setOffline( true );
-        
+
         String localRepoPath = "/path/to/local/repo";
-        
+
         s.setLocalRepository( localRepoPath );
-        
+
         File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
         settingsFile.deleteOnExit();
-        
+
         FileWriter writer = null;
         try
         {
@@ -315,9 +319,9 @@ public class MavenEmbedderTest
         {
             IOUtil.close( writer );
         }
-        
+
         Settings result = MavenEmbedder.readSettings( settingsFile );
-        
+
         assertEquals( localRepoPath, result.getLocalRepository() );
         assertTrue( result.isOffline() );
     }
@@ -326,12 +330,12 @@ public class MavenEmbedderTest
         throws IOException, SettingsConfigurationException, MavenEmbedderException
     {
         Settings s = new Settings();
-        
+
         Profile p = new Profile();
-        
+
         Repository r = new Repository();
         r.setUrl( "http://example.com" );
-        
+
         p.addRepository( r );
         s.addProfile( p );
 
@@ -355,7 +359,7 @@ public class MavenEmbedderTest
 
             fail( "Settings should not pass validation when being read." );
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             String message = e.getMessage();
             assertTrue( message.indexOf( "Failed to validate" ) > -1 );
@@ -411,7 +415,7 @@ public class MavenEmbedderTest
         try
         {
             MavenEmbedder.writeSettings( settingsFile, s );
-            
+
             fail( "Validation of settings should fail before settings are written." );
         }
         catch ( IOException e )
@@ -437,7 +441,9 @@ public class MavenEmbedderTest
         public ExtendableMavenEmbedder( ClassLoader classLoader )
             throws MavenEmbedderException
         {
-            super( classLoader, new MavenEmbedderConsoleLogger() );
+            super( new DefaultConfiguration()
+                .setClassLoader( classLoader )
+                .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() ) );
         }
 
         protected Map getPluginExtensionComponents( Plugin plugin )
@@ -449,7 +455,8 @@ public class MavenEmbedderTest
             return toReturn;
         }
 
-        protected void verifyPlugin( Plugin plugin, MavenProject project )
+        protected void verifyPlugin( Plugin plugin,
+                                     MavenProject project )
         {
             //ignore don't want to actually verify in test
         }

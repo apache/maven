@@ -1,6 +1,8 @@
 package org.apache.maven.embedder;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.embedder.configuration.DefaultConfiguration;
+import org.apache.maven.embedder.configuration.Configuration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -25,7 +27,7 @@ public class TestComponentOverride
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        MavenEmbedderConfiguration request = new DefaultMavenEmbedderConfiguration();
+        Configuration request = new DefaultConfiguration();
 
         request.setClassLoader( loader );
 

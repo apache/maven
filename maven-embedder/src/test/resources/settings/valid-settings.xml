@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<settings>
+  <localRepository>/Users/jvanzyl/maven-repo-local</localRepository>
+  <pluginGroups>
+    <pluginGroup>org.codehaus.tycho</pluginGroup>
+    <pluginGroup>org.sonatype.pwt</pluginGroup>    
+  </pluginGroups>
+</settings>
