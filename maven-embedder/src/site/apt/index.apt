@@ -15,7 +15,7 @@ The Maven Embedder
 
 A Simple Example
 
-%{snippet|id=simple-embedder-example|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder/src/test/java/org/apache/maven/embedder/MavenEmbedderTest.java}
+%{snippet|id=simple-embedder-example|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder/src/test/java/org/apache/maven/embedder/MavenEmbedderExampleTest.java}
 
 
 
