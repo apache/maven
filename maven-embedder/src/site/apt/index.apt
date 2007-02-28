@@ -32,12 +32,14 @@ A Note on Configuring Settings
 
  * Plugin Groups
 
+ []
+
  If you are using the embedder it is entirely your responsibility to take user and global settings information and specify
  it in the embedder configuration. The embedder carries with it <<<no>>> defaults about where these are located and how
  they are used. If you want your embedded use of Maven to mimic the behavior of the Maven CLI insofar as settings use
  then use the following code:
 
- %{snippet|id=mimic-cli|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder/src/test/java/org/apache/maven/embedder/MavenEmbedderExampleTest.java}
+%{snippet|id=mimic-cli|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder/src/test/java/org/apache/maven/embedder/MavenEmbedderExampleTest.java}
 
   Also note that the user and global settings are merged, and the user settings are dominant.
 
