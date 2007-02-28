@@ -755,7 +755,6 @@ public class MavenEmbedder
 
         if ( configuration.getGlobalSettingsFile() != null )
         {
-
             try
             {
                 fileReader = new FileReader( configuration.getGlobalSettingsFile() );

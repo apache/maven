@@ -18,9 +18,23 @@ public class ValidateConfigurationTest
 
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
-        assertTrue( result.isUserSettingsFileParses() );
+        assertTrue( result.isUserSettingsFilePresent() );
 
         assertTrue( result.isUserSettingsFileParses() );
+    }
+
+    public void testConfigurationOnlyUserSettingsAreActiveAndItIsInvalid()
+    {
+        File user = new File( getBasedir(), "src/test/resources/settings/invalid-settings.xml" );
+
+        Configuration configuration = new DefaultConfiguration()
+            .setUserSettingsFile( user );
+
+        ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
+
+        assertTrue( result.isUserSettingsFilePresent() );
+
+        assertFalse( result.isUserSettingsFileParses() );
     }
 
     public void testConfigurationOnlyGlobalSettingsAreActiveAndItIsValid()
@@ -35,5 +49,19 @@ public class ValidateConfigurationTest
         assertTrue( result.isGlobalSettingsFilePresent() );
 
         assertTrue( result.isGlobalSettingsFileParses() );
+    }
+
+    public void testConfigurationOnlyGlobalSettingsAreActiveAndItIsInvalid()
+    {
+        File global = new File( getBasedir(), "src/test/resources/settings/invalid-settings.xml" );
+
+        Configuration configuration = new DefaultConfiguration()
+            .setGlobalSettingsFile( global );
+
+        ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
+
+        assertTrue( result.isGlobalSettingsFilePresent() );
+
+        assertFalse( result.isGlobalSettingsFileParses() );
     }
 }
