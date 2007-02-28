@@ -9,7 +9,7 @@ import java.io.File;
 public class ValidateConfigurationTest
     extends PlexusTestCase
 {
-    public void testConfigurationOnlyUserSettingsAreActive()
+    public void testConfigurationOnlyUserSettingsAreActiveAndItIsValid()
     {
         File user = new File( getBasedir(), "src/test/resources/settings/valid-settings.xml" );
 
@@ -23,17 +23,17 @@ public class ValidateConfigurationTest
         assertTrue( result.isUserSettingsFileParses() );
     }
 
-    public void testConfigurationOnlyGlobalSettingsAreActive()
+    public void testConfigurationOnlyGlobalSettingsAreActiveAndItIsValid()
     {
-        File user = new File( getBasedir(), "src/test/resources/settings/valid-settings.xml" );
+        File global = new File( getBasedir(), "src/test/resources/settings/valid-settings.xml" );
 
         Configuration configuration = new DefaultConfiguration()
-            .setUserSettingsFile( user );
+            .setUserSettingsFile( global );
 
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
-        assertTrue( result.isUserSettingsFileParses() );
+        assertTrue( result.isGlobalSettingsFilePresent() );
 
-        assertTrue( result.isUserSettingsFileParses() );
+        assertTrue( result.isGlobalSettingsFileParses() );
     }
 }
