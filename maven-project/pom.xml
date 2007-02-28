@@ -66,11 +66,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-tools</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.1-SNAPSHOT</version>
     </dependency>
