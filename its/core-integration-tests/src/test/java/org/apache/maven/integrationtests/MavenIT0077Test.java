@@ -6,11 +6,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0077Test
     extends AbstractMavenIntegrationTestCase
 {
-
     /**
      * Test test jar attachment.
      */
@@ -20,14 +20,10 @@ public class MavenIT0077Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0077" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "install" );
         verifier.assertArtifactPresent( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
 }
 
