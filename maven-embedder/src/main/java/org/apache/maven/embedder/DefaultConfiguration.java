@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.configuration;
+package org.apache.maven.embedder;
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -17,9 +17,6 @@ package org.apache.maven.embedder.configuration;
 
 import org.apache.maven.embedder.ContainerCustomizer;
 import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;

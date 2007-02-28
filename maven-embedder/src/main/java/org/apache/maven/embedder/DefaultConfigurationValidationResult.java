@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.configuration;
+package org.apache.maven.embedder;
 
 /** @author Jason van Zyl */
 public class DefaultConfigurationValidationResult

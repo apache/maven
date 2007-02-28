@@ -1,8 +1,8 @@
 package org.apache.maven.embedder;
 
 import org.apache.maven.SettingsConfigurationException;
-import org.apache.maven.embedder.configuration.Configuration;
-import org.apache.maven.embedder.configuration.DefaultConfiguration;
+import org.apache.maven.embedder.Configuration;
+import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;

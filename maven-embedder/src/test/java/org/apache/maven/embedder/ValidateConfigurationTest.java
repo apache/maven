@@ -1,7 +1,10 @@
-package org.apache.maven.embedder.configuration;
+package org.apache.maven.embedder;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.ConfigurationValidationResult;
+import org.apache.maven.embedder.DefaultConfiguration;
+import org.apache.maven.embedder.Configuration;
 
 import java.io.File;
 

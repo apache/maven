@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.configuration;
+package org.apache.maven.embedder;
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
