@@ -37,49 +37,30 @@ public class MavenSession
 {
     private PlexusContainer container;
 
-    private ArtifactRepository localRepository;
-
-    private List goals;
-
     private EventDispatcher eventDispatcher;
-
-    // TODO: make this the central one, get rid of build settings...
-    private final Settings settings;
 
     private ReactorManager reactorManager;
 
-    private final String executionRootDir;
-
     private boolean usingPOMsFromFilesystem = true;
 
-    private final Properties executionProperties;
+    private MavenExecutionRequest request;
 
-    private final Date startTime;
-
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
-                         String executionRootDir, Properties executionProperties, Date startTime )
+    public MavenSession( PlexusContainer container,
+                         MavenExecutionRequest request,
+                         EventDispatcher eventDispatcher,
+                         ReactorManager reactorManager )
     {
         this.container = container;
 
-        this.settings = settings;
-
-        this.localRepository = localRepository;
+        this.request = request;
 
         this.eventDispatcher = eventDispatcher;
 
         this.reactorManager = reactorManager;
-
-        this.goals = goals;
-
-        this.executionRootDir = executionRootDir;
-
-        this.executionProperties = executionProperties;
-
-        this.startTime = startTime;
     }
 
-    public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    public Map getPluginContext( PluginDescriptor pluginDescriptor,
+                                 MavenProject project )
     {
         return reactorManager.getPluginContext( pluginDescriptor, project );
     }
@@ -91,17 +72,17 @@ public class MavenSession
 
     public ArtifactRepository getLocalRepository()
     {
-        return localRepository;
+        return request.getLocalRepository();
     }
 
     public List getGoals()
     {
-        return goals;
+        return request.getGoals();
     }
 
     public Properties getExecutionProperties()
     {
-        return executionProperties;
+        return request.getProperties();
     }
 
     // ----------------------------------------------------------------------
@@ -114,7 +95,8 @@ public class MavenSession
         return container.lookup( role );
     }
 
-    public Object lookup( String role, String roleHint )
+    public Object lookup( String role,
+                          String roleHint )
         throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
@@ -139,7 +121,7 @@ public class MavenSession
 
     public Settings getSettings()
     {
-        return settings;
+        return request.getSettings();
     }
 
     public List getSortedProjects()
@@ -149,7 +131,7 @@ public class MavenSession
 
     public String getExecutionRootDirectory()
     {
-        return executionRootDir;
+        return request.getBaseDirectory();
     }
 
     public void setUsingPOMsFromFilesystem( boolean usingPOMsFromFilesystem )
@@ -164,6 +146,11 @@ public class MavenSession
 
     public Date getStartTime()
     {
-        return startTime;
+        return request.getStartTime();
+    }
+
+    public MavenExecutionRequest getRequest()
+    {
+        return request;
     }
 }
