@@ -66,7 +66,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container, Properties props )
     {
-        this( container, (Settings)null, props );
+        this( container, null, props );
         
     }
 
