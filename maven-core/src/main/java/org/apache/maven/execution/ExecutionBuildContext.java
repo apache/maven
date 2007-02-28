@@ -138,11 +138,6 @@ public class ExecutionBuildContext
         return request.getSettings();
     }
 
-    public String getSettingsFile()
-    {
-        return request.getSettingsFile();
-    }
-
     public Date getStartTime()
     {
         return request.getStartTime();

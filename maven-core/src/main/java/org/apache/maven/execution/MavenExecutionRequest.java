@@ -16,12 +16,11 @@ package org.apache.maven.execution;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsBuilderAdvice;
-import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
@@ -77,10 +76,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setBaseDirectory( File basedir );
     String getBaseDirectory();
 
-    // Settings
-    MavenExecutionRequest setSettings( Settings settings );
-    Settings getSettings();
-
     // Timing (remove this)
     MavenExecutionRequest setStartTime( Date start );
     Date getStartTime();
@@ -135,14 +130,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
     String getGlobalChecksumPolicy();
 
-    // ----------------------------------------------------------------------------
-    // Settings equivalents
-    // ----------------------------------------------------------------------------
-
-    // Settings
-    MavenExecutionRequest setSettingsFile( String settingsFile );
-    String getSettingsFile();
-
     // Local repository
     MavenExecutionRequest setLocalRepositoryPath( String localRepository );
     MavenExecutionRequest setLocalRepositoryPath( File localRepository );
@@ -185,13 +172,15 @@ public interface MavenExecutionRequest
     List getPluginGroups();
     MavenExecutionRequest setPluginGroups( List pluginGroups );
 
+    //PLXAPI: should go away
     // Plugin registry
     boolean isUsePluginRegistry();
     MavenExecutionRequest setUsePluginRegistry( boolean usePluginRegistry );
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
-    
-    SettingsBuilderAdvice getSettingsBuilderAdvice();
-    MavenExecutionRequest setSettingsBuilderAdvice( SettingsBuilderAdvice advice );
+
+    // Setting
+    Settings getSettings();
+    MavenExecutionRequest setSettings( Settings settings );
 }
