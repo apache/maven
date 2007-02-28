@@ -15,14 +15,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <distributionManagement>
-    <repository>
-      <id>central</id>
-      <name>Test Repository</name>
-      <url>file:../target/test-repo</url>
-    </repository>
-  </distributionManagement>
   <build>
     <plugins>
       <plugin>

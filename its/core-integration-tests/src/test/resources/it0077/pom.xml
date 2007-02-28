@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <name>Maven Integration Test :: it0077</name> 
   <groupId>org.apache.maven.its.it0077</groupId>
@@ -20,11 +20,4 @@
     <module>sub1</module>
     <module>sub2</module>
   </modules>
-
-  <repositories>
-    <repository>
-      <id>test</id>
-      <url>file:target/test-repo</url>
-    </repository>
-  </repositories>
-</model>
+</project>
