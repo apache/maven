@@ -42,38 +42,45 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
+    void executeMojo( MavenProject project,
+                      MojoExecution execution,
+                      MavenSession session )
         throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
         InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
 
-    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+    MavenReport getReport( MavenProject project,
+                           MojoExecution mojoExecution,
+                           MavenSession session )
         throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
         ArtifactResolutionException;
 
     PluginDescriptor getPluginDescriptorForPrefix( String prefix );
 
-    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
+    Plugin getPluginDefinitionForPrefix( String prefix,
+                                         MavenSession session,
+                                         MavenProject project );
 
-    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                   ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-    
-    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    PluginDescriptor verifyPlugin( Plugin plugin,
+                                   MavenProject project,
+                                   MavenSession session )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;
 
-    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
+    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
+                                         MavenProject project,
+                                         MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;
 
-    Object getPluginComponent( Plugin plugin, String role, String roleHint )
+    Object getPluginComponent( Plugin plugin,
+                               String role,
+                               String roleHint )
         throws PluginManagerException, ComponentLookupException;
 
-    Map getPluginComponents( Plugin plugin, String role )
+    Map getPluginComponents( Plugin plugin,
+                             String role )
         throws ComponentLookupException, PluginManagerException;
 
 }
