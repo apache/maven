@@ -31,19 +31,9 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-         <execution>
-            <id>xsd</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <version>1.0.0</version>
           <model>src/main/mdo/paramdoc.mdo</model>
-          <packageWithVersion>false</packageWithVersion>
         </configuration>
       </plugin>
     </plugins>
