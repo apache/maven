@@ -27,7 +27,7 @@
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
   <properties>
-    <bundleVersion>2.1.0.v20070224-1541</bundleVersion>
+    <bundleVersion>2.1.0.v20070227-2207</bundleVersion>
   </properties>
   <build>
     <resources>

@@ -21,16 +21,10 @@ import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 /**
  * Attach a POM to an artifact.
@@ -84,34 +78,16 @@ public class ProjectArtifactMetadata
         // here and be safe. jvz.
         // ----------------------------------------------------------------------------
 
-        Reader reader = null;
-
-        Writer writer = null;
-
         try
         {
-            reader = new FileReader( file );
-
-            writer = new FileWriter( destination );
-
-            IOUtil.copy( reader, writer );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
+            FileUtils.copyFile( file, destination );
         }
         catch ( IOException e )
         {
-            throw new RepositoryMetadataStoreException( "Error rewriting POM", e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-
-            IOUtil.close( writer );
+            throw new RepositoryMetadataStoreException( "Error copying POM to the local repository.", e );
         }
     }
-
+    
     public String toString()
     {
         return "project information for " + artifact.getArtifactId() + " " + artifact.getVersion();
