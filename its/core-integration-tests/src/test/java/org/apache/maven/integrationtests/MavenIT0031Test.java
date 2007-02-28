@@ -6,16 +6,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MavenIT0031Test
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0031Test()
-        throws InvalidVersionSpecificationException
-    {
-        super( "[,2.1-SNAPSHOT)" );
-    }
-
     /**
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
      * pluginGroups in the provided settings.xml.
@@ -25,8 +21,10 @@ public class MavenIT0031Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0031" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "--settings settings.xml" );
+        verifier.setCliOptions( cliOptions );
         Properties systemProperties = new Properties();
-        systemProperties.put( "org.apache.maven.user-settings", "settings.xml" );
         systemProperties.put( "model", "src/main/mdo/test.mdo" );
         systemProperties.put( "version", "1.0.0" );
         verifier.setSystemProperties( systemProperties );
