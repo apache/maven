@@ -37,7 +37,6 @@ import org.apache.maven.plugin.registry.PluginRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;

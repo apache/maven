@@ -16,11 +16,12 @@ package org.apache.maven.settings.validation;
  * limitations under the License.
  */
 
-import java.util.Iterator;
-import java.util.List;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Milos Kleint

@@ -16,13 +16,12 @@ package org.apache.maven.cli;
  * limitations under the License.
  */
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
+import junit.framework.TestCase;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.util.StringOutputStream;
 
-import junit.framework.TestCase;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 /**
  * Test method for 'org.apache.maven.cli.MavenCli.main(String[], ClassWorld)'

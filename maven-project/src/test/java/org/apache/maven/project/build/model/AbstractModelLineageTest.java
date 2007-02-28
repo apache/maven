@@ -1,18 +1,16 @@
 package org.apache.maven.project.build.model;
 
+import junit.framework.TestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.build.model.ModelLineage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 public abstract class AbstractModelLineageTest
     extends TestCase

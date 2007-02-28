@@ -16,14 +16,13 @@ package org.apache.maven.project.injection;
  * limitations under the License.
  */
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
+
+import java.util.List;
 
 /**
  * @author jdcasey

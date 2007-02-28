@@ -17,7 +17,6 @@ package org.apache.maven.artifact;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
 

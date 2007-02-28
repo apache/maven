@@ -1,5 +1,6 @@
 package org.apache.maven.artifact.repository.metadata;
 
+import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.testutils.MockManager;
@@ -9,8 +10,6 @@ import org.easymock.MockControl;
 
 import java.io.File;
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 public class AbstractRepositoryMetadataTest
     extends TestCase

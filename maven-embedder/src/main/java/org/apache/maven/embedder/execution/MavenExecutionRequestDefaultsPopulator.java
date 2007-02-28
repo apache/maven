@@ -1,7 +1,7 @@
 package org.apache.maven.embedder.execution;
 
-import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 
 public interface MavenExecutionRequestDefaultsPopulator

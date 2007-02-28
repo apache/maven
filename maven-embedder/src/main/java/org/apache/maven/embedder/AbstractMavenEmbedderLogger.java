@@ -1,7 +1,5 @@
 package org.apache.maven.embedder;
 
-import java.io.File;
-
 /*
 * Copyright 2001-2005 The Apache Software Foundation.
 *

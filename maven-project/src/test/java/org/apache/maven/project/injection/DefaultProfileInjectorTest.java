@@ -1,12 +1,6 @@
 package org.apache.maven.project.injection;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
@@ -16,6 +10,11 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultProfileInjectorTest
     extends TestCase

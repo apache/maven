@@ -16,16 +16,10 @@ package org.apache.maven.project.inheritance.t03;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.List;
-
-import org.apache.maven.model.Build;
-import org.apache.maven.model.MailingList;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.io.File;
 
 /**
  * A test which demonstrates maven's recursive inheritance where

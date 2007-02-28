@@ -1,7 +1,6 @@
 package org.apache.maven.usability.plugin;
 
 import junit.framework.TestCase;
-
 import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

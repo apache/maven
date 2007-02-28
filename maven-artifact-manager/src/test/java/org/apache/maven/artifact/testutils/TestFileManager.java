@@ -1,5 +1,6 @@
 package org.apache.maven.artifact.testutils;
 
+import junit.framework.Assert;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -12,8 +13,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.Assert;
 
 public class TestFileManager
 {

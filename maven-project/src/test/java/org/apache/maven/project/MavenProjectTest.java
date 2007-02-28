@@ -16,11 +16,11 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase

@@ -16,8 +16,8 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;

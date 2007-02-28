@@ -1,14 +1,13 @@
 package org.apache.maven.embedder;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class MavenEmbedderCrappySettingsConfigurationTest
     extends PlexusTestCase

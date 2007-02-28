@@ -2,8 +2,8 @@ package org.apache.maven.execution;
 
 import org.apache.maven.project.MavenProject;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult

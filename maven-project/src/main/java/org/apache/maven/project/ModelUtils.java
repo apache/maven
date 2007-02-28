@@ -48,12 +48,12 @@ import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.HashMap;
 
 public final class ModelUtils
 {

@@ -17,7 +17,6 @@ package org.apache.maven.project;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;

@@ -19,8 +19,6 @@ package org.apache.maven.embedder.writer;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;

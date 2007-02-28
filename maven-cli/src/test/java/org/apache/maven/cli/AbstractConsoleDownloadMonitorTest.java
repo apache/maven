@@ -17,7 +17,6 @@ package org.apache.maven.cli;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.authentication.AuthenticationException;

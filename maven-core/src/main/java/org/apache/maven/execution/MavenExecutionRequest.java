@@ -19,8 +19,8 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;

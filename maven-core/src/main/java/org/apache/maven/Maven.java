@@ -18,7 +18,6 @@ package org.apache.maven;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.reactor.MavenExecutionException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>

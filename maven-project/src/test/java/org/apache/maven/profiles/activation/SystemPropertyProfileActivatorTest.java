@@ -7,7 +7,6 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.ContextException;
 
 import java.util.Properties;
 

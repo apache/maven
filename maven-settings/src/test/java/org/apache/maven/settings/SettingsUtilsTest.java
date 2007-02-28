@@ -1,8 +1,8 @@
 package org.apache.maven.settings;
 
-import java.util.List;
-
 import junit.framework.TestCase;
+
+import java.util.List;
 
 public class SettingsUtilsTest
     extends TestCase

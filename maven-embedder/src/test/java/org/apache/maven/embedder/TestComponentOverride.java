@@ -1,14 +1,11 @@
 package org.apache.maven.embedder;
 
+import junit.framework.TestCase;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.embedder.DefaultConfiguration;
-import org.apache.maven.embedder.Configuration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
-
-import junit.framework.TestCase;
 
 /** @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a> */
 public class TestComponentOverride

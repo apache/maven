@@ -16,7 +16,6 @@ package org.apache.maven.profiles;
  * limitations under the License.
  */
 
-import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -29,10 +28,11 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 public class DefaultProfileManager
     implements ProfileManager

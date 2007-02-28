@@ -17,7 +17,6 @@ package org.apache.maven.usability;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.DuplicateParameterException;

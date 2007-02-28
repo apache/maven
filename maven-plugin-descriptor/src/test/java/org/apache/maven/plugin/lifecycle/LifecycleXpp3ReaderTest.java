@@ -16,14 +16,13 @@ package org.apache.maven.plugin.lifecycle;
  * limitations under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import junit.framework.TestCase;
 
 /**
  * Test the lifecycle reader.

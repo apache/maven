@@ -1,9 +1,9 @@
 package org.apache.maven.context;
 
+import junit.framework.TestCase;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 public abstract class AbstractBuildContextTest
     extends TestCase

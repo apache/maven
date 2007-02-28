@@ -1,8 +1,7 @@
 package org.apache.maven.embedder;
 
+import junit.framework.TestCase;
 import org.apache.maven.SettingsConfigurationException;
-import org.apache.maven.embedder.Configuration;
-import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -31,8 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 public class MavenEmbedderTest
     extends TestCase

@@ -30,7 +30,6 @@ import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

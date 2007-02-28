@@ -4,12 +4,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
-import org.apache.maven.settings.Settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.List;
 
 /**

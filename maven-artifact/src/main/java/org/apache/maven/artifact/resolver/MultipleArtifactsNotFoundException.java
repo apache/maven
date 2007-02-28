@@ -1,9 +1,9 @@
 package org.apache.maven.artifact.resolver;
 
+import org.apache.maven.artifact.Artifact;
+
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.maven.artifact.Artifact;
 
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException

@@ -15,8 +15,6 @@ package org.apache.maven.embedder;
  * limitations under the License.
  */
 
-import org.apache.maven.embedder.ContainerCustomizer;
-import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
