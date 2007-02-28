@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class MavenEmbedderCrappySettingsConfigurationTest
     extends PlexusTestCase
 {
-    public void testEmbedderWillStilStartupWhenTheSettingsConfigurationIsCrap()
+    public void testEmbedderWillStillStartupWhenTheSettingsConfigurationIsCrap()
         throws Exception
     {
         // START SNIPPET: simple-embedder-example
