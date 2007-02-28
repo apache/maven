@@ -538,10 +538,8 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request,
                                           ReactorManager rpm,
                                           EventDispatcher dispatcher )
-    {
-        return new MavenSession( container, request.getSettings(), request.getLocalRepository(), dispatcher, rpm,
-                                 request.getGoals(), request.getBaseDirectory(), request.getProperties(),
-                                 request.getStartTime() );
+    {        
+        return new MavenSession( container, request, dispatcher, rpm );
     }
 
     // ----------------------------------------------------------------------
