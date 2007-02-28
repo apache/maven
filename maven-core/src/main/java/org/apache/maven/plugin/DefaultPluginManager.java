@@ -145,27 +145,6 @@ public class DefaultPluginManager
                                                  session.getLocalRepository() );
     }
 
-    /**
-     * @deprecated use {@link PluginManager#verifyPlugin(Plugin, MavenProject, Settings)}
-     */
-    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                          ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
-        // TODO: this should be possibly outside
-        // All version-resolution logic has been moved to DefaultPluginVersionManager.
-        if ( plugin.getVersion() == null )
-        {
-            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
-                                                                        project, settings, localRepository );
-            plugin.setVersion( version );
-        }
-
-        return verifyVersionedPlugin( plugin, project, localRepository );
-    }
-
     public PluginDescriptor verifyPlugin( Plugin plugin,
                                           MavenProject project,
                                           MavenSession session )
