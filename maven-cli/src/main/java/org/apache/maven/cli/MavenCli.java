@@ -21,10 +21,11 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
+import org.apache.maven.embedder.configuration.Configuration;
+import org.apache.maven.embedder.configuration.DefaultConfiguration;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.settings.SettingsBuilderAdvice;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -42,6 +43,11 @@ import java.util.StringTokenizer;
  */
 public class MavenCli
 {
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
+        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+
+    public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
@@ -90,6 +96,7 @@ public class MavenCli
         }
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
+
         boolean quiet = !debug && commandLine.hasOption( CLIManager.QUIET );
 
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
@@ -124,21 +131,6 @@ public class MavenCli
         // Now that we have everything that we need we will fire up plexus and
         // bring the maven component to life for use.
         // ----------------------------------------------------------------------
-
-        //** use CLI option values directly in request where possible
-
-        MavenEmbedder mavenEmbedder;
-
-        try
-        {
-            mavenEmbedder = new MavenEmbedder( classWorld );            
-        }
-        catch ( MavenEmbedderException e )
-        {
-            showFatalError( "Unable to start the embedded plexus container", e, showErrors );
-
-            return 1;
-        }
 
         boolean interactive = true;
 
@@ -315,11 +307,6 @@ public class MavenCli
             }
 
             Properties executionProperties = getExecutionProperties( commandLine );
-            
-            SettingsBuilderAdvice settingsAdvice = new SettingsBuilderAdvice();
-            
-            settingsAdvice.setDefaultGlobalLocationEnabled( true );
-            settingsAdvice.setDefaultUserLocationEnabled( true );
 
             MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setBaseDirectory( baseDirectory )
@@ -330,22 +317,54 @@ public class MavenCli
                 .setUseReactor( useReactor ) // default: false
                 .setPomFile( alternatePomFile ) // optional
                 .setShowErrors( showErrors ) // default: false
-                    // Settings
-                .setSettingsFile( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) )
-                .setSettingsBuilderAdvice( settingsAdvice )
-                    //.setLocalRepositoryPath( localRepositoryPath ) // default: ~/.m2/repository
                 .setInteractiveMode( interactive ) // default: false
                 .setUsePluginRegistry( usePluginRegistry )
                 .setOffline( offline ) // default: false
                 .setUsePluginUpdateOverride( pluginUpdateOverride )
                 .addActiveProfiles( activeProfiles ) // optional
                 .addInactiveProfiles( inactiveProfiles ) // optional
-                    //
                 .setLoggingLevel( loggingLevel ) // default: info
                 .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
                 .setUpdateSnapshots( updateSnapshots ) // default: false
                 .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
                 .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
+
+        File userSettingsFile;
+
+        if ( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) != null )
+        {
+            userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
+        }
+        else
+        {
+            userSettingsFile = MavenEmbedder.DEFAULT_USER_SETTINGS_FILE;
+        }
+
+        Configuration configuration = new DefaultConfiguration()
+            .setUserSettingsFile( userSettingsFile )
+            .setGlobalSettingsFile( DEFAULT_GLOBAL_SETTINGS_FILE )
+            .setClassWorld( classWorld );
+
+        String localRepoProperty = executionProperties.getProperty( LOCAL_REPO_PROPERTY );
+
+        if ( localRepoProperty != null )
+        {
+            configuration.setLocalRepository( new File( localRepoProperty ) );
+        }
+
+        MavenEmbedder mavenEmbedder;
+
+        try
+        {
+            mavenEmbedder = new MavenEmbedder( configuration );
+        }
+        catch ( MavenEmbedderException e )
+        {
+            showFatalError( "Unable to start the embedded plexus container", e, showErrors );
+
+            return 1;
+        }
+
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 

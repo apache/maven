@@ -30,6 +30,7 @@ public class ConsoleDownloadMonitorTest
         throws Exception
     {
         super.setMonitor( new ConsoleDownloadMonitor() );
+
         super.setUp();
     }
 }
