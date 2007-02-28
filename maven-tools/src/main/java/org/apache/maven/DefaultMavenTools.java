@@ -46,30 +46,6 @@ public class DefaultMavenTools
     private PlexusContainer container;
 
     // ----------------------------------------------------------------------------
-    // ArtifactRepository
-    // ----------------------------------------------------------------------------
-
-    public ArtifactRepository createLocalRepository( File directory )
-    {
-        String localRepositoryUrl = directory.getAbsolutePath();
-
-        if ( !localRepositoryUrl.startsWith( "file:" ) )
-        {
-            localRepositoryUrl = "file://" + localRepositoryUrl;
-        }
-
-        return createRepository( "local", localRepositoryUrl );
-    }
-
-    private ArtifactRepository createRepository( String repositoryId,
-                                                 String repositoryUrl )
-    {
-        ArtifactRepository localRepository =
-            new DefaultArtifactRepository( repositoryId, repositoryUrl, repositoryLayout );
-        return localRepository;
-    }
-
-    // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
     // but just trying to collect it all in one place right now.
     // ----------------------------------------------------------------------------
@@ -77,7 +53,6 @@ public class DefaultMavenTools
     public List buildArtifactRepositories( List repositories )
         throws InvalidRepositoryException
     {
-
         List repos = new ArrayList();
 
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
@@ -126,6 +101,7 @@ public class DefaultMavenTools
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
+
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
             return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshots, releases );
