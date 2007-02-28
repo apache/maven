@@ -5,6 +5,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -97,4 +98,31 @@ public class MavenEmbedderExampleTest
         }
         // END SNIPPET: mimic-cli
     }
+
+    public void testEmbedderExampleThatShowsAccessingThePlexusContainer()
+        throws Exception
+    {
+
+        // START SNIPPET: plexus-container
+        Configuration configuration = new DefaultConfiguration()
+            .setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE )
+            .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
+            .setClassLoader( Thread.currentThread().getContextClassLoader() );
+
+        ConfigurationValidationResult validationResult = MavenEmbedder.validateConfiguration( configuration );
+
+        if ( validationResult.isValid() )
+        {
+            // If the configuration is valid then do your thang ...
+        }
+
+        MavenEmbedder embedder = new MavenEmbedder( configuration );
+
+        PlexusContainer container = embedder.getPlexusContainer();
+
+        // Do what you like with the container ...
+
+        // END SNIPPET: plexus-container
+    }
+
 }

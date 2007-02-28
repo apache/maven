@@ -65,6 +65,7 @@ import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -618,8 +619,6 @@ public class MavenEmbedder
             {
                 settings = settingsBuilder.buildSettings( configuration.getUserSettingsFile(),
                                                           configuration.getGlobalSettingsFile() );
-
-                System.out.println( "settings.getLocalRepository() = " + settings.getLocalRepository() );
             }
             catch ( Exception e )
             {
@@ -904,5 +903,15 @@ public class MavenEmbedder
         {
             loggerManager.setThresholds( oldThreshold );
         }
+    }
+
+    /**
+     * Return the instance of the plexus container being used in the embedder.
+     *  
+     * @return The plexus container used in the embedder.
+     */
+    public PlexusContainer getPlexusContainer()
+    {
+        return container;
     }
 }

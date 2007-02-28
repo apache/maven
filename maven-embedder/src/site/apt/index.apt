@@ -41,5 +41,12 @@ A Note on Configuring Settings
 
   Also note that the user and global settings are merged, and the user settings are dominant.
 
-  
+Accessing the Underlying Plexus Container
+
+  Though it is not recommended for general use, it is possible to get at the underlying Plexus Container instance if you
+  wish to lookup custom components. The Maven Embedder was specifically designed to be used for Maven and not a general
+  purpose use of Plexus. So if you use this method then you use it at your peril. You can access the Plexus Container
+  using the following:
+
+%{snippet|id=plexus-container|url=http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder/src/test/java/org/apache/maven/embedder/MavenEmbedderExampleTest.java}
 
