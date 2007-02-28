@@ -41,7 +41,6 @@ public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
     implements MavenSettingsBuilder
 {
-
     private SettingsValidator validator;
 
     /**
@@ -50,25 +49,6 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException
     {
-        return buildSettings( userSettingsFile, globalSettingsFile, new SettingsBuilderAdvice() );
-    }
-
-    /**
-     * @since 2.1
-     */
-    public Settings buildSettings( File userSettingsFile, File globalSettingsFile, SettingsBuilderAdvice advice )
-        throws IOException, XmlPullParserException
-    {
-        if ( advice.isDefaultUserLocationEnabled() && userSettingsFile == null )
-        {
-            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
-        }
-
-        if ( advice.isDefaultGlobalLocationEnabled() && globalSettingsFile == null )
-        {
-            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
-        }
-
         if ( globalSettingsFile == null && userSettingsFile == null )
         {
             getLogger().debug(
@@ -105,24 +85,6 @@ public class DefaultMavenSettingsBuilder
         return userSettings;
     }
 
-    /**
-     * @deprecated
-     */
-    public Settings buildSettings()
-        throws IOException, XmlPullParserException
-    {
-        return buildSettings( DEFAULT_USER_SETTINGS_FILE );
-    }
-
-    /**
-     * @deprecated
-     */
-    public Settings buildSettings( File userSettingsFile )
-        throws IOException, XmlPullParserException
-    {
-        return buildSettings( userSettingsFile, null );
-    }
-
     private Settings readSettings( File settingsFile )
         throws IOException, XmlPullParserException
     {
@@ -142,6 +104,7 @@ public class DefaultMavenSettingsBuilder
             try
             {
                 reader = new FileReader( settingsFile );
+
                 StringWriter sWriter = new StringWriter();
 
                 IOUtil.copy( reader, sWriter );
@@ -151,6 +114,7 @@ public class DefaultMavenSettingsBuilder
                 try
                 {
                     RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
                     interpolator.addValueSource( new EnvarBasedValueSource() );
 
                     rawInput = interpolator.interpolate( rawInput, "settings" );
@@ -220,6 +184,5 @@ public class DefaultMavenSettingsBuilder
         {
             throw new IOException( "Failed to validate Settings file at " + location + "\n" + validationResult.render( "\n" ) );
         }
-
     }
 }

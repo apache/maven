@@ -29,33 +29,9 @@ public interface MavenSettingsBuilder
 {
     String ROLE = MavenSettingsBuilder.class.getName();
 
-    File DEFAULT_USER_SETTINGS_FILE = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
-
-    File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
-        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
-
-    /**
-     * @deprecated
-     */
-    Settings buildSettings()
-        throws IOException, XmlPullParserException;
-
-    /**
-     * @deprecated
-     */
-    Settings buildSettings( File userSettingsFile )
-        throws IOException, XmlPullParserException;
-
     /**
      * @since 2.1
      */
     Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException;
-
-    /**
-     * @since 2.1
-     */
-    Settings buildSettings( File userSettingsPath, File globalSettingsPath, SettingsBuilderAdvice advice )
-        throws IOException, XmlPullParserException;
-    
 }
