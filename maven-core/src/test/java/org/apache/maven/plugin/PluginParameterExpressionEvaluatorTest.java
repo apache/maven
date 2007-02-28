@@ -24,6 +24,8 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -125,18 +127,18 @@ public class PluginParameterExpressionEvaluatorTest
 
         assertEquals( "test with version: 1", value );
     }
-    
+
     public void testMissingPOMPropertyRefInLargerExpression()
         throws Exception
     {
         String expr = "/path/to/someproject-${baseVersion}";
-        
+
         MavenProject project = new MavenProject( new Model() );
-        
+
         ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
 
         Object value = ee.evaluate( expr );
-        
+
         assertEquals( expr, value );
     }
 
@@ -209,19 +211,27 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
-    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
+    private static MavenSession createSession( PlexusContainer container,
+                                               ArtifactRepository repo )
         throws CycleDetectedException, DuplicateProjectException
     {
-        return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ),
-                                 Collections.EMPTY_LIST, ".", new Properties(), new Date() );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setSettings( new Settings() )
+            .setProperties( new Properties() )
+            .setStartTime( new Date() )
+            .setGoals( Collections.EMPTY_LIST )
+            .setBaseDirectory( new File( "" ) )
+            .setLocalRepository( repo );
+
+        return new MavenSession( container, request, new DefaultEventDispatcher(),
+                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
     }
 
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null,
-                                                                             new Properties() );
+        ExpressionEvaluator expressionEvaluator =
+            createExpressionEvaluator( createDefaultProject(), null, new Properties() );
         Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
         assertEquals( "local", ( (DefaultArtifactRepository) value ).getId() );
@@ -237,8 +247,8 @@ public class PluginParameterExpressionEvaluatorTest
         Model model = new Model();
         model.setBuild( build );
 
-        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null,
-                                                                             new Properties() );
+        ExpressionEvaluator expressionEvaluator =
+            createExpressionEvaluator( new MavenProject( model ), null, new Properties() );
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
 
@@ -274,12 +284,13 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenProject( new Model() );
     }
 
-    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor,
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project,
+                                                           PluginDescriptor pluginDescriptor,
                                                            Properties executionProperties )
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
 
@@ -296,7 +307,9 @@ public class PluginParameterExpressionEvaluatorTest
                                                        executionProperties );
     }
 
-    protected Artifact createArtifact( String groupId, String artifactId, String version )
+    protected Artifact createArtifact( String groupId,
+                                       String artifactId,
+                                       String version )
         throws Exception
     {
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
