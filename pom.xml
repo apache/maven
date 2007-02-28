@@ -151,7 +151,6 @@
     <module>maven-settings</module>
     <module>maven-cli</module>
     <module>maven-embedder</module>
-    <module>maven-tools</module>
   </modules>
   <properties>
     <plexusVersion>1.0-alpha-16</plexusVersion>
