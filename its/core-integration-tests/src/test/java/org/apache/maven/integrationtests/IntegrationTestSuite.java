@@ -1,12 +1,11 @@
 package org.apache.maven.integrationtests;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 
 import java.io.PrintStream;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class IntegrationTestSuite
     extends AbstractMavenIntegrationTestCase
@@ -111,7 +110,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0087Test.class );
         suite.addTestSuite( MavenIT0088Test.class );
         suite.addTestSuite( MavenIT0089Test.class );
-        // suite.addTestSuite(MavenIT0090Test.class);
+        suite.addTestSuite(MavenIT0090Test.class);
         // suite.addTestSuite(MavenIT0091Test.class);
         suite.addTestSuite( MavenIT0092Test.class );
         // suite.addTestSuite( MavenIT0093Test.class );
