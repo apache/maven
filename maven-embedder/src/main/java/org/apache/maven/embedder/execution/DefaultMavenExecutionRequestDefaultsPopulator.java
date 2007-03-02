@@ -84,7 +84,8 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
     private WagonManager wagonManager;
 
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, MavenEmbedder embedder )
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
+                                                   MavenEmbedder embedder )
         throws MavenEmbedderException
     {
         if ( request.getSettings() == null )
@@ -123,24 +124,21 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
 
         // Wagon
 
-        wagonManager.setOnline( !request.isOffline() );
-
         if ( request.isOffline() )
         {
             getLogger().info( SystemWarnings.getOfflineWarning() );
 
-            if ( request.isOffline() )
-            {
-                wagonManager.setOnline( false );
-            }
-            else
-            {
-                wagonManager.setInteractive( request.isInteractiveMode() );
+            wagonManager.setOnline( false );
+        }
+        else
+        {
+            wagonManager.setInteractive( request.isInteractiveMode() );
 
-                wagonManager.addTransferListener( request.getTransferListener() );
+            System.out.println( "request.getTransferListener() = " + request.getTransferListener() );
 
-                wagonManager.setOnline( true );
-            }
+            wagonManager.addTransferListener( request.getTransferListener() );
+
+            wagonManager.setOnline( true );
         }
 
         try
