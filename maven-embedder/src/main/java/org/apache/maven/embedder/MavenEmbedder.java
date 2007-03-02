@@ -598,7 +598,7 @@ public class MavenEmbedder
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-            buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE );
+            buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE, "default" );
 
             // ----------------------------------------------------------------------
             // Artifact related components
@@ -608,7 +608,7 @@ public class MavenEmbedder
 
             artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-            artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+            artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE, "default" );
 
             defaultArtifactRepositoryLayout =
                 (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );

@@ -63,6 +63,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.version.PluginVersionManager</role>
+          <role-hint>default</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
@@ -73,6 +74,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+          <role-hint>maven</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.PluginMappingManager</role>
@@ -102,6 +104,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+          <role-hint>maven</role-hint>
         </requirement>
         <requirement>
 	      <role>org.apache.maven.wagon.manager.WagonManager</role>
@@ -605,6 +608,7 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+          <role-hint>maven</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.registry.MavenPluginRegistryBuilder</role>
@@ -614,6 +618,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.codehaus.plexus.components.interactivity.InputHandler</role>
+          <role-hint>default</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>

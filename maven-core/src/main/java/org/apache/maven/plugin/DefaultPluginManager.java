@@ -1122,7 +1122,7 @@ public class DefaultPluginManager
             }
             else
             {
-                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, pluginRealm );
+                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, "basic", pluginRealm );
             }
 
             ConfigurationListener listener = new DebugConfigurationListener( getLogger() );

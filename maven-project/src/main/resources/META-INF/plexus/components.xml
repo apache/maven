@@ -178,6 +178,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+          <role-hint>default</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.context.BuildContextManager</role>
