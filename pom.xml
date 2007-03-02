@@ -132,6 +132,12 @@ under the License.
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>
+    </plugins>
   </build>
   <modules>
     <module>maven-artifact</module>
