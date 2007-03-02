@@ -39,7 +39,12 @@ public abstract class AbstractProjectInheritanceTestCase
 
     protected File projectFile( String name )
     {
-        return new File( getLocalRepositoryPath(), "/maven/poms/" + name + "-1.0.pom" );
+        return projectFile( "maven", name );
+    }
+
+    protected File projectFile( String groupId, String artifactId )
+    {
+        return new File( getLocalRepositoryPath(), "/" + groupId + "/poms/" + artifactId + "-1.0.pom" );
     }
 
     // ----------------------------------------------------------------------

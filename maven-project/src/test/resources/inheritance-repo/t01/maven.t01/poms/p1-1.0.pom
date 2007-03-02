@@ -1,16 +1,16 @@
 <project>
   <parent>
-    <artifactId>p1</artifactId>
-    <groupId>maven</groupId>
+    <artifactId>p0</artifactId>
+    <groupId>maven.t01</groupId>
     <version>1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
-  <artifactId>p2</artifactId>
+  <groupId>maven.t01</groupId>
+  <artifactId>p1</artifactId>
   <packaging>pom</packaging>
-  <name>p2</name>
+  <name>p1</name>
   <version>1.0</version>
   <organization>
-    <name>p2-org</name>
+    <name>p1-org</name>
   </organization>
 </project>
