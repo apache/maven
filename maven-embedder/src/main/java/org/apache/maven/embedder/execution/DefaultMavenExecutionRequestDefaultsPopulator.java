@@ -115,8 +115,6 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         {
             wagonManager.setInteractive( request.isInteractiveMode() );
 
-            System.out.println( "request.getTransferListener() = " + request.getTransferListener() );
-
             wagonManager.addTransferListener( request.getTransferListener() );
 
             wagonManager.setOnline( true );
