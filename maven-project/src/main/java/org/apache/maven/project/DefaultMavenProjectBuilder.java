@@ -407,7 +407,7 @@ public class DefaultMavenProjectBuilder
         {
             try
             {
-                artifactMetadataSource = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE );
+                artifactMetadataSource = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE, "maven" );
             }
             catch ( ComponentLookupException e )
             {
