@@ -12,6 +12,12 @@ import java.util.ArrayList;
 public class MavenIT0031Test
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0031Test()                                                                                                                                    
+        throws InvalidVersionSpecificationException                                                                                                             
+    {                                                                                                                                                           
+        super( "[,2.1-SNAPSHOT)" );                                                                                                                             
+    }            
+
     /**
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
      * pluginGroups in the provided settings.xml.
