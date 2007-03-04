@@ -333,7 +333,7 @@ load ${bootstrapDir}/target/classes
 
     <property name="maven.goals" value="clean assembly:assembly"/>
     <property name="bootstrapDir" value="${basedir}/bootstrap"/>
-    <java dir="maven-cli" classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
+    <java dir="maven-embedder" classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
       <classpath>
         <fileset dir="${bootstrapDir}/boot" includes="plexus-classworlds-*.jar"/>
         <path refid="sources"/>
