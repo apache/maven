@@ -58,7 +58,7 @@ under the License.
         <version>2.1</version>
         <configuration>
           <descriptors>
-            <descriptor>src/assemble/bin.xml</descriptor>
+            <descriptor>src/main/assembly/bin.xml</descriptor>
           </descriptors>
           <finalName>maven-${version}</finalName>
         </configuration>
