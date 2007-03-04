@@ -24,7 +24,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>4</version>
+    <version>6-SNAPSHOT</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <artifactId>maven</artifactId>
@@ -164,7 +164,7 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-17</plexusVersion>
+    <plexusVersion>1.0-alpha-18</plexusVersion>
     <wagonVersion>1.0-beta-3-SNAPSHOT</wagonVersion>
   </properties>
   <dependencies>
@@ -196,11 +196,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
