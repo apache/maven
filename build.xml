@@ -344,7 +344,7 @@ load ${bootstrapDir}/target/classes
       <arg line="${maven.goals}"/>
     </java>
 
-    <property name="maven.assembly" location="maven-cli/target/${maven.home.basename.expected}-bin.zip"/>
+    <property name="maven.assembly" location="maven-embedder/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
         <available file="${maven.assembly}"/>
