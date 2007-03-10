@@ -128,7 +128,6 @@ under the License.
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
     <!-- Wagon Deps (Start) -->
-    <pull orgpath="org/apache/maven/wagon/wagon-manager" version="${wagon.version}" name="wagon-manager"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
     <pull orgpath="org/apache/maven/wagon/wagon-file" version="${wagon.version}" name="wagon-file"/>
     <pull orgpath="org/apache/maven/wagon/wagon-http-shared" version="${wagon.version}" name="wagon-http-shared"/>
