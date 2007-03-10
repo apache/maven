@@ -21,7 +21,6 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
-import org.apache.maven.artifact.manager.ArtifactManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -47,13 +46,13 @@ import java.util.TimeZone;
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
-    private ArtifactManager artifactManager;
-    
     private String deploymentTimestamp;
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
+
+    
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
@@ -153,7 +152,7 @@ public class SnapshotTransformation
     {
         RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
-        if ( !artifactManager.isOnline() )
+        if ( !wagonManager.isOnline() )
         {
             // build number is a required feature for metadata consistency
             throw new RepositoryMetadataResolutionException(

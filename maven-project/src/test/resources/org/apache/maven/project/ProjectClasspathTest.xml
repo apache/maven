@@ -59,9 +59,11 @@ under the License.
       <role>org.apache.maven.project.TestArtifactResolver</role>
       <implementation>org.apache.maven.project.TestArtifactResolver</implementation>
       <requirements>
+        <!--
         <requirement>
           <role>org.apache.maven.artifact.manager.ArtifactManager</role>
         </requirement>
+        -->
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>

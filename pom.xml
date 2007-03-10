@@ -39,33 +39,6 @@ under the License.
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <!-- For plexus snapshots -->
-  <repositories>
-    <repository>
-      <id>codehaus.snapshots</id>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
@@ -163,8 +136,8 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-19-SNAPSHOT</plexusVersion>
-    <wagonVersion>1.0-beta-3-SNAPSHOT</wagonVersion>
+    <plexusVersion>1.0-alpha-19</plexusVersion>
+    <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
   <dependencies>
     <dependency>
@@ -198,7 +171,12 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-manager</artifactId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-file</artifactId>
         <version>${wagonVersion}</version>
       </dependency>
       <dependency>

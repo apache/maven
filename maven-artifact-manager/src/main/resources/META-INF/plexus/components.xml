@@ -19,12 +19,9 @@ under the License.
 
 <component-set>
   <components>
-  
     <!--
      |
-     | Old WagonManager
-     |
-     |  !!Deprecated!!
+     | WagonManager
      |
      -->
     <component>
@@ -32,23 +29,7 @@ under the License.
       <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
-        </requirement>
-      </requirements>
-    </component>
-  
-    <!--
-     |
-     | ArtifactManager
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.manager.ArtifactManager</role>
-      <implementation>org.apache.maven.artifact.manager.DefaultArtifactManager</implementation>
-      <requirements>
-        <requirement>
-	      <role>org.apache.maven.wagon.manager.WagonManager</role>
-    	  <role-hint>default</role-hint>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
       </requirements>
     </component>
@@ -58,7 +39,7 @@ under the License.
       <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
       </requirements>
     </component>
@@ -74,7 +55,7 @@ under the License.
       <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
@@ -88,6 +69,9 @@ under the License.
       <implementation>org.apache.maven.artifact.transform.ReleaseArtifactTransformation</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
       </requirements>
@@ -98,6 +82,9 @@ under the License.
       <role-hint>latest</role-hint>
       <implementation>org.apache.maven.artifact.transform.LatestArtifactTransformation</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
@@ -128,10 +115,9 @@ under the License.
     <component>
       <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
-      <role-hint>default</role-hint>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
@@ -173,7 +159,7 @@ under the License.
       <implementation>org.apache.maven.artifact.deployer.DefaultArtifactDeployer</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>

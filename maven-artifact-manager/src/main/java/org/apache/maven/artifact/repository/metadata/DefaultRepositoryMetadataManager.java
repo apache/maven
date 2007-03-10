@@ -19,7 +19,7 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.manager.ArtifactManager;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -43,17 +43,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * DefaultRepositoryMetadataManager 
- *
- * @version $Id$
- */
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
 {
     // component requirement
-    private ArtifactManager artifactManager;
+    private WagonManager wagonManager;
 
     /**
      * @todo very primitive. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
@@ -308,7 +303,7 @@ public class DefaultRepositoryMetadataManager
                                ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {
-        if ( !artifactManager.isOnline() )
+        if ( !wagonManager.isOnline() )
         {
             // metadata is required for deployment, can't be offline
             throw new RepositoryMetadataResolutionException(
@@ -348,7 +343,7 @@ public class DefaultRepositoryMetadataManager
                                 String checksumPolicy, boolean allowBlacklisting )
         throws RepositoryMetadataResolutionException, TransferFailedException
     {
-        if ( !artifactManager.isOnline() )
+        if ( !wagonManager.isOnline() )
         {
             if ( allowBlacklisting )
             {
@@ -366,7 +361,7 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            artifactManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
+            wagonManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
         }
         catch ( ResourceDoesNotExistException e )
         {
@@ -399,7 +394,7 @@ public class DefaultRepositoryMetadataManager
                         ArtifactRepository deploymentRepository )
         throws RepositoryMetadataDeploymentException
     {
-        if ( !artifactManager.isOnline() )
+        if ( !wagonManager.isOnline() )
         {
             // deployment shouldn't silently fail when offline
             throw new RepositoryMetadataDeploymentException(
@@ -439,7 +434,7 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            artifactManager.putArtifactMetadata( file, metadata, deploymentRepository );
+            wagonManager.putArtifactMetadata( file, metadata, deploymentRepository );
         }
         catch ( TransferFailedException e )
         {

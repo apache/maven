@@ -21,7 +21,7 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.ArtifactManager;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -55,7 +55,7 @@ public class DefaultArtifactResolver
     // Components
     // ----------------------------------------------------------------------
 
-    private ArtifactManager artifactManager;
+    private WagonManager wagonManager;
 
     private ArtifactTransformationManager transformationManager;
 
@@ -89,7 +89,7 @@ public class DefaultArtifactResolver
             {
                 File systemFile = artifact.getFile();
 
-                if ( systemFile == null || !systemFile.exists() )
+                if ( !systemFile.exists() )
                 {
                     throw new ArtifactNotFoundException(
                         "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
@@ -167,7 +167,7 @@ public class DefaultArtifactResolver
                 boolean resolved = false;
                 if ( !destination.exists() || force )
                 {
-                    if ( !artifactManager.isOnline() )
+                    if ( !wagonManager.isOnline() )
                     {
                         throw new ArtifactNotFoundException( "System is offline.", artifact );
                     }
@@ -178,11 +178,11 @@ public class DefaultArtifactResolver
                         if ( artifact.getRepository() != null )
                         {
                             // the transformations discovered the artifact - so use it exclusively
-                            artifactManager.getArtifact( artifact, artifact.getRepository() );
+                            wagonManager.getArtifact( artifact, artifact.getRepository() );
                         }
                         else
                         {
-                            artifactManager.getArtifact( artifact, repositories );
+                            wagonManager.getArtifact( artifact, repositories );
                         }
 
                         if ( !artifact.isResolved() && !destination.exists() )

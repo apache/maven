@@ -38,7 +38,6 @@ under the License.
      -->
     <component>
       <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-      <role-hint>default</role-hint>
       <implementation>org.apache.maven.artifact.handler.manager.DefaultArtifactHandlerManager</implementation>
       <requirements>
         <requirement>
@@ -194,7 +193,6 @@ under the License.
 
     <component>
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-      <role-hint>default</role-hint>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
       <requirements>
         <requirement>
@@ -205,7 +203,6 @@ under the License.
 
     <component>
       <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
-      <role-hint>default</role-hint>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
     </component>
   </components>

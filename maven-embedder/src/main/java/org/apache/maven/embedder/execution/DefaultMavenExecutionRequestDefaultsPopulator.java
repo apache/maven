@@ -20,6 +20,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -33,11 +34,10 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.SystemWarnings;
-import org.apache.maven.wagon.manager.RepositorySettings;
-import org.apache.maven.wagon.manager.WagonManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -115,7 +115,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         {
             wagonManager.setInteractive( request.isInteractiveMode() );
 
-            wagonManager.addTransferListener( request.getTransferListener() );
+            wagonManager.setDownloadMonitor( request.getTransferListener() );
 
             wagonManager.setOnline( true );
         }
@@ -124,7 +124,7 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         {
             resolveParameters( request.getSettings() );
         }
-        catch ( SettingsConfigurationException e )
+        catch ( Exception e )
         {
             throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
         }
@@ -151,52 +151,51 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
     }
 
     private void resolveParameters( Settings settings )
-        throws SettingsConfigurationException
+        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
-        Proxy proxy = settings.getActiveProxy();
+        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-        if ( proxy != null )
+        try
         {
-            if ( proxy.getHost() == null )
+            Proxy proxy = settings.getActiveProxy();
+
+            if ( proxy != null )
             {
-                throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                if ( proxy.getHost() == null )
+                {
+                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                }
+
+                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                       proxy.getPassword(), proxy.getNonProxyHosts() );
             }
 
-            wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy
-                .getPassword(), proxy.getNonProxyHosts() );
+            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            {
+                Server server = (Server) i.next();
+
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
+                                                    server.getPrivateKey(), server.getPassphrase() );
+
+                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
+                                                server.getDirectoryPermissions() );
+
+                if ( server.getConfiguration() != null )
+                {
+                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
+                }
+            }
+
+            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+            {
+                Mirror mirror = (Mirror) i.next();
+
+                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+            }
         }
-
-        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        finally
         {
-            Server server = (Server) i.next();
-
-            RepositorySettings repoSetting = wagonManager.getRepositorySettings( server.getId() );
-
-            repoSetting.setAuthentication( server.getUsername(), server.getPassword(), server.getPrivateKey(), server
-                .getPassphrase() );
-
-            repoSetting
-                .setPermissions( /* group */null, server.getFilePermissions(), server.getDirectoryPermissions() );
-
-            if ( server.getConfiguration() != null )
-            {
-                repoSetting.setConfiguration( new XmlPlexusConfiguration( (Xpp3Dom) server.getConfiguration() ) );
-            }
-        }
-
-        for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-        {
-            Mirror mirror = (Mirror) i.next();
-
-            try
-            {
-                wagonManager.addRepositoryMirror( mirror.getMirrorOf(), mirror.getId(), mirror.getUrl() );
-            }
-            catch ( IllegalArgumentException e )
-            {
-                throw new SettingsConfigurationException(
-                    "Unable to configure mirror " + mirror + ": " + e.getMessage(), e );
-            }
+            container.release( wagonManager );
         }
     }
 

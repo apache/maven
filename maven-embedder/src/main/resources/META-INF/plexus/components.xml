@@ -24,7 +24,7 @@ under the License.
       <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestDefaultsPopulator</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.wagon.manager.WagonManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
           <role-hint>default</role-hint>
         </requirement>
         <requirement>

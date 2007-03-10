@@ -20,15 +20,13 @@ package org.apache.maven.cli;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.MavenTransferListener;
+
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.resource.Resource;
-
-import java.io.File;
 
 /**
  * Test for {@link AbstractConsoleDownloadMonitor}
@@ -39,19 +37,20 @@ import java.io.File;
 public abstract class AbstractConsoleDownloadMonitorTest
     extends TestCase
 {
-    private MavenTransferListener monitor;
+
+    private AbstractConsoleDownloadMonitor monitor;
 
     public AbstractConsoleDownloadMonitorTest()
     {
         super();
     }
 
-    public void setMonitor( MavenTransferListener monitor )
+    public void setMonitor( AbstractConsoleDownloadMonitor monitor )
     {
         this.monitor = monitor;
     }
 
-    public MavenTransferListener getMonitor()
+    public AbstractConsoleDownloadMonitor getMonitor()
     {
         return monitor;
     }
@@ -92,18 +91,6 @@ public abstract class AbstractConsoleDownloadMonitorTest
     {
         monitor.debug( "msg" );
     }
-    
-    private class RepositoryMock
-    extends Repository
-    {
-        public RepositoryMock()
-        {
-            super();
-            setId("mock");
-            File basedir = new File(System.getProperty( "basedir", "." ));
-            setUrl( "file://" + basedir.getAbsolutePath() + "/target/" );
-        }
-    }
 
     private class TransferEventMock
         extends TransferEvent
@@ -111,19 +98,19 @@ public abstract class AbstractConsoleDownloadMonitorTest
         public TransferEventMock()
             throws ConnectionException, AuthenticationException
         {
-            super( new FileWagon(), new RepositoryMock(), new Resource(), TransferEvent.TRANSFER_INITIATED, TransferEvent.REQUEST_GET );
+            super( new FileWagon(), new Resource(), TransferEvent.TRANSFER_INITIATED, TransferEvent.REQUEST_GET );
             getResource().setContentLength( 100000 );
-            getWagon().setRepository( new RepositoryMock() );
-            getWagon().connect();
+            Repository repository = new Repository();
+            getWagon().connect( repository );
         }
 
         public TransferEventMock( Exception exception )
             throws ConnectionException, AuthenticationException
         {
-            super( new FileWagon(), new RepositoryMock(), new Resource(), exception, TransferEvent.REQUEST_GET );
+            super( new FileWagon(), new Resource(), exception, TransferEvent.REQUEST_GET );
             getResource().setContentLength( 100000 );
-            getWagon().setRepository( new RepositoryMock() );
-            getWagon().connect();
+            Repository repository = new Repository();
+            getWagon().connect( repository );
         }
     }
 }

@@ -43,8 +43,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.ArtifactManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -195,10 +195,10 @@ public class DefaultMavenProjectBuilder
     // a monitor wagon monitor as a parameter so that tools can use the
     // methods here and receive callbacks. MNG-1015
     //     
-    //    Probably no longer relevant with wagonManager/artifactManager change - joakime
+    //    Probably no longer relevant with wagonManager/wagonManager change - joakime
     // ----------------------------------------------------------------------
 
-    private ArtifactManager artifactManager;
+    private WagonManager wagonManager;
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
@@ -382,7 +382,7 @@ public class DefaultMavenProjectBuilder
 
         if ( transferListener != null )
         {
-            artifactManager.getWagonManager().addTransferListener( transferListener );
+            wagonManager.setDownloadMonitor( transferListener );
         }
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),

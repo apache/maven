@@ -20,8 +20,10 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,7 +36,6 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.wagon.manager.WagonManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -47,6 +48,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used to locate extensions.
@@ -158,7 +160,9 @@ public class DefaultExtensionManager
     {
         try
         {
-            wagonManager.registerExtensionContainer( container );
+            Map wagons = container.lookupMap( Wagon.ROLE );
+
+            wagonManager.registerWagons( wagons.keySet(), container );
         }
         catch ( ComponentLookupException e )
         {

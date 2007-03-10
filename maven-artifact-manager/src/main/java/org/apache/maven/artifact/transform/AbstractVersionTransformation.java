@@ -20,6 +20,7 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -44,6 +45,8 @@ public abstract class AbstractVersionTransformation
     implements ArtifactTransformation
 {
     protected RepositoryMetadataManager repositoryMetadataManager;
+
+    protected WagonManager wagonManager;
 
     protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws RepositoryMetadataResolutionException

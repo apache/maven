@@ -107,7 +107,7 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-	      <role>org.apache.maven.wagon.manager.WagonManager</role>
+	      <role>org.apache.maven.artifact.manager.WagonManager</role>
     	  <role-hint>default</role-hint>
         </requirement>
       </requirements>
@@ -221,7 +221,7 @@ under the License.
       <implementation>org.apache.maven.usability.ArtifactNotFoundDiagnoser</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
       </requirements>
     </component>
@@ -236,7 +236,7 @@ under the License.
       <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
       </requirements>
     </component>
