@@ -113,6 +113,8 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
         }
         else
         {
+            wagonManager.findAndRegisterWagons( container );
+
             wagonManager.setInteractive( request.isInteractiveMode() );
 
             wagonManager.setDownloadMonitor( request.getTransferListener() );

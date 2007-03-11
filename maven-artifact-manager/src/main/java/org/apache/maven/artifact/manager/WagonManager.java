@@ -117,4 +117,6 @@ public interface WagonManager
     void setInteractive( boolean interactive );
 
     void registerWagons( Collection wagons, PlexusContainer extensionContainer );
+
+    void findAndRegisterWagons( PlexusContainer container );    
 }

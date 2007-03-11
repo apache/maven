@@ -247,9 +247,21 @@ public class MavenEmbedderTest
         throws Exception
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( getPomFile().getAbsolutePath() );
+            .setPomFile( getPomFile().getAbsolutePath() ).setShowErrors( true );
 
         MavenExecutionResult result = maven.readProjectWithDependencies( request );
+
+        if ( result.hasExceptions() )
+        {
+            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
+            {
+                Exception e = (Exception) i.next();
+
+                e.printStackTrace();
+            }
+
+            fail( "Exception is readProjectWithDependencies() test." );
+        }
 
         assertNoExceptions( result );
 

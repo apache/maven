@@ -295,7 +295,8 @@ public class DefaultArtifactResolver
             }
             catch ( ArtifactNotFoundException anfe )
             {
-                getLogger().debug( anfe.getMessage() );
+                getLogger().debug( anfe.getMessage(), anfe );
+
                 missingArtifacts.add( node.getArtifact() );
             }
         }
@@ -303,14 +304,6 @@ public class DefaultArtifactResolver
         if ( missingArtifacts.size() > 0 )
         {
             throw new MultipleArtifactsNotFoundException( originatingArtifact, missingArtifacts, remoteRepositories );
-//            String message = "required artifacts missing:\n";
-//            for ( Iterator i = missingArtifacts.iterator(); i.hasNext(); )
-//            {
-//                Artifact missingArtifact = (Artifact) i.next();
-//                message += "  " + missingArtifact.getId() + "\n";
-//            }
-//            message += "\nfor the artifact:";
-//            throw new ArtifactResolutionException( message, originatingArtifact, remoteRepositories );
         }
 
         return artifactResolutionResult;

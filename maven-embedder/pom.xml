@@ -86,6 +86,7 @@ under the License.
                 <exclude>classworlds:classworlds</exclude>
                 <exclude>junit:junit</exclude>
                 <exclude>jmock:jmock</exclude>
+                <exclude>xml-apis:xml-apis</exclude>
               </excludes>
               <!--
               <dependenciesToHide>
@@ -128,6 +129,18 @@ under the License.
           <groupId>commons-logging</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http-lightweight</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ssh</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ssh-external</artifactId>
     </dependency>
   </dependencies>
   <distributionManagement>

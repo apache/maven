@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */

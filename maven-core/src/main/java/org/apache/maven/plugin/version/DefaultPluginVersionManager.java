@@ -35,12 +35,9 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.registry.MavenPluginRegistryBuilder;
-import org.apache.maven.plugin.registry.PluginRegistry;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -53,16 +50,9 @@ public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
 {
-    private MavenPluginRegistryBuilder mavenPluginRegistryBuilder;
-
     private ArtifactFactory artifactFactory;
 
-    private InputHandler inputHandler;
-
     private ArtifactMetadataSource artifactMetadataSource;
-
-    // TODO: [jc] Revisit to remove this piece of state. PLUGIN REGISTRY MAY BE UPDATED ON DISK OUT-OF-PROCESS!
-    private PluginRegistry pluginRegistry;
 
     private MavenProjectBuilder mavenProjectBuilder;
 
@@ -118,21 +108,12 @@ public class DefaultPluginVersionManager
             }
         }
 
-        // we're NEVER going to persist POM-derived plugin versions.
-        String updatedVersion = null;
-
         // third pass...we're always checking for latest install/deploy, so retrieve the version for LATEST metadata and
         // also set that resolved version as the <useVersion/> in settings.xml.
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
-
-            if ( version != null )
-            {
-                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
-                updatedVersion = version;
-            }
         }
 
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
@@ -141,12 +122,6 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
-
-            if ( version != null )
-            {
-                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
-                updatedVersion = version;
-            }
         }
 
         // if we're still empty here, and the current project matches the plugin in question, use the current project's

@@ -328,6 +328,7 @@ public class DefaultWagonManager
         else
         {
             getLogger().debug( "Trying repository " + repository.getId() );
+
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(),
                            false );
             getLogger().debug( "  Artifact resolved" );
@@ -785,6 +786,20 @@ public class DefaultWagonManager
     public void setInteractive( boolean interactive )
     {
         this.interactive = interactive;
+    }
+
+    public void findAndRegisterWagons( PlexusContainer container )
+    {
+        try
+        {
+            Map wagons = container.lookupMap( Wagon.ROLE );
+
+            registerWagons( wagons.keySet(), container );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // no wagons found in the extension
+        }
     }
 
     public void registerWagons( Collection wagons, PlexusContainer extensionContainer )

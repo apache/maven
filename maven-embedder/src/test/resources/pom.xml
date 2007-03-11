@@ -21,31 +21,9 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
   <artifactId>maven-model</artifactId>
-  <name>Maven Model</name>
-  <version>2.0-beta-2-SNAPSHOT</version>
-  <description>Maven Model</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>xpp3-writer</goal>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xsd</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <version>4.0.0</version>
-          <model>maven.mdo</model>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <name>Maven Embedder Test Project</name>
+  <version>1.0</version>
+  <description>Maven Embedder Test Project</description>
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>

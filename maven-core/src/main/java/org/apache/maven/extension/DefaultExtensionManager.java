@@ -158,16 +158,7 @@ public class DefaultExtensionManager
 
     public void registerWagons()
     {
-        try
-        {
-            Map wagons = container.lookupMap( Wagon.ROLE );
-
-            wagonManager.registerWagons( wagons.keySet(), container );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // no wagons found in the extension
-        }
+        wagonManager.findAndRegisterWagons( container );
     }
 
     public void contextualize( Context context )
