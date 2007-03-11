@@ -21,9 +21,15 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -41,7 +47,7 @@ public class MavenProjectTest
         childModel.setArtifactId( "artifact" );
 
         MavenProject childProject = new MavenProject( childModel );
-        
+
         File childFile = new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis() + "/child/pom.xml" );
 
         childProject.setFile( childFile );
@@ -49,7 +55,7 @@ public class MavenProjectTest
         String adjustment = parentProject.getModulePathAdjustment( childProject );
 
         assertNotNull( adjustment );
-        
+
         assertEquals( "..", adjustment );
     }
 
@@ -92,6 +98,33 @@ public class MavenProjectTest
 
         MavenProject clonedProject = new MavenProject( projectToClone );
         assertEquals( "maven-core", clonedProject.getArtifactId() );
+        Map clonedMap = clonedProject.getManagedVersionMap();
+        assertNotNull("ManagedVersionMap not copied", clonedMap);
+        assertTrue("ManagedVersionMap is not empty", clonedMap.isEmpty());
+    }
+
+    public void testCopyConstructorWithDependencyManagement()
+        throws Exception
+    {
+        File f = getFileForClasspathResource( "dependencyManagement-pom.xml" );
+        MavenProject projectToClone = getProjectWithDependencies( f );
+        DependencyManagement dep = projectToClone.getDependencyManagement();
+        assertNotNull("No dependencyManagement", dep);
+        List list = dep.getDependencies();
+        assertNotNull("No dependencies", list);
+        assertTrue("Empty dependency list", !list.isEmpty());
+
+        Map map = projectToClone.getManagedVersionMap();
+        assertNotNull("No ManagedVersionMap", map);
+        assertTrue("ManagedVersionMap is empty", !map.isEmpty());
+
+        MavenProject clonedProject = new MavenProject( projectToClone );
+        assertEquals( "maven-core", clonedProject.getArtifactId() );
+        Map clonedMap = clonedProject.getManagedVersionMap();
+        assertNotNull("ManagedVersionMap not copied", clonedMap);
+        assertTrue("ManagedVersionMap is empty", !clonedMap.isEmpty());
+        assertTrue("Not a ManagedVersionMap", clonedMap instanceof ManagedVersionMap);
+        assertTrue("ManagedVersionMap does not contain test key", clonedMap.containsKey("maven-test:maven-test-b:jar"));
     }
 
     public void testGetModulePathAdjustment()

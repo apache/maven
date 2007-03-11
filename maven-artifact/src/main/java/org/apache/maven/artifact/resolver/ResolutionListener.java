@@ -44,6 +44,9 @@ public interface ResolutionListener
 
     int UPDATE_SCOPE = 6;
 
+    /**
+     * @deprecated
+     */
     int MANAGE_ARTIFACT = 7;
 
     int OMIT_FOR_CYCLE = 8;
@@ -53,6 +56,10 @@ public interface ResolutionListener
     int SELECT_VERSION_FROM_RANGE = 10;
 
     int RESTRICT_RANGE = 11;
+    
+    int MANAGE_ARTIFACT_VERSION = 12;
+    
+    int MANAGE_ARTIFACT_SCOPE = 13;
 
     void testArtifact( Artifact node );
 
@@ -66,7 +73,17 @@ public interface ResolutionListener
 
     void updateScope( Artifact artifact, String scope );
 
+    /**
+     * @deprecated
+     */
     void manageArtifact( Artifact artifact, Artifact replacement );
+    
+    // TODO Use the following two instead of manageArtifact
+    // TODO Remove ResolutionListenerDM interface
+
+    //void manageArtifactVersion( Artifact artifact, Artifact replacement );
+    
+    //void manageArtifactScope( Artifact artifact, Artifact replacement );
 
     void omitForCycle( Artifact artifact );
 

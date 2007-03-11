@@ -84,6 +84,7 @@ public class DefaultExtensionManager
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
                                                                                     project.getArtifact(),
+                                                                                    project.getManagedVersionMap(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource, filter );

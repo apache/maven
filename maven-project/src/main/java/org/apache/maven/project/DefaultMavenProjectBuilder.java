@@ -33,12 +33,15 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -274,6 +277,8 @@ public class DefaultMavenProjectBuilder
 
         MavenProject project = new MavenProject( superModel );
 
+        project.setManagedVersionMap(createManagedVersionMap(projectId, superModel.getDependencyManagement(), null));
+
         project.setActiveProfiles( activeProfiles );
 
         project.setOriginalModel( superModel );
@@ -334,7 +339,8 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
-        Map managedVersions = createManagedVersionMap( projectId, project.getDependencyManagement() );
+        // Map managedVersions = createManagedVersionMap( projectId, project.getDependencyManagement() );
+        Map managedVersions = project.getManagedVersionMap();
 
         ensureMetadataSourceIsInitialized();
 
@@ -386,13 +392,20 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement )
+    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement, MavenProject parent)
         throws ProjectBuildingException
     {
-        Map map;
-        if ( dependencyManagement != null && dependencyManagement.getDependencies() != null )
+        Map map = null;
+        List deps;
+        if ( dependencyManagement != null && (deps = dependencyManagement.getDependencies()) != null && deps.size() > 0)
         {
-            map = new HashMap();
+            map = new ManagedVersionMap(map);
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug("Adding managed depedendencies for " + projectId);
+            }
+
             for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
             {
                 Dependency d = (Dependency) i.next();
@@ -404,6 +417,26 @@ public class DefaultMavenProjectBuilder
                                                                                   versionRange, d.getType(),
                                                                                   d.getClassifier(), d.getScope(),
                                                                                   d.isOptional() );
+                    if ( getLogger().isDebugEnabled())
+                    {
+                        getLogger().debug("  " + artifact);
+                    }
+
+                    // If the dependencyManagement section listed exclusions,
+                    // add them to the managed artifacts here so that transitive
+                    // dependencies will be excluded if necessary.
+                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() ) {
+                    	List exclusions = new ArrayList();
+                    	Iterator exclItr = d.getExclusions().iterator();
+                    	while (exclItr.hasNext()) {
+                    		Exclusion e = (Exclusion) exclItr.next();
+                    		exclusions.add(e.getGroupId() + ":" + e.getArtifactId());
+                    	}
+                        ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
+                        artifact.setDependencyFilter( eaf );
+                    } else {
+                    	artifact.setDependencyFilter( null );
+                    }
                     map.put( d.getManagementKey(), artifact );
                 }
                 catch ( InvalidVersionSpecificationException e )
@@ -413,7 +446,7 @@ public class DefaultMavenProjectBuilder
                 }
             }
         }
-        else
+        else if (map == null)
         {
             map = Collections.EMPTY_MAP;
         }
@@ -804,6 +837,8 @@ public class DefaultMavenProjectBuilder
             }
         }
 
+        project.setManagedVersionMap(createManagedVersionMap(projectId, project.getDependencyManagement(), project.getParent()));
+
         return project;
     }
     
@@ -1033,10 +1068,10 @@ public class DefaultMavenProjectBuilder
 
         Parent parentModel = model.getParent();
 
+        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+
         if ( parentModel != null )
         {
-            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
             if ( StringUtils.isEmpty( parentModel.getGroupId() ) )
             {
                 throw new ProjectBuildingException( projectId, "Missing groupId element from parent element" );
