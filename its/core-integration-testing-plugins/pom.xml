@@ -20,6 +20,7 @@
     <module>maven-it-plugin-packaging</module>      
     <module>maven-it-plugin-parameter-implementation</module>
     <module>maven-it-plugin-setter</module>        
-    <module>maven-it-plugin-touch</module>
+    <module>maven-it-plugin-touch</module>    
+    <module>maven-it-plugin-uses-properties</module>    
   </modules>
 </project>
