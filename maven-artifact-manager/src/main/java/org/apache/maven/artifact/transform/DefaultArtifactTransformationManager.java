@@ -25,15 +25,29 @@ import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class DefaultArtifactTransformationManager
-    implements ArtifactTransformationManager
+    implements ArtifactTransformationManager, Initializable
 {
     private List artifactTransformations;
-
+    
+	public void initialize() throws InitializationException {
+		// TODO this is a hack until plexus can fix the ordering of the arrays
+		Object obj[] = artifactTransformations.toArray();
+		for (int x = 0; x < obj.length; x++)
+		{
+			if (obj[x].getClass().getName().indexOf("Snapshot") != -1) {
+				artifactTransformations.remove(obj[x]);
+				artifactTransformations.add(obj[x]);
+			}
+		}
+	}
+    
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -64,5 +78,7 @@ public class DefaultArtifactTransformationManager
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }
+
+
 
 }
