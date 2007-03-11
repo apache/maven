@@ -8,10 +8,8 @@ import java.io.FileOutputStream;
 import java.io.File;
 
 /**
- * Take some configuration values that use interpolated POM values and write them to a properties file
- * to make sure they are passing through the system properly. We have reports (MNG-1927) that we're
- * 
  * @goal generate-properties
+ * @phase validate
  */
 public class UsesPropertiesMojo
     extends AbstractMojo
