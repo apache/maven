@@ -133,7 +133,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
-        //suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
+        suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         return suite;
     }
 }
