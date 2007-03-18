@@ -1,3 +1,16 @@
+The top things that could be done:
+
+1) The issues that would be most helpful that could be tackled on a piecewise basis by many would be to take plugin specific ITs out of the ITs. There are many in there for the surefire plugin so while you're doing that you can look at it. Piecewise but probably totally simple because you have to replace it with an IT that actually tests what it was testing. A lot of time I have had to make a new IT plugin flavour.
+
+2) The next issue of importance would be to collect all the in IT plugin plugins, invokers and verifiers and align all theses.
+
+3) Once 2) is done then we wire the embedder option into the resulting invoker.
+
+As far as them working in situ: the ITs could now run from the top level of http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/ with an addition to the POM. It's not there because I generally build from the top-level and then walk into  http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests/. The invoker plugin has been released and that's what I used to install the supporting artifacts because they can't install in a reactor run normally because there are 5 artifacts with the id.
+
+I am not entirely happy with the structure we have but I don't think it's worth changing right now until 1) and 2) are done. It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
+
+
 - [-] Goals
     - [ ] An IT should be completely self-contained so that the problem
           can be understood by looking in one place, in one Maven
