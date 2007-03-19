@@ -1,2 +1,0 @@
-target/classes/test.properties
-target/mojo-generated.properties

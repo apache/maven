@@ -1,4 +1,0 @@
-help:active-profiles
-package
-eclipse:eclipse
-clean:clean

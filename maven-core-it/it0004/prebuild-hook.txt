@@ -1,1 +1,0 @@
-rm ${artifact:org.apache.maven:maven-core-it0004:1.0:pom}

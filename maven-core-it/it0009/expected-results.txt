@@ -1,3 +1,0 @@
-target/pluginItem
-target/goalItem
-!target/bad-item

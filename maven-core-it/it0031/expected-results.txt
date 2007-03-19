@@ -1,1 +1,0 @@
-target/generated-sources/modello/org/apache/maven/it/it0031/Root.java

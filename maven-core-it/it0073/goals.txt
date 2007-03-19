@@ -1,2 +1,0 @@
-core-it:throw
-core-it:catch

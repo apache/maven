@@ -1,2 +1,0 @@
-target/fooValue
-target/barValue.baz

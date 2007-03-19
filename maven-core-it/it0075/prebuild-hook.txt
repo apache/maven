@@ -1,2 +1,0 @@
-rm sub1/target/maven-core-it0075-sub1-1.0.jar
-rm sub2/target/maven-core-it0075-sub2-1.0.jar

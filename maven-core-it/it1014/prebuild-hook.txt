@@ -1,1 +1,0 @@
-rm ${artifact:commons-logging:commons-logging:1.0.3:jar}
