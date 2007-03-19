@@ -50,11 +50,3 @@ M2_HOME=$OLD_M2_HOME
 export M2_HOME
 
 ARGS=$ORIG_ARGS
-
-(
-  # TODO: should we be going back to the mini now that we have the real thing?
-  cd maven-core-it-verifier
-  $JAVACMD $MAVEN_OPTS -jar ../bootstrap/$BOOTSTRAP_JAR package $ARGS
-  ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-)
-ret=$?; if [ $ret != 0 ]; then exit $ret; fi
