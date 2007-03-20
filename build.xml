@@ -116,6 +116,7 @@ under the License.
       </sequential>
     </macrodef>
     <pull orgpath="commons-cli/commons-cli" version="${commons-cli.version}" name="commons-cli"/>
+    <pull orgpath="org/codehaus/plexus/plexus-active-collections" version="${plexus-active-collections.version}" name="plexus-active-collections" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api" repository="codehaus"/>
@@ -153,6 +154,7 @@ under the License.
     <path id="pre.classpath">
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-active-collections/${plexus-active-collections.version}/plexus-active-collections-${plexus-active-collections.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/${plexus.version}/plexus-container-default-${plexus.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-component-api/${plexus.version}/plexus-component-api-${plexus.version}.jar"/>
@@ -226,6 +228,7 @@ under the License.
 
     <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0"/>
     <!-- DGF TODO turn this into a big <apply> task? write a custom task? -->
+    <modello file="maven-lifecycle/src/main/mdo/maven-lifecycle.mdo"/>
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
     <modello file="maven-plugin-registry/plugin-registry.mdo"/>
@@ -339,6 +342,9 @@ load ${bootstrapDir}/target/classes
       </classpath>
       <sysproperty key="classworlds.conf" value="${bootstrapDir}/m2.conf"/>
       <sysproperty key="bootstrapDir" value="${bootstrapDir}"/>
+<!-- 
+      <arg value="-X"/>
+ -->
       <arg value="-e"/>
       <arg line="${maven.goals}"/>
     </java>

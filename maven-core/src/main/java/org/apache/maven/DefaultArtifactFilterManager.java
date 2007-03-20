@@ -48,6 +48,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "maven-build-context" );
         artifacts.add( "maven-core" );
         artifacts.add( "maven-error-diagnoser" );
+        artifacts.add( "maven-lifecycle" );
         artifacts.add( "maven-model" );
         artifacts.add( "maven-monitor" );
         artifacts.add( "maven-plugin-api" );

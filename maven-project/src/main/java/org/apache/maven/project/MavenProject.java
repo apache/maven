@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -146,6 +147,8 @@ public class MavenProject
     private boolean executionRoot;
     
     private Map moduleAdjustments;
+
+    private Stack previousExecutionProjects = new Stack();
 
     public MavenProject()
     {
@@ -1425,11 +1428,16 @@ public class MavenProject
 
     public MavenProject getExecutionProject()
     {
-        return executionProject;
+        return ( executionProject == null ? this : executionProject );
     }
 
     public void setExecutionProject( MavenProject executionProject )
     {
+        if ( this.executionProject != null )
+        {
+            previousExecutionProjects.push( this.executionProject );
+        }
+        
         this.executionProject = executionProject;
     }
 
@@ -1648,6 +1656,18 @@ public class MavenProject
                 throw new DependencyResolutionRequiredException( a );
             }
             list.add( file.getPath() );
+        }
+    }
+
+    public void clearExecutionProject()
+    {
+        if ( !previousExecutionProjects.isEmpty() )
+        {
+            executionProject = (MavenProject) previousExecutionProjects.pop();
+        }
+        else
+        {
+            executionProject = null;
         }
     }
 }

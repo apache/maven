@@ -33,6 +33,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -542,7 +543,12 @@ public class DefaultMaven
                                           ReactorManager rpm,
                                           EventDispatcher dispatcher )
     {        
-        return new MavenSession( container, request, dispatcher, rpm );
+        MavenSession session = new MavenSession( container, request, dispatcher, rpm );
+        
+        SessionContext ctx = new SessionContext( session );
+        ctx.store( buildContextManager );
+        
+        return session;
     }
 
     // ----------------------------------------------------------------------

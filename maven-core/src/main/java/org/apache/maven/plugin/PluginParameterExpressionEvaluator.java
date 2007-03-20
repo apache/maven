@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionContext;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -74,6 +75,49 @@ public class PluginParameterExpressionEvaluator
 
     private final Properties properties;
 
+    private final LifecycleExecutionContext lifecycleExecutionContext;
+
+    public PluginParameterExpressionEvaluator( MavenSession context,
+                                               MojoExecution mojoExecution,
+                                               PathTranslator pathTranslator,
+                                               LifecycleExecutionContext lifecycleExecutionContext,
+                                               Logger logger,
+                                               Properties properties )
+    {
+        this.context = context;
+        this.mojoExecution = mojoExecution;
+        this.pathTranslator = pathTranslator;
+        this.lifecycleExecutionContext = lifecycleExecutionContext;
+        this.logger = logger;
+        this.properties = properties;
+        
+        this.project = lifecycleExecutionContext.getCurrentProject();
+
+        String basedir = null;
+
+        if ( project != null )
+        {
+            File projectFile = project.getFile();
+
+            // this should always be the case for non-super POM instances...
+            if ( projectFile != null )
+            {
+                basedir = projectFile.getParentFile().getAbsolutePath();
+            }
+        }
+
+        if ( basedir == null )
+        {
+            basedir = System.getProperty( "user.dir" );
+        }
+
+        this.basedir = basedir;
+    }
+
+    /**
+     * @deprecated Use {@link PluginParameterExpressionEvaluator#PluginParameterExpressionEvaluator(MavenSession, MojoExecution, PathTranslator, LifecycleExecutionContext, Logger, Properties)}
+     * instead.
+     */
     public PluginParameterExpressionEvaluator( MavenSession context,
                                                MojoExecution mojoExecution,
                                                PathTranslator pathTranslator,
@@ -84,9 +128,11 @@ public class PluginParameterExpressionEvaluator
         this.context = context;
         this.mojoExecution = mojoExecution;
         this.pathTranslator = pathTranslator;
+        this.lifecycleExecutionContext = new LifecycleExecutionContext( project );
         this.logger = logger;
-        this.project = project;
         this.properties = properties;
+        
+        this.project = project;
 
         String basedir = null;
 
@@ -192,7 +238,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "reports".equals( expression ) )
         {
-            value = mojoExecution.getReports();
+            value = lifecycleExecutionContext.getReports();
         }
         else if ( "project".equals( expression ) )
         {

@@ -26,6 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -36,20 +37,20 @@ public abstract class AbstractEmbedderExecutionTestCase
     protected File runWithProject( String goal )
         throws Exception
     {
-        return runWithProject( goal, null );
+        return runWithProject( Collections.singletonList( goal ), null );
     }
 
     protected File runWithProject( String goal,
                                    Properties properties )
         throws Exception
     {
-        return runWithProject( new String[]{goal}, properties );
+        return runWithProject( Collections.singletonList( goal ), properties );
     }
 
     protected File runWithProject( String[] goals )
         throws Exception
     {
-        return runWithProject( goals, null );
+        return runWithProject( Arrays.asList( goals ), null );
     }
 
     protected File runWithProject( String[] goals,
@@ -83,6 +84,8 @@ public abstract class AbstractEmbedderExecutionTestCase
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setShowErrors( true )
+            .setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG )
             .setBaseDirectory( targetDirectory )
             .setGoals( goals );
 

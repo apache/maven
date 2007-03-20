@@ -1,0 +1,12 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
+      <role-hint>single-clean-mapping</role-hint>
+      <implementation>org.apache.maven.lifecycle.ClassLoaderXmlBindingLoader</implementation>
+      <configuration>
+        <path>single-clean-mapping.xml</path>
+      </configuration>
+    </component>
+  </components>
+</component-set>

@@ -28,6 +28,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -47,6 +48,8 @@ public class MavenSession
     private boolean usingPOMsFromFilesystem = true;
 
     private MavenExecutionRequest request;
+
+    private Map reports = new LinkedHashMap();
 
     public MavenSession( PlexusContainer container,
                          MavenExecutionRequest request,
@@ -156,4 +159,5 @@ public class MavenSession
     {
         return request;
     }
+    
 }

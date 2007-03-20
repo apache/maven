@@ -90,6 +90,7 @@ public class DefaultPluginVersionManager
 
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
+        getLogger().debug( "Version from POM: " + version );
 
         // NOTE: We CANNOT check the current project version here, so delay it until later.
         // It will prevent plugins from building themselves, if they are part of the lifecycle mapping.
@@ -107,6 +108,7 @@ public class DefaultPluginVersionManager
                 }
             }
         }
+        getLogger().debug( "Version from another POM in the reactor: " + version );
 
         // third pass...we're always checking for latest install/deploy, so retrieve the version for LATEST metadata and
         // also set that resolved version as the <useVersion/> in settings.xml.
@@ -114,6 +116,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
+            getLogger().debug( "Version from LATEST metadata: " + version );
         }
 
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
@@ -122,6 +125,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
+            getLogger().debug( "Version from RELEASE metadata: " + version );
         }
 
         // if we're still empty here, and the current project matches the plugin in question, use the current project's
@@ -130,6 +134,7 @@ public class DefaultPluginVersionManager
             project.getArtifactId().equals( artifactId ) )
         {
             version = project.getVersion();
+            getLogger().debug( "Version from POM itself (this project IS the plugin project): " + version );
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.

@@ -36,8 +36,11 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.lifecycle.LifecycleExecutionContext;
+import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -92,6 +95,17 @@ public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager, Contextualizable
 {
+    private static final List RESERVED_GROUP_IDS;
+    
+    static
+    {
+        List rgids = new ArrayList();
+        
+        rgids.add( StateManagementUtils.GROUP_ID );
+        
+        RESERVED_GROUP_IDS = rgids;
+    }
+
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
@@ -118,6 +132,8 @@ public class DefaultPluginManager
     protected MavenProjectBuilder mavenProjectBuilder;
 
     protected PluginMappingManager pluginMappingManager;
+
+    private BuildContextManager buildContextManager;
 
     // END component requirements
 
@@ -157,6 +173,7 @@ public class DefaultPluginManager
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         if ( plugin.getVersion() == null )
         {
+            getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
             String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
                                                                         project, session );
             plugin.setVersion( version );
@@ -189,27 +206,38 @@ public class DefaultPluginManager
         // the 'Can't find plexus container for plugin: xxx' error.
         try
         {
-            VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+            // if the groupId is internal, don't try to resolve it...
+            if ( !RESERVED_GROUP_IDS.contains( plugin.getGroupId() ) )
+            {
+                VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
 
-            List remoteRepositories = new ArrayList();
+                List remoteRepositories = new ArrayList();
 
-            remoteRepositories.addAll( project.getPluginArtifactRepositories() );
+                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
 
-            remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
+                remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
 
-            checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
+                checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
 
-            Artifact pluginArtifact =
-                artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+                Artifact pluginArtifact =
+                    artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
 
-            pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
+                pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-            artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
+                artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-//            if ( !pluginCollector.isPluginInstalled( plugin ) )
-//            {
-//            }
-            addPlugin( plugin, pluginArtifact, project, localRepository );
+//                if ( !pluginCollector.isPluginInstalled( plugin ) )
+//                {
+//                }
+                addPlugin( plugin, pluginArtifact, project, localRepository );
+            }
+            else
+            {
+                getLogger().debug( "Skipping resolution for Maven built-in plugin: " + plugin.getKey() );
+                
+                PluginDescriptor pd = pluginCollector.getPluginDescriptor( plugin );
+                pd.setClassRealm( container.getContainerRealm() );
+            }
 
             project.addPlugin( plugin );
         }
@@ -236,7 +264,9 @@ public class DefaultPluginManager
             }
         }
 
-        return pluginCollector.getPluginDescriptor( plugin );
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+        
+        return pluginDescriptor;
     }
 
     /**
@@ -548,25 +578,13 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        String goalId = mojoDescriptor.getGoal();
-
-        String groupId = pluginDescriptor.getGroupId();
-
-        String artifactId = pluginDescriptor.getArtifactId();
-
-        String executionId = mojoExecution.getExecutionId();
-
-        Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
-
-        Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
-
-        dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
-
-        if ( mojoExecution.getConfiguration() != null )
+        Xpp3Dom dom = (Xpp3Dom) mojoExecution.getConfiguration();
+        if ( dom != null )
         {
-            dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
+            // make a defensive copy, to keep things from getting polluted.
+            dom = new Xpp3Dom( dom );
         }
-
+        
         plugin = getConfiguredMojo( session, dom, project, false, mojoExecution );
 
         // Event monitoring.
@@ -596,7 +614,21 @@ public class DefaultPluginManager
             ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
 
             plugin.execute();
-
+            
+            // NEW: If the mojo that just executed is a report, store it in the LifecycleExecutionContext
+            // for reference by future mojos.
+            if ( plugin instanceof MavenReport )
+            {
+                LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
+                if ( ctx == null )
+                {
+                    ctx = new LifecycleExecutionContext( project );
+                }
+                
+                ctx.addReport( mojoDescriptor, (MavenReport) plugin );
+                ctx.store( buildContextManager );
+            }
+            
             container.setLookupRealm( oldRealm );
 
             dispatcher.dispatchEnd( event, goalExecId );
@@ -757,7 +789,7 @@ public class DefaultPluginManager
         {
             pomConfiguration = new XmlPlexusConfiguration( dom );
         }
-
+        
         // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
         // override in the POM.
         validatePomConfiguration( mojoDescriptor, pomConfiguration );
@@ -768,9 +800,16 @@ public class DefaultPluginManager
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution,
-                                                                                          pathTranslator, getLogger(),
-                                                                                          project,
+        // NEW: Pass in the LifecycleExecutionContext so we have access to the current project, 
+        // forked project stack (future), and reports.
+        LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
+        if ( ctx == null )
+        {
+            ctx = new LifecycleExecutionContext( project );
+        }
+        
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution, pathTranslator,
+                                                                                          ctx, getLogger(),
                                                                                           session.getExecutionProperties() );
 
         PlexusConfiguration extractedMojoConfiguration =
@@ -1181,7 +1220,7 @@ public class DefaultPluginManager
     }
 
     // ----------------------------------------------------------------------
-    // Lifecycle
+    // LegacyLifecycle
     // ----------------------------------------------------------------------
 
     public void contextualize( Context context )

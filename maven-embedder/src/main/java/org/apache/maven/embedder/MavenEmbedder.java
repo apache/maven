@@ -41,7 +41,7 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.jdom.MavenJDOMWriter;
@@ -67,17 +67,15 @@ import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
@@ -94,13 +92,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -489,34 +485,37 @@ public class MavenEmbedder
     // Execution of phases/goals
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
-    // Lifecycle information
+    // LegacyLifecycle information
     // ----------------------------------------------------------------------
 
     public List getLifecyclePhases()
-        throws MavenEmbedderException
     {
-        List phases = new ArrayList();
+        return getBuildLifecyclePhases();
+    }
+    
+    public List getAllLifecyclePhases()
+    {
+        return LifecycleUtils.getValidPhaseNames();
+    }
+    
+    public List getDefaultLifecyclePhases()
+    {
+        return getBuildLifecyclePhases();
+    }
+    
+    public List getBuildLifecyclePhases()
+    {
+        return LifecycleUtils.getValidBuildPhaseNames();
+    }
 
-        ComponentDescriptor descriptor = container.getComponentDescriptor( LifecycleExecutor.ROLE );
+    public List getCleanLifecyclePhases()
+    {
+        return LifecycleUtils.getValidCleanPhaseNames();
+    }
 
-        PlexusConfiguration configuration = descriptor.getConfiguration();
-
-        PlexusConfiguration[] phasesConfigurations =
-            configuration.getChild( "lifecycles" ).getChild( 0 ).getChild( "phases" ).getChildren( "phase" );
-
-        try
-        {
-            for ( int i = 0; i < phasesConfigurations.length; i++ )
-            {
-                phases.add( phasesConfigurations[i].getValue() );
-            }
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new MavenEmbedderException( "Cannot retrieve default lifecycle phasesConfigurations.", e );
-        }
-
-        return phases;
+    public List getSiteLifecyclePhases()
+    {
+        return LifecycleUtils.getValidSitePhaseNames();
     }
 
     // ----------------------------------------------------------------------
@@ -524,7 +523,7 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     // ----------------------------------------------------------------------
-    //  Lifecycle
+    //  LegacyLifecycle
     // ----------------------------------------------------------------------
 
     private void start( Configuration configuration )
@@ -645,7 +644,7 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    // Lifecycle
+    // LegacyLifecycle
     // ----------------------------------------------------------------------
 
     private void handleExtensions( List extensions )

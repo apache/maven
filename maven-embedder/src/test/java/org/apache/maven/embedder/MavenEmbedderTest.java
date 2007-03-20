@@ -63,6 +63,11 @@ public class MavenEmbedderTest
         super.setUp();
 
         basedir = System.getProperty( "basedir" );
+        
+        if ( basedir == null )
+        {
+            basedir = new File( "." ).getCanonicalPath();
+        }
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
@@ -202,7 +207,7 @@ public class MavenEmbedderTest
     }
 
     // ----------------------------------------------------------------------
-    // Lifecycle phases
+    // LegacyLifecycle phases
     // ----------------------------------------------------------------------
 
     public void testRetrievingLifecyclePhases()

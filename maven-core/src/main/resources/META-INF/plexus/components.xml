@@ -53,6 +53,9 @@ under the License.
       <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>
@@ -261,101 +264,27 @@ under the License.
       <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.plan.BuildPlanner</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+        </requirement>
       </requirements>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: lifecycle -->
-            <phases>
-              <phase>validate</phase>
-              <phase>initialize</phase>
-              <phase>generate-sources</phase>
-              <phase>process-sources</phase>
-              <phase>generate-resources</phase>
-              <phase>process-resources</phase>
-              <phase>compile</phase>
-              <phase>process-classes</phase>
-              <phase>generate-test-sources</phase>
-              <phase>process-test-sources</phase>
-              <phase>generate-test-resources</phase>
-              <phase>process-test-resources</phase>
-              <phase>test-compile</phase>
-              <phase>process-test-classes</phase>
-              <phase>test</phase>
-              <phase>prepare-package</phase>
-              <phase>package</phase>
-              <phase>pre-integration-test</phase>
-              <phase>integration-test</phase>
-              <phase>post-integration-test</phase>
-              <phase>verify</phase>
-              <phase>install</phase>
-              <phase>deploy</phase>
-            </phases>
-            <!-- END SNIPPET: lifecycle -->
-          </lifecycle>
-          <lifecycle>
-            <id>clean</id>
-            <phases>
-              <phase>pre-clean</phase>
-              <phase>clean</phase>
-              <phase>post-clean</phase>
-            </phases>
-            <default-phases>
-              <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
-            </default-phases>
-          </lifecycle>
-          <lifecycle>
-            <id>site</id>
-            <phases>
-              <phase>pre-site</phase>
-              <phase>site</phase>
-              <phase>post-site</phase>
-              <phase>site-deploy</phase>
-            </phases>
-            <default-phases>
-              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
-              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
-            </default-phases>
-          </lifecycle>
-        </lifecycles>
-        <!-- START SNIPPET: default-reports -->
-        <defaultReports>
-          <report>org.apache.maven.plugins:maven-project-info-reports-plugin</report>
-          <!-- TODO: currently in mojo - should they be defaults any more?
-          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
-          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
-                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
-                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
-                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
-          -->
-        </defaultReports>
-        <!-- END SNIPPET: default-reports -->
-        <!-- START SNIPPET: default-lifecycle -->
-        <!-- NOT USED, ACCORDING TO CODE.
-        <defaultPhases>
-          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-          <package>
-            org.apache.maven.plugins:maven-jar-plugin:jar,
-            org.apache.maven.plugins:maven-source-plugin:jar
-          </package>
-          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
-        </defaultPhases>
-        -->
-        <!-- END SNIPPET: default-lifecycle -->
-      </configuration>
     </component>
 
     <!-- TODO: issues with the lifecycle:
@@ -621,5 +550,182 @@ under the License.
         </requirement>
       </requirements>
     </component>
+    
+    <component>
+      <role>org.codehaus.plexus.collections.ActiveMap</role>
+      <role-hint>lifecycle-loaders-by-packaging</role-hint>
+      <implementation>org.codehaus.plexus.collections.DefaultActiveMap</implementation>
+      <configuration>
+        <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
+      </configuration>
+    </component>
+    
+    <component>
+      <role>org.codehaus.plexus.collections.ActiveMap</role>
+      <role-hint>legacy-lifecycle-mappings-by-packaging</role-hint>
+      <implementation>org.codehaus.plexus.collections.DefaultActiveMap</implementation>
+      <configuration>
+        <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      </configuration>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.plugin.loader.PluginLoader</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.plugin.loader.DefaultPluginLoader</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.MavenPluginCollector</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginMappingManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.collections.ActiveMap</role>
+          <role-hint>lifecycle-loaders-by-packaging</role-hint>
+          <field-name>bindingsByPackaging</field-name>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.collections.ActiveMap</role>
+          <role-hint>legacy-lifecycle-mappings-by-packaging</role-hint>
+          <field-name>legacyMappingsByPackaging</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
+        </requirement>
+      </requirements>
+      <configuration>
+        <legacyLifecycles>
+          <legacyLifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: lifecycle -->
+            <phases>
+              <phase>validate</phase>
+              <phase>initialize</phase>
+              <phase>generate-sources</phase>
+              <phase>process-sources</phase>
+              <phase>generate-resources</phase>
+              <phase>process-resources</phase>
+              <phase>compile</phase>
+              <phase>process-classes</phase>
+              <phase>generate-test-sources</phase>
+              <phase>process-test-sources</phase>
+              <phase>generate-test-resources</phase>
+              <phase>process-test-resources</phase>
+              <phase>test-compile</phase>
+              <phase>process-test-classes</phase>
+              <phase>test</phase>
+              <phase>prepare-package</phase>
+              <phase>package</phase>
+              <phase>pre-integration-test</phase>
+              <phase>integration-test</phase>
+              <phase>post-integration-test</phase>
+              <phase>verify</phase>
+              <phase>install</phase>
+              <phase>deploy</phase>
+            </phases>
+            <!-- END SNIPPET: lifecycle -->
+          </legacyLifecycle>
+          <legacyLifecycle>
+            <id>clean</id>
+            <phases>
+              <phase>pre-clean</phase>
+              <phase>clean</phase>
+              <phase>post-clean</phase>
+            </phases>
+            <default-phases>
+              <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
+            </default-phases>
+          </legacyLifecycle>
+          <legacyLifecycle>
+            <id>site</id>
+            <phases>
+              <phase>pre-site</phase>
+              <phase>site</phase>
+              <phase>post-site</phase>
+              <phase>site-deploy</phase>
+            </phases>
+            <default-phases>
+              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
+              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
+            </default-phases>
+          </legacyLifecycle>
+        </legacyLifecycles>
+        <!-- START SNIPPET: default-reports -->
+        <defaultReports>
+          <report>org.apache.maven.plugins:maven-project-info-reports-plugin</report>
+          <!-- TODO: currently in mojo - should they be defaults any more?
+          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
+          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
+                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
+                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
+                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
+                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
+          -->
+        </defaultReports>
+        <!-- END SNIPPET: default-reports -->
+      </configuration>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.lifecycle.plan.BuildPlanner</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.lifecycle.plan.DefaultBuildPlanner</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.lifecycle.binding.DefaultMojoBindingFactory</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+    
   </components>
 </component-set>

@@ -1,0 +1,117 @@
+<plugin>
+  <description>Maven Internal State-Management Plugins</description>
+  <groupId>org.apache.maven.plugins.internal</groupId>
+  <artifactId>maven-state-management</artifactId>
+  <version>2.1</version>
+  <goalPrefix>statemgmt</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>start-fork</goal>
+      <description>Setup the appropriate build state to initiate a forked execution.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>org.apache.maven.lifecycle.statemgmt.StartForkedExecutionMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenProject instance, which will have a new executionProject set after execution.</description>
+        </parameter>
+        <parameter>
+          <name>forkId</name>
+          <type>int</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The current fork identifier.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <forkId implementation="int" default-value="-1">${forkId}</forkId>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <field-name>buildContextManager</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+    <mojo>
+      <goal>end-fork</goal>
+      <description>Restore the non-fork currentProject instance, for use in the forking mojo.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>org.apache.maven.lifecycle.statemgmt.EndForkedExecutionMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>forkId</name>
+          <type>int</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The current fork identifier.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <forkId implementation="int" default-value="-1">${forkId}</forkId>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <field-name>buildContextManager</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+    <mojo>
+      <goal>clear-fork-context</goal>
+      <description>Tear down any build state used during the previous forked execution.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>org.apache.maven.lifecycle.statemgmt.ClearForkedContextMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenProject instance, which will have the current executionProject cleared after execution.</description>
+        </parameter>
+        <parameter>
+          <name>forkId</name>
+          <type>int</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The current fork identifier.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <forkId implementation="int" default-value="-1">${forkId}</forkId>
+      </configuration>
+    </mojo>
+  </mojos>
+</plugin>

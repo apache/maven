@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.binding;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class Lifecycle.
+ * Class LegacyLifecycle.
  */
-public class Lifecycle
+public class LegacyLifecycle
 {
     /**
      * Field id
