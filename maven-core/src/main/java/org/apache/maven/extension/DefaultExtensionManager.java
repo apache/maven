@@ -102,7 +102,7 @@ public class DefaultExtensionManager
 
         Artifact projectArtifact = artifactFactory.createProjectArtifact( groupId, artifactId, version );
 
-        addExtension( extensionArtifact, projectArtifact, remoteRepositories, localRepository, null );
+        addExtension( extensionArtifact, projectArtifact, Collections.EMPTY_MAP, remoteRepositories, localRepository, null );
     }
 
     public void addExtension( Extension extension,
@@ -116,15 +116,15 @@ public class DefaultExtensionManager
 
         Artifact artifact = (Artifact) project.getExtensionArtifactMap().get( extensionId );
 
-        addExtension( artifact, project.getArtifact(), project.getRemoteArtifactRepositories(), localRepository,
-                      new ActiveArtifactResolver( project ) );
+        addExtension( artifact, project.getArtifact(), project.getManagedVersionMap(), project.getRemoteArtifactRepositories(),
+                      localRepository, new ActiveArtifactResolver( project ) );
     }
 
     private void addExtension( Artifact extensionArtifact,
                                Artifact projectArtifact,
+                               Map managedVersionMap,
                                List remoteRepositories,
-                               ArtifactRepository localRepository,
-                               ActiveArtifactResolver activeArtifactResolver )
+                               ArtifactRepository localRepository, ActiveArtifactResolver activeArtifactResolver )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
         getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
@@ -134,9 +134,10 @@ public class DefaultExtensionManager
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively(
-                Collections.singleton( extensionArtifact ), projectArtifact, localRepository, remoteRepositories,
-                artifactMetadataSource, filter );
+            ArtifactResolutionResult result =
+                artifactResolver.resolveTransitively( Collections.singleton( extensionArtifact ), projectArtifact,
+                                                      managedVersionMap, localRepository, remoteRepositories,
+                                                      artifactMetadataSource, filter );
 
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {

@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -139,6 +140,8 @@ public class MavenProject
     private Set extensionArtifacts;
 
     private Map extensionArtifactMap;
+    
+    private Map managedVersionMap;
 
     private Map projectReferences = new HashMap();
 
@@ -255,7 +258,12 @@ public class MavenProject
         if ( project.artifact != null )
         {
             this.artifact = ArtifactUtils.copyArtifact( project.artifact );
-        }        
+        }
+        
+        if ( project.getManagedVersionMap() != null )
+        {
+            setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
+        }
     }
     
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
@@ -1485,6 +1493,16 @@ public class MavenProject
     public Model getOriginalModel()
     {
         return originalModel;
+    }
+    
+    public void setManagedVersionMap( Map map )
+    {
+        this.managedVersionMap = map;
+    }
+    
+    public Map getManagedVersionMap()
+    {
+        return this.managedVersionMap;
     }
 
     public boolean equals( Object other )

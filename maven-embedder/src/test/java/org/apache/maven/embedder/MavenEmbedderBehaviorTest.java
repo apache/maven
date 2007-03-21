@@ -44,7 +44,7 @@ public class MavenEmbedderBehaviorTest
 
         MavenEmbedder maven = new MavenEmbedder( configuration );
 
-        assertEquals( "/global/maven/local-repository", maven.getLocalRepository().getBasedir() );
+        assertEquals( (new File("/global/maven/local-repository")).getAbsolutePath(), maven.getLocalRepository().getBasedir() );
 
         maven.stop();
     }

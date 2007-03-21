@@ -30,7 +30,7 @@ import org.codehaus.plexus.logging.Logger;
  * @version $Id$
  */
 public class DebugResolutionListener
-    implements ResolutionListener
+    implements ResolutionListener, ResolutionListenerForDepMgmt
 {
     private Logger logger;
 
@@ -93,6 +93,12 @@ public class DebugResolutionListener
             replacement.getVersionRange() + " to: " + newRange + " )" );
     }
 
+    /**
+     * The logic used here used to be a copy of the logic used in the DefaultArtifactCollector, and this method was
+     * called right before the actual version/scope changes were done. However, a different set of conditionals (and
+     * more information) is needed to be able to determine when and if the version and/or scope changes. See the two
+     * added methods, manageArtifactVersion and manageArtifactScope.
+     */
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
         String msg = indent + artifact;
@@ -108,4 +114,25 @@ public class DebugResolutionListener
         msg += ")";
         logger.debug( msg );
     }
+
+    public void manageArtifactVersion( Artifact artifact, Artifact replacement )
+    {
+        // only show msg if a change is actually taking place
+        if ( !replacement.getVersion().equals( artifact.getVersion() ) )
+        {
+            String msg = indent + artifact + " (applying version: " + replacement.getVersion() + ")";
+            logger.debug( msg );
+        }
+    }
+
+    public void manageArtifactScope( Artifact artifact, Artifact replacement )
+    {
+        // only show msg if a change is actually taking place
+        if ( !replacement.getScope().equals( artifact.getScope() ) )
+        {
+            String msg = indent + artifact + " (applying scope: " + replacement.getScope() + ")";
+            logger.debug( msg );
+        }
+    }
+
 }

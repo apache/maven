@@ -33,13 +33,16 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -269,6 +272,8 @@ public class DefaultMavenProjectBuilder
         projectContext.store( buildContextManager );
         
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
+        
+        project.setManagedVersionMap(createManagedVersionMap(projectId, superModel.getDependencyManagement(), null));
 
         List activeProfiles = profileAdvisor.applyActivatedProfiles( superModel, null, profileManager.getExplicitlyActivatedIds(), profileManager.getExplicitlyDeactivatedIds() );
         List activeExternalProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
@@ -346,7 +351,7 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
-        Map managedVersions = createManagedVersionMap( projectId, project.getDependencyManagement() );
+        Map managedVersions = project.getManagedVersionMap();
 
         ensureMetadataSourceIsInitialized();
 
@@ -398,13 +403,20 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement )
+    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement, MavenProject parent )
         throws ProjectBuildingException
     {
-        Map map;
-        if ( dependencyManagement != null && dependencyManagement.getDependencies() != null )
+        Map map = null;
+        List deps;
+        if ( dependencyManagement != null && (deps = dependencyManagement.getDependencies()) != null && deps.size() > 0)
         {
-            map = new HashMap();
+            map = new ManagedVersionMap( map );
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Adding managed depedendencies for " + projectId );
+            }
+
             for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
             {
                 Dependency d = (Dependency) i.next();
@@ -416,6 +428,30 @@ public class DefaultMavenProjectBuilder
                                                                                   versionRange, d.getType(),
                                                                                   d.getClassifier(), d.getScope(),
                                                                                   d.isOptional() );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "  " + artifact );
+                    }
+
+                    // If the dependencyManagement section listed exclusions,
+                    // add them to the managed artifacts here so that transitive
+                    // dependencies will be excluded if necessary.
+                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() )
+                    {
+                        List exclusions = new ArrayList();
+                        Iterator exclItr = d.getExclusions().iterator();
+                        while ( exclItr.hasNext() )
+                        {
+                            Exclusion e = (Exclusion) exclItr.next();
+                            exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                        }
+                        ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
+                        artifact.setDependencyFilter( eaf );
+                    }
+                    else
+                    {
+                        artifact.setDependencyFilter( null );
+                    }
                     map.put( d.getManagementKey(), artifact );
                 }
                 catch ( InvalidVersionSpecificationException e )
@@ -425,7 +461,7 @@ public class DefaultMavenProjectBuilder
                 }
             }
         }
-        else
+        else if ( map == null )
         {
             map = Collections.EMPTY_MAP;
         }
@@ -787,6 +823,9 @@ public class DefaultMavenProjectBuilder
                 project.setParent( processedParent );
             }
         }
+
+        project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement(),
+                                                               project.getParent() ) );
 
         return project;
     }

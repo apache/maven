@@ -464,6 +464,7 @@ public class DefaultPluginManager
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
+                                                                                project.getManagedVersionMap(),
                                                                                 localRepository, repositories,
                                                                                 artifactMetadataSource,
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
@@ -475,6 +476,7 @@ public class DefaultPluginManager
         // Also resolve the plugin dependencies specified in <plugin><dependencies>:
         resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
                                                                pluginArtifact,
+                                                               project.getManagedVersionMap(),
                                                                localRepository,
                                                                repositories,
                                                                artifactMetadataSource,
@@ -1256,7 +1258,9 @@ public class DefaultPluginManager
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
-                                                                                artifact, context.getLocalRepository(),
+                                                                                artifact,
+                                                                                project.getManagedVersionMap(),
+                                                                                context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
                                                                                 artifactMetadataSource, filter );
 

@@ -25,9 +25,11 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +69,10 @@ public class DefaultArtifactCollector
 
         root.addDependencies( artifacts, remoteRepositories, filter );
 
-        recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
+        ManagedVersionMap versionMap = (managedVersions != null && managedVersions instanceof ManagedVersionMap) ?
+            (ManagedVersionMap)managedVersions : new ManagedVersionMap(managedVersions);
+
+        recurse( root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
                  listeners );
 
         Set set = new LinkedHashSet();
@@ -102,29 +107,20 @@ public class DefaultArtifactCollector
         return result;
     }
 
-    private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
+    private void recurse( ResolutionNode node, Map resolvedArtifacts, ManagedVersionMap managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
                           ArtifactFilter filter, List listeners )
         throws CyclicDependencyException, ArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
 
-        // TODO: use as a conflict resolver
         Object key = node.getKey();
-        if ( managedVersions.containsKey( key ) )
+        
+        // TODO: Does this check need to happen here?  Had to add the same call
+        // below when we iterate on child nodes -- will that suffice?
+        if ( managedVersions.containsKey( key ))
         {
-            Artifact artifact = (Artifact) managedVersions.get( key );
-
-            fireEvent( ResolutionListener.MANAGE_ARTIFACT, listeners, node, artifact );
-
-            if ( artifact.getVersion() != null )
-            {
-                node.getArtifact().setVersion( artifact.getVersion() );
-            }
-            if ( artifact.getScope() != null )
-            {
-                node.getArtifact().setScope( artifact.getScope() );
-            }
+            manageArtifact( node, managedVersions, listeners );
         }
 
         List previousNodes = (List) resolvedArtifacts.get( key );
@@ -274,6 +270,38 @@ public class DefaultArtifactCollector
                             fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                         }
 
+                        Object childKey = child.getKey();
+                        if ( managedVersions.containsKey( childKey ) )
+                        {
+                            // If this child node is a managed dependency, ensure
+                            // we are using the dependency management version
+                            // of this child if applicable b/c we want to use the
+                            // managed version's POM, *not* any other version's POM.
+                            // We retrieve the POM below in the retrieval step.
+                            manageArtifact( child, managedVersions, listeners );
+                            
+                            // Also, we need to ensure that any exclusions it presents are
+                            // added to the artifact before we retrive the metadata
+                            // for the artifact; otherwise we may end up with unwanted
+                            // dependencies.
+                            Artifact ma = (Artifact) managedVersions.get( childKey );
+                            ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
+                            if ( null != managedExclusionFilter )
+                            {
+                                if ( null != artifact.getDependencyFilter() )
+                                {
+                                    AndArtifactFilter aaf = new AndArtifactFilter();
+                                    aaf.add( artifact.getDependencyFilter() );
+                                    aaf.add( managedExclusionFilter );
+                                    artifact.setDependencyFilter( aaf );
+                                }
+                                else
+                                {
+                                    artifact.setDependencyFilter( managedExclusionFilter );
+                                }
+                            }
+                        }
+
                         artifact.setDependencyTrail( node.getDependencyTrail() );
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
 
@@ -286,6 +314,7 @@ public class DefaultArtifactCollector
                         }
 
                         child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
+
                     }
                     catch ( CyclicDependencyException e )
                     {
@@ -308,6 +337,32 @@ public class DefaultArtifactCollector
             }
 
             fireEvent( ResolutionListener.FINISH_PROCESSING_CHILDREN, listeners, node );
+        }
+    }
+
+    private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions, List listeners )
+    {
+        Artifact artifact = (Artifact) managedVersions.get( node.getKey() );
+
+        // Before we update the version of the artifact, we need to know
+        // whether we are working on a transitive dependency or not.  This
+        // allows depMgmt to always override transitive dependencies, while
+        // explicit child override depMgmt (viz. depMgmt should only
+        // provide defaults to children, but should override transitives).
+        // We can do this by calling isChildOfRootNode on the current node.
+
+        if ( artifact.getVersion() != null
+                        && ( node.isChildOfRootNode() ? node.getArtifact().getVersion() == null : true ) )
+        {
+            fireEvent( ResolutionListener.MANAGE_ARTIFACT_VERSION, listeners, node, artifact );
+            node.getArtifact().setVersion( artifact.getVersion() );
+        }
+
+        if ( artifact.getScope() != null
+                        && ( node.isChildOfRootNode() ? node.getArtifact().getScope() == null : true ) )
+        {
+            fireEvent( ResolutionListener.MANAGE_ARTIFACT_SCOPE, listeners, node, artifact );
+            node.getArtifact().setScope( artifact.getScope() );
         }
     }
 
@@ -407,8 +462,21 @@ public class DefaultArtifactCollector
                 case ResolutionListener.UPDATE_SCOPE_CURRENT_POM:
                     listener.updateScopeCurrentPom( node.getArtifact(), replacement.getScope() );
                     break;
-                case ResolutionListener.MANAGE_ARTIFACT:
-                    listener.manageArtifact( node.getArtifact(), replacement );
+                case ResolutionListener.MANAGE_ARTIFACT_VERSION:
+                    if (listener instanceof ResolutionListenerForDepMgmt) {
+                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                        asImpl.manageArtifactVersion( node.getArtifact(), replacement );
+                    } else {
+                        listener.manageArtifact( node.getArtifact(), replacement );
+                    }
+                    break;
+                case ResolutionListener.MANAGE_ARTIFACT_SCOPE:
+                    if (listener instanceof ResolutionListenerForDepMgmt) {
+                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                        asImpl.manageArtifactScope( node.getArtifact(), replacement );
+                    } else {
+                        listener.manageArtifact( node.getArtifact(), replacement );
+                    }
                     break;
                 case ResolutionListener.SELECT_VERSION_FROM_RANGE:
                     listener.selectVersionFromRange( node.getArtifact() );
