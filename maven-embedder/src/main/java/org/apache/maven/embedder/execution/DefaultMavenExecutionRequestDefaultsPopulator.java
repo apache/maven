@@ -20,6 +20,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -179,14 +180,22 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
                                                     server.getPrivateKey(), server.getPassphrase() );
 
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
-                                                server.getDirectoryPermissions() );
+                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
 
                 if ( server.getConfiguration() != null )
                 {
                     wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
                 }
             }
+
+            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
+
+            
+            defaultPermissions.setDirectoryMode( "775" );
+
+            defaultPermissions.setFileMode( "664" );
+
+            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
 
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
             {

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.manager;
+        package org.apache.maven.artifact.manager;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -74,7 +74,7 @@ public class DefaultWagonManager
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
     // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
     private Map proxies = new HashMap();
-
+                                            
     private Map authenticationInfoMap = new HashMap();
 
     private Map serverPermissionsMap = new HashMap();
@@ -96,6 +96,8 @@ public class DefaultWagonManager
 
     private Map availableWagons = new HashMap();
 
+    private RepositoryPermissions defaultRepositoryPermissions;
+    
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -209,8 +211,10 @@ public class DefaultWagonManager
             if ( serverPermissionsMap.containsKey( repository.getId() ) )
             {
                 RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
+
                 getLogger().debug(
                     "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
+
                 artifactRepository.setPermissions( perms );
             }
             else
@@ -744,8 +748,8 @@ public class DefaultWagonManager
 
     public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
     {
-
         RepositoryPermissions permissions = new RepositoryPermissions();
+
         boolean addPermissions = false;
 
         if ( filePermissions != null )
@@ -871,4 +875,8 @@ public class DefaultWagonManager
         serverConfigurationMap.put( repositoryId, xmlConf );
     }
 
+    public void setDefaultRepositoryPermissions( RepositoryPermissions defaultRepositoryPermissions )
+    {
+        this.defaultRepositoryPermissions = defaultRepositoryPermissions;
+    }
 }
