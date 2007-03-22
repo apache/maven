@@ -207,7 +207,7 @@ under the License.
   </dependencies>
   
   <build>
-    <defaultGoal>jar</defaultGoal>
+    <defaultGoal>jar:install</defaultGoal>
     <sourceDirectory>${maven.build.dir}/generated-src/main/modello</sourceDirectory>
   </build>
   
