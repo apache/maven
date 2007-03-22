@@ -30,6 +30,7 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
+import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -117,4 +118,6 @@ public interface WagonManager
     void setInteractive( boolean interactive );
 
     void registerWagons( Collection wagons, PlexusContainer extensionContainer );
+
+    void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
 }

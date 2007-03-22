@@ -48,6 +48,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
+import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -57,6 +58,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -197,7 +199,8 @@ public class DefaultMaven
         dispatcher.dispatchEnd( event, request.getBaseDirectory() );
     }
 
-    private void logErrors( ReactorManager rm, boolean showErrors )
+    private void logErrors( ReactorManager rm,
+                            boolean showErrors )
     {
         for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
@@ -227,7 +230,8 @@ public class DefaultMaven
 
     }
 
-    private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
+    private ReactorManager doExecute( MavenExecutionRequest request,
+                                      EventDispatcher dispatcher )
         throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
     {
         if ( request.getSettings().isOffline() )
@@ -348,7 +352,8 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request,
+                              ProfileManager globalProfileManager )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
@@ -379,12 +384,15 @@ public class DefaultMaven
         return projects;
     }
 
-    private void logReactorSummaryLine( String name, String status )
+    private void logReactorSummaryLine( String name,
+                                        String status )
     {
         logReactorSummaryLine( name, status, -1 );
     }
 
-    private void logReactorSummaryLine( String name, String status, long time )
+    private void logReactorSummaryLine( String name,
+                                        String status,
+                                        long time )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
@@ -433,8 +441,12 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                  ProfileManager globalProfileManager, boolean isRoot )
+    private List collectProjects( List files,
+                                  ArtifactRepository localRepository,
+                                  boolean recursive,
+                                  Settings settings,
+                                  ProfileManager globalProfileManager,
+                                  boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
@@ -507,7 +519,9 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
+    public MavenProject getProject( File pom,
+                                    ArtifactRepository localRepository,
+                                    Settings settings,
                                     ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
@@ -532,7 +546,8 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm )
+    protected MavenSession createSession( MavenExecutionRequest request,
+                                          ReactorManager rpm )
     {
         return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
                                  request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory(),
@@ -581,6 +596,14 @@ public class DefaultMaven
                 }
             }
 
+            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
+
+            defaultPermissions.setDirectoryMode( "775" );
+
+            defaultPermissions.setFileMode( "664" );
+
+            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
+
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
             {
                 Mirror mirror = (Mirror) i.next();
@@ -621,7 +644,8 @@ public class DefaultMaven
         logTrace( error, true );
     }
 
-    protected void logError( Exception e, boolean showErrors )
+    protected void logError( Exception e,
+                             boolean showErrors )
     {
         line();
 
@@ -641,7 +665,8 @@ public class DefaultMaven
         }
     }
 
-    protected void logFailure( BuildFailureException e, boolean showErrors )
+    protected void logFailure( BuildFailureException e,
+                               boolean showErrors )
     {
         line();
 
@@ -661,7 +686,8 @@ public class DefaultMaven
         }
     }
 
-    private void logTrace( Throwable t, boolean showErrors )
+    private void logTrace( Throwable t,
+                           boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -770,7 +796,7 @@ public class DefaultMaven
     {
         getLogger().info( "------------------------------------------------------------------------" );
     }
-    
+
     protected static String formatTime( long ms )
     {
         long secs = ms / MS_PER_SEC;
