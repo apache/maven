@@ -120,13 +120,13 @@ public class OnlineArtifactDownloader
         // Assume managed snapshot
         if ( dep == null || dep.getGroupId().startsWith( "org.apache.maven" ) )
         {
-            return true;
+            return false;
         }
 
         // Assume managed snapshot
         if ( dep.getVersion() == null )
         {
-            return true;
+            return false;
         }
 
         return dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) >= 0;
