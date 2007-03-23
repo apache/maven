@@ -71,6 +71,7 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <!--
       <plugin>
         <artifactId>minijar-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
@@ -88,16 +89,15 @@ under the License.
                 <exclude>jmock:jmock</exclude>
                 <exclude>xml-apis:xml-apis</exclude>
               </excludes>
-              <!--
               <dependenciesToHide>
                 <dependencyHide>org.codehaus.plexus:plexus-utils</dependencyHide>
                 <dependencyHide>jdom:jdom</dependencyHide>                
               </dependenciesToHide>
-              -->
             </configuration>
           </execution>
         </executions>
       </plugin>
+      -->
     </plugins>
   </build>
   <dependencies>
