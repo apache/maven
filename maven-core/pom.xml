@@ -166,8 +166,8 @@ under the License.
 
   <repositories>
     <repository>
-      <id>codehaus.snapshots</id>
-      <name>Codehaus Snapshot Development Repository</name>
+      <id>codehaus</id>
+      <name>Codehaus Development Repository</name>
       <url>http://repository.codehaus.org</url>
       <snapshots>
         <enabled>false</enabled>
