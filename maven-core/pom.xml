@@ -160,7 +160,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-active-collections</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0-beta-1</version>
     </dependency>
   </dependencies>
 
@@ -168,10 +168,10 @@ under the License.
     <repository>
       <id>codehaus.snapshots</id>
       <name>Codehaus Snapshot Development Repository</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <releases>
+      <url>http://repository.codehaus.org</url>
+      <snapshots>
         <enabled>false</enabled>
-      </releases>
+      </snapshots>
     </repository>
   </repositories>
 
