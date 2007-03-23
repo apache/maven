@@ -312,6 +312,7 @@ public class MavenMetadataSource
 
     /**
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
+     * @return {@link Set} &lt; {@link Artifact} >
      */
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
                                        ArtifactFilter dependencyFilter, MavenProject project )

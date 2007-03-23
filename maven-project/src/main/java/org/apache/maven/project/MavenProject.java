@@ -1096,6 +1096,13 @@ public class MavenProject
         this.artifactMap = null;
     }
 
+    /**
+     * All dependencies that this project has, including transitive ones.
+     * Contents are lazily populated, so depending on what phases have run dependencies in some scopes won't be included.
+     * eg. if only compile phase has run, dependencies with scope test won't be included. 
+     * @return {@link Set} &lt; {@link Artifact} >
+     * @see #getDependencyArtifacts() to get only direct dependencies
+     */
     public Set getArtifacts()
     {
         return artifacts == null ? Collections.EMPTY_SET : artifacts;
@@ -1465,6 +1472,11 @@ public class MavenProject
         pomWriter.write( writer, getOriginalModel() );
     }
 
+    /**
+     * Direct dependencies that this project has.
+     * @return {@link Set} &lt; {@link Artifact} >
+     * @see #getArtifacts() to get all transitive dependencies
+     */
     public Set getDependencyArtifacts()
     {
         return dependencyArtifacts;
@@ -1543,6 +1555,7 @@ public class MavenProject
 
     /**
      * @todo the lazy initialisation of this makes me uneasy.
+     * @return {@link Set} &lt; {@link Artifact} >
      */
     public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                 ArtifactFilter dependencyFilter )
