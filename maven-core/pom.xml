@@ -68,7 +68,10 @@ under the License.
               <relocations>
                 <relocation>
                   <pattern>org.codehaus.plexus.util</pattern>
-                  <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                  <excludes>
+                    <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                    <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
+                  </excludes>
                 </relocation>
               </relocations>
             </configuration>
