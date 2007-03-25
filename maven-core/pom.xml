@@ -6,7 +6,8 @@ or more contributor license agreements.  See the NOTICE file
 distributed with this work for additional information
 regarding copyright ownership.  The ASF licenses this file
 to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
+"License"); you may not use t
+his file except in compliance
 with the License.  You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -19,7 +20,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -43,7 +45,35 @@ under the License.
               <goal>attached</goal>
             </goals>
           </execution>
-        </executions>        
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>shade-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>classworlds:classworlds</exclude>
+                  <exclude>junit:junit</exclude>
+                  <exclude>jmock:jmock</exclude>
+                  <exclude>xml-apis:xml-apis</exclude>
+                </excludes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.codehaus.plexus.util</pattern>
+                  <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

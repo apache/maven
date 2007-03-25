@@ -160,7 +160,7 @@ fi
 
 exec "$JAVACMD" \
   $MAVEN_OPTS \
-  -classpath "${M2_HOME}"/core/boot/classworlds-*.jar \
+  -classpath "${M2_HOME}"/boot/classworlds-*.jar \
   "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
   "-Dmaven.home=${M2_HOME}"  \
   ${CLASSWORLDS_LAUNCHER} $QUOTED_ARGS

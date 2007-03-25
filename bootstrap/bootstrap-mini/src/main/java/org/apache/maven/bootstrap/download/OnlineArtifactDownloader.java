@@ -121,6 +121,7 @@ public class OnlineArtifactDownloader
         if ( dep == null || dep.getGroupId().startsWith( "org.apache.maven" ) )
         {
             return false;
+
         }
 
         // Assume managed snapshot

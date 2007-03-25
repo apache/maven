@@ -248,7 +248,7 @@ public class BootstrapInstaller
         File coreDirectory = new File( dir, "core" );
         coreDirectory.mkdir();
 
-        File bootDirectory = new File( coreDirectory, "boot" );
+        File bootDirectory = new File( dir, "boot" );
         bootDirectory.mkdir();
 
         for ( Iterator i = mavenCoreModel.getAllDependencies().iterator(); i.hasNext(); )
@@ -259,11 +259,6 @@ public class BootstrapInstaller
             if ( dep.getArtifactId().equals( "classworlds" ) )
             {
                 FileUtils.copyFileToDirectory( artifactFile, bootDirectory );
-            }
-            else if ( dep.getArtifactId().equals( "plexus-container-default" ) ||
-                dep.getArtifactId().equals( "plexus-utils" ) )
-            {
-                FileUtils.copyFileToDirectory( artifactFile, coreDirectory );
             }
             else
             {

@@ -58,7 +58,7 @@ public class MavenArtifactFilterManager
         artifacts.add( "maven-settings" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
-        artifacts.add( "plexus-utils" );
+        //artifacts.add( "plexus-utils" );
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );

@@ -24,6 +24,14 @@ under the License.
     <format>tar.bz2</format>
     <format>zip</format>
   </formats>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>boot</outputDirectory>
+      <includes>
+        <include>classworlds:classworlds</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
   <fileSets>
     <fileSet>
       <includes>
@@ -56,41 +64,11 @@ under the License.
       <outputDirectory>conf</outputDirectory>
     </fileSet>
     <fileSet>
-      <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>maven-core-*.jar</include>
+        <include>maven-*-uber.jar</include>
       </includes>
-      <excludes>
-        <exclude>maven-core-*-sources.jar</exclude>
-      </excludes>
     </fileSet>
   </fileSets>
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>core</outputDirectory>
-      <includes>
-        <include>org.codehaus.plexus:plexus-container-default</include>
-        <include>org.codehaus.plexus:plexus-utils</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>core/boot</outputDirectory>
-      <includes>
-        <include>classworlds:classworlds</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>lib</outputDirectory>
-      <excludes>
-        <exclude>org.codehaus.plexus:plexus-container-default</exclude>
-        <exclude>classworlds:classworlds</exclude>
-        <exclude>org.codehaus.plexus:plexus-utils</exclude>
-        <!-- transitively picked up via default container - not needed -->
-        <exclude>plexus:plexus-utils</exclude>
-        <exclude>junit:junit</exclude>
-      </excludes>
-    </dependencySet>
-  </dependencySets>
 </assembly>

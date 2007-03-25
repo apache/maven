@@ -157,7 +157,7 @@ public class DefaultMavenProjectBuilder
     private ProfileInjector profileInjector;
 
     private ModelValidator validator;
-    
+
     private Map rawProjectCache = new HashMap();
 
     private Map processedProjectCache = new HashMap();
@@ -192,7 +192,9 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, ProfileManager profileManager )
+    public MavenProject build( File projectDescriptor,
+                               ArtifactRepository localRepository,
+                               ProfileManager profileManager )
         throws ProjectBuildingException
     {
         return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager, true );
@@ -204,7 +206,8 @@ public class DefaultMavenProjectBuilder
                                boolean checkDistributionManagementStatus )
         throws ProjectBuildingException
     {
-        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager, checkDistributionManagementStatus );
+        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager,
+                                            checkDistributionManagementStatus );
     }
 
     // jvz:note
@@ -230,7 +233,8 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
 
-        return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null, false );
+        return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null,
+                              null, false );
     }
 
     public MavenProject buildFromRepository( Artifact artifact,
@@ -249,8 +253,9 @@ public class DefaultMavenProjectBuilder
         ProfileManager profileManager = new DefaultProfileManager( container );
         return buildStandaloneSuperProject( localRepository, profileManager );
     }
-    
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager ) 
+
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository,
+                                                     ProfileManager profileManager )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -263,10 +268,10 @@ public class DefaultMavenProjectBuilder
 
 
         List activeProfiles;
-        
+
         if ( profileManager == null )
         {
-        	profileManager = new DefaultProfileManager( container );
+            profileManager = new DefaultProfileManager( container );
         }
 
         profileManager.addProfiles( superModel.getProfiles() );
@@ -277,7 +282,8 @@ public class DefaultMavenProjectBuilder
 
         MavenProject project = new MavenProject( superModel );
 
-        project.setManagedVersionMap(createManagedVersionMap(projectId, superModel.getDependencyManagement(), null));
+        project.setManagedVersionMap(
+            createManagedVersionMap( projectId, superModel.getDependencyManagement(), null ) );
 
         project.setActiveProfiles( activeProfiles );
 
@@ -311,9 +317,7 @@ public class DefaultMavenProjectBuilder
 
     // note:jvz This was added for the embedder.
 
-    /**
-     * @todo move to metadatasource itself?
-     */
+    /** @todo move to metadatasource itself? */
     public MavenProject buildWithDependencies( File projectDescriptor,
                                                ArtifactRepository localRepository,
                                                ProfileManager profileManager,
@@ -392,18 +396,21 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Map createManagedVersionMap( String projectId, DependencyManagement dependencyManagement, MavenProject parent)
+    private Map createManagedVersionMap( String projectId,
+                                         DependencyManagement dependencyManagement,
+                                         MavenProject parent )
         throws ProjectBuildingException
     {
         Map map = null;
         List deps;
-        if ( dependencyManagement != null && (deps = dependencyManagement.getDependencies()) != null && deps.size() > 0)
+        if ( dependencyManagement != null && ( deps = dependencyManagement.getDependencies() ) != null &&
+            deps.size() > 0 )
         {
-            map = new ManagedVersionMap(map);
+            map = new ManagedVersionMap( map );
 
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug("Adding managed depedendencies for " + projectId);
+                getLogger().debug( "Adding managed depedendencies for " + projectId );
             }
 
             for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
@@ -413,29 +420,36 @@ public class DefaultMavenProjectBuilder
                 try
                 {
                     VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+
                     Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                                   versionRange, d.getType(),
                                                                                   d.getClassifier(), d.getScope(),
                                                                                   d.isOptional() );
-                    if ( getLogger().isDebugEnabled())
+                    if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug("  " + artifact);
+                        getLogger().debug( "  " + artifact );
                     }
 
                     // If the dependencyManagement section listed exclusions,
                     // add them to the managed artifacts here so that transitive
                     // dependencies will be excluded if necessary.
-                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() ) {
-                    	List exclusions = new ArrayList();
-                    	Iterator exclItr = d.getExclusions().iterator();
-                    	while (exclItr.hasNext()) {
-                    		Exclusion e = (Exclusion) exclItr.next();
-                    		exclusions.add(e.getGroupId() + ":" + e.getArtifactId());
-                    	}
+                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() )
+                    {
+                        List exclusions = new ArrayList();
+                        
+                        Iterator exclItr = d.getExclusions().iterator();
+
+                        while ( exclItr.hasNext() )
+                        {
+                            Exclusion e = (Exclusion) exclItr.next();
+                            exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                        }
                         ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
                         artifact.setDependencyFilter( eaf );
-                    } else {
-                    	artifact.setDependencyFilter( null );
+                    }
+                    else
+                    {
+                        artifact.setDependencyFilter( null );
                     }
                     map.put( d.getManagementKey(), artifact );
                 }
@@ -446,10 +460,11 @@ public class DefaultMavenProjectBuilder
                 }
             }
         }
-        else if (map == null)
+        else if ( map == null )
         {
             map = Collections.EMPTY_MAP;
         }
+
         return map;
     }
 
@@ -461,17 +476,14 @@ public class DefaultMavenProjectBuilder
     {
         Model model = readModel( "unknown", projectDescriptor, true );
 
-        MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(),
-                                              model,
-                                              localRepository,
-                                              buildArtifactRepositories( getSuperModel() ),
-                                              projectDescriptor,
-                                              profileManager,
-                                              true );
+        MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(), model, localRepository,
+                                              buildArtifactRepositories( getSuperModel() ), projectDescriptor,
+                                              profileManager, true );
 
         if ( checkDistributionManagementStatus )
         {
-            if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
+            if ( project.getDistributionManagement() != null &&
+                project.getDistributionManagement().getStatus() != null )
             {
                 String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
@@ -498,12 +510,11 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            getLogger().warn( "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType() + "; constructing POM artifact instead." );
+            getLogger().warn( "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType() +
+                "; constructing POM artifact instead." );
 
-            projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(),
-                                                                     artifact.getArtifactId(),
-                                                                     artifact.getVersion(),
-                                                                     artifact.getScope() );
+            projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                     artifact.getVersion(), artifact.getScope() );
         }
 
         Model model;
@@ -546,7 +557,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId + "' from the repository: " + e.getMessage(), e );
+            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId +
+                "' from the repository: " + e.getMessage(), e );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -558,7 +570,8 @@ public class DefaultMavenProjectBuilder
             }
             else
             {
-                throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
+                throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " +
+                    e.getMessage(), e );
             }
         }
 
@@ -566,7 +579,8 @@ public class DefaultMavenProjectBuilder
     }
 
     private void checkStatusAndUpdate( Artifact projectArtifact,
-                                       ArtifactStatus status, File file,
+                                       ArtifactStatus status,
+                                       File file,
                                        List remoteArtifactRepositories,
                                        ArtifactRepository localRepository )
         throws ArtifactNotFoundException
@@ -654,11 +668,15 @@ public class DefaultMavenProjectBuilder
 
         //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
         // shall the ProfileManager intefrace expose the properties?
-        
+
         ProfileManager superProjectProfileManager;
-        if (externalProfileManager instanceof DefaultProfileManager) {
-            superProjectProfileManager = new DefaultProfileManager( container, ((DefaultProfileManager) externalProfileManager).getSystemProperties() );
-        } else {
+        if ( externalProfileManager instanceof DefaultProfileManager )
+        {
+            superProjectProfileManager = new DefaultProfileManager( container,
+                                                                    ( (DefaultProfileManager) externalProfileManager ).getSystemProperties() );
+        }
+        else
+        {
             superProjectProfileManager = new DefaultProfileManager( container );
         }
 
@@ -711,7 +729,8 @@ public class DefaultMavenProjectBuilder
                 ArtifactRepository artifactRepo = null;
                 try
                 {
-                    artifactRepo = ProjectUtils.buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
+                    artifactRepo =
+                        ProjectUtils.buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
                 }
                 catch ( InvalidRepositoryException e )
                 {
@@ -727,14 +746,8 @@ public class DefaultMavenProjectBuilder
         MavenProject project = null;
         try
         {
-            project = assembleLineage( model,
-                                       lineage,
-                                       localRepository,
-                                       projectDir,
-                                       parentSearchRepositories,
-                                       aggregatedRemoteWagonRepositories,
-                                       externalProfileManager,
-                                       strict );
+            project = assembleLineage( model, lineage, localRepository, projectDir, parentSearchRepositories,
+                                       aggregatedRemoteWagonRepositories, externalProfileManager, strict );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -742,8 +755,9 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setOriginalModel( originalModel );
-        
-        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), new MavenProject( project ) );
+
+        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
+                             new MavenProject( project ) );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         MavenProject previousProject = superProject;
@@ -764,7 +778,8 @@ public class DefaultMavenProjectBuilder
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
+                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " +
+                    previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
@@ -801,7 +816,8 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
         }
 
-        processedProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+        processedProjectCache.put(
+            createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
 
         // jvz:note
         // this only happens if we are building from a source file
@@ -821,15 +837,16 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
-        
+
         MavenProject rawParent = project.getParent();
-        
+
         if ( rawParent != null )
         {
-            String cacheKey = createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
-            
+            String cacheKey =
+                createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
+
             MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
-            
+
             // yeah, this null check might be a bit paranoid, but better safe than sorry...
             if ( processedParent != null )
             {
@@ -837,12 +854,14 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        project.setManagedVersionMap(createManagedVersionMap(projectId, project.getDependencyManagement(), project.getParent()));
+        project.setManagedVersionMap(
+            createManagedVersionMap( projectId, project.getDependencyManagement(), project.getParent() ) );
 
         return project;
     }
-    
-    private String safeVersionlessKey( String groupId, String artifactId )
+
+    private String safeVersionlessKey( String groupId,
+                                       String artifactId )
     {
         String gid = groupId;
 
@@ -866,7 +885,8 @@ public class DefaultMavenProjectBuilder
     {
         try
         {
-            return ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container );
+            return ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory,
+                                                           container );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -1030,9 +1050,13 @@ public class DefaultMavenProjectBuilder
 
         //TODO mkleint - use the (Container, Properties constructor to make system properties embeddable
         ProfileManager profileManager;
-        if (externalProfileManager != null && externalProfileManager instanceof DefaultProfileManager ) {
-            profileManager = new DefaultProfileManager( container, ((DefaultProfileManager)externalProfileManager).getSystemProperties() );
-        } else {
+        if ( externalProfileManager != null && externalProfileManager instanceof DefaultProfileManager )
+        {
+            profileManager = new DefaultProfileManager( container,
+                                                        ( (DefaultProfileManager) externalProfileManager ).getSystemProperties() );
+        }
+        else
+        {
             profileManager = new DefaultProfileManager( container );
         }
 
@@ -1057,7 +1081,8 @@ public class DefaultMavenProjectBuilder
         {
             String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles: " + e.getMessage(), e );
+            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles: " +
+                e.getMessage(), e );
         }
 
         MavenProject project = new MavenProject( model );
@@ -1083,7 +1108,8 @@ public class DefaultMavenProjectBuilder
             else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&
                 parentModel.getArtifactId().equals( model.getArtifactId() ) )
             {
-                throw new ProjectBuildingException( projectId, "Parent element is a duplicate of " + "the current project " );
+                throw new ProjectBuildingException( projectId,
+                                                    "Parent element is a duplicate of " + "the current project " );
             }
             else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
@@ -1094,17 +1120,18 @@ public class DefaultMavenProjectBuilder
             File parentDescriptor = null;
 
             model = null;
-            
-            String parentKey = createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
+
+            String parentKey =
+                createCacheKey( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
             MavenProject parentProject = (MavenProject) rawProjectCache.get( parentKey );
-    
+
             if ( parentProject != null )
             {
                 model = ModelUtils.cloneModel( parentProject.getModel() );
-                
+
                 parentDescriptor = parentProject.getFile();
             }
-            
+
             String parentRelativePath = parentModel.getRelativePath();
 
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using
@@ -1115,7 +1142,8 @@ public class DefaultMavenProjectBuilder
 
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " + project.getId() + " in relative path: " + parentRelativePath );
+                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " +
+                        project.getId() + " in relative path: " + parentRelativePath );
                 }
 
                 if ( parentDescriptor.isDirectory() )
@@ -1132,7 +1160,9 @@ public class DefaultMavenProjectBuilder
                     {
                         if ( getLogger().isDebugEnabled() )
                         {
-                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " + project.getId() + " cannot be loaded from relative path: " + parentDescriptor + "; path does not exist." );
+                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " +
+                                project.getId() + " cannot be loaded from relative path: " + parentDescriptor +
+                                "; path does not exist." );
                         }
                     }
                 }
@@ -1186,7 +1216,8 @@ public class DefaultMavenProjectBuilder
                 }
                 else if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Parent-POM: " + parentModel.getId() + " not found in relative path: " + parentRelativePath );
+                    getLogger().debug(
+                        "Parent-POM: " + parentModel.getId() + " not found in relative path: " + parentRelativePath );
                 }
             }
 
@@ -1198,7 +1229,7 @@ public class DefaultMavenProjectBuilder
                 // MNG-2302: parent's File was being populated incorrectly when parent is loaded from repo.
                 // keep this in line with other POMs loaded from the repository...the file should be null.
                 parentDescriptor = null;
-                
+
                 //!! (**)
                 // ----------------------------------------------------------------------
                 // Do we have the necessary information to actually find the parent
@@ -1215,9 +1246,8 @@ public class DefaultMavenProjectBuilder
 
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug(
-                                       "Retrieving parent-POM: " + parentModel.getId() + " for project: "
-                                           + project.getId() + " from the repository." );
+                    getLogger().debug( "Retrieving parent-POM: " + parentModel.getId() + " for project: " +
+                        project.getId() + " from the repository." );
                 }
 
                 parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
@@ -1228,9 +1258,10 @@ public class DefaultMavenProjectBuilder
                 {
                     model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository, false );
                 }
-                catch( ProjectBuildingException e )
+                catch ( ProjectBuildingException e )
                 {
-                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId() + " for project: " + project.getId(), e );
+                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId() +
+                        " for project: " + project.getId(), e );
                 }
             }
 
@@ -1245,11 +1276,11 @@ public class DefaultMavenProjectBuilder
             {
                 parentProjectDir = parentDescriptor.getParentFile();
             }
-            
+
             MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir,
                                                    parentSearchRepositories, aggregatedRemoteWagonRepositories,
                                                    externalProfileManager, strict );
-            
+
             parent.setFile( parentDescriptor );
 
             project.setParent( parent );
@@ -1260,7 +1291,8 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private List injectActiveProfiles( ProfileManager profileManager, Model model )
+    private List injectActiveProfiles( ProfileManager profileManager,
+                                       Model model )
         throws ProjectBuildingException
     {
         List activeProfiles;
@@ -1293,7 +1325,8 @@ public class DefaultMavenProjectBuilder
         return activeProfiles;
     }
 
-    private void loadProjectExternalProfiles( ProfileManager profileManager, File projectDir )
+    private void loadProjectExternalProfiles( ProfileManager profileManager,
+                                              File projectDir )
         throws ProfileActivationException
     {
         if ( projectDir != null )
@@ -1334,7 +1367,9 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId, File file, boolean strict )
+    private Model readModel( String projectId,
+                             File file,
+                             boolean strict )
         throws ProjectBuildingException
     {
         Reader reader = null;
@@ -1359,7 +1394,10 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId, String pomLocation, Reader reader, boolean strict )
+    private Model readModel( String projectId,
+                             String pomLocation,
+                             Reader reader,
+                             boolean strict )
         throws IOException, InvalidProjectModelException
     {
         StringWriter sw = new StringWriter();
@@ -1386,7 +1424,9 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId, URL url, boolean strict )
+    private Model readModel( String projectId,
+                             URL url,
+                             boolean strict )
         throws ProjectBuildingException
     {
         InputStreamReader reader = null;
@@ -1406,12 +1446,15 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private static String createCacheKey( String groupId, String artifactId, String version )
+    private static String createCacheKey( String groupId,
+                                          String artifactId,
+                                          String version )
     {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    protected Set createPluginArtifacts( String projectId, List plugins )
+    protected Set createPluginArtifacts( String projectId,
+                                         List plugins )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1453,7 +1496,8 @@ public class DefaultMavenProjectBuilder
     }
 
     // TODO: share with createPluginArtifacts?
-    protected Set createReportArtifacts( String projectId, List reports )
+    protected Set createReportArtifacts( String projectId,
+                                         List reports )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1498,7 +1542,8 @@ public class DefaultMavenProjectBuilder
     }
 
     // TODO: share with createPluginArtifacts?
-    protected Set createExtensionArtifacts( String projectId, List extensions )
+    protected Set createExtensionArtifacts( String projectId,
+                                            List extensions )
         throws ProjectBuildingException
     {
         Set extensionArtifacts = new HashSet();
