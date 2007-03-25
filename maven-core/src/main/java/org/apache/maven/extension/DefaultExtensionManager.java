@@ -20,10 +20,14 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.MavenArtifactFilterManager;
+import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -45,6 +49,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Used to locate extensions.
@@ -58,6 +64,8 @@ public class DefaultExtensionManager
     implements ExtensionManager, Contextualizable
 {
     private ArtifactResolver artifactResolver;
+
+    private ArtifactFactory artifactFactory;
 
     private ArtifactMetadataSource artifactMetadataSource;
 
@@ -82,13 +90,32 @@ public class DefaultExtensionManager
         {
             ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
+            ResolutionGroup resolutionGroup;
+            try
+            {
+                resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository,
+                                                                   project.getRemoteArtifactRepositories() );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
+                    artifact.getId() + "': " + e.getMessage(), artifact, e );
+            }
+
+            // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
+            // not declare plexus-utils but need it. MNG-2900
+            DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
+
+            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+
+            dependencies.add( artifact );
+
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies,
                                                                                     project.getArtifact(),
                                                                                     project.getManagedVersionMap(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource, filter );
-
             // create a child container for the extension
             // TODO: this could surely be simpler/different on trunk with the new classworlds
             PlexusContainer extensionContainer = getExtensionContainer();
