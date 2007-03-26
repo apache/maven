@@ -77,7 +77,9 @@ public class DefaultExtensionManager
 
     private static final String CONTAINER_NAME = "extensions";
 
-    public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
+    public void addExtension( Extension extension,
+                              MavenProject project,
+                              ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
@@ -110,8 +112,7 @@ public class DefaultExtensionManager
 
             dependencies.add( artifact );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies,
-                                                                                    project.getArtifact(),
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, project.getArtifact(),
                                                                                     project.getManagedVersionMap(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
@@ -129,26 +130,35 @@ public class DefaultExtensionManager
             // if it is a lone artifact, then we assume it to be a resource package, and put it in the main container
             // as before. If it has dependencies, that's when we risk conflict and exile to the child container
             // jvz: we have to make this 2 because plexus is always added now.
-            if ( result.getArtifacts().size() == 2 )
+
+            Set artifacts = result.getArtifacts();
+
+            if ( artifacts.size() == 2 )
             {
-                Artifact a = (Artifact) result.getArtifacts().iterator().next();
+                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                {
+                    Artifact a = (Artifact) i.next();
 
-                a = project.replaceWithActiveArtifact( a );
+                    if ( !a.getArtifactId().equals( "plexus-utils" ) )
+                    {
+                        a = project.replaceWithActiveArtifact( a );
 
-                getLogger().debug( "Adding extension to core container: " + a.getFile() );
+                        getLogger().debug( "Adding extension to core container: " + a.getFile() );
 
-                container.addJarResource( a.getFile() );
+                        container.addJarResource( a.getFile() );
+                    }
+                }
             }
             else
             {
                 for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
                 {
                     Artifact a = (Artifact) i.next();
-    
+
                     a = project.replaceWithActiveArtifact( a );
-    
+
                     getLogger().debug( "Adding to extension classpath: " + a.getFile() );
-    
+
                     extensionContainer.addJarResource( a.getFile() );
                 }
             }
@@ -192,7 +202,8 @@ public class DefaultExtensionManager
 
         private String projectDependencyConflictId;
 
-        ProjectArtifactExceptionFilter( ArtifactFilter passThroughFilter, Artifact projectArtifact )
+        ProjectArtifactExceptionFilter( ArtifactFilter passThroughFilter,
+                                        Artifact projectArtifact )
         {
             this.passThroughFilter = passThroughFilter;
             this.projectDependencyConflictId = projectArtifact.getDependencyConflictId();
