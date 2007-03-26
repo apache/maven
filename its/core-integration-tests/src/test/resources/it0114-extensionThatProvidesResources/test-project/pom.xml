@@ -3,29 +3,33 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>test</groupId>
-	<artifactId>test-project</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<name>My test project</name>
+	<groupId>org.apache.maven.its.it0114</groupId>
+	<artifactId>it0114-plugin-runner</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+	<name>it0114 - plugin runner</name>
 	<build>
 		<extensions>
 			<extension>
-				<groupId>test</groupId>
-				<artifactId>checkstyle-configs</artifactId>
-				<version>1.0.4-SNAPSHOT</version>
+				<groupId>org.apache.maven.its.it0114</groupId>
+				<artifactId>it0114-extension</artifactId>
+				<version>1.0</version>
 			</extension>
 		</extensions>
-	</build>
-	<reporting>
 		<plugins>			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<configLocation>MyConventions.xml</configLocation>
-				</configuration>
+				<groupId>org.apache.maven.its.it0114</groupId>
+				<artifactId>it0114-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+
 			</plugin>	
 		</plugins>
-	</reporting>
+	</build>
 </project>
