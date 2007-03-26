@@ -42,7 +42,7 @@ under the License.
  |   definition of these types
  |
  -->
-<model>
+<model xsd.namespace="http://maven.apache.org/POM/4.0.0" xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
   <id>maven</id>
   <name>Maven</name>
   <description><![CDATA[
