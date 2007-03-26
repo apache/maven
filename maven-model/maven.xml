@@ -36,8 +36,8 @@ under the License.
   <preGoal name="java:compile">
     <attainGoal name="customizeModello"/>
   </preGoal>
-  <!-- We need to have the generated code before to compute the javadoc -->
-  <preGoal name="maven-javadoc-plugin:register">
+  <!-- We need to have the generated code before to compute the javadoc and to register the modello report -->
+  <preGoal name="xdoc:register-reports">
     <attainGoal name="customizeModello"/>
   </preGoal>
 </project>
