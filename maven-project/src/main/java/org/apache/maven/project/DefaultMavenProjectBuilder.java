@@ -962,6 +962,7 @@ public class DefaultMavenProjectBuilder
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
                                                                         project.getVersion(), project.getPackaging() );
+
         project.setArtifact( projectArtifact );
 
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),

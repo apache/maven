@@ -462,6 +462,14 @@ public class DefaultArtifact
 
     public VersionRange getVersionRange()
     {
+        // I am assuming this is happening as a result of the MNG-1577 work, but somehow the value
+        // of versionRange just goes null or is not set. But this is happeningin Yoko and the value is
+        // set when attaching the JAR and not set when attaching the test JAR.
+        if ( versionRange == null )
+        {
+            versionRange = VersionRange.createFromVersion( version );
+        }
+
         return versionRange;
     }
 

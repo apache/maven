@@ -38,7 +38,7 @@ public class AttachedArtifact
     private final Artifact parent;
 
     public AttachedArtifact( Artifact parent, String type, String classifier, ArtifactHandler artifactHandler )
-    {
+    {        
         super( parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), type,
                classifier, artifactHandler, parent.isOptional() );
         

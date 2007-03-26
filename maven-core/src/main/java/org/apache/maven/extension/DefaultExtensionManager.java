@@ -128,7 +128,8 @@ public class DefaultExtensionManager
             // gross hack for some backwards compat (MNG-2749)
             // if it is a lone artifact, then we assume it to be a resource package, and put it in the main container
             // as before. If it has dependencies, that's when we risk conflict and exile to the child container
-            if ( result.getArtifacts().size() == 1 )
+            // jvz: we have to make this 2 because plexus is always added now.
+            if ( result.getArtifacts().size() == 2 )
             {
                 Artifact a = (Artifact) result.getArtifacts().iterator().next();
 

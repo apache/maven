@@ -49,7 +49,7 @@ public class DefaultMavenProjectHelper
         {
             handler = artifactHandlerManager.getArtifactHandler( "jar" );
         }
-        
+
         Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType, artifactClassifier, handler );
         
         artifact.setFile( artifactFile );
