@@ -23,6 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;
 
+import java.util.Set;
+import java.util.HashSet;
+
 /**
  * Send resolution events to the debug log.
  *
@@ -36,6 +39,8 @@ public class DebugResolutionListener
 
     private String indent = "";
 
+    private static Set ignoredArtifacts = new HashSet();
+    
     public DebugResolutionListener( Logger logger )
     {
         this.logger = logger;
@@ -74,6 +79,15 @@ public class DebugResolutionListener
     {
         logger.debug( indent + artifact + " (not setting scope to: " + scope + "; local scope " + artifact.getScope() +
             " wins)" );
+
+        // TODO: better way than static? this might hide messages in a reactor
+        if ( !ignoredArtifacts.contains( artifact ) )
+        {
+            logger.warn( "\n\tArtifact " + artifact + " retains local scope '" + artifact.getScope() +
+                "' overriding broader scope '" + scope + "'\n" +
+                "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
+            ignoredArtifacts.add( artifact );
+        }
     }
 
     public void updateScope( Artifact artifact, String scope )

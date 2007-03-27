@@ -37,8 +37,6 @@ public class WarningResolutionListener
 {
     private Logger logger;
 
-    private static Set ignoredArtifacts = new HashSet();
-
     public WarningResolutionListener( Logger logger )
     {
         this.logger = logger;
@@ -70,14 +68,6 @@ public class WarningResolutionListener
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        // TODO: better way than static? this might hide messages in a reactor
-        if ( !ignoredArtifacts.contains( artifact ) )
-        {
-            logger.warn( "\n\tArtifact " + artifact + " retains local scope '" + artifact.getScope() +
-                "' overriding broader scope '" + scope + "'\n" +
-                "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
-            ignoredArtifacts.add( artifact );
-        }
     }
 
     public void updateScope( Artifact artifact, String scope )
