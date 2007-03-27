@@ -737,13 +737,12 @@ public class DefaultPluginManager
         if ( !plexusUtilsPresent )
         {
             // We will add plexus-utils as every plugin was getting this anyway from Maven itself. We will set the
-            // version to the latest version we know that works as of the 2.0.6 release. We set the scope to compile
-            // as the resolution process will turn this into runtime. We are trying to mimic what was happening
-            // prior to hiding plexus-utils. jvz.
+            // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
+            // as this is what's implicitly happening in 2.0.6.
 
             resolutionGroup.getArtifacts().add( artifactFactory.createArtifact( "org.codehaus.plexus",
                                                                                 "plexus-utils", "1.1",
-                                                                                Artifact.SCOPE_COMPILE, "jar" ) );
+                                                                                Artifact.SCOPE_RUNTIME, "jar" ) );
         }
     }
 
