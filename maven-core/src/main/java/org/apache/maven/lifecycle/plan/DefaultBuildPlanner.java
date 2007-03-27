@@ -8,6 +8,7 @@ import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.lifecycle.model.Phase;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
@@ -150,9 +151,29 @@ public class DefaultBuildPlanner
             {
                 List reportBindings = lifecycleBindingManager.getReportBindings( project );
 
-                BuildPlanModifier modder = new ReportingPlanModifier( mojoBinding, reportBindings );
+                Phase phase = LifecycleUtils.findPhaseForMojoBinding( mojoBinding, lifecycleBindings, true );
+                
+                if ( phase == null )
+                {
+                    if ( planElement instanceof DirectInvocationOriginElement )
+                    {
+                        DirectInvocationModifier modder = new SimpleDirectInvocationModifier( mojoBinding, reportBindings );
 
-                planElement.addModifier( modder );
+                        ((DirectInvocationOriginElement) planElement).addDirectInvocationModifier( modder );
+                    }
+                    else
+                    {
+                        throw new LifecyclePlannerException( "Cannot inject reports for direct invocation: "
+                            + MojoBindingUtils.toString( mojoBinding )
+                            + "; current plan element does not accept direct-invocation modifiers." );
+                    }
+                }
+                else
+                {
+                    BuildPlanModifier modder = new ReportingPlanModifier( mojoBinding, reportBindings );
+
+                    planElement.addModifier( modder );
+                }
 
                 // NOTE: the first sighting of a mojo requiring reports should satisfy this condition.
                 // therefore, we can break out as soon as we find one.
