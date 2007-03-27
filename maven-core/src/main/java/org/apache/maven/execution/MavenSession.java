@@ -27,6 +27,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import java.io.File;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,6 +51,40 @@ public class MavenSession
     private MavenExecutionRequest request;
 
     private Map reports = new LinkedHashMap();
+    
+    /**
+     * @deprecated Use {@link MavenSession#MavenSession(PlexusContainer, MavenExecutionRequest, EventDispatcher, ReactorManager)}
+     * instead. MavenExecutionRequest is now used for the rest of this information.
+     * 
+     * @param container
+     * @param settings
+     * @param localRepository
+     * @param eventDispatcher
+     * @param reactorManager
+     * @param goals
+     * @param executionRootDir
+     * @param executionProperties
+     * @param startTime
+     */
+    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         String executionRootDir, Properties executionProperties, Date startTime )
+    {
+        this.container = container;
+        this.eventDispatcher = eventDispatcher;
+        this.reactorManager = reactorManager;
+        
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        
+        request.setBaseDirectory( new File( executionRootDir ) );
+        request.setSettings( settings );
+        request.setLocalRepository( localRepository );
+        request.setGoals( goals );
+        request.setProperties( executionProperties );
+        request.setStartTime( startTime );
+        
+        this.request = request;
+    }
 
     public MavenSession( PlexusContainer container,
                          MavenExecutionRequest request,
