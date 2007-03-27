@@ -50,9 +50,9 @@ under the License.
     </mailingList>
   </mailingLists>
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.6</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.6</developerConnection>
-    <url>https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.6</url>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <url>https://svn.apache.org/repos/asf/maven/components/trunk</url>
   </scm>
   <build>
     <pluginManagement>
@@ -118,11 +118,21 @@ under the License.
     </dependency>
   </dependencies>
   <properties>
-    <mavenVersion>2.0.6-SNAPSHOT</mavenVersion>
+    <mavenVersion>2.0.7-SNAPSHOT</mavenVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
       <!-- Maven -->
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-descriptor</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-error-diagnostics</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
