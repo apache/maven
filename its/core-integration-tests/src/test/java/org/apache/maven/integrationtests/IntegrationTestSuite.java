@@ -130,10 +130,11 @@ public class IntegrationTestSuite
         // suite.addTestSuite(MavenIT0107Test.class);
         suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class );
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
-        suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
+        //Superceded by IT0114 - see readme in resources folder
+        //suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
-        //suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
+        suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         return suite;
     }
