@@ -174,7 +174,8 @@ public class MavenCli
 
             boolean recursive = true;
 
-            String reactorFailureBehaviour = null;
+            // this is the default behavior.
+            String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
 
             if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
             {

@@ -58,7 +58,14 @@ public class ReactorManager
     {
         this.sorter = new ProjectSorter( projects );
 
-        this.failureBehavior = failureBehavior;
+        if ( failureBehavior == null )
+        {
+            this.failureBehavior = FAIL_FAST;
+        }
+        else
+        {
+            this.failureBehavior = failureBehavior;
+        }
     }
 
     public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
