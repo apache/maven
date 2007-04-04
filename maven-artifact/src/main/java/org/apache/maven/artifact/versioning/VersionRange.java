@@ -78,7 +78,7 @@ public class VersionRange
      * 
      * Some spec examples are
      * <ul>
-     *   <li><code>1.0</code> Version 1.0</li>
+     *   <li><code>1.0</code> Version 1.0 (suggested) The actual range constructed is (,) -> anything.</li>
      *   <li><code>[1.0,2.0)</code> Versions 1.0 (included) to 2.0 (not included)</li>
      *   <li><code>[1.0,2.0]</code> Versions 1.0 to 2.0 (both included)</li>
      *   <li><code>[1.5,)</code> Versions 1.5 and higher</li>
