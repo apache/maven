@@ -69,8 +69,7 @@ public class DefaultArtifactCollector
 
         root.addDependencies( artifacts, remoteRepositories, filter );
 
-        ManagedVersionMap versionMap = (managedVersions != null && managedVersions instanceof ManagedVersionMap) ?
-            (ManagedVersionMap)managedVersions : new ManagedVersionMap(managedVersions);
+        ManagedVersionMap versionMap = getManagedVersionsMap( originatingArtifact, managedVersions );
 
         recurse( root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
                  listeners );
@@ -105,6 +104,45 @@ public class DefaultArtifactCollector
         ArtifactResolutionResult result = new ArtifactResolutionResult();
         result.setArtifactResolutionNodes( set );
         return result;
+    }
+
+    /**
+     * Get the map of managed versions, removing the originating artifact if it is also in managed versions
+     * @param originatingArtifact artifact we are processing
+     * @param managedVersions original managed versions
+     */
+    private ManagedVersionMap getManagedVersionsMap( Artifact originatingArtifact, Map managedVersions )
+    {
+        ManagedVersionMap versionMap;
+        if ( managedVersions != null && managedVersions instanceof ManagedVersionMap )
+        {
+            versionMap = (ManagedVersionMap) managedVersions;
+        }
+        else
+        {
+            versionMap = new ManagedVersionMap( managedVersions );
+        }
+
+        /* remove the originating artifact if it is also in managed versions to avoid being modified during resolution */
+        Artifact managedOriginatingArtifact = (Artifact) versionMap.get( originatingArtifact.getDependencyConflictId() );
+        if ( managedOriginatingArtifact != null )
+        {
+            String managedVersion = managedOriginatingArtifact.getVersion();
+            String version = originatingArtifact.getVersion();
+            if ( !managedVersion.equals( version ) )
+            {
+                // TODO we probably want to warn the user that he is building and artifact with a
+                // different version than in dependencyManagement 
+                if ( managedVersions instanceof ManagedVersionMap )
+                {
+                    /* avoid modifying the managedVersions parameter creating a new map */
+                    versionMap = new ManagedVersionMap( managedVersions );
+                }
+                versionMap.remove( originatingArtifact.getDependencyConflictId() );
+            }
+        }
+
+        return versionMap;
     }
 
     private void recurse( ResolutionNode node, Map resolvedArtifacts, ManagedVersionMap managedVersions,
