@@ -1,10 +1,10 @@
 #!/bin/sh
 
-[ -z $LOCAL_REPO ] && echo && echo "Set your LOCAL_REPO envar!" && echo && exit
+[ -z "$LOCAL_REPO" ] && echo && echo "Set your LOCAL_REPO envar!" && echo && exit
 
 echo "Using $LOCAL_REPO ..."
 
-mv ${LOCAL_REPO} ${LOCAL_REPO}.its
+mv "${LOCAL_REPO}" "${LOCAL_REPO}.its"
 
 mvn -N install
 
@@ -26,4 +26,4 @@ mvn -N install
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 
-mv ${LOCAL_REPO}.its ${LOCAL_REPO}
+mv "${LOCAL_REPO}.its" "${LOCAL_REPO}"
