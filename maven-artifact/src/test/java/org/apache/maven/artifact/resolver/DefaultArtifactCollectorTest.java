@@ -19,6 +19,17 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -31,19 +42,7 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.codehaus.plexus.PlexusTestCase;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Test the default artifact collector.
@@ -384,6 +383,23 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a, managedVersion );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedB} ), res.getArtifacts() );
+    }
+
+    public void testCollectChangesVersionOfOriginatingArtifactIfInDependencyManagementHasDifferentVersion()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+
+        Artifact artifact = projectArtifact.artifact;
+        Artifact managedVersion = createArtifact( artifact.getArtifactId(), "2.0" ).artifact;
+
+        ArtifactResolutionResult result = collect( a, managedVersion );
+
+        assertEquals( "collect has modified version in originating artifact", "1.0", artifact.getVersion() );
+
+        Artifact resolvedArtifact = (Artifact) result.getArtifacts().iterator().next();
+
+        assertEquals( "Resolved version don't match original artifact version", "1.0", resolvedArtifact.getVersion() );
     }
 
     public void testResolveCompileScopeOverTestScope()
