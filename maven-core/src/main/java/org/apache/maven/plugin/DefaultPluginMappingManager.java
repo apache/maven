@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,9 +37,10 @@ import java.util.Map;
 
 /**
  * Manage plugin prefix to artifact ID mapping associations.
- *
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
+ * @version $Id: DefaultPluginMappingManager.java 495147 2007-01-11 07:47:53Z
+ *          jvanzyl $
  */
 public class DefaultPluginMappingManager
     extends AbstractLogEnabled
@@ -79,7 +81,7 @@ public class DefaultPluginMappingManager
         for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
         {
             String groupId = (String) it.next();
-
+            getLogger().debug( "Loading plugin prefixes from group: " + groupId );
             try
             {
                 loadPluginMappings( groupId, pluginRepositories, localRepository );
@@ -108,16 +110,21 @@ public class DefaultPluginMappingManager
                 Plugin mapping = (Plugin) pluginIterator.next();
 
                 String prefix = mapping.getPrefix();
+                
+                //if the prefix has already been found, don't add it again.
+                //this is to preserve the correct ordering of prefix searching (MNG-2926)
+                if ( !pluginDefinitionsByPrefix.containsKey( prefix ) )
+                {
+                    String artifactId = mapping.getArtifactId();
 
-                String artifactId = mapping.getArtifactId();
+                    org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 
-                org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+                    plugin.setGroupId( metadata.getGroupId() );
 
-                plugin.setGroupId( metadata.getGroupId() );
+                    plugin.setArtifactId( artifactId );
 
-                plugin.setArtifactId( artifactId );
-
-                pluginDefinitionsByPrefix.put( prefix, plugin );
+                    pluginDefinitionsByPrefix.put( prefix, plugin );
+                }
             }
         }
     }
