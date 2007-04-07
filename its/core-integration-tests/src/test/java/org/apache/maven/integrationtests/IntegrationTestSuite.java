@@ -21,7 +21,8 @@ public class IntegrationTestSuite
         System.setProperty( "maven.version", mavenVersion );
 
         TestSuite suite = new TestSuite();
-        suite.addTestSuite( MavenIT0000Test.class );
+        suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
+        /*suite.addTestSuite( MavenIT0000Test.class );
         suite.addTestSuite( MavenIT0001Test.class );
         suite.addTestSuite( MavenIT0002Test.class );
         suite.addTestSuite( MavenIT0003Test.class );
@@ -135,7 +136,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
-        suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
+        suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );*/
         return suite;
     }
 }

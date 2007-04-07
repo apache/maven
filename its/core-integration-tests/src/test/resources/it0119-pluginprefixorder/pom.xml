@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0119</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>it0119 - parent</name>
+  <modules>
+    <module>test-plugin-apache</module>
+    <module>test-plugin-codehaus</module>
+    <module>test-plugin-custom</module>  
+  </modules>
+</project>
