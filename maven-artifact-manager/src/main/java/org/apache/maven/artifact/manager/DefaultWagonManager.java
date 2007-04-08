@@ -632,6 +632,7 @@ public class DefaultWagonManager
                     checksumFile.delete();
                 }
                 FileUtils.copyFile( tempChecksumFile, checksumFile );
+                tempChecksumFile.delete();
             }
             else
             {
