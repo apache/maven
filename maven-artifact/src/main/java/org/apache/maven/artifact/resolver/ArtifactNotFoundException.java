@@ -39,30 +39,30 @@ public class ArtifactNotFoundException
     
     public ArtifactNotFoundException( String message, Artifact artifact )
     {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
-              artifact.getDownloadUrl(), artifact.getDependencyTrail() );
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+              artifact.getClassifier(), null, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
     protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories, Throwable t )
     {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
               remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), t );
     }
 
-    public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
+    public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type, String classifier,
                                       List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
-        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
-               version, type, remoteRepositories, null, t );
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,downloadUrl, path ), groupId, artifactId,
+               version, type, classifier, remoteRepositories, null, t );
 
         this.downloadUrl = downloadUrl;
     }
 
     private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                       List remoteRepositories, String downloadUrl, List path )
+                                       String classifier, List remoteRepositories, String downloadUrl, List path )
     {
-        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, downloadUrl, path ), groupId, artifactId,
-               version, type, remoteRepositories, null );
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier, downloadUrl, path ), groupId, artifactId,
+               version, type, classifier, remoteRepositories, null );
 
         this.downloadUrl = downloadUrl;
     }

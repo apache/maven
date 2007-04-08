@@ -31,15 +31,15 @@ public class ArtifactResolutionException
     extends AbstractArtifactResolutionException
 {
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        List remoteRepositories, List path, Throwable t )
+                                        String classifier, List remoteRepositories, List path, Throwable t )
     {
-        super( message, groupId, artifactId, version, type, remoteRepositories, path, t );
+        super( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, t );
     }
 
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        Throwable t )
+                                        String classifier, Throwable t )
     {
-        super( message, groupId, artifactId, version, type, null, null, t );
+        super( message, groupId, artifactId, version, type, classifier,null, null, t );
     }
 
     public ArtifactResolutionException( String message, Artifact artifact )
