@@ -218,6 +218,7 @@ under the License.
     <report>maven-file-activity-plugin</report>
     <report>maven-developer-activity-plugin</report>
     <report>maven-linkcheck-plugin</report>
+    <report>maven-jdiff-plugin</report>
   </reports>
 
 </project>
