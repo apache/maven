@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -47,6 +48,12 @@ import java.util.StringTokenizer;
 public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
+    public static final String OS_NAME = System.getProperty( "os.name" ).toLowerCase( Locale.US );
+
+    public static final String OS_ARCH = System.getProperty( "os.arch" ).toLowerCase( Locale.US );
+
+    public static final String OS_VERSION = System.getProperty( "os.version" ).toLowerCase( Locale.US );
 
     public static void main( String[] args )
     {
@@ -428,6 +435,11 @@ public class MavenCli
             {
                 System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
             }
+
+            System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
+
+            //TODO: when plexus can return the family type, add that here because it will make it easier to know what profile activation settings to use.
+            System.out.println( "OS name: \"" + OS_NAME + "\" version: \"" + OS_VERSION + "\" arch: \"" + OS_ARCH + "\"" );
         }
         catch ( IOException e )
         {
