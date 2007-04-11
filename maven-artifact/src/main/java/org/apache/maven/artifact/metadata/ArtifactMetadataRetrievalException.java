@@ -20,6 +20,8 @@ package org.apache.maven.artifact.metadata;
  */
 
 /**
+ * Error while retrieving repository metadata from the repository.
+ * 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
