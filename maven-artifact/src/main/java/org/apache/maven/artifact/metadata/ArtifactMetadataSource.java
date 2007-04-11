@@ -67,7 +67,7 @@ public interface ArtifactMetadataSource
      * @param localRepository local repository
      * @param remoteRepositories remote repositories, {@link List} $lt; {@link ArtifactRepository} >
      * @return {@link List} $lt; {@link ArtifactVersion} >
-     * @throws ArtifactMetadataRetrievalException
+     * @throws ArtifactMetadataRetrievalException in case of error while retrieving repository metadata from the repository.
      */
     List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
