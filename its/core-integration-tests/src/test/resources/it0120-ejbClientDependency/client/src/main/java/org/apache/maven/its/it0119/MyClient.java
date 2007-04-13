@@ -1,4 +1,4 @@
-package org.apache.maven.its.it0119;
+package org.apache.maven.its.it0120;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,7 +19,19 @@ package org.apache.maven.its.it0119;
  * under the License.
  */
 
-public interface Component
+import org.apache.maven.its.it0119.Component;
+
+public class MyClient
 {
-    void func();
+
+    void func()
+    {
+        Component testComponent = new Component()
+        {
+
+            public void func()
+            {
+            }
+        };
+    }
 }
