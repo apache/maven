@@ -155,13 +155,6 @@ under the License.
   </developers>
 
   <dependencies>
-  
-    <dependency>
-      <groupId>maven</groupId>
-      <artifactId>maven-modello-plugin</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <type>plugin</type>
-    </dependency>
 
     <dependency>
       <groupId>plexus</groupId>
