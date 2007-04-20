@@ -880,9 +880,13 @@ under the License.
           <name>integrationUnitTestSourceDirectory</name>
           <version>3.0.0</version>
           <description><![CDATA[    
-             This element specifies a directory containing integration test    
-             sources of the project. This element is not known to be used.
-           ]]></description>
+             This element is <strong>deprecated</strong> and should no longer be used.
+             Initially it was used by the first Cactus plugin. Now
+             the location of the Cactus test sources is defined
+             through a plugin property. See the Cactus plugin
+             <a href="http://jakarta.apache.org/cactus/integration/maven/properties.html">properties</a>
+             page.
+            ]]></description>
           <type>String</type>
         </field>
         <field>
