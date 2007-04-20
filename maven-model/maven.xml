@@ -40,4 +40,11 @@ under the License.
   <preGoal name="xdoc:register-reports">
     <attainGoal name="customizeModello"/>
   </preGoal>
+  <!-- Workaround for MODELLO-87 -->
+  <postGoal name="modello:xdoc">
+    <ant:replace file="${maven.modello.xdoc.targetDirectory}/${maven_modello_model_id}.xml" token="packageName" value="package"/>
+  </postGoal>
+  <postGoal name="modello:xsd">
+      <ant:replace file="${maven.modello.xsd.targetDirectory}/${maven_modello_model_id}-${maven.modello.version}.xsd" token="packageName" value="package"/>
+  </postGoal>
 </project>
