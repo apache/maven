@@ -40,19 +40,6 @@ under the License.
       </resource>
     </resources>
     <plugins>
-      <!--
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <finalName>${artifactId}-${bundleVersion}</finalName>
-          <descriptor>src/main/assembly/dep.xml</descriptor>
-          <archive>
-            <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-      -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.1</version>
@@ -72,32 +59,37 @@ under the License.
         </executions>
       </plugin>
       <plugin>
-        <artifactId>minijar-maven-plugin</artifactId>
+        <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
+        <version>1.0-alpha-4</version>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
-              <goal>ueberjar</goal>
+              <goal>shade</goal>
             </goals>
             <configuration>
-              <stripUnusedClasses>false</stripUnusedClasses>
-              <excludes>
-                <exclude>classworlds:classworlds</exclude>
-                <exclude>junit:junit</exclude>
-                <exclude>jmock:jmock</exclude>
-                <exclude>xml-apis:xml-apis</exclude>
-              </excludes>
-              <!--
-              <dependenciesToHide>
-                <dependencyHide>org.codehaus.plexus:plexus-utils</dependencyHide>
-                <dependencyHide>jdom:jdom</dependencyHide>                
-              </dependenciesToHide>
-              -->
+              <artifactSet>
+                <excludes>
+                  <exclude>classworlds:classworlds</exclude>
+                  <exclude>junit:junit</exclude>
+                  <exclude>jmock:jmock</exclude>
+                  <exclude>xml-apis:xml-apis</exclude>
+                </excludes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.codehaus.plexus.util</pattern>
+                  <excludes>
+                    <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                    <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
+                  </excludes>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin>      
     </plugins>
   </build>
   <dependencies>
