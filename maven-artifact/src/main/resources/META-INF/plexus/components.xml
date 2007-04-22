@@ -205,5 +205,181 @@ under the License.
       <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
     </component>
+    
+    <!-- From maven-artifact-manager -->
+    
+    <!--
+     |
+     | WagonManager
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.manager.WagonManager</role>
+      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+      <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | Transformations
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>snapshot</role-hint>
+      <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>release</role-hint>
+      <implementation>org.apache.maven.artifact.transform.ReleaseArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>latest</role-hint>
+      <implementation>org.apache.maven.artifact.transform.LatestArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+    |
+    | ArtifactTransformationManager
+    |
+    -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+      <implementation>org.apache.maven.artifact.transform.DefaultArtifactTransformationManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | Resolver
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+      <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
+      <role-hint>default</role-hint>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactInstaller
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.installer.ArtifactInstaller</role>
+      <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactDeployer
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.deployer.ArtifactDeployer</role>
+      <implementation>org.apache.maven.artifact.deployer.DefaultArtifactDeployer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataBuilder</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>    
+    
   </components>
 </component-set>

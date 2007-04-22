@@ -40,4 +40,17 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>1.0.0</version>
+          <model>src/main/mdo/metadata.mdo</model>
+        </configuration>
+      </plugin>    
+    </plugins>
+  </build>
 </project>

@@ -232,7 +232,7 @@ under the License.
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
     <modello file="maven-profile/profiles.mdo"/>
-    <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo"/>
+    <modello file="maven-artifact/src/main/mdo/metadata.mdo"/>
     <modello file="maven-settings/src/main/mdo/settings.mdo"/>
   </target>
 
