@@ -118,7 +118,6 @@ under the License.
   <modules>
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
-    <module>maven-artifact-test</module>
     <module>maven-build-context</module>
     <module>maven-core</module>
     <module>maven-error-diagnostics</module>

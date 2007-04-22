@@ -59,7 +59,7 @@ under the License.
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>maven-embedder-*ueber.jar</include>
+        <include>maven-embedder-*uber.jar</include>
       </includes>
     </fileSet>
   </fileSets>
