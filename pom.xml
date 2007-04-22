@@ -128,7 +128,6 @@ under the License.
     <module>maven-plugin-api</module>
     <module>maven-plugin-descriptor</module>
     <module>maven-plugin-parameter-documenter</module>
-    <module>maven-plugin-registry</module>
     <module>maven-profile</module>
     <module>maven-project</module>
     <module>maven-reporting</module>
