@@ -146,15 +146,6 @@ public class MavenCli
             interactive = false;
         }
 
-        // This is now off by default and should just be removed as it causes too many problems and
-        // is turned off in 2.0.4.
-        boolean usePluginRegistry = false;
-
-        if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
-        {
-            usePluginRegistry = false;
-        }
-
         boolean pluginUpdateOverride = false;
 
         if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
@@ -326,7 +317,6 @@ public class MavenCli
                 .setPomFile( alternatePomFile ) // optional
                 .setShowErrors( showErrors ) // default: false
                 .setInteractiveMode( interactive ) // default: false
-                .setUsePluginRegistry( usePluginRegistry )
                 .setOffline( offline ) // default: false
                 .setUsePluginUpdateOverride( pluginUpdateOverride )
                 .addActiveProfiles( activeProfiles ) // optional

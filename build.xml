@@ -231,7 +231,6 @@ under the License.
     <modello file="maven-lifecycle/src/main/mdo/maven-lifecycle.mdo"/>
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
-    <modello file="maven-plugin-registry/plugin-registry.mdo"/>
     <modello file="maven-profile/profiles.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/plugins.mdo"/>

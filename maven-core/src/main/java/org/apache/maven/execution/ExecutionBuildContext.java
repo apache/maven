@@ -181,11 +181,6 @@ public class ExecutionBuildContext
         return request.isUpdateSnapshots();
     }
 
-    public boolean isUsePluginRegistry()
-    {
-        return request.isUsePluginRegistry();
-    }
-
     public boolean isUsePluginUpdateOverride()
     {
         return request.isUsePluginUpdateOverride();

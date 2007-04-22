@@ -175,11 +175,6 @@ public interface MavenExecutionRequest
     List getPluginGroups();
     MavenExecutionRequest setPluginGroups( List pluginGroups );
 
-    //PLXAPI: should go away
-    // Plugin registry
-    boolean isUsePluginRegistry();
-    MavenExecutionRequest setUsePluginRegistry( boolean usePluginRegistry );
-
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
 

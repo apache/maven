@@ -55,9 +55,6 @@ public class DefaultMavenExecutionRequest
 
     private List pluginGroups;
 
-    // This is off by default because it causes so many problem. It should just be extracted and redone.
-    private boolean usePluginRegistry = false;
-
     private boolean usePluginUpdateOverride;
 
     // ----------------------------------------------------------------------------
@@ -450,18 +447,6 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setPluginGroups( List pluginGroups )
     {
         this.pluginGroups = pluginGroups;
-
-        return this;
-    }
-
-    public boolean isUsePluginRegistry()
-    {
-        return usePluginRegistry;
-    }
-
-    public MavenExecutionRequest setUsePluginRegistry( boolean usePluginRegistry )
-    {
-        this.usePluginRegistry = usePluginRegistry;
 
         return this;
     }

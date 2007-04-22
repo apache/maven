@@ -49,11 +49,6 @@ public class SettingsAdapter
         return request.isInteractiveMode();
     }
 
-    public boolean isUsePluginRegistry()
-    {
-        return request.isUsePluginRegistry();
-    }
-
     public boolean isOffline()
     {
         return request.isOffline();
