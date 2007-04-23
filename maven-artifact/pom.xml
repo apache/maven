@@ -42,7 +42,6 @@ under the License.
   </dependencies>
   <build>
     <plugins>
-    <plugins>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
