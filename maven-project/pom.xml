@@ -65,5 +65,10 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+      <scope>test</scope>
+    </dependency>    
   </dependencies>
 </project>
