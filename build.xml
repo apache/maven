@@ -119,12 +119,8 @@ under the License.
     <pull orgpath="org/codehaus/plexus/plexus-active-collections" version="${plexus-active-collections.version}" name="plexus-active-collections" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
-    <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api" repository="codehaus"/>
-    <!--
-    <pull orgpath="org/codehaus/plexus/plexus-archiver" version="${plexus-archiver.version}" name="plexus-archiver" repository="codehaus"/>
-    -->
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>

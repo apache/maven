@@ -189,7 +189,6 @@ public class DefaultMavenExecutionRequestDefaultsPopulator
             }
 
             RepositoryPermissions defaultPermissions = new RepositoryPermissions();
-
             
             defaultPermissions.setDirectoryMode( "775" );
 
