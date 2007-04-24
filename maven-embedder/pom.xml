@@ -61,7 +61,7 @@ under the License.
       <plugin>
         <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-alpha-7</version>
+        <version>1.0-alpha-8-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -134,6 +134,10 @@ under the License.
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-ssh-external</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+    </dependency>    
   </dependencies>
   <distributionManagement>
     <site>
