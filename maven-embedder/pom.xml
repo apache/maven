@@ -44,9 +44,7 @@ under the License.
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.1</version>
         <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/bin.xml</descriptor>
-          </descriptors>
+          <descriptor>src/main/assembly/bin.xml</descriptor>
           <finalName>maven-${version}</finalName>
         </configuration>
         <executions>
@@ -61,7 +59,7 @@ under the License.
       <plugin>
         <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-alpha-8-SNAPSHOT</version>
+        <version>1.0-alpha-4</version>
         <executions>
           <execution>
             <phase>package</phase>
