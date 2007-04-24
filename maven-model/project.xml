@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,36 +19,30 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/3.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
-
   <name>Maven Model</name>
   <groupId>maven</groupId>
   <artifactId>maven-model</artifactId>
-  <currentVersion>3.0.2-SNAPSHOT</currentVersion>
+  <currentVersion>3.0.2</currentVersion>
   <description>The Maven project descriptor used in Maven 1.x. This library is used to represent in Java the POM (project.xml) and it offers services to parse and to serialize it.</description>
   <shortDescription>The Maven project descriptor used in Maven.</shortDescription>
-  
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
     <logo>http://maven.apache.org/images/apache-maven-project-2.png</logo>
   </organization>
-
   <inceptionYear>2005</inceptionYear>
   <package>org.apache.maven</package>
   <logo>http://maven.apache.org/images/maven-logo-2.gif</logo>
   <url>http://maven.apache.org/maven-1.x/reference/maven-model/${pom.currentVersion}/</url>
-
   <siteAddress>people.apache.org</siteAddress>
   <siteDirectory>/www/maven.apache.org/maven-1.x/reference/maven-model/${pom.currentVersion}/</siteDirectory>
   <distributionSite>people.apache.org</distributionSite>
   <distributionDirectory>/www/people.apache.org/repo/m1-ibiblio-rsync-repository/</distributionDirectory>
-
   <repository>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-model/</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-model/</developerConnection>
     <url>http://svn.apache.org/viewcvs/maven/components/trunk/maven-model/</url>
   </repository>
-
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
@@ -100,7 +95,6 @@ under the License.
       <archive>http://mail-archives.apache.org/mod_mbox/www-announce/</archive>
     </mailingList>
   </mailingLists>
-  
   <developers>
     <developer>
       <name>Arnaud Heritier</name>
@@ -153,15 +147,12 @@ under the License.
       <timezone>+1</timezone>
     </developer>
   </developers>
-
   <dependencies>
-
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.0.3</version>
     </dependency>
-    
     <dependency>
       <groupId>maven</groupId>
       <artifactId>dom4j</artifactId>
@@ -171,7 +162,6 @@ under the License.
         <comment>Maven model dependency - Required to read/write XML using dom4j.</comment>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>stax</groupId>
       <artifactId>stax</artifactId>
@@ -196,14 +186,11 @@ under the License.
         <comment>Maven model dependency - Required to read/write XML using stax.</comment>
       </properties>
     </dependency>
-
   </dependencies>
-  
   <build>
     <defaultGoal>jar:install</defaultGoal>
     <sourceDirectory>${maven.build.dir}/generated-src/main/modello</sourceDirectory>
   </build>
-  
   <reports>
     <report>maven-modello-plugin</report>
     <report>maven-javadoc-plugin</report>
@@ -212,5 +199,11 @@ under the License.
     <report>maven-developer-activity-plugin</report>
     <report>maven-linkcheck-plugin</report>
   </reports>
-
+  <versions>
+    <version>
+      <id>3.0.2</id>
+      <name>3.0.2</name>
+      <tag>maven-model-3.0.2</tag>
+    </version>
+  </versions>
 </project>
