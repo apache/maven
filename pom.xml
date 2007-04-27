@@ -176,6 +176,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-api</artifactId>
+        <version>${plexusVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>1.2-alpha-7</version>
       </dependency>
