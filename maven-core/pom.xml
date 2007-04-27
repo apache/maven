@@ -144,16 +144,4 @@ under the License.
       <version>1.0-beta-1</version>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>codehaus</id>
-      <name>Codehaus Development Repository</name>
-      <url>http://repository.codehaus.org</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
 </project>
