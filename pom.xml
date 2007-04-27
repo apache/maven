@@ -107,6 +107,30 @@ under the License.
       </plugins>
     </pluginManagement>
     <plugins>
+      <!-- if plugin not released at maven release time the manifests generated could be checked in by hand -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>0.9.0-incubator-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Needed for including the manifest, see MJAR-71 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.2</version>
@@ -204,4 +228,19 @@ under the License.
       <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
     </site>
   </distributionManagement>
+
+  <!-- needed for felix bundle plugin -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <name>snapshot plugins</name>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
