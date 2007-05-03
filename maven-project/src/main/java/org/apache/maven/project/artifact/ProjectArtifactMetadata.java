@@ -19,21 +19,15 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 /**
  * Attach a POM to an artifact.
