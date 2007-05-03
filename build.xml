@@ -121,7 +121,6 @@ under the License.
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-component-api" version="${plexus.version}" name="plexus-component-api" repository="codehaus"/>    
     <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
-    <pull orgpath="org/codehaus/plexus/plexus-interactivity-api" version="${plexus-interactivity-api.version}" name="plexus-interactivity-api" repository="codehaus"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
     <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
@@ -131,11 +130,6 @@ under the License.
     <pull orgpath="org/apache/maven/wagon/wagon-http-shared" version="${wagon.version}" name="wagon-http-shared"/>
     <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="${wagon.version}" name="wagon-http-lightweight"/>
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-ssh-external" version="${wagon.version}" name="wagon-ssh-external"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-ssh-common" version="${wagon.version}" name="wagon-ssh-common"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-ssh" version="${wagon.version}" name="wagon-ssh"/>
-    <pull orgpath="commons-lang/commons-lang" version="${commons-lang.version}" name="commons-lang"/>
-    <pull orgpath="com/jcraft/jsch" version="${jsch.version}" name="jsch"/>
     <!-- Wagon Deps (End) -->
     <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="${doxia.version}" name="doxia-sink-api"/>
     <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
