@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+    package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -61,6 +61,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -160,6 +161,28 @@ public class DefaultPluginManager
         return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
                                                  project.getPluginArtifactRepositories(),
                                                  session.getLocalRepository() );
+    }
+    
+    /**
+     * @deprecated 
+     */
+    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
+                                          ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException
+    {
+        // TODO: this should be possibly outside
+        // All version-resolution logic has been moved to DefaultPluginVersionManager.
+        if ( plugin.getVersion() == null )
+        {
+            getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
+            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
+                                                                        project, localRepository );
+            plugin.setVersion( version );
+        }
+
+        return verifyVersionedPlugin( plugin, project, localRepository );
     }
 
     public PluginDescriptor verifyPlugin( Plugin plugin,

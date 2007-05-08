@@ -19,6 +19,7 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -31,6 +32,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Map;
@@ -61,6 +63,17 @@ public interface PluginManager
                                          MavenSession session,
                                          MavenProject project );
 
+    /**
+     * @deprecated 
+     */
+    PluginDescriptor verifyPlugin( Plugin plugin, 
+                                   MavenProject project, 
+                                   Settings settings, 
+                                   ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException;
+        
     PluginDescriptor verifyPlugin( Plugin plugin,
                                    MavenProject project,
                                    MavenSession session )

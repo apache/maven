@@ -61,13 +61,22 @@ public class DefaultPluginVersionManager
     // TODO: Revisit to remove this piece of state. PLUGIN REGISTRY MAY BE UPDATED ON DISK OUT-OF-PROCESS!
     private Map resolvedMetaVersions = new HashMap();
 
+    /**
+     * @deprecated
+     */
+    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
+    {
+        return resolvePluginVersion( groupId, artifactId, project, localRepository, false );
+    }
+
     public String resolvePluginVersion( String groupId,
                                         String artifactId,
                                         MavenProject project,
                                         MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, session, false );
+        return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), false );
     }
 
     public String resolveReportPluginVersion( String groupId,
@@ -76,18 +85,16 @@ public class DefaultPluginVersionManager
                                               MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, session, true );
+        return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), true );
     }
 
     private String resolvePluginVersion( String groupId,
                                          String artifactId,
                                          MavenProject project,
-                                         MavenSession session,
+                                         ArtifactRepository localRepository,
                                          boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        ArtifactRepository localRepository = session.getLocalRepository();
-
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
         getLogger().debug( "Version from POM: " + version );

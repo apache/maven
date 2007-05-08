@@ -94,25 +94,32 @@ public class DefaultBuildPlanner
         {
             MojoBinding mojoBinding = (MojoBinding) it.next();
 
-            PluginDescriptor pluginDescriptor;
-            try
-            {
-                pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
-            }
-            catch ( PluginLoaderException e )
-            {
-                throw new LifecyclePlannerException( e.getMessage(), e );
-            }
-
-            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
-            if ( mojoDescriptor == null )
-            {
-                throw new LifecyclePlannerException( "Mojo: " + mojoBinding.getGoal() + " does not exist in plugin: "
-                    + pluginDescriptor.getId() + "." );
-            }
-
-            findForkModifiers( mojoBinding, pluginDescriptor, planElement, lifecycleBindings, project, new LinkedList(), tasks );
+            findForkModifiers( mojoBinding, planElement, lifecycleBindings, project );
         }
+    }
+
+    private void findForkModifiers( MojoBinding mojoBinding, ModifiablePlanElement planElement,
+                                    LifecycleBindings lifecycleBindings, MavenProject project )
+        throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
+    {
+        PluginDescriptor pluginDescriptor;
+        try
+        {
+            pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
+        }
+        catch ( PluginLoaderException e )
+        {
+            throw new LifecyclePlannerException( e.getMessage(), e );
+        }
+
+        MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
+        if ( mojoDescriptor == null )
+        {
+            throw new LifecyclePlannerException( "Mojo: " + mojoBinding.getGoal() + " does not exist in plugin: "
+                + pluginDescriptor.getId() + "." );
+        }
+
+        findForkModifiers( mojoBinding, pluginDescriptor, planElement, lifecycleBindings, project, new LinkedList() );
     }
 
     /**
@@ -151,15 +158,35 @@ public class DefaultBuildPlanner
             {
                 List reportBindings = lifecycleBindingManager.getReportBindings( project );
 
+                // findForkModifiers( mojoBinding, pluginDescriptor, planElement, lifecycleBindings, 
+                //                    project, forkingBindings, tasks );
+                for ( Iterator reportBindingIt = reportBindings.iterator(); reportBindingIt.hasNext(); )
+                {
+                    MojoBinding reportBinding = (MojoBinding) reportBindingIt.next();
+                    
+                    PluginDescriptor pd;
+                    try
+                    {
+                        pd = pluginLoader.loadReportPlugin( mojoBinding, project );
+                    }
+                    catch ( PluginLoaderException e )
+                    {
+                        throw new LifecyclePlannerException( "Failed to load report-plugin descriptor for: "
+                            + MojoBindingUtils.toString( reportBinding ) + ". Reason: " + e.getMessage(), e );
+                    }
+
+//                    findForkModifiers( reportBinding, planElement, lifecycleBindings, project );
+                }
+
                 Phase phase = LifecycleUtils.findPhaseForMojoBinding( mojoBinding, lifecycleBindings, true );
-                
+
                 if ( phase == null )
                 {
                     if ( planElement instanceof DirectInvocationOriginElement )
                     {
                         DirectInvocationModifier modder = new SimpleDirectInvocationModifier( mojoBinding, reportBindings );
 
-                        ((DirectInvocationOriginElement) planElement).addDirectInvocationModifier( modder );
+                        ( (DirectInvocationOriginElement) planElement ).addDirectInvocationModifier( modder );
                     }
                     else
                     {
@@ -188,7 +215,7 @@ public class DefaultBuildPlanner
      */
     private void findForkModifiers( MojoBinding mojoBinding, PluginDescriptor pluginDescriptor,
                                     ModifiablePlanElement planElement, LifecycleBindings mergedBindings, MavenProject project,
-                                    LinkedList forkingBindings, List tasks )
+                                    LinkedList forkingBindings )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         forkingBindings.addLast( mojoBinding );
@@ -201,12 +228,11 @@ public class DefaultBuildPlanner
 
             if ( mojoDescriptor.getExecuteGoal() != null )
             {
-                recurseSingleMojoFork( mojoBinding, pluginDescriptor, planElement, mergedBindings, project, forkingBindings,
-                                       tasks );
+                recurseSingleMojoFork( mojoBinding, pluginDescriptor, planElement, mergedBindings, project, forkingBindings );
             }
             else if ( mojoDescriptor.getExecutePhase() != null )
             {
-                recursePhaseMojoFork( mojoBinding, pluginDescriptor, planElement, mergedBindings, project, forkingBindings, tasks );
+                recursePhaseMojoFork( mojoBinding, pluginDescriptor, planElement, mergedBindings, project, forkingBindings );
             }
         }
         finally
@@ -222,27 +248,26 @@ public class DefaultBuildPlanner
     private void modifyBuildPlanForForkedDirectInvocation( MojoBinding invokedBinding, MojoBinding invokedVia,
                                                            PluginDescriptor pluginDescriptor, ModifiablePlanElement planElement,
                                                            LifecycleBindings mergedBindings, MavenProject project,
-                                                           LinkedList forkingBindings, List tasks )
+                                                           LinkedList forkingBindings )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         if ( planElement instanceof DirectInvocationOriginElement )
         {
             List noTasks = Collections.EMPTY_LIST;
-            
+
             LifecycleBindings forkedBindings = new LifecycleBindings();
             LifecycleBuildPlan forkedPlan = new LifecycleBuildPlan( noTasks, forkedBindings );
-            
+
             forkingBindings.addLast( invokedBinding );
             try
             {
-                findForkModifiers( invokedBinding, pluginDescriptor, forkedPlan, forkedBindings, project,
-                                   forkingBindings, tasks );
+                findForkModifiers( invokedBinding, pluginDescriptor, forkedPlan, forkedBindings, project, forkingBindings );
             }
             finally
             {
                 forkingBindings.removeLast();
             }
-            
+
             List forkedMojos = new ArrayList();
             forkedMojos.addAll( lifecycleBindingManager.assembleMojoBindingList( noTasks, forkedBindings, project ) );
             forkedMojos.add( invokedBinding );
@@ -264,7 +289,7 @@ public class DefaultBuildPlanner
      */
     private void modifyBuildPlanForForkedLifecycle( MojoBinding mojoBinding, PluginDescriptor pluginDescriptor,
                                                     ModifiablePlanElement planElement, LifecycleBindings bindings,
-                                                    MavenProject project, LinkedList forkingBindings, List tasks )
+                                                    MavenProject project, LinkedList forkingBindings )
         throws LifecycleSpecificationException, LifecyclePlannerException, LifecycleLoaderException
     {
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
@@ -307,7 +332,7 @@ public class DefaultBuildPlanner
                 throw new LifecyclePlannerException( e.getMessage(), e );
             }
 
-            findForkModifiers( forkedBinding, forkedPluginDescriptor, mpe, bindings, project, forkingBindings, tasks );
+            findForkModifiers( forkedBinding, forkedPluginDescriptor, mpe, bindings, project, forkingBindings );
         }
 
         // now that we've discovered any deeper modifications, add the current MPE to the parent MPE
@@ -318,10 +343,10 @@ public class DefaultBuildPlanner
         }
         else if ( planElement instanceof DirectInvocationOriginElement )
         {
-            List planMojoBindings = ((BuildPlan) mpe).getPlanMojoBindings( project, lifecycleBindingManager );
-            
+            List planMojoBindings = ( (BuildPlan) mpe ).getPlanMojoBindings( project, lifecycleBindingManager );
+
             ForkedDirectInvocationModifier modifier = new ForkedDirectInvocationModifier( mojoBinding, planMojoBindings );
-            
+
             ( (DirectInvocationOriginElement) planElement ).addDirectInvocationModifier( modifier );
         }
     }
@@ -337,7 +362,7 @@ public class DefaultBuildPlanner
      */
     private void recursePhaseMojoFork( MojoBinding mojoBinding, PluginDescriptor pluginDescriptor,
                                        ModifiablePlanElement planElement, LifecycleBindings mergedBindings, MavenProject project,
-                                       LinkedList forkingBindings, List tasks )
+                                       LinkedList forkingBindings )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         String referencingGoal = mojoBinding.getGoal();
@@ -382,7 +407,7 @@ public class DefaultBuildPlanner
 
         LifecycleUtils.removeMojoBindings( forkingBindings, cloned, false );
 
-        modifyBuildPlanForForkedLifecycle( mojoBinding, pluginDescriptor, planElement, cloned, project, forkingBindings, tasks );
+        modifyBuildPlanForForkedLifecycle( mojoBinding, pluginDescriptor, planElement, cloned, project, forkingBindings );
     }
 
     /**
@@ -392,7 +417,7 @@ public class DefaultBuildPlanner
      */
     private void recurseSingleMojoFork( MojoBinding mojoBinding, PluginDescriptor pluginDescriptor,
                                         ModifiablePlanElement planElement, LifecycleBindings mergedBindings,
-                                        MavenProject project, LinkedList forkingBindings, List tasks )
+                                        MavenProject project, LinkedList forkingBindings )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         String referencingGoal = mojoBinding.getGoal();
@@ -422,7 +447,7 @@ public class DefaultBuildPlanner
         if ( !LifecycleUtils.isMojoBindingPresent( binding, forkingBindings, false ) )
         {
             modifyBuildPlanForForkedDirectInvocation( binding, mojoBinding, pluginDescriptor, planElement, mergedBindings,
-                                                      project, forkingBindings, tasks );
+                                                      project, forkingBindings );
         }
     }
 
