@@ -1,4 +1,4 @@
-        package org.apache.maven.artifact.manager;
+package org.apache.maven.artifact.manager;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -68,6 +68,11 @@ public class DefaultWagonManager
     implements WagonManager, Contextualizable
 {
     private static final String WILDCARD = "*";
+
+    private static final String[] CHECKSUM_IDS = { "md5", "sha1" };
+
+    /** have to match the CHECKSUM_IDS */
+    private static final String[] CHECKSUM_ALGORITHMS = { "MD5", "SHA-1" };
 
     private PlexusContainer container;
 
@@ -190,43 +195,42 @@ public class DefaultWagonManager
         Map sums = new HashMap( 2 );
 
         // TODO: configure these on the repository
-        try
+        for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
         {
-            ChecksumObserver checksumObserver = new ChecksumObserver( "MD5" );
-            wagon.addTransferListener( checksumObserver );
-            checksums.put( "md5", checksumObserver );
-            checksumObserver = new ChecksumObserver( "SHA-1" );
-            wagon.addTransferListener( checksumObserver );
-            checksums.put( "sha1", checksumObserver );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            throw new TransferFailedException( "Unable to add checksum methods: " + e.getMessage(), e );
+            checksums.put( CHECKSUM_IDS[i], addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i] ) );
         }
 
         try
         {
-            Repository artifactRepository = new Repository( repository.getId(), repository.getUrl() );
-
-            if ( serverPermissionsMap.containsKey( repository.getId() ) )
+            try
             {
-                RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
+                Repository artifactRepository = new Repository( repository.getId(), repository.getUrl() );
 
-                getLogger().debug(
-                    "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
+                if ( serverPermissionsMap.containsKey( repository.getId() ) )
+                {
+                    RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
 
-                artifactRepository.setPermissions( perms );
+                    getLogger().debug( 
+                        "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
+
+                    artifactRepository.setPermissions( perms );
+                }
+                else
+                {
+                    getLogger().debug( "not adding permissions to wagon connection" );
+                }
+
+                wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+
+                wagon.put( source, remotePath );
             }
-            else
+            finally
             {
-                getLogger().debug( "not adding permissions to wagon connection" );
+                if ( downloadMonitor != null )
+                {
+                    wagon.removeTransferListener( downloadMonitor );
+                }
             }
-
-            wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
-
-            wagon.put( source, remotePath );
-
-            wagon.removeTransferListener( downloadMonitor );
 
             // Pre-store the checksums as any future puts will overwrite them
             for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
@@ -271,9 +275,34 @@ public class DefaultWagonManager
         }
         finally
         {
+            // Remove every checksum listener
+            for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
+            {
+                TransferListener checksumListener = (TransferListener) checksums.get( CHECKSUM_IDS[i] );
+                if ( checksumListener != null )
+                {
+                    wagon.removeTransferListener( checksumListener );
+                }
+            }
+
             disconnectWagon( wagon );
 
             releaseWagon( protocol, wagon );
+        }
+    }
+
+    private ChecksumObserver addChecksumObserver( Wagon wagon, String algorithm )
+        throws TransferFailedException
+    {
+        try
+        {
+            ChecksumObserver checksumObserver = new ChecksumObserver( algorithm );
+            wagon.addTransferListener( checksumObserver );
+            return checksumObserver;
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new TransferFailedException( "Unable to add checksum for unsupported algorithm " + algorithm, e );
         }
     }
 
@@ -385,20 +414,9 @@ public class DefaultWagonManager
         }
 
         // TODO: configure on repository
-        ChecksumObserver md5ChecksumObserver;
-        ChecksumObserver sha1ChecksumObserver;
-        try
-        {
-            md5ChecksumObserver = new ChecksumObserver( "MD5" );
-            wagon.addTransferListener( md5ChecksumObserver );
-
-            sha1ChecksumObserver = new ChecksumObserver( "SHA-1" );
-            wagon.addTransferListener( sha1ChecksumObserver );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            throw new TransferFailedException( "Unable to add checksum methods: " + e.getMessage(), e );
-        }
+        int i = 0;
+        ChecksumObserver md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
+        ChecksumObserver sha1ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
 
         File temp = new File( destination + ".tmp" );
         temp.deleteOnExit();
@@ -531,6 +549,14 @@ public class DefaultWagonManager
         }
         finally
         {
+            // Remove every TransferListener
+            wagon.removeTransferListener( md5ChecksumObserver );
+            wagon.removeTransferListener( sha1ChecksumObserver );
+            if ( downloadMonitor != null )
+            {
+                wagon.removeTransferListener( downloadMonitor );
+            }
+
             disconnectWagon( wagon );
 
             releaseWagon( protocol, wagon );

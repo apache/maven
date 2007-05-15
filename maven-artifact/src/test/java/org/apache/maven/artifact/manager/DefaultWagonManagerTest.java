@@ -19,8 +19,19 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.observers.Debug;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -34,6 +45,8 @@ public class DefaultWagonManagerTest
 {
 
     private WagonManager wagonManager;
+
+    private TransferListener transferListener = new Debug();
 
     protected void setUp()
         throws Exception
@@ -53,6 +66,8 @@ public class DefaultWagonManagerTest
         assertWagon( "b2" );
 
         assertWagon( "c" );
+
+        assertWagon( "noop" );
 
         try
         {
@@ -111,6 +126,46 @@ public class DefaultWagonManagerTest
         }
     }
 
+    /**
+     * Check that transfer listeners are properly removed after getArtifact and putArtifact
+     */
+    public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact()
+        throws Exception
+    {
+        File tmpFile = File.createTempFile( "mvn-test", ".temp" );
+
+        try
+        {
+            tmpFile.deleteOnExit();
+            Artifact artifact = new DefaultArtifact( "sample.group", "sample-art", VersionRange
+                .createFromVersion( "1.0" ), "scope", "type", "classifier", null );
+            artifact.setFile( tmpFile );
+            ArtifactRepository repo = new DefaultArtifactRepository( "id", "noop://url",
+                                                                     new ArtifactRepositoryLayoutStub() );
+            WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+
+            /* getArtifact */
+            assertFalse( "Transfer listener is registered before test", wagon.getTransferEventSupport()
+                .hasTransferListener( transferListener ) );
+            wagonManager.setDownloadMonitor( transferListener );
+            wagonManager.getArtifact( artifact, repo );
+            assertFalse( "Transfer listener still registered after getArtifact", wagon.getTransferEventSupport()
+                .hasTransferListener( transferListener ) );
+
+            /* putArtifact */
+            assertFalse( "Transfer listener is registered before test", wagon.getTransferEventSupport()
+                .hasTransferListener( transferListener ) );
+            wagonManager.setDownloadMonitor( transferListener );
+            wagonManager.putArtifact( new File( "sample file" ), artifact, repo );
+            assertFalse( "Transfer listener still registered after putArtifact", wagon.getTransferEventSupport()
+                .hasTransferListener( transferListener ) );
+        }
+        finally
+        {
+            tmpFile.delete();
+        }
+    }
+
     private void assertWagon( String protocol )
         throws Exception
     {
@@ -145,6 +200,25 @@ public class DefaultWagonManagerTest
         assertNotNull( "Check wagon, protocol=" + protocol, wagon );
 
         assertEquals( "Check configuration for wagon, protocol=" + protocol, s, wagon.getConfigurableField() );
+    }
+
+    private final class ArtifactRepositoryLayoutStub
+        implements ArtifactRepositoryLayout
+    {
+        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+        {
+            return "path";
+        }
+
+        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        {
+            return "path";
+        }
+
+        public String pathOf( Artifact artifact )
+        {
+            return "path";
+        }
     }
 
 }
