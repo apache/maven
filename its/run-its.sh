@@ -26,4 +26,5 @@ mvn -N install
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 
+rm -rf "${LOCAL_REPO}"
 mv "${LOCAL_REPO}.its" "${LOCAL_REPO}"
