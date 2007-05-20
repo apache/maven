@@ -119,6 +119,6 @@
     <!-- <module>it0105</module> -->
     <!-- <module>it0106</module> -->
     <!-- <module>it0107</module> -->
-    <!-- <module>it0119-ejbClientDependency</module> not fixed yet -->
+    <!-- <module>it0120-ejbClientDependency</module> not fixed yet -->
   </modules>
 </project>
