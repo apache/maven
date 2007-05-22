@@ -156,7 +156,7 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-24</plexusVersion>
+    <plexusVersion>1.0-alpha-25-SNAPSHOT</plexusVersion>
     <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
   <dependencies>
@@ -248,4 +248,16 @@ under the License.
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
+
+  <!-- needed for plexus -->
+  <repositories>
+    <repository>
+      <id>codehaus.org</id>
+      <name>Maven Central Development Repository</name>
+      <url>http://snapshots.repository.codehaus.org</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
 </project>
