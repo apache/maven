@@ -29,42 +29,63 @@ import java.util.List;
  */
 public final class SettingsValidationResult
 {
-    /** */
     private final static String NEWLINE = System.getProperty( "line.separator" );
 
-    /** */
     private List messages;
 
+    /**
+     * Default constructor
+     */
     public SettingsValidationResult()
     {
         messages = new ArrayList();
     }
 
+    /**
+     * @return
+     */
     public int getMessageCount()
     {
         return messages.size();
     }
 
+    /**
+     * @param i
+     * @return
+     */
     public String getMessage( int i )
     {
         return messages.get( i ).toString();
     }
 
+    /**
+     * @return
+     */
     public List getMessages()
     {
         return Collections.unmodifiableList( messages );
     }
 
+    /**
+     * @param message
+     */
     public void addMessage( String message )
     {
         messages.add( message );
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
         return render( "" );
     }
 
+    /**
+     * @param indentation
+     * @return
+     */
     public String render( String indentation )
     {
         if ( messages.size() == 0 )

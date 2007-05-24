@@ -1,6 +1,5 @@
 package org.apache.maven.settings.validation;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,11 +22,19 @@ package org.apache.maven.settings.validation;
 import org.apache.maven.settings.Settings;
 
 /**
+ * Validate a model settings
+ *
  * @author Milos Kleint
  */
 public interface SettingsValidator
 {
     String ROLE = SettingsValidator.class.getName();
 
+    /**
+     * Validate a model settings
+     *
+     * @param model
+     * @return a <code>SettingsValidationResult</code> instance
+     */
     SettingsValidationResult validate( Settings model );
 }
