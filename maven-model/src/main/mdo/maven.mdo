@@ -901,7 +901,7 @@
       <superClass>PluginConfiguration</superClass>
       <description>
         <![CDATA[
-        Build definition for a profile.
+        Generic informations for a build.
         ]]>
       </description>
       <fields>
