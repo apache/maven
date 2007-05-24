@@ -28,6 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Several convenience methods to handle settings
+ *
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
+ * @version $Id$
+ */
 public final class SettingsUtils
 {
     private SettingsUtils()
@@ -35,6 +41,11 @@ public final class SettingsUtils
         // don't allow construction.
     }
 
+    /**
+     * @param dominant
+     * @param recessive
+     * @param recessiveSourceLevel
+     */
     public static void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
     {
         if ( dominant == null || recessive == null )
@@ -70,14 +81,14 @@ public final class SettingsUtils
                 }
             }
         }
-        
+
         if ( dominant.getRuntimeInfo() != null && recessive.getRuntimeInfo() != null )
         {
             List recessiveLocations = recessive.getRuntimeInfo().getLocations();
             for ( Iterator it = recessiveLocations.iterator(); it.hasNext(); )
             {
                 String path = (String) it.next();
-                
+
                 dominant.getRuntimeInfo().addLocation( path );
             }
         }
@@ -126,6 +137,11 @@ public final class SettingsUtils
 
     }
 
+    /**
+     * @param dominant
+     * @param recessive
+     * @param recessiveSourceLevel
+     */
     private static void shallowMergeById( List dominant, List recessive, String recessiveSourceLevel )
     {
         Map dominantById = mapById( dominant );
@@ -143,6 +159,10 @@ public final class SettingsUtils
         }
     }
 
+    /**
+     * @param identifiables
+     * @return a map
+     */
     private static Map mapById( List identifiables )
     {
         Map byId = new HashMap();
@@ -157,6 +177,10 @@ public final class SettingsUtils
         return byId;
     }
 
+    /**
+     * @param settingsProfile
+     * @return a profile
+     */
     public static org.apache.maven.model.Profile convertFromSettingsProfile( Profile settingsProfile )
     {
         org.apache.maven.model.Profile profile = new org.apache.maven.model.Profile();
@@ -239,6 +263,10 @@ public final class SettingsUtils
         return profile;
     }
 
+    /**
+     * @param settingsRepo
+     * @return a repository
+     */
     private static org.apache.maven.model.Repository convertFromSettingsRepository( Repository settingsRepo )
     {
         org.apache.maven.model.Repository repo = new org.apache.maven.model.Repository();
@@ -260,6 +288,10 @@ public final class SettingsUtils
         return repo;
     }
 
+    /**
+     * @param settingsPolicy
+     * @return a RepositoryPolicy
+     */
     private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy settingsPolicy )
     {
         org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
@@ -268,5 +300,4 @@ public final class SettingsUtils
         policy.setChecksumPolicy( settingsPolicy.getChecksumPolicy() );
         return policy;
     }
-
 }

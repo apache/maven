@@ -25,6 +25,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Builder for the user or global settings. By default, the settings files are located:
+ * <ul>
+ * <li>user settings: ${user.home}/settings.xml</li>
+ * <li>global settings: ${maven.home}/conf/settings.xml</li>
+ * </ul>
+ *
  * @author jdcasey
  * @version $Id$
  */
@@ -33,6 +39,12 @@ public interface MavenSettingsBuilder
     String ROLE = MavenSettingsBuilder.class.getName();
 
     /**
+     *
+     * @param userSettingsFile
+     * @param globalSettingsFile
+     * @return a <code>Settings</code> object from the user and global settings file.
+     * @throws IOException if any
+     * @throws XmlPullParserException if any
      * @since 2.1
      */
     Settings buildSettings( File userSettingsFile, File globalSettingsFile )

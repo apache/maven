@@ -89,6 +89,10 @@
       <name>IdentifiableBase</name>
       <superClass>TrackableBase</superClass>
       <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        Base class for <code>Mirror</code>, <code>Profile</code>, <code>Proxy</code> and <code>Server</code>.
+        ]]></description>
       <fields>
         <field>
           <name>id</name>
@@ -272,11 +276,17 @@
 
     private Proxy activeProxy;
 
+    /**
+     * Reset the <code>activeProxy</code> field to <code>null</code>
+     */
     public void flushActiveProxy()
     {
         this.activeProxy = null;
     }
 
+    /**
+     * @return the first active proxy
+     */
     public synchronized Proxy getActiveProxy()
     {
         if(activeProxy == null)
@@ -351,11 +361,18 @@
 
     private java.util.Map profileMap;
 
+    /**
+     * Reset the <code>profileMap</code> field to <code>null</code>
+     */
     public void flushProfileMap()
     {
         this.profileMap = null;
     }
 
+    /**
+     * @return a Map of profiles field with <code>Profile#getId()</code> as key
+     * @see org.apache.maven.settings.Profile#getId()
+     */
     public java.util.Map getProfilesAsMap()
     {
         if ( profileMap == null )
@@ -428,6 +445,10 @@
       <name>Proxy</name>
       <version>1.0.0</version>
       <superClass>IdentifiableBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;proxy&gt;</code> element contains informations required to a proxy settings.
+        ]]></description>
       <fields>
         <field>
           <name>active</name>
@@ -510,6 +531,10 @@
       <name>Server</name>
       <version>1.0.0</version>
       <superClass>IdentifiableBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;server&gt;</code> element contains informations required to a server settings.
+        ]]></description>
       <fields>
         <field>
           <name>username</name>
@@ -847,19 +872,22 @@
           <version>1.0.0</version>
           <code>
             <![CDATA[
-            public boolean equals( Object obj )
-            {
-                RepositoryBase other =  (RepositoryBase) obj;
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        RepositoryBase other =  (RepositoryBase) obj;
 
-                boolean retValue = false;
+        boolean retValue = false;
 
-                if ( id != null )
-                {
-                    retValue = id.equals( other.id );
-                }
+        if ( id != null )
+        {
+            retValue = id.equals( other.id );
+        }
 
-                return retValue;
-            }
+        return retValue;
+    }
             ]]>
           </code>
         </codeSegment>
@@ -902,10 +930,13 @@
           <version>1.0.0</version>
           <code>
             <![CDATA[
-            public boolean equals( Object obj )
-            {
-                return super.equals( obj );
-            }
+    /**
+     * @see org.apache.maven.settings.RepositoryBase#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
             ]]>
           </code>
         </codeSegment>
@@ -942,7 +973,7 @@
           <version>1.0.0</version>
           <description>
             What to do when verification of an artifact checksum fails -
-            warn, fail, etc. Valid values are "fail" or "warn"
+            warn, fail, etc. Valid values are "fail" or "warn".
           </description>
           <type>String</type>
         </field>
@@ -966,7 +997,7 @@
           <type>String</type>
           <required>true</required>
           <description>
-            The name of the property to be used to activate a profile
+            The name of the property to be used to activate a profile.
           </description>
         </field>
         <field>
@@ -974,7 +1005,7 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>
-            The value of the property to be used to activate a profile
+            The value of the property to be used to activate a profile.
           </description>
         </field>
       </fields>
@@ -994,7 +1025,7 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>
-            The name of the OS to be used to activate a profile
+            The name of the OS to be used to activate a profile.
           </description>
         </field>
         <field>
@@ -1011,7 +1042,7 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>
-            The architecture of the OS to be used to activate a profile
+            The architecture of the OS to be used to activate a profile.
           </description>
         </field>
         <field>
@@ -1019,7 +1050,7 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>
-            The version of the OS to be used to activate a profile
+            The version of the OS to be used to activate a profile.
           </description>
         </field>
       </fields>
@@ -1041,7 +1072,7 @@
           <type>String</type>
           <description>
             The name of the file that should be missing to activate a
-            profile
+            profile.
           </description>
         </field>
         <field>
@@ -1049,7 +1080,7 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>
-            The name of the file that should exist to activate a profile
+            The name of the file that should exist to activate a profile.
           </description>
         </field>
       </fields>

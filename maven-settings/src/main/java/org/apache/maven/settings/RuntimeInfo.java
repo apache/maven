@@ -24,74 +24,107 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * To handle runtime informations like local repository or profiles.
+ *
+ * @version $Id$
+ */
 public class RuntimeInfo
 {
-
     private List locations = new ArrayList();
-    
+
     // using Boolean for 3VL (null for not-set, otherwise override with value)
     private Boolean pluginUpdateForced;
-    
+
     // using Boolean for 3VL (null, true-to-all, false-to-all)
     private Boolean applyToAllPluginUpdates;
-    
+
 //    private boolean pluginRegistryActive = true;
-    
+
     // using Boolean for 3VL (null for not-set, otherwise override with value)
 //    private Boolean checkLatest;
-    
+
     private Map activeProfileToSourceLevel = new HashMap();
-    
+
     private String localRepositorySourceLevel = TrackableBase.USER_LEVEL;
-    
+
     private Map pluginGroupIdSourceLevels = new HashMap();
-    
+
     private final Settings settings;
 
+    /**
+     * @param settings
+     */
     public RuntimeInfo( Settings settings )
     {
         this.settings = settings;
     }
-    
+
+    /**
+     * @param path
+     */
     public void addLocation( String path )
     {
         this.locations.add( path );
     }
-    
+
+    /**
+     * @return
+     */
     public List getLocations()
     {
         return locations;
     }
-    
+
+    /**
+     * @param pluginUpdateForced
+     */
     public void setPluginUpdateOverride( Boolean pluginUpdateForced )
     {
         this.pluginUpdateForced = pluginUpdateForced;
     }
-    
+
+    /**
+     * @return
+     */
     public Boolean getPluginUpdateOverride()
     {
         return pluginUpdateForced;
     }
 
+    /**
+     * @return
+     */
     public Boolean getApplyToAllPluginUpdates()
     {
         return applyToAllPluginUpdates;
     }
 
+    /**
+     * @param applyToAll
+     */
     public void setApplyToAllPluginUpdates( Boolean applyToAll )
     {
         this.applyToAllPluginUpdates = applyToAll;
     }
-    
+
+    /**
+     * @param activeProfile
+     * @param sourceLevel
+     */
     public void setActiveProfileSourceLevel( String activeProfile, String sourceLevel )
     {
         activeProfileToSourceLevel.put( activeProfile, sourceLevel );
     }
-    
+
+    /**
+     * @param activeProfile
+     * @return
+     */
     public String getSourceLevelForActiveProfile( String activeProfile )
     {
         String sourceLevel = (String) activeProfileToSourceLevel.get( activeProfile );
-        
+
         if ( sourceLevel != null )
         {
             return sourceLevel;
@@ -101,16 +134,24 @@ public class RuntimeInfo
             return settings.getSourceLevel();
         }
     }
-    
+
+    /**
+     * @param pluginGroupId
+     * @param sourceLevel
+     */
     public void setPluginGroupIdSourceLevel( String pluginGroupId, String sourceLevel )
     {
         pluginGroupIdSourceLevels.put( pluginGroupId, sourceLevel );
     }
-    
+
+    /**
+     * @param pluginGroupId
+     * @return
+     */
     public String getSourceLevelForPluginGroupId( String pluginGroupId )
     {
         String sourceLevel = (String) pluginGroupIdSourceLevels.get( pluginGroupId );
-        
+
         if ( sourceLevel != null )
         {
             return sourceLevel;
@@ -120,15 +161,20 @@ public class RuntimeInfo
             return settings.getSourceLevel();
         }
     }
-    
+
+    /**
+     * @param localRepoSourceLevel
+     */
     public void setLocalRepositorySourceLevel( String localRepoSourceLevel )
     {
         this.localRepositorySourceLevel = localRepoSourceLevel;
     }
-    
+
+    /**
+     * @return
+     */
     public String getLocalRepositorySourceLevel()
     {
         return localRepositorySourceLevel;
     }
-
 }
