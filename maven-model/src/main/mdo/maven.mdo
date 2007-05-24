@@ -95,7 +95,8 @@
             <![CDATA[
             The location of the parent project, if one exists. Values from the
             parent project will be the default for this project if they are
-            left unspecified. The location is given as a group ID, artifact ID and version.
+            left unspecified. The location is given as a group ID, artifact ID
+            and version.
             ]]>
           </description>
           <association>
@@ -121,7 +122,8 @@
           <type>String</type>
           <description>
             <![CDATA[
-            Declares to which version of project descriptor this POM conforms. The only valid value is <code>3</code>.
+            Declares to which version of project descriptor this POM conforms.
+            The only valid value is <code>3</code>.
             ]]>
           </description>
         </field>
@@ -132,8 +134,8 @@
           <description>
             <![CDATA[
             A universally unique identifier for a project. It is normal to
-            use a fully-qualified package name to distinguish it from other projects with a similar name
-            (eg. <code>org.apache.maven</code>).
+            use a fully-qualified package name to distinguish it from other
+            projects with a similar name (eg. <code>org.apache.maven</code>).
             ]]>
           </description>
           <type>String</type>
@@ -144,9 +146,11 @@
           <required>true</required>
           <description>
             <![CDATA[
-            The identifier for this artifact that is unique within the group given by the group ID.
-            An artifact is something that is either produced or used by a project. Examples of artifacts produced by
-            Maven for a project include: JARs, source and binary distributions, and WARs.
+            The identifier for this artifact that is unique within the group
+            given by the group ID.
+            An artifact is something that is either produced or used by a project.
+            Examples of artifacts produced by Maven for a project include: JARs,
+            source and binary distributions, and WARs.
             ]]>
           </description>
           <type>String</type>
@@ -157,8 +161,8 @@
           <required>true</required>
           <description>
             <![CDATA[
-            <b>Deprecated</b>. When used, this sets both the <code>groupId</code> and <code>artifactId</code> elements
-            if they were previously empty.
+            <b>Deprecated</b>. When used, this sets both the <code>groupId</code>
+            and <code>artifactId</code> elements if they were previously empty.
             ]]>
           </description>
           <type>String</type>
@@ -229,11 +233,12 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            A detailed description of the project, used by Maven whenever it needs to describe the project,
-            such as on the web site. While this element can be specified as CDATA to enable
-            the use of HTML tags within the description, it is discouraged to allow plain text representation.
-            If you need to modify the index page of the generated web site, you are able to specify your own instead
-            of adjusting this text.
+            A detailed description of the project, used by Maven whenever it needs
+            to describe the project, such as on the web site. While this element can
+            be specified as CDATA to enable the use of HTML tags within the description,
+            it is discouraged to allow plain text representation.
+            If you need to modify the index page of the generated web site, you are able
+            to specify your own instead of adjusting this text.
             ]]>
           </description>
           <type>String</type>
@@ -256,7 +261,7 @@
             The URL of the project's logo image.  This can be an URL relative
             to the base directory of the generated web site,
             (e.g., <code>/images/project-logo.png</code>) or an absolute URL
-            (e.g., <code>http://my.corp/project-logo.png</code>).  This is used
+            (e.g., <code>http://my.corp/project-logo.png</code>). This is used
             when generating the project documentation.
             ]]>
           </description>
@@ -334,8 +339,8 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The hostname of the web server that hosts the project's web site. This is used when the web site is
-            deployed.
+            The hostname of the web server that hosts the project's web site.
+            This is used when the web site is deployed.
             ]]>
           </description>
           <type>String</type>
@@ -346,7 +351,7 @@
           <description>
             <![CDATA[
             The directory on the web server where the public web site
-            for this project resides.  This is used when the web site is deployed.
+            for this project resides. This is used when the web site is deployed.
             ]]>
           </description>
           <type>String</type>
@@ -356,7 +361,7 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The server where the final distributions will be published.  This is used when the
+            The server where the final distributions will be published. This is used when the
             distributions are deployed. If this isn't defined, the central repository is used instead as
             determined by <code>maven.repo.central</code> and <code>maven.repo.central.directory</code>.
             ]]>
@@ -368,8 +373,8 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The directory on the web server where the final distributions will be published.  This is used when the
-            distributions are deployed.
+            The directory on the web server where the final distributions will be published.
+            This is used when the distributions are deployed.
             ]]>
           </description>
           <type>String</type>
@@ -423,8 +428,8 @@
             is then described by additional elements.
             Projects should only list the license(s) that applies to the project
             and not the licenses that apply to dependencies.
-            If multiple licenses are listed, it is assumed that the user can select any of them, not that they
-            must accept all.
+            If multiple licenses are listed, it is assumed that the user can select
+            any of them, not that they must accept all.
             ]]>
           </description>
           <association>
@@ -532,7 +537,8 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            Project properties that will be used by various plugins. The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
+            Project properties that will be used by various plugins.
+            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
             ]]>
           </description>
           <type>Properties</type>
@@ -570,7 +576,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            A listing of project-local build profiles which will modify the build process when activated.
+            A listing of project-local build profiles which will modify
+            the build process when activated.
             ]]>
           </description>
           <association>
@@ -611,20 +618,23 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public String getId()
-            {
-                StringBuffer id = new StringBuffer();
+    /**
+     * @return the model id as <code>groupId:artifactId:packaging:version</code>
+     */
+      public String getId()
+      {
+          StringBuffer id = new StringBuffer();
 
-                id.append( getGroupId() == null ? "[inherited]" : getGroupId() );
-                id.append( ":" );
-                id.append( getArtifactId() );
-                id.append( ":" );
-                id.append( getPackaging() );
-                id.append( ":" );
-                id.append( getVersion() == null ? "[inherited]" : getVersion() );
+          id.append( getGroupId() == null ? "[inherited]" : getGroupId() );
+          id.append( ":" );
+          id.append( getArtifactId() );
+          id.append( ":" );
+          id.append( getPackaging() );
+          id.append( ":" );
+          id.append( getVersion() == null ? "[inherited]" : getVersion() );
 
-                return id.toString();
-            }
+          return id.toString();
+      }
             ]]>
           </code>
         </codeSegment>
@@ -633,6 +643,11 @@
     <class>
       <name>ModelBase</name>
       <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Base class for the <code>Model</code> and the <code>Profile</code> objects.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>modules</name>
@@ -708,9 +723,10 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            This element includes the specification of report plugins to use to generate the reports on the
-            Maven-generated site.  These reports will be run when a user executes <code>mvn site</code>.  All of the
-            reports will be included in the navigation bar for browsing.
+            This element includes the specification of report plugins to use
+            to generate the reports on the Maven-generated site.
+            These reports will be run when a user executes <code>mvn site</code>.
+            All of the reports will be included in the navigation bar for browsing.
             ]]>
           </description>
           <association>
@@ -752,8 +768,9 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            Properties that can be used throughout the POM as a substitution, and are used as filters in resources
-            if enabled. The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
+            Properties that can be used throughout the POM as a substitution, and
+            are used as filters in resources if enabled.
+            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
             ]]>
           </description>
           <type>Properties</type>
@@ -791,6 +808,11 @@
     <class>
       <name>PluginContainer</name>
       <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Contains the plugins informations for the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>plugins</name>
@@ -809,11 +831,18 @@
             <![CDATA[
     java.util.Map pluginMap;
 
+    /**
+     * Reset the <code>pluginsMap</code> field to <code>null</code>
+     */
     public void flushPluginMap()
     {
         this.pluginMap = null;
     }
 
+    /**
+     * @return a Map of plugins field with <code>Plugins#getKey()</code> as key
+     * @see org.apache.maven.model.Plugin#getKey()
+     */
     public java.util.Map getPluginsAsMap()
     {
         if ( pluginMap == null )
@@ -828,6 +857,7 @@
                 }
             }
         }
+
         return pluginMap;
     }
             ]]>
@@ -839,6 +869,11 @@
       <name>PluginConfiguration</name>
       <version>3.0.0+</version>
       <superClass>PluginContainer</superClass>
+      <description>
+        <![CDATA[
+        Contains the plugins management informations for the project.
+        ]]>
+      </description>
       <fields>
         <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
           | plugins to be used in sub-projects. -->
@@ -865,13 +900,19 @@
       <name>BuildBase</name>
       <version>3.0.0+</version>
       <superClass>PluginConfiguration</superClass>
+      <description>
+        <![CDATA[
+        Generic informations for a build.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>defaultGoal</name>
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The default goal (or phase in Maven 2) to execute when none is specified for the project.
+            The default goal (or phase in Maven 2) to execute when none is
+            specified for the project.
             ]]>
           </description>
           <type>String</type>
@@ -881,8 +922,9 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            This element describes all of the classpath resources such as properties files associated with a
-            project. These resources are often included in the final package.
+            This element describes all of the classpath resources such as
+            properties files associated with a project.
+            These resources are often included in the final package.
             ]]>
           </description>
           <association>
@@ -895,8 +937,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            This element describes all of the classpath resources such as properties files associated with a
-            project's unit tests.
+            This element describes all of the classpath resources such as
+            properties files associated with a project's unit tests.
             ]]>
           </description>
           <association>
@@ -919,8 +961,9 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The filename (excluding the extension, and with no path information) that the produced artifact
-            will be called. The default value is <code>${artifactId}-${version}</code>.
+            The filename (excluding the extension, and with no path information) that
+            the produced artifact will be called.
+            The default value is <code>${artifactId}-${version}</code>.
             ]]>
           </description>
           <type>String</type>
@@ -944,6 +987,11 @@
       <name>Build</name>
       <version>3.0.0+</version>
       <superClass>BuildBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;build&gt;</code> element contains informations required to build the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>nagEmailAddress</name>
@@ -1111,6 +1159,12 @@
     <class>
       <name>CiManagement</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;CiManagement&gt;</code> element contains informations required to the
+        continuous integration system of the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>system</name>
@@ -1331,6 +1385,12 @@
     <class>
       <name>Dependency</name>
       <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;dependency&gt;</code> element contains informations required to a dependency
+        of the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>id</name>
@@ -1395,7 +1455,8 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            Literal name of the artifact in the repository. Used to override the calculated artifact name.
+            Literal name of the artifact in the repository. Used to override the
+            calculated artifact name.
             ]]>
           </description>
           <type>String</type>
@@ -1405,11 +1466,12 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The type of dependency. This defaults to <code>jar</code>. While it usually represents the extension on
-            the filename of the dependency, that is not always the case.
+            The type of dependency. This defaults to <code>jar</code>. While it
+            usually represents the extension on the filename of the dependency,
+            that is not always the case.
             Some examples are <code>jar</code>, <code>war</code>, and <code>plugin</code>.
-            A dependency of type <code>plugin</code> is loaded as a Maven plugin and not added to the project
-            build classpath.
+            A dependency of type <code>plugin</code> is loaded as a Maven plugin and
+            not added to the project build classpath.
             ]]>
           </description>
           <type>String</type>
@@ -1420,11 +1482,14 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The type of dependency. This defaults to <code>jar</code>. While it usually represents the extension on
-            the filename of the dependency, that is not always the case. A type can be mapped to a different
+            The type of dependency. This defaults to <code>jar</code>. While it
+            usually represents the extension on the filename of the dependency,
+            that is not always the case. A type can be mapped to a different
             extension and a classifier.
-            The type often correspongs to the packaging used, though this is also not always the case.
-            Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code> and <code>test-jar</code>.
+            The type often correspongs to the packaging used, though this is also
+            not always the case.
+            Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code>
+            and <code>test-jar</code>.
             New types can be defined by plugins that set
             <code>extensions</code> to <code>true</code>, so this is not a complete list.
             ]]>
@@ -1437,9 +1502,9 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The classifier of the dependency. This allows distinguishing two artifacts that belong to the same POM but
-            were built differently, and is appended to the filename after the version. For example,
-            <code>jdk14</code> and <code>jdk15</code>.
+            The classifier of the dependency. This allows distinguishing two artifacts
+            that belong to the same POM but were built differently, and is appended to
+            the filename after the version. For example, <code>jdk14</code> and <code>jdk15</code>.
             ]]>
           </description>
           <type>String</type>
@@ -1467,10 +1532,11 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The scope of the dependency - <code>compile</code>, <code>runtime</code>, <code>test</code>,
-            <code>system</code>, and <code>provided</code>. Used to
-            calculate the various classpaths used for compilation, testing, and so on. It also assists in determining
-            which artifacts to include in a distribution of this project. For more information, see
+            The scope of the dependency - <code>compile</code>, <code>runtime</code>,
+            <code>test</code>, <code>system</code>, and <code>provided</code>. Used to
+            calculate the various classpaths used for compilation, testing, and so on.
+            It also assists in determining which artifacts to include in a distribution of
+            this project. For more information, see
             <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
             dependency mechanism</a>.
             ]]>
@@ -1487,8 +1553,9 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            FOR SYSTEM SCOPE ONLY. Note that use of this property is <b>discouraged</b> and may be replaced in later
-            versions. This specifies the path on the filesystem for this dependency.
+            FOR SYSTEM SCOPE ONLY. Note that use of this property is <b>discouraged</b>
+            and may be replaced in later versions. This specifies the path on the filesystem
+            for this dependency.
             Requires an absolute path for the value, not relative.
             Use a property that gives the machine specific absolute path,
             e.g. <code>${java.home}</code>.
@@ -1527,10 +1594,13 @@
           <version>3.0.0</version>
           <code>
             <![CDATA[
-            public String toString()
-            {
-                return groupId + "/" + type + "s:" + artifactId + "-" + version;
-            }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return groupId + "/" + type + "s:" + artifactId + "-" + version;
+    }
             ]]>
           </code>
         </codeSegment>
@@ -1538,10 +1608,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public String toString()
-            {
-                return "Dependency {groupId=" + groupId + ", artifactId=" + artifactId + ", version=" + version + ", type=" + type + "}";
-            }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Dependency {groupId=" + groupId + ", artifactId=" + artifactId + ", version=" + version + ", type=" + type + "}";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -1549,10 +1622,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public String getManagementKey()
-            {
-                return groupId + ":" + artifactId + ":" + type + (classifier != null ? ":" + classifier : "");
-            }
+    /**
+     * @return the management key as <code>groupId:artifactId:type</code>
+     */
+    public String getManagementKey()
+    {
+        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" );
+    }
             ]]>
           </code>
         </codeSegment>
@@ -1560,88 +1636,104 @@
           <version>3.0.0</version>
           <code>
             <![CDATA[
-            public String getKey()
-            {
-                return getId() + ":" + getType();
-            }
+    /**
+     * @return the key as <code>id:type</code>
+     */
+    public String getKey()
+    {
+        return getId() + ":" + getType();
+    }
 
-            public String getArtifactDirectory()
-            {
-                return getGroupId();
-            }
+    /**
+     * @return the groupId as artifact directory
+     */
+    public String getArtifactDirectory()
+    {
+        return getGroupId();
+    }
 
-            public String getArtifact()
-            {
-                // If the jar name has been explicty set then use that. This
-                // is when the <jar/> element is explicity used in the POM.
-                if ( getJar() != null)
-                {
-                    return getJar();
-                }
+    /**
+     * @return the artifact name as <code>artifactId-version.extension</code> if &lt;jar/&gt; not set
+     */
+    public String getArtifact()
+    {
+        // If the jar name has been explicty set then use that. This
+        // is when the <jar/> element is explicity used in the POM.
+        if ( getJar() != null)
+        {
+            return getJar();
+        }
 
-                String artifact;
+        String artifact;
 
-                if ("ejb-client".equals(getType())) {
-                  artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
-                } else {
-                  artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
-                }
+        if ("ejb-client".equals(getType())) {
+          artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
+        } else {
+          artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
+        }
 
-                return artifact;
-            }
+        return artifact;
+    }
 
-            public String getTypeDirectory()
-            {
-                String path;
-                if (getType().equals("ejb-client")) {
-                    path = "ejbs";
-                } else {
-                    path = getType() + "s";
-                }
-               return path;
-            }
+    public String getTypeDirectory()
+    {
+        String path;
+        if (getType().equals("ejb-client")) {
+            path = "ejbs";
+        } else {
+            path = getType() + "s";
+        }
 
-            public String getExtension()
-            {
-                if ("ejb".equals(getType()) || "ejb-client".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
-                return getType();
-            }
+        return path;
+    }
 
-            public boolean isAddedToClasspath()
-            {
-                return ("jar".equals(getType()) || "ejb".equals(getType()) || "ejb-client".equals(getType()) || "sar".equals(getType()));
-            }
+    public String getExtension()
+    {
+        if ("ejb".equals(getType()) || "ejb-client".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
+        return getType();
+    }
 
-            public boolean isPlugin()
-            {
-                return ("plugin".equals(getType()));
-            }
+    public boolean isAddedToClasspath()
+    {
+        return ("jar".equals(getType()) || "ejb".equals(getType()) || "ejb-client".equals(getType()) || "sar".equals(getType()));
+    }
 
-            public String getProperty( String property )
-            {
-                return getProperties().getProperty( property );
-            }
+    public boolean isPlugin()
+    {
+        return ("plugin".equals(getType()));
+    }
 
-            public boolean equals( Object o )
-            {
-                if ( this == o )
-                {
-                    return true;
-                }
+    public String getProperty( String property )
+    {
+        return getProperties().getProperty( property );
+    }
 
-                if ( !( o instanceof Dependency ) )
-                {
-                    return false;
-                }
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
 
-                Dependency d  = (Dependency) o;
-                return getId().equals( d.getId() );
-            }
+        if ( !( o instanceof Dependency ) )
+        {
+            return false;
+        }
 
-            public int hashCode()
-            {
-                return getId().hashCode();
-            }
+        Dependency d  = (Dependency) o;
+        return getId().equals( d.getId() );
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -1672,6 +1764,12 @@
     <class>
       <name>Exclusion</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;exclusion&gt;</code> element contains informations required to exclude
+        an artifact to the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>artifactId</name>
@@ -1755,7 +1853,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            Where to deploy snapshots of artifacts to. If not given, it defaults to the <code>repository</code> element.
+            Where to deploy snapshots of artifacts to. If not given, it defaults to the
+            <code>repository</code> element.
             ]]>
           </description>
           <association>
@@ -1779,8 +1878,9 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The URL of the project's download page. If not given users will be referred to the homepage given by
-            <code>url</code>. This is given to assist in locating artifacts that are not in the repository due to
+            The URL of the project's download page. If not given users will be
+            referred to the homepage given by <code>url</code>.
+            This is given to assist in locating artifacts that are not in the repository due to
             licensing restrictions.
             ]]>
           </description>
@@ -1802,9 +1902,11 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            Gives the status of this artifact in the remote repository. This must not be set in your local
-            project, as it is updated by tools placing it in the reposiory. Valid values are: <code>none</code> (default),
-            <code>converted</code> (repository manager converted this from an Maven 1 POM), <code>partner</code>
+            Gives the status of this artifact in the remote repository.
+            This must not be set in your local project, as it is updated by
+            tools placing it in the reposiory. Valid values are: <code>none</code> (default),
+            <code>converted</code> (repository manager converted this from an Maven 1 POM),
+            <code>partner</code>
             (directly synced from a partner Maven 2 repository), <code>deployed</code> (was deployed from a Maven 2
             instance), <code>verified</code> (has been hand verified as correct and final).
             ]]>
@@ -1819,8 +1921,9 @@
       <description>
         <![CDATA[
         Describes the licenses for this project.  This is used to generate
-        the license page of the project's web site, as well as being taken into consideration in other reporting and
-        validation. The licenses listed for the project are that of the project itself, and not of dependencies.
+        the license page of the project's web site, as well as being taken into
+        consideration in other reporting and validation. The licenses listed for
+        the project are that of the project itself, and not of dependencies.
         ]]>
       </description>
       <version>3.0.0+</version>
@@ -2034,6 +2137,11 @@
     <class>
       <name>PatternSet</name>
       <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Definition of include or exclude patterns.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>includes</name>
@@ -2066,6 +2174,11 @@
     <class>
       <name>Parent</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;parent&gt;</code> element contains informations required to the parent project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>artifactId</name>
@@ -2124,20 +2237,23 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public String getId()
-            {
-                StringBuffer id = new StringBuffer();
+    /**
+     * @return the id as <code>groupId:artifactId:version</code>
+     */
+    public String getId()
+    {
+        StringBuffer id = new StringBuffer();
 
-                id.append( getGroupId() );
-                id.append( ":" );
-                id.append( getArtifactId() );
-                id.append( ":" );
-              //  id.append( getPackaging() );
-                id.append( ":" );
-                id.append( getVersion() );
+        id.append( getGroupId() );
+        id.append( ":" );
+        id.append( getArtifactId() );
+        id.append( ":" );
+      //  id.append( getPackaging() );
+        id.append( ":" );
+        id.append( getVersion() );
 
-                return id.toString();
-            }
+        return id.toString();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2147,6 +2263,12 @@
     <class>
       <name>Repository</name>
       <version>3.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;repository&gt;</code> element contains informations required to a repository
+        used by the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>connection</name>
@@ -2189,6 +2311,12 @@
     <class>
       <name>Scm</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;scm&gt;</code> element contains informations required to the SCM
+        (Source Control Management) of the project.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>connection</name>
@@ -2243,6 +2371,11 @@
       <name>FileSet</name>
       <version>3.0.0+</version>
       <superClass>PatternSet</superClass>
+      <description>
+        <![CDATA[
+        A PatternSet for files.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>directory</name>
@@ -2277,7 +2410,8 @@
             resource to appear in a specific package
             (<code>org.apache.maven.messages</code>), you must specify this
             element with this value: <code>org/apache/maven/messages</code>.
-            This is not required if you simply put the resources in that directory structure at the source, however.
+            This is not required if you simply put the resources in that directory
+            structure at the source, however.
             ]]>
           </description>
           <type>String</type>
@@ -2288,8 +2422,8 @@
           <description>
             <![CDATA[
             Whether resources are filtered to replace tokens with parameterised values or not.
-            The values are taken from the <code>properties</code> element and from the properties in the files listed
-            in the <code>filters</code> element.
+            The values are taken from the <code>properties</code> element and from the
+            properties in the files listed in the <code>filters</code> element.
             ]]>
           </description>
           <type>boolean</type>
@@ -2340,6 +2474,11 @@
       <name>UnitTest</name>
       <version>3.0.0</version>
       <superClass>PatternSet</superClass>
+      <description>
+        <![CDATA[
+        A PatternSet for unit tests.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>resources</name>
@@ -2408,10 +2547,13 @@
           <version>3.0.0</version>
           <code>
             <![CDATA[
-              public String toString()
-              {
-                  return getId();
-              }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2433,8 +2575,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            A unique identifier for a repository. This is used to match the repository to configuration in
-            the <code>settings.xml</code> file, for example.
+            A unique identifier for a repository. This is used to match the repository
+            to configuration in the <code>settings.xml</code> file, for example.
             ]]>
           </description>
           <type>String</type>
@@ -2464,8 +2606,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The type of layout this repository uses for locating and storing artifacts - can be <code>legacy</code> or
-            <code>default</code>.
+            The type of layout this repository uses for locating and storing artifacts -
+            can be <code>legacy</code> or <code>default</code>.
             ]]>
           </description>
           <type>String</type>
@@ -2477,19 +2619,22 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public boolean equals( Object obj )
-            {
-                RepositoryBase other =  (RepositoryBase) obj;
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        RepositoryBase other =  (RepositoryBase) obj;
 
-                boolean retValue = false;
+        boolean retValue = false;
 
-                if ( id != null )
-                {
-                    retValue = id.equals( other.id );
-                }
+        if ( id != null )
+        {
+            retValue = id.equals( other.id );
+        }
 
-                return retValue;
-            }
+        return retValue;
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2532,10 +2677,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public boolean equals( Object obj )
-            {
-                return super.equals( obj );
-            }
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2569,10 +2717,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-            public boolean equals( Object obj )
-            {
-                return super.equals( obj );
-            }
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2582,7 +2733,9 @@
     <class>
       <name>RepositoryPolicy</name>
       <version>4.0.0</version>
-      <description>Download policy.</description>
+      <description>
+        Download policy.
+      </description>
       <fields>
         <field>
           <name>enabled</name>
@@ -2645,8 +2798,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            A unique identifier for a deployment location. This is used to match the site to configuration in
-            the <code>settings.xml</code> file, for example.
+            A unique identifier for a deployment location. This is used to match the
+            site to configuration in the <code>settings.xml</code> file, for example.
             ]]>
           </description>
           <type>String</type>
@@ -2677,6 +2830,11 @@
     <class>
       <name>ConfigurationContainer</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        Contains the configuration information of the container like Plugin.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>inherited</name>
@@ -2689,6 +2847,11 @@
           <type>String</type>
         </field>
         <field>
+          <description>
+            <![CDATA[
+            The configuration as DOM object.
+            ]]>
+          </description>
           <name>configuration</name>
           <type>DOM</type>
         </field>
@@ -2718,6 +2881,11 @@
       <name>Plugin</name>
       <version>4.0.0</version>
       <superClass>ConfigurationContainer</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;plugin&gt;</code> element contains informations required for a plugin.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>groupId</name>
@@ -2801,11 +2969,18 @@
             <![CDATA[
     private java.util.Map executionMap = null;
 
+    /**
+     * Reset the <code>executionMap</code> field to <code>null</code>
+     */
     public void flushExecutionMap()
     {
         this.executionMap = null;
     }
 
+    /**
+     * @return a Map of executions field with <code>PluginExecution#getId()</code> as key
+     * @see org.apache.maven.model.PluginExecution#getId()
+     */
     public java.util.Map getExecutionsAsMap()
     {
         if ( executionMap == null )
@@ -2830,16 +3005,27 @@
         return executionMap;
     }
 
+    /**
+     * @return the key of the plugin, ie <code>groupId:artifactId</code>
+     */
     public String getKey()
     {
         return constructKey( groupId, artifactId );
     }
 
+    /**
+     * @param groupId
+     * @param artifactId
+     * @return the key of the plugin, ie <code>groupId:artifactId</code>
+     */
     public static String constructKey( String groupId, String artifactId )
     {
         return groupId + ":" + artifactId;
     }
 
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals( Object other )
     {
         if ( other instanceof Plugin )
@@ -2852,11 +3038,17 @@
         return false;
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     public int hashCode()
     {
         return getKey().hashCode();
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
         return "Plugin [" + getKey() + "]";
@@ -2870,6 +3062,12 @@
       <name>PluginExecution</name>
       <version>4.0.0</version>
       <superClass>ConfigurationContainer</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;execution&gt;</code> element contains informations required for the
+        execution of a plugin.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>id</name>
@@ -2998,11 +3196,18 @@
             <![CDATA[
     java.util.Map reportPluginMap;
 
+    /**
+     * Reset the <code>reportPluginMap</code> field to <code>null</code>
+     */
     public void flushReportPluginMap()
     {
         this.reportPluginMap = null;
     }
 
+    /**
+     * @return a Map of plugins field with <code>ReportPlugin#getKey()</code> as key
+     * @see org.apache.maven.model.ReportPlugin#getKey()
+     */
     public java.util.Map getReportPluginsAsMap()
     {
         if ( reportPluginMap == null )
@@ -3017,6 +3222,7 @@
                 }
             }
         }
+
         return reportPluginMap;
     }
             ]]>
@@ -3031,7 +3237,8 @@
       <version>4.0.0</version>
       <description>
         <![CDATA[
-        Modifications to the build process which is activated based on environmental parameters or command line arguments.
+        Modifications to the build process which is activated based on environmental
+        parameters or command line arguments.
         ]]>
       </description>
       <fields>
@@ -3093,6 +3300,9 @@
         return source;
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
         return "Profile {id: " + getId() + ", source: " + getSource() + "}";
@@ -3126,8 +3336,9 @@
           <type>String</type>
           <description>
             <![CDATA[
-            Specifies that this profile will be activated when a matching JDK is detected. For example, <code>1.4</code>
-            only activates on JDKs versioned 1.4, while <code>!1.4</code> matches any JDK that is not version 1.4.
+            Specifies that this profile will be activated when a matching JDK is detected.
+            For example, <code>1.4</code> only activates on JDKs versioned 1.4,
+            while <code>!1.4</code> matches any JDK that is not version 1.4.
             ]]>
           </description>
         </field>
@@ -3136,7 +3347,8 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            Specifies that this profile will be activated when matching operating system attributes are detected.
+            Specifies that this profile will be activated when matching operating
+            system attributes are detected.
             ]]>
           </description>
           <association>
@@ -3185,8 +3397,9 @@
       <version>4.0.0</version>
       <description>
         <![CDATA[
-        This is the property specification used to activate a profile. If the value field is empty,
-        then the existence of the named property will activate the profile, otherwise it does a case-sensitive
+        This is the property specification used to activate a profile.
+        If the value field is empty, then the existence of the named property
+        will activate the profile, otherwise it does a case-sensitive
         match against the property value as well.
         ]]>
       </description>
@@ -3237,7 +3450,8 @@
           <type>String</type>
           <description>
             <![CDATA[
-            The general family of the OS to be used to activate the profile, such as <code>windows</code> or <code>unix</code>.
+            The general family of the OS to be used to activate the profile, such as
+            <code>windows</code> or <code>unix</code>.
             ]]>
           </description>
         </field>
@@ -3266,8 +3480,9 @@
       <version>4.0.0</version>
       <description>
         <![CDATA[
-        This is the file specification used to activate the profile. The missing value will be the location
-        of a file that needs to exist, and if it doesn't the profile will be activated.  On the other hand exists will test
+        This is the file specification used to activate the profile.
+        The missing value will be the location of a file that needs to exist,
+        and if it doesn't the profile will be activated.  On the other hand exists will test
         for the existence of the file and if it is there the profile will be activated.
         ]]>
       </description>
@@ -3328,6 +3543,11 @@
     <class xml.tagName="plugin">
       <name>ReportPlugin</name>
       <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;plugin&gt;</code> element contains informations required for a report plugin.
+        ]]>
+      </description>
       <fields>
         <field>
           <name>groupId</name>
@@ -3397,11 +3617,18 @@
             <![CDATA[
     private java.util.Map reportSetMap = null;
 
+    /**
+     * Reset the <code>reportSetMap</code> field to <code>null</code>
+     */
     public void flushReportSetMap()
     {
         this.reportSetMap = null;
     }
 
+    /**
+     * @return a Map of reportSets field with <code>ReportSet#getId()</code> as key
+     * @see org.apache.maven.model.ReportSet#getId()
+     */
     public java.util.Map getReportSetsAsMap()
     {
         if ( reportSetMap == null )
@@ -3420,11 +3647,19 @@
         return reportSetMap;
     }
 
+    /**
+     * @return the key of the report plugin, ie <code>groupId:artifactId</code>
+     */
     public String getKey()
     {
         return constructKey( groupId, artifactId );
     }
 
+    /**
+     * @param groupId
+     * @param artifactId
+     * @return the key of the report plugin, ie <code>groupId:artifactId</code>
+     */
     public static String constructKey( String groupId, String artifactId )
     {
         return groupId + ":" + artifactId;
@@ -3583,7 +3818,9 @@
     <class>
       <name>Extension</name>
       <version>4.0.0</version>
-      <description>Describes a build extension to utilise.</description>
+      <description>
+        Describes a build extension to utilise.
+      </description>
       <fields>
         <field>
           <name>groupId</name>
@@ -3613,6 +3850,9 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals( Object o )
     {
         if ( this == o )
@@ -3642,6 +3882,9 @@
         return true;
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     public int hashCode()
     {
         int result = 17;
@@ -3657,4 +3900,3 @@
     </class>
   </classes>
 </model>
-
