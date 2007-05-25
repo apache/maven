@@ -7,7 +7,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
-public interface BuildPlan
+public interface BuildPlanIfc
     extends ModifiablePlanElement
 {
 
