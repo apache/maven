@@ -55,6 +55,7 @@ public class DefaultBuildPlanner
 
         BuildPlan plan = new BuildPlan( packagingBindings, projectBindings, defaultBindings, tasks );
 
+        // initialize/resolve any direct-invocation tasks, if possible.
         initializeDirectInvocations( plan, project );
 
         // Inject forked lifecycles as plan modifiers for each mojo that has @execute in it.
@@ -108,28 +109,7 @@ public class DefaultBuildPlanner
     private void findForkModifiers( final MojoBinding mojoBinding, final BuildPlan plan, final MavenProject project )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
-        PluginDescriptor pluginDescriptor = null;
-        try
-        {
-            pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
-        }
-        catch ( PluginLoaderException e )
-        {
-            String message =
-                "Failed to load plugin: " + MojoBindingUtils.createPluginKey( mojoBinding )
-                                + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( message, e );
-            }
-            else
-            {
-                logger.warn( message );
-            }
-
-            plan.addLateBoundMojo( mojoBinding );
-        }
+        PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding, plan, project );
 
         if ( pluginDescriptor == null )
         {
@@ -161,28 +141,7 @@ public class DefaultBuildPlanner
         {
             MojoBinding mojoBinding = (MojoBinding) it.next();
 
-            PluginDescriptor pluginDescriptor = null;
-            try
-            {
-                pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
-            }
-            catch ( PluginLoaderException e )
-            {
-                String message =
-                    "Failed to load plugin: " + MojoBindingUtils.createPluginKey( mojoBinding )
-                                    + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
-
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( message, e );
-                }
-                else
-                {
-                    logger.warn( message );
-                }
-
-                plan.addLateBoundMojo( mojoBinding );
-            }
+            PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding, plan, project );
 
             if ( pluginDescriptor == null )
             {
@@ -200,29 +159,57 @@ public class DefaultBuildPlanner
             {
                 List reportBindings = lifecycleBindingManager.getReportBindings( project );
 
-                for ( Iterator reportBindingIt = reportBindings.iterator(); reportBindingIt.hasNext(); )
+                if ( reportBindings != null )
                 {
-                    MojoBinding reportBinding = (MojoBinding) reportBindingIt.next();
+                    plan.addForkedExecution( mojoBinding, reportBindings );
 
-                    try
+                    for ( Iterator reportBindingIt = reportBindings.iterator(); reportBindingIt.hasNext(); )
                     {
-                        pluginLoader.loadReportPlugin( mojoBinding, project );
-                    }
-                    catch ( PluginLoaderException e )
-                    {
-                        throw new LifecyclePlannerException( "Failed to load report-plugin descriptor for: "
-                                                             + MojoBindingUtils.toString( reportBinding )
-                                                             + ". Reason: " + e.getMessage(), e );
+                        MojoBinding reportBinding = (MojoBinding) reportBindingIt.next();
+
+                        PluginDescriptor pd = loadPluginDescriptor( reportBinding, plan, project );
+
+                        if ( pd != null )
+                        {
+                            findForkModifiers( reportBinding, pluginDescriptor, plan, project );
+                        }
                     }
                 }
-
-                plan.addForkedExecution( mojoBinding, reportBindings );
 
                 // NOTE: the first sighting of a mojo requiring reports should satisfy this condition.
                 // therefore, we can break out as soon as we find one.
                 break;
             }
         }
+    }
+
+    private PluginDescriptor loadPluginDescriptor( final MojoBinding mojoBinding, final BuildPlan plan,
+                                                   final MavenProject project )
+    {
+        PluginDescriptor pluginDescriptor = null;
+        try
+        {
+            pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
+        }
+        catch ( PluginLoaderException e )
+        {
+            String message =
+                "Failed to load plugin: " + MojoBindingUtils.createPluginKey( mojoBinding )
+                                + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( message, e );
+            }
+            else
+            {
+                logger.warn( message );
+            }
+
+            plan.addLateBoundMojo( mojoBinding );
+        }
+
+        return pluginDescriptor;
     }
 
     /**
