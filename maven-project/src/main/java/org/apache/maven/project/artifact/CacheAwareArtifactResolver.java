@@ -31,68 +31,95 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.build.ProjectBuildCache;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 
 public class CacheAwareArtifactResolver
     extends DefaultArtifactResolver
 {
-    
+
     private ArtifactResolver delegate;
-    
+
     private BuildContextManager buildContextManager;
 
-    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( final Artifact artifact, final List remoteRepositories,
+                         final ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolveFromCache( artifact );
-        
+
         if ( !artifact.isResolved() )
         {
             delegate.resolve( artifact, remoteRepositories, localRepository );
         }
     }
 
-    public void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolveAlways( final Artifact artifact, final List remoteRepositories,
+                               final ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolveFromCache( artifact );
-        
+
         if ( !artifact.isResolved() )
         {
             delegate.resolveAlways( artifact, remoteRepositories, localRepository );
         }
     }
 
-    private void resolveFromCache( Artifact artifact )
+    private void resolveFromCache( final Artifact artifact )
     {
         ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
-        
+
         if ( "pom".equals( artifact.getType() ) )
         {
             File pomFile = cache.getCachedModelFile( artifact );
-            
+
             if ( pomFile != null )
             {
                 artifact.setFile( pomFile );
                 artifact.setResolved( true );
             }
         }
-        // currently, artifacts with classifiers are not really supported as the main project artifact...
         else if ( artifact.getClassifier() == null )
         {
             MavenProject project = cache.getCachedProject( artifact );
-            ArtifactHandler handler = artifact.getArtifactHandler();
-            
-            if ( project != null && handler.getPackaging().equals( project.getPackaging() ) )
+            String classifier = artifact.getClassifier();
+            String type = artifact.getType();
+
+            if ( classifier == null )
             {
-                File projectArtifactFile = project.getArtifact().getFile();
-                
-                if ( projectArtifactFile != null )
+                ArtifactHandler handler = artifact.getArtifactHandler();
+                if ( ( project != null ) && handler.getPackaging().equals( project.getPackaging() ) )
                 {
-                    artifact.setFile( projectArtifactFile );
-                    artifact.setResolved( true );
+                    File projectArtifactFile = project.getArtifact().getFile();
+
+                    if ( projectArtifactFile != null )
+                    {
+                        artifact.setFile( projectArtifactFile );
+                        artifact.setResolved( true );
+                    }
                 }
             }
+            else
+            {
+                List attachments = project.getAttachedArtifacts();
+                for ( Iterator it = attachments.iterator(); it.hasNext(); )
+                {
+                    Artifact attachment = (Artifact) it.next();
+
+                    if ( classifier.equals( attachment.getClassifier() ) && type.equals( attachment.getType() ) )
+                    {
+                        File attachedFile = attachment.getFile();
+
+                        if ( attachedFile != null )
+                        {
+                            artifact.setFile( attachedFile );
+                            artifact.setResolved( true );
+                        }
+                    }
+                }
+            }
+
         }
     }
 
