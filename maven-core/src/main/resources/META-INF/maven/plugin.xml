@@ -114,7 +114,7 @@
       </configuration>
     </mojo>
     <mojo>
-      <goal>resolve-plugin</goal>
+      <goal>resolve-late-bound-plugin</goal>
       <description>Resolve a late-bound plugin during a build, right before it is to be used.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
       <requiresProject>true</requiresProject>
@@ -156,7 +156,7 @@
           <description>The plugin's version.</description>
         </parameter>
         <parameter>
-          <name>gaol</name>
+          <name>goal</name>
           <type>java.lang.String</type>
           <required>true</required>
           <editable>true</editable>
