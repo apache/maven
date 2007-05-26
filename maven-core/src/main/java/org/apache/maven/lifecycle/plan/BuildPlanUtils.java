@@ -1,21 +1,17 @@
 package org.apache.maven.lifecycle.plan;
 
-import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
-import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.MojoBindingUtils;
-import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
-import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
-import org.apache.maven.project.MavenProject;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 /**
- * Collection of static utility methods used to work with LifecycleBindings and other collections
- * of MojoBinding instances that make up a build plan.
+ * Collection of static utility methods used to work with LifecycleBindings and other collections of MojoBinding
+ * instances that make up a build plan.
  */
 public final class BuildPlanUtils
 {
@@ -25,55 +21,23 @@ public final class BuildPlanUtils
     }
 
     /**
-     * Inject a set of {@link BuildPlanModifier} instances into an existing LifecycleBindings instance.
-     * This is a generalization of a piece of code present in almost all scenarios where a build
-     * plan contains modifiers and is asked to produce an effective list of MojoBinding instances
-     * that make up the build process. Simply iterate through the modifiers, and apply each one,
-     * replacing the previous LifecycleBindings instance with the result of the current modifier.
+     * Render an entire build plan to a String. If extendedInfo == true, include each MojoBinding's configuration in the
+     * output.
      */
-    public static LifecycleBindings modifyPlanBindings( LifecycleBindings bindings, List planModifiers )
-        throws LifecyclePlannerException
+    public static String listBuildPlan( final BuildPlan plan, final boolean extendedInfo )
+        throws LifecycleSpecificationException, LifecyclePlannerException
     {
-        LifecycleBindings result;
+        List mojos = plan.renderExecutionPlan( new Stack() );
+        plan.resetExecutionProgress();
 
-        // if the bindings are completely empty, passing in null avoids an extra instance creation 
-        // for the purposes of cloning...
-        if ( bindings != null )
-        {
-            result = LifecycleUtils.cloneBindings( bindings );
-        }
-        else
-        {
-            result = new LifecycleBindings();
-        }
-
-        for ( Iterator it = planModifiers.iterator(); it.hasNext(); )
-        {
-            BuildPlanModifier modifier = (BuildPlanModifier) it.next();
-
-            result = modifier.modifyBindings( result );
-        }
-
-        return result;
+        return listBuildPlan( mojos, extendedInfo );
     }
 
     /**
-     * Render an entire build plan to a String.
-     * If extendedInfo == true, include each MojoBinding's configuration in the output.
+     * Render a list containing the MojoBinding instances for an entire build plan to a String. If extendedInfo == true,
+     * include each MojoBinding's configuration in the output.
      */
-    public static String listBuildPlan( BuildPlan plan, MavenProject project, LifecycleBindingManager lifecycleBindingManager, boolean extendedInfo )
-        throws LifecycleSpecificationException, LifecyclePlannerException, LifecycleLoaderException
-    {
-        List mojoBindings = plan.getPlanMojoBindings( project, lifecycleBindingManager );
-
-        return listBuildPlan( mojoBindings, extendedInfo );
-    }
-
-    /**
-     * Render a list containing the MojoBinding instances for an entire build plan to a String.
-     * If extendedInfo == true, include each MojoBinding's configuration in the output.
-     */
-    public static String listBuildPlan( List mojoBindings, boolean extendedInfo )
+    public static String listBuildPlan( final List mojoBindings, final boolean extendedInfo )
         throws LifecycleSpecificationException, LifecyclePlannerException
     {
         StringBuffer listing = new StringBuffer();
@@ -119,7 +83,7 @@ public final class BuildPlanUtils
                 {
                     listing.append( ' ' ).append( formatMojoListing( binding, indentLevel, extendedInfo ) );
                 }
-                
+
                 indentLevel++;
             }
             else
@@ -135,10 +99,10 @@ public final class BuildPlanUtils
     }
 
     /**
-     * Append a newline character, add the next line's number, and indent the new line to the
-     * appropriate level (which tracks separate forked executions).
+     * Append a newline character, add the next line's number, and indent the new line to the appropriate level (which
+     * tracks separate forked executions).
      */
-    private static void newListingLine( StringBuffer listing, int indentLevel, int counter )
+    private static void newListingLine( final StringBuffer listing, final int indentLevel, final int counter )
     {
         listing.append( '\n' );
 
@@ -155,10 +119,10 @@ public final class BuildPlanUtils
     }
 
     /**
-     * Format a single MojoBinding for inclusion in a build plan listing. If extendedInfo == true,
-     * include the MojoBinding's configuration in the output.
+     * Format a single MojoBinding for inclusion in a build plan listing. If extendedInfo == true, include the
+     * MojoBinding's configuration in the output.
      */
-    public static String formatMojoListing( MojoBinding binding, int indentLevel, boolean extendedInfo )
+    public static String formatMojoListing( final MojoBinding binding, final int indentLevel, final boolean extendedInfo )
     {
         StringBuffer listing = new StringBuffer();
 
@@ -169,7 +133,8 @@ public final class BuildPlanUtils
         {
             listing.append( "\nOrigin: " ).append( binding.getOrigin() );
             listing.append( "\nConfiguration:\n\t" ).append(
-                                                             String.valueOf( binding.getConfiguration() ).replaceAll( "\\n",
+                                                             String.valueOf( binding.getConfiguration() ).replaceAll(
+                                                                                                                      "\\n",
                                                                                                                       "\n\t" ) ).append(
                                                                                                                                          '\n' );
         }

@@ -615,6 +615,18 @@
           <type>boolean</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+
+    public String toString()
+    {
+        return getGroupId() + ":" + getArtifactId() + ":" + getVersion() + ":" + getGoal() + ":" + getExecutionId();
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
   </classes>
 </model>

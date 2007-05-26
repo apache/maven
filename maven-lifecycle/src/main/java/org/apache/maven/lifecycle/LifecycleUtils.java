@@ -22,7 +22,7 @@ public class LifecycleUtils
     {
     }
 
-    public static void setOrigin( LifecycleBindings bindings, String origin )
+    public static void setOrigin( final LifecycleBindings bindings, final String origin )
     {
         for ( Iterator bindingIt = bindings.getBindingList().iterator(); bindingIt.hasNext(); )
         {
@@ -52,7 +52,7 @@ public class LifecycleUtils
         }
     }
 
-    public static List getMojoBindingListForLifecycle( String stopPhase, LifecycleBindings bindings )
+    public static List getMojoBindingListForLifecycle( final String stopPhase, final LifecycleBindings bindings )
         throws NoSuchPhaseException
     {
         LifecycleBinding binding = findLifecycleBindingForPhase( stopPhase, bindings );
@@ -65,7 +65,7 @@ public class LifecycleUtils
         return getMojoBindingListForLifecycle( stopPhase, binding );
     }
 
-    public static List getMojoBindingListForLifecycle( String stopPhase, LifecycleBinding lifecycle )
+    public static List getMojoBindingListForLifecycle( final String stopPhase, final LifecycleBinding lifecycle )
         throws NoSuchPhaseException
     {
         List phaseNames = lifecycle.getPhaseNamesInOrder();
@@ -85,7 +85,7 @@ public class LifecycleUtils
             Phase phase = (Phase) phases.get( i );
             List phaseBindings = phase.getBindings();
 
-            if ( phaseBindings != null && !phaseBindings.isEmpty() )
+            if ( ( phaseBindings != null ) && !phaseBindings.isEmpty() )
             {
                 bindings.addAll( phaseBindings );
             }
@@ -97,7 +97,8 @@ public class LifecycleUtils
     /**
      * @return null if the phase is not contained in any of the lifecycles.
      */
-    public static LifecycleBinding findLifecycleBindingForPhase( String phaseName, LifecycleBindings lifecycles )
+    public static LifecycleBinding findLifecycleBindingForPhase( final String phaseName,
+                                                                 final LifecycleBindings lifecycles )
     {
         List lifecyclesAvailable = lifecycles.getBindingList();
 
@@ -114,8 +115,8 @@ public class LifecycleUtils
         return null;
     }
 
-    public static void removeMojoBinding( String phaseName, MojoBinding mojoBinding, LifecycleBinding lifecycleBinding,
-                                          boolean considerExecutionId )
+    public static void removeMojoBinding( final String phaseName, final MojoBinding mojoBinding,
+                                          final LifecycleBinding lifecycleBinding, final boolean considerExecutionId )
         throws NoSuchPhaseException
     {
         List phaseNames = lifecycleBinding.getPhaseNamesInOrder();
@@ -125,7 +126,7 @@ public class LifecycleUtils
         if ( idx < 0 )
         {
             throw new NoSuchPhaseException( phaseName, "Phase: " + phaseName + " not found in lifecycle: "
-                + lifecycleBinding.getId() );
+                            + lifecycleBinding.getId() );
         }
 
         List phases = lifecycleBinding.getPhasesInOrder();
@@ -136,13 +137,13 @@ public class LifecycleUtils
         {
             List mojoBindings = phase.getBindings();
 
-            String targetKey = createMojoBindingKey( mojoBinding, considerExecutionId );
+            String targetKey = MojoBindingUtils.createMojoBindingKey( mojoBinding, considerExecutionId );
 
             for ( Iterator it = mojoBindings.iterator(); it.hasNext(); )
             {
                 MojoBinding candidate = (MojoBinding) it.next();
 
-                String candidateKey = createMojoBindingKey( candidate, considerExecutionId );
+                String candidateKey = MojoBindingUtils.createMojoBindingKey( candidate, considerExecutionId );
                 if ( candidateKey.equals( targetKey ) )
                 {
                     it.remove();
@@ -153,8 +154,8 @@ public class LifecycleUtils
         }
     }
 
-    public static void addMojoBinding( String phaseName, MojoBinding mojoBinding, LifecycleBinding lifecycleBinding )
-        throws NoSuchPhaseException
+    public static void addMojoBinding( final String phaseName, final MojoBinding mojoBinding,
+                                       final LifecycleBinding lifecycleBinding ) throws NoSuchPhaseException
     {
         List phaseNames = lifecycleBinding.getPhaseNamesInOrder();
 
@@ -163,7 +164,7 @@ public class LifecycleUtils
         if ( idx < 0 )
         {
             throw new NoSuchPhaseException( phaseName, "Phase: " + phaseName + " not found in lifecycle: "
-                + lifecycleBinding.getId() );
+                            + lifecycleBinding.getId() );
         }
 
         List phases = lifecycleBinding.getPhasesInOrder();
@@ -172,7 +173,7 @@ public class LifecycleUtils
         phase.addBinding( mojoBinding );
     }
 
-    public static void addMojoBinding( String phaseName, MojoBinding mojo, LifecycleBindings bindings )
+    public static void addMojoBinding( final String phaseName, final MojoBinding mojo, final LifecycleBindings bindings )
         throws LifecycleSpecificationException
     {
         LifecycleBinding binding = findLifecycleBindingForPhase( phaseName, bindings );
@@ -185,21 +186,25 @@ public class LifecycleUtils
         addMojoBinding( phaseName, mojo, binding );
     }
 
-    public static LifecycleBindings mergeBindings( LifecycleBindings existingBindings, LifecycleBindings newBindings,
-                                                   LifecycleBindings defaultBindings, boolean mergeConfigIfExecutionIdMatches )
+    public static LifecycleBindings mergeBindings( final LifecycleBindings existingBindings,
+                                                   final LifecycleBindings newBindings,
+                                                   final LifecycleBindings defaultBindings,
+                                                   final boolean mergeConfigIfExecutionIdMatches )
     {
         return mergeBindings( existingBindings, newBindings, defaultBindings, mergeConfigIfExecutionIdMatches, false );
     }
 
-    public static LifecycleBindings mergeBindings( LifecycleBindings existingBindings, LifecycleBindings newBindings,
-                                                   LifecycleBindings defaultBindings, boolean mergeConfigIfExecutionIdMatches,
-                                                   boolean reverseConfigMergeDirection )
+    public static LifecycleBindings mergeBindings( final LifecycleBindings existingBindings,
+                                                   final LifecycleBindings newBindings,
+                                                   final LifecycleBindings defaultBindings,
+                                                   final boolean mergeConfigIfExecutionIdMatches,
+                                                   final boolean reverseConfigMergeDirection )
     {
         LifecycleBindings result = new LifecycleBindings();
         result.setPackaging( newBindings.getPackaging() );
 
         CleanBinding cb = (CleanBinding) cloneBinding( existingBindings.getCleanBinding() );
-        if ( defaultBindings != null && isNullOrEmpty( cb ) )
+        if ( ( defaultBindings != null ) && isNullOrEmpty( cb ) )
         {
             cb = (CleanBinding) cloneBinding( defaultBindings.getCleanBinding() );
         }
@@ -212,7 +217,7 @@ public class LifecycleUtils
         result.setCleanBinding( cb );
 
         BuildBinding bb = (BuildBinding) cloneBinding( existingBindings.getBuildBinding() );
-        if ( defaultBindings != null && isNullOrEmpty( bb ) )
+        if ( ( defaultBindings != null ) && isNullOrEmpty( bb ) )
         {
             bb = (BuildBinding) cloneBinding( defaultBindings.getBuildBinding() );
         }
@@ -225,7 +230,7 @@ public class LifecycleUtils
         result.setBuildBinding( bb );
 
         SiteBinding sb = (SiteBinding) cloneBinding( existingBindings.getSiteBinding() );
-        if ( defaultBindings != null && isNullOrEmpty( sb ) )
+        if ( ( defaultBindings != null ) && isNullOrEmpty( sb ) )
         {
             sb = (SiteBinding) cloneBinding( defaultBindings.getSiteBinding() );
         }
@@ -251,7 +256,7 @@ public class LifecycleUtils
                     Phase phase = (Phase) phases.get( i );
                     String name = (String) phaseNames.get( i );
 
-                    if ( phase != null && phase.getBindings() != null && !phase.getBindings().isEmpty() )
+                    if ( ( phase != null ) && ( phase.getBindings() != null ) && !phase.getBindings().isEmpty() )
                     {
                         for ( Iterator phaseIt = phase.getBindings().iterator(); phaseIt.hasNext(); )
                         {
@@ -261,40 +266,46 @@ public class LifecycleUtils
 
                             if ( mergeConfigIfExecutionIdMatches )
                             {
-                                MojoBinding matchingBinding = findMatchingMojoBinding( mojoBinding, existingBindings, true );
+                                MojoBinding matchingBinding =
+                                    findMatchingMojoBinding( mojoBinding, existingBindings, true );
 
                                 if ( matchingBinding != null )
                                 {
                                     Xpp3Dom existingConfig = new Xpp3Dom( (Xpp3Dom) matchingBinding.getConfiguration() );
-                                    
+
                                     Xpp3Dom configuration;
                                     if ( reverseConfigMergeDirection )
                                     {
-                                        configuration = Xpp3Dom.mergeXpp3Dom( existingConfig, (Xpp3Dom) mojoBinding.getConfiguration() );
+                                        configuration =
+                                            Xpp3Dom.mergeXpp3Dom( existingConfig,
+                                                                  (Xpp3Dom) mojoBinding.getConfiguration() );
                                     }
                                     else
                                     {
-                                        configuration = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) mojoBinding.getConfiguration(), existingConfig );
+                                        configuration =
+                                            Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) mojoBinding.getConfiguration(),
+                                                                  existingConfig );
                                     }
 
                                     mojoBinding.setConfiguration( configuration );
-                                    
-                                    if ( mojoBinding.getOrigin() == null && matchingBinding.getOrigin() != null )
+
+                                    if ( ( mojoBinding.getOrigin() == null ) && ( matchingBinding.getOrigin() != null ) )
                                     {
                                         mojoBinding.setOrigin( matchingBinding.getOrigin() );
                                     }
-                                    
+
                                     LifecycleBinding resultBinding = findLifecycleBindingForPhase( name, result );
-                                    
+
                                     try
                                     {
                                         removeMojoBinding( name, matchingBinding, resultBinding, true );
                                     }
                                     catch ( NoSuchPhaseException e )
                                     {
-                                        IllegalStateException error = new IllegalStateException(
-                                                                                                 e.getMessage()
-                                                                                                     + "\nSomething strange is going on. Merging should not encounter such inconsistencies." );
+                                        IllegalStateException error =
+                                            new IllegalStateException(
+                                                                       e.getMessage()
+                                                                                       + "\nSomething strange is going on. Merging should not encounter such inconsistencies." );
 
                                         error.initCause( e );
 
@@ -311,9 +322,9 @@ public class LifecycleUtils
                             {
                                 // NOTE: this shouldn't happen as long as normal components are used
                                 // to create/read these LifecycleBindings instances.
-                                IllegalArgumentException error = new IllegalArgumentException(
-                                                                                               "Project bindings are invalid. Reason: "
-                                                                                                   + e.getMessage() );
+                                IllegalArgumentException error =
+                                    new IllegalArgumentException( "Project bindings are invalid. Reason: "
+                                                    + e.getMessage() );
 
                                 error.initCause( e );
 
@@ -328,35 +339,36 @@ public class LifecycleUtils
         return result;
     }
 
-    private static boolean isNullOrEmpty( LifecycleBinding binding )
+    private static boolean isNullOrEmpty( final LifecycleBinding binding )
     {
         if ( binding == null )
         {
             return true;
         }
-        
+
         for ( Iterator it = binding.getPhasesInOrder().iterator(); it.hasNext(); )
         {
             Phase phase = (Phase) it.next();
-            
+
             if ( !phase.getBindings().isEmpty() )
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 
-    public static MojoBinding findMatchingMojoBinding( MojoBinding mojoBinding, LifecycleBindings inBindings,
-                                                       boolean considerExecutionId )
+    public static MojoBinding findMatchingMojoBinding( final MojoBinding mojoBinding,
+                                                       final LifecycleBindings inBindings,
+                                                       final boolean considerExecutionId )
     {
-        String key = createMojoBindingKey( mojoBinding, considerExecutionId );
+        String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, considerExecutionId );
 
         return (MojoBinding) mapMojoBindingsByKey( inBindings, considerExecutionId ).get( key );
     }
 
-    private static Map mapMojoBindingsByKey( LifecycleBindings bindings, boolean considerExecutionId )
+    private static Map mapMojoBindingsByKey( final LifecycleBindings bindings, final boolean considerExecutionId )
     {
         Map byKey = new HashMap();
 
@@ -376,7 +388,8 @@ public class LifecycleUtils
                         {
                             MojoBinding mojoBinding = (MojoBinding) mojoIt.next();
 
-                            byKey.put( createMojoBindingKey( mojoBinding, considerExecutionId ), mojoBinding );
+                            byKey.put( MojoBindingUtils.createMojoBindingKey( mojoBinding, considerExecutionId ),
+                                       mojoBinding );
                         }
                     }
                 }
@@ -386,8 +399,8 @@ public class LifecycleUtils
         return byKey;
     }
 
-    public static void removeMojoBindings( List toRemove, LifecycleBindings bindings, boolean considerExecutionId )
-        throws NoSuchPhaseException
+    public static void removeMojoBindings( final List toRemove, final LifecycleBindings bindings,
+                                           final boolean considerExecutionId ) throws NoSuchPhaseException
     {
         if ( bindings.getCleanBinding() != null )
         {
@@ -405,8 +418,8 @@ public class LifecycleUtils
         }
     }
 
-    public static void removeMojoBindings( List toRemove, LifecycleBinding removeFrom, boolean considerExecutionId )
-        throws NoSuchPhaseException
+    public static void removeMojoBindings( final List toRemove, final LifecycleBinding removeFrom,
+                                           final boolean considerExecutionId ) throws NoSuchPhaseException
     {
         // remove where gid:aid:goal matches.
         List targets = new ArrayList();
@@ -414,7 +427,7 @@ public class LifecycleUtils
         {
             MojoBinding binding = (MojoBinding) it.next();
 
-            targets.add( createMojoBindingKey( binding, considerExecutionId ) );
+            targets.add( MojoBindingUtils.createMojoBindingKey( binding, considerExecutionId ) );
         }
 
         List phases = removeFrom.getPhasesInOrder();
@@ -427,7 +440,7 @@ public class LifecycleUtils
             for ( Iterator mojoIt = phaseBindings.iterator(); mojoIt.hasNext(); )
             {
                 MojoBinding binding = (MojoBinding) mojoIt.next();
-                String key = createMojoBindingKey( binding, considerExecutionId );
+                String key = MojoBindingUtils.createMojoBindingKey( binding, considerExecutionId );
                 if ( targets.contains( key ) )
                 {
                     mojoIt.remove();
@@ -438,19 +451,7 @@ public class LifecycleUtils
         }
     }
 
-    public static String createMojoBindingKey( MojoBinding mojoBinding, boolean considerExecutionId )
-    {
-        String key = mojoBinding.getGroupId() + ":" + mojoBinding.getArtifactId() + ":" + mojoBinding.getGoal();
-
-        if ( considerExecutionId )
-        {
-            key += ":" + mojoBinding.getExecutionId();
-        }
-
-        return key;
-    }
-
-    public static LifecycleBindings cloneBindings( LifecycleBindings bindings )
+    public static LifecycleBindings cloneBindings( final LifecycleBindings bindings )
     {
         LifecycleBindings result = new LifecycleBindings();
 
@@ -472,7 +473,7 @@ public class LifecycleUtils
         return result;
     }
 
-    public static LifecycleBinding cloneBinding( LifecycleBinding binding )
+    public static LifecycleBinding cloneBinding( final LifecycleBinding binding )
     {
         if ( binding == null )
         {
@@ -495,7 +496,7 @@ public class LifecycleUtils
         else
         {
             throw new IllegalArgumentException( "Unrecognized LifecycleBinding type: " + binding.getClass().getName()
-                + "; cannot clone." );
+                            + "; cannot clone." );
         }
 
         List phases = binding.getPhasesInOrder();
@@ -518,8 +519,10 @@ public class LifecycleUtils
                 }
                 catch ( NoSuchPhaseException e )
                 {
-                    IllegalStateException error = new IllegalStateException( e.getMessage()
-                        + "\nSomething strange is going on. Cloning should not encounter such inconsistencies." );
+                    IllegalStateException error =
+                        new IllegalStateException(
+                                                   e.getMessage()
+                                                                   + "\nSomething strange is going on. Cloning should not encounter such inconsistencies." );
 
                     error.initCause( e );
 
@@ -531,7 +534,7 @@ public class LifecycleUtils
         return result;
     }
 
-    public static MojoBinding cloneMojoBinding( MojoBinding binding )
+    public static MojoBinding cloneMojoBinding( final MojoBinding binding )
     {
         MojoBinding result = new MojoBinding();
 
@@ -546,10 +549,11 @@ public class LifecycleUtils
         return result;
     }
 
-    public static Phase findPhaseForMojoBinding( MojoBinding mojoBinding, LifecycleBindings lifecycleBindings,
-                                                 boolean considerExecutionId )
+    public static Phase findPhaseForMojoBinding( final MojoBinding mojoBinding,
+                                                 final LifecycleBindings lifecycleBindings,
+                                                 final boolean considerExecutionId )
     {
-        String targetKey = createMojoBindingKey( mojoBinding, considerExecutionId );
+        String targetKey = MojoBindingUtils.createMojoBindingKey( mojoBinding, considerExecutionId );
 
         for ( Iterator lifecycleIt = lifecycleBindings.getBindingList().iterator(); lifecycleIt.hasNext(); )
         {
@@ -562,7 +566,7 @@ public class LifecycleUtils
                 for ( Iterator mojoIt = phase.getBindings().iterator(); mojoIt.hasNext(); )
                 {
                     MojoBinding candidate = (MojoBinding) mojoIt.next();
-                    String key = createMojoBindingKey( candidate, considerExecutionId );
+                    String key = MojoBindingUtils.createMojoBindingKey( candidate, considerExecutionId );
                     if ( key.equals( targetKey ) )
                     {
                         return phase;
@@ -574,15 +578,16 @@ public class LifecycleUtils
         return null;
     }
 
-    public static boolean isMojoBindingPresent( MojoBinding binding, List candidates, boolean considerExecutionId )
+    public static boolean isMojoBindingPresent( final MojoBinding binding, final List candidates,
+                                                final boolean considerExecutionId )
     {
-        String key = createMojoBindingKey( binding, considerExecutionId );
+        String key = MojoBindingUtils.createMojoBindingKey( binding, considerExecutionId );
 
         for ( Iterator it = candidates.iterator(); it.hasNext(); )
         {
             MojoBinding candidate = (MojoBinding) it.next();
 
-            String candidateKey = createMojoBindingKey( candidate, considerExecutionId );
+            String candidateKey = MojoBindingUtils.createMojoBindingKey( candidate, considerExecutionId );
 
             if ( candidateKey.equals( key ) )
             {
@@ -593,79 +598,87 @@ public class LifecycleUtils
         return false;
     }
 
-    public static boolean isValidPhaseName( String phaseName )
+    public static boolean isValidPhaseName( final String phaseName )
     {
         LifecycleBindings test = new LifecycleBindings();
         for ( Iterator it = test.getBindingList().iterator(); it.hasNext(); )
         {
             LifecycleBinding binding = (LifecycleBinding) it.next();
-            
+
             if ( binding.getPhaseNamesInOrder().contains( phaseName ) )
             {
                 return true;
             }
         }
-        
+
         return false;
     }
 
     public static List getValidPhaseNames()
     {
         List phaseNames = new ArrayList();
-        
+
         LifecycleBindings bindings = new LifecycleBindings();
         for ( Iterator bindingIt = bindings.getBindingList().iterator(); bindingIt.hasNext(); )
         {
             LifecycleBinding binding = (LifecycleBinding) bindingIt.next();
-            
+
             for ( Iterator phaseNameIt = binding.getPhaseNamesInOrder().iterator(); phaseNameIt.hasNext(); )
             {
                 phaseNames.add( phaseNameIt.next() );
             }
         }
-        
+
         return phaseNames;
     }
 
     public static List getValidBuildPhaseNames()
     {
         List phaseNames = new ArrayList();
-        
+
         LifecycleBinding binding = new BuildBinding();
-        
+
         for ( Iterator phaseNameIt = binding.getPhaseNamesInOrder().iterator(); phaseNameIt.hasNext(); )
         {
             phaseNames.add( phaseNameIt.next() );
         }
-        
+
         return phaseNames;
     }
 
     public static List getValidCleanPhaseNames()
     {
         List phaseNames = new ArrayList();
-        
+
         LifecycleBinding binding = new CleanBinding();
-        
+
         for ( Iterator phaseNameIt = binding.getPhaseNamesInOrder().iterator(); phaseNameIt.hasNext(); )
         {
             phaseNames.add( phaseNameIt.next() );
         }
-        
+
         return phaseNames;
     }
 
     public static List getValidSitePhaseNames()
     {
         List phaseNames = new ArrayList();
-        
+
         LifecycleBinding binding = new SiteBinding();
-        
+
         for ( Iterator phaseNameIt = binding.getPhaseNamesInOrder().iterator(); phaseNameIt.hasNext(); )
         {
             phaseNames.add( phaseNameIt.next() );
         }
-        
+
         return phaseNames;
+    }
+
+    /**
+     * @deprecated Use {@link MojoBindingUtils#createMojoBindingKey(MojoBinding, boolean)} instead.
+     */
+    public static String createMojoBindingKey( final MojoBinding mojoBinding, final boolean considerExecutionId )
+    {
+        return MojoBindingUtils.createMojoBindingKey( mojoBinding, considerExecutionId );
     }
 }

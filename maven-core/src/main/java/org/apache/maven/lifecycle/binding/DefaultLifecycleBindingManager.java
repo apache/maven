@@ -5,11 +5,8 @@ import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.lifecycle.model.LifecycleBinding;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.lifecycle.plan.DirectInvocationModifier;
-import org.apache.maven.lifecycle.plan.LifecyclePlannerException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
@@ -30,23 +27,20 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances
- * to different parts of the three lifecycles: clean, build, and site. Also, handles transcribing
- * these LifecycleBindings instances into lists of MojoBinding's, which can be consumed by the
- * LifecycleExecutor.
+ * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances to different parts
+ * of the three lifecycles: clean, build, and site. Also, handles transcribing these LifecycleBindings instances into
+ * lists of MojoBinding's, which can be consumed by the LifecycleExecutor.
  * 
  * @author jdcasey
- *
+ * 
  */
-public class DefaultLifecycleBindingManager
-    implements LifecycleBindingManager, LogEnabled
+public class DefaultLifecycleBindingManager implements LifecycleBindingManager, LogEnabled
 {
 
     private ActiveMap bindingsByPackaging;
@@ -56,7 +50,7 @@ public class DefaultLifecycleBindingManager
     private PluginLoader pluginLoader;
 
     private MojoBindingFactory mojoBindingFactory;
-    
+
     private LegacyLifecycleMappingParser legacyLifecycleMappingParser;
 
     private Logger logger;
@@ -68,11 +62,10 @@ public class DefaultLifecycleBindingManager
     private List defaultReports;
 
     /**
-     * Retrieve the LifecycleBindings given by the lifecycle mapping component/file for the project's
-     * packaging. Any applicable mojo configuration will be injected into the LifecycleBindings from
-     * the POM.
+     * Retrieve the LifecycleBindings given by the lifecycle mapping component/file for the project's packaging. Any
+     * applicable mojo configuration will be injected into the LifecycleBindings from the POM.
      */
-    public LifecycleBindings getBindingsForPackaging( MavenProject project )
+    public LifecycleBindings getBindingsForPackaging( final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         String packaging = project.getPackaging();
@@ -114,12 +107,11 @@ public class DefaultLifecycleBindingManager
 
     /**
      * Search all plugins configured in the POM that have extensions == true, looking for either a
-     * {@link LifecycleBindingLoader} instance, or a {@link LifecycleMapping} instance that matches
-     * the project's packaging. For the first match found, construct the corresponding LifecycleBindings
-     * instance and return it after POM configurations have been injected into any appropriate
-     * MojoBinding instances contained within.
+     * {@link LifecycleBindingLoader} instance, or a {@link LifecycleMapping} instance that matches the project's
+     * packaging. For the first match found, construct the corresponding LifecycleBindings instance and return it after
+     * POM configurations have been injected into any appropriate MojoBinding instances contained within.
      */
-    private LifecycleBindings searchPluginsWithExtensions( MavenProject project )
+    private LifecycleBindings searchPluginsWithExtensions( final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         List plugins = project.getBuildPlugins();
@@ -136,18 +128,20 @@ public class DefaultLifecycleBindingManager
 
                 try
                 {
-                    loader = (LifecycleBindingLoader) pluginLoader.loadPluginComponent( LifecycleBindingLoader.ROLE, packaging,
-                                                                                        plugin, project );
+                    loader =
+                        (LifecycleBindingLoader) pluginLoader.loadPluginComponent( LifecycleBindingLoader.ROLE,
+                                                                                   packaging, plugin, project );
                 }
                 catch ( ComponentLookupException e )
                 {
                     logger.debug( LifecycleBindingLoader.ROLE + " for packaging: " + packaging
-                        + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: " + e.getMessage(), e );
+                                    + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: "
+                                    + e.getMessage(), e );
                 }
                 catch ( PluginLoaderException e )
                 {
                     throw new LifecycleLoaderException( "Failed to load plugin: " + plugin.getKey() + ". Reason: "
-                        + e.getMessage(), e );
+                                    + e.getMessage(), e );
                 }
 
                 if ( loader != null )
@@ -161,18 +155,20 @@ public class DefaultLifecycleBindingManager
                     LifecycleMapping mapping = null;
                     try
                     {
-                        mapping = (LifecycleMapping) pluginLoader.loadPluginComponent( LifecycleMapping.ROLE, packaging, plugin,
-                                                                                       project );
+                        mapping =
+                            (LifecycleMapping) pluginLoader.loadPluginComponent( LifecycleMapping.ROLE, packaging,
+                                                                                 plugin, project );
                     }
                     catch ( ComponentLookupException e )
                     {
                         logger.debug( LifecycleMapping.ROLE + " for packaging: " + packaging
-                            + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: " + e.getMessage(), e );
+                                        + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: "
+                                        + e.getMessage(), e );
                     }
                     catch ( PluginLoaderException e )
                     {
                         throw new LifecycleLoaderException( "Failed to load plugin: " + plugin.getKey() + ". Reason: "
-                            + e.getMessage(), e );
+                                        + e.getMessage(), e );
                     }
 
                     if ( mapping != null )
@@ -197,11 +193,10 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Construct the LifecycleBindings for the default lifecycle mappings, including injection of 
-     * configuration from the project into each MojoBinding, where appropriate.
+     * Construct the LifecycleBindings for the default lifecycle mappings, including injection of configuration from the
+     * project into each MojoBinding, where appropriate.
      */
-    public LifecycleBindings getDefaultBindings( MavenProject project )
-        throws LifecycleSpecificationException
+    public LifecycleBindings getDefaultBindings( final MavenProject project ) throws LifecycleSpecificationException
     {
         LifecycleBindings bindings = legacyLifecycleMappingParser.parseDefaultMappings( legacyLifecycles );
 
@@ -210,16 +205,15 @@ public class DefaultLifecycleBindingManager
         return bindings;
     }
 
-    public void enableLogging( Logger logger )
+    public void enableLogging( final Logger logger )
     {
         this.logger = logger;
     }
 
     /**
-     * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within
-     * the POM itself.
+     * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within the POM itself.
      */
-    public LifecycleBindings getProjectCustomBindings( MavenProject project )
+    public LifecycleBindings getProjectCustomBindings( final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         String projectId = project.getId();
@@ -245,15 +239,16 @@ public class DefaultLifecycleBindingManager
                         PluginExecution execution = (PluginExecution) execIt.next();
 
                         List goals = execution.getGoals();
-                        if ( goals != null && !goals.isEmpty() )
+                        if ( ( goals != null ) && !goals.isEmpty() )
                         {
                             for ( Iterator goalIterator = goals.iterator(); goalIterator.hasNext(); )
                             {
                                 String goal = (String) goalIterator.next();
-                                
+
                                 if ( goal == null )
                                 {
-                                    logger.warn( "Execution: " + execution.getId() + " in plugin: " + plugin.getKey() + " in the POM has a null goal." );
+                                    logger.warn( "Execution: " + execution.getId() + " in plugin: " + plugin.getKey()
+                                                    + " in the POM has a null goal." );
                                     continue;
                                 }
 
@@ -278,14 +273,15 @@ public class DefaultLifecycleBindingManager
                                         }
                                         catch ( PluginLoaderException e )
                                         {
-                                            throw new LifecycleLoaderException( "Failed to load plugin: " + plugin + ". Reason: "
-                                                + e.getMessage(), e );
+                                            throw new LifecycleLoaderException( "Failed to load plugin: " + plugin
+                                                            + ". Reason: " + e.getMessage(), e );
                                         }
                                     }
-                                    
+
                                     if ( pluginDescriptor.getMojos() == null )
                                     {
-                                        logger.error( "Somehow, the PluginDescriptor for plugin: " + plugin.getKey() + " contains no mojos. This is highly irregular. Ignoring..." );
+                                        logger.error( "Somehow, the PluginDescriptor for plugin: " + plugin.getKey()
+                                                        + " contains no mojos. This is highly irregular. Ignoring..." );
                                         continue;
                                     }
 
@@ -294,8 +290,9 @@ public class DefaultLifecycleBindingManager
 
                                     if ( phase == null )
                                     {
-                                        throw new LifecycleSpecificationException( "No phase specified for goal: " + goal
-                                            + " in plugin: " + plugin.getKey() + " from POM: " + projectId );
+                                        throw new LifecycleSpecificationException( "No phase specified for goal: "
+                                                        + goal + " in plugin: " + plugin.getKey() + " from POM: "
+                                                        + projectId );
                                     }
                                 }
 
@@ -313,12 +310,11 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Construct the LifecycleBindings that constitute the mojos mapped to the lifecycles by an overlay
-     * specified in a plugin. Inject mojo configuration from the POM into all appropriate MojoBinding
-     * instances.
+     * Construct the LifecycleBindings that constitute the mojos mapped to the lifecycles by an overlay specified in a
+     * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
      */
-    public LifecycleBindings getPluginLifecycleOverlay( PluginDescriptor pluginDescriptor, String lifecycleId,
-                                                        MavenProject project )
+    public LifecycleBindings getPluginLifecycleOverlay( final PluginDescriptor pluginDescriptor,
+                                                        final String lifecycleId, final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         Lifecycle lifecycleOverlay = null;
@@ -362,21 +358,21 @@ public class DefaultLifecycleBindingManager
                     // An example of this is the corbertura plugin that needs to call the surefire
                     // plugin in forking mode.
                     //
-                    //<phase>
-                    //  <id>test</id>
-                    //  <executions>
-                    //    <execution>
-                    //      <goals>
-                    //        <goal>org.apache.maven.plugins:maven-surefire-plugin:test</goal>
-                    //      </goals>
-                    //      <configuration>
-                    //        <classesDirectory>${project.build.directory}/generated-classes/cobertura</classesDirectory>
-                    //        <ignoreFailures>true</ignoreFailures>
-                    //        <forkMode>once</forkMode>
-                    //      </configuration>
-                    //    </execution>
-                    //  </executions>
-                    //</phase>
+                    // <phase>
+                    // <id>test</id>
+                    // <executions>
+                    // <execution>
+                    // <goals>
+                    // <goal>org.apache.maven.plugins:maven-surefire-plugin:test</goal>
+                    // </goals>
+                    // <configuration>
+                    // <classesDirectory>${project.build.directory}/generated-classes/cobertura</classesDirectory>
+                    // <ignoreFailures>true</ignoreFailures>
+                    // <forkMode>once</forkMode>
+                    // </configuration>
+                    // </execution>
+                    // </executions>
+                    // </phase>
 
                     // ----------------------------------------------------------------------
                     //
@@ -399,7 +395,8 @@ public class DefaultLifecycleBindingManager
                     Xpp3Dom configuration = (Xpp3Dom) exec.getConfiguration();
                     if ( phase.getConfiguration() != null )
                     {
-                        configuration = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ), configuration );
+                        configuration =
+                            Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ), configuration );
                     }
 
                     binding.setConfiguration( configuration );
@@ -414,15 +411,16 @@ public class DefaultLifecycleBindingManager
             {
                 // Merge in general configuration for a phase.
                 // TODO: this is all kind of backwards from the POMM. Let's align it all under 2.1.
-                //   We should create a new lifecycle executor for modelVersion >5.0.0
+                // We should create a new lifecycle executor for modelVersion >5.0.0
                 // [jdcasey; 08-March-2007] Not sure what the above to-do references...how _should_
                 // this work??
                 for ( Iterator j = phaseBindings.iterator(); j.hasNext(); )
                 {
                     MojoBinding binding = (MojoBinding) j.next();
 
-                    Xpp3Dom configuration = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ),
-                                                                  (Xpp3Dom) binding.getConfiguration() );
+                    Xpp3Dom configuration =
+                        Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ),
+                                              (Xpp3Dom) binding.getConfiguration() );
 
                     binding.setConfiguration( configuration );
                 }
@@ -434,18 +432,17 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Retrieve the list of MojoBinding instances that correspond  to the reports configured for the
-     * specified project. Inject all appropriate configuration from the POM for each MojoBinding, using
-     * the following precedence rules:
+     * Retrieve the list of MojoBinding instances that correspond to the reports configured for the specified project.
+     * Inject all appropriate configuration from the POM for each MojoBinding, using the following precedence rules:
      * <br/>
      * <ol>
-     *   <li>report-set-level configuration</li>
-     *   <li>reporting-level configuration</li>
-     *   <li>execution-level configuration</li>
-     *   <li>plugin-level configuration</li>
+     * <li>report-set-level configuration</li>
+     * <li>reporting-level configuration</li>
+     * <li>execution-level configuration</li>
+     * <li>plugin-level configuration</li>
      * </ol>
      */
-    public List getReportBindings( MavenProject project )
+    public List getReportBindings( final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         if ( project.getModel().getReports() != null )
@@ -464,7 +461,7 @@ public class DefaultLifecycleBindingManager
 
                 List reportSets = reportPlugin.getReportSets();
 
-                if ( reportSets == null || reportSets.isEmpty() )
+                if ( ( reportSets == null ) || reportSets.isEmpty() )
                 {
                     reports.addAll( getReportsForPlugin( reportPlugin, null, project ) );
                 }
@@ -485,11 +482,11 @@ public class DefaultLifecycleBindingManager
     /**
      * Retrieve the ReportPlugin instances referenced in the specified POM.
      */
-    private List getReportPluginsForProject( MavenProject project )
+    private List getReportPluginsForProject( final MavenProject project )
     {
         List reportPlugins = project.getReportPlugins();
 
-        if ( project.getReporting() == null || !project.getReporting().isExcludeDefaults() )
+        if ( ( project.getReporting() == null ) || !project.getReporting().isExcludeDefaults() )
         {
             if ( reportPlugins == null )
             {
@@ -518,7 +515,8 @@ public class DefaultLifecycleBindingManager
                     for ( Iterator j = reportPlugins.iterator(); j.hasNext() && !found; )
                     {
                         ReportPlugin reportPlugin = (ReportPlugin) j.next();
-                        if ( reportPlugin.getGroupId().equals( groupId ) && reportPlugin.getArtifactId().equals( artifactId ) )
+                        if ( reportPlugin.getGroupId().equals( groupId )
+                                        && reportPlugin.getArtifactId().equals( artifactId ) )
                         {
                             found = true;
                         }
@@ -541,8 +539,8 @@ public class DefaultLifecycleBindingManager
     /**
      * Retrieve any reports from the specified ReportPlugin which are referenced in the specified POM.
      */
-    private List getReportsForPlugin( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project )
-        throws LifecycleLoaderException
+    private List getReportsForPlugin( final ReportPlugin reportPlugin, final ReportSet reportSet,
+                                      final MavenProject project ) throws LifecycleLoaderException
     {
         PluginDescriptor pluginDescriptor;
         try
@@ -552,7 +550,7 @@ public class DefaultLifecycleBindingManager
         catch ( PluginLoaderException e )
         {
             throw new LifecycleLoaderException( "Failed to load report plugin: " + reportPlugin.getKey() + ". Reason: "
-                + e.getMessage(), e );
+                            + e.getMessage(), e );
         }
 
         String pluginKey = BindingUtils.createPluginKey( reportPlugin.getGroupId(), reportPlugin.getArtifactId() );
@@ -565,7 +563,7 @@ public class DefaultLifecycleBindingManager
 
             // TODO: check ID is correct for reports
             // if the POM configured no reports, give all from plugin
-            if ( reportSet == null || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
+            if ( ( reportSet == null ) || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
             {
                 String id = null;
                 if ( reportSet != null )
@@ -589,7 +587,7 @@ public class DefaultLifecycleBindingManager
                     plugin.setGroupId( pluginDescriptor.getGroupId() );
                     plugin.setArtifactId( pluginDescriptor.getArtifactId() );
                 }
-                
+
                 BindingUtils.injectPluginManagementInfo( plugin, project );
 
                 Map execMap = plugin.getExecutionsAsMap();
@@ -609,128 +607,6 @@ public class DefaultLifecycleBindingManager
             }
         }
         return reports;
-    }
-
-    /**
-     * Determine whether the first list contains all of the same MojoBinding instances, in the same
-     * order, starting at index zero, as the second list. If so, it is either a perfect super-list
-     * or an equal list, and return true. Return false otherwise.
-     */
-    private static boolean isSameOrSuperListOfMojoBindings( List superCandidate, List check )
-    {
-        if ( superCandidate == null || check == null )
-        {
-            return false;
-        }
-
-        if ( superCandidate.size() < check.size() )
-        {
-            return false;
-        }
-
-        List superKeys = new ArrayList( superCandidate.size() );
-        for ( Iterator it = superCandidate.iterator(); it.hasNext(); )
-        {
-            MojoBinding binding = (MojoBinding) it.next();
-
-            superKeys.add( LifecycleUtils.createMojoBindingKey( binding, true ) );
-        }
-
-        List checkKeys = new ArrayList( check.size() );
-        for ( Iterator it = check.iterator(); it.hasNext(); )
-        {
-            MojoBinding binding = (MojoBinding) it.next();
-
-            checkKeys.add( LifecycleUtils.createMojoBindingKey( binding, true ) );
-        }
-
-        return superKeys.subList( 0, checkKeys.size() ).equals( checkKeys );
-    }
-
-    /**
-     * Traverse the specified LifecycleBindings instance for all of the specified tasks. If the task
-     * is found to be a phase name, construct the list of all MojoBindings that lead up to that phase
-     * in that lifecycle, and add them to the master MojoBinding list. If the task is not a phase name,
-     * treat it as a direct mojo invocation, parse it into a MojoBinding (resolving the plugin prefix
-     * first if necessary), and add it to the master MojoBinding list. Finally, return the master list.
-     */
-    public List assembleMojoBindingList( List tasks, LifecycleBindings bindings, MavenProject project )
-        throws LifecycleSpecificationException, LifecyclePlannerException, LifecycleLoaderException
-    {
-        return assembleMojoBindingList( tasks, bindings, Collections.EMPTY_MAP, project );
-    }
-
-    /**
-     * Traverse the specified LifecycleBindings instance for all of the specified tasks. If the task
-     * is found to be a phase name, construct the list of all MojoBindings that lead up to that phase
-     * in that lifecycle, and add them to the master MojoBinding list. If the task is not a phase name,
-     * treat it as a direct mojo invocation, parse it into a MojoBinding (resolving the plugin prefix
-     * first if necessary), and add it to the master MojoBinding list.
-     * 
-     * Then, iterate through all MojoBindings in the master list, and for each one that maps to an 
-     * entry in directInvocationModifiers, substitute the resultant MojoBinding list from that 
-     * modifier in place of the original MojoBinding.
-     * 
-     * Finally, return the modified master list.
-     */
-    public List assembleMojoBindingList( List tasks, LifecycleBindings lifecycleBindings, Map directInvocationModifiers,
-                                                MavenProject project )
-        throws LifecycleSpecificationException, LifecyclePlannerException, LifecycleLoaderException
-    {
-        List planBindings = new ArrayList();
-
-        List lastMojoBindings = null;
-        for ( Iterator it = tasks.iterator(); it.hasNext(); )
-        {
-            String task = (String) it.next();
-
-            LifecycleBinding binding = LifecycleUtils.findLifecycleBindingForPhase( task, lifecycleBindings );
-            if ( binding != null )
-            {
-                List mojoBindings = LifecycleUtils.getMojoBindingListForLifecycle( task, binding );
-
-                // save these so we can reference the originals...
-                List originalMojoBindings = mojoBindings;
-
-                // if these mojo bindings are a superset of the last bindings, only add the difference.
-                if ( isSameOrSuperListOfMojoBindings( mojoBindings, lastMojoBindings ) )
-                {
-                    List revised = new ArrayList( mojoBindings );
-                    revised.removeAll( lastMojoBindings );
-
-                    if ( revised.isEmpty() )
-                    {
-                        continue;
-                    }
-
-                    mojoBindings = revised;
-                }
-
-                planBindings.addAll( mojoBindings );
-                lastMojoBindings = originalMojoBindings;
-            }
-            else
-            {
-                MojoBinding mojoBinding = mojoBindingFactory.parseMojoBinding( task, project, true );
-                BindingUtils.injectProjectConfiguration( mojoBinding, project );
-
-                mojoBinding.setOrigin( "direct invocation" );
-
-                String key = LifecycleUtils.createMojoBindingKey( mojoBinding, true );
-                DirectInvocationModifier modifier = (DirectInvocationModifier) directInvocationModifiers.get( key );
-
-                if ( modifier != null )
-                {
-                    planBindings.addAll( modifier.getModifiedBindings( project, this ) );
-                }
-                else
-                {
-                    planBindings.add( mojoBinding );
-                }
-            }
-        }
-
-        return planBindings;
     }
 
 }

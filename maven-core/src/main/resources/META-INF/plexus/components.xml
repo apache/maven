@@ -267,9 +267,6 @@ under the License.
           <role>org.apache.maven.context.BuildContextManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.plugin.loader.PluginLoader</role>
         </requirement>
         <requirement>

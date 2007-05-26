@@ -113,5 +113,73 @@
         <forkId implementation="int" default-value="-1">${forkId}</forkId>
       </configuration>
     </mojo>
+    <mojo>
+      <goal>resolve-plugin</goal>
+      <description>Resolve a late-bound plugin during a build, right before it is to be used.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>org.apache.maven.lifecycle.statemgmt.ResolveLateBoundPluginMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenProject instance, for building a new MojoBinding instance.</description>
+        </parameter>
+        <parameter>
+          <name>groupId</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The plugin's groupId.</description>
+        </parameter>
+        <parameter>
+          <name>artifactId</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The plugin's artifactId.</description>
+        </parameter>
+        <parameter>
+          <name>version</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The plugin's version.</description>
+        </parameter>
+        <parameter>
+          <name>gaol</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The mojo's goal that we're looking for, as an extra validation step.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <groupId implementation="java.lang.String">${groupId}</groupId>
+        <artifactId implementation="java.lang.String">${artifactId}</artifactId>
+        <version implementation="java.lang.String">${version}</version>
+        <goal implementation="java.lang.String">${goal}</goal>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+          <field-name>pluginLoader</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
+          <field-name>bindingFactory</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
   </mojos>
 </plugin>
