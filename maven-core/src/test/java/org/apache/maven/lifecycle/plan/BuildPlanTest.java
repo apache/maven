@@ -45,7 +45,7 @@ public class BuildPlanTest
 
         check.add( mb );
 
-        check.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
+        check.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
 
         binding.getGenerateSources().addBinding( mb );
 
@@ -62,7 +62,7 @@ public class BuildPlanTest
 
         check.add( eclipseBinding );
 
-        check.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
+        check.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
 
         BuildPlan plan = new BuildPlan( new LifecycleBindings(), tasks );
 

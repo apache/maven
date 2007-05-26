@@ -256,14 +256,14 @@ public class BuildPlan
                 {
                     bindings.add( StateManagementUtils.createStartForkedExecutionMojoBinding() );
                     bindings.addAll( forkedBindings );
-                    bindings.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
+                    bindings.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
                 }
 
                 bindings.add( mojoBinding );
 
                 if ( !forkedBindings.isEmpty() )
                 {
-                    bindings.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
+                    bindings.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
                 }
             }
             else
