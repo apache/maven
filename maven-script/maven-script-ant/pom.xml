@@ -48,7 +48,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-ant-factory</artifactId>
-      <version>1.0-alpha-4-SNAPSHOT</version>
+      <version>1.0-alpha-4</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -60,14 +60,4 @@ under the License.
       <version>1.0-alpha-8</version>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>codehaus-snapshots</id>
-      <name>Codehaus Snapshot Development Repository</name>
-      <url>http://snapshots.repository.codehaus.org/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
 </project>
