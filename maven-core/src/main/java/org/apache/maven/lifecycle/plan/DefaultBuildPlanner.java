@@ -171,7 +171,7 @@ public class DefaultBuildPlanner
 
                         if ( pd != null )
                         {
-                            findForkModifiers( reportBinding, pluginDescriptor, plan, project );
+                            findForkModifiers( reportBinding, pd, plan, project );
                         }
                     }
                 }
@@ -223,6 +223,12 @@ public class DefaultBuildPlanner
         String referencingGoal = mojoBinding.getGoal();
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( referencingGoal );
+
+        if ( mojoDescriptor == null )
+        {
+            throw new LifecyclePlannerException( "Cannot find mojo descriptor for: " + referencingGoal + " in plugin: "
+                                                 + pluginDescriptor.getId() );
+        }
 
         if ( mojoDescriptor.getExecuteGoal() != null )
         {
