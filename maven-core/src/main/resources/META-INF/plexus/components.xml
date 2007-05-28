@@ -126,12 +126,6 @@ under the License.
       </requirements>
     </component>
 
-    <!-- Duplicated from Maven core as it is used in the plugin manager -->
-    <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
-    </component>
-    
     <component>
       <role>org.apache.maven.Maven</role>
       <implementation>org.apache.maven.DefaultMaven</implementation>
