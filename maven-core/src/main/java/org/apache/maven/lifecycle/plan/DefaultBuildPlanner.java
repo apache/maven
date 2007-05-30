@@ -71,6 +71,7 @@ public class DefaultBuildPlanner
         throws LifecycleSpecificationException, LifecycleLoaderException
     {
         List tasks = plan.getTasks();
+
         for ( Iterator it = tasks.iterator(); it.hasNext(); )
         {
             String task = (String) it.next();

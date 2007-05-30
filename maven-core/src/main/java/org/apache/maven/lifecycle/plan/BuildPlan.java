@@ -155,7 +155,8 @@ public class BuildPlan
                 List newRendered = new ArrayList( bindingsToAdd );
 
                 // if we've already executed part of the lifecycle, just continue with the new bindings.
-                if ( ( renderedLifecycleMojos != null ) && ( renderedLifecycleMojos.size() < bindingsToAdd.size() ) )
+                if ( ( renderedLifecycleMojos != null ) && ( renderedLifecycleMojos.size() < bindingsToAdd.size() )
+                     && bindingsToAdd.containsAll( renderedLifecycleMojos ) )
                 {
                     bindingsToAdd = bindingsToAdd.subList( renderedLifecycleMojos.size(), bindingsToAdd.size() );
                 }

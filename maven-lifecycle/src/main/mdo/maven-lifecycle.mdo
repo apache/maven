@@ -564,6 +564,7 @@
         <field>
           <name>groupId</name>
           <required>true</required>
+          <identifier>true</identifier>
           <version>1.0.0</version>
           <description>Plugin's groupId.</description>
           <type>String</type>
@@ -571,6 +572,7 @@
         <field>
           <name>artifactId</name>
           <required>true</required>
+          <identifier>true</identifier>
           <version>1.0.0</version>
           <description>Plugin's artifactId.</description>
           <type>String</type>
@@ -585,6 +587,7 @@
         <field>
           <name>goal</name>
           <required>true</required>
+          <identifier>true</identifier>
           <version>1.0.0</version>
           <description>Mojo's goal name.</description>
           <type>String</type>
@@ -592,6 +595,7 @@
         <field>
           <name>executionId</name>
           <version>1.0.0</version>
+          <identifier>true</identifier>
           <defaultValue>default</defaultValue>
           <description>A name for this mojo binding, for purposes of merging configurations via inheritance, etc.</description>
           <type>String</type>
@@ -615,6 +619,7 @@
           <type>boolean</type>
         </field>
       </fields>
+<!-- 
       <codeSegments>
         <codeSegment>
           <version>1.0.0</version>
@@ -627,6 +632,7 @@
           ]]></code>
         </codeSegment>
       </codeSegments>
+ -->
     </class>
   </classes>
 </model>
