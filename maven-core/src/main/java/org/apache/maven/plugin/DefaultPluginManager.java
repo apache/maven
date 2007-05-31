@@ -384,25 +384,10 @@ public class DefaultPluginManager
         // POM), we need to undo this somehow.
         ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
 
-        getLogger().debug( "Realm for " + projectPlugin.getKey() + " is: " + pluginRealm );
-
         if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
         {
             getLogger().debug( "Realm already exists for: " + projectPlugin.getKey() + ". Skipping addition..." );
             // we've already discovered this plugin, and configured it, so skip it this time.
-
-//            StringBuffer debugMessage = new StringBuffer();
-//            debugMessage.append( "Realm for plugin: " ).append( projectPlugin.getKey() );
-//            debugMessage.append( " with classpath:\n" ).append( String.valueOf( Arrays.asList( pluginRealm.getURLs() ) ).replace( ',', '\n' ) );
-//            debugMessage.append( "\nClass realm is: " )
-//                        .append( pluginRealm.getId() )
-//                        .append( " with parent: " )
-//                        .append( pluginRealm.getParentRealm().getId() );
-//            debugMessage.append( "\nParent classpath:\n" )
-//                        .append(
-//                                 String.valueOf( Arrays.asList( pluginRealm.getParentRealm().getURLs() ) )
-//                                       .replace( ',', '\n' ) );
-//            getLogger().debug( debugMessage.toString() );
 
             return;
         }
@@ -433,19 +418,6 @@ public class DefaultPluginManager
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
             componentRealm.importFrom( componentRealm.getParentRealm().getId(), Xpp3Dom.class.getName() );
-
-//            StringBuffer debugMessage = new StringBuffer();
-//            debugMessage.append( "Creating realm for plugin: " ).append( projectPlugin.getKey() );
-//            debugMessage.append( " with classpath:\n" ).append( String.valueOf( jars ).replace( ',', '\n' ) );
-//            debugMessage.append( "\nClass realm is: " )
-//                        .append( componentRealm.getId() )
-//                        .append( " with parent: " )
-//                        .append( componentRealm.getParentRealm().getId() );
-//            debugMessage.append( "\nParent classpath:\n" )
-//                        .append(
-//                                 String.valueOf( Arrays.asList( componentRealm.getParentRealm().getURLs() ) )
-//                                       .replace( ',', '\n' ) );
-//            getLogger().debug( debugMessage.toString() );
         }
         catch ( PlexusContainerException e )
         {
