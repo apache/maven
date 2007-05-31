@@ -157,6 +157,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
+        suite.addTestSuite( MavenIT0120EjbClientDependency.class );
         // not fixed yet
         //suite.addTestSuite( MavenIT0120EjbClientDependency.class );
         return suite;
