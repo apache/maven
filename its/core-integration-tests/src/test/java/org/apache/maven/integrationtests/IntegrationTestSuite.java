@@ -154,6 +154,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
+        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         // not fixed yet
