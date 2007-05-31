@@ -19,7 +19,7 @@ package org.apache.maven.its.it0120;
  * under the License.
  */
 
-import org.apache.maven.its.it0119.Component;
+import org.apache.maven.its.it0120.Component;
 
 public class MyClient
 {
