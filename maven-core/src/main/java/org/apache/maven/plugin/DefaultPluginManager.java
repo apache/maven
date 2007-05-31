@@ -66,6 +66,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
@@ -97,13 +98,13 @@ public class DefaultPluginManager
     implements PluginManager, Contextualizable
 {
     private static final List RESERVED_GROUP_IDS;
-    
+
     static
     {
         List rgids = new ArrayList();
-        
+
         rgids.add( StateManagementUtils.GROUP_ID );
-        
+
         RESERVED_GROUP_IDS = rgids;
     }
 
@@ -162,9 +163,9 @@ public class DefaultPluginManager
                                                  project.getPluginArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
-    
+
     /**
-     * @deprecated 
+     * @deprecated
      */
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                           ArtifactRepository localRepository )
@@ -257,7 +258,7 @@ public class DefaultPluginManager
             else
             {
                 getLogger().debug( "Skipping resolution for Maven built-in plugin: " + plugin.getKey() );
-                
+
                 PluginDescriptor pd = pluginCollector.getPluginDescriptor( plugin );
                 pd.setClassRealm( container.getContainerRealm() );
             }
@@ -272,7 +273,7 @@ public class DefaultPluginManager
 
             String version = plugin.getVersion();
 
-            if ( groupId == null || artifactId == null || version == null )
+            if ( ( groupId == null ) || ( artifactId == null ) || ( version == null ) )
             {
                 throw new PluginNotFoundException( e );
             }
@@ -288,7 +289,7 @@ public class DefaultPluginManager
         }
 
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
-        
+
         return pluginDescriptor;
     }
 
@@ -308,7 +309,7 @@ public class DefaultPluginManager
             MavenProject project =
                 mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, false );
             // if we don't have the required Maven version, then ignore an update
-            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
+            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
                 DefaultArtifactVersion requiredVersion =
                     new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
@@ -383,10 +384,26 @@ public class DefaultPluginManager
         // POM), we need to undo this somehow.
         ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
 
-        if ( pluginRealm != null && pluginRealm != container.getContainerRealm() )
+        getLogger().debug( "Realm for " + projectPlugin.getKey() + " is: " + pluginRealm );
+
+        if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
         {
             getLogger().debug( "Realm already exists for: " + projectPlugin.getKey() + ". Skipping addition..." );
             // we've already discovered this plugin, and configured it, so skip it this time.
+
+//            StringBuffer debugMessage = new StringBuffer();
+//            debugMessage.append( "Realm for plugin: " ).append( projectPlugin.getKey() );
+//            debugMessage.append( " with classpath:\n" ).append( String.valueOf( Arrays.asList( pluginRealm.getURLs() ) ).replace( ',', '\n' ) );
+//            debugMessage.append( "\nClass realm is: " )
+//                        .append( pluginRealm.getId() )
+//                        .append( " with parent: " )
+//                        .append( pluginRealm.getParentRealm().getId() );
+//            debugMessage.append( "\nParent classpath:\n" )
+//                        .append(
+//                                 String.valueOf( Arrays.asList( pluginRealm.getParentRealm().getURLs() ) )
+//                                       .replace( ',', '\n' ) );
+//            getLogger().debug( debugMessage.toString() );
+
             return;
         }
 
@@ -412,10 +429,32 @@ public class DefaultPluginManager
             // Now here we need the artifact coreArtifactFilter stuff
 
             componentRealm = container.createComponentRealm( projectPlugin.getKey(), jars );
+
+            // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
+            // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
+            getLogger().info( "\n\n\n\n***** Adding import for " + Xpp3Dom.class.getName() + "\nPlugin: " + projectPlugin.getKey() + " *****\n\n\n\n" );
+            componentRealm.importFrom( componentRealm.getParentRealm().getId(), Xpp3Dom.class.getName() );
+
+//            StringBuffer debugMessage = new StringBuffer();
+//            debugMessage.append( "Creating realm for plugin: " ).append( projectPlugin.getKey() );
+//            debugMessage.append( " with classpath:\n" ).append( String.valueOf( jars ).replace( ',', '\n' ) );
+//            debugMessage.append( "\nClass realm is: " )
+//                        .append( componentRealm.getId() )
+//                        .append( " with parent: " )
+//                        .append( componentRealm.getParentRealm().getId() );
+//            debugMessage.append( "\nParent classpath:\n" )
+//                        .append(
+//                                 String.valueOf( Arrays.asList( componentRealm.getParentRealm().getURLs() ) )
+//                                       .replace( ',', '\n' ) );
+//            getLogger().debug( debugMessage.toString() );
         }
         catch ( PlexusContainerException e )
         {
             throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin + ".", e );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            throw new PluginManagerException( "Failed to import Xpp3Dom from parent realm for plugin: '" + projectPlugin + ".", e );
         }
 
         // ----------------------------------------------------------------------------
@@ -478,7 +517,7 @@ public class DefaultPluginManager
                 pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
         }
 
-        checkPlexusUtils( resolutionGroup, artifactFactory );        
+        checkPlexusUtils( resolutionGroup, artifactFactory );
 
         Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
 
@@ -605,13 +644,13 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        Xpp3Dom dom = (Xpp3Dom) mojoExecution.getConfiguration();
+        Xpp3Dom dom = mojoExecution.getConfiguration();
         if ( dom != null )
         {
             // make a defensive copy, to keep things from getting polluted.
             dom = new Xpp3Dom( dom );
         }
-        
+
         plugin = getConfiguredMojo( session, dom, project, false, mojoExecution );
 
         // Event monitoring.
@@ -641,7 +680,7 @@ public class DefaultPluginManager
             ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
 
             plugin.execute();
-            
+
             // NEW: If the mojo that just executed is a report, store it in the LifecycleExecutionContext
             // for reference by future mojos.
             if ( plugin instanceof MavenReport )
@@ -651,11 +690,11 @@ public class DefaultPluginManager
                 {
                     ctx = new LifecycleExecutionContext( project );
                 }
-                
+
                 ctx.addReport( mojoDescriptor, (MavenReport) plugin );
                 ctx.store( buildContextManager );
             }
-            
+
             container.setLookupRealm( oldRealm );
 
             dispatcher.dispatchEnd( event, goalExecId );
@@ -759,9 +798,13 @@ public class DefaultPluginManager
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
 
                 if ( plugin != null )
-                getLogger().debug( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
-                else// not needed i guess.
+                {
+                    getLogger().debug( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                }
+                else
+                {
                     getLogger().warn("No luck.");
+                }
 
                 container.setLookupRealm( oldRealm );
             }
@@ -772,9 +815,13 @@ public class DefaultPluginManager
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
 
                 if ( plugin != null )
-                getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
-                else// not needed i guess.
+                {
+                    getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                }
+                else
+                {
                     getLogger().warn("No luck.");
+                }
 
             }
 
@@ -816,7 +863,7 @@ public class DefaultPluginManager
         {
             pomConfiguration = new XmlPlexusConfiguration( dom );
         }
-        
+
         // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
         // override in the POM.
         validatePomConfiguration( mojoDescriptor, pomConfiguration );
@@ -827,14 +874,14 @@ public class DefaultPluginManager
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
-        // NEW: Pass in the LifecycleExecutionContext so we have access to the current project, 
+        // NEW: Pass in the LifecycleExecutionContext so we have access to the current project,
         // forked project stack (future), and reports.
         LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
         if ( ctx == null )
         {
             ctx = new LifecycleExecutionContext( project );
         }
-        
+
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution, pathTranslator,
                                                                                           ctx, getLogger(),
                                                                                           session.getExecutionProperties() );
@@ -922,7 +969,7 @@ public class DefaultPluginManager
                         }
                     }
 
-                    if ( fieldValue == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                    if ( ( fieldValue == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
                     {
                         value = configuration.getChild( parameter.getAlias(), false );
                         if ( value != null )
@@ -942,7 +989,7 @@ public class DefaultPluginManager
                 }
 
                 // only mark as invalid if there are no child nodes
-                if ( fieldValue == null && ( value == null || value.getChildCount() == 0 ) )
+                if ( ( fieldValue == null ) && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
                 {
                     parameter.setExpression( expression );
                     invalidParameters.add( parameter );
@@ -976,7 +1023,7 @@ public class DefaultPluginManager
 
             PlexusConfiguration value = pomConfiguration.getChild( key, false );
 
-            if ( value == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+            if ( ( value == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
             {
                 key = parameter.getAlias();
                 value = pomConfiguration.getChild( key, false );
@@ -1050,20 +1097,20 @@ public class DefaultPluginManager
                 {
                     pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
 
-                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || pomConfig.getChildCount() > 0 )
+                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || ( pomConfig.getChildCount() > 0 ) )
                     {
                         toAdd = pomConfig;
                     }
                 }
 
-                if ( toAdd == null && mojoConfig != null )
+                if ( ( toAdd == null ) && ( mojoConfig != null ) )
                 {
                     toAdd = copyConfiguration( mojoConfig );
                 }
 
                 if ( toAdd != null )
                 {
-                    if ( implementation != null && toAdd.getAttribute( "implementation", null ) == null )
+                    if ( ( implementation != null ) && ( toAdd.getAttribute( "implementation", null ) == null ) )
                     {
 
                         XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
@@ -1087,7 +1134,7 @@ public class DefaultPluginManager
 
         String value = dominant.getValue( null );
 
-        if ( StringUtils.isEmpty( value ) && recessive != null )
+        if ( StringUtils.isEmpty( value ) && ( recessive != null ) )
         {
             value = recessive.getValue( null );
         }
@@ -1390,5 +1437,5 @@ public class DefaultPluginManager
                                                                                 "plexus-utils", "1.1",
                                                                                 Artifact.SCOPE_RUNTIME, "jar" ) );
         }
-    }    
+    }
 }
