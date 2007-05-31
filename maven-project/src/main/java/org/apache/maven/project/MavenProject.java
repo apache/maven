@@ -1657,7 +1657,9 @@ public class MavenProject
                             at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:115)
                             at org.apache.maven.cli.MavenCli.main(MavenCli.java:256)
                         */
-                        return ArtifactUtils.copyArtifact(attached);
+                        Artifact resultArtifact=ArtifactUtils.copyArtifact(attached);
+                        resultArtifact.setScope(pluginArtifact.getScope());
+                        return resultArtifact;
                     }
                 }
             }
