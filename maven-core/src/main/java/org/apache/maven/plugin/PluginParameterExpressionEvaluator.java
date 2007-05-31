@@ -106,6 +106,11 @@ public class PluginParameterExpressionEvaluator
             }
         }
 
+        if ( basedir == null && context != null )
+        {
+            basedir = context.getExecutionRootDirectory();
+        }
+
         if ( basedir == null )
         {
             basedir = System.getProperty( "user.dir" );
@@ -403,6 +408,10 @@ public class PluginParameterExpressionEvaluator
         if ( project != null && project.getFile() != null )
         {
             basedir = project.getFile().getParentFile();
+        }
+        else if ( context != null && context.getExecutionRootDirectory() != null )
+        {
+            basedir = new File( context.getExecutionRootDirectory() ).getAbsoluteFile();
         }
         else
         {
