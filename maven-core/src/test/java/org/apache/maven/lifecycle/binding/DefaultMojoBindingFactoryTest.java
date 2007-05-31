@@ -12,11 +12,11 @@ public class DefaultMojoBindingFactoryTest
 {
 
     private MojoBindingFactory factory;
-    
+
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         factory = (MojoBindingFactory) lookup( MojoBindingFactory.ROLE, "default" );
     }
 
@@ -27,7 +27,7 @@ public class DefaultMojoBindingFactoryTest
 
         try
         {
-            factory.parseMojoBinding( spec, new MavenProject( new Model() ), false );
+            factory.parseMojoBinding( spec, new MavenProject( new Model() ), false, false );
 
             fail( "Should fail when prefix references are not allowed." );
         }
@@ -42,7 +42,7 @@ public class DefaultMojoBindingFactoryTest
     {
         String spec = "group:artifact:goal";
 
-        MojoBinding binding = factory.parseMojoBinding( spec, new MavenProject( new Model() ), false );
+        MojoBinding binding = factory.parseMojoBinding( spec, new MavenProject( new Model() ), false, false );
 
         assertEquals( "group", binding.getGroupId() );
         assertEquals( "artifact", binding.getArtifactId() );
@@ -55,7 +55,7 @@ public class DefaultMojoBindingFactoryTest
     {
         String spec = "group:artifact:version:goal";
 
-        MojoBinding binding = factory.parseMojoBinding( spec, new MavenProject( new Model() ), false );
+        MojoBinding binding = factory.parseMojoBinding( spec, new MavenProject( new Model() ), false, false );
 
         assertEquals( "group", binding.getGroupId() );
         assertEquals( "artifact", binding.getArtifactId() );
@@ -70,7 +70,7 @@ public class DefaultMojoBindingFactoryTest
 
         try
         {
-            factory.parseMojoBinding( spec, new MavenProject( new Model() ), false );
+            factory.parseMojoBinding( spec, new MavenProject( new Model() ), false, false );
 
             fail( "Should fail because spec has too many parts (type part is not allowed)." );
         }

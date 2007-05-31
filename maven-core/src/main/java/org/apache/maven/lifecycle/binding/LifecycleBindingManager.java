@@ -12,9 +12,9 @@ import java.util.List;
  * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances to different parts
  * of the three lifecycles: clean, build, and site. Also, handles transcribing these LifecycleBindings instances into
  * lists of MojoBinding's, which can be consumed by the LifecycleExecutor.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public interface LifecycleBindingManager
 {
@@ -45,7 +45,7 @@ public interface LifecycleBindingManager
      * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
      */
     LifecycleBindings getPluginLifecycleOverlay( PluginDescriptor pluginDescriptor, String lifecycleId,
-                                                 MavenProject project )
+                                                 MavenProject project, boolean includeReportConfig )
         throws LifecycleLoaderException, LifecycleSpecificationException;
 
     /**

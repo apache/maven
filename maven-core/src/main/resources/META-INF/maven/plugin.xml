@@ -162,6 +162,13 @@
           <editable>true</editable>
           <description>The mojo's goal that we're looking for, as an extra validation step.</description>
         </parameter>
+        <parameter>
+          <name>includeReportConfig</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether the mojo should include plugin-configuration from the reporting section.</description>
+        </parameter>
       </parameters>
       <configuration>
         <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
@@ -169,6 +176,7 @@
         <artifactId implementation="java.lang.String">${artifactId}</artifactId>
         <version implementation="java.lang.String">${version}</version>
         <goal implementation="java.lang.String">${goal}</goal>
+        <includeReportConfig>false</includeReportConfig>
       </configuration>
       <requirements>
         <requirement>

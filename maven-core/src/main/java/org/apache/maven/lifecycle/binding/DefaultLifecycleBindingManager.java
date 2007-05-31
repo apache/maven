@@ -18,6 +18,8 @@ import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.collections.ActiveMap;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -29,18 +31,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
  * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances to different parts
  * of the three lifecycles: clean, build, and site. Also, handles transcribing these LifecycleBindings instances into
  * lists of MojoBinding's, which can be consumed by the LifecycleExecutor.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
-public class DefaultLifecycleBindingManager implements LifecycleBindingManager, LogEnabled
+public class DefaultLifecycleBindingManager
+    implements LifecycleBindingManager, LogEnabled
 {
 
     private ActiveMap bindingsByPackaging;
@@ -314,7 +316,8 @@ public class DefaultLifecycleBindingManager implements LifecycleBindingManager, 
      * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
      */
     public LifecycleBindings getPluginLifecycleOverlay( final PluginDescriptor pluginDescriptor,
-                                                        final String lifecycleId, final MavenProject project )
+                                                        final String lifecycleId, final MavenProject project,
+                                                        final boolean includeReportConfig )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         Lifecycle lifecycleOverlay = null;
@@ -381,7 +384,7 @@ public class DefaultLifecycleBindingManager implements LifecycleBindingManager, 
                     MojoBinding binding;
                     if ( goal.indexOf( ":" ) > 0 )
                     {
-                        binding = mojoBindingFactory.parseMojoBinding( goal, project, false );
+                        binding = mojoBindingFactory.parseMojoBinding( goal, project, false, includeReportConfig );
                     }
                     else
                     {
@@ -447,7 +450,7 @@ public class DefaultLifecycleBindingManager implements LifecycleBindingManager, 
     {
         if ( project.getModel().getReports() != null )
         {
-            logger.error( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+            logger.warn( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
 
         List reportPlugins = getReportPluginsForProject( project );
@@ -553,13 +556,24 @@ public class DefaultLifecycleBindingManager implements LifecycleBindingManager, 
                             + e.getMessage(), e );
         }
 
-        String pluginKey = BindingUtils.createPluginKey( reportPlugin.getGroupId(), reportPlugin.getArtifactId() );
-        Plugin plugin = (Plugin) BindingUtils.buildPluginMap( project ).get( pluginKey );
-
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
+
+
+            // FIXME: Can't we be smarter about what is and what is not a report???
+            try
+            {
+                if ( !isReport( mojoDescriptor ) )
+                {
+                    continue;
+                }
+            }
+            catch ( ClassNotFoundException e )
+            {
+                throw new LifecycleLoaderException( "Failed while verifying that mojo: " + mojoDescriptor.getId() + " is a report mojo. Reason: " + e.getMessage(), e );
+            }
 
             // TODO: check ID is correct for reports
             // if the POM configured no reports, give all from plugin
@@ -579,34 +593,24 @@ public class DefaultLifecycleBindingManager implements LifecycleBindingManager, 
                 binding.setExecutionId( id );
                 binding.setOrigin( "POM" );
 
-                Object reportConfig = BindingUtils.mergeConfigurations( reportPlugin, reportSet );
-
-                if ( plugin == null )
-                {
-                    plugin = new Plugin();
-                    plugin.setGroupId( pluginDescriptor.getGroupId() );
-                    plugin.setArtifactId( pluginDescriptor.getArtifactId() );
-                }
-
-                BindingUtils.injectPluginManagementInfo( plugin, project );
-
-                Map execMap = plugin.getExecutionsAsMap();
-                PluginExecution exec = (PluginExecution) execMap.get( id );
-
-                Object pluginConfig = plugin.getConfiguration();
-                if ( exec != null )
-                {
-                    pluginConfig = BindingUtils.mergeConfigurations( plugin, exec );
-                }
-
-                reportConfig = BindingUtils.mergeRawConfigurations( reportConfig, pluginConfig );
-
-                binding.setConfiguration( reportConfig );
+                BindingUtils.injectProjectConfiguration( binding, project, true );
 
                 reports.add( binding );
             }
         }
         return reports;
+    }
+
+    private boolean isReport( MojoDescriptor mojoDescriptor )
+        throws ClassNotFoundException
+    {
+        ClassRealm classRealm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+        String impl = mojoDescriptor.getImplementation();
+
+        Class mojoClass = classRealm.loadClass( impl );
+        Class reportClass = classRealm.loadClass( MavenReport.class.getName() );
+
+        return reportClass.isAssignableFrom( mojoClass );
     }
 
 }

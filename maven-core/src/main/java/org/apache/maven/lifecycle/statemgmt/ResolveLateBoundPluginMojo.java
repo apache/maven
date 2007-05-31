@@ -28,13 +28,15 @@ public class ResolveLateBoundPluginMojo extends AbstractMojo
 
     private String goal;
 
+    private boolean includeReportConfig = false;
+
     private MavenProject project;
 
     private MojoBindingFactory bindingFactory;
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        MojoBinding binding = bindingFactory.createMojoBinding( groupId, artifactId, version, artifactId, project );
+        MojoBinding binding = bindingFactory.createMojoBinding( groupId, artifactId, version, artifactId, project, includeReportConfig );
         try
         {
             PluginDescriptor descriptor = pluginLoader.loadPlugin( binding, project );

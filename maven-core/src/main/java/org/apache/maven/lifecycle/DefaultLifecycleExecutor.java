@@ -95,7 +95,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
     /**
      * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
-     * 
+     *
      * @param session
      * @param rm
      * @param dispatcher
@@ -547,7 +547,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
     /**
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      *       lookup directly, or have them passed in
-     * 
+     *
      * @todo Move this sort of thing to the tail end of the project-building process
      */
     private Map findArtifactTypeHandlers( final MavenSession session )
@@ -644,7 +644,9 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                                                                  final MavenProject project )
         throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException
     {
-        MojoBinding binding = mojoBindingFactory.parseMojoBinding( task, project, true );
+        // we don't need to include report configuration here, since we're just looking for
+        // an @aggregator flag...
+        MojoBinding binding = mojoBindingFactory.parseMojoBinding( task, project, true, false );
 
         PluginDescriptor descriptor = pluginLoader.loadPlugin( binding, project );
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );

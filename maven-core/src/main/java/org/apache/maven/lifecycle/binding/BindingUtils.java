@@ -11,6 +11,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ModelUtils;
@@ -37,7 +38,7 @@ final class BindingUtils
     static Map buildPluginMap( MavenProject project )
     {
         Map pluginMap = new HashMap();
-        
+
         if ( project != null )
         {
             Build build = project.getBuild();
@@ -56,14 +57,40 @@ final class BindingUtils
     }
 
     /**
+     * Builds a mapping of groupId:artifactId --&gt; ReportPlugin from the POM. If a plugin is listed
+     * without a groupId, the {@link BindingUtils#createPluginKey(Plugin)} method will fill it in
+     * using org.apache.maven.plugins.
+     */
+    static Map buildReportPluginMap( MavenProject project )
+    {
+        Map pluginMap = new HashMap();
+
+        if ( project != null )
+        {
+            Reporting reporting = project.getReporting();
+            if ( reporting != null )
+            {
+                for ( Iterator it = reporting.getPlugins().iterator(); it.hasNext(); )
+                {
+                    ReportPlugin plugin = (ReportPlugin) it.next();
+
+                    pluginMap.put( createPluginKey( plugin.getGroupId(), plugin.getArtifactId() ), plugin );
+                }
+            }
+        }
+
+        return pluginMap;
+    }
+
+    /**
      * Builds a mapping of groupId:artifactId --&gt; Plugin from a PluginContainer, such as the build
-     * or pluginManagement section of a POM. If a plugin is listed without a groupId, the 
+     * or pluginManagement section of a POM. If a plugin is listed without a groupId, the
      * {@link BindingUtils#createPluginKey(Plugin)} method will fill it in using org.apache.maven.plugins.
      */
     static Map buildPluginMap( PluginContainer pluginContainer )
     {
         Map pluginMap = new HashMap();
-        
+
         if ( pluginContainer != null )
         {
             for ( Iterator it = pluginContainer.getPlugins().iterator(); it.hasNext(); )
@@ -87,7 +114,7 @@ final class BindingUtils
     }
 
     /**
-     * Create a key for use in looking up Plugin instances from mappings. The key consists of 
+     * Create a key for use in looking up Plugin instances from mappings. The key consists of
      * groupId:artifactId, where groupId == org.apache.maven.plugins if the supplied groupId
      * value == null.
      */
@@ -102,7 +129,7 @@ final class BindingUtils
      */
     static Object mergeConfigurations( ReportPlugin reportPlugin, ReportSet reportSet )
     {
-        if ( reportPlugin == null && reportSet == null )
+        if ( ( reportPlugin == null ) && ( reportSet == null ) )
         {
             return null;
         }
@@ -121,12 +148,12 @@ final class BindingUtils
     }
 
     /**
-     * Merge the Plugin and PluginExecution configurations, with the PluginExecution configuration 
+     * Merge the Plugin and PluginExecution configurations, with the PluginExecution configuration
      * taking precedence.
      */
     static Object mergeConfigurations( Plugin plugin, PluginExecution execution )
     {
-        if ( plugin == null && execution == null )
+        if ( ( plugin == null ) && ( execution == null ) )
         {
             return null;
         }
@@ -167,15 +194,17 @@ final class BindingUtils
             return Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( dominantConfig ), recessiveConfig );
         }
     }
-    
+
     /**
      * Inject any plugin configuration available from the specified POM into the MojoBinding, after
      * first merging in the applicable configuration from the POM's pluginManagement section.
      */
-    static void injectProjectConfiguration( MojoBinding binding, MavenProject project )
+    static void injectProjectConfiguration( MojoBinding binding, MavenProject project, boolean includeReportConfig )
     {
         Map pluginMap = buildPluginMap( project );
-        Plugin plugin = (Plugin) pluginMap.get( createPluginKey( binding.getGroupId(), binding.getArtifactId() ) );
+
+        String key = createPluginKey( binding.getGroupId(), binding.getArtifactId() );
+        Plugin plugin = (Plugin) pluginMap.get( key );
 
         if ( plugin == null )
         {
@@ -183,17 +212,41 @@ final class BindingUtils
             plugin.setGroupId( binding.getGroupId() );
             plugin.setArtifactId( binding.getArtifactId() );
         }
-        
+
         injectPluginManagementInfo( plugin, project );
 
         PluginExecution exec = (PluginExecution) plugin.getExecutionsAsMap().get( binding.getExecutionId() );
 
-        binding.setConfiguration( mergeConfigurations( plugin, exec ) );
+        Object configuration = mergeConfigurations( plugin, exec );
+
+        if ( includeReportConfig )
+        {
+            ReportPlugin reportPlugin = (ReportPlugin) BindingUtils.buildReportPluginMap( project ).get( key );
+            if ( reportPlugin != null )
+            {
+                Map reportSets = reportPlugin.getReportSetsAsMap();
+
+                ReportSet reportSet = null;
+                if ( ( reportSets != null ) && ( exec != null ) )
+                {
+                    reportSet = (ReportSet) reportSets.get( exec.getId() );
+                }
+
+                Object reportConfig = BindingUtils.mergeConfigurations( reportPlugin, reportSet );
+
+                // NOTE: This looks weird, but we must retain some consistency with
+                // dominance of plugin configs, regardless of whether they're report
+                // mojos or not.
+                configuration = mergeRawConfigurations( reportConfig, configuration );
+            }
+        }
+
+        binding.setConfiguration( configuration );
     }
 
     /**
-     * Inject any plugin configuration available from the specified POM into the MojoBindings 
-     * present in the given LifecycleBindings instance, after first merging in the configuration 
+     * Inject any plugin configuration available from the specified POM into the MojoBindings
+     * present in the given LifecycleBindings instance, after first merging in the configuration
      * from the POM's pluginManagement section.
      */
     static void injectProjectConfiguration( LifecycleBindings bindings, MavenProject project )
@@ -221,7 +274,7 @@ final class BindingUtils
                         plugin.setGroupId( mojo.getGroupId() );
                         plugin.setArtifactId( mojo.getArtifactId() );
                     }
-                    
+
                     injectPluginManagementInfo( plugin, project );
 
                     PluginExecution exec = (PluginExecution) plugin.getExecutionsAsMap().get( mojo.getExecutionId() );
@@ -242,24 +295,24 @@ final class BindingUtils
         {
             return;
         }
-        
+
         Build build = project.getBuild();
         if ( build == null )
         {
             return;
         }
-        
+
         PluginManagement plugMgmt = build.getPluginManagement();
         if ( plugMgmt == null )
         {
             return;
         }
-        
+
         Map plugMgmtMap = buildPluginMap( plugMgmt );
-        
+
         String key = createPluginKey( plugin );
         Plugin mgmtPlugin = (Plugin) plugMgmtMap.get( key );
-        
+
         if ( mgmtPlugin != null )
         {
             ModelUtils.mergePluginDefinitions( plugin, mgmtPlugin, false );

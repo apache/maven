@@ -23,7 +23,9 @@ public class BuildPlan
 
     private final List tasks;
 
-    private final Map forks;
+    private final Map forkedDirectInvocations;
+
+    private final Map forkedPhases;
 
     private final List lateBoundMojos;
 
@@ -43,16 +45,18 @@ public class BuildPlan
     {
         this.bindings = bindings;
         this.tasks = tasks;
-        forks = new HashMap();
+        forkedDirectInvocations = new HashMap();
+        forkedPhases = new HashMap();
         lateBoundMojos = new ArrayList();
         directInvocationBindings = new HashMap();
     }
 
-    private BuildPlan( final LifecycleBindings bindings, final Map forks, final List lateBoundMojos,
+    private BuildPlan( final LifecycleBindings bindings, final Map forkedDirectInvocations, final Map forkedPhases, final List lateBoundMojos,
                        final Map directInvocationBindings, final List tasks )
     {
         this.bindings = LifecycleUtils.cloneBindings( bindings );
-        this.forks = new HashMap( forks );
+        this.forkedDirectInvocations = new HashMap( forkedDirectInvocations );
+        this.forkedPhases = new HashMap( forkedPhases );
         this.lateBoundMojos = new ArrayList( lateBoundMojos );
         this.tasks = tasks;
         this.directInvocationBindings = new HashMap( directInvocationBindings );
@@ -100,23 +104,36 @@ public class BuildPlan
         return directInvocationBindings;
     }
 
-    public Map getForks()
+    public Map getForkedDirectInvocations()
     {
-        return forks;
+        return forkedDirectInvocations;
+    }
+
+    public Map getForkedPhases()
+    {
+        return forkedPhases;
     }
 
     public void addForkedExecution( final MojoBinding mojoBinding, final BuildPlan plan )
     {
         String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
 
-        forks.put( key, plan );
+        forkedPhases.put( key, plan );
     }
 
     public void addForkedExecution( final MojoBinding mojoBinding, final List forkedInvocations )
     {
         String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
 
-        forks.put( key, forkedInvocations );
+        List invoke = (List) forkedDirectInvocations.get( key );
+
+        if ( invoke == null )
+        {
+            invoke = new ArrayList();
+            forkedDirectInvocations.put( key, invoke );
+        }
+
+        invoke.addAll( forkedInvocations );
     }
 
     public void addLateBoundMojo( final MojoBinding mojoBinding )
@@ -126,12 +143,17 @@ public class BuildPlan
 
     public BuildPlan copy( final List newTasks )
     {
-        return new BuildPlan( bindings, forks, lateBoundMojos, directInvocationBindings, newTasks );
+        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, lateBoundMojos, directInvocationBindings, newTasks );
     }
 
     public void resetExecutionProgress()
     {
         renderedLifecycleMojos = new ArrayList();
+        for ( Iterator it = forkedPhases.values().iterator(); it.hasNext(); )
+        {
+            BuildPlan plan = (BuildPlan) it.next();
+            plan.resetExecutionProgress();
+        }
     }
 
     public List renderExecutionPlan( final Stack executionStack )
@@ -207,69 +229,54 @@ public class BuildPlan
 
         String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
 
-        // let's see if we have any forks...
-        Object fork = forks.get( key );
-
         executionStack.push( key );
         try
         {
-            if ( fork != null )
+            List forkedBindings = new ArrayList();
+
+            BuildPlan forkedPlan = (BuildPlan) forkedPhases.get( key );
+
+            // if we have a forked build plan, recurse into it and retrieve the execution plan.
+            if ( forkedPlan != null )
             {
-                List forkedBindings = new ArrayList();
+                forkedBindings = forkedPlan.renderExecutionPlan( executionStack );
+            }
 
-                // if the fork is a build plan, recurse into it and retrieve the execution plan.
-                if ( fork instanceof BuildPlan )
+            List directInvocations = (List) forkedDirectInvocations.get( key );
+
+            // leave room for new kinds of forks, and do some extra validation...
+            // if this is a list, it's a list of direct mojo invocations...we have to see if they have their own
+            // forks.
+            if ( directInvocations != null )
+            {
+                for ( Iterator it = directInvocations.iterator(); it.hasNext(); )
                 {
-                    forkedBindings = ( (BuildPlan) fork ).renderExecutionPlan( executionStack );
-                }
-                // leave room for new kinds of forks, and do some extra validation...
-                // if this is a list, it's a list of direct mojo invocations...we have to see if they have their own
-                // forks.
-                else if ( fork instanceof List )
-                {
-                    List directInvocations = (List) fork;
-                    for ( Iterator it = directInvocations.iterator(); it.hasNext(); )
+                    MojoBinding invocation = (MojoBinding) it.next();
+
+                    String invocationKey = MojoBindingUtils.createMojoBindingKey( invocation, false );
+
+                    if ( executionStack.contains( invocationKey ) )
                     {
-                        MojoBinding invocation = (MojoBinding) it.next();
-
-                        String invocationKey = MojoBindingUtils.createMojoBindingKey( invocation, false );
-
-                        if ( executionStack.contains( invocationKey ) )
-                        {
-                            continue;
-                        }
-
-                        executionStack.push( MojoBindingUtils.createMojoBindingKey( mojoBinding, false ) );
-
-                        try
-                        {
-                            addResolverIfLateBound( invocation, forkedBindings );
-                            forkedBindings.addAll( findForkedBindings( invocation, executionStack ) );
-                        }
-                        finally
-                        {
-                            executionStack.pop();
-                        }
+                        continue;
                     }
-                }
 
-                if ( !forkedBindings.isEmpty() )
-                {
-                    bindings.add( StateManagementUtils.createStartForkedExecutionMojoBinding() );
-                    bindings.addAll( forkedBindings );
-                    bindings.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
-                }
-
-                bindings.add( mojoBinding );
-
-                if ( !forkedBindings.isEmpty() )
-                {
-                    bindings.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
+                    addResolverIfLateBound( invocation, forkedBindings );
+                    forkedBindings.addAll( findForkedBindings( invocation, executionStack ) );
                 }
             }
-            else
+
+            if ( !forkedBindings.isEmpty() )
             {
-                bindings.add( mojoBinding );
+                bindings.add( StateManagementUtils.createStartForkedExecutionMojoBinding() );
+                bindings.addAll( forkedBindings );
+                bindings.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
+            }
+
+            bindings.add( mojoBinding );
+
+            if ( !forkedBindings.isEmpty() )
+            {
+                bindings.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
             }
         }
         finally
