@@ -44,4 +44,9 @@ public class ProjectBuildingException
     {
         return projectId;
     }
+
+    public String getMessage() 
+    {
+        return super.getMessage() + " for project " + this.projectId;
+    }
 }
