@@ -1,4 +1,4 @@
-package org.apache.maven.monitor.event;
+package org.apache.maven.core.monitor.event;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,18 +19,31 @@ package org.apache.maven.monitor.event;
  * under the License.
  */
 
+import org.apache.maven.monitor.event.AbstractSelectiveEventMonitor;
+import org.apache.maven.monitor.event.MavenEvents;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * @author jdcasey
- * @deprecated use {@link org.apache.maven.core.monitor.event.DefaultEventMonitor}
  */
 public class DefaultEventMonitor
-    extends org.apache.maven.core.monitor.event.DefaultEventMonitor
+    extends AbstractSelectiveEventMonitor
 {
+
+    private static final String[] START_EVENTS = {MavenEvents.MOJO_EXECUTION};
+
+    private final Logger logger;
 
     public DefaultEventMonitor( Logger logger )
     {
-        super( logger );
+        super( START_EVENTS, MavenEvents.NO_EVENTS, MavenEvents.NO_EVENTS );
+
+        this.logger = logger;
     }
+
+    protected void doStartEvent( String event, String target, long time )
+    {
+        logger.info( "[" + target + "]" );
+    }
+
 }
