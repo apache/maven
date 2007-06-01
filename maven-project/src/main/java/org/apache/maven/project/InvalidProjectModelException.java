@@ -60,4 +60,9 @@ public class InvalidProjectModelException
         return validationResult;
     }
 
+    public String getMessage() 
+    {
+        return super.getMessage() + " at " + this.pomLocation;
+    }
+
 }
