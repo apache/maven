@@ -414,7 +414,7 @@ public class DefaultMavenProjectBuilder
 
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Adding managed depedendencies for " + projectId );
+                getLogger().debug( "Adding managed dependencies for " + projectId );
             }
 
             for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
