@@ -498,6 +498,15 @@ public class DefaultMaven
                         moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                     }
 
+                    try
+                    {
+                        moduleFile = moduleFile.getCanonicalFile();
+                    }
+                    catch ( IOException e )
+                    {
+                        throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                    }
+                    
                     moduleFiles.add( moduleFile );
                 }
 
