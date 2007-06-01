@@ -1,0 +1,13 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	<groupId>grandchildtest</groupId>
+	<artifactId>root-pom</artifactId>
+	<version>1</version>
+	</parent>
+	<artifactId>child</artifactId>
+	<packaging>pom</packaging>
+  <modules>
+    <module>grandchild</module>
+  </modules>
+</project>

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class DefaultMavenProjectBuilderTest
-    extends PlexusTestCase
+    extends AbstractMavenProjectTestCase
 {
 
     private List filesToDelete = new ArrayList();
@@ -150,6 +150,22 @@ public class DefaultMavenProjectBuilderTest
                       ( (Repository) repositories.get( 0 ) ).getId() );
     }
 
+    /**
+     * Check that we can build ok from the middle pom of a (parent,child,grandchild) heirarchy
+     * @throws Exception 
+     */
+    public void testBuildFromMiddlePom() throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/grandchild-check/child/pom.xml");
+        File f2 = getTestFile( "src/test/resources/projects/grandchild-check/child/grandchild/pom.xml");
+
+        getProject( f1 );
+        
+        // it's the building of the grandchild project, having already cached the child project
+        // (but not the parent project), which causes the problem.
+        getProject( f2 );
+    }
+    
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
