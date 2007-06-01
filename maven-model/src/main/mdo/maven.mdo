@@ -3842,8 +3842,8 @@
     public int hashCode()
     {
         int result = 17;
-        result = 37 * result + getArtifactId().hashCode();
-        result = 37 * result + getGroupId().hashCode();
+        result = 37 * result + getArtifactId() != null ? getArtifactId().hashCode() : 0;
+        result = 37 * result + getGroupId() != null ? getGroupId().hashCode() : 0;
         result = 37 * result + getVersion() != null ? getVersion().hashCode() : 0;
         return result;
     }
