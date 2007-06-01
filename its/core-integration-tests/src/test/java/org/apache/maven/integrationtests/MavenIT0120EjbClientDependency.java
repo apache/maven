@@ -30,7 +30,7 @@ public class MavenIT0120EjbClientDependency
     public void testit0119()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-ejbClientDependency" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0120-ejbClientDependency" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.it0119", "parent", "1.0-SNAPSHOT", "pom" );
