@@ -19,21 +19,21 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
-import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.core.monitor.event.DefaultEventMonitor;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.usability.SystemWarnings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;

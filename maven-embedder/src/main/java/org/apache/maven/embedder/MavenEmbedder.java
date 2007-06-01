@@ -20,7 +20,6 @@ package org.apache.maven.embedder;
  */
 
 import org.apache.maven.Maven;
-import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -60,6 +59,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.validation.DefaultSettingsValidator;

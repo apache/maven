@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.settings;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,15 +21,17 @@ package org.apache.maven;
 
 /**
  * If there was an error in the settings file.
- * 
- * @deprecated use {@link org.apache.maven.settings.SettingsConfigurationException}
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
 public class SettingsConfigurationException
-    extends org.apache.maven.settings.SettingsConfigurationException
+    extends Exception
 {
+    private int lineNumber;
+
+    private int columnNumber;
+
     public SettingsConfigurationException( String message )
     {
         super( message );
@@ -42,7 +44,21 @@ public class SettingsConfigurationException
 
     public SettingsConfigurationException( String message, Throwable cause, int lineNumber, int columnNumber )
     {
-        super( message, cause, lineNumber, columnNumber );
+        super( message + ( lineNumber > 0 ? "\n  Line:   " + lineNumber : "" ) +
+            ( columnNumber > 0 ? "\n  Column: " + columnNumber : "" ), cause );
+        this.lineNumber = lineNumber;
+        this.columnNumber = columnNumber;
     }
+
+    public int getColumnNumber()
+    {
+        return columnNumber;
+    }
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+    
 
 }

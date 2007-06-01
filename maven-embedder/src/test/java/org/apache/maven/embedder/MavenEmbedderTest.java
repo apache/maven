@@ -20,7 +20,6 @@ package org.apache.maven.embedder;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -34,6 +33,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.util.FileUtils;
