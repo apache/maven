@@ -260,7 +260,12 @@ public class DefaultMavenSettingsBuilder
 
             path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
             path = path.replaceAll( "\\\\", "/" );
-            path = path.replaceAll( "//", "/" );
+            // ---------------------------------------------------------------------------------
+            // I'm not sure if this last regexp was really intended to disallow the usage of
+            // network paths as user.home directory. Unfortunately it did. I removed it and 
+            // have not detected any problems yet.
+            // ---------------------------------------------------------------------------------
+            // path = path.replaceAll( "//", "/" );
 
             return new File( path ).getAbsoluteFile();
         }
