@@ -2,6 +2,7 @@ package org.apache.maven.it0048;
 
 import junit.framework.TestCase;
 import java.net.URL;
+import java.net.URISyntaxException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.IOException;
 public class PersonTest
     extends TestCase
 {
-    public void testPerson() throws IOException
+    public void testPerson() throws IOException, URISyntaxException
     {
         ClassLoader cloader = getClass().getClassLoader();
 
@@ -17,7 +18,7 @@ public class PersonTest
 
         URL resource = cloader.getResource( path );
 
-        File resourceFile = new File( resource.getPath() );
+        File resourceFile = new File( resource.toURI() );
 
         String dirPath = resourceFile.getAbsolutePath();
 

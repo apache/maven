@@ -37,7 +37,7 @@ public class MavenIT0119PluginPrefixOrder
         
         //use my custom settings upon invocation.
         ArrayList cli = new ArrayList();
-        cli.add("-s "+testDir.getAbsolutePath()+"/settings.xml");
+        cli.add("-s '" +testDir.getAbsolutePath()+"/settings.xml'");
         verifier.setCliOptions( cli );
         verifier.executeGoal( "it0119:custom" );
         verifier.verifyErrorFreeLog();
