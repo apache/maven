@@ -41,10 +41,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 
 /**
  * Inject profile data into a Model, using the profile as the dominant data source, and
@@ -141,24 +141,24 @@ public class DefaultProfileInjector
 
     /**
      * This should be the resulting ordering of plugins after injection:
-     * 
+     *
      * Given:
-     * 
+     *
      *   model: X -> A -> B -> D -> E
      *   profile: Y -> A -> C -> D -> F
-     *  
-     * Result: 
-     * 
+     *
+     * Result:
+     *
      *   X -> Y -> A -> B -> C -> D -> E -> F
      */
     protected void injectPlugins( PluginContainer profileContainer, PluginContainer modelContainer )
     {
-        if ( profileContainer == null || modelContainer == null )
+        if ( ( profileContainer == null ) || ( modelContainer == null ) )
         {
             // nothing to do...
             return;
         }
-        
+
         List modelPlugins = modelContainer.getPlugins();
 
         if ( modelPlugins == null )
@@ -177,7 +177,7 @@ public class DefaultProfileInjector
 
                 Plugin profilePlugin = (Plugin) profilePlugins.get( modelPlugin.getKey() );
 
-                if ( profilePlugin != null && !mergedPlugins.contains( profilePlugin ) )
+                if ( ( profilePlugin != null ) && !mergedPlugins.contains( profilePlugin ) )
                 {
                     Plugin mergedPlugin = modelPlugin;
 
@@ -197,7 +197,7 @@ public class DefaultProfileInjector
 
     private void injectPluginDefinition( Plugin profilePlugin, Plugin modelPlugin )
     {
-        if ( profilePlugin == null || modelPlugin == null )
+        if ( ( profilePlugin == null ) || ( modelPlugin == null ) )
         {
             // nothing to do.
             return;
@@ -219,13 +219,13 @@ public class DefaultProfileInjector
         // from here to the end of the method is dealing with merging of the <executions/> section.
         List modelExecutions = modelPlugin.getExecutions();
 
-        if ( modelExecutions == null || modelExecutions.isEmpty() )
+        if ( ( modelExecutions == null ) || modelExecutions.isEmpty() )
         {
             modelPlugin.setExecutions( profilePlugin.getExecutions() );
         }
         else
         {
-            Map executions = new TreeMap();
+            Map executions = new LinkedHashMap();
 
             Map profileExecutions = profilePlugin.getExecutionsAsMap();
 
@@ -249,7 +249,7 @@ public class DefaultProfileInjector
 
                     List goals = new ArrayList();
 
-                    if ( modelGoals != null && !modelGoals.isEmpty() )
+                    if ( ( modelGoals != null ) && !modelGoals.isEmpty() )
                     {
                         goals.addAll( modelGoals );
                     }
@@ -331,7 +331,7 @@ public class DefaultProfileInjector
 
         List modelModules = model.getModules();
 
-        if ( modelModules != null && !modelModules.isEmpty() )
+        if ( ( modelModules != null ) && !modelModules.isEmpty() )
         {
             modules.addAll( modelModules );
         }
