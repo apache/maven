@@ -27,6 +27,7 @@ import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -59,7 +60,7 @@ public abstract class AbstractMavenProjectTestCase
     // ----------------------------------------------------------------------
 
     protected File getLocalRepositoryPath()
-        throws FileNotFoundException
+        throws FileNotFoundException, URISyntaxException
     {
         File markerFile = getFileForClasspathResource( "local-repo/marker.txt" );
 
@@ -67,7 +68,7 @@ public abstract class AbstractMavenProjectTestCase
     }
 
     protected File getFileForClasspathResource( String resource )
-        throws FileNotFoundException
+        throws FileNotFoundException, URISyntaxException
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
@@ -78,7 +79,7 @@ public abstract class AbstractMavenProjectTestCase
             throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
-        return new File( resourceUrl.getPath() );
+        return new File( resourceUrl.toURI() );
     }
 
     protected ArtifactRepository getLocalRepository()
