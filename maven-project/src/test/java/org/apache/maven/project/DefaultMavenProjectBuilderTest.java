@@ -32,26 +32,21 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
 public class DefaultMavenProjectBuilderTest
-    extends PlexusTestCase
+    extends AbstractMavenProjectTestCase
 {
 
     private List filesToDelete = new ArrayList();
 
     private File localRepoDir;
 
-    private DefaultMavenProjectBuilder projectBuilder;
-
     public void setUp()
         throws Exception
     {
         super.setUp();
 
-        projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        
         localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
         localRepoDir.mkdirs();
 
@@ -150,6 +145,22 @@ public class DefaultMavenProjectBuilderTest
                       ( (Repository) repositories.get( 0 ) ).getId() );
     }
 
+    /**
+     * Check that we can build ok from the middle pom of a (parent,child,grandchild) heirarchy
+     * @throws Exception 
+     */
+    public void testBuildFromMiddlePom() throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/grandchild-check/child/pom.xml");
+        File f2 = getTestFile( "src/test/resources/projects/grandchild-check/child/grandchild/pom.xml");
+
+        getProject( f1 );
+        
+        // it's the building of the grandchild project, having already cached the child project
+        // (but not the parent project), which causes the problem.
+        getProject( f2 );
+    }
+    
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {

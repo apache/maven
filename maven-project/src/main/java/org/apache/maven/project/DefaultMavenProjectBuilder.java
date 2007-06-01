@@ -741,8 +741,6 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        Model originalModel = ModelUtils.cloneModel( model );
-
         MavenProject project = null;
         try
         {
@@ -753,11 +751,6 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( projectId, e.getMessage(), e );
         }
-
-        project.setOriginalModel( originalModel );
-
-        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
-                             new MavenProject( project ) );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         MavenProject previousProject = superProject;
@@ -1034,6 +1027,9 @@ public class DefaultMavenProjectBuilder
                                           boolean strict )
         throws ProjectBuildingException, InvalidRepositoryException
     {
+        Model originalModel = ModelUtils.cloneModel( model );
+
+
         if ( !model.getRepositories().isEmpty() )
         {
             List respositories = buildArtifactRepositories( model );
@@ -1089,7 +1085,8 @@ public class DefaultMavenProjectBuilder
         MavenProject project = new MavenProject( model );
 
         project.setActiveProfiles( activeProfiles );
-
+        project.setOriginalModel( originalModel );
+        
         lineage.addFirst( project );
 
         Parent parentModel = model.getParent();
@@ -1288,6 +1285,8 @@ public class DefaultMavenProjectBuilder
 
             project.setParentArtifact( parentArtifact );
         }
+
+        rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), new MavenProject( project ) );
 
         return project;
     }
