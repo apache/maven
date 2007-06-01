@@ -21,10 +21,12 @@ package org.apache.maven.embedder;
 
 import junit.framework.TestCase;
 import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManagerException;
@@ -204,6 +206,67 @@ public class MavenEmbedderTest
         assertEquals( "jason", p1.getProperties().getProperty( "name" ) );
 
         assertEquals( "somnambulance", p1.getProperties().getProperty( "occupation" ) );
+    }
+
+    /**
+     * Test that two executions of the embedder don't share data that has changed, see MNG-3013
+     * 
+     * @throws Exception
+     */
+    public void testTwoExecutionsDoNotCacheChangedData()
+        throws Exception
+    {
+        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
+
+        File targetDirectory = new File( basedir, "target/embedder-test-project-caching" );
+
+        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
+
+        File pom = new File( targetDirectory, "pom.xml" );
+
+        /* Add the surefire plugin 2.2 to the pom */
+        Model model = maven.readModel( pom );
+
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId( "maven-surefire-plugin" );
+        plugin.setVersion( "2.2" );
+        model.setBuild( new Build() );
+        model.getBuild().addPlugin( plugin );
+
+        FileWriter writer = new FileWriter( pom );
+        maven.writeModel( new FileWriter( pom ), model );
+        writer.close();
+
+        /* execute maven */
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile( pom.getAbsolutePath() )
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        assertNoExceptions( result );
+
+        MavenProject project = result.getMavenProject();
+
+        Artifact p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
+        assertEquals( "2.2", p.getVersion() );
+
+        /* Add the surefire plugin 2.3 to the pom */
+        plugin.setVersion( "2.3" );
+        writer = new FileWriter( pom );
+        maven.writeModel( new FileWriter( pom ), model );
+        writer.close();
+
+        /* execute Maven */
+        request = new DefaultMavenExecutionRequest().setPomFile( pom.getAbsolutePath() ).setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "package" } ) );
+        result = maven.execute( request );
+
+        assertNoExceptions( result );
+
+        project = result.getMavenProject();
+
+        p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
+        assertEquals( "2.3", p.getVersion() );
     }
 
     // ----------------------------------------------------------------------
