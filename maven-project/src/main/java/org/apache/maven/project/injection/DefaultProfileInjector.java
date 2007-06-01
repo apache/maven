@@ -291,6 +291,24 @@ public class DefaultProfileInjector
         }
 
     }
+    
+    /**
+     * Merge two DOMs. Copy the dominant DOM so the original one is left unchanged.
+     * <p>
+     * Use this method instead of a direct call to {@link Xpp3Dom#mergeXpp3Dom(Xpp3Dom, Xpp3Dom)}.
+     * Profiles are dominant, thus they are merge targets, but they may be merged in several times
+     * (e.g. if they are inherited). So with the second merge, you don't get the profile's original
+     * DOM, but an already merged one.
+     * 
+     * @param dominant Dominant DOM
+     * @param recessive Recessive DOM
+     * @return Merged DOM
+     */
+    private Xpp3Dom merge( Xpp3Dom dominant, Xpp3Dom recessive )
+    {
+        Xpp3Dom dominantCopy = ( dominant == null ) ? null : new Xpp3Dom( dominant );
+        return Xpp3Dom.mergeXpp3Dom( dominantCopy, recessive );
+    }
 
     private void injectConfigurationContainer( ConfigurationContainer profileContainer,
                                                ConfigurationContainer modelContainer )
@@ -298,7 +316,7 @@ public class DefaultProfileInjector
         Xpp3Dom configuration = (Xpp3Dom) profileContainer.getConfiguration();
         Xpp3Dom parentConfiguration = (Xpp3Dom) modelContainer.getConfiguration();
 
-        configuration = Xpp3Dom.mergeXpp3Dom( configuration, parentConfiguration );
+        configuration = merge( configuration, parentConfiguration );
 
         modelContainer.setConfiguration( configuration );
     }
@@ -504,7 +522,7 @@ public class DefaultProfileInjector
         Xpp3Dom dominantConfig = (Xpp3Dom) dominant.getConfiguration();
         Xpp3Dom recessiveConfig = (Xpp3Dom) recessive.getConfiguration();
 
-        recessive.setConfiguration( Xpp3Dom.mergeXpp3Dom( dominantConfig, recessiveConfig ) );
+        recessive.setConfiguration( merge( dominantConfig, recessiveConfig ) );
 
         Map mergedReportSets = new HashMap();
 
@@ -525,7 +543,7 @@ public class DefaultProfileInjector
                 Xpp3Dom dominantRSConfig = (Xpp3Dom) dominantReportSet.getConfiguration();
                 Xpp3Dom mergedRSConfig = (Xpp3Dom) merged.getConfiguration();
 
-                merged.setConfiguration( Xpp3Dom.mergeXpp3Dom( dominantRSConfig, mergedRSConfig ) );
+                merged.setConfiguration( merge( dominantRSConfig, mergedRSConfig ) );
 
                 List mergedReports = merged.getReports();
 
