@@ -19,7 +19,6 @@ package org.apache.maven.project.build.model;
  * under the License.
  */
 
-import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -32,6 +31,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.MavenTools;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.build.profile.ProfileAdvisor;

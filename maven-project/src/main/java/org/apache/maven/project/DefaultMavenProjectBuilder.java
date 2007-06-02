@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;

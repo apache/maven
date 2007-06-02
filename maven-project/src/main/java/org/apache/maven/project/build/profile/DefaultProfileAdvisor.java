@@ -19,7 +19,6 @@ package org.apache.maven.project.build.profile;
  * under the License.
  */
 
-import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -32,6 +31,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.MavenTools;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.injection.ProfileInjector;
 import org.codehaus.plexus.PlexusConstants;
