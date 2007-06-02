@@ -157,6 +157,7 @@ under the License.
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <!-- do not export deprecated packages -->
             <Export-Package>!org.apache.maven.monitor.*,*</Export-Package>
           </instructions>
         </configuration>

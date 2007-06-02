@@ -24,6 +24,7 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * @author jdcasey
+ * @since 2.1
  */
 public class DefaultLog
     implements Log

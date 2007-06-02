@@ -24,6 +24,7 @@ package org.apache.maven.settings;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @since 2.1
  */
 public class SettingsConfigurationException
     extends Exception
