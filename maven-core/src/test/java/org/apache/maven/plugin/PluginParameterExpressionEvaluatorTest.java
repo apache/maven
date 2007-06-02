@@ -256,7 +256,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
 
-        assertEquals( "expected-directory/expected-finalName", value );
+        assertEquals( new File( "expected-directory/expected-finalName" ).getCanonicalPath(), value );
     }
 
     public void testShouldExtractPluginArtifacts()

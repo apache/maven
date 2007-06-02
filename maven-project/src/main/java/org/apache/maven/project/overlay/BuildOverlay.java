@@ -25,6 +25,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +37,11 @@ import java.util.Map;
 public class BuildOverlay
     extends Build
 {
-    
+
     private final Build build;
-    
+
     private List resources;
+
     private List testResources;
 
     public BuildOverlay( Build build )
@@ -46,18 +49,18 @@ public class BuildOverlay
         if ( build == null )
         {
             this.build = new Build();
-            
-            this.resources = new ArrayList();
-            
-            this.testResources = new ArrayList();
+
+            resources = new ArrayList();
+
+            testResources = new ArrayList();
         }
         else
         {
             this.build = build;
-            
-            this.resources = new ArrayList( build.getResources() );
-            
-            this.testResources = new ArrayList( build.getTestResources() );
+
+            resources = new ArrayList( build.getResources() );
+
+            testResources = new ArrayList( build.getTestResources() );
         }
     }
 
@@ -98,7 +101,17 @@ public class BuildOverlay
 
     public String getDirectory()
     {
-        return build.getDirectory();
+        String path = build.getDirectory();
+        File file = new File( build.getDirectory() );
+        try
+        {
+            path = file.getCanonicalPath();
+        }
+        catch ( IOException e )
+        {
+            handleCanonicalException( path, e );
+        }
+        return path;
     }
 
     public List getExtensions()
@@ -113,7 +126,17 @@ public class BuildOverlay
 
     public String getOutputDirectory()
     {
-        return build.getOutputDirectory();
+        String path = build.getDirectory();
+        File file = new File( build.getOutputDirectory() );
+        try
+        {
+            path = file.getCanonicalPath();
+        }
+        catch ( IOException e )
+        {
+            handleCanonicalException( path, e );
+        }
+        return path;
     }
 
     public PluginManagement getPluginManagement()
@@ -138,7 +161,26 @@ public class BuildOverlay
 
     public String getScriptSourceDirectory()
     {
-        return build.getScriptSourceDirectory();
+        String path = build.getDirectory();
+        File file = new File( build.getScriptSourceDirectory() );
+        try
+        {
+            path = file.getCanonicalPath();
+        }
+        catch ( IOException e )
+        {
+            handleCanonicalException( path, e );
+        }
+        return path;
+    }
+
+    private void handleCanonicalException( String path, IOException e )
+    {
+        IllegalStateException error = new IllegalStateException( "Cannot compute canonical path for: " + path
+                                                                 + ". Reason: " + e.getMessage() );
+        error.initCause( e );
+
+        throw error;
     }
 
     public String getSourceDirectory()
@@ -158,7 +200,17 @@ public class BuildOverlay
 
     public String getTestSourceDirectory()
     {
-        return build.getTestSourceDirectory();
+        String path = build.getDirectory();
+        File file = new File( build.getTestSourceDirectory() );
+        try
+        {
+            path = file.getCanonicalPath();
+        }
+        catch ( IOException e )
+        {
+            handleCanonicalException( path, e );
+        }
+        return path;
     }
 
     public int hashCode()
@@ -258,7 +310,7 @@ public class BuildOverlay
 
     public void addFilter( String string )
     {
-        build.addFilter( string );   
+        build.addFilter( string );
     } //-- void addFilter(String)
 
     public List getFilters()
