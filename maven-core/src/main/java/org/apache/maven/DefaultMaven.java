@@ -494,6 +494,13 @@ public class DefaultMaven
                 {
                     String name = (String) i.next();
 
+                    if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
+                    {
+                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+
+                        continue;
+                    }
+
                     File moduleFile;
 
                     if ( usingReleasePom )
