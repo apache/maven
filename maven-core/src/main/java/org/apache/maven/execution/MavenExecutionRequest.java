@@ -89,6 +89,7 @@ public interface MavenExecutionRequest
 
     // Properties
     MavenExecutionRequest setProperties( Properties properties );
+    MavenExecutionRequest setProperty( String key, String value );
     Properties getProperties();
 
     // Reactor
