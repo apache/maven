@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export M2_HOME=$HOME/m2
+export JRUBY_HOME=$HOME/jruby
+export CLASSPATH=$M2_HOME/lib/maven-embedder-2.1-SNAPSHOT-uber.jar
+$JRUBY_HOME/bin/jruby $M2_HOME/bin/mvnr.rb
