@@ -221,6 +221,33 @@ public class VersionRange
         return new VersionRange( new DefaultArtifactVersion( version ), Collections.EMPTY_LIST );
     }
 
+    /**
+     * Creates and returns a new <code>VersionRange</code> that is a restriction of this 
+     * version range and the specified version range.
+     * <p>
+     * Note: Precedence is given to the recommended version from this version range over the 
+     * recommended version from the specified version range.
+     * </p>
+     * @param restriction the <code>VersionRange</code> that will be used to restrict this version
+     * range.
+     * @return the <code>VersionRange</code> that is a restriction of this version range and the 
+     * specified version range.
+     * <p>
+     * The restrictions of the returned version range will be an intersection of the restrictions
+     * of this version range and the specified version range if both version ranges have 
+     * restrictions. Otherwise, the restrictions on the returned range will be empty.
+     * </p>
+     * <p>
+     * The recommended version of the returned version range will be the recommended version of
+     * this version range, provided that ranges falls within the intersected restrictions. If 
+     * the restrictions are empty, this version range's recommended version is used if it is not
+     * <code>null</code>. If it is <code>null</code>, the specified version range's recommended
+     * version is used (provided it is non-<code>null</code>). If no recommended version can be 
+     * obtained, the returned version range's recommended version is set to <code>null</code>.
+     * </p>
+     * @throws NullPointerException if the specified <code>VersionRange</code> is 
+     * <code>null</code>.
+     */
     public VersionRange restrict( VersionRange restriction )
     {
         List r1 = this.restrictions;
@@ -257,10 +284,17 @@ public class VersionRange
                 }
             }
         }
+        // Either the original or the specified version ranges have no restructions
         else if ( recommendedVersion != null )
         {
-            // no range, so the recommended version is valid
+            // Use the original recommended version since it exists
             version = recommendedVersion;
+        }
+        else if (restriction.recommendedVersion != null)
+        {
+            // Use the recommended version from the specified VersionRange since there is no
+            // original recommended version
+            version = restriction.recommendedVersion;
         }
 /* TODO: should throw this immediately, but need artifact
         else
