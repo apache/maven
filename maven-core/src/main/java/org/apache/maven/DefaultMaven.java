@@ -25,15 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.SystemBuildContext;
-import org.apache.maven.execution.BuildFailure;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.ExecutionBuildContext;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.execution.SessionContext;
+import org.apache.maven.execution.*;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -57,18 +49,14 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * @author jason van zyl
@@ -486,6 +474,13 @@ public class DefaultMaven
                 for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
                     String name = (String) i.next();
+
+                    if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
+                    {
+                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+
+                        continue;
+                    }
 
                     File moduleFile;
 
