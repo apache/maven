@@ -19,20 +19,27 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
 
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException
 {
-
+    private final List missingArtifacts;
+    
     public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List artifacts, List remoteRepositories )
     {
         super( constructMessage( artifacts ), originatingArtifact, remoteRepositories );
+        this.missingArtifacts = artifacts;
     }
-
+    
+    public List getMissingArtifacts()
+    {
+        return missingArtifacts;
+    }
+    
     private static String constructMessage( List artifacts )
     {
         StringBuffer buffer = new StringBuffer( "Missing:\n" );
