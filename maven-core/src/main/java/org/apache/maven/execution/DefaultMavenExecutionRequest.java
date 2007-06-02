@@ -267,7 +267,26 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setProperties( Properties properties )
     {
-        this.properties = properties;
+        if ( this.properties == null )
+        {
+            this.properties = properties;
+        }
+        else
+        {
+            this.properties.putAll( properties );
+        }
+
+        return this;
+    }
+
+    public MavenExecutionRequest setProperty( String key, String value )
+    {
+        if ( properties == null )
+        {
+            properties = new Properties();
+        }
+
+        properties.setProperty( key, value );
 
         return this;
     }
