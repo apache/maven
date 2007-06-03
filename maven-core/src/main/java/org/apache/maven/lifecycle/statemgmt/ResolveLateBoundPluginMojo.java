@@ -52,7 +52,7 @@ public class ResolveLateBoundPluginMojo extends AbstractMojo
         catch ( PluginLoaderException e )
         {
             throw new MojoExecutionException( "Failed to load late-bound plugin: "
-                            + MojoBindingUtils.createPluginKey( binding ) );
+                            + MojoBindingUtils.createPluginKey( binding ), e );
         }
     }
 
