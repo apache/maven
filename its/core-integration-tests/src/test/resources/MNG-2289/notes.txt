@@ -6,3 +6,4 @@
 6. Go to the issue directory and call mvn eclipse:eclipse, the project is now dependent on junit-3.8 as defined in the dependencyManagement of the parent
 7. Restore your settings.xml
 8. Call mvn eclipse:eclipse again for the issue, the project is still dependent on junit-3.7 the available newer version of the snapshot parent is ignored
+
