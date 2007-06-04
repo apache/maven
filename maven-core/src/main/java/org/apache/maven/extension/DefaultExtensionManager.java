@@ -20,14 +20,13 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.MavenArtifactFilterManager;
-import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -35,6 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Extension;
+import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusConstants;
@@ -45,12 +45,14 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.jar.JarFile;
 
 /**
  * Used to locate extensions.
@@ -68,6 +70,7 @@ public class DefaultExtensionManager
     private ArtifactFactory artifactFactory;
 
     private ArtifactMetadataSource artifactMetadataSource;
+
 
     private PlexusContainer container;
 
@@ -119,7 +122,9 @@ public class DefaultExtensionManager
                                                                                     artifactMetadataSource, filter );
             // create a child container for the extension
             // TODO: this could surely be simpler/different on trunk with the new classworlds
+
             PlexusContainer extensionContainer = getExtensionContainer();
+
             if ( extensionContainer == null )
             {
                 extensionContainer =
@@ -133,7 +138,25 @@ public class DefaultExtensionManager
 
             Set artifacts = result.getArtifacts();
 
-            if ( artifacts.size() == 2 )
+            // Lifecycles are loaded by the Lifecycle executor by looking up lifecycle definitions from the
+            // core container. So we need to look if an extension has a lifecycle mapping and use the container
+            // and not an extension container. (MNG-2831)
+
+            if ( extensionContainsLifeycle( artifact.getFile() ) )
+            {
+                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                {
+                    Artifact a = (Artifact) i.next();
+
+                    if ( artifactFilter.include( a ) )
+                    {
+                        getLogger().debug( "Adding extension to core container: " + a.getFile() );
+
+                        container.addJarResource( a.getFile() );
+                    }
+                }
+            }
+            else if ( artifacts.size() == 2 )
             {
                 for ( Iterator i = artifacts.iterator(); i.hasNext(); )
                 {
@@ -215,5 +238,40 @@ public class DefaultExtensionManager
 
             return projectDependencyConflictId.equals( depConflictId ) || passThroughFilter.include( artifact );
         }
+    }
+
+    private boolean extensionContainsLifeycle( File extension )
+    {
+        JarFile f;
+
+        try
+        {
+            f = new JarFile( extension );
+
+            InputStream is = f.getInputStream( f.getEntry( "META-INF/plexus/components.xml" ) );
+
+            if ( is == null )
+            {
+                return false;
+            }
+
+            Xpp3Dom dom = Xpp3DomBuilder.build( new InputStreamReader( is ) );
+
+            Xpp3Dom[] components = dom.getChild( "components" ).getChildren( "component" );
+
+            for ( int i = 0; i < components.length; i++ )
+            {
+                if ( components[i].getChild( "role" ).getValue().equals( "org.apache.maven.lifecycle.mapping.LifecycleMapping" ) )
+                {
+                    return true;
+                }
+            }
+        }
+        catch( Exception e )
+        {
+            // do nothingls
+        }
+
+        return false;
     }
 }
