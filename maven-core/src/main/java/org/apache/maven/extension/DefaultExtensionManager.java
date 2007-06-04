@@ -115,8 +115,12 @@ public class DefaultExtensionManager
 
             dependencies.add( artifact );
 
+            // Make sure that we do not influence the dependenecy resolution of extensions with the project's
+            // dependencyManagement
+
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, project.getArtifact(),
-                                                                                    project.getManagedVersionMap(),
+                                                                                    Collections.EMPTY_MAP,
+                                                                                    //project.getManagedVersionMap(),
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource, filter );
@@ -184,6 +188,11 @@ public class DefaultExtensionManager
 
                     extensionContainer.addJarResource( a.getFile() );
                 }
+            }
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                extensionContainer.getContainerRealm().display();
             }
         }
     }
