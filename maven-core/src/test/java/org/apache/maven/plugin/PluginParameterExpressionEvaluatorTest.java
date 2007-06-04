@@ -54,6 +54,8 @@ import java.util.Properties;
 public class PluginParameterExpressionEvaluatorTest
     extends PlexusTestCase
 {
+    private static final String FS = System.getProperty( "file.separator" );
+
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {
@@ -229,7 +231,7 @@ public class PluginParameterExpressionEvaluatorTest
         ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ), null,
                                                                              new Properties() );
 
-        Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
+        Object value = expressionEvaluator.evaluate( "${project.build.directory}" + FS + "${project.build.finalName}" );
 
         assertEquals( "expected-directory/expected-finalName", value );
     }
