@@ -9,16 +9,17 @@
 # 7. Restore your settings.xml
 # 8. Call mvn eclipse:eclipse again for the issue, the project is still dependent on junit-3.7 the available newer version of the snapshot parent is ignored
 
+# We want to test that after changing the parent POM which is a SNAPSHOT, it is used for any children.
 
 dir=`pwd`
 
 mvn="mvn"
 repo="$HOME/maven-repo-local"
 
-rm -rf $repo/junit
+rm -rf $repo/commons-logging
 ( cd parent ; cp pom-with-ju-3.7.xml pom.xml ; $mvn deploy )
 ( cd issue; $mvn compile )
 ( cd parent ; cp pom-with-ju-3.8.xml pom.xml ; $mvn deploy )
-mv $repo/junit $repo/junit-3.7
+mv $repo/commons-logging $repo/commons-logging-1.0.1
 ( cd issue; $mvn compile )
 
