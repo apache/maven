@@ -36,7 +36,7 @@
             </snapshots>
             <id>local-snapshot-repo</id>
             <name>Local snapshot repository</name>
-            <url>file:///temp/repo-m2-snapshot</url>
+            <url>file:///tmp/repo-m2-snapshot</url>
         </repository>
     </repositories>
     
@@ -45,7 +45,7 @@
         <snapshotRepository>
             <id>demo-snapshot</id>
             <name>Demo Maven 2 snapshot repository</name>
-            <url>file:///temp/repo-m2-snapshot</url>
+            <url>file:///tmp/repo-m2-snapshot</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
