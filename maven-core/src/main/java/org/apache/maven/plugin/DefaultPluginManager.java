@@ -490,7 +490,10 @@ public class DefaultPluginManager
 
         checkPlexusUtils( resolutionGroup, artifactFactory );
 
-        Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+        Set dependencies = new LinkedHashSet( resolutionGroup.getArtifacts() );
+
+        // Also resolve the plugin dependencies specified in <plugin><dependencies>:
+        dependencies.addAll( projectPluginDependencies );
 
         List repositories = new ArrayList();
 
@@ -505,19 +508,6 @@ public class DefaultPluginManager
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
         List resolved = new ArrayList( result.getArtifacts() );
-
-        getLogger().debug( "Main plugin artifacts: " + resolved.toString().replace( ',', '\n' ) );
-
-        // Also resolve the plugin dependencies specified in <plugin><dependencies>:
-        resolved.addAll( artifactResolver.resolveTransitively( projectPluginDependencies,
-                                                               pluginArtifact,
-                                                               project.getManagedVersionMap(),
-                                                               localRepository,
-                                                               repositories,
-                                                               artifactMetadataSource,
-                                                               coreArtifactFilterManager.getArtifactFilter() ).getArtifacts() );
-
-        getLogger().debug( "After adding project-level plugin dependencies: " + resolved.toString().replace( ',', '\n' ) );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
