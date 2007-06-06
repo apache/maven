@@ -160,6 +160,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0120EjbClientDependency.class );
         // not fixed yet
         //suite.addTestSuite( MavenIT0120EjbClientDependency.class );
+        //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class );
         return suite;
     }
 }
