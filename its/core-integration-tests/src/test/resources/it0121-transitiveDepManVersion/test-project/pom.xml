@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0121</groupId>
+  <artifactId>example-parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>A</module>
+    <module>B</module>
+    <module>C</module>
+  </modules>
+</project>

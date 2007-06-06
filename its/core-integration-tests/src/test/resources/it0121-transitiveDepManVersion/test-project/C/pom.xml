@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0121</groupId>
+  <artifactId>C</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0121</groupId>
+      <artifactId>D</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

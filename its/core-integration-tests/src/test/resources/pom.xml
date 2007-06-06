@@ -1,9 +1,9 @@
-<project>  
-  <modelVersion>4.0.0</modelVersion>                                                                                                                                                                                                            
+<project>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its</groupId>
-  <artifactId>maven-its</artifactId>                                                                                                                                                                                                    
-  <packaging>pom</packaging>                                                                                                                                                                                                                    
-  <version>1.0-SNAPSHOT</version>                          
+  <artifactId>maven-its</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
   <modules>
     <module>it0000</module>
     <module>it0001</module>
@@ -120,5 +120,6 @@
     <!-- <module>it0106</module> -->
     <!-- <module>it0107</module> -->
     <!-- <module>it0120-ejbClientDependency</module> not fixed yet -->
+    <module>it0121-transitiveDepManVersion</module>
   </modules>
 </project>
