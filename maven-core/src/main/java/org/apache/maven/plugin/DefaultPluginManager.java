@@ -295,7 +295,7 @@ public class DefaultPluginManager
             try
             {
                 child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.Xpp3Dom" );
-                child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull" );
+                //child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull" );
             }
             catch ( NoSuchRealmException e )
             {
