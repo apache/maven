@@ -62,6 +62,10 @@ under the License.
           <version>2.2-beta-1</version>
         </plugin>
         <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.3.1-SNAPSHOT</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
