@@ -233,7 +233,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}" + FS + "${project.build.finalName}" );
 
-        assertEquals( "expected-directory/expected-finalName", value );
+        assertEquals( "expected-directory" + FS + "expected-finalName", value );
     }
 
     public void testShouldExtractPluginArtifacts()
