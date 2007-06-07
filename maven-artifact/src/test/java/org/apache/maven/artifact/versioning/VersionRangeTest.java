@@ -23,6 +23,8 @@ import junit.framework.TestCase;
 
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+
 /**
  * Tests version range construction.
  *
@@ -44,9 +46,15 @@ public class VersionRangeTest
 
     private static final String CHECK_VERSION_RECOMMENDATION = "check version recommended";
 
+    private static final String CHECK_SELECTED_VERSION_KNOWN = "check selected version known";
+
+    private static final String CHECK_SELECTED_VERSION = "check selected version";
+
     public void testRange()
-        throws InvalidVersionSpecificationException
+        throws InvalidVersionSpecificationException, OverConstrainedVersionException
     {
+        Artifact artifact = null;
+        
         VersionRange range = VersionRange.createFromVersionSpec( "(,1.0]" );
         List restrictions = range.getRestrictions();
         assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
@@ -56,6 +64,8 @@ public class VersionRangeTest
         assertEquals( CHECK_UPPER_BOUND, "1.0", restriction.getUpperBound().toString() );
         assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
 
         range = VersionRange.createFromVersionSpec( "1.0" );
         assertEquals( CHECK_VERSION_RECOMMENDATION, "1.0", range.getRecommendedVersion().toString() );
@@ -66,6 +76,8 @@ public class VersionRangeTest
         assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
         assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
         assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+        assertTrue( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertEquals( CHECK_SELECTED_VERSION, "1.0", range.getSelectedVersion( artifact ).toString() );
 
         range = VersionRange.createFromVersionSpec( "[1.0]" );
         restrictions = range.getRestrictions();
@@ -76,6 +88,8 @@ public class VersionRangeTest
         assertEquals( CHECK_UPPER_BOUND, "1.0", restriction.getUpperBound().toString() );
         assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
 
         range = VersionRange.createFromVersionSpec( "[1.2,1.3]" );
         restrictions = range.getRestrictions();
@@ -86,6 +100,8 @@ public class VersionRangeTest
         assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
         assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
 
         range = VersionRange.createFromVersionSpec( "[1.0,2.0)" );
         restrictions = range.getRestrictions();
@@ -96,6 +112,8 @@ public class VersionRangeTest
         assertEquals( CHECK_UPPER_BOUND, "2.0", restriction.getUpperBound().toString() );
         assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
 
         range = VersionRange.createFromVersionSpec( "[1.5,)" );
         restrictions = range.getRestrictions();
@@ -106,6 +124,8 @@ public class VersionRangeTest
         assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
         assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
 
         range = VersionRange.createFromVersionSpec( "(,1.0],[1.2,)" );
         restrictions = range.getRestrictions();
@@ -122,6 +142,8 @@ public class VersionRangeTest
         assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
         assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
+        assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
+        assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
     }
 
     public void testInvalidRanges()

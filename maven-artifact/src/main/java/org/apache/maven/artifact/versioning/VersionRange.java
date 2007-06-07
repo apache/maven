@@ -34,8 +34,6 @@ import java.util.List;
  */
 public class VersionRange
 {
-    private final ArtifactVersion RELEASE = new DefaultArtifactVersion( "RELEASE" );
-
     private final ArtifactVersion recommendedVersion;
 
     private final List restrictions;
@@ -469,16 +467,8 @@ public class VersionRange
             {
                 throw new OverConstrainedVersionException( "The artifact has no valid ranges", artifact );
             }
-            else
-            {
-                Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
 
-                version = restriction.getUpperBound();
-                if ( version == null )
-                {
-                    version = RELEASE;
-                }
-            }
+            version = null;
         }
         return version;
     }
@@ -496,15 +486,6 @@ public class VersionRange
             if ( restrictions.size() == 0 )
             {
                 throw new OverConstrainedVersionException( "The artifact has no valid ranges", artifact );
-            }
-            else
-            {
-                Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
-
-                if ( restriction.getUpperBound() != null )
-                {
-                    value = restriction.isUpperBoundInclusive();
-                }
             }
         }
         return value;
