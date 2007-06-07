@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0122</name> 
+  <description>Test that reactor projects are included in dependency resolution.</description>
+  <groupId>org.apache.maven.its.it0122</groupId>
+  <artifactId>maven-it-it0122</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <modules>
+    <module>dependency</module>
+    <module>main</module>
+  </modules>
+</project>

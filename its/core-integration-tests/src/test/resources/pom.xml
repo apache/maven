@@ -121,5 +121,6 @@
     <!-- <module>it0107</module> -->
     <!-- <module>it0120-ejbClientDependency</module> not fixed yet -->
     <module>it0121-transitiveDepManVersion</module>
+    <module>it0122-reactorDependencyResolution</module>
   </modules>
 </project>
