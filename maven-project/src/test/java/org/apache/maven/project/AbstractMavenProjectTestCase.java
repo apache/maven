@@ -27,6 +27,7 @@ import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -79,7 +80,7 @@ public abstract class AbstractMavenProjectTestCase
             throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
-        return new File( resourceUrl.toURI() );
+        return new File( new URI( resourceUrl.getPath() ) );
     }
 
     protected ArtifactRepository getLocalRepository()
