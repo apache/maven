@@ -63,7 +63,7 @@ under the License.
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.3.1-SNAPSHOT</version>
+          <version>2.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
