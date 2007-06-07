@@ -19,12 +19,16 @@ package org.apache.maven.settings;
  * under the License.
  */
 
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.util.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -46,13 +50,15 @@ public class DefaultMavenSettingsBuilder
 {
     private SettingsValidator validator;
 
+    private BuildContextManager manager;
+
     /**
      * @since 2.1
      */
     public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
         throws IOException, XmlPullParserException
     {
-        if ( globalSettingsFile == null && userSettingsFile == null )
+        if ( ( globalSettingsFile == null ) && ( userSettingsFile == null ) )
         {
             getLogger().debug(
                                "No settings files provided, and default locations are disabled for this request. Returning empty Settings instance." );
@@ -60,7 +66,7 @@ public class DefaultMavenSettingsBuilder
         }
 
         getLogger().debug( "Reading global settings from: " + globalSettingsFile );
-        
+
         Settings globalSettings = readSettings( globalSettingsFile );
 
         if ( globalSettings == null )
@@ -69,7 +75,7 @@ public class DefaultMavenSettingsBuilder
         }
 
         getLogger().debug( "Reading user settings from: " + userSettingsFile );
-        
+
         Settings userSettings = readSettings( userSettingsFile );
 
         if ( userSettings == null )
@@ -85,7 +91,46 @@ public class DefaultMavenSettingsBuilder
 
         activateDefaultProfiles( userSettings );
 
+        userSettings = interpolate( userSettings );
+
         return userSettings;
+    }
+
+    private Settings interpolate( Settings settings )
+        throws IOException
+    {
+        List activeProfiles = settings.getActiveProfiles();
+
+        StringWriter writer = new StringWriter();
+        new SettingsXpp3Writer().write( writer, settings );
+
+        String serializedSettings = writer.toString();
+
+        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( manager, true );
+
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        interpolator.addValueSource( new PropertiesBasedValueSource( sysContext.getSystemProperties() ) );
+        interpolator.addValueSource( new EnvarBasedValueSource() );
+
+        serializedSettings = interpolator.interpolate( serializedSettings, "settings" );
+
+        Settings result;
+        try
+        {
+            result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
+
+            result.setActiveProfiles( activeProfiles );
+        }
+        catch ( XmlPullParserException e )
+        {
+            IOException error = new IOException( "Failed to parse interpolated settings: " + e.getMessage() );
+            error.initCause( e );
+
+            throw error;
+        }
+
+        return result;
     }
 
     private Settings readSettings( File settingsFile )
@@ -102,39 +147,15 @@ public class DefaultMavenSettingsBuilder
         if ( settingsFile.exists() && settingsFile.isFile() )
         {
             getLogger().debug( "Settings file is a proper file. Reading." );
-            
+
             FileReader reader = null;
             try
             {
                 reader = new FileReader( settingsFile );
 
-                StringWriter sWriter = new StringWriter();
-
-                IOUtil.copy( reader, sWriter );
-
-                String rawInput = sWriter.toString();
-
-                try
-                {
-                    RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-                    interpolator.addValueSource( new EnvarBasedValueSource() );
-
-                    rawInput = interpolator.interpolate( rawInput, "settings" );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn(
-                                      "Failed to initialize environment variable resolver. Skipping environment substitution in settings." );
-                    
-                    getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
-                }
-
-                StringReader sReader = new StringReader( rawInput );
-
                 SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
-                settings = modelReader.read( sReader );
+                settings = modelReader.read( reader );
 
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 
@@ -145,13 +166,13 @@ public class DefaultMavenSettingsBuilder
             catch ( XmlPullParserException e )
             {
                 getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing XmlPullParserException..." );
-                
+
                 throw e;
             }
             catch ( IOException e )
             {
                 getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing IOException..." );
-                
+
                 throw e;
             }
             finally
@@ -170,7 +191,7 @@ public class DefaultMavenSettingsBuilder
         for ( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
         {
             Profile profile = (Profile) profiles.next();
-            if ( profile.getActivation() != null && profile.getActivation().isActiveByDefault()
+            if ( ( profile.getActivation() != null ) && profile.getActivation().isActiveByDefault()
                 && !activeProfiles.contains( profile.getId() ) )
             {
                 settings.addActiveProfile( profile.getId() );
