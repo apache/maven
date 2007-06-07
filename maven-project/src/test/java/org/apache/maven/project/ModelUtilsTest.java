@@ -26,7 +26,11 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -35,108 +39,108 @@ import java.util.Map;
 public class ModelUtilsTest
     extends TestCase
 {
-    
+
     public void testShouldNotInheritPluginWithInheritanceSetToFalse()
     {
         PluginContainer parent = new PluginContainer();
-        
+
         Plugin parentPlugin = createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP );
         parentPlugin.setInherited( "false" );
-        
+
         parent.addPlugin( parentPlugin );
-        
+
         PluginContainer child = new PluginContainer();
-        
+
         child.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
-        
+
         ModelUtils.mergePluginLists( child, parent, true );
-        
+
         List results = child.getPlugins();
-        
+
         assertEquals( 1, results.size() );
-        
+
         Plugin result1 = (Plugin) results.get( 0 );
         assertEquals( "group3", result1.getGroupId() );
         assertEquals( "artifact3", result1.getArtifactId() );
     }
-    
+
     /**
      * Test that this is the resulting ordering of plugins after merging:
-     * 
+     *
      * Given:
-     * 
+     *
      *   parent: X -> A -> B -> D -> E
      *   child: Y -> A -> C -> D -> F
-     *  
-     * Result: 
-     * 
+     *
+     * Result:
+     *
      *   X -> Y -> A -> B -> C -> D -> E -> F
      */
     public void testShouldPreserveChildOrderingOfPluginsAfterParentMerge()
     {
         PluginContainer parent = new PluginContainer();
-        
+
         parent.addPlugin( createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP ) );
         parent.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key", "value" ) ) );
-        
+
         PluginContainer child = new PluginContainer();
-        
+
         child.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
         child.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key2", "value2" ) ) );
-        
+
         ModelUtils.mergePluginLists( child, parent, true );
-        
+
         List results = child.getPlugins();
-        
+
         assertEquals( 3, results.size() );
-        
+
         Plugin result1 = (Plugin) results.get( 0 );
-        
+
         assertEquals( "group", result1.getGroupId() );
         assertEquals( "artifact", result1.getArtifactId() );
-        
+
         Plugin result2 = (Plugin) results.get( 1 );
-        
+
         assertEquals( "group3", result2.getGroupId() );
         assertEquals( "artifact3", result2.getArtifactId() );
-        
+
         Plugin result3 = (Plugin) results.get( 2 );
-        
+
         assertEquals( "group2", result3.getGroupId() );
         assertEquals( "artifact2", result3.getArtifactId() );
-        
+
         Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
-        
+
         assertNotNull( result3Config );
-        
+
         assertEquals( "value", result3Config.getChild( "key" ).getValue() );
         assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
     }
-    
+
     private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
     {
         Plugin plugin = new Plugin();
         plugin.setGroupId( groupId );
         plugin.setArtifactId( artifactId );
         plugin.setVersion( version );
-        
+
         Xpp3Dom config = new Xpp3Dom( "configuration" );
-        
+
         if( configuration != null )
         {
             for ( Iterator it = configuration.entrySet().iterator(); it.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) it.next();
-                
+
                 Xpp3Dom param = new Xpp3Dom( String.valueOf( entry.getKey() ) );
                 param.setValue( String.valueOf( entry.getValue() ) );
-                
+
                 config.addChild( param );
             }
         }
-        
+
         plugin.setConfiguration( config );
-        
+
         return plugin;
     }
 
@@ -200,7 +204,7 @@ public class ModelUtilsTest
         parentExecution.setId( "testExecution" );
 
         parent.addExecution( parentExecution );
-        
+
         Build parentContainer = new Build();
         parentContainer.addPlugin( parent );
 
@@ -208,18 +212,18 @@ public class ModelUtilsTest
         child.setArtifactId( "testArtifact" );
         child.setGroupId( "testGroup" );
         child.setVersion( "1.0" );
-        
+
         Build childContainer = new Build();
         childContainer.addPlugin( child );
 
         ModelUtils.mergePluginLists( childContainer, parentContainer, true );
-        
+
         List plugins = childContainer.getPlugins();
-        
+
         assertEquals( 1, plugins.size() );
-        
+
         Plugin plugin = (Plugin) plugins.get( 0 );
-        
+
         assertEquals( 1, plugin.getExecutions().size() );
     }
 
@@ -234,7 +238,7 @@ public class ModelUtilsTest
         parentExecution.setId( "testExecution" );
 
         parent.addExecution( parentExecution );
-        
+
         Build parentContainer = new Build();
         parentContainer.addPlugin( parent );
 
@@ -248,18 +252,18 @@ public class ModelUtilsTest
 
         child.addExecution( childExecution );
 
-        
+
         Build childContainer = new Build();
         childContainer.addPlugin( child );
 
         ModelUtils.mergePluginLists( childContainer, parentContainer, true );
-        
+
         List plugins = childContainer.getPlugins();
-        
+
         assertEquals( 1, plugins.size() );
-        
+
         Plugin plugin = (Plugin) plugins.get( 0 );
-        
+
         assertEquals( 2, plugin.getExecutions().size() );
     }
 
@@ -401,5 +405,60 @@ public class ModelUtilsTest
         assertEquals( 1, child.getDependencies().size() );
         Dependency dep2 = (Dependency) child.getDependencies().get( 0 );
         assertEquals( dep.getManagementKey(), dep2.getManagementKey() );
+    }
+
+    public void testShouldOverwritePluginConfigurationSubItemsByDefault()
+        throws XmlPullParserException, IOException
+    {
+        String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
+        Xpp3Dom parentConfig = Xpp3DomBuilder.build( new StringReader( parentConfigStr ) );
+
+        Plugin parentPlugin = createPlugin( "group", "artifact", "1", null );
+        parentPlugin.setConfiguration( parentConfig );
+
+        String childConfigStr = "<configuration><items><item>three</item></items></configuration>";
+        Xpp3Dom childConfig = Xpp3DomBuilder.build( new StringReader( childConfigStr ) );
+
+        Plugin childPlugin = createPlugin( "group", "artifact", "1", null );
+        childPlugin.setConfiguration( childConfig );
+
+        ModelUtils.mergePluginDefinitions( childPlugin, parentPlugin, true );
+
+        Xpp3Dom result = (Xpp3Dom) childPlugin.getConfiguration();
+        Xpp3Dom items = result.getChild( "items" );
+
+        assertEquals( 1, items.getChildCount() );
+
+        Xpp3Dom item = items.getChild( 0 );
+        assertEquals( "three", item.getValue() );
+    }
+
+    public void testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet()
+        throws XmlPullParserException, IOException
+    {
+        String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
+        Xpp3Dom parentConfig = Xpp3DomBuilder.build( new StringReader( parentConfigStr ) );
+
+        Plugin parentPlugin = createPlugin( "group", "artifact", "1", null );
+        parentPlugin.setConfiguration( parentConfig );
+
+        String childConfigStr = "<configuration><items combine.children=\"append\"><item>three</item></items></configuration>";
+        Xpp3Dom childConfig = Xpp3DomBuilder.build( new StringReader( childConfigStr ) );
+
+        Plugin childPlugin = createPlugin( "group", "artifact", "1", null );
+        childPlugin.setConfiguration( childConfig );
+
+        ModelUtils.mergePluginDefinitions( childPlugin, parentPlugin, true );
+
+        Xpp3Dom result = (Xpp3Dom) childPlugin.getConfiguration();
+        Xpp3Dom items = result.getChild( "items" );
+
+        assertEquals( 3, items.getChildCount() );
+
+        Xpp3Dom[] item = items.getChildren();
+
+        assertEquals( "one", item[0].getValue() );
+        assertEquals( "two", item[1].getValue() );
+        assertEquals( "three", item[2].getValue() );
     }
 }
