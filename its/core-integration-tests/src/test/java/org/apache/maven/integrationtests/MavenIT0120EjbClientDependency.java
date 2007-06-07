@@ -27,15 +27,15 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenIT0120EjbClientDependency
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0119()
+    public void testit0120()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0120-ejbClientDependency" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0119", "parent", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0119", "client", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0119", "model", "1.0-SNAPSHOT", "ejb" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0120", "parent", "1.0-SNAPSHOT", "pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0120", "client", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0120", "model", "1.0-SNAPSHOT", "ejb" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
