@@ -183,7 +183,7 @@ under the License.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
