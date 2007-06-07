@@ -159,7 +159,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         suite.addTestSuite( MavenIT0120EjbClientDependency.class );
         // not fixed yet
-        //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-2998
+        //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
         return suite;
     }
