@@ -275,20 +275,38 @@ public class DefaultLifecycleBindingManager
                                         }
                                         catch ( PluginLoaderException e )
                                         {
-                                            throw new LifecycleLoaderException( "Failed to load plugin: " + plugin
-                                                            + ". Reason: " + e.getMessage(), e );
+                                            mojoBinding.setLateBound( true );
+
+                                            String message = "Failed to load plugin descriptor for: "
+                                                             + plugin
+                                                             + ". Assigning this plugin to be resolved again just prior to its execution. "
+                                                             + "NOTE, This may affect assignment of the mojo: "
+                                                             + mojoBinding.getGoal()
+                                                             + " if its default phase (given in the plugin descriptor) is used.";
+
+                                            if ( logger.isDebugEnabled() )
+                                            {
+                                                logger.debug( message, e );
+                                            }
+                                            else
+                                            {
+                                                logger.warn( message + " Check debug output (-X) for more information." );
+                                            }
                                         }
                                     }
 
-                                    if ( pluginDescriptor.getMojos() == null )
+                                    if ( pluginDescriptor != null )
                                     {
-                                        logger.error( "Somehow, the PluginDescriptor for plugin: " + plugin.getKey()
-                                                        + " contains no mojos. This is highly irregular. Ignoring..." );
-                                        continue;
-                                    }
+                                        if ( pluginDescriptor.getMojos() == null )
+                                        {
+                                            logger.error( "Somehow, the PluginDescriptor for plugin: " + plugin.getKey()
+                                                            + " contains no mojos. This is highly irregular. Ignoring..." );
+                                            continue;
+                                        }
 
-                                    MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-                                    phase = mojoDescriptor.getPhase();
+                                        MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+                                        phase = mojoDescriptor.getPhase();
+                                    }
 
                                     if ( phase == null )
                                     {

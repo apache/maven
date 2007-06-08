@@ -209,7 +209,7 @@ public class DefaultBuildPlanner
                 logger.warn( message );
             }
 
-            plan.addLateBoundMojo( mojoBinding );
+            mojoBinding.setLateBound( true );
         }
 
         return pluginDescriptor;

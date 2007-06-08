@@ -27,8 +27,6 @@ public class BuildPlan
 
     private final Map forkedPhases;
 
-    private final List lateBoundMojos;
-
     private List renderedLifecycleMojos = new ArrayList();
 
     private final Map directInvocationBindings;
@@ -47,17 +45,15 @@ public class BuildPlan
         this.tasks = tasks;
         forkedDirectInvocations = new HashMap();
         forkedPhases = new HashMap();
-        lateBoundMojos = new ArrayList();
         directInvocationBindings = new HashMap();
     }
 
-    private BuildPlan( final LifecycleBindings bindings, final Map forkedDirectInvocations, final Map forkedPhases, final List lateBoundMojos,
+    private BuildPlan( final LifecycleBindings bindings, final Map forkedDirectInvocations, final Map forkedPhases,
                        final Map directInvocationBindings, final List tasks )
     {
         this.bindings = LifecycleUtils.cloneBindings( bindings );
         this.forkedDirectInvocations = new HashMap( forkedDirectInvocations );
         this.forkedPhases = new HashMap( forkedPhases );
-        this.lateBoundMojos = new ArrayList( lateBoundMojos );
         this.tasks = tasks;
         this.directInvocationBindings = new HashMap( directInvocationBindings );
     }
@@ -92,11 +88,6 @@ public class BuildPlan
     {
         directInvocationBindings.put( MojoBindingUtils.createMojoBindingKey( binding, false ), binding );
         directInvocationBindings.put( key, binding );
-    }
-
-    public List getLateBoundMojos()
-    {
-        return lateBoundMojos;
     }
 
     public Map getDirectInvocationBindings()
@@ -136,14 +127,9 @@ public class BuildPlan
         invoke.addAll( forkedInvocations );
     }
 
-    public void addLateBoundMojo( final MojoBinding mojoBinding )
-    {
-        lateBoundMojos.add( MojoBindingUtils.createMojoBindingKey( mojoBinding, false ) );
-    }
-
     public BuildPlan copy( final List newTasks )
     {
-        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, lateBoundMojos, directInvocationBindings, newTasks );
+        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, directInvocationBindings, newTasks );
     }
 
     public void resetExecutionProgress()
@@ -214,8 +200,7 @@ public class BuildPlan
 
     private void addResolverIfLateBound( final MojoBinding mojoBinding, final List plan )
     {
-        String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
-        if ( lateBoundMojos.contains( key ) )
+        if ( mojoBinding.isLateBound() )
         {
             MojoBinding resolveBinding = StateManagementUtils.createResolveLateBoundMojoBinding( mojoBinding );
             plan.add( resolveBinding );

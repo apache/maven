@@ -619,20 +619,24 @@
           <type>boolean</type>
         </field>
       </fields>
-<!-- 
       <codeSegments>
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
-
-    public String toString()
+    private boolean lateBound = false;
+          
+    public boolean isLateBound()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getVersion() + ":" + getGoal() + ":" + getExecutionId();
+        return lateBound;
+    }
+          
+    public void setLateBound( boolean lateBound )
+    {
+        this.lateBound = lateBound;
     }
           ]]></code>
         </codeSegment>
       </codeSegments>
- -->
     </class>
   </classes>
 </model>
