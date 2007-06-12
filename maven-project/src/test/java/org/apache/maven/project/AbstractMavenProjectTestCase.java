@@ -28,6 +28,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 
 /**
