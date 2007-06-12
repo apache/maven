@@ -79,7 +79,7 @@ public abstract class AbstractMavenProjectTestCase
             throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
-        return new File( resourceUrl.toURI() );
+        return new File( new URI( resourceUrl.toString() ) );
     }
 
     protected ArtifactRepository getLocalRepository()
