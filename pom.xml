@@ -127,7 +127,7 @@ under the License.
     </dependency>
   </dependencies>
   <properties>
-    <mavenVersion>2.0.7-SNAPSHOT</mavenVersion>
+    <mavenVersion>${project.version}</mavenVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
