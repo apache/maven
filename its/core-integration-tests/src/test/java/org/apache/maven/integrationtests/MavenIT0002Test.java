@@ -24,7 +24,7 @@ public class MavenIT0002Test
         verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0002/PersonTest.class" );
         verifier.assertFilePresent( "target/maven-it-it0002-1.0.jar" );
         verifier.assertFilePresent( "target/maven-it-it0002-1.0.jar!/it0002.properties" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its", "maven-core-it-support", "1.0", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
