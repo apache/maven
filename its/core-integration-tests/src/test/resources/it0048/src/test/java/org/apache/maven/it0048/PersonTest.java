@@ -2,6 +2,7 @@ package org.apache.maven.it0048;
 
 import junit.framework.TestCase;
 import java.net.URL;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,7 +19,7 @@ public class PersonTest
 
         URL resource = cloader.getResource( path );
 
-        File resourceFile = new File( resource.toURI() );
+        File resourceFile = new File( new URI( resource.toString() ) );
 
         String dirPath = resourceFile.getAbsolutePath();
 
