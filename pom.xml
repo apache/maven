@@ -50,9 +50,9 @@ under the License.
     </mailingList>
   </mailingLists>
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
-    <url>https://svn.apache.org/repos/asf/maven/components/trunk</url>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</developerConnection>
+    <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</url>
   </scm>
   <build>
     <pluginManagement>
