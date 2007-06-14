@@ -230,6 +230,18 @@ under the License.
     </site>
   </distributionManagement>
 
+  <!-- for pleuxs-utils -->
+  <repositories>
+    <repository>
+      <id>codehaus.snapshots</id>
+      <name>Codehaus Snapshot Development Repository</name>
+      <url>http://snapshots.repository.codehaus.org</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+
   <!-- needed for felix bundle plugin -->
   <pluginRepositories>
     <pluginRepository>
