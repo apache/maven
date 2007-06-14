@@ -418,7 +418,7 @@ public class DefaultPluginManager
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
             componentRealm.importFrom( componentRealm.getParentRealm().getId(), Xpp3Dom.class.getName() );
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "plexus.core", "org.codehaus.plexus.util.xml.pull" );            
+            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "org.codehaus.plexus.util.xml.pull" );            
         }
         catch ( PlexusContainerException e )
         {
