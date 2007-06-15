@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0123</groupId>
+  <artifactId>maven-it-it0123-dependency</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</project>
