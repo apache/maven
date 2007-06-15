@@ -38,9 +38,13 @@ public class ProjectBaseDirectoryAlignmentTest
 
         assertNotNull( "Test project can't be null!", project );
 
-        assertTrue( project.getBuild().getSourceDirectory().startsWith( getBasedir() ) );
+        File basedirFile = new File( getBasedir() );
+        File sourceDirectoryFile = new File( project.getBuild().getSourceDirectory() );
+        File testSourceDirectoryFile = new File( project.getBuild().getTestSourceDirectory() );
 
-        assertTrue( project.getBuild().getTestSourceDirectory().startsWith( getBasedir() ) );
+        assertEquals( basedirFile.getCanonicalPath(), sourceDirectoryFile.getCanonicalPath().substring( 0, getBasedir().length() ) );
+
+        assertEquals( basedirFile.getCanonicalPath(), testSourceDirectoryFile.getCanonicalPath().substring( 0, getBasedir().length() ) );
 
         Build build = project.getBuild();
 
