@@ -18,7 +18,7 @@ public class MavenIT0002Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0002" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its", "maven-core-it-support", "1.0", "jar" );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "target/classes/org/apache/maven/it0002/Person.class" );
         verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0002/PersonTest.class" );

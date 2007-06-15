@@ -17,7 +17,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.apache.maven.its</groupId>
       <artifactId>maven-core-it-support</artifactId>
       <version>1.0</version>
       <type>jar</type>
