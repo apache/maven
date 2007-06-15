@@ -120,8 +120,10 @@ public class OnlineArtifactDownloader
         // Assume managed snapshot
         if ( dep == null || dep.getGroupId().startsWith( "org.apache.maven" ) )
         {
-            return false;
-
+            if ( !dep.getArtifactId().equals( "maven-parent" ) )
+            {
+                return false;
+            }
         }
 
         // Assume managed snapshot
@@ -341,7 +343,7 @@ public class OnlineArtifactDownloader
             // TODO: use super POM?
             remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT, false, true ) );
             // TODO: use maven root POM?
-            remoteRepositories.add( new Repository( "apache.snapshots", "http://cvs.apache.org/maven-snapshot-repository/",
+            remoteRepositories.add( new Repository( "apache.snapshots", "http://people.apache.org/repo/m2-snapshot-repository/",
                                                     Repository.LAYOUT_DEFAULT, true, false ) );
         }
 
