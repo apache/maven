@@ -275,7 +275,7 @@ under the License.
                 <descriptor>src/main/assembly/src.xml</descriptor>
               </descriptors>
               <tarLongFileMode>gnu</tarLongFileMode>
-              <finalName>maven</finalName>
+              <finalName>maven-${project.version}-src</finalName>
             </configuration>
             <executions>
               <execution>

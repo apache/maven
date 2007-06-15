@@ -21,6 +21,8 @@ under the License.
   <id>src</id>
   <formats>
     <format>zip</format>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
   </formats>
   <fileSets>
     <fileSet>
@@ -29,6 +31,10 @@ under the License.
       <excludes>
         <exclude>**/target/**</exclude>
       </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>target/maven-shared-archive-resources/META-INF</directory>
+      <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
