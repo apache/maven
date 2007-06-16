@@ -41,6 +41,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -665,6 +666,24 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+    }
+
+    public void testSnapshotNotIncluded()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        a.addDependency( "b", "[1.0,)" );
+        createArtifact( "b", "1.0-SNAPSHOT" );
+
+        try
+        {
+            ArtifactResolutionResult res = collect( a );
+            fail( "Expected b not to resolve: " + res );
+        }
+        catch ( OverConstrainedVersionException e )
+        {
+            assertTrue( e.getMessage().indexOf( "[1.0-SNAPSHOT]" ) < e.getMessage().indexOf( "[1.0,)" ) );
+        }
     }
 
     private Artifact getArtifact( String id, Set artifacts )

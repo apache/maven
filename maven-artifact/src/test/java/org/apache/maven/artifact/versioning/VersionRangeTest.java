@@ -144,6 +144,9 @@ public class VersionRangeTest
         assertNull( CHECK_VERSION_RECOMMENDATION, range.getRecommendedVersion() );
         assertFalse( CHECK_SELECTED_VERSION_KNOWN, range.isSelectedVersionKnown( artifact ) );
         assertNull( CHECK_SELECTED_VERSION, range.getSelectedVersion( artifact ) );
+
+        range = VersionRange.createFromVersionSpec( "[1.0,)" );
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
     }
 
     public void testInvalidRanges()
@@ -657,5 +660,34 @@ public class VersionRangeTest
         {
             // expected
         }
+    }
+
+    public void testContains() throws InvalidVersionSpecificationException
+    {
+        ArtifactVersion actualVersion = new DefaultArtifactVersion( "2.0.5" );
+        assertTrue( enforceVersion( "2.0.5", actualVersion ) );
+        assertTrue( enforceVersion( "2.0.4", actualVersion ) );
+        assertTrue( enforceVersion( "[2.0.5]", actualVersion ) );
+        assertFalse( enforceVersion( "[2.0.6,)", actualVersion ) );
+        assertFalse( enforceVersion( "[2.0.6]", actualVersion ) );
+        assertTrue( enforceVersion( "[2.0,2.1]", actualVersion ) );
+        assertFalse( enforceVersion( "[2.0,2.0.3]", actualVersion ) );
+        assertTrue( enforceVersion( "[2.0,2.0.5]", actualVersion ) );
+        assertFalse( enforceVersion( "[2.0,2.0.5)", actualVersion ) );
+    }
+
+    public boolean enforceVersion( String requiredVersionRange, ArtifactVersion actualVersion )
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange vr = null;
+
+        vr = VersionRange.createFromVersionSpec( requiredVersionRange );
+
+        return vr.containsVersion( actualVersion );
+    }
+
+    public void testOrder0()
+    {
+        // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" ) ) > 0 );
     }
 }
