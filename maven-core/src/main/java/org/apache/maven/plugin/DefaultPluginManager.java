@@ -491,10 +491,13 @@ public class DefaultPluginManager
 
         checkPlexusUtils( resolutionGroup, artifactFactory );
 
-        Set dependencies = new LinkedHashSet( resolutionGroup.getArtifacts() );
+        Set dependencies = new LinkedHashSet();
 
-        // Also resolve the plugin dependencies specified in <plugin><dependencies>:
+        // resolve the plugin dependencies specified in <plugin><dependencies> first:
         dependencies.addAll( projectPluginDependencies );
+
+        // followed by the plugin's default artifact set
+        dependencies.addAll( resolutionGroup.getArtifacts() );
 
         List repositories = new ArrayList();
 
