@@ -484,12 +484,7 @@ public class DefaultArtifactCollector
                     listener.includeArtifact( node.getArtifact() );
                     break;
                 case ResolutionListener.OMIT_FOR_NEARER:
-                    String version = node.getArtifact().getVersion();
-                    String replacementVersion = replacement.getVersion();
-                    if ( version != null ? !version.equals( replacementVersion ) : replacementVersion != null )
-                    {
-                        listener.omitForNearer( node.getArtifact(), replacement );
-                    }
+                    listener.omitForNearer( node.getArtifact(), replacement );
                     break;
                 case ResolutionListener.OMIT_FOR_CYCLE:
                     listener.omitForCycle( node.getArtifact() );
