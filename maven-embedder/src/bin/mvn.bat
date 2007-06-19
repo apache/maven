@@ -130,17 +130,17 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 if "%@eval[2+2]" == "4" goto 4NTCWJars
 
 @REM -- Regular WinNT shell
-for %%i in ("%M2_HOME%"\core\boot\classworlds-*) do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%M2_HOME%"\lib\maven-embedder-*) do set MAVEN_JAR="%%i"
 goto runm2
 
 @REM The 4NT Shell from jp software
 :4NTCWJars
-for %%i in ("%M2_HOME%\core\boot\classworlds-*") do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%M2_HOME%\lib\maven-embedder-*") do set MAVEN_JAR="%%i"
 goto runm2
 
 @REM Start MAVEN2
 :runm2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %MAVEN_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
