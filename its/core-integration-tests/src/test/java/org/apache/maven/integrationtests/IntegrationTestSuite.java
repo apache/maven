@@ -33,11 +33,23 @@ public class IntegrationTestSuite
 
     public static Test suite() throws VerificationException
     {
-        String mavenVersion = new Verifier( "" ).getMavenVersion();
+        Verifier verifier = null;
+        try
+        {
+            verifier = new Verifier( "" );
+            String mavenVersion = verifier.getMavenVersion();
 
-        out.println( "Running integration tests for Maven " + mavenVersion );
+            out.println( "Running integration tests for Maven " + mavenVersion );
 
-        System.setProperty( "maven.version", mavenVersion );
+            System.setProperty( "maven.version", mavenVersion );
+        }
+        finally
+        {
+            if ( verifier != null )
+            {
+                verifier.resetStreams();
+            }
+        }
 
         TestSuite suite = new TestSuite();
         suite.addTestSuite( MavenIT0000Test.class );
