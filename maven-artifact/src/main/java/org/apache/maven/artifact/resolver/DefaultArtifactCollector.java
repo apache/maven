@@ -229,12 +229,13 @@ public class DefaultArtifactCollector
                         // if we need to update scope of nearest to use farthest scope, use the nearest version, but farthest scope
                         nearest.disable();
                         farthest.getArtifact().setVersion( nearest.getArtifact().getVersion() );
+                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, nearest, farthest.getArtifact() );
                     }
                     else
                     {
                         farthest.disable();
+                        fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, farthest, nearest.getArtifact() );
                     }
-                    fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, farthest, nearest.getArtifact() );
                 }
             }
         }
