@@ -67,7 +67,13 @@ public class DebugResolutionListener
 
     public void omitForNearer( Artifact omitted, Artifact kept )
     {
-        logger.debug( indent + omitted + " (removed - nearer found: " + kept.getVersion() + ")" );
+        String omittedVersion = omitted.getVersion();
+        String keptVersion = kept.getVersion();
+
+        if ( omittedVersion != null ? !omittedVersion.equals( keptVersion ) : keptVersion != null )
+        {
+            logger.debug( indent + omitted + " (removed - nearer found: " + kept.getVersion() + ")" );
+        }
     }
 
     public void omitForCycle( Artifact omitted )
