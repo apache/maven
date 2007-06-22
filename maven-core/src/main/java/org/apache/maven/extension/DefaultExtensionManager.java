@@ -68,7 +68,7 @@ public class DefaultExtensionManager
     private PlexusContainer container;
 
     private ArtifactFilterManager artifactFilterManager;
-    
+
     private WagonManager wagonManager;
 
     public void addExtension( Extension extension,
@@ -84,7 +84,7 @@ public class DefaultExtensionManager
         Parent originatingParent = originatingModel.getParent();
 
         String groupId = originatingModel.getGroupId();
-        if ( groupId == null && originatingParent != null )
+        if ( ( groupId == null ) && ( originatingParent != null ) )
         {
             groupId = originatingParent.getGroupId();
         }
@@ -92,7 +92,7 @@ public class DefaultExtensionManager
         String artifactId = originatingModel.getArtifactId();
 
         String version = originatingModel.getVersion();
-        if ( version == null && originatingParent != null )
+        if ( ( version == null ) && ( originatingParent != null ) )
         {
             version = originatingParent.getVersion();
         }
@@ -124,12 +124,13 @@ public class DefaultExtensionManager
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
         getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
-        
+
         if ( extensionArtifact != null )
         {
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
 
+            // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
             ArtifactResolutionResult result =
                 artifactResolver.resolveTransitively( Collections.singleton( extensionArtifact ), projectArtifact,
                                                       Collections.EMPTY_MAP, localRepository, remoteRepositories,
@@ -147,7 +148,7 @@ public class DefaultExtensionManager
                 getLogger().debug( "Adding to extension classpath: " + a.getFile() + " in classRealm: " + container.getContainerRealm().getId() );
 
                 container.addJarResource( a.getFile() );
-                
+
                 artifactFilterManager.excludeArtifact( a.getArtifactId() );
             }
         }
@@ -161,7 +162,7 @@ public class DefaultExtensionManager
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private static final class ActiveArtifactResolver
@@ -190,7 +191,7 @@ public class DefaultExtensionManager
                                         Artifact projectArtifact )
         {
             this.passThroughFilter = passThroughFilter;
-            this.projectDependencyConflictId = projectArtifact.getDependencyConflictId();
+            projectDependencyConflictId = projectArtifact.getDependencyConflictId();
         }
 
         public boolean include( Artifact artifact )
