@@ -90,7 +90,7 @@ public class DefaultBuildExtensionScanner
         scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ) );
     }
 
-    // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles, 
+    // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles,
     //       once we move to just-in-time project scanning.
     private void scanInternal( File pom, ArtifactRepository localRepository, ProfileManager globalProfileManager,
                                List visitedModelIds, List reactorFiles )
@@ -114,10 +114,19 @@ public class DefaultBuildExtensionScanner
 
             Map inheritedInterpolationValues = new HashMap();
 
+            List inheritedRemoteRepositories = new ArrayList();
+            inheritedRemoteRepositories.addAll( originalRemoteRepositories );
+
             for ( ModelLineageIterator lineageIterator = lineage.reversedLineageIterator(); lineageIterator.hasNext(); )
             {
                 Model model = (Model) lineageIterator.next();
                 File modelPom = lineageIterator.getPOMFile();
+
+                List remoteRepos = lineageIterator.getArtifactRepositories();
+                if ( ( remoteRepos != null ) && !remoteRepos.isEmpty() )
+                {
+                    inheritedRemoteRepositories.addAll( remoteRepos );
+                }
 
                 String key = createKey( model );
 
@@ -140,7 +149,7 @@ public class DefaultBuildExtensionScanner
 
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
-                checkModelBuildForExtensions( model, localRepository, lineageIterator.getArtifactRepositories() );
+                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories );
 
                 if ( !reactorFiles.contains( modelPom ) )
                 {
@@ -274,7 +283,7 @@ public class DefaultBuildExtensionScanner
         {
             List extensions = build.getExtensions();
 
-            if ( extensions != null && !extensions.isEmpty() )
+            if ( ( extensions != null ) && !extensions.isEmpty() )
             {
                 // thankfully, we don't have to deal with dependencyManagement here, yet.
                 // TODO Revisit if/when extensions are made to use the info in dependencyManagement
