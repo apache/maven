@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: it0124</name> 
+  <groupId>org.apache.maven.its.it0124</groupId>
+  <artifactId>maven-it-it0124-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <description>Plugin that writes the injected artifact factory implementation to a file.</description>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -123,5 +123,6 @@
     <module>it0121-transitiveDepManVersion</module>
     <module>it0122-reactorDependencyResolution</module>
     <module>it0123-snapshotRangeRepository</module>
+    <!-- <module>it0124-pomExtensionComponentOverride</module> not fixed yet -->
   </modules>
 </project>

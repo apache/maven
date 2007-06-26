@@ -176,6 +176,7 @@ public class IntegrationTestSuite
         //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
+        // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         return suite;
     }
 }
