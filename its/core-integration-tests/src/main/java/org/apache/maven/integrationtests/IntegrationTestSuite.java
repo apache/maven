@@ -33,23 +33,11 @@ public class IntegrationTestSuite
 
     public static Test suite() throws VerificationException
     {
-        Verifier verifier = null;
-        try
-        {
-            verifier = new Verifier( "" );
-            String mavenVersion = verifier.getMavenVersion();
+        String mavenVersion = new Verifier( "" ).getMavenVersion();
 
-            out.println( "Running integration tests for Maven " + mavenVersion );
+        out.println( "Running integration tests for Maven " + mavenVersion );
 
-            System.setProperty( "maven.version", mavenVersion );
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
+        System.setProperty( "maven.version", mavenVersion );
 
         TestSuite suite = new TestSuite();
         suite.addTestSuite( MavenIT0000Test.class );
@@ -175,8 +163,6 @@ public class IntegrationTestSuite
         // not fixed yet
         //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
-        // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
-        // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         return suite;
     }
 }

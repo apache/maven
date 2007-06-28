@@ -14,6 +14,9 @@ rm -rf $repo/commons-logging
 # Run the compile phase for the child project. This will bring down commons-logging 1.0.1
 ( cd issue; $mvn compile )
 # Deploy the parent POM with an update version of the commons-logging dependency -> 1.0.2
+
+read
+
 ( cd parent ; $mvn -f pom2.xml deploy )
 # Move the original commons-loggings deps out of the way
 mv $repo/commons-logging $repo/commons-logging-1.0.1
