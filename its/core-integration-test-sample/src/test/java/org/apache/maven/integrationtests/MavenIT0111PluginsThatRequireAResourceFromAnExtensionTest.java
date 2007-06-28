@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
+//!! public class ${className}
 public class MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest
     extends AbstractMavenIntegrationTestCase
 {
