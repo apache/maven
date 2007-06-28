@@ -5,7 +5,7 @@
     <artifactId>core-integration-testing</artifactId>
     <version>1-SNAPSHOT</version>
   </parent>
-  <artifactId>core-integration-tests</artifactId>
+  <artifactId>maven-it</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Maven Integration Tests</name>
   <build>
