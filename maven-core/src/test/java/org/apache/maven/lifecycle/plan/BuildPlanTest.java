@@ -76,11 +76,64 @@ public class BuildPlanTest
         assertBindings( check, executionPlan );
     }
 
+    public void testRender_MojoBoundToPackagePhaseAndForkingPackagePhaseGetsFilteredOut()
+        throws LifecycleSpecificationException, LifecycleLoaderException
+    {
+        MojoBinding mb = new MojoBinding();
+        mb.setGroupId( "test" );
+        mb.setArtifactId( "test-plugin" );
+        mb.setVersion( "1" );
+        mb.setGoal( "validate" );
+
+        BuildBinding binding = new BuildBinding();
+        binding.getValidate().addBinding( mb );
+
+        MojoBinding mb2 = new MojoBinding();
+        mb2.setGroupId( "test" );
+        mb2.setArtifactId( "test-plugin" );
+        mb2.setVersion( "1" );
+        mb2.setGoal( "generate-sources" );
+
+        binding.getGenerateSources().addBinding( mb2 );
+
+        MojoBinding assemblyBinding = new MojoBinding();
+        assemblyBinding.setGroupId( "org.apache.maven.plugins" );
+        assemblyBinding.setArtifactId( "maven-assembly-plugin" );
+        assemblyBinding.setVersion( "2.1" );
+        assemblyBinding.setGoal( "assembly" );
+
+        binding.getCreatePackage().addBinding( assemblyBinding );
+
+        List check = new ArrayList();
+
+        check.add( mb );
+        check.add( mb2 );
+        check.add( StateManagementUtils.createStartForkedExecutionMojoBinding() );
+        check.add( mb );
+        check.add( mb2 );
+        check.add( StateManagementUtils.createEndForkedExecutionMojoBinding() );
+        check.add( assemblyBinding );
+        check.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
+
+        LifecycleBindings bindings = new LifecycleBindings();
+        bindings.setBuildBinding( binding );
+
+        List tasks = Collections.singletonList( "package" );
+
+        BuildPlan plan = new BuildPlan( bindings, tasks );
+
+        plan.addForkedExecution( assemblyBinding, plan.copy( "package" ) );
+
+        List executionPlan = plan.renderExecutionPlan( new Stack() );
+
+        assertBindings( check, executionPlan );
+    }
+
     private void assertBindings( final List check, final List executionPlan )
     {
         assertNotNull( executionPlan );
 
-        System.out.println( "Expected execution plan:\n" + String.valueOf( check ).replace( ',', '\n' ) );
+        System.out.println( "\n\nExpected execution plan:\n" + String.valueOf( check ).replace( ',', '\n' ) );
         System.out.println( "\nActual execution plan:\n" + String.valueOf( executionPlan ).replace( ',', '\n' ) );
 
         assertEquals( "Execution plan does not contain the expected number of mojo bindings.", check.size(),

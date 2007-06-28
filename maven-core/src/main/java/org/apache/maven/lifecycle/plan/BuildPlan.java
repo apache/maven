@@ -11,6 +11,7 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -125,6 +126,11 @@ public class BuildPlan
         }
 
         invoke.addAll( forkedInvocations );
+    }
+
+    public BuildPlan copy( String task )
+    {
+        return copy( Collections.singletonList( task ) );
     }
 
     public BuildPlan copy( final List newTasks )
@@ -270,6 +276,12 @@ public class BuildPlan
         }
 
         return bindings;
+    }
+
+    public void removeAll( List mojoBindings )
+        throws NoSuchPhaseException
+    {
+        LifecycleUtils.removeMojoBindings( mojoBindings, bindings, false );
     }
 
 }
