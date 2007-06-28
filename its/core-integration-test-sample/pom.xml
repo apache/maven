@@ -4,20 +4,6 @@
   <artifactId>maven-it</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Maven Integration Tests</name>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/IntegrationTestSuite.java</include>
-          </includes>
-          <forkMode>never</forkMode>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
