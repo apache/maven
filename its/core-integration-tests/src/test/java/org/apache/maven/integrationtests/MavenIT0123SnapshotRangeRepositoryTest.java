@@ -12,6 +12,7 @@ public class MavenIT0123SnapshotRangeRepositoryTest
      * Test that snapshot repositories are checked for ranges with snapshot boundaries.
      * 
      * @throws Exception
+     * @see <a href="http://jira.codehaus.org/browse/MNG-2994">MNG-2994</a>
      */
     public void testit0123() throws Exception
     {

@@ -12,6 +12,7 @@ public class MavenIT0124PomExtensionComponentOverrideTest
      * Test that ensures the POM extensions can override default component implementations.
      * 
      * @throws Exception
+     * @see <a href="http://jira.codehaus.org/browse/MNG-2771">MNG-2771</a>
      */
     public void testit0124() throws Exception
     {

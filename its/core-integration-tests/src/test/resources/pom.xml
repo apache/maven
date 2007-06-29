@@ -122,8 +122,8 @@
     <!-- <module>it0120-ejbClientDependency</module> not fixed yet -->
     <module>it0121-transitiveDepManVersion</module>
     <module>it0122-reactorDependencyResolution</module>
-    <module>it0123-snapshotRangeRepository</module>
-    <!-- <module>it0124-pomExtensionComponentOverride</module> not fixed yet -->
+    <!-- <module>it0123-snapshotRangeRepository</module> MNG-2994 -->
+    <!-- <module>it0124-pomExtensionComponentOverride</module> MNG-2771 -->
     <!-- <module>it0125-newestConflictResolver</module> MNG-612 -->
   </modules>
 </project>
