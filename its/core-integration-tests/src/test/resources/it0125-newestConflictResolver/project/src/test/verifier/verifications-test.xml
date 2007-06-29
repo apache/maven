@@ -1,0 +1,8 @@
+<verifications>
+  <files>
+    <file>
+      <location>target/dependencies.log</location>
+      <contains>org.apache.maven.its:maven-core-it-support:jar:1.1:compile</contains>
+    </file>
+  </files>
+</verifications>
