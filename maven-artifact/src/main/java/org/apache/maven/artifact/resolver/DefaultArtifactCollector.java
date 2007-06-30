@@ -127,19 +127,14 @@ public class DefaultArtifactCollector
         Artifact managedOriginatingArtifact = (Artifact) versionMap.get( originatingArtifact.getDependencyConflictId() );
         if ( managedOriginatingArtifact != null )
         {
-            String managedVersion = managedOriginatingArtifact.getVersion();
-            String version = originatingArtifact.getVersion();
-            if ( !managedVersion.equals( version ) )
+            // TODO we probably want to warn the user that he is building an artifact with
+            // different values than in dependencyManagement
+            if ( managedVersions instanceof ManagedVersionMap )
             {
-                // TODO we probably want to warn the user that he is building and artifact with a
-                // different version than in dependencyManagement 
-                if ( managedVersions instanceof ManagedVersionMap )
-                {
-                    /* avoid modifying the managedVersions parameter creating a new map */
-                    versionMap = new ManagedVersionMap( managedVersions );
-                }
-                versionMap.remove( originatingArtifact.getDependencyConflictId() );
+                /* avoid modifying the managedVersions parameter creating a new map */
+                versionMap = new ManagedVersionMap( managedVersions );
             }
+            versionMap.remove( originatingArtifact.getDependencyConflictId() );
         }
 
         return versionMap;
