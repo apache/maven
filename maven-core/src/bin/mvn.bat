@@ -145,6 +145,7 @@ if ERRORLEVEL 1 goto error
 goto end
 
 :error
+if "%OS%"=="Windows_NT" @endlocal
 set ERROR_CODE=1
 
 :end
