@@ -130,6 +130,10 @@ public class RegexBasedModelInterpolator
     {
         Logger logger = getLogger();
 
+        boolean isSnapshotModel = ( model.getVersion() == null
+            ? model.getParent() == null ? "" : model.getParent().getVersion()
+            : model.getVersion() ).indexOf( "SNAPSHOT" ) >= 0;
+
         String result = src;
         Matcher matcher = EXPRESSION_PATTERN.matcher( result );
         while ( matcher.find() )
@@ -144,11 +148,16 @@ public class RegexBasedModelInterpolator
 
             boolean isPomExpression = "pom.".equals( prefix ) || "project.".equals( prefix );
 
-            if ( logger != null && "project.".equals( prefix ) )
-            {
-                logger.warn( "Deprecated expression: " + wholeExpr + " - 'project.' prefix is deprecated."
-                    + " Use 'pom.': ${pom." + realExpr + "} (model: " + model.getId() + ")" );
-            }
+// TODO
+// I don't think we should deprecate this as it's used in plugin params aswell,
+// and project.build.outputDirectory etc. are documented.
+// For now I'll allow both pom. and project.
+// Perhaps pom. should be deprecated instead?
+//            if ( isSnapshotModel && logger != null && "project.".equals( prefix ) )
+//            {
+//                logger.warn( "Deprecated expression: " + wholeExpr + " - 'project.' prefix is deprecated."
+//                    + " Use 'pom.': ${pom." + realExpr + "} (model: " + model.getId() + ")" );
+//            }
 
             if ( isPomExpression )
             {
@@ -179,7 +188,7 @@ public class RegexBasedModelInterpolator
             {
                 value = getValueFromModel( realExpr, model, wholeExpr, logger );
 
-                if ( value != null && logger != null )
+                if ( isSnapshotModel && value != null && logger != null )
                 {
                     logger.warn( "Deprecated expression: " + wholeExpr + " - missing prefix. Use ${pom."
                         + realExpr + "} (model: " + model.getId() + ")" );
