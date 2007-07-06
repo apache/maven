@@ -42,7 +42,7 @@ public class AbstractArtifactResolutionException
     private String version;
 
     private String type;
-    
+
     private String classifier;
 
     private List remoteRepositories;
@@ -232,7 +232,7 @@ public class AbstractArtifactResolutionException
                 sb.append( indentation );
                 sb.append( "Try downloading the file manually from the project website." );
             }
-            
+
             sb.append( LS );
             sb.append( LS );
             sb.append( indentation );
@@ -263,6 +263,7 @@ public class AbstractArtifactResolutionException
             // If people want to deploy it
 
             sb.append( "Alternatively, if you host your own repository you can deploy the file there: " );
+            sb.append( LS );
             sb.append( indentation );
             sb.append( "    mvn deploy:deploy-file -DgroupId=" );
             sb.append( groupId );
@@ -295,7 +296,7 @@ public class AbstractArtifactResolutionException
 
         return sb.toString();
     }
-    
+
     public String getArtifactPath()
     {
         return path;
