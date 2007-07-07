@@ -671,9 +671,9 @@ public class DefaultArtifactCollectorTest
     public void testSnapshotNotIncluded()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
-        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         a.addDependency( "b", "[1.0,)" );
-        createArtifact( "b", "1.0-SNAPSHOT" );
+        createArtifactSpec( "b", "1.0-SNAPSHOT" );
 
         try
         {
