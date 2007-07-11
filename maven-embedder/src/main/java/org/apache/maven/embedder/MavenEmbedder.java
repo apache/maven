@@ -407,7 +407,7 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
     {
-        return mavenProjectBuilder.build( mavenProject, localRepository, profileManager );
+        return mavenProjectBuilder.build( mavenProject, localRepository, profileManager, false );
     }
 
     /**
