@@ -325,7 +325,7 @@ public class DefaultLifecycleBindingManager
                                             message.append( "\nHowever, the mojo metadata it contains does not specify a default lifecycle phase binding." );
                                             message.append( "\n\nPlease provide a valid <phase/> specification for execution: " )
                                                    .append( execution.getId() )
-                                                   .append( " in plugin: " )
+                                                   .append( "\nin plugin: " )
                                                    .append( plugin.getKey() );
                                             message.append( "\n\n" );
 
@@ -343,8 +343,9 @@ public class DefaultLifecycleBindingManager
                                                     .append( "\n(if there is one) is impossible." );
                                             message.append( "\n\nPlease ensure that the plugin: " )
                                                    .append( plugin.getKey() )
-                                                   .append( " can be resolved by Maven, then try re-running this " )
-                                                   .append( "\nbuild with the -U option, to ensure that all plugin metadata is refreshed." );
+                                                   .append( " can be resolved by Maven," )
+                                                   .append( "\nthen try re-running this build with the -U option " )
+                                                   .append( "\n(to ensure that all plugin metadata is refreshed)." );
                                             message.append( "\n\n" );
 
                                             throw new LifecycleSpecificationException( message.toString() );
