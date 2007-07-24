@@ -147,6 +147,9 @@ public class VersionRangeTest
 
         range = VersionRange.createFromVersionSpec( "[1.0,)" );
         assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
+
+        range = VersionRange.createFromVersionSpec( "[1.0,1.1]" );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
     }
 
     public void testInvalidRanges()
