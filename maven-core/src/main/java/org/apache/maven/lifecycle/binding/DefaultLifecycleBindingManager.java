@@ -337,7 +337,7 @@ public class DefaultLifecycleBindingManager
 
                                             message.append( "\n\nNo lifecycle phase binding can be found for goal: " + goal );
                                             message.append( ",\nspecified as a part of the execution: " + execution.getId() );
-                                            message.append( " in plugin: " );
+                                            message.append( "\nin plugin: " );
                                             message.append( plugin.getKey() );
                                             message.append( "\n\nThis plugin could not be resolved, so use of the default lifecycle phase binding " )
                                                     .append( "\n(if there is one) is impossible." );
