@@ -555,9 +555,9 @@ public class MavenProject
     {
         List list = new ArrayList( getArtifacts().size() + 2 );
 
-        list.add( getBuild().getOutputDirectory() );
-
         list.add( getBuild().getTestOutputDirectory() );
+
+        list.add( getBuild().getOutputDirectory() );
         
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
