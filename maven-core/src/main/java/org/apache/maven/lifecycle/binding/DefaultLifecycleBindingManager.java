@@ -265,6 +265,8 @@ public class DefaultLifecycleBindingManager
                                 mojoBinding.setOrigin( "POM" );
 
                                 String phase = execution.getPhase();
+                                boolean pluginResolved = false;
+
                                 if ( phase == null )
                                 {
                                     if ( pluginDescriptor == null )
@@ -272,6 +274,7 @@ public class DefaultLifecycleBindingManager
                                         try
                                         {
                                             pluginDescriptor = pluginLoader.loadPlugin( plugin, project );
+                                            pluginResolved = true;
                                         }
                                         catch ( PluginLoaderException e )
                                         {
@@ -310,9 +313,42 @@ public class DefaultLifecycleBindingManager
 
                                     if ( phase == null )
                                     {
-                                        throw new LifecycleSpecificationException( "No phase specified for goal: "
-                                                        + goal + " in plugin: " + plugin.getKey() + " from POM: "
-                                                        + projectId );
+                                        if ( pluginResolved )
+                                        {
+                                            StringBuffer message = new StringBuffer();
+
+                                            message.append( "\n\nNo lifecycle phase binding can be found for goal: " + goal );
+                                            message.append( ",\nspecified as a part of the execution: " + execution.getId() );
+                                            message.append( "in plugin: " );
+                                            message.append( pluginDescriptor.getPluginLookupKey() );
+                                            message.append( "\n\nThis plugin was resolved successfully." );
+                                            message.append( "\nHowever, the mojo metadata it contains does not specify a default lifecycle phase binding." );
+                                            message.append( "\n\nPlease provide a valid <phase/> specification for execution: " )
+                                                   .append( execution.getId() )
+                                                   .append( " in plugin: " )
+                                                   .append( plugin.getKey() );
+                                            message.append( "\n\n" );
+
+                                            throw new LifecycleSpecificationException( message.toString() );
+                                        }
+                                        else
+                                        {
+                                            StringBuffer message = new StringBuffer();
+
+                                            message.append( "\n\nNo lifecycle phase binding can be found for goal: " + goal );
+                                            message.append( ",\nspecified as a part of the execution: " + execution.getId() );
+                                            message.append( "in plugin: " );
+                                            message.append( pluginDescriptor.getPluginLookupKey() );
+                                            message.append( "\n\nThis plugin could not be resolved, so use of the default lifecycle phase binding " )
+                                                    .append( "\n(if there is one) is impossible." );
+                                            message.append( "\n\nPlease ensure that the plugin: " )
+                                                   .append( plugin.getKey() )
+                                                   .append( " can be resolved by Maven, then try re-running this " )
+                                                   .append( "\nbuild with the -U option, to ensure that all plugin metadata is refreshed." );
+                                            message.append( "\n\n" );
+
+                                            throw new LifecycleSpecificationException( message.toString() );
+                                        }
                                     }
                                 }
 
