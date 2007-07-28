@@ -16,7 +16,7 @@
     </dependency>
   </dependencies>
 
-  <prerequesites>
+  <prerequisites>
     <maven>2.0-alpha-3</maven>
-  </prerequesites>
+  </prerequisites>
 </project>
