@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven.its.it0030</groupId>
@@ -7,4 +7,4 @@
   </parent>
   <artifactId>project1</artifactId>
   <version>1.0-SNAPSHOT</version>
-</model>
+</project>

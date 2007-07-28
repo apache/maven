@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.it0037</groupId>
   <artifactId>maven-it-it0037</artifactId>
@@ -13,4 +13,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

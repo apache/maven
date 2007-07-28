@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <name>Maven Integration Test :: it0032</name> 
   <groupId>org.apache.maven.its.it0032</groupId>
@@ -19,4 +19,4 @@
   <prerequesites>
     <maven>2.0-alpha-3</maven>
   </prerequesites>
-</model>
+</project>
