@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
@@ -19,4 +19,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-</model>
+</project>
