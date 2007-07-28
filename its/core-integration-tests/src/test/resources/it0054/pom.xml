@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <name>Maven Integration Test :: it0054</name> 
   <groupId>org.apache.maven.its.it0054</groupId>
@@ -26,4 +26,4 @@
       </resource>
     </resources>
   </build>
-</model>
+</project>
