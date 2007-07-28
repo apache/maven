@@ -43,7 +43,7 @@ under the License.
       <plugin>
         <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-alpha-4</version>
+        <version>1.0-alpha-8-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -51,8 +51,12 @@ under the License.
               <goal>shade</goal>
             </goals>
             <configuration>
+              <transformers>
+               <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+              </transformers>
               <artifactSet>
                 <excludes>
+                  <exclude>org.codehaus.plexus:plexus-component-api</exclude>                
                   <exclude>classworlds:classworlds</exclude>
                   <exclude>junit:junit</exclude>
                   <exclude>jmock:jmock</exclude>

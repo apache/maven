@@ -80,7 +80,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>1.0-alpha-13</version>
+          <version>1.0-alpha-16-SNAPSHOT</version>
           <executions>
             <execution>
               <id>site-docs</id>
@@ -128,7 +128,7 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-25</plexusVersion>
+    <plexusVersion>1.0-alpha-29</plexusVersion>
     <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
   <dependencies>
@@ -148,18 +148,13 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-api</artifactId>
-        <version>${plexusVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>1.2-alpha-7</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.4.3-SNAPSHOT</version>
+        <version>1.4.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

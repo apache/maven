@@ -40,6 +40,8 @@ public abstract class AbstractEmbedderTestCase
     {
         super.setUp();
 
+        System.out.println( ">>> " + getBasedir() );
+        
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         Configuration configuration = new DefaultConfiguration()

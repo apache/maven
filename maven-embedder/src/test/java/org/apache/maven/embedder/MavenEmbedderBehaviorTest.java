@@ -25,7 +25,7 @@ import java.io.File;
 
 /** @author Jason van Zyl */
 public class MavenEmbedderBehaviorTest
-    extends PlexusTestCase
+    extends AbstractEmbedderTestCase
 {
     public void testThatTheLocalRepositoryIsTakenFromGlobalSettingsWhenUserSettingsAreNull()
         throws Exception

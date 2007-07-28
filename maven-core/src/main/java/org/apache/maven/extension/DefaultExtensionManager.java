@@ -20,11 +20,17 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -46,6 +52,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Used to locate extensions.
@@ -130,9 +138,30 @@ public class DefaultExtensionManager
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
 
+
+            ResolutionGroup resolutionGroup;
+
+            try
+            {
+                resolutionGroup = artifactMetadataSource.retrieve( extensionArtifact, localRepository, remoteRepositories );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
+                    extensionArtifact.getId() + "': " + e.getMessage(), extensionArtifact, e );
+            }
+
+            // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
+            // not declare plexus-utils but need it. MNG-2900
+            DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
+
+            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+
+            dependencies.add( extensionArtifact );
+
             // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
             ArtifactResolutionResult result =
-                artifactResolver.resolveTransitively( Collections.singleton( extensionArtifact ), projectArtifact,
+                artifactResolver.resolveTransitively( dependencies, projectArtifact,
                                                       Collections.EMPTY_MAP, localRepository, remoteRepositories,
                                                       artifactMetadataSource, filter );
 
@@ -202,4 +231,53 @@ public class DefaultExtensionManager
         }
     }
 
+    public static void checkPlexusUtils( ResolutionGroup resolutionGroup, ArtifactFactory artifactFactory )
+    {
+        // ----------------------------------------------------------------------------
+        // If the plugin already declares a dependency on plexus-utils then we're all
+        // set as the plugin author is aware of its use. If we don't have a dependency
+        // on plexus-utils then we must protect users from stupid plugin authors who
+        // did not declare a direct dependency on plexus-utils because the version
+        // Maven uses is hidden from downstream use. We will also bump up any
+        // anything below 1.1 to 1.1 as this mimics the behaviour in 2.0.5 where
+        // plexus-utils 1.1 was being forced into use.
+        // ----------------------------------------------------------------------------
+
+        VersionRange vr = null;
+
+        try
+        {
+            vr = VersionRange.createFromVersionSpec( "[1.1,)" );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            // Won't happen
+        }
+
+        boolean plexusUtilsPresent = false;
+
+        for ( Iterator i = resolutionGroup.getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( a.getArtifactId().equals( "plexus-utils" ) &&
+                vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
+            {
+                plexusUtilsPresent = true;
+
+                break;
+            }
+        }
+
+        if ( !plexusUtilsPresent )
+        {
+            // We will add plexus-utils as every plugin was getting this anyway from Maven itself. We will set the
+            // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
+            // as this is what's implicitly happening in 2.0.6.
+
+            resolutionGroup.getArtifacts().add( artifactFactory.createArtifact( "org.codehaus.plexus",
+                                                                                "plexus-utils", "1.1",
+                                                                                Artifact.SCOPE_RUNTIME, "jar" ) );
+        }
+    }    
 }
