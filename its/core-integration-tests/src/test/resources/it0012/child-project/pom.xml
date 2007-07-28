@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
   <artifactId>child-project</artifactId>
@@ -17,4 +17,4 @@
       </plugin>
     </plugins>
   </build>
-</model>
+</project>
