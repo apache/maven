@@ -9,9 +9,30 @@ import java.io.File;
 
 /**
  * Take some configuration values that use interpolated POM values and write them to a properties file
- * to make sure they are passing through the system properly. We have reports (MNG-1927) that we're
+ * to make sure they are passing through the system properly. We are using this mojo in it0088, and the
+ * configuration looks like the following:
+ * 
+ * <plugin>
+ *   <groupId>org.apache.maven.its.plugins</groupId>
+ *   <artifactId>maven-it-plugin-generate-properties</artifactId>
+ *   <version>1.0-SNAPSHOT</version>
+ *   <executions>
+ *     <execution>
+ *       <phase>process-resources</phase>
+ *       <configuration>
+ *         <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+ *         <targetDirectoryString>target</targetDirectoryString>
+ *         <targetDirectoryFile>target</targetDirectoryFile>
+ *       </configuration>
+ *       <goals>
+ *         <goal>generate-properties</goal>
+ *       </goals>
+ *     </execution>
+ *   </executions>
+ * </plugin>
  * 
  * @goal generate-properties
+ *
  */
 public class InterpolatedPomConfigurationMojo
     extends AbstractMojo
@@ -22,6 +43,11 @@ public class InterpolatedPomConfigurationMojo
     private String basedir;
 
     /**
+     * This is using the plugin configuration above and so ${project.build.directory} is the value
+     * of the expression ${projectBuildDirectory} and should be the full path to the scratch directory
+     * which often looks something like /path/to/project/target. For the 2.0.x family this always results
+     * in a full path, and bugs have resulted when it resolves to something that is not a full path like "target".
+     *
      * @parameter expression="${projectBuildDirectory}"
      */
     private String projectBuildDirectory;
@@ -44,6 +70,7 @@ public class InterpolatedPomConfigurationMojo
             Properties mojoGeneratedPropeties = new Properties();
 
             mojoGeneratedPropeties.put( "project.build.directory", projectBuildDirectory );
+            
             if ( targetDirectoryString != null )
             {
                 mojoGeneratedPropeties.put( "targetDirectoryString", targetDirectoryString );
