@@ -148,6 +148,13 @@ public class RegexBasedModelInterpolator
 
             boolean isPomExpression = "pom.".equals( prefix ) || "project.".equals( prefix );
 
+            // Check for special expressions that should NOT be interpolated.
+            // See DefaultProjectBuilder and MNG-2124/MNG-1927.
+            if ( context.get( realExpr ) == null && context.containsKey( realExpr ) )
+            {
+                continue;
+            }
+
 // TODO
 // I don't think we should deprecate this as it's used in plugin params aswell,
 // and project.build.outputDirectory etc. are documented.
@@ -167,13 +174,6 @@ public class RegexBasedModelInterpolator
             if ( value == null )
             {
                 value = context.get( realExpr );
-
-                // This may look out of place, but its here for the MNG-2124/MNG-1927 fix described in the project builder
-                if ( value == null && context.containsKey( realExpr ) )
-                {
-                    // It existed, but was null. Leave it alone.
-                    continue;
-                }
             }
 
             if ( value == null )
