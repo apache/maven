@@ -43,7 +43,7 @@ under the License.
       <plugin>
         <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-alpha-8-SNAPSHOT</version>
+        <version>1.0-alpha-10</version>
         <executions>
           <execution>
             <phase>package</phase>
