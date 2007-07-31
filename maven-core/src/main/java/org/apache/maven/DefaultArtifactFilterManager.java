@@ -59,6 +59,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "maven-reporting-api" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
+        artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
         artifacts.add( "wagon-provider-api" );
