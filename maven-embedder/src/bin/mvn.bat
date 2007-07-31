@@ -1,21 +1,19 @@
 @REM ----------------------------------------------------------------------------
-@REM Licensed to the Apache Software Foundation (ASF) under one
-@REM or more contributor license agreements.  See the NOTICE file
-@REM distributed with this work for additional information
-@REM regarding copyright ownership.  The ASF licenses this file
-@REM to you under the Apache License, Version 2.0 (the
-@REM "License"); you may not use this file except in compliance
-@REM with the License.  You may obtain a copy of the License at
-@REM
-@REM    http://www.apache.org/licenses/LICENSE-2.0
-@REM
-@REM Unless required by applicable law or agreed to in writing,
-@REM software distributed under the License is distributed on an
-@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-@REM KIND, either express or implied.  See the License for the
-@REM specific language governing permissions and limitations
-@REM under the License.
+@REM Copyright 2001-2004 The Apache Software Foundation.
+@REM 
+@REM Licensed under the Apache License, Version 2.0 (the "License");
+@REM you may not use this file except in compliance with the License.
+@REM You may obtain a copy of the License at
+@REM 
+@REM      http://www.apache.org/licenses/LICENSE-2.0
+@REM 
+@REM Unless required by applicable law or agreed to in writing, software
+@REM distributed under the License is distributed on an "AS IS" BASIS,
+@REM WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@REM See the License for the specific language governing permissions and
+@REM limitations under the License.
 @REM ----------------------------------------------------------------------------
+@REM 
 
 @REM ----------------------------------------------------------------------------
 @REM Maven2 Start Up Batch script
@@ -36,9 +34,6 @@
 @echo off
 @REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
-
-@REM set %HOME% to equivalent of $HOME
-if "%HOME%" == "" (set HOME=%HOMEDRIVE%%HOMEPATH%)
 
 @REM Execute a user defined script before this one
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
@@ -101,7 +96,7 @@ goto error
 if NOT "%OS%"=="Windows_NT" goto Win9xArg
 
 @REM -- 4NT shell
-if "%@eval[2+2]" == "4" goto 4NTArgs
+if "%eval[2+2]" == "4" goto 4NTArgs
 
 @REM -- Regular WinNT shell
 set MAVEN_CMD_LINE_ARGS=%*
@@ -126,25 +121,14 @@ goto Win9xApp
 :endInit
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-@REM -- 4NT shell
-if "%@eval[2+2]" == "4" goto 4NTCWJars
-
-@REM -- Regular WinNT shell
-for %%i in ("%M2_HOME%"\lib\maven-embedder-*) do set MAVEN_JAR="%%i"
-goto runm2
-
-@REM The 4NT Shell from jp software
-:4NTCWJars
-for %%i in ("%M2_HOME%\lib\maven-embedder-*") do set MAVEN_JAR="%%i"
-goto runm2
-
 @REM Start MAVEN2
-:runm2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %MAVEN_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
+for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.plexus.classworlds.launcher.Launcher %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
 :error
+if "%OS%"=="Windows_NT" @endlocal
 set ERROR_CODE=1
 
 :end
@@ -168,4 +152,5 @@ if "%MAVEN_BATCH_PAUSE%" == "on" pause
 if "%MAVEN_TERMINATE_CMD%" == "on" exit %ERROR_CODE%
 
 exit /B %ERROR_CODE%
+
 
