@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><archetype-descriptor id="maven-integration-test-sample-archetype">
+  <fileSets>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>src/test/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>src/test/resources</directory>
+      <includes>
+        <include>**/*.txt</include>
+        <include>**/*.java</include>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>src/test/resources</directory>
+      <includes>
+        <include>**/*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory></directory>
+      <includes>
+        <include>.classpath</include>
+        <include>.project</include>
+        <include>out.txt</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</archetype-descriptor>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><archetype>
+  <id>maven-integration-test-sample-archetype</id>
+  <testSources>
+    <source>src\test\java\org\apache\maven\itSample\MavenITmngXXXXDescriptionOfProblemTest.java</source>
+  </testSources>
+  <resources>
+    <resource>.classpath</resource>
+    <resource>.project</resource>
+    <resource>out.txt</resource>
+  </resources>
+  <testResources>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\checkstyle-assembly\pom.xml</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\checkstyle-assembly\src\main\resources\rule_set.xml</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\checkstyle-assembly\src\main\resources\stc_checks.xml</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\checkstyle-test\pom.xml</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\checkstyle-test\src\main\java\Class.java</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\pom.xml</resource>
+    <resource>src\test\resources\mng-xxxx-descriptionOfProblem\readme.txt</resource>
+  </testResources>
+</archetype>

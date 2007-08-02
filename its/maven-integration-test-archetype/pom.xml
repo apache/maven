@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven-parent</artifactId>
+    <version>6-SNAPSHOT</version>
+  </parent>
+  <groupId>org.apache.maven.archetypes</groupId>
+  <artifactId>maven-integration-test-archetype</artifactId>
+  <packaging>maven-archetype</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-archetypeng-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <artifactId>maven-archetypeng-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

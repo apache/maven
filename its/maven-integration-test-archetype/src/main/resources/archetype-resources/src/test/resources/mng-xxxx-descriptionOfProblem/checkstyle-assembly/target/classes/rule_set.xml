@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<ruleset name="EPHS Custom ruleset"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+  <description>
+  This ruleset checks EPHS code
+  </description>
+
+  <rule ref="rulesets/finalizers.xml"/>  
+
+  
+  <rule ref="rulesets/controversial.xml/UnnecessaryParentheses"/>
+
+  <rule ref="rulesets/optimizations.xml/UseArrayListInsteadOfVector"/>
+  <rule ref="rulesets/optimizations.xml/SimplifyStartsWith"/>
+  <rule ref="rulesets/optimizations.xml/UseArraysAsList"/>
+  <rule ref="rulesets/optimizations.xml/AvoidArrayLoops"/>
+  <!--<rule ref="rulesets/optimizations.xml/UnnecessaryWrapperObjectCreation"/> -->
+
+  <rule ref="rulesets/j2ee.xml/UseProperClassLoader"/>
+
+
+  <rule ref="rulesets/basic.xml/EmptyCatchBlock"/>
+  <rule ref="rulesets/basic.xml/EmptyIfStmt"/>
+  <rule ref="rulesets/basic.xml/EmptyWhileStmt"/>
+  <rule ref="rulesets/basic.xml/EmptyTryBlock"/>
+  <rule ref="rulesets/basic.xml/EmptyFinallyBlock"/>
+  <rule ref="rulesets/basic.xml/EmptySwitchStatements"/>
+  <rule ref="rulesets/basic.xml/JumbledIncrementer"/>
+  <rule ref="rulesets/basic.xml/UnnecessaryConversionTemporary"/>
+  <rule ref="rulesets/basic.xml/DoubleCheckedLocking"/>
+  <rule ref="rulesets/basic.xml/OverrideBothEqualsAndHashcode"/>
+  <rule ref="rulesets/basic.xml/ReturnFromFinallyBlock"/>
+  <rule ref="rulesets/basic.xml/EmptySynchronizedBlock"/>
+  <rule ref="rulesets/basic.xml/UnnecessaryReturn"/>
+  <rule ref="rulesets/basic.xml/UnconditionalIfStatement"/>
+  <rule ref="rulesets/basic.xml/EmptyStatementNotInLoop"/>
+  <rule ref="rulesets/basic.xml/BooleanInstantiation"/>
+  <rule ref="rulesets/basic.xml/CollapsibleIfStatements"/>
+  <rule ref="rulesets/basic.xml/ClassCastExceptionWithToArray"/>
+  <rule ref="rulesets/basic.xml/UselessOperationOnImmutable"/>
+ <!-- <rule ref="rulesets/basic.xml/NullPointerException"/> -->
+  <rule ref="rulesets/basic.xml/AvoidThreadGroup"/>
+ <!-- <rule ref="rulesets/basic.xml/BrokenNullCheck"/> -->
+ 
+  <rule ref="rulesets/sunsecure.xml"/>
+  <rule ref="rulesets/strictexception.xml"/>
+  
+  <rule ref="rulesets/codesize.xml/ExcessiveMethodLength"/>
+  <rule ref="rulesets/codesize.xml/ExcessiveParameterList"/>
+
+  <rule ref="rulesets/design.xml/SimplifyBooleanReturns"/>  
+  
+  
+  <rule ref="rulesets/design.xml/AvoidDeeplyNestedIfStmts"/>
+  <rule ref="rulesets/design.xml/ConstructorCallsOverridableMethod"/>
+  <rule ref="rulesets/design.xml/CloseResource"/>
+  <rule ref="rulesets/design.xml/NonStaticInitializer"/>
+  <rule ref="rulesets/design.xml/DefaultLabelNotLastInSwitchStmt"/>
+  <rule ref="rulesets/design.xml/NonCaseLabelInSwitchStatement"/>
+  <rule ref="rulesets/design.xml/OptimizableToArrayCall"/>
+  <rule ref="rulesets/design.xml/BadComparison"/>
+  <rule ref="rulesets/design.xml/EqualsNull"/>
+  <rule ref="rulesets/design.xml/InstantiationToGetClass"/>
+  <rule ref="rulesets/design.xml/IdempotentOperations"/>
+  <rule ref="rulesets/design.xml/AssignmentToNonFinalStatic"/>
+  <rule ref="rulesets/design.xml/MissingStaticMethodInNonInstantiatableClass"/>
+  <rule ref="rulesets/design.xml/MissingBreakInSwitch"/>
+  <rule ref="rulesets/design.xml/UseNotifyAllInsteadOfNotify"/>
+  <rule ref="rulesets/design.xml/SimplifyConditional"/>
+  <rule ref="rulesets/design.xml/CompareObjectsWithEquals"/>
+  <rule ref="rulesets/design.xml/UnnecessaryLocalBeforeReturn"/>
+  <rule ref="rulesets/design.xml/UnsynchronizedStaticDateFormatter"/>
+  <rule ref="rulesets/design.xml/PreserveStackTrace"/>
+
+  <rule ref="rulesets/strings.xml/StringInstantiation"/>
+  <rule ref="rulesets/strings.xml/StringToString"/>
+  <rule ref="rulesets/strings.xml/UnnecessaryCaseChange"/>
+  <rule ref="rulesets/strings.xml/UseStringBufferLength"/>
+  <rule ref="rulesets/strings.xml/InsufficientStringBufferDeclaration"/>
+  <!--<rule ref="rulesets/strings.xml/UselessStringValueOf"/>  -->
+
+
+  <rule ref="rulesets/imports.xml"/>
+
+  <rule ref="rulesets/naming.xml/VariableNamingConventions"/>
+
+  <!--<rule ref="rulesets/naming.xml/AvoidDollarSign"/> -->
+  <rule ref="rulesets/naming.xml/SuspiciousHashcodeMethodName"/>
+  <rule ref="rulesets/naming.xml/SuspiciousConstantFieldName"/>
+  <rule ref="rulesets/naming.xml/SuspiciousEqualsMethodName"/>
+  <rule ref="rulesets/naming.xml/AvoidFieldNameMatchingTypeName"/>
+  <rule ref="rulesets/naming.xml/AvoidFieldNameMatchingMethodName"/>
+  <rule ref="rulesets/naming.xml/AvoidNonConstructorMethodsWithClassName"/>
+  
+  <rule ref="rulesets/naming.xml/NoPackage"/>
+  <rule ref="rulesets/naming.xml/PackageCase"/>  
+  <rule ref="rulesets/naming.xml/MisleadingVariableName"/>
+
+
+  <rule ref="rulesets/logging-java.xml/SystemPrintln"/>
+  <rule ref="rulesets/logging-java.xml/AvoidPrintStackTrace"/>
+  
+  <rule ref="rulesets/logging-jakarta-commons.xml/UseCorrectExceptionLogging"/>
+  
+
+  <rule ref="rulesets/braces.xml"/>
+
+</ruleset>
