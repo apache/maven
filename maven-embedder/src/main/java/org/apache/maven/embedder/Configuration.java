@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -76,6 +77,10 @@ public interface Configuration
 
     Configuration setClassLoader( ClassLoader loader );
 
+    PlexusContainer getParentContainer();
+
+    Configuration setParentContainer( PlexusContainer parentContainer );
+
     // ----------------------------------------------------------------------------
     // Profiles
     // ----------------------------------------------------------------------------
@@ -120,5 +125,5 @@ public interface Configuration
 
     void addExtension( URL url );
 
-    List getExtensions();    
+    List getExtensions();
 }

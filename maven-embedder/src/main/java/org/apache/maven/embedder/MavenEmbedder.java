@@ -494,17 +494,17 @@ public class MavenEmbedder
     {
         return getBuildLifecyclePhases();
     }
-    
+
     public List getAllLifecyclePhases()
     {
         return LifecycleUtils.getValidPhaseNames();
     }
-    
+
     public List getDefaultLifecyclePhases()
     {
         return getBuildLifecyclePhases();
     }
-    
+
     public List getBuildLifecyclePhases()
     {
         return LifecycleUtils.getValidBuildPhaseNames();
@@ -557,7 +557,7 @@ public class MavenEmbedder
         try
         {
             ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( classWorld );
+                .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() );
 
             container = new DefaultPlexusContainer( cc );
         }
@@ -918,7 +918,7 @@ public class MavenEmbedder
 
     /**
      * Return the instance of the plexus container being used in the embedder.
-     *  
+     *
      * @return The plexus container used in the embedder.
      */
     public PlexusContainer getPlexusContainer()

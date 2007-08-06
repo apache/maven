@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import java.io.File;
@@ -52,6 +53,8 @@ public class DefaultConfiguration
     private MavenEmbedderLogger logger;
 
     private ClassWorld classWorld;
+
+    private PlexusContainer parentContainer;
 
     private File localRepository;
 
@@ -186,6 +189,17 @@ public class DefaultConfiguration
     {
         this.classWorld = new ClassWorld( "plexus.core", loader );
 
+        return this;
+    }
+
+    public PlexusContainer getParentContainer()
+    {
+        return parentContainer;
+    }
+
+    public Configuration setParentContainer( PlexusContainer parentContainer )
+    {
+        this.parentContainer = parentContainer;
         return this;
     }
 
