@@ -49,7 +49,6 @@
     <module>core-integration-testing-plugins</module>
     <module>core-integration-testing-support</module>  
     <module>maven-integration-test-helper</module>  
-    <module>maven-integration-test</module>  
   </modules>  
   <distributionManagement>
     <repository>
