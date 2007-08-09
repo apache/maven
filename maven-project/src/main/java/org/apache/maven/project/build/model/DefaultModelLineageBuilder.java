@@ -67,7 +67,7 @@ public class DefaultModelLineageBuilder
     private MavenTools mavenTools;
 
     private ProfileAdvisor profileAdvisor;
-    
+
     private BuildContextManager buildContextManager;
 
     private Logger logger;
@@ -78,7 +78,7 @@ public class DefaultModelLineageBuilder
 
     public DefaultModelLineageBuilder( ArtifactResolver resolver, ArtifactFactory artifactFactory, BuildContextManager buildContextManager )
     {
-        this.artifactResolver = resolver;
+        artifactResolver = resolver;
         this.artifactFactory = artifactFactory;
         this.buildContextManager = buildContextManager;
     }
@@ -91,30 +91,28 @@ public class DefaultModelLineageBuilder
         throws ProjectBuildingException
     {
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-        
+
         ModelLineage lineage = new DefaultModelLineage();
 
-        File pomFile = pom;
         List currentRemoteRepositories = remoteRepositories == null ? new ArrayList()
                                                                    : new ArrayList( remoteRepositories );
 
-        while ( pomFile != null )
-        {
-            Model model = readModel( pomFile, projectBuildCache );
+        ModelAndFile current = new ModelAndFile( readModel( pom, projectBuildCache ), pom );
 
+        while ( current != null )
+        {
             if ( lineage.size() == 0 )
             {
-                lineage.setOrigin( model, pomFile, currentRemoteRepositories );
+                lineage.setOrigin( current.model, current.file, currentRemoteRepositories );
             }
             else
             {
-                lineage.addParent( model, pomFile, currentRemoteRepositories );
+                lineage.addParent( current.model, current.file, currentRemoteRepositories );
             }
 
-            currentRemoteRepositories = updateRepositorySet( model, currentRemoteRepositories, pomFile, profileManager );
+            currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager );
 
-            pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile,
-                                        projectBuildCache );
+            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
         }
 
         return lineage;
@@ -125,8 +123,7 @@ public class DefaultModelLineageBuilder
         throws ProjectBuildingException
     {
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-        
-        File pomFile = lineage.getDeepestFile();
+
         List currentRemoteRepositories = lineage.getDeepestArtifactRepositoryList();
 
         if ( currentRemoteRepositories == null )
@@ -134,28 +131,25 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = new ArrayList();
         }
 
-        Model model = lineage.getDeepestModel();
+        ModelAndFile current = new ModelAndFile( lineage.getDeepestModel(), lineage.getDeepestFile() );
 
         // use the above information to re-bootstrap the resolution chain...
-        pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile, projectBuildCache );
+        current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
 
-        while ( pomFile != null )
+        while ( current != null )
         {
-            model = readModel( pomFile, projectBuildCache );
-
             if ( lineage.size() == 0 )
             {
-                lineage.setOrigin( model, pomFile, currentRemoteRepositories );
+                lineage.setOrigin( current.model, current.file, currentRemoteRepositories );
             }
             else
             {
-                lineage.addParent( model, pomFile, currentRemoteRepositories );
+                lineage.addParent( current.model, current.file, currentRemoteRepositories );
             }
 
-            currentRemoteRepositories = updateRepositorySet( model, currentRemoteRepositories, pomFile, profileManager );
+            currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager );
 
-            pomFile = resolveParentPom( model, currentRemoteRepositories, localRepository, pomFile,
-                                        projectBuildCache );
+            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
         }
     }
 
@@ -170,7 +164,7 @@ public class DefaultModelLineageBuilder
     }
 
     /**
-     * Read the Model instance from the given POM file, and cache it in the given Map before 
+     * Read the Model instance from the given POM file, and cache it in the given Map before
      * returning it.
      */
     private Model readModel( File pomFile, ProjectBuildCache projectBuildCache )
@@ -193,7 +187,7 @@ public class DefaultModelLineageBuilder
             pomFile = new File( pom, "pom.xml" );
 //            getLogger().debug( "readModel(..): POM: " + pom + " is a directory. Trying: " + pomFile + " instead." );
         }
-        
+
         Model model;
         FileReader reader = null;
 
@@ -225,10 +219,10 @@ public class DefaultModelLineageBuilder
     }
 
     /**
-     * Update the remote repository set used to resolve parent POMs, by adding those declared in 
+     * Update the remote repository set used to resolve parent POMs, by adding those declared in
      * the given model to the HEAD of a new list, then appending the old remote repositories list.
      * The specified pomFile is used for error reporting.
-     * @param profileManager 
+     * @param profileManager
      */
     private List updateRepositorySet( Model model, List oldArtifactRepositories, File pomFile,
                                       ProfileManager externalProfileManager )
@@ -236,7 +230,9 @@ public class DefaultModelLineageBuilder
     {
         List repositories = model.getRepositories();
 
-        loadActiveProfileRepositories( repositories, model, externalProfileManager, pomFile.getParentFile() );
+        File projectDir = pomFile == null ? null : pomFile.getParentFile();
+
+        loadActiveProfileRepositories( repositories, model, externalProfileManager, projectDir );
 
         Set artifactRepositories = null;
 
@@ -293,36 +289,57 @@ public class DefaultModelLineageBuilder
     /**
      * Pull the parent specification out of the given model, construct an Artifact instance, and
      * resolve that artifact...then, return the resolved POM file for the parent.
-     * @param projectBuildCache 
+     * @param projectBuildCache
      */
-    private File resolveParentPom( Model model, List remoteRepositories, ArtifactRepository localRepository,
-                                   File modelPomFile, ProjectBuildCache projectBuildCache )
+    private ModelAndFile resolveParentPom( ModelAndFile child, List remoteRepositories, ArtifactRepository localRepository,
+                                   ProjectBuildCache projectBuildCache )
         throws ProjectBuildingException
     {
+        Model model = child.model;
+        File modelPomFile = child.file;
+
         Parent modelParent = model.getParent();
 
-        File pomFile = null;
+        ModelAndFile result = null;
 
         if ( modelParent != null )
         {
             validateParentDeclaration( modelParent, model );
 
 //            getLogger().debug( "Looking for cached parent POM under: " + cacheKey );
-            
-            pomFile = (File) projectBuildCache.getCachedModelFile( modelParent );
 
-            if ( pomFile == null )
+            File parentPomFile = projectBuildCache.getCachedModelFile( modelParent );
+
+            if ( parentPomFile == null )
             {
-                pomFile = resolveParentWithRelativePath( modelParent, modelPomFile );
+                parentPomFile = resolveParentWithRelativePath( modelParent, modelPomFile );
             }
 
-            if ( pomFile == null )
+            if ( parentPomFile == null )
             {
-                pomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, modelPomFile );
+                parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, modelPomFile );
             }
+
+            Model parent;
+            if ( parentPomFile == null )
+            {
+                getLogger().warn( "Cannot find parent POM: " + modelParent.getId() + " for child: " + model.getId() + ". Using stub model instead." );
+
+                parent = new Model();
+
+                parent.setGroupId( modelParent.getGroupId() );
+                parent.setArtifactId( modelParent.getArtifactId() );
+                parent.setVersion( modelParent.getVersion() );
+            }
+            else
+            {
+                parent = readModel( parentPomFile );
+            }
+
+            result = new ModelAndFile( parent, parentPomFile );
         }
 
-        return pomFile;
+        return result;
     }
 
     private void validateParentDeclaration( Parent modelParent, Model model )
@@ -404,9 +421,9 @@ public class DefaultModelLineageBuilder
         {
             Model parentModel = readModel( parentPomFile );
 
-            boolean groupsMatch = parentModel.getGroupId() == null
+            boolean groupsMatch = ( parentModel.getGroupId() == null )
                 || parentModel.getGroupId().equals( modelParent.getGroupId() );
-            boolean versionsMatch = parentModel.getVersion() == null
+            boolean versionsMatch = ( parentModel.getVersion() == null )
                 || parentModel.getVersion().equals( modelParent.getVersion() );
 
             if ( groupsMatch && versionsMatch && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
@@ -431,6 +448,18 @@ public class DefaultModelLineageBuilder
     public void enableLogging( Logger logger )
     {
         this.logger = logger;
+    }
+
+    private static final class ModelAndFile
+    {
+        private final Model model;
+        private final File file;
+
+        ModelAndFile( Model model, File file )
+        {
+            this.model = model;
+            this.file = file;
+        }
     }
 
 }

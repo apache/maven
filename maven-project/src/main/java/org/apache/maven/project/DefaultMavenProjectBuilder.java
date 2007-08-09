@@ -156,7 +156,7 @@ public class DefaultMavenProjectBuilder
     private ModelInheritanceAssembler modelInheritanceAssembler;
 
     private ModelValidator validator;
-    
+
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
 
@@ -167,9 +167,9 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ModelLineageBuilder modelLineageBuilder;
-    
+
     private ProfileAdvisor profileAdvisor;
-    
+
     private BuildContextManager buildContextManager;
 
     private MavenTools mavenTools;
@@ -178,7 +178,7 @@ public class DefaultMavenProjectBuilder
     // I am making this available for use with a new method that takes a
     // a monitor wagon monitor as a parameter so that tools can use the
     // methods here and receive callbacks. MNG-1015
-    //     
+    //
     //    Probably no longer relevant with wagonManager/wagonManager change - joakime
     // ----------------------------------------------------------------------
 
@@ -223,8 +223,8 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-        
-        MavenProject project = (MavenProject) projectBuildCache.getCachedProject( artifact );
+
+        MavenProject project = projectBuildCache.getCachedProject( artifact );
 
         if ( project != null )
         {
@@ -252,8 +252,8 @@ public class DefaultMavenProjectBuilder
         ProfileManager profileManager = new DefaultProfileManager( container );
         return buildStandaloneSuperProject( localRepository, profileManager );
     }
-    
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager ) 
+
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -265,27 +265,27 @@ public class DefaultMavenProjectBuilder
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
         MavenProject project = new MavenProject( superModel );
-        
+
         ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
-        
+
         projectContext.setCurrentProject( project );
         projectContext.store( buildContextManager );
-        
+
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
-        
+
         project.setManagedVersionMap(createManagedVersionMap(projectId, superModel.getDependencyManagement(), null));
 
         List activeProfiles = profileAdvisor.applyActivatedProfiles( superModel, null, profileManager.getExplicitlyActivatedIds(), profileManager.getExplicitlyDeactivatedIds() );
         List activeExternalProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
-        
+
         LinkedHashSet profiles = new LinkedHashSet();
-        
-        if ( activeProfiles != null && !activeProfiles.isEmpty() )
+
+        if ( ( activeProfiles != null ) && !activeProfiles.isEmpty() )
         {
             profiles.addAll( activeProfiles );
         }
-        
-        if ( activeExternalProfiles != null && !activeExternalProfiles.isEmpty() )
+
+        if ( ( activeExternalProfiles != null ) && !activeExternalProfiles.isEmpty() )
         {
             profiles.addAll( activeExternalProfiles );
         }
@@ -408,7 +408,7 @@ public class DefaultMavenProjectBuilder
     {
         Map map = null;
         List deps;
-        if ( dependencyManagement != null && (deps = dependencyManagement.getDependencies()) != null && deps.size() > 0)
+        if ( ( dependencyManagement != null ) && ( (deps = dependencyManagement.getDependencies()) != null ) && ( deps.size() > 0 ))
         {
             map = new ManagedVersionMap( map );
 
@@ -436,7 +436,7 @@ public class DefaultMavenProjectBuilder
                     // If the dependencyManagement section listed exclusions,
                     // add them to the managed artifacts here so that transitive
                     // dependencies will be excluded if necessary.
-                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() )
+                    if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
                     {
                         List exclusions = new ArrayList();
                         Iterator exclItr = d.getExclusions().iterator();
@@ -479,7 +479,7 @@ public class DefaultMavenProjectBuilder
         {
             container.addContextValue("SystemProperties", System.getProperties());
         }
-        
+
         Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
         MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(),
@@ -492,7 +492,7 @@ public class DefaultMavenProjectBuilder
 
         if ( checkDistributionManagementStatus )
         {
-            if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
+            if ( ( project.getDistributionManagement() != null ) && ( project.getDistributionManagement().getStatus() != null ) )
             {
                 String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
@@ -593,7 +593,7 @@ public class DefaultMavenProjectBuilder
         throws ArtifactNotFoundException
     {
         // TODO: configurable actions dependant on status
-        if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
+        if ( !projectArtifact.isSnapshot() && ( status.compareTo( ArtifactStatus.DEPLOYED ) < 0 ) )
         {
             // use default policy (enabled, daily update, warn on bad checksum)
             ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
@@ -674,12 +674,12 @@ public class DefaultMavenProjectBuilder
         Model superModel = getSuperModel();
 
         MavenProject superProject = new MavenProject( superModel );
-        
+
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
         List explicitlyActive;
         List explicitlyInactive;
-        
+
         if ( externalProfileManager != null )
         {
             // used to trigger the caching of SystemProperties in the container context...
@@ -691,7 +691,7 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", e );
             }
-            
+
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
             explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
         }
@@ -700,7 +700,7 @@ public class DefaultMavenProjectBuilder
             explicitlyActive = Collections.EMPTY_LIST;
             explicitlyInactive = Collections.EMPTY_LIST;
         }
-        
+
         superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, null, explicitlyActive, explicitlyInactive ) );
 
         //noinspection CollectionDeclaredAsConcreteClass
@@ -710,7 +710,7 @@ public class DefaultMavenProjectBuilder
                                                                                       parentSearchRepositories,
                                                                                       projectDir, explicitlyActive,
                                                                                       explicitlyInactive );
-        
+
         Model originalModel = ModelUtils.cloneModel( model );
 
         MavenProject project = null;
@@ -754,7 +754,11 @@ public class DefaultMavenProjectBuilder
                 getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
+            getLogger().debug( "[buildInternal] Assembling model-inheritance: child=" + current.getId() + ", parent=" + previous.getId() );
+
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
+
+            getLogger().debug( "[buildInternal] Assembled model-inheritance for child=" + current.getId() );
 
             previous = current;
             previousProject = currentProject;
@@ -810,13 +814,13 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
-        
+
         MavenProject rawParent = project.getParent();
-        
+
         if ( rawParent != null )
         {
-            MavenProject processedParent = (MavenProject) projectBuildCache.getCachedProject( rawParent );
-            
+            MavenProject processedParent = projectBuildCache.getCachedProject( rawParent );
+
             // yeah, this null check might be a bit paranoid, but better safe than sorry...
             if ( processedParent != null )
             {
@@ -829,10 +833,10 @@ public class DefaultMavenProjectBuilder
 
         return project;
     }
-    
+
     /*
      * Order is:
-     * 
+     *
      * 1. model profile repositories
      * 2. model repositories
      * 3. superModel profile repositories
@@ -844,16 +848,16 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         LinkedHashSet collected = new LinkedHashSet();
-        
+
         collectInitialRepositoriesFromModel( collected, model, projectDir, explicitlyActive, explicitlyInactive );
 
         collectInitialRepositoriesFromModel( collected, superModel, projectDir, explicitlyActive, explicitlyInactive );
 
-        if ( parentSearchRepositories != null && !parentSearchRepositories.isEmpty() )
+        if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
         {
             collected.addAll( parentSearchRepositories );
         }
-        
+
         return collected;
     }
 
@@ -865,13 +869,13 @@ public class DefaultMavenProjectBuilder
                                                                                           explicitlyActive,
                                                                                           explicitlyInactive );
 
-        if ( reposFromProfiles != null && !reposFromProfiles.isEmpty() )
+        if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
             collected.addAll( reposFromProfiles );
         }
 
         List modelRepos = model.getRepositories();
-        if ( modelRepos != null && !modelRepos.isEmpty() )
+        if ( ( modelRepos != null ) && !modelRepos.isEmpty() )
         {
             try
             {
@@ -967,7 +971,7 @@ public class DefaultMavenProjectBuilder
         MavenProject parentProject = project.getParent();
 
         Model originalModel = project.getOriginalModel();
-        
+
         Artifact parentArtifact = project.getParentArtifact();
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
@@ -1049,17 +1053,17 @@ public class DefaultMavenProjectBuilder
     {
         ModelLineage modelLineage = new DefaultModelLineage();
         modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
-        
+
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager );
-        
+
         ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
-        
+
         projectContext.setModelLineage( modelLineage );
         projectContext.store( buildContextManager );
-        
+
         List explicitlyActive;
         List explicitlyInactive;
-        
+
         if ( externalProfileManager != null )
         {
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
@@ -1070,50 +1074,53 @@ public class DefaultMavenProjectBuilder
             explicitlyActive = Collections.EMPTY_LIST;
             explicitlyInactive = Collections.EMPTY_LIST;
         }
-        
+
         MavenProject lastProject = null;
         for ( ModelLineageIterator it = modelLineage.lineageIterator(); it.hasNext(); )
         {
             Model currentModel = (Model) it.next();
+
+            getLogger().debug( "[assembleLineage] Assembling MavenProject instance for: " + currentModel.getId() );
+
             File currentPom = it.getPOMFile();
-            
+
             MavenProject project = new MavenProject( currentModel );
             project.setFile( currentPom );
-            
+
             projectContext.setCurrentProject( project );
             projectContext.store( buildContextManager );
 
             project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, projectDir, explicitlyActive,
                                                                               explicitlyInactive ) );
-            
+
             if ( lastProject != null )
             {
                 lastProject.setParent( project );
-                
+
                 lastProject.setParentArtifact( artifactFactory.createParentArtifact( project.getGroupId(), project
                     .getArtifactId(), project.getVersion() ) );
             }
-            
+
             lineage.addFirst( project );
-            
+
             lastProject = project;
         }
 
         MavenProject result = (MavenProject) lineage.getLast();
-        
+
         if ( externalProfileManager != null )
         {
             LinkedHashSet active = new LinkedHashSet();
-            
+
             List existingActiveProfiles = result.getActiveProfiles();
-            if ( existingActiveProfiles != null && !existingActiveProfiles.isEmpty() )
+            if ( ( existingActiveProfiles != null ) && !existingActiveProfiles.isEmpty() )
             {
                 active.addAll( existingActiveProfiles );
             }
-            
+
             profileAdvisor.applyActivatedExternalProfiles( result.getModel(), projectDir, externalProfileManager );
         }
-        
+
         return result;
     }
 
@@ -1343,6 +1350,6 @@ public class DefaultMavenProjectBuilder
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }
