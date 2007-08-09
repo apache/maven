@@ -195,6 +195,10 @@ under the License.
     </dependencies>
   </dependencyManagement>
   <distributionManagement>
+    <snapshotRepository>
+      <id>asf.snapshots</id>
+      <url>scp://people.apache.org/repo/m2-snapshot-repository</url>
+    </snapshotRepository>
     <site>
       <id>apache.website</id>
       <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
@@ -290,4 +294,5 @@ under the License.
       </build>
     </profile>
   </profiles>
+  
 </project>
