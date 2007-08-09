@@ -79,16 +79,17 @@ under the License.
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-1</version>
-        <configuration>
-          <descriptor>src/main/assembly/bin.xml</descriptor>
-          <finalName>maven-${version}</finalName>
-        </configuration>
         <executions>
           <execution>
+            <id>create-distro</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <descriptor>src/main/assembly/bin.xml</descriptor>
+              <finalName>maven-${version}</finalName>
+            </configuration>
           </execution>
         </executions>
       </plugin>      
@@ -150,4 +151,31 @@ under the License.
       <url>scp://people.apache.org/home/jvanzyl/public_html/embedder/</url>
     </site>
   </distributionManagement>
+  
+  <profiles>
+    <profile>
+      <id>make-dependency-repo</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-2-SNAPSHOT</version>
+            
+            <executions>
+              <execution>
+                <id>make-dependency-repo</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptor>src/main/assembly/repo.xml</descriptor>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>      
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
