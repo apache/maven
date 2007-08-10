@@ -28,56 +28,56 @@ import java.util.List;
 /**
  * Tracks information from a current POM and its ancestors, including Model instances, associated
  * POM files, and repository lists used to resolve each model.
- * 
+ *
  * @author jdcasey
  *
  */
 public interface ModelLineage
 {
-    
+
     /**
      * Retrieve the Model instance for the deepest ancestor which has been resolved so far in this
      * lineage.
      */
-    Model getDeepestModel();
-    
+    Model getDeepestAncestorModel();
+
     /**
      * Retrieve the POM file for the deepest ancestor which has been resolved so far in this
      * lineage.
      */
-    File getDeepestFile();
-    
+    File getDeepestAncestorFile();
+
     /**
-     * Retrieve the remote-repository list for the deepest ancestor which has been resolved so far 
+     * Retrieve the remote-repository list for the deepest ancestor which has been resolved so far
      * in this lineage.
      */
-    List getDeepestArtifactRepositoryList();
-    
+    List getDeepestAncestorArtifactRepositoryList();
+
     /**
-     * Retrieve the Model instance for the POM from which this lineage was constructed. This is the  
-     * "leaf" of the inheritance hierarchy, or the current POM, or the child (all means the same 
+     * Retrieve the Model instance for the POM from which this lineage was constructed. This is the
+     * "leaf" of the inheritance hierarchy, or the current POM, or the child (all means the same
      * thing).
      */
     Model getOriginatingModel();
-    
+
     /**
-     * Retrieve the File for the POM from which this lineage was constructed. This is the  
-     * "leaf" of the inheritance hierarchy, or the current POM, or the child (all means the same 
+     * Retrieve the File for the POM from which this lineage was constructed. This is the
+     * "leaf" of the inheritance hierarchy, or the current POM, or the child (all means the same
      * thing).
      */
     File getOriginatingPOMFile();
-    
+
     /**
-     * Retrieve the List of ArtifactRepository instances used to resolve the first parent POM of the 
-     * POM from which this lineage was constructed. This is the "leaf" of the inheritance hierarchy, 
+     * Retrieve the List of ArtifactRepository instances used to resolve the first parent POM of the
+     * POM from which this lineage was constructed. This is the "leaf" of the inheritance hierarchy,
      * or the current POM, or the child (all means the same thing).
      */
     List getOriginatingArtifactRepositoryList();
-    
+
     /**
-     * Setup the originating POM information from which this lineage is constructed. This is the 
+     * Setup the originating POM information from which this lineage is constructed. This is the
      * "child" POM that is the starting point of the build.
-     * 
+     *
      * @throws IllegalStateException When the originating POM information has already been set.
      */
     void setOrigin( Model model, File pomFile, List artifactRepositories );
@@ -85,59 +85,59 @@ public interface ModelLineage
     /**
      * Add a parent model, along with its file and the repositories used to resolve it.
      * NOTE: If setOrigin(..) hasn't been called, this method will result in an IllegalStateException.
-     * 
+     *
      * @throws IllegalStateException When the originating POM information has not yet been set.
      */
     void addParent( Model model, File pomFile, List artifactRepositories );
-    
+
     /**
      * Retrieve the models in this lineage, with the deepest parent at the zero index, and the current
      * POM at the last index.
      */
     List getModelsInDescendingOrder();
-    
+
     /**
-     * Retrieve the files used to construct this lineage, with that of the deepest parent at the 
+     * Retrieve the files used to construct this lineage, with that of the deepest parent at the
      * zero index, and that of the current POM at the last index.
      */
     List getFilesInDescendingOrder();
-    
+
     /**
-     * Retrieve the remote-artifact repository lists used to construct this lineage, with 
+     * Retrieve the remote-artifact repository lists used to construct this lineage, with
      * that of the deepest parent at the zero index, and that of the current POM at the last index.
      */
     List getArtifactRepositoryListsInDescendingOrder();
-    
+
     /**
-     * Retrieve an Iterator derivative that functions in the simplest sense just like the return 
+     * Retrieve an Iterator derivative that functions in the simplest sense just like the return
      * value of the modelIterator() method. However, the ModelLineageIterator also gives access to
-     * the current POM file and current remote ArtifactRepository instances used to resolve the 
+     * the current POM file and current remote ArtifactRepository instances used to resolve the
      * current Model...along with a method to give explicit access to the current Model instance.
      */
     ModelLineageIterator lineageIterator();
 
     /**
-     * Retrieve an Iterator derivative that functions in the simplest sense just like the return 
+     * Retrieve an Iterator derivative that functions in the simplest sense just like the return
      * value of the modelIterator() method. However, the ModelLineageIterator also gives access to
-     * the current POM file and current remote ArtifactRepository instances used to resolve the 
+     * the current POM file and current remote ArtifactRepository instances used to resolve the
      * current Model...along with a method to give explicit access to the current Model instance.
      */
     ModelLineageIterator reversedLineageIterator();
 
     /**
-     * Iterate over the lineage of Model instances, starting with the child (current) Model, 
+     * Iterate over the lineage of Model instances, starting with the child (current) Model,
      * and ending with the deepest ancestor.
      */
     Iterator modelIterator();
 
     /**
-     * Iterate over the lineage of POM Files, starting with the child (current) POM and ending with 
+     * Iterate over the lineage of POM Files, starting with the child (current) POM and ending with
      * the deepest ancestor.
      */
     Iterator fileIterator();
 
     /**
-     * Iterate over the remote-repository Lists used to resolve the lineage, starting with the  
+     * Iterate over the remote-repository Lists used to resolve the lineage, starting with the
      * child (current) remote-repository List and ending with the deepest ancestor.
      */
     Iterator artifactRepositoryListIterator();
@@ -149,7 +149,7 @@ public interface ModelLineage
     File getFile( Model model );
 
     /**
-     * Retrieve the List of remote repositories from which the given Model instance was resolved. 
+     * Retrieve the List of remote repositories from which the given Model instance was resolved.
      * If the model itself doesn't belong to this lineage, match it in the lineage by Model.getId().
      */
     List getArtifactRepositories( Model model );

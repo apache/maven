@@ -58,13 +58,13 @@ public class DefaultModelLineageBuilderTest
 
         defaultLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
     }
-    
+
     public void tearDown()
         throws Exception
     {
         BuildContextManager ctxMgr = (BuildContextManager) lookup( BuildContextManager.ROLE );
         ctxMgr.clearBuildContext();
-        
+
         super.tearDown();
     }
 
@@ -96,7 +96,7 @@ public class DefaultModelLineageBuilderTest
             IOUtil.close( writer );
         }
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null, false );
 
         assertEquals( 1, lineage.size() );
 
@@ -150,11 +150,13 @@ public class DefaultModelLineageBuilderTest
         writeModel( current, currentPOM );
 
         // 7. build the lineage.
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", localRepoDirectory.toURL()
-            .toExternalForm(), defaultLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                            "local",
+                                                                            localRepoDirectory.toURL().toExternalForm(),
+                                                                            defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null );
+                                                                      Collections.EMPTY_LIST, null, false );
 
         assertEquals( 3, lineage.size() );
 
@@ -163,6 +165,54 @@ public class DefaultModelLineageBuilderTest
         assertEquals( current.getId(), ( (Model) modelIterator.next() ).getId() );
         assertEquals( parent.getId(), ( (Model) modelIterator.next() ).getId() );
         assertEquals( ancestor.getId(), ( (Model) modelIterator.next() ).getId() );
+    }
+
+    public void testReadPOMWithMissingParentAndAllowStubsSetToTrue()
+        throws IOException, ProjectBuildingException
+    {
+        // 1. create local repository directory
+        File localRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.localRepository.", "" );
+
+        localRepoDirectory.delete();
+        localRepoDirectory.mkdirs();
+
+        deleteDirOnExit( localRepoDirectory );
+
+        // 5. create the current pom with a parent-ref on the parent model
+        Model current = createModel( "group", "current", "1" );
+
+        Parent currentParent = new Parent();
+        currentParent.setGroupId( "group" );
+        currentParent.setArtifactId( "parent" );
+        currentParent.setVersion( "1" );
+
+        current.setParent( currentParent );
+
+        // 6. write the current pom somewhere
+        File currentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+        currentPOM.deleteOnExit();
+
+        writeModel( current, currentPOM );
+
+        // 7. build the lineage.
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                            "local",
+                                                                            localRepoDirectory.toURL().toExternalForm(),
+                                                                            defaultLayout );
+
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
+                                                                      Collections.EMPTY_LIST, null, true );
+
+        assertEquals( 2, lineage.size() );
+
+        Iterator modelIterator = lineage.modelIterator();
+
+        assertEquals( current.getId(), ( (Model) modelIterator.next() ).getId() );
+
+        Model parent = (Model) modelIterator.next();
+        assertEquals( currentParent.getGroupId(), parent.getGroupId() );
+        assertEquals( currentParent.getArtifactId(), parent.getArtifactId() );
+        assertEquals( currentParent.getVersion(), parent.getVersion() );
     }
 
     public void testReadPOMWithParentInLocalRepositoryAndAncestorInRemoteRepository()
@@ -219,14 +269,19 @@ public class DefaultModelLineageBuilderTest
         writeModel( current, currentPOM );
 
         // 7. build the lineage.
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", localRepoDirectory.toURL()
-            .toExternalForm(), defaultLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                            "local",
+                                                                            localRepoDirectory.toURL().toExternalForm(),
+                                                                            defaultLayout );
 
-        ArtifactRepository remoteRepository = new DefaultArtifactRepository( "test", remoteRepoDirectory.toURL()
-            .toExternalForm(), defaultLayout );
+        ArtifactRepository remoteRepository = new DefaultArtifactRepository( "test",
+                                                                             remoteRepoDirectory.toURL()
+                                                                                                .toExternalForm(),
+                                                                             defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository, Collections
-            .singletonList( remoteRepository ), null );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
+                                                                      Collections.singletonList( remoteRepository ),
+                                                                      null, false );
 
         assertEquals( 3, lineage.size() );
 
@@ -277,11 +332,13 @@ public class DefaultModelLineageBuilderTest
         writeModel( current, currentPOM );
 
         // 7. build the lineage.
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", projectRootDirectory.toURL()
-            .toExternalForm(), defaultLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local",
+                                                                            projectRootDirectory.toURL()
+                                                                                                .toExternalForm(),
+                                                                            defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null );
+                                                                      Collections.EMPTY_LIST, null, false );
 
         assertEquals( 2, lineage.size() );
 
@@ -341,9 +398,9 @@ public class DefaultModelLineageBuilderTest
 
         // 4. write the parent model to the local repo directory
         writeModel( parent, parentPOM );
-        
+
         BuildContextManager buildContextManager = (BuildContextManager) lookup( BuildContextManager.ROLE, "default" );
-        
+
         ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
         cache.cacheModelFileForModel( parentPOM, parent );
         cache.store( buildContextManager );
@@ -366,8 +423,8 @@ public class DefaultModelLineageBuilderTest
         writeModel( current, currentPOM );
 
         // 7. build the lineage.
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, null, Collections
-            .EMPTY_LIST, null );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, null, Collections.EMPTY_LIST, null,
+                                                                      false );
 
         assertEquals( 2, lineage.size() );
 

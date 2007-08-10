@@ -87,7 +87,7 @@ public class DefaultModelLineageBuilder
      * @see org.apache.maven.project.build.model.ModelLineageBuilder#buildModelLineage(java.io.File, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List)
      */
     public ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository, List remoteRepositories,
-                                           ProfileManager profileManager )
+                                           ProfileManager profileManager, boolean allowStubs )
         throws ProjectBuildingException
     {
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
@@ -99,7 +99,7 @@ public class DefaultModelLineageBuilder
 
         ModelAndFile current = new ModelAndFile( readModel( pom, projectBuildCache ), pom );
 
-        while ( current != null )
+        do
         {
             if ( lineage.size() == 0 )
             {
@@ -112,44 +112,43 @@ public class DefaultModelLineageBuilder
 
             currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager );
 
-            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
+            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
         }
+        while ( current != null );
 
         return lineage;
     }
 
     public void resumeBuildingModelLineage( ModelLineage lineage, ArtifactRepository localRepository,
-                                            ProfileManager profileManager )
+                                            ProfileManager profileManager, boolean allowStubs )
         throws ProjectBuildingException
     {
+        if ( lineage.size() == 0 )
+        {
+            throw new ProjectBuildingException( "unknown", "Cannot resume a ModelLineage that doesn't contain at least one Model instance." );
+        }
+
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
 
-        List currentRemoteRepositories = lineage.getDeepestArtifactRepositoryList();
+        List currentRemoteRepositories = lineage.getDeepestAncestorArtifactRepositoryList();
 
         if ( currentRemoteRepositories == null )
         {
             currentRemoteRepositories = new ArrayList();
         }
 
-        ModelAndFile current = new ModelAndFile( lineage.getDeepestModel(), lineage.getDeepestFile() );
+        ModelAndFile current = new ModelAndFile( lineage.getDeepestAncestorModel(), lineage.getDeepestAncestorFile() );
 
         // use the above information to re-bootstrap the resolution chain...
-        current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
+        current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
 
         while ( current != null )
         {
-            if ( lineage.size() == 0 )
-            {
-                lineage.setOrigin( current.model, current.file, currentRemoteRepositories );
-            }
-            else
-            {
-                lineage.addParent( current.model, current.file, currentRemoteRepositories );
-            }
+            lineage.addParent( current.model, current.file, currentRemoteRepositories );
 
             currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager );
 
-            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache );
+            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
         }
     }
 
@@ -290,9 +289,10 @@ public class DefaultModelLineageBuilder
      * Pull the parent specification out of the given model, construct an Artifact instance, and
      * resolve that artifact...then, return the resolved POM file for the parent.
      * @param projectBuildCache
+     * @param allowStubs
      */
     private ModelAndFile resolveParentPom( ModelAndFile child, List remoteRepositories, ArtifactRepository localRepository,
-                                   ProjectBuildCache projectBuildCache )
+                                   ProjectBuildCache projectBuildCache, boolean allowStubs )
         throws ProjectBuildingException
     {
         Model model = child.model;
@@ -304,9 +304,7 @@ public class DefaultModelLineageBuilder
 
         if ( modelParent != null )
         {
-            validateParentDeclaration( modelParent, model );
-
-//            getLogger().debug( "Looking for cached parent POM under: " + cacheKey );
+              validateParentDeclaration( modelParent, model );
 
             File parentPomFile = projectBuildCache.getCachedModelFile( modelParent );
 
@@ -317,26 +315,48 @@ public class DefaultModelLineageBuilder
 
             if ( parentPomFile == null )
             {
-                parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, modelPomFile );
+                try
+                {
+                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, modelPomFile );
+                }
+                catch( ProjectBuildingException e )
+                {
+                    if ( allowStubs )
+                    {
+                        getLogger().debug( "DISREGARDING the error encountered while resolving artifact for: " + modelParent.getId() + ", building a stub model in its place.", e );
+                        parentPomFile = null;
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
             }
 
-            Model parent;
             if ( parentPomFile == null )
             {
-                getLogger().warn( "Cannot find parent POM: " + modelParent.getId() + " for child: " + model.getId() + ". Using stub model instead." );
+                if ( allowStubs )
+                {
+                    getLogger().warn( "Cannot find parent POM: " + modelParent.getId() + " for child: " + model.getId() + ". Using stub model instead." );
 
-                parent = new Model();
+                    Model parent = new Model();
 
-                parent.setGroupId( modelParent.getGroupId() );
-                parent.setArtifactId( modelParent.getArtifactId() );
-                parent.setVersion( modelParent.getVersion() );
+                    parent.setGroupId( modelParent.getGroupId() );
+                    parent.setArtifactId( modelParent.getArtifactId() );
+                    parent.setVersion( modelParent.getVersion() );
+
+                    result = new ModelAndFile( parent, parentPomFile );
+                }
+                else
+                {
+                    getLogger().error( "Cannot find parent POM: " + modelParent.getId() );
+                }
             }
             else
             {
-                parent = readModel( parentPomFile );
+                Model parent = readModel( parentPomFile );
+                result = new ModelAndFile( parent, parentPomFile );
             }
-
-            result = new ModelAndFile( parent, parentPomFile );
         }
 
         return result;

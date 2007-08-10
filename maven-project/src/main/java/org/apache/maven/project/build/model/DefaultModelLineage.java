@@ -45,7 +45,7 @@ public class DefaultModelLineage
         {
             throw new IllegalStateException( "You must call setOrigin(..) before adding a parent to the lineage." );
         }
-        
+
         tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories ) );
     }
 
@@ -123,18 +123,18 @@ public class DefaultModelLineage
         {
             return Collections.EMPTY_LIST;
         }
-        
+
         List tuplesInReverse = new ArrayList( tuples );
         Collections.reverse( tuplesInReverse );
-        
+
         List results = new ArrayList( tuplesInReverse.size() );
         for ( Iterator it = tuplesInReverse.iterator(); it.hasNext(); )
         {
             ModelLineageTuple tuple = (ModelLineageTuple) it.next();
-            
+
             results.add( tuple.remoteRepositories );
         }
-        
+
         return results;
     }
 
@@ -156,18 +156,18 @@ public class DefaultModelLineage
         {
             return Collections.EMPTY_LIST;
         }
-        
+
         List tuplesInReverse = new ArrayList( tuples );
         Collections.reverse( tuplesInReverse );
-        
+
         List results = new ArrayList( tuplesInReverse.size() );
         for ( Iterator it = tuplesInReverse.iterator(); it.hasNext(); )
         {
             ModelLineageTuple tuple = (ModelLineageTuple) it.next();
-            
+
             results.add( tuple.file );
         }
-        
+
         return results;
     }
 
@@ -177,18 +177,18 @@ public class DefaultModelLineage
         {
             return Collections.EMPTY_LIST;
         }
-        
+
         List tuplesInReverse = new ArrayList( tuples );
         Collections.reverse( tuplesInReverse );
-        
+
         List results = new ArrayList( tuplesInReverse.size() );
         for ( Iterator it = tuplesInReverse.iterator(); it.hasNext(); )
         {
             ModelLineageTuple tuple = (ModelLineageTuple) it.next();
-            
+
             results.add( tuple.model );
         }
-        
+
         return results;
     }
 
@@ -198,9 +198,9 @@ public class DefaultModelLineage
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( 0 );
-        
+
         return tuple.remoteRepositories;
     }
 
@@ -210,9 +210,9 @@ public class DefaultModelLineage
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( 0 );
-        
+
         return tuple.model;
     }
 
@@ -222,45 +222,45 @@ public class DefaultModelLineage
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( 0 );
-        
+
         return tuple.file;
     }
 
-    public List getDeepestArtifactRepositoryList()
+    public List getDeepestAncestorArtifactRepositoryList()
     {
         if ( tuples.isEmpty() )
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( tuples.size() - 1 );
-        
+
         return tuple.remoteRepositories;
     }
 
-    public File getDeepestFile()
+    public File getDeepestAncestorFile()
     {
         if ( tuples.isEmpty() )
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( tuples.size() - 1 );
-        
+
         return tuple.file;
     }
 
-    public Model getDeepestModel()
+    public Model getDeepestAncestorModel()
     {
         if ( tuples.isEmpty() )
         {
             return null;
         }
-        
+
         ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( tuples.size() - 1 );
-        
+
         return tuple.model;
     }
 
@@ -298,7 +298,7 @@ public class DefaultModelLineage
         {
             throw new IllegalStateException( "Origin already set; you must use addParent(..) for successive additions to the lineage." );
         }
-        
+
         tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories ) );
     }
 
@@ -309,7 +309,7 @@ public class DefaultModelLineage
     {
         return tuples.size();
     }
-    
+
     private static final class ModelLineageTuple
     {
         private Model model;

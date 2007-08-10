@@ -52,129 +52,129 @@ public class DefaultModelInheritanceAssemblerTest
     extends TestCase
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
-    
+
     public void testShouldAdjustChildUrlBasedOnParentAndModulePathInSiblingDir()
     {
         Model parent = makeBaseModel( "parent" );
-        
+
         parent.setUrl( "http://www.google.com/parent" );
-        
+
         Model child = makeBaseModel( "child" );
-        
+
         // TODO: this is probably what we should be appending...
 //        child.setUrl( "/child.dir" );
-        
+
         parent.addModule( "../child" );
-        
+
         assembler.assembleModelInheritance( child, parent, ".." );
-        
+
         String resultingUrl = child.getUrl();
-        
+
         System.out.println( resultingUrl );
-        
+
         assertEquals( "http://www.google.com/child", resultingUrl );
     }
-    
+
     public void testShouldAdjustPathsThreeLevelsDeepAncestryInRepoAndNonStandardModulePaths()
     {
         Model top = makeBaseModel( "top" );
-        
+
         top.setUrl( "http://www.google.com/top" );
-        
+
         Model middle = makeBaseModel( "middle" );
-        
+
         top.addModule( "../middle" );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         middle.addModule( "../bottom" );
-        
+
         assembler.assembleModelInheritance( middle, top, ".." );
         assembler.assembleModelInheritance( bottom, middle, ".." );
-        
+
         String resultingUrl = bottom.getUrl();
-        
+
         System.out.println( resultingUrl );
-        
+
         assertEquals( "http://www.google.com/bottom", resultingUrl );
     }
-    
+
     public void testShouldMergeSuccessiveDependencyManagementSectionsOverThreeLevels()
     {
         Model top = makeBaseModel( "top" );
-        
+
         DependencyManagement topMgmt = new DependencyManagement();
-        
+
         topMgmt.addDependency( makeDep( "top-dep" ) );
-        
+
         top.setDependencyManagement( topMgmt );
-        
+
         Model mid = makeBaseModel( "mid" );
-        
+
         DependencyManagement midMgmt = new DependencyManagement();
-        
+
         midMgmt.addDependency( makeDep( "mid-dep" ) );
-        
+
         mid.setDependencyManagement( midMgmt );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         DependencyManagement bottomMgmt = new DependencyManagement();
-        
+
         bottomMgmt.addDependency( makeDep( "bottom-dep" ) );
-        
+
         bottom.setDependencyManagement( bottomMgmt );
-        
+
         assembler.assembleModelInheritance( mid, top );
-        
+
         assembler.assembleModelInheritance( bottom, mid );
-        
+
         DependencyManagement result = bottom.getDependencyManagement();
-        
+
         List resultDeps = result.getDependencies();
-        
+
         assertEquals( 3, resultDeps.size() );
     }
-    
+
     public void testShouldMergeDependencyManagementSectionsFromTopTwoLevelsToBottomLevel()
     {
         Model top = makeBaseModel( "top" );
-        
+
         DependencyManagement topMgmt = new DependencyManagement();
-        
+
         topMgmt.addDependency( makeDep( "top-dep" ) );
-        
+
         top.setDependencyManagement( topMgmt );
-        
+
         Model mid = makeBaseModel( "mid" );
-        
+
         DependencyManagement midMgmt = new DependencyManagement();
-        
+
         midMgmt.addDependency( makeDep( "mid-dep" ) );
-        
+
         mid.setDependencyManagement( midMgmt );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         assembler.assembleModelInheritance( mid, top );
-        
+
         assembler.assembleModelInheritance( bottom, mid );
-        
+
         DependencyManagement result = bottom.getDependencyManagement();
-        
+
         List resultDeps = result.getDependencies();
-        
+
         assertEquals( 2, resultDeps.size() );
     }
-    
+
     private Dependency makeDep( String artifactId )
     {
         Dependency dep = new Dependency();
-        
+
         dep.setGroupId( "maven" );
         dep.setArtifactId( artifactId );
         dep.setVersion( "1.0" );
-        
+
         return dep;
     }
 
@@ -267,6 +267,62 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( "Check id matches", site.getId(), childSite.getId() );
         assertEquals( "Check name matches", site.getName(), childSite.getName() );
         assertEquals( "Check url matches with appended path", site.getUrl() + "child", childSite.getUrl() );
+
+        assertRepositoryBase( childDistMgmt.getRepository(), repository );
+        assertRepositoryBase( childDistMgmt.getSnapshotRepository(), snapshotRepository );
+        assertEquals( "Check uniqueVersion is inherited", snapshotRepository.isUniqueVersion(),
+                      childDistMgmt.getSnapshotRepository().isUniqueVersion() );
+    }
+
+    public void testThreeLevelDistributionManagementInheritance()
+    {
+        Model gpar = makeBaseModel( "gpar" );
+        Model parent = makeBaseModel( "parent" );
+        Model child = makeBaseModel( "child" );
+
+        DistributionManagement distributionManagement = new DistributionManagement();
+        distributionManagement.setDownloadUrl( "downloadUrl" );
+        distributionManagement.setRelocation( new Relocation() );
+        distributionManagement.setStatus( "deployed" );
+
+        DeploymentRepository repository = new DeploymentRepository();
+        repository.setId( "apache.releases" );
+        repository.setUrl( "scp://minotaur.apache.org/www/www.apache.org/dist/java-repository" );
+        repository.setName( "name" );
+        repository.setLayout( "legacy" );
+        distributionManagement.setRepository( repository );
+
+        DeploymentRepository snapshotRepository = new DeploymentRepository();
+        snapshotRepository.setId( "apache.snapshots" );
+        snapshotRepository.setUrl( "scp://minotaur.apache.org/www/cvs.apache.org/repository" );
+        snapshotRepository.setName( "name" );
+        snapshotRepository.setLayout( "legacy" );
+        snapshotRepository.setUniqueVersion( false );
+        distributionManagement.setSnapshotRepository( snapshotRepository );
+
+        Site site = new Site();
+        site.setId( "apache.website" );
+        site.setUrl( "scp://minotaur.apache.org/www/maven.apache.org/" );
+        site.setName( "name3" );
+        distributionManagement.setSite( site );
+
+        gpar.setDistributionManagement( distributionManagement );
+
+        assembler.assembleModelInheritance( parent, gpar );
+        assembler.assembleModelInheritance( child, parent );
+
+        DistributionManagement childDistMgmt = child.getDistributionManagement();
+        assertNotNull( "Check distMgmt inherited", childDistMgmt );
+        assertNull( "Check status NOT inherited", childDistMgmt.getStatus() );
+        assertNull( "Check relocation NOT inherited", childDistMgmt.getRelocation() );
+        assertEquals( "Check downloadUrl inherited", distributionManagement.getDownloadUrl(),
+                      childDistMgmt.getDownloadUrl() );
+
+        Site childSite = childDistMgmt.getSite();
+        assertNotNull( "Check site inherited", childSite );
+        assertEquals( "Check id matches", site.getId(), childSite.getId() );
+        assertEquals( "Check name matches", site.getName(), childSite.getName() );
+        assertEquals( "Check url matches with appended path", site.getUrl() + "parent/child", childSite.getUrl() );
 
         assertRepositoryBase( childDistMgmt.getRepository(), repository );
         assertRepositoryBase( childDistMgmt.getSnapshotRepository(), snapshotRepository );
@@ -590,7 +646,7 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Build childBuild = child.getBuild();
 
-        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        if ( ( expectedPlugins != null ) && !expectedPlugins.isEmpty() )
         {
             assertNotNull( childBuild );
 
@@ -616,7 +672,7 @@ public class DefaultModelInheritanceAssemblerTest
         }
         else
         {
-            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+            assertTrue( ( childBuild == null ) || ( childBuild.getPlugins() == null ) || childBuild.getPlugins().isEmpty() );
         }
     }
 
@@ -628,9 +684,9 @@ public class DefaultModelInheritanceAssemblerTest
         List referenceExecutions = reference.getExecutions();
         Map testExecutionsMap = test.getExecutionsAsMap();
 
-        if ( referenceExecutions != null && !referenceExecutions.isEmpty() )
+        if ( ( referenceExecutions != null ) && !referenceExecutions.isEmpty() )
         {
-            assertTrue( "Missing goals specification", ( testExecutionsMap != null && !testExecutionsMap.isEmpty() ) );
+            assertTrue( "Missing goals specification", ( ( testExecutionsMap != null ) && !testExecutionsMap.isEmpty() ) );
 
             for ( Iterator it = referenceExecutions.iterator(); it.hasNext(); )
             {
@@ -648,7 +704,7 @@ public class DefaultModelInheritanceAssemblerTest
         else
         {
             assertTrue( "Unexpected goals specification",
-                        ( testExecutionsMap == null || testExecutionsMap.isEmpty() ) );
+                        ( ( testExecutionsMap == null ) || testExecutionsMap.isEmpty() ) );
         }
     }
 
@@ -750,7 +806,7 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Reporting childBuild = child.getReporting();
 
-        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        if ( ( expectedPlugins != null ) && !expectedPlugins.isEmpty() )
         {
             assertNotNull( childBuild );
 
@@ -776,7 +832,7 @@ public class DefaultModelInheritanceAssemblerTest
         }
         else
         {
-            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+            assertTrue( ( childBuild == null ) || ( childBuild.getPlugins() == null ) || childBuild.getPlugins().isEmpty() );
         }
     }
 
@@ -788,9 +844,9 @@ public class DefaultModelInheritanceAssemblerTest
         List referenceReportSets = reference.getReportSets();
         Map testReportSetsMap = test.getReportSetsAsMap();
 
-        if ( referenceReportSets != null && !referenceReportSets.isEmpty() )
+        if ( ( referenceReportSets != null ) && !referenceReportSets.isEmpty() )
         {
-            assertTrue( "Missing goals specification", ( testReportSetsMap != null && !testReportSetsMap.isEmpty() ) );
+            assertTrue( "Missing goals specification", ( ( testReportSetsMap != null ) && !testReportSetsMap.isEmpty() ) );
 
             for ( Iterator it = referenceReportSets.iterator(); it.hasNext(); )
             {
@@ -808,7 +864,7 @@ public class DefaultModelInheritanceAssemblerTest
         else
         {
             assertTrue( "Unexpected goals specification",
-                        ( testReportSetsMap == null || testReportSetsMap.isEmpty() ) );
+                        ( ( testReportSetsMap == null ) || testReportSetsMap.isEmpty() ) );
         }
     }
 
@@ -851,7 +907,7 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Model model = makeBaseModel( artifactId );
 
-        if ( connection != null || developerConnection != null || url != null )
+        if ( ( connection != null ) || ( developerConnection != null ) || ( url != null ) )
         {
             Scm scm = new Scm();
 

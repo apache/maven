@@ -754,11 +754,11 @@ public class DefaultMavenProjectBuilder
                 getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
-            getLogger().debug( "[buildInternal] Assembling model-inheritance: child=" + current.getId() + ", parent=" + previous.getId() );
+            getLogger().debug( "[buildInternal] Assembling model-inheritance: child=" + current.getId() + " has distributionManagement? " + ( current.getDistributionManagement() != null ) + ", parent=" + previous.getId() + " has distributionManagement? " + ( previous.getDistributionManagement() != null ) );
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
 
-            getLogger().debug( "[buildInternal] Assembled model-inheritance for child=" + current.getId() );
+            getLogger().debug( "[buildInternal] Assembled model-inheritance for child=" + current.getId() + " (has distributionManagement? " + ( current.getDistributionManagement() != null ) + ")" );
 
             previous = current;
             previousProject = currentProject;
@@ -1054,7 +1054,8 @@ public class DefaultMavenProjectBuilder
         ModelLineage modelLineage = new DefaultModelLineage();
         modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
 
-        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager );
+        // strict means "no stubs", so we invert it here for the allowStubs parameter.
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
         ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
 
@@ -1079,8 +1080,6 @@ public class DefaultMavenProjectBuilder
         for ( ModelLineageIterator it = modelLineage.lineageIterator(); it.hasNext(); )
         {
             Model currentModel = (Model) it.next();
-
-            getLogger().debug( "[assembleLineage] Assembling MavenProject instance for: " + currentModel.getId() );
 
             File currentPom = it.getPOMFile();
 

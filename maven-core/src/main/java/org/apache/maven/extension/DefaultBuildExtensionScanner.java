@@ -330,7 +330,7 @@ public class DefaultBuildExtensionScanner
             getLogger().debug( "Building model-lineage for: " + pom + " to pre-scan for extensions." );
 
             lineage = modelLineageBuilder.buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                             globalProfileManager );
+                                                             globalProfileManager, false );
         }
         catch ( ProjectBuildingException e )
         {
