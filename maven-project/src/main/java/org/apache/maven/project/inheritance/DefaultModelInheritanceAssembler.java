@@ -111,7 +111,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        assembleDistributionInheritence( child, parent, appendPaths );
+        assembleDistributionInheritence( child, parent, childPathAdjustment, appendPaths );
 
         // issueManagement
         if ( child.getIssueManagement() == null )
@@ -402,7 +402,7 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleDistributionInheritence( Model child, Model parent, boolean appendPaths )
+    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )
         {
@@ -434,7 +434,7 @@ public class DefaultModelInheritanceAssembler
                     if ( site.getUrl() != null )
                     {
                         site.setUrl(
-                            appendPath( site.getUrl(), child.getArtifactId(), null, appendPaths ) );
+                            appendPath( site.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
                     }
                 }
             }
