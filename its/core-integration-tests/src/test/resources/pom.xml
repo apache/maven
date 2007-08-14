@@ -125,5 +125,6 @@
     <!-- <module>it0123-snapshotRangeRepository</module> MNG-2994 -->
     <!-- <module>it0124-pomExtensionComponentOverride</module> MNG-2771 -->
     <!-- <module>it0125-newestConflictResolver</module> MNG-612 -->
+    <module>it0126-testJarDependency</module>
   </modules>
 </project>
