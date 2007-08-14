@@ -754,11 +754,7 @@ public class DefaultMavenProjectBuilder
                 getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
-            getLogger().debug( "[buildInternal] Assembling model-inheritance: child=" + current.getId() + " has distributionManagement? " + ( current.getDistributionManagement() != null ) + ", parent=" + previous.getId() + " has distributionManagement? " + ( previous.getDistributionManagement() != null ) );
-
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
-
-            getLogger().debug( "[buildInternal] Assembled model-inheritance for child=" + current.getId() + " (has distributionManagement? " + ( current.getDistributionManagement() != null ) + ")" );
 
             previous = current;
             previousProject = currentProject;
