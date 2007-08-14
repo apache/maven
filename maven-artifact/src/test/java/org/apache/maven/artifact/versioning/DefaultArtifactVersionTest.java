@@ -247,4 +247,32 @@ public class DefaultArtifactVersionTest
         // version = new DefaultArtifactVersion( "1.1-foo-10" );
         // assertTrue( version.compareTo( new DefaultArtifactVersion( "1.1-foo-2" ) ) > 0 );
     }
+    
+    public void testVersionComparingWithBuildNumberZero()
+    {
+        DefaultArtifactVersion v1 = new DefaultArtifactVersion("2.0");
+        DefaultArtifactVersion v2 = new DefaultArtifactVersion("2.0-0");
+        DefaultArtifactVersion v3 = new DefaultArtifactVersion("2.0-alpha1");
+        DefaultArtifactVersion v4 = new DefaultArtifactVersion("2.0-1");
+        
+        // v1 and v2 are equal
+        assertTrue( v1.compareTo(v2) == 0 );
+        assertTrue( v2.compareTo(v1) == 0 );
+        
+        // v1 is newer than v3
+        assertTrue( v1.compareTo(v3) > 0 );
+        assertTrue( v3.compareTo(v1) < 0 );
+        
+        // ergo, v2 should also be newer than v3
+        assertTrue( v2.compareTo(v3) > 0 );
+        assertTrue( v3.compareTo(v1) < 0 );
+        
+        // nonzero build numbers still respected
+        assertTrue( v1.compareTo(v4) < 0 ); // build number one is always newer
+        assertTrue( v4.compareTo(v1) > 0 );
+        assertTrue( v2.compareTo(v4) < 0 ); // same results as v1
+        assertTrue( v4.compareTo(v2) > 0 );
+        assertTrue( v3.compareTo(v4) < 0 ); // qualifier is always older
+        assertTrue( v4.compareTo(v3) > 0 );
+    }
 }
