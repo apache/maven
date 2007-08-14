@@ -187,7 +187,7 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
-        this.baseVersion = version;
+        this.setBaseVersion( version );
         this.versionRange = null;
     }
 
@@ -283,7 +283,7 @@ public class DefaultArtifact
         }
         appendArtifactTypeClassifierString( sb );
         sb.append( ":" );
-        if ( version != null || baseVersion != null )
+        if ( getBaseVersion() != null )
         {
             sb.append( getBaseVersion() );
         }
@@ -357,19 +357,26 @@ public class DefaultArtifact
     {
         if ( baseVersion == null )
         {
-            baseVersion = version;
-
             if ( version == null )
             {
                 throw new NullPointerException( "version was null for " + groupId + ":" + artifactId );
             }
+            setBaseVersion( version );
         }
         return baseVersion;
     }
 
     public void setBaseVersion( String baseVersion )
     {
-        this.baseVersion = baseVersion;
+        Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
+        if ( m.matches() )
+        {
+            this.baseVersion = m.group( 1 ) + "-" + SNAPSHOT_VERSION;
+        }
+        else
+        {
+            this.baseVersion = baseVersion;
+        }
     }
 
     public int compareTo( Object o )
@@ -496,7 +503,7 @@ public class DefaultArtifact
     public void selectVersion( String version )
     {
         this.version = version;
-        this.baseVersion = version;
+        setBaseVersion( version );
     }
 
     public void setGroupId( String groupId )
@@ -511,18 +518,9 @@ public class DefaultArtifact
 
     public boolean isSnapshot()
     {
-        if ( version != null || baseVersion != null )
+        if ( getBaseVersion() != null )
         {
-            Matcher m = VERSION_FILE_PATTERN.matcher( getBaseVersion() );
-            if ( m.matches() )
-            {
-                setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
-                return true;
-            }
-            else
-            {
-                return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
-            }
+            return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
         }
         else
         {
