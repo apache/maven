@@ -19,9 +19,10 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
+
+import junit.framework.TestCase;
 
 public class DefaultArtifactTest
     extends TestCase
@@ -29,10 +30,16 @@ public class DefaultArtifactTest
 
     private DefaultArtifact artifact;
 
+    private DefaultArtifact snapshotArtifact;
+
     private String groupId = "groupid", artifactId = "artifactId", version = "1.0", scope = "scope", type = "type",
         classifier = "classifier";
 
+    private String snapshotSpecVersion = "1.0-SNAPSHOT";
+    private String snapshotResolvedVersion = "1.0-20070606.010101-1";
+
     private VersionRange versionRange;
+    private VersionRange snapshotVersionRange;
 
     private ArtifactHandlerMock artifactHandler;
 
@@ -43,6 +50,19 @@ public class DefaultArtifactTest
         artifactHandler = new ArtifactHandlerMock();
         versionRange = VersionRange.createFromVersion( version );
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler );
+
+        snapshotVersionRange = VersionRange.createFromVersion( snapshotResolvedVersion );
+        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotVersionRange, scope, type, classifier, artifactHandler );
+    }
+
+    public void testGetVersionReturnsResolvedVersionOnSnapshot()
+    {
+        assertEquals( snapshotResolvedVersion, snapshotArtifact.getVersion() );
+
+        // this is FOUL!
+//        snapshotArtifact.isSnapshot();
+
+        assertEquals( snapshotSpecVersion, snapshotArtifact.getBaseVersion() );
     }
 
     public void testGetDependencyConflictId()
