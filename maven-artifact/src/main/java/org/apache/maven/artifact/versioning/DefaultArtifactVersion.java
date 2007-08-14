@@ -60,11 +60,7 @@ public class DefaultArtifactVersion
         }
         if ( result == 0 )
         {
-            if ( buildNumber != null || otherVersion.buildNumber != null )
-            {
-                result = compareIntegers( buildNumber, otherVersion.buildNumber );
-            }
-            else if ( qualifier != null )
+            if ( qualifier != null )
             {
                 if ( otherVersion.qualifier != null )
                 {
@@ -95,6 +91,10 @@ public class DefaultArtifactVersion
             {
                 // otherVersion has a qualifier but we don't, we're newer
                 result = 1;
+            }
+            else if ( buildNumber != null || otherVersion.buildNumber != null )
+            {
+                result = compareIntegers( buildNumber, otherVersion.buildNumber );
             }
         }
         return result;
