@@ -40,6 +40,8 @@ public class DefaultArtifactVersion
 
     private String qualifier;
 
+    private String unparsed;
+
     public DefaultArtifactVersion( String version )
     {
         parseVersion( version );
@@ -47,38 +49,40 @@ public class DefaultArtifactVersion
 
     public int compareTo( Object o )
     {
-        DefaultArtifactVersion otherVersion = (DefaultArtifactVersion) o;
+        ArtifactVersion otherVersion = (ArtifactVersion) o;
 
-        int result = compareIntegers( majorVersion, otherVersion.majorVersion );
+        int result = getMajorVersion() - otherVersion.getMajorVersion();
         if ( result == 0 )
         {
-            result = compareIntegers( minorVersion, otherVersion.minorVersion );
+            result = getMinorVersion() - otherVersion.getMinorVersion();
         }
         if ( result == 0 )
         {
-            result = compareIntegers( incrementalVersion, otherVersion.incrementalVersion );
+            result = getIncrementalVersion() - otherVersion.getIncrementalVersion();
         }
         if ( result == 0 )
         {
             if ( qualifier != null )
             {
-                if ( otherVersion.qualifier != null )
+                String otherQualifier = otherVersion.getQualifier();
+
+                if ( otherQualifier != null )
                 {
-                    if ( qualifier.length() > otherVersion.qualifier.length() &&
-                        qualifier.startsWith( otherVersion.qualifier ) )
+                    if ( ( qualifier.length() > otherQualifier.length() )
+                         && qualifier.startsWith( otherQualifier ) )
                     {
                         // here, the longer one that otherwise match is considered older
                         result = -1;
                     }
-                    else if ( qualifier.length() < otherVersion.qualifier.length() &&
-                        otherVersion.qualifier.startsWith( qualifier ) )
+                    else if ( ( qualifier.length() < otherQualifier.length() )
+                              && otherQualifier.startsWith( qualifier ) )
                     {
                         // here, the longer one that otherwise match is considered older
                         result = 1;
                     }
                     else
                     {
-                        result = qualifier.compareTo( otherVersion.qualifier );
+                        result = qualifier.compareTo( otherQualifier );
                     }
                 }
                 else
@@ -87,38 +91,17 @@ public class DefaultArtifactVersion
                     result = -1;
                 }
             }
-            else if ( otherVersion.qualifier != null )
+            else if ( otherVersion.getQualifier() != null )
             {
                 // otherVersion has a qualifier but we don't, we're newer
                 result = 1;
             }
-            else if ( buildNumber != null || otherVersion.buildNumber != null )
+            else
             {
-                result = compareIntegers( buildNumber, otherVersion.buildNumber );
+                result = getBuildNumber() - otherVersion.getBuildNumber();
             }
         }
         return result;
-    }
-
-    private int compareIntegers( Integer i1, Integer i2 )
-    {
-        // treat null as 0 in comparison
-        if ( i1 == null ? i2 == null : i1.equals( i2 ) )
-        {
-            return 0;
-        }
-        else if ( i1 == null )
-        {
-            return -i2.intValue();
-        }
-        else if ( i2 == null )
-        {
-            return i1.intValue();
-        }
-        else
-        {
-            return i1.intValue() - i2.intValue();
-        }
     }
 
     public int getMajorVersion()
@@ -148,6 +131,8 @@ public class DefaultArtifactVersion
 
     public final void parseVersion( String version )
     {
+        unparsed = version;
+
         int index = version.indexOf( "-" );
 
         String part1;
@@ -167,7 +152,7 @@ public class DefaultArtifactVersion
         {
             try
             {
-                if ( part2.length() == 1 || !part2.startsWith( "0" ) )
+                if ( ( part2.length() == 1 ) || !part2.startsWith( "0" ) )
                 {
                     buildNumber = Integer.valueOf( part2 );
                 }
@@ -182,7 +167,7 @@ public class DefaultArtifactVersion
             }
         }
 
-        if ( part1.indexOf( "." ) < 0 && !part1.startsWith( "0" ) )
+        if ( ( part1.indexOf( "." ) < 0 ) && !part1.startsWith( "0" ) )
         {
             try
             {
@@ -235,7 +220,7 @@ public class DefaultArtifactVersion
     private static Integer getNextIntegerToken( StringTokenizer tok )
     {
         String s = tok.nextToken();
-        if ( s.length() > 1 && s.startsWith( "0" ) )
+        if ( ( s.length() > 1 ) && s.startsWith( "0" ) )
         {
             throw new NumberFormatException( "Number part has a leading 0: '" + s + "'" );
         }
@@ -244,34 +229,38 @@ public class DefaultArtifactVersion
 
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
-        if ( majorVersion != null )
+        return unparsed;
+    }
+
+    public boolean equals( Object other )
+    {
+        if ( this == other )
         {
-            buf.append( majorVersion );
+            return true;
         }
-        if ( minorVersion != null )
+
+        if ( false == ( other instanceof ArtifactVersion ) )
         {
-            buf.append( "." );
-            buf.append( minorVersion );
+            return false;
         }
-        if ( incrementalVersion != null )
+
+        return 0 == compareTo( other );
+    }
+
+    public int hashCode()
+    {
+        int result = 1229;
+
+        result = 1223 * result + getMajorVersion();
+        result = 1223 * result + getMinorVersion();
+        result = 1223 * result + getIncrementalVersion();
+        result = 1223 * result + getBuildNumber();
+
+        if ( null != getQualifier() )
         {
-            buf.append( "." );
-            buf.append( incrementalVersion );
+            result = 1223 * result + getQualifier().hashCode();
         }
-        if ( buildNumber != null )
-        {
-            buf.append( "-" );
-            buf.append( buildNumber );
-        }
-        else if ( qualifier != null )
-        {
-            if ( buf.length() > 0 )
-            {
-                buf.append( "-" );
-            }
-            buf.append( qualifier );
-        }
-        return buf.toString();
+
+        return result;
     }
 }

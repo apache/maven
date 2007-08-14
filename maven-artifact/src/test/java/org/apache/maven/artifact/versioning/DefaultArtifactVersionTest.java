@@ -247,32 +247,147 @@ public class DefaultArtifactVersionTest
         // version = new DefaultArtifactVersion( "1.1-foo-10" );
         // assertTrue( version.compareTo( new DefaultArtifactVersion( "1.1-foo-2" ) ) > 0 );
     }
-    
+
     public void testVersionComparingWithBuildNumberZero()
     {
-        DefaultArtifactVersion v1 = new DefaultArtifactVersion("2.0");
-        DefaultArtifactVersion v2 = new DefaultArtifactVersion("2.0-0");
-        DefaultArtifactVersion v3 = new DefaultArtifactVersion("2.0-alpha1");
-        DefaultArtifactVersion v4 = new DefaultArtifactVersion("2.0-1");
-        
+        DefaultArtifactVersion v1 = new DefaultArtifactVersion( "2.0" );
+        DefaultArtifactVersion v2 = new DefaultArtifactVersion( "2.0-0" );
+        DefaultArtifactVersion v3 = new DefaultArtifactVersion( "2.0-alpha1" );
+        DefaultArtifactVersion v4 = new DefaultArtifactVersion( "2.0-1" );
+
         // v1 and v2 are equal
-        assertTrue( v1.compareTo(v2) == 0 );
-        assertTrue( v2.compareTo(v1) == 0 );
-        
+        assertTrue( v1.compareTo( v2 ) == 0 );
+        assertTrue( v2.compareTo( v1 ) == 0 );
+
         // v1 is newer than v3
-        assertTrue( v1.compareTo(v3) > 0 );
-        assertTrue( v3.compareTo(v1) < 0 );
-        
+        assertTrue( v1.compareTo( v3 ) > 0 );
+        assertTrue( v3.compareTo( v1 ) < 0 );
+
         // ergo, v2 should also be newer than v3
-        assertTrue( v2.compareTo(v3) > 0 );
-        assertTrue( v3.compareTo(v1) < 0 );
-        
+        assertTrue( v2.compareTo( v3 ) > 0 );
+        assertTrue( v3.compareTo( v1 ) < 0 );
+
         // nonzero build numbers still respected
-        assertTrue( v1.compareTo(v4) < 0 ); // build number one is always newer
-        assertTrue( v4.compareTo(v1) > 0 );
-        assertTrue( v2.compareTo(v4) < 0 ); // same results as v1
-        assertTrue( v4.compareTo(v2) > 0 );
-        assertTrue( v3.compareTo(v4) < 0 ); // qualifier is always older
-        assertTrue( v4.compareTo(v3) > 0 );
+        assertTrue( v1.compareTo( v4 ) < 0 ); // build number one is always newer
+        assertTrue( v4.compareTo( v1 ) > 0 );
+        assertTrue( v2.compareTo( v4 ) < 0 ); // same results as v1
+        assertTrue( v4.compareTo( v2 ) > 0 );
+        assertTrue( v3.compareTo( v4 ) < 0 ); // qualifier is always older
+        assertTrue( v4.compareTo( v3 ) > 0 );
+    }
+
+    public void testCompareToEqualsHashCodeConsistency()
+    {
+        DefaultArtifactVersion v1;
+        DefaultArtifactVersion v2;
+
+        // equal to itself
+        v1 = new DefaultArtifactVersion( "1.3" );
+        v2 = v1;
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
+                    && ( v2.compareTo( v1 ) == 0 ) );
+
+        // equal to something that means the same
+        v1 = new DefaultArtifactVersion( "1" );
+        v2 = new DefaultArtifactVersion( "1.0.0-0" );
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
+                    && ( v2.compareTo( v1 ) == 0 ) );
+
+        // equal with qualifier
+        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
+        v2 = new DefaultArtifactVersion( "1.3-alpha1" );
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
+                    && ( v2.compareTo( v1 ) == 0 ) );
+
+        // longer qualifier with same start is *newer*
+        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
+        v2 = new DefaultArtifactVersion( "1.3-alpha1-1" );
+        assertTrue( !v1.equals( v2 ) && !v2.equals( v1 ) && ( v1.compareTo( v2 ) > 0 ) && ( v2.compareTo( v1 ) < 0 ) );
+
+        // different qualifiers alpha compared
+        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
+        v2 = new DefaultArtifactVersion( "1.3-beta1" );
+        assertTrue( !v1.equals( v2 ) && !v2.equals( v1 ) && ( v1.compareTo( v2 ) < 0 ) && ( v2.compareTo( v1 ) > 0 ) );
+    }
+
+    public void testTransitivity()
+    {
+        DefaultArtifactVersion v1 = new DefaultArtifactVersion( "1" );
+        DefaultArtifactVersion v2 = new DefaultArtifactVersion( "1.0-0" );
+        DefaultArtifactVersion v3 = new DefaultArtifactVersion( "1.0.1" );
+        DefaultArtifactVersion v4 = new DefaultArtifactVersion( "1.0-beta1" );
+
+        // v1 and v2 are equal
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.compareTo( v2 ) == 0 ) && ( v2.compareTo( v1 ) == 0 ) );
+
+        // v1 is older than v3
+        assertTrue( !v1.equals( v3 ) && !v3.equals( v1 ) && ( v1.compareTo( v3 ) < 0 ) && ( v3.compareTo( v1 ) > 0 ) );
+
+        // ergo, v2 is older than v3
+        assertTrue( !v2.equals( v3 ) && !v3.equals( v2 ) && ( v2.compareTo( v3 ) < 0 ) && ( v3.compareTo( v2 ) > 0 ) );
+
+        // v1 is newer than v4
+        assertTrue( !v1.equals( v4 ) && !v4.equals( v1 ) && ( v1.compareTo( v4 ) > 0 ) && ( v4.compareTo( v1 ) < 0 ) );
+
+        // ergo, v2 is newer than v4
+        assertTrue( !v2.equals( v4 ) && !v4.equals( v2 ) && ( v2.compareTo( v4 ) > 0 ) && ( v4.compareTo( v2 ) < 0 ) );
+    }
+
+    private void testInterfaceCompare( String version )
+    {
+        final DefaultArtifactVersion dav = new DefaultArtifactVersion( version );
+
+        // create an anonymous instance to compare the big daddy to
+        ArtifactVersion av = new ArtifactVersion()
+        {
+            public int getMajorVersion()
+            {
+                return dav.getMajorVersion();
+            }
+
+            public int getMinorVersion()
+            {
+                return dav.getMinorVersion();
+            }
+
+            public int getIncrementalVersion()
+            {
+                return dav.getIncrementalVersion();
+            }
+
+            public int getBuildNumber()
+            {
+                return dav.getBuildNumber();
+            }
+
+            public String getQualifier()
+            {
+                return dav.getQualifier();
+            }
+
+            // required by interface but unused for our test
+            public int compareTo( Object o )
+            {
+                return 0; /* bogus */
+            }
+
+            public void parseVersion( String s )
+            { /* bogus */
+            }
+        };
+
+        assertTrue( dav.equals( av ) );
+        assertTrue( dav.compareTo( av ) == 0 );
+    }
+
+    public void testInterfaceCompares()
+    {
+        testInterfaceCompare( "1" );
+        testInterfaceCompare( "1.2" );
+        testInterfaceCompare( "1.2.3" );
+        testInterfaceCompare( "1.2.3-4" );
+        testInterfaceCompare( "1.2.3-four" );
+        testInterfaceCompare( "1-2" );
+        testInterfaceCompare( "1-two" );
     }
 }
