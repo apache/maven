@@ -185,6 +185,10 @@ public class PluginParameterExpressionEvaluator
         {
             value = mojoExecution.getReports();
         }
+        else if ("mojoExecution".equals(expression)) 
+        {
+        	value = mojoExecution;
+        }
         else if ( "project".equals( expression ) )
         {
             value = project;
