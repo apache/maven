@@ -89,6 +89,12 @@ public class DefaultArtifactResolver
             {
                 File systemFile = artifact.getFile();
 
+                if ( systemFile == null )
+                {
+                    throw new ArtifactNotFoundException(
+                        "System artifact: " + artifact + " has no file attached", artifact );
+                }
+
                 if ( !systemFile.exists() )
                 {
                     throw new ArtifactNotFoundException(
