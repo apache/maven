@@ -285,6 +285,7 @@ public class DefaultArtifactResolver
                                                               localRepository, remoteRepositories, source, filter,
                                                               listeners );
 
+        List resolvedArtifacts = new ArrayList();
         List missingArtifacts = new ArrayList();
         for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
@@ -292,6 +293,7 @@ public class DefaultArtifactResolver
             try
             {
                 resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+                resolvedArtifacts.add( node.getArtifact() );
             }
             catch ( ArtifactNotFoundException anfe )
             {
@@ -303,7 +305,8 @@ public class DefaultArtifactResolver
 
         if ( missingArtifacts.size() > 0 )
         {
-            throw new MultipleArtifactsNotFoundException( originatingArtifact, missingArtifacts, remoteRepositories );
+            throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
+                                                          remoteRepositories );
         }
 
         return artifactResolutionResult;

@@ -19,22 +19,59 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * Exception caused when one or more artifacts can not be resolved because they are not found in the
+ * local or remote repositories.
+ */
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException
 {
+    private final List resolvedArtifacts;
     private final List missingArtifacts;
     
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List artifacts, List remoteRepositories )
+    /**
+     * @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} 
+     */
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List missingArtifacts, List remoteRepositories )
     {
-        super( constructMessage( artifacts ), originatingArtifact, remoteRepositories );
-        this.missingArtifacts = artifacts;
+        this( originatingArtifact, new ArrayList(), missingArtifacts, remoteRepositories );
+    }
+
+    /**
+     * Create an instance of the exception with allrequired information.
+     * 
+     * @param originatingArtifact the artifact that was being resolved
+     * @param resolvedArtifacts artifacts that could be resolved
+     * @param missingArtifacts artifacts that could not be resolved
+     * @param remoteRepositories remote repositories where the missing artifacts were not found
+     */
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List resolvedArtifacts,
+                                               List missingArtifacts, List remoteRepositories )
+    {
+        super( constructMessage( missingArtifacts ), originatingArtifact, remoteRepositories );
+        this.resolvedArtifacts = resolvedArtifacts;
+        this.missingArtifacts = missingArtifacts;
+    }
+
+    /**
+     * artifacts that could be resolved
+     * @return {@link List} of {@link Artifact}
+     */
+    public List getResolvedArtifacts()
+    {
+        return resolvedArtifacts;
     }
     
+    /**
+     * artifacts that could NOT be resolved
+     * @return {@link List} of {@link Artifact}
+     */
     public List getMissingArtifacts()
     {
         return missingArtifacts;
