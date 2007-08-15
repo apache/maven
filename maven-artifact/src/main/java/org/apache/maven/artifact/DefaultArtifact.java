@@ -187,7 +187,7 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
-        this.setBaseVersion( version );
+        this.setBaseVersionInternal( version );
         this.versionRange = null;
     }
 
@@ -361,12 +361,17 @@ public class DefaultArtifact
             {
                 throw new NullPointerException( "version was null for " + groupId + ":" + artifactId );
             }
-            setBaseVersion( version );
+            setBaseVersionInternal( version );
         }
         return baseVersion;
     }
 
     public void setBaseVersion( String baseVersion )
+    {
+        setBaseVersionInternal( baseVersion );
+    }
+    
+    protected void setBaseVersionInternal( String baseVersion )
     {
         Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
         if ( m.matches() )
@@ -495,7 +500,7 @@ public class DefaultArtifact
     public void selectVersion( String version )
     {
         this.version = version;
-        setBaseVersion( version );
+        setBaseVersionInternal( version );
     }
 
     public void setGroupId( String groupId )
