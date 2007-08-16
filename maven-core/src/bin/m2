@@ -18,9 +18,6 @@
 # under the License.
 # ----------------------------------------------------------------------------
 
-#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
-#   reserved.
-
 echo ""
 echo THE m2 COMMMAND IS DEPRECATED - PLEASE RUN mvn INSTEAD
 echo ""
