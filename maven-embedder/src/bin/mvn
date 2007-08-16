@@ -15,9 +15,6 @@
 #  limitations under the License.
 # ----------------------------------------------------------------------------
 
-#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
-#   reserved.
-
 # ----------------------------------------------------------------------------
 # Maven2 Start Up Batch script
 #
@@ -32,7 +29,6 @@
 #     e.g. to debug Maven itself, use
 #       set MAVEN_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 # ----------------------------------------------------------------------------
-
 
 QUOTED_ARGS=""
 while [ "$1" != "" ] ; do
