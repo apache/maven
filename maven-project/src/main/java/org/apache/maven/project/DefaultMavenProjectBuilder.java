@@ -436,7 +436,7 @@ public class DefaultMavenProjectBuilder
                     if ( null != d.getExclusions() && !d.getExclusions().isEmpty() )
                     {
                         List exclusions = new ArrayList();
-                        
+
                         Iterator exclItr = d.getExclusions().iterator();
 
                         while ( exclItr.hasNext() )
@@ -510,8 +510,9 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            getLogger().warn( "Attempting to build MavenProject instance for Artifact of type: " + artifact.getType() +
-                "; constructing POM artifact instead." );
+            getLogger().warn( "Attempting to build MavenProject instance for Artifact (" + artifact.getGroupId() + ":"
+                                  + artifact.getArtifactId() + ":" + artifact.getVersion() + ") of type: "
+                                  + artifact.getType() + "; constructing POM artifact instead." );
 
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                                      artifact.getVersion(), artifact.getScope() );
@@ -1086,7 +1087,7 @@ public class DefaultMavenProjectBuilder
 
         project.setActiveProfiles( activeProfiles );
         project.setOriginalModel( originalModel );
-        
+
         lineage.addFirst( project );
 
         Parent parentModel = model.getParent();
