@@ -110,7 +110,6 @@ under the License.
     </plugins>
   </build>
   <modules>
-    <module>maven-artifact</module>
     <module>maven-build-context</module>
     <module>maven-core</module>
     <module>maven-error-diagnostics</module>
@@ -181,6 +180,11 @@ under the License.
         <artifactId>wagon-ssh-external</artifactId>
         <version>${wagonVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven.artifact</groupId>
+        <artifactId>maven-artifact</artifactId>
+        <version>3.0-SNAPSHOT</version>
+      </dependency>      
       <dependency>
         <groupId>easymock</groupId>
         <artifactId>easymock</artifactId>

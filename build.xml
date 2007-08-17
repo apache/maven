@@ -137,6 +137,7 @@ under the License.
     <pull orgpath="org/codehaus/modello/modello-plugin-jdom" version="${modello.version}" name="modello-plugin-jdom" repository="codehaus"/>
     <pull orgpath="junit/junit" version="${junit.version}" name="junit"/>
     <pull orgpath="jdom/jdom" version="${jdom.version}" name="jdom"/>
+    <pull orgpath="org/apache/maven/artifact/maven-artifact" version="${maven-artifact.version}" name="maven-artifact"/>    
   </target>
 
   <target name="classpath-pre" depends="init,pull"
@@ -162,7 +163,9 @@ under the License.
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
       <pathelement location="${maven.repo.local}/jdom/jdom/${jdom.version}/jdom-${jdom.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/apache/maven/artifact/maven-artifact/${maven-artifact.version}/maven-artifact-${maven-artifact.version}.jar"/>
     </path>
+    
     <!-- DGF Need to keep these modello classes out of the system classpath at runtime, because different parts of the build
          need different versions of modello.  -->
     <path id="modello.classpath">
@@ -221,7 +224,6 @@ under the License.
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
     <modello file="maven-profile/profiles.mdo"/>
-    <modello file="maven-artifact/src/main/mdo/metadata.mdo"/>
     <modello file="maven-settings/src/main/mdo/settings.mdo"/>
   </target>
 
@@ -277,9 +279,6 @@ under the License.
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
-<!--
-      <arg value="-X"/>
- -->
       <arg value="clean"/>
       <arg value="install"/>
     </java>
@@ -292,56 +291,6 @@ under the License.
     The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
     </echo>
-    
-<!--
-    <echo>
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    MAVEN-ASSEMBLY
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    </echo>
-
-    <delete>
-      <fileset dir="bootstrap/lib" includes="*.pom,maven*.jar,modello*.jar,junit*.jar"/>
-    </delete>
-
-    <mkdir dir="bootstrap/boot"/>
-    <copy todir="bootstrap/boot">
-      <fileset dir="bootstrap/lib">
-        <include name="plexus-classworlds*.jar"/>
-      </fileset>
-    </copy>
-
-    <delete>
-      <fileset dir="bootstrap/lib">
-        <include name="plexus-classworlds*.jar"/>
-      </fileset>
-    </delete>
-
-<echo file="bootstrap/m2.conf">
-main is org.apache.maven.cli.MavenCli from plexus.core
-
-[plexus.core]
-load ${bootstrapDir}/lib/*.jar
-load ${bootstrapDir}/target/classes
-</echo>
-
-    <property name="maven.goals" value="clean assembly:assembly"/>
-    <property name="bootstrapDir" value="${basedir}/bootstrap"/>
-    <java dir="maven-embedder" classname="org.codehaus.classworlds.Launcher" fork="true" failonerror="true">
-      <classpath>
-        <fileset dir="${bootstrapDir}/boot" includes="plexus-classworlds-*.jar"/>
-        <path refid="sources"/>
-      </classpath>
-      <sysproperty key="classworlds.conf" value="${bootstrapDir}/m2.conf"/>
-      <sysproperty key="bootstrapDir" value="${bootstrapDir}"/>
-      <arg value="-e"/>
-      <arg line="${maven.goals}"/>
-    </java>
-    
- -->
-
     <property name="maven.assembly" location="maven-embedder/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
@@ -449,7 +398,6 @@ load ${bootstrapDir}/target/classes
     <copy file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" todir="bootstrap/lib"/>
 
     <echo>Resolved version ${fileversion} (given=${version})</echo>
-
 
     <condition property="build.failed">
       <not>
