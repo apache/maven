@@ -89,6 +89,12 @@ public class DefaultArtifactResolver
             {
                 File systemFile = artifact.getFile();
 
+                if ( systemFile == null )
+                {
+                    throw new ArtifactNotFoundException(
+                        "System artifact: " + artifact + " has no file attached", artifact );
+                }
+
                 if ( !systemFile.exists() )
                 {
                     throw new ArtifactNotFoundException(
@@ -285,6 +291,7 @@ public class DefaultArtifactResolver
                                                               localRepository, remoteRepositories, source, filter,
                                                               listeners );
 
+        List resolvedArtifacts = new ArrayList();
         List missingArtifacts = new ArrayList();
         for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
@@ -292,25 +299,20 @@ public class DefaultArtifactResolver
             try
             {
                 resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+                resolvedArtifacts.add( node.getArtifact() );
             }
             catch ( ArtifactNotFoundException anfe )
             {
-                getLogger().debug( anfe.getMessage() );
+                getLogger().debug( anfe.getMessage(), anfe );
+
                 missingArtifacts.add( node.getArtifact() );
             }
         }
 
         if ( missingArtifacts.size() > 0 )
         {
-            throw new MultipleArtifactsNotFoundException( originatingArtifact, missingArtifacts, remoteRepositories );
-//            String message = "required artifacts missing:\n";
-//            for ( Iterator i = missingArtifacts.iterator(); i.hasNext(); )
-//            {
-//                Artifact missingArtifact = (Artifact) i.next();
-//                message += "  " + missingArtifact.getId() + "\n";
-//            }
-//            message += "\nfor the artifact:";
-//            throw new ArtifactResolutionException( message, originatingArtifact, remoteRepositories );
+            throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
+                                                          remoteRepositories );
         }
 
         return artifactResolutionResult;
