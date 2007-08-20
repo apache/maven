@@ -1,6 +1,5 @@
 package org.apache.maven.artifact;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +19,10 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
+/**
+ * Exception thrown when the identity of an artifact can not be established,
+ * eg. one of groupId, artifactId, version or type is null.   
+ */
 public class InvalidArtifactRTException
     extends RuntimeException
 {
