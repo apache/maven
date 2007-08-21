@@ -414,6 +414,7 @@ public class DefaultArtifactCollector
         Artifact farthestArtifact = farthest.getArtifact();
         Artifact nearestArtifact = nearest.getArtifact();
 
+        /* farthest is runtime and nearest has lower priority, change to runtime */
         if ( Artifact.SCOPE_RUNTIME.equals( farthestArtifact.getScope() ) && (
             Artifact.SCOPE_TEST.equals( nearestArtifact.getScope() ) ||
                 Artifact.SCOPE_PROVIDED.equals( nearestArtifact.getScope() ) ) )
@@ -421,13 +422,14 @@ public class DefaultArtifactCollector
             updateScope = true;
         }
 
+        /* farthest is compile and nearest is not (has lower priority), change to compile */
         if ( Artifact.SCOPE_COMPILE.equals( farthestArtifact.getScope() ) &&
             !Artifact.SCOPE_COMPILE.equals( nearestArtifact.getScope() ) )
         {
             updateScope = true;
         }
 
-        // current POM rules all
+        /* current POM rules all, if nearest is in current pom, do not update its scope */
         if ( nearest.getDepth() < 2 && updateScope )
         {
             updateScope = false;

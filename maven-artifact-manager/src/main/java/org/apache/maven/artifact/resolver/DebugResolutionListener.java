@@ -81,16 +81,16 @@ public class DebugResolutionListener
         logger.debug( indent + omitted + " (removed - causes a cycle in the graph)" );
     }
 
-    public void updateScopeCurrentPom( Artifact artifact, String scope )
+    public void updateScopeCurrentPom( Artifact artifact, String ignoredScope )
     {
-        logger.debug( indent + artifact + " (not setting scope to: " + scope + "; local scope " + artifact.getScope() +
+        logger.debug( indent + artifact + " (not setting scope to: " + ignoredScope + "; local scope " + artifact.getScope() +
             " wins)" );
 
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
             logger.warn( "\n\tArtifact " + artifact + " retains local scope '" + artifact.getScope() +
-                "' overriding broader scope '" + scope + "'\n" +
+                "' overriding broader scope '" + ignoredScope + "'\n" +
                 "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
             ignoredArtifacts.add( artifact );
         }
