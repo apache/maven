@@ -25,7 +25,15 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.SystemBuildContext;
-import org.apache.maven.execution.*;
+import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.ExecutionBuildContext;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -56,7 +64,12 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author jason van zyl
@@ -72,7 +85,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     protected BuildContextManager buildContextManager;
-    
+
     protected MavenProjectBuilder projectBuilder;
 
     protected LifecycleExecutor lifecycleExecutor;
@@ -98,7 +111,7 @@ public class DefaultMaven
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
-        
+
         initializeBuildContext( request );
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
@@ -130,7 +143,7 @@ public class DefaultMaven
         // Either the build was successful, or it was a fail_at_end/fail_never reactor build
 
         ReactorManager reactorManager = result.getReactorManager();
-        
+
         // TODO: should all the logging be left to the CLI?
         logReactorSummary( reactorManager );
 
@@ -150,7 +163,8 @@ public class DefaultMaven
 
                 line();
 
-                return new DefaultMavenExecutionResult( Collections.singletonList( new MavenExecutionException( "Some builds failed" ) ) );
+                return new DefaultMavenExecutionResult(
+                    Collections.singletonList( new MavenExecutionException( "Some builds failed" ) ) );
             }
             else
             {
@@ -171,21 +185,20 @@ public class DefaultMaven
 
     /**
      * Initialize some context objects to be stored in the container's context map for reference by
-     * other Maven components (including custom components that need more information about the 
+     * other Maven components (including custom components that need more information about the
      * build than is supplied to them by the APIs).
      */
     private void initializeBuildContext( MavenExecutionRequest request )
     {
         new ExecutionBuildContext( request ).store( buildContextManager );
-        
+
         SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
-        
+
         systemContext.setSystemProperties( request.getProperties() );
         systemContext.store( buildContextManager );
     }
 
-    private void logErrors( ReactorManager rm,
-                            boolean showErrors )
+    private void logErrors( ReactorManager rm, boolean showErrors )
     {
         for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
@@ -214,8 +227,7 @@ public class DefaultMaven
         }
     }
 
-    private MavenExecutionResult doExecute( MavenExecutionRequest request,
-                                            EventDispatcher dispatcher )
+    private MavenExecutionResult doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
     {
         List executionExceptions = new ArrayList();
 
@@ -292,7 +304,7 @@ public class DefaultMaven
             lifecycleExecutor.execute( session, rm, dispatcher );
         }
         catch ( Exception e )
-        {                        
+        {
             executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
         }
 
@@ -317,12 +329,11 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request,
-                              ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
-        
+
         List files;
         try
         {
@@ -332,7 +343,7 @@ public class DefaultMaven
         {
             throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
         }
-        
+
         // TODO: We should probably do this discovery just-in-time, if we can move to building project
         // instances just-in-time.
         try
@@ -343,7 +354,7 @@ public class DefaultMaven
         {
             throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
-        
+
         try
         {
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
@@ -365,15 +376,12 @@ public class DefaultMaven
         return projects;
     }
 
-    private void logReactorSummaryLine( String name,
-                                        String status )
+    private void logReactorSummaryLine( String name, String status )
     {
         logReactorSummaryLine( name, status, -1 );
     }
 
-    private void logReactorSummaryLine( String name,
-                                        String status,
-                                        long time )
+    private void logReactorSummaryLine( String name, String status, long time )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
@@ -422,12 +430,8 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files,
-                                  ArtifactRepository localRepository,
-                                  boolean recursive,
-                                  Settings settings,
-                                  ProfileManager globalProfileManager,
-                                  boolean isRoot )
+    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
+                                  ProfileManager globalProfileManager, boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
@@ -477,7 +481,8 @@ public class DefaultMaven
 
                     if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
                     {
-                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+                        getLogger().warn(
+                            "Empty module detected. Please check you don't have any empty module definitions in your POM." );
 
                         continue;
                     }
@@ -501,7 +506,7 @@ public class DefaultMaven
                     {
                         throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
                     }
-                    
+
                     moduleFiles.add( moduleFile );
                 }
 
@@ -516,9 +521,7 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom,
-                                    ArtifactRepository localRepository,
-                                    Settings settings,
+    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
                                     ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
@@ -543,15 +546,14 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request,
-                                          ReactorManager rpm,
+    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm,
                                           EventDispatcher dispatcher )
-    {        
+    {
         MavenSession session = new MavenSession( container, request, dispatcher, rpm );
-        
+
         SessionContext ctx = new SessionContext( session );
         ctx.store( buildContextManager );
-        
+
         return session;
     }
 
@@ -582,8 +584,7 @@ public class DefaultMaven
         logTrace( error, true );
     }
 
-    protected void logError( Exception e,
-                             boolean showErrors )
+    protected void logError( Exception e, boolean showErrors )
     {
         line();
 
@@ -603,8 +604,7 @@ public class DefaultMaven
         }
     }
 
-    protected void logFailure( BuildFailureException e,
-                               boolean showErrors )
+    protected void logFailure( BuildFailureException e, boolean showErrors )
     {
         line();
 
@@ -617,8 +617,7 @@ public class DefaultMaven
         logTrace( e, showErrors );
     }
 
-    private void logTrace( Throwable t,
-                           boolean showErrors )
+    private void logTrace( Throwable t, boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
