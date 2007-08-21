@@ -58,6 +58,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -503,13 +504,18 @@ public class DefaultMaven
                         moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                     }
 
-                    try
+                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
                     {
-                        moduleFile = moduleFile.getCanonicalFile();
-                    }
-                    catch ( IOException e )
-                    {
-                        throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                        // we don't canonicalize on unix to avoid interfering with symlinks
+
+                        try
+                        {
+                            moduleFile = moduleFile.getCanonicalFile();
+                        }
+                        catch ( IOException e )
+                        {
+                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                        }
                     }
 
                     moduleFiles.add( moduleFile );
