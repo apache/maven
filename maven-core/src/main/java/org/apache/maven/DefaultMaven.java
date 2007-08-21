@@ -504,7 +504,7 @@ public class DefaultMaven
                         moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                     }
 
-                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                    if ( Os.isFamily( "windows" ) )
                     {
                         // we don't canonicalize on unix to avoid interfering with symlinks
 
