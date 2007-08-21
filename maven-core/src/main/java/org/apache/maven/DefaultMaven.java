@@ -199,8 +199,7 @@ public class DefaultMaven
         dispatcher.dispatchEnd( event, request.getBaseDirectory() );
     }
 
-    private void logErrors( ReactorManager rm,
-                            boolean showErrors )
+    private void logErrors( ReactorManager rm, boolean showErrors )
     {
         for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
@@ -230,8 +229,7 @@ public class DefaultMaven
 
     }
 
-    private ReactorManager doExecute( MavenExecutionRequest request,
-                                      EventDispatcher dispatcher )
+    private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
         throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
     {
         if ( request.getSettings().isOffline() )
@@ -352,8 +350,7 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request,
-                              ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
@@ -384,15 +381,12 @@ public class DefaultMaven
         return projects;
     }
 
-    private void logReactorSummaryLine( String name,
-                                        String status )
+    private void logReactorSummaryLine( String name, String status )
     {
         logReactorSummaryLine( name, status, -1 );
     }
 
-    private void logReactorSummaryLine( String name,
-                                        String status,
-                                        long time )
+    private void logReactorSummaryLine( String name, String status, long time )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
@@ -441,12 +435,8 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files,
-                                  ArtifactRepository localRepository,
-                                  boolean recursive,
-                                  Settings settings,
-                                  ProfileManager globalProfileManager,
-                                  boolean isRoot )
+    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
+                                  ProfileManager globalProfileManager, boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
@@ -496,7 +486,8 @@ public class DefaultMaven
 
                     if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
                     {
-                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+                        getLogger().warn(
+                            "Empty module detected. Please check you don't have any empty module definitions in your POM." );
 
                         continue;
                     }
@@ -520,7 +511,7 @@ public class DefaultMaven
                     {
                         throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
                     }
-                    
+
                     moduleFiles.add( moduleFile );
                 }
 
@@ -535,9 +526,7 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom,
-                                    ArtifactRepository localRepository,
-                                    Settings settings,
+    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
                                     ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
@@ -660,8 +649,7 @@ public class DefaultMaven
         logTrace( error, true );
     }
 
-    protected void logError( Exception e,
-                             boolean showErrors )
+    protected void logError( Exception e, boolean showErrors )
     {
         line();
 
@@ -681,8 +669,7 @@ public class DefaultMaven
         }
     }
 
-    protected void logFailure( BuildFailureException e,
-                               boolean showErrors )
+    protected void logFailure( BuildFailureException e, boolean showErrors )
     {
         line();
 
@@ -702,8 +689,7 @@ public class DefaultMaven
         }
     }
 
-    private void logTrace( Throwable t,
-                           boolean showErrors )
+    private void logTrace( Throwable t, boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
