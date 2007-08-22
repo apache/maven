@@ -14,12 +14,6 @@
         <include>**/*.xml</include>
       </includes>
     </fileSet>
-    <fileSet encoding="UTF-8">
-      <directory>src/test/resources</directory>
-      <includes>
-        <include>**/*.jar</include>
-      </includes>
-    </fileSet>
     <fileSet filtered="true" encoding="UTF-8">
       <directory></directory>
       <includes>

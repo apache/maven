@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-  <parent>
+    <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>5</version>
   </parent>
-  <groupId>org.apache.maven.archetypes</groupId>
-  <artifactId>maven-integration-test-archetype</artifactId>
+  <groupId>org.apache.maven.it.sample</groupId>
+  <artifactId>maven-integration-test-sample-archetype</artifactId>
   <packaging>maven-archetype</packaging>
   <version>1.0-SNAPSHOT</version>
   <build>
