@@ -557,7 +557,7 @@ public class MavenEmbedder
         try
         {
             ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() );
+                .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() ).setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );
         }
