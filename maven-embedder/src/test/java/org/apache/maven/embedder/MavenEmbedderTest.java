@@ -315,21 +315,9 @@ public class MavenEmbedderTest
         throws Exception
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( getPomFile().getAbsolutePath() ).setShowErrors( true );
+            .setPomFile( getPomFile().getAbsolutePath() );
 
         MavenExecutionResult result = maven.readProjectWithDependencies( request );
-
-        if ( result.hasExceptions() )
-        {
-            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
-            {
-                Exception e = (Exception) i.next();
-
-                e.printStackTrace();
-            }
-
-            fail( "Exception is readProjectWithDependencies() test." );
-        }
 
         assertNoExceptions( result );
 
@@ -354,14 +342,28 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        //        Iterator it = result.getMavenProject().getTestClasspathElements().iterator();
-        //        while(it.hasNext()) {
-        //            Object object = (Object) it.next();
-        //            System.out.println(" element=" + object);
-        //        }
-
         // sources, test sources, and the junit jar..
         assertEquals( 3, result.getMavenProject().getTestClasspathElements().size() );
+    }
+
+    public void testProjectReadingWithDistributionStatus()
+        throws Exception
+    {
+        File pom = new File( basedir, "src/test/resources/pom-with-distribution-status.xml" );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
+            .setPomFile( pom.getAbsolutePath() );
+
+        MavenProject project = maven.readProject( pom );
+
+        assertEquals( "deployed", project.getDistributionManagement().getStatus() );
+
+        MavenExecutionResult result = maven.readProjectWithDependencies( request );
+
+        assertNoExceptions( result );
+
+        assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
+
+        assertEquals( "deployed", result.getMavenProject().getDistributionManagement().getStatus() );
     }
 
     // ----------------------------------------------------------------------------
