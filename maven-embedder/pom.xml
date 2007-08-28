@@ -51,6 +51,10 @@ under the License.
               <goal>shade</goal>
             </goals>
             <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
               <transformers>
                <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
               </transformers>
