@@ -101,7 +101,7 @@ public class DefaultArtifact
         this.artifactId = artifactId;
 
         this.versionRange = versionRange;
-        
+
         selectVersionFromNewRangeIfAvailable();
 
         this.artifactHandler = artifactHandler;
@@ -142,7 +142,7 @@ public class DefaultArtifact
                                                   "The type cannot be empty." );
         }
 
-        if ( version == null && versionRange == null )
+        if ( ( version == null ) && ( versionRange == null ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
                                                   "The version cannot be empty." );
@@ -151,7 +151,7 @@ public class DefaultArtifact
 
     private boolean empty( String value )
     {
-        return value == null || value.trim().length() < 1;
+        return ( value == null ) || ( value.trim().length() < 1 );
     }
 
     public String getClassifier()
@@ -187,8 +187,8 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
-        this.setBaseVersionInternal( version );
-        this.versionRange = null;
+        setBaseVersionInternal( version );
+        versionRange = null;
     }
 
     public String getType()
@@ -283,9 +283,9 @@ public class DefaultArtifact
         }
         appendArtifactTypeClassifierString( sb );
         sb.append( ":" );
-        if ( getBaseVersion() != null )
+        if ( getBaseVersionInternal() != null )
         {
-            sb.append( getBaseVersion() );
+            sb.append( getBaseVersionInternal() );
         }
         else
         {
@@ -366,11 +366,21 @@ public class DefaultArtifact
         return baseVersion;
     }
 
+    protected String getBaseVersionInternal()
+    {
+        if ( ( baseVersion == null ) && ( version != null ) )
+        {
+            setBaseVersionInternal( version );
+        }
+
+        return baseVersion;
+    }
+
     public void setBaseVersion( String baseVersion )
     {
         setBaseVersionInternal( baseVersion );
     }
-    
+
     protected void setBaseVersionInternal( String baseVersion )
     {
         Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
@@ -449,7 +459,7 @@ public class DefaultArtifact
 
     public void setDependencyFilter( ArtifactFilter artifactFilter )
     {
-        this.dependencyFilter = artifactFilter;
+        dependencyFilter = artifactFilter;
     }
 
     public ArtifactHandler getArtifactHandler()
@@ -488,20 +498,20 @@ public class DefaultArtifact
     public void setVersionRange( VersionRange versionRange )
     {
         this.versionRange = versionRange;
-        
+
         selectVersionFromNewRangeIfAvailable();
     }
-    
+
     private void selectVersionFromNewRangeIfAvailable()
     {
-        if ( versionRange != null && versionRange.getRecommendedVersion() != null )
+        if ( ( versionRange != null ) && ( versionRange.getRecommendedVersion() != null ) )
         {
             selectVersion( versionRange.getRecommendedVersion().toString() );
         }
         else
         {
-            this.version = null;
-            this.baseVersion = null;
+            version = null;
+            baseVersion = null;
         }
     }
 
