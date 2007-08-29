@@ -23,6 +23,7 @@ import org.apache.maven.settings.Settings;
 
 /**
  * @author Jason van Zyl
+ * TODO remove deprecated methods
  */
 public interface ConfigurationValidationResult
 {
