@@ -60,7 +60,7 @@ public class ValidateConfigurationTest
         File global = new File( getBasedir(), "src/test/resources/settings/valid-settings.xml" );
 
         Configuration configuration = new DefaultConfiguration()
-            .setUserSettingsFile( global );
+            .setGlobalSettingsFile( global );
 
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 

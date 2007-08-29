@@ -754,7 +754,10 @@ public class MavenEmbedder
             {
                 try
                 {
-                    fileReader.close();
+                    if ( fileReader != null )
+                    {
+                        fileReader.close();
+                    }
                 }
                 catch ( IOException e )
                 {

@@ -32,13 +32,13 @@ public interface ConfigurationValidationResult
     boolean isValid();
 
     /**
-     * Parsed user settings, or null if there's any parse error, that can be retrieved through
+     * Parsed user settings. If there's any parse error, it can be retrieved through
      * {@link #getUserSettingsException()}
      */
     Settings getUserSettings();
 
     /**
-     * Parsed global settings, or null if there's any parse error, that can be retrieved through
+     * Parsed global settings. If there's any parse error, it can be retrieved through
      * {@link #getGlobalSettingsException()}
      */
     Settings getGlobalSettings();

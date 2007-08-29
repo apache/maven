@@ -37,7 +37,7 @@ public class DefaultConfigurationValidationResult
 
     public boolean isValid()
     {
-        return ( getUserSettings() != null ) && ( getGlobalSettings() != null );
+        return ( getUserSettingsException() == null ) && ( getGlobalSettingsException() == null );
     }
 
     public Throwable getUserSettingsException()
@@ -87,7 +87,7 @@ public class DefaultConfigurationValidationResult
 
     public boolean isGlobalSettingsFilePresent()
     {
-        return getGlobalSettingsException() instanceof FileNotFoundException;
+        return isSettingsFilePresent( getGlobalSettings(), getGlobalSettingsException() );
     }
 
     public boolean isUserSettingsFileParses()
@@ -97,7 +97,7 @@ public class DefaultConfigurationValidationResult
 
     public boolean isUserSettingsFilePresent()
     {
-        return getUserSettingsException() instanceof FileNotFoundException;
+        return isSettingsFilePresent( getUserSettings(), getUserSettingsException() );
     }
 
     public void setGlobalSettingsFileParses( boolean globalSettingsFileParses )
@@ -123,5 +123,10 @@ public class DefaultConfigurationValidationResult
     public void display()
     {
         // ignored
+    }
+
+    private boolean isSettingsFilePresent( Settings settings, Throwable e )
+    {
+        return ( settings != null ) || ( ( e != null ) && !( e instanceof FileNotFoundException ) );
     }
 }
