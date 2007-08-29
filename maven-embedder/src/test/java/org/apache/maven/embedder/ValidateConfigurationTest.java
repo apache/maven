@@ -20,6 +20,7 @@ package org.apache.maven.embedder;
  */
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 
@@ -37,8 +38,11 @@ public class ValidateConfigurationTest
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
         assertTrue( result.isUserSettingsFilePresent() );
-
         assertTrue( result.isUserSettingsFileParses() );
+        assertNotNull( result.getUserSettings() );
+        assertNull( result.getUserSettingsException() );
+        assertNull( result.getGlobalSettings() );
+        assertNull( result.getGlobalSettingsException() );
     }
 
     public void testConfigurationOnlyUserSettingsAreActiveAndItIsInvalid()
@@ -51,8 +55,12 @@ public class ValidateConfigurationTest
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
         assertTrue( result.isUserSettingsFilePresent() );
-
         assertFalse( result.isUserSettingsFileParses() );
+        assertNull( result.getUserSettings() );
+        assertNotNull( result.getUserSettingsException() );
+        assertTrue( result.getUserSettingsException() instanceof XmlPullParserException );
+        assertNull( result.getGlobalSettings() );
+        assertNull( result.getGlobalSettingsException() );
     }
 
     public void testConfigurationOnlyGlobalSettingsAreActiveAndItIsValid()
@@ -65,8 +73,11 @@ public class ValidateConfigurationTest
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
         assertTrue( result.isGlobalSettingsFilePresent() );
-
         assertTrue( result.isGlobalSettingsFileParses() );
+        assertNotNull( result.getGlobalSettings() );
+        assertNull( result.getGlobalSettingsException() );
+        assertNull( result.getUserSettings() );
+        assertNull( result.getUserSettingsException() );
     }
 
     public void testConfigurationOnlyGlobalSettingsAreActiveAndItIsInvalid()
@@ -79,7 +90,11 @@ public class ValidateConfigurationTest
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
         assertTrue( result.isGlobalSettingsFilePresent() );
-
         assertFalse( result.isGlobalSettingsFileParses() );
+        assertNull( result.getGlobalSettings() );
+        assertNotNull( result.getGlobalSettingsException() );
+        assertTrue( result.getGlobalSettingsException() instanceof XmlPullParserException );
+        assertNull( result.getUserSettings() );
+        assertNull( result.getUserSettingsException() );
     }
 }
