@@ -87,7 +87,6 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -729,9 +728,9 @@ public class MavenEmbedder
 
     public static ConfigurationValidationResult validateConfiguration( Configuration configuration )
     {
-        ConfigurationValidationResult result = new DefaultConfigurationValidationResult();
+        DefaultConfigurationValidationResult result = new DefaultConfigurationValidationResult();
 
-        Reader fileReader;
+        Reader fileReader = null;
 
         // User settings
 
@@ -741,19 +740,26 @@ public class MavenEmbedder
             {
                 fileReader = new FileReader( configuration.getUserSettingsFile() );
 
-                new SettingsXpp3Reader().read( fileReader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                result.setUserSettingsFilePresent( false );
+                result.setUserSettings( new SettingsXpp3Reader().read( fileReader ) );
             }
             catch ( IOException e )
             {
-                result.setUserSettingsFileParses( false );
+                result.setUserSettingsException( e );
             }
             catch ( XmlPullParserException e )
             {
-                result.setUserSettingsFileParses( false );
+                result.setUserSettingsException( e );
+            }
+            finally
+            {
+                try
+                {
+                    fileReader.close();
+                }
+                catch ( IOException e )
+                {
+                    // nothing to do
+                }
             }
         }
 
@@ -765,19 +771,26 @@ public class MavenEmbedder
             {
                 fileReader = new FileReader( configuration.getGlobalSettingsFile() );
 
-                new SettingsXpp3Reader().read( fileReader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                result.setGlobalSettingsFilePresent( false );
+                result.setGlobalSettings( new SettingsXpp3Reader().read( fileReader ) );
             }
             catch ( IOException e )
             {
-                result.setGlobalSettingsFileParses( false );
+                result.setGlobalSettingsException( e );
             }
             catch ( XmlPullParserException e )
             {
-                result.setGlobalSettingsFileParses( false );
+                result.setGlobalSettingsException( e );
+            }
+            finally
+            {
+                try
+                {
+                    fileReader.close();
+                }
+                catch ( IOException e )
+                {
+                    // nothing to do
+                }
             }
         }
 

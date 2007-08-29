@@ -19,26 +19,82 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-/** @author Jason van Zyl */
+import org.apache.maven.settings.Settings;
+
+/**
+ * @author Jason van Zyl
+ */
 public interface ConfigurationValidationResult
 {
+    /**
+     * Whether both user and global settings are valid
+     */
     boolean isValid();
 
+    /**
+     * Parsed user settings, or null if there's any parse error, that can be retrieved through
+     * {@link #getUserSettingsException()}
+     */
+    Settings getUserSettings();
+
+    /**
+     * Parsed global settings, or null if there's any parse error, that can be retrieved through
+     * {@link #getGlobalSettingsException()}
+     */
+    Settings getGlobalSettings();
+
+    /**
+     * Any exception that happened during parsing user settings, or null if there were no errors.
+     */
+    Throwable getUserSettingsException();
+
+    /**
+     * Any exception that happened during parsing global settings, or null if there were no errors.
+     */
+    Throwable getGlobalSettingsException();
+
+    /**
+     * @deprecated
+     */
     boolean isUserSettingsFilePresent();
 
+    /**
+     * @deprecated
+     */
     void setUserSettingsFilePresent( boolean userSettingsFilePresent );
 
+    /**
+     * @deprecated
+     */
     boolean isUserSettingsFileParses();
 
+    /**
+     * @deprecated
+     */
     void setUserSettingsFileParses( boolean userSettingsFileParses );
 
+    /**
+     * @deprecated
+     */
     boolean isGlobalSettingsFilePresent();
 
+    /**
+     * @deprecated
+     */
     void setGlobalSettingsFilePresent( boolean globalSettingsFilePresent );
 
+    /**
+     * @deprecated
+     */
     boolean isGlobalSettingsFileParses();
 
+    /**
+     * @deprecated
+     */
     void setGlobalSettingsFileParses( boolean globalSettingsFileParses );
 
+    /**
+     * @deprecated
+     */
     void display();
 }

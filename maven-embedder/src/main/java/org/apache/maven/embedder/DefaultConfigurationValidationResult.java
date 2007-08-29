@@ -19,69 +19,109 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-/** @author Jason van Zyl */
+import java.io.FileNotFoundException;
+
+import org.apache.maven.settings.Settings;
+
+/**
+ * @author Jason van Zyl
+ */
 public class DefaultConfigurationValidationResult
     implements ConfigurationValidationResult
 {
-    private boolean userSettingsFilePresent = true;
+    private Throwable userSettingsException;
 
-    private boolean userSettingsFileParses = true;
+    private Throwable globalSettingsException;
 
-    private boolean globalSettingsFilePresent = true;
-
-    private boolean globalSettingsFileParses = true;
+    private Settings userSettings, globalSettings;
 
     public boolean isValid()
     {
-        return userSettingsFilePresent && userSettingsFileParses && globalSettingsFilePresent &&
-            globalSettingsFileParses;
+        return ( getUserSettings() != null ) && ( getGlobalSettings() != null );
     }
 
-    public boolean isUserSettingsFilePresent()
+    public Throwable getUserSettingsException()
     {
-        return userSettingsFilePresent;
+        return userSettingsException;
     }
 
-    public void setUserSettingsFilePresent( boolean userSettingsFilePresent )
+    public void setUserSettingsException( Throwable e )
     {
-        this.userSettingsFilePresent = userSettingsFilePresent;
+        this.userSettingsException = e;
     }
 
-    public boolean isUserSettingsFileParses()
+    public Throwable getGlobalSettingsException()
     {
-        return userSettingsFileParses;
+        return globalSettingsException;
     }
 
-    public void setUserSettingsFileParses( boolean userSettingsFileParses )
+    public void setGlobalSettingsException( Throwable e )
     {
-        this.userSettingsFileParses = userSettingsFileParses;
+        this.globalSettingsException = e;
     }
 
-    public boolean isGlobalSettingsFilePresent()
+    public Settings getUserSettings()
     {
-        return globalSettingsFilePresent;
+        return userSettings;
     }
 
-    public void setGlobalSettingsFilePresent( boolean globalSettingsFilePresent )
+    public void setUserSettings( Settings settings )
     {
-        this.globalSettingsFilePresent = globalSettingsFilePresent;
+        this.userSettings = settings;
+    }
+
+    public Settings getGlobalSettings()
+    {
+        return globalSettings;
+    }
+
+    public void setGlobalSettings( Settings globalSettings )
+    {
+        this.globalSettings = globalSettings;
     }
 
     public boolean isGlobalSettingsFileParses()
     {
-        return globalSettingsFileParses;
+        return getGlobalSettings() != null;
+    }
+
+    public boolean isGlobalSettingsFilePresent()
+    {
+        return getGlobalSettingsException() instanceof FileNotFoundException;
+    }
+
+    public boolean isUserSettingsFileParses()
+    {
+        return getUserSettings() != null;
+    }
+
+    public boolean isUserSettingsFilePresent()
+    {
+        return getUserSettingsException() instanceof FileNotFoundException;
     }
 
     public void setGlobalSettingsFileParses( boolean globalSettingsFileParses )
     {
-        this.globalSettingsFileParses = globalSettingsFileParses;
+        // ignored
+    }
+
+    public void setGlobalSettingsFilePresent( boolean globalSettingsFilePresent )
+    {
+        // ignored
+    }
+
+    public void setUserSettingsFileParses( boolean userSettingsFileParses )
+    {
+        // ignored
+    }
+
+    public void setUserSettingsFilePresent( boolean userSettingsFilePresent )
+    {
+        // ignored
     }
 
     public void display()
     {
-        System.out.println( "userSettingsFilePresent = " + userSettingsFilePresent );
-        System.out.println( "globalSettingsFileParses = " + globalSettingsFileParses );
-        System.out.println( "globalSettingsFilePresent = " + globalSettingsFilePresent );
-        System.out.println( "globalSettingsFileParses = " + globalSettingsFileParses );
+        // ignored
     }
 }
