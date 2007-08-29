@@ -242,7 +242,7 @@ under the License.
             <plugin>
               <groupId>org.apache.felix</groupId>
               <artifactId>maven-bundle-plugin</artifactId>
-              <version>0.9.0-incubator-SNAPSHOT</version>
+              <version>1.0.0</version>
               <executions>
                 <execution>
                   <goals>
