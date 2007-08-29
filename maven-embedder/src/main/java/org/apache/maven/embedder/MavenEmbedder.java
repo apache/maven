@@ -563,7 +563,7 @@ public class MavenEmbedder
         }
         catch ( PlexusContainerException e )
         {
-            throw new MavenEmbedderException( "Error starting Maven embedder.", e );
+            throw new MavenEmbedderException( "Error creating Plexus container for Maven Embedder", e );
         }
 
         if ( logger != null )
