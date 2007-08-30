@@ -211,7 +211,6 @@ under the License.
       <build>
         <pluginManagement>
           <plugins>
-            <!-- if plugin not released at maven release time the manifests generated could be checked in by hand -->
             <plugin>
               <groupId>org.apache.felix</groupId>
               <artifactId>maven-bundle-plugin</artifactId>
