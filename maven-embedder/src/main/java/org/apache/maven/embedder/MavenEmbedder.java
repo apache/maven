@@ -777,14 +777,7 @@ public class MavenEmbedder
             }
             finally
             {
-                try
-                {
-                    fileReader.close();
-                }
-                catch ( IOException e )
-                {
-                    // nothing to do
-                }
+                IOUtil.close( fileReader );
             }
         }
 
