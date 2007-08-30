@@ -324,7 +324,7 @@ public class DefaultMavenProjectBuilder
                                                TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        MavenProject project = build( projectDescriptor, localRepository, profileManager );
+        MavenProject project = build( projectDescriptor, localRepository, profileManager, false );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
