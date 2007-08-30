@@ -80,6 +80,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jdom.Document;
@@ -235,7 +236,7 @@ public class MavenEmbedder
         }
         finally
         {
-            reader.close();
+            IOUtil.close( reader );
         }
 
         return model;
@@ -323,7 +324,7 @@ public class MavenEmbedder
         }
         finally
         {
-            fileReader.close();
+            IOUtil.close( fileReader );
         }
     }
 
@@ -752,17 +753,7 @@ public class MavenEmbedder
             }
             finally
             {
-                try
-                {
-                    if ( fileReader != null )
-                    {
-                        fileReader.close();
-                    }
-                }
-                catch ( IOException e )
-                {
-                    // nothing to do
-                }
+                IOUtil.close( fileReader );
             }
         }
 
