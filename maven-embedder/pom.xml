@@ -149,38 +149,107 @@ under the License.
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <!--
       <url>scp://people.apache.org/www/maven.apache.org/embedder/${project.version}/</url>
-      -->
-      <url>scp://people.apache.org/home/jvanzyl/public_html/embedder/</url>
     </site>
   </distributionManagement>
-  
   <profiles>
     <profile>
-      <id>make-dependency-repo</id>
+      <id>idea</id>
       <build>
         <plugins>
           <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-1</version>
-            <!--
-            <version>2.2-beta-2-SNAPSHOT</version>
-            -->
-            
+            <artifactId>shade-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>1.0-alpha-10</version>
             <executions>
               <execution>
-                <id>make-dependency-repo</id>
                 <phase>package</phase>
                 <goals>
-                  <goal>single</goal>
+                  <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <descriptor>src/main/assembly/repo.xml</descriptor>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
+                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                  <transformers>
+                   <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+                  </transformers>
+                  <artifactSet>
+                    <excludes>
+                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
+                      <exclude>classworlds:classworlds</exclude>
+                      <exclude>junit:junit</exclude>
+                      <exclude>jmock:jmock</exclude>
+                      <exclude>xml-apis:xml-apis</exclude>
+                      <!-- So this is required for the IDEA embedder which already has its own copy of JDOM -->
+                      <exclude>jdom:jdom</exclude>
+                      <exclude>jtidy:jtidy</exclude>
+                    </excludes>
+                  </artifactSet>
+                  <relocations>
+                    <relocation>
+                      <pattern>org.codehaus.plexus.util</pattern>
+                      <excludes>
+                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
+                      </excludes>
+                    </relocation>
+                  </relocations>
                 </configuration>
               </execution>
             </executions>
-          </plugin>      
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>standard</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>shade-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>1.0-alpha-10</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
+                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                  <transformers>
+                   <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+                  </transformers>
+                  <artifactSet>
+                    <excludes>
+                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
+                      <exclude>classworlds:classworlds</exclude>
+                      <exclude>junit:junit</exclude>
+                      <exclude>jmock:jmock</exclude>
+                      <exclude>xml-apis:xml-apis</exclude>
+                    </excludes>
+                  </artifactSet>
+                  <relocations>
+                    <relocation>
+                      <pattern>org.codehaus.plexus.util</pattern>
+                      <excludes>
+                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
+                      </excludes>
+                    </relocation>
+                  </relocations>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
