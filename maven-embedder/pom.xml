@@ -154,6 +154,13 @@ under the License.
   </distributionManagement>
   <profiles>
     <profile>
+      <!--
+       |
+       | This profile is specifically for creating an embedder that can be used for IntelliJ integration. We need to
+       | remove the JDOM JAR because IntelliJ include its own version, and the JTidy JAR includes org.xml.* classes
+       | which causes a loader constraint issues while loading the embedder.
+       |
+       -->
       <id>idea</id>
       <build>
         <plugins>
