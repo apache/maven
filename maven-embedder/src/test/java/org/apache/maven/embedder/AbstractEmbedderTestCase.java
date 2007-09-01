@@ -20,15 +20,6 @@ package org.apache.maven.embedder;
  */
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.FileUtils;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-
-import java.io.File;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public abstract class AbstractEmbedderTestCase
     extends PlexusTestCase
@@ -39,8 +30,6 @@ public abstract class AbstractEmbedderTestCase
         throws Exception
     {
         super.setUp();
-
-        System.out.println( ">>> " + getBasedir() );
         
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
