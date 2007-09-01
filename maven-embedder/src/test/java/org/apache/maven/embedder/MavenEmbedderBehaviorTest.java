@@ -40,7 +40,7 @@ public class MavenEmbedderBehaviorTest
 
         ConfigurationValidationResult result = MavenEmbedder.validateConfiguration( configuration );
 
-        assertTrue( result.isValid() );
+         assertTrue( result.isValid() );
 
         MavenEmbedder maven = new MavenEmbedder( configuration );
 

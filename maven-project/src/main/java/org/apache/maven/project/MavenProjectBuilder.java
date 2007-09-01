@@ -71,13 +71,13 @@ public interface MavenProjectBuilder
     // These methods are used by the MavenEmbedder
     // ----------------------------------------------------------------------
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    MavenProjectBuildingResult buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager, TransferListener transferListener )
-        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
+        throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    MavenProjectBuildingResult buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
-        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
+        throws ProjectBuildingException;
 
     // ----------------------------------------------------------------------
     //

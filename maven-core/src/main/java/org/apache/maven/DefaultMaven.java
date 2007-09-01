@@ -109,6 +109,10 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
+    // project build
+    // artifact resolution
+    // lifecycle execution
+
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
@@ -121,9 +125,88 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
-        MavenExecutionResult result;
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        result = doExecute( request, dispatcher );
+        // old doExecute
+        
+        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
+
+        globalProfileManager.loadSettingsProfiles( request.getSettings() );
+
+        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
+
+        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
+
+        getLogger().info( "Scanning for projects..." );
+
+        boolean foundProjects = true;
+
+        List projects;
+
+        try
+        {
+            projects = getProjects( request, globalProfileManager );
+
+            if ( projects.isEmpty() )
+            {
+                projects.add( getSuperProject( request ) );
+
+                foundProjects = false;
+            }
+        }
+        catch ( Exception e )
+        {
+            result.addException( e );
+
+            return result;
+        }
+
+        ReactorManager reactorManager;
+
+        try
+        {
+            reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
+        }
+        catch ( CycleDetectedException e )
+        {
+            result.addException( new BuildFailureException(
+                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e ) );
+
+            return result;
+        }
+        catch ( DuplicateProjectException e )
+        {
+            result.addException( new BuildFailureException( e.getMessage(), e ) );
+
+            return result;
+        }
+
+        if ( reactorManager.hasMultipleProjects() )
+        {
+            getLogger().info( "Reactor build order: " );
+
+            for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
+            {
+                MavenProject project = (MavenProject) i.next();
+
+                getLogger().info( "  " + project.getName() );
+            }
+        }
+
+        MavenSession session = createSession( request, reactorManager, dispatcher );
+
+        session.setUsingPOMsFromFilesystem( foundProjects );
+
+        try
+        {
+            lifecycleExecutor.execute( session, reactorManager, dispatcher );
+        }
+        catch ( Exception e )
+        {
+            result.addException( new BuildFailureException( e.getMessage(), e ) );
+        }
+
+        // old doExecute
 
         if ( result.hasExceptions() )
         {
@@ -142,8 +225,6 @@ public class DefaultMaven
         }
 
         // Either the build was successful, or it was a fail_at_end/fail_never reactor build
-
-        ReactorManager reactorManager = result.getReactorManager();
 
         // TODO: should all the logging be left to the CLI?
         logReactorSummary( reactorManager );
@@ -164,8 +245,9 @@ public class DefaultMaven
 
                 line();
 
-                return new DefaultMavenExecutionResult(
-                    Collections.singletonList( new MavenExecutionException( "Some builds failed" ) ) );
+                result.addException( new MavenExecutionException( "Some builds failed" ) );
+
+                return result;
             }
             else
             {
@@ -181,7 +263,11 @@ public class DefaultMaven
 
         dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
-        return new DefaultMavenExecutionResult( result.getReactorManager() );
+        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+
+        result.setProject( reactorManager.getTopLevelProject() );
+
+        return result;
     }
 
     /**
@@ -226,90 +312,6 @@ public class DefaultMaven
 
             line();
         }
-    }
-
-    private MavenExecutionResult doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
-    {
-        List executionExceptions = new ArrayList();
-
-        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
-
-        globalProfileManager.loadSettingsProfiles( request.getSettings() );
-
-        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
-
-        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
-
-        getLogger().info( "Scanning for projects..." );
-
-        boolean foundProjects = true;
-
-        List projects;
-
-        try
-        {
-            projects = getProjects( request, globalProfileManager );
-
-            if ( projects.isEmpty() )
-            {
-                projects.add( getSuperProject( request ) );
-
-                foundProjects = false;
-            }
-        }
-        catch ( Exception e )
-        {
-            executionExceptions.add( e );
-
-            return new DefaultMavenExecutionResult( executionExceptions );
-        }
-
-        ReactorManager rm;
-
-        try
-        {
-            rm = new ReactorManager( projects, request.getReactorFailureBehavior() );
-        }
-        catch ( CycleDetectedException e )
-        {
-            executionExceptions.add( new BuildFailureException(
-                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e ) );
-
-            return new DefaultMavenExecutionResult( executionExceptions );
-        }
-        catch ( DuplicateProjectException e )
-        {
-            executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
-
-            return new DefaultMavenExecutionResult( executionExceptions );
-        }
-
-        if ( rm.hasMultipleProjects() )
-        {
-            getLogger().info( "Reactor build order: " );
-
-            for ( Iterator i = rm.getSortedProjects().iterator(); i.hasNext(); )
-            {
-                MavenProject project = (MavenProject) i.next();
-
-                getLogger().info( "  " + project.getName() );
-            }
-        }
-
-        MavenSession session = createSession( request, rm, dispatcher );
-
-        session.setUsingPOMsFromFilesystem( foundProjects );
-
-        try
-        {
-            lifecycleExecutor.execute( session, rm, dispatcher );
-        }
-        catch ( Exception e )
-        {
-            executionExceptions.add( new BuildFailureException( e.getMessage(), e ) );
-        }
-
-        return new DefaultMavenExecutionResult( executionExceptions, rm );
     }
 
     private MavenProject getSuperProject( MavenExecutionRequest request )

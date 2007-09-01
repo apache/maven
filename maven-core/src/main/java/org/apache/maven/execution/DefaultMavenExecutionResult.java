@@ -19,6 +19,7 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
@@ -28,49 +29,48 @@ import java.util.List;
 public class DefaultMavenExecutionResult
     implements MavenExecutionResult
 {
+    private MavenProject project;
+
+    private List topologicallySortedProjects;
+
+    private ArtifactResolutionResult artifactResolutionResult;
+
     private List exceptions;
 
-    private MavenProject mavenProject;
-
-    private ReactorManager reactorManager;
-
-    public DefaultMavenExecutionResult( List exceptions )
+    public MavenExecutionResult setProject( MavenProject project )
     {
-        this.exceptions = exceptions;
+        this.project = project;
+
+        return this;
     }
 
-    public DefaultMavenExecutionResult( ReactorManager reactorManager )
+    public MavenProject getProject()
     {
-        this.reactorManager = reactorManager;
+        return project;
     }
 
-    public DefaultMavenExecutionResult( List exceptions,
-                                        ReactorManager reactorManager )
+    public MavenExecutionResult setTopologicallySortedProjects( List topologicallySortedProjects )
     {
-        this.reactorManager = reactorManager;
-        this.exceptions = exceptions;
+        this.topologicallySortedProjects = topologicallySortedProjects;
+
+        return this;
     }
 
-    public DefaultMavenExecutionResult( MavenProject project,
-                                        List exceptions )
+    public List getTopologicallySortedProjects()
     {
-        this.mavenProject = project;
-        this.exceptions = exceptions;
+        return topologicallySortedProjects;
     }
 
-    public MavenProject getMavenProject()
+    public ArtifactResolutionResult getArtifactResolutionResult()
     {
-        if ( reactorManager != null )
-        {
-            return reactorManager.getTopLevelProject();
-        }
-
-        return mavenProject;
+        return artifactResolutionResult;
     }
 
-    public ReactorManager getReactorManager()
+    public MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult artifactResolutionResult )
     {
-        return reactorManager;
+        this.artifactResolutionResult = artifactResolutionResult;
+
+        return this;
     }
 
     public List getExceptions()

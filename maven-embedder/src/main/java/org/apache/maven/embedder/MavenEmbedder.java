@@ -57,6 +57,7 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
@@ -419,6 +420,8 @@ public class MavenEmbedder
      */
     public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
     {
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
         MavenProject project = null;
 
         try
@@ -433,16 +436,37 @@ public class MavenEmbedder
             //is this necessary in this context, I doubt it..mkleint
             artifactHandlerManager.addHandlers( handlers );
 
-            project = mavenProjectBuilder.buildWithDependencies( new File( request.getPomFile() ),
-                                                                 request.getLocalRepository(), profileManager,
-                                                                 request.getTransferListener() );
         }
         catch ( Exception e )
         {
-            return new DefaultMavenExecutionResult( project, Collections.singletonList( e ) );
+            // At this point real project building, and artifact resolution have not occured.
+
+            result.addException( e );
+
+            return result;
         }
 
-        return new DefaultMavenExecutionResult( project, Collections.EMPTY_LIST );
+        MavenProjectBuildingResult r = null;
+
+        try
+        {
+            r = mavenProjectBuilder.buildWithDependencies(
+                new File( request.getPomFile() ),
+                request.getLocalRepository(),
+                profileManager,
+                request.getTransferListener() );
+        }
+        catch ( ProjectBuildingException e )
+        {
+
+        }
+
+        result.setProject( r.getProject() );
+
+        result.setArtifactResolutionResult( r.getArtifactResolutionResult() );
+
+
+        return result;
     }
 
     // ----------------------------------------------------------------------
@@ -629,7 +653,7 @@ public class MavenEmbedder
             try
             {
                 settings = settingsBuilder.buildSettings( configuration.getUserSettingsFile(),
-                                                          configuration.getGlobalSettingsFile() );
+                    configuration.getGlobalSettingsFile() );
             }
             catch ( Exception e )
             {
@@ -873,7 +897,7 @@ public class MavenEmbedder
             new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
 
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout,
-                                                                   snapshotsPolicy, releasesPolicy );
+            snapshotsPolicy, releasesPolicy );
     }
 
     // ----------------------------------------------------------------------------
@@ -905,7 +929,11 @@ public class MavenEmbedder
             }
             catch ( MavenEmbedderException e )
             {
-                return new DefaultMavenExecutionResult( Collections.singletonList( e ) );
+                MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+                result.addException( e );
+
+                return result;
             }
 
             return maven.execute( request );

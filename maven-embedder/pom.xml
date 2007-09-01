@@ -29,76 +29,6 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
-  <properties>
-    <bundleVersion>2.1.0.v20070728-1835</bundleVersion>
-  </properties>
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>shade-maven-plugin</artifactId>
-        <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-alpha-10</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
-              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-              <transformers>
-               <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
-              </transformers>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.codehaus.plexus:plexus-component-api</exclude>                
-                  <exclude>classworlds:classworlds</exclude>
-                  <exclude>junit:junit</exclude>
-                  <exclude>jmock:jmock</exclude>
-                  <exclude>xml-apis:xml-apis</exclude>
-                </excludes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>org.codehaus.plexus.util</pattern>
-                  <excludes>
-                    <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                    <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                  </excludes>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>      
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-1</version>
-        <executions>
-          <execution>
-            <id>create-distro</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptor>src/main/assembly/bin.xml</descriptor>
-              <finalName>maven-${version}</finalName>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>      
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -144,7 +74,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-    </dependency>    
+    </dependency>
   </dependencies>
   <distributionManagement>
     <site>
@@ -167,7 +97,7 @@ under the License.
           <plugin>
             <artifactId>shade-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-10</version>
+            <version>1.0-alpha-12-SNAPSHOT</version>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -175,12 +105,78 @@ under the License.
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <!-- The IDEA folks don't want to put SNAPSHOT libs in their projects even though they are -->
+                  <finalName>maven-embedder-idea-2.1</finalName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
                   <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
-                   <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+                  </transformers>
+                  <artifactSet>
+                    <excludes>
+                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
+                      <exclude>classworlds:classworlds</exclude>
+                      <exclude>junit:junit</exclude>
+                      <exclude>jmock:jmock</exclude>
+                      <exclude>xml-apis:xml-apis</exclude>
+                      <!-- So this is required for the IDEA embedder which already has its own copy of JDOM -->
+                      <exclude>jdom:jdom</exclude>
+                      <exclude>jtidy:jtidy</exclude>
+                    </excludes>
+                  </artifactSet>
+                  <relocations>
+                    <relocation>
+                      <pattern>org.codehaus.plexus.util</pattern>
+                      <excludes>
+                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
+                      </excludes>
+                    </relocation>
+                  </relocations>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!--
+       |
+       | This profile is specifically for creating an embedder that can be used for Eclipse integration. We need to
+       | need a single embedder JAR that looks like an OSGi bundle.
+       |
+       -->
+      <id>tycho</id>
+      <properties>
+        <bundleVersion>2.1.0.v20070728-1835</bundleVersion>
+      </properties>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <artifactId>shade-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>1.0-alpha-11-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <shadedArtifactId>maven-embedder-idea</shadedArtifactId>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
+                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                  <transformers>
+                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
                   </transformers>
                   <artifactSet>
                     <excludes>
@@ -233,7 +229,7 @@ under the License.
                   <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
-                   <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
                   </transformers>
                   <artifactSet>
                     <excludes>
@@ -253,6 +249,23 @@ under the License.
                       </excludes>
                     </relocation>
                   </relocations>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-1</version>
+            <executions>
+              <execution>
+                <id>create-distro</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptor>src/main/assembly/bin.xml</descriptor>
+                  <finalName>maven-${version}</finalName>
                 </configuration>
               </execution>
             </executions>

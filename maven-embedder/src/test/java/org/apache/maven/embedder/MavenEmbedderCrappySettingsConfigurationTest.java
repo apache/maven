@@ -58,9 +58,9 @@ public class MavenEmbedderCrappySettingsConfigurationTest
 
         MavenExecutionResult result = embedder.execute( request );
 
-        assertNotNull( result.getMavenProject() );
+        assertNotNull( result.getProject() );
 
-        MavenProject project = result.getMavenProject();
+        MavenProject project = result.getProject();
 
         String environment = project.getProperties().getProperty( "environment" );
 

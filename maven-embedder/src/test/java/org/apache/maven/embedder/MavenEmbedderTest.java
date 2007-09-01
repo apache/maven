@@ -126,7 +126,7 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        MavenProject project = result.getMavenProject();
+        MavenProject project = result.getProject();
 
         assertEquals( "embedder-test-project", project.getArtifactId() );
 
@@ -153,7 +153,7 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        MavenProject project = result.getMavenProject();
+        MavenProject project = result.getProject();
 
         assertEquals( "embedder-test-project", project.getArtifactId() );
 
@@ -181,7 +181,7 @@ public class MavenEmbedderTest
 
         assertNoExceptions( r0 );
 
-        MavenProject p0 = r0.getMavenProject();
+        MavenProject p0 = r0.getProject();
 
         assertNull( p0.getProperties().getProperty( "embedderProfile" ) );
 
@@ -199,7 +199,7 @@ public class MavenEmbedderTest
 
         MavenExecutionResult r1 = maven.execute( request );
 
-        MavenProject p1 = r1.getMavenProject();
+        MavenProject p1 = r1.getProject();
 
         assertEquals( "true", p1.getProperties().getProperty( "embedderProfile" ) );
 
@@ -245,7 +245,7 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        MavenProject project = result.getMavenProject();
+        MavenProject project = result.getProject();
 
         Artifact p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
         assertEquals( "2.2", p.getVersion() );
@@ -263,7 +263,7 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        project = result.getMavenProject();
+        project = result.getProject();
 
         p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
         assertEquals( "2.3", p.getVersion() );
@@ -321,9 +321,9 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
+        assertEquals( "org.apache.maven", result.getProject().getGroupId() );
 
-        Set artifacts = result.getMavenProject().getArtifacts();
+        Set artifacts = result.getProject().getArtifacts();
 
         assertEquals( 1, artifacts.size() );
 
@@ -343,7 +343,7 @@ public class MavenEmbedderTest
         assertNoExceptions( result );
 
         // sources, test sources, and the junit jar..
-        assertEquals( 3, result.getMavenProject().getTestClasspathElements().size() );
+        assertEquals( 3, result.getProject().getTestClasspathElements().size() );
     }
 
     public void testProjectReadingWithDistributionStatus()
@@ -361,9 +361,9 @@ public class MavenEmbedderTest
 
         assertNoExceptions( result );
 
-        assertEquals( "org.apache.maven", result.getMavenProject().getGroupId() );
+        assertEquals( "org.apache.maven", result.getProject().getGroupId() );
 
-        assertEquals( "deployed", result.getMavenProject().getDistributionManagement().getStatus() );
+        assertEquals( "deployed", result.getProject().getDistributionManagement().getStatus() );
     }
 
     // ----------------------------------------------------------------------------

@@ -66,7 +66,7 @@ public class MavenEmbedderExampleTest
             // You may want to inspect the project after the execution.
             // ----------------------------------------------------------------------------
 
-            MavenProject project = result.getMavenProject();
+            MavenProject project = result.getProject();
 
             // Do something with the project
 

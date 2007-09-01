@@ -19,6 +19,7 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -28,9 +29,17 @@ import java.util.List;
  */
 public interface MavenExecutionResult
 {
-    MavenProject getMavenProject();
+    MavenExecutionResult setProject( MavenProject project );
 
-    ReactorManager getReactorManager();
+    MavenProject getProject();
+
+    MavenExecutionResult setTopologicallySortedProjects( List projects );
+
+    List getTopologicallySortedProjects();
+
+    MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult result );
+
+    ArtifactResolutionResult getArtifactResolutionResult();
 
     // for each exception
     // - knowing what artifacts are missing

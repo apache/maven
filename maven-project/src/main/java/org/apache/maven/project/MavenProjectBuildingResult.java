@@ -19,63 +19,34 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.project.validation.ModelValidationResult;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class MavenProjectBuildingResult
 {
-    /** */
     private MavenProject project;
 
-    /** */
-    private ModelValidationResult modelValidationResult;
+    private ArtifactResolutionResult artifactResolutionResult;
 
-    /** */
-    private boolean successful;
-
-    /**
-     * @param project
-     */
-    public MavenProjectBuildingResult( MavenProject project )
+    public MavenProjectBuildingResult( MavenProject project,
+                                       ArtifactResolutionResult artifactResolutionResult )
     {
         this.project = project;
 
-        successful = true;
+        this.artifactResolutionResult = artifactResolutionResult;
     }
 
-    public MavenProjectBuildingResult( ModelValidationResult modelValidationResult )
-    {
-        this.modelValidationResult = modelValidationResult;
-
-        successful = modelValidationResult.getMessageCount() == 0;
-    }
-
-    /**
-     * @return Returns the modelValidationResult.
-     */
-    public ModelValidationResult getModelValidationResult()
-    {
-        return modelValidationResult;
-    }
-
-    /**
-     * @return Returns the project.
-     */
     public MavenProject getProject()
     {
         return project;
     }
 
-    /**
-     * Returns true if the project is valid.
-     *
-     * @return Returns true if the project is valid.
-     */
-    public boolean isSuccessful()
+    public ArtifactResolutionResult getArtifactResolutionResult()
     {
-        return successful;
+        return artifactResolutionResult;
     }
 }

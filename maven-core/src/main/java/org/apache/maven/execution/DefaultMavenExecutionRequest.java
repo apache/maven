@@ -67,6 +67,8 @@ public class DefaultMavenExecutionRequest
 
     private boolean useReactor = false;
 
+    private boolean recursive = true;
+    
     private String pomFile;
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
@@ -89,8 +91,6 @@ public class DefaultMavenExecutionRequest
 
     private String globalChecksumPolicy = CHECKSUM_POLICY_WARN;
 
-    private boolean recursive = true;
-        
     private boolean updateSnapshots = false;
 
     /**
