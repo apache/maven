@@ -97,7 +97,7 @@ under the License.
           <plugin>
             <artifactId>shade-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-12-SNAPSHOT</version>
+            <version>1.0-alpha-12</version>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -150,7 +150,7 @@ under the License.
        -->
       <id>tycho</id>
       <properties>
-        <bundleVersion>2.1.0.v20070728-1835</bundleVersion>
+        <bundleVersion>2.1.0.v20070901-1427</bundleVersion>
       </properties>
       <build>
         <resources>
@@ -163,7 +163,7 @@ under the License.
           <plugin>
             <artifactId>shade-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-11-SNAPSHOT</version>
+            <version>1.0-alpha-12</version>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -171,7 +171,7 @@ under the License.
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <shadedArtifactId>maven-embedder-idea</shadedArtifactId>
+                  <finalName>maven-embedder-tycho-${bundleVersion}</finalName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
                   <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
@@ -185,9 +185,6 @@ under the License.
                       <exclude>junit:junit</exclude>
                       <exclude>jmock:jmock</exclude>
                       <exclude>xml-apis:xml-apis</exclude>
-                      <!-- So this is required for the IDEA embedder which already has its own copy of JDOM -->
-                      <exclude>jdom:jdom</exclude>
-                      <exclude>jtidy:jtidy</exclude>
                     </excludes>
                   </artifactSet>
                   <relocations>
@@ -216,7 +213,7 @@ under the License.
           <plugin>
             <artifactId>shade-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-10</version>
+            <version>1.0-alpha-12</version>
             <executions>
               <execution>
                 <phase>package</phase>
