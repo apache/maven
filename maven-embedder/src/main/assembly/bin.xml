@@ -31,6 +31,18 @@ under the License.
         <include>org.codehaus.plexus:plexus-classworlds</include>
       </includes>
     </dependencySet>
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>org.codehaus.plexus:plexus-component-api</exclude>
+        <exclude>classworlds:classworlds</exclude>
+        <exclude>junit:junit</exclude>
+        <exclude>jmock:jmock</exclude>
+        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>org.apache.maven:maven-artifact</exclude>
+      </excludes>
+    </dependencySet>
   </dependencySets>
   <fileSets>
     <fileSet>
@@ -67,7 +79,7 @@ under the License.
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>maven-embedder*.jar</include>
+        <include>maven*.jar</include>
       </includes>
     </fileSet>
   </fileSets>

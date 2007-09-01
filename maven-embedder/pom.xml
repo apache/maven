@@ -108,7 +108,6 @@ under the License.
                   <!-- The IDEA folks don't want to put SNAPSHOT libs in their projects even though they are -->
                   <finalName>maven-embedder-idea-2.1</finalName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
                     <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
@@ -173,7 +172,6 @@ under the License.
                 <configuration>
                   <finalName>maven-embedder-tycho-${bundleVersion}</finalName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
                     <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
@@ -210,46 +208,6 @@ under the License.
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>shade-maven-plugin</artifactId>
-            <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-12</version>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <configuration>
-                  <shadedArtifactAttached>true</shadedArtifactAttached>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <!-- this will work with shade plugin 1.0-alpha-11-SNAP -->
-                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-                  <transformers>
-                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
-                  </transformers>
-                  <artifactSet>
-                    <excludes>
-                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
-                      <exclude>classworlds:classworlds</exclude>
-                      <exclude>junit:junit</exclude>
-                      <exclude>jmock:jmock</exclude>
-                      <exclude>xml-apis:xml-apis</exclude>
-                    </excludes>
-                  </artifactSet>
-                  <relocations>
-                    <relocation>
-                      <pattern>org.codehaus.plexus.util</pattern>
-                      <excludes>
-                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                      </excludes>
-                    </relocation>
-                  </relocations>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>2.2-beta-1</version>
