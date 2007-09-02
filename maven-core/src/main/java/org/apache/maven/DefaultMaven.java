@@ -127,9 +127,6 @@ public class DefaultMaven
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        // old doExecute
-        
-
         getLogger().info( "Scanning for projects..." );
 
         boolean foundProjects = true;
@@ -173,6 +170,9 @@ public class DefaultMaven
 
             return result;
         }
+
+        // Display the order of the projects
+        //CLI:move
 
         if ( reactorManager.hasMultipleProjects() )
         {
@@ -313,9 +313,7 @@ public class DefaultMaven
         MavenProject superProject;
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
-                                                                       new DefaultProfileManager( container,
-                                                                                                  request.getProperties() ) );
+            superProject = projectBuilder.buildStandaloneSuperProject();
 
         }
         catch ( ProjectBuildingException e )

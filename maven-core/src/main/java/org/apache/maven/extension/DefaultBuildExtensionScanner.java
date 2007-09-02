@@ -115,6 +115,7 @@ public class DefaultBuildExtensionScanner
             Map inheritedInterpolationValues = new HashMap();
 
             List inheritedRemoteRepositories = new ArrayList();
+
             inheritedRemoteRepositories.addAll( originalRemoteRepositories );
 
             for ( ModelLineageIterator lineageIterator = lineage.reversedLineageIterator(); lineageIterator.hasNext(); )
@@ -345,9 +346,10 @@ public class DefaultBuildExtensionScanner
         throws ExtensionScanningException
     {
         MavenProject superProject;
+
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( localRepository, globalProfileManager );
+            superProject = projectBuilder.buildStandaloneSuperProject();
         }
         catch ( ProjectBuildingException e )
         {
@@ -355,6 +357,8 @@ public class DefaultBuildExtensionScanner
                                                   "Error building super-POM for retrieving the default remote repository list: "
                                                       + e.getMessage(), e );
         }
+
+        System.out.println( "superProject = " + superProject );
 
         return superProject.getRemoteArtifactRepositories();
     }

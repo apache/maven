@@ -110,12 +110,6 @@ public interface MavenProjectBuilder
                                       ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException;
 
-    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
-        throws ProjectBuildingException;
-    
-    /**
-     * need to pass a profilemanager with correct context (eg. with execution properties)
-     */
-    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
+    MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException;
 }

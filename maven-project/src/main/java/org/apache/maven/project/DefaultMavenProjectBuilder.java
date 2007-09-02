@@ -247,19 +247,16 @@ public class DefaultMavenProjectBuilder
         return buildFromRepository( artifact, remoteArtifactRepositories, localRepository, true );
     }
 
-    // what is using this externally? jvz.
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
-        ProfileManager profileManager = new DefaultProfileManager( container );
-        return buildStandaloneSuperProject( localRepository, profileManager );
-    }
+    private MavenProject superProject;
 
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository,
-                                                     ProfileManager profileManager )
+    public MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException
     {
+        if ( this.superProject != null )
+        {
+            return this.superProject;
+        }
+
         Model superModel = getSuperModel();
 
         superModel.setGroupId( STANDALONE_SUPERPOM_GROUPID );
@@ -268,54 +265,23 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
-        MavenProject project = new MavenProject( superModel );
-
-        ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
-
-        projectContext.setCurrentProject( project );
-        projectContext.store( buildContextManager );
-
-        String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
-
-        project.setManagedVersionMap( createManagedVersionMap( projectId, superModel.getDependencyManagement(), null ) );
-
-        List activeProfiles = profileAdvisor.applyActivatedProfiles( superModel, null, profileManager.getExplicitlyActivatedIds(), profileManager.getExplicitlyDeactivatedIds() );
-        List activeExternalProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
-
-        LinkedHashSet profiles = new LinkedHashSet();
-
-        if ( ( activeProfiles != null ) && !activeProfiles.isEmpty() )
-        {
-            profiles.addAll( activeProfiles );
-        }
-
-        if ( ( activeExternalProfiles != null ) && !activeExternalProfiles.isEmpty() )
-        {
-            profiles.addAll( activeExternalProfiles );
-        }
-
-        project.setActiveProfiles( new ArrayList( profiles ) );
-
-        project.setOriginalModel( superModel );
+        superProject = new MavenProject( superModel );
 
         try
         {
-            project = processProjectLogic( "<Super-POM>", project, null, null, STRICT_MODEL_PARSING );
-
-            project.setExecutionRoot( true );
-
-            return project;
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new ProjectBuildingException( projectId, e.getMessage(), e );
+            superProject.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new ProjectBuildingException( projectId, e.getMessage(), e );
+            // This will never happen with the repositories in the SuperPOM
         }
-    }
 
+        superProject.setOriginalModel( superModel );
+
+        superProject.setExecutionRoot( true );
+
+        return superProject;
+    }
 
     public MavenProjectBuildingResult buildWithDependencies( File projectDescriptor,
                                                              ArtifactRepository localRepository,

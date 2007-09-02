@@ -263,7 +263,7 @@ public class MavenMetadataSource
         {
             try
             {
-                superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
+                superProject = mavenProjectBuilder.buildStandaloneSuperProject();
             }
             catch ( ProjectBuildingException e )
             {
