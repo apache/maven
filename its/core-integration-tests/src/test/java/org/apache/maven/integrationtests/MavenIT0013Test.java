@@ -22,13 +22,16 @@ public class MavenIT0013Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0013" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-it0013", "1.0-SNAPSHOT", "maven-plugin" );
-        List goals = Arrays.asList( new String[]{"install", "org.apache.maven.its.it0013:maven-it-it0013:it0013"} );
+        List goals = Arrays.asList( new String[]{"install" } );
         verifier.executeGoals( goals );
         verifier.assertFilePresent( "target/maven-it-it0013-1.0-SNAPSHOT.jar" );
+
+        verifier = new Verifier( testDir.getAbsolutePath() );        
+        goals = Arrays.asList( new String[]{"org.apache.maven.its.it0013:maven-it-it0013:it0013"} );
+        verifier.executeGoals( goals );
         verifier.assertFilePresent( "target/it0013-verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
 }
 

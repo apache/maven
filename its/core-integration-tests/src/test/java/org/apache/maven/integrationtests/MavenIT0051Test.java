@@ -2,6 +2,7 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +11,11 @@ import java.util.List;
 public class MavenIT0051Test
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0051Test()                                                                                                                          
+        throws InvalidVersionSpecificationException                                                                                                   
+    {                                                                                                                                                 
+        super( "[,2.1-SNAPSHOT)" );                                                                                                                   
+    }    
 
     /**
      * Test source attachment when -DperformRelease=true is specified.
