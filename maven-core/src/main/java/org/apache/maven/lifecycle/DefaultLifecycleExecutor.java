@@ -69,9 +69,11 @@ import java.util.Stack;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
- *       much of the event handling)
+ * much of the event handling)
  */
-public class DefaultLifecycleExecutor extends AbstractLogEnabled implements LifecycleExecutor
+public class DefaultLifecycleExecutor
+    extends AbstractLogEnabled
+    implements LifecycleExecutor
 {
     // ----------------------------------------------------------------------
     // Components
@@ -100,7 +102,9 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
      * @param reactorManager
      * @param dispatcher
      */
-    public void execute( final MavenSession session, final ReactorManager reactorManager, final EventDispatcher dispatcher )
+    public void execute( final MavenSession session,
+                         final ReactorManager reactorManager,
+                         final EventDispatcher dispatcher )
         throws BuildFailureException, LifecycleExecutionException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
@@ -124,7 +128,10 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
             throw new BuildFailureException( "You must specify at least one goal. Try 'install'" );
         }
 
-        List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
+        List taskSegments = segmentTaskListByAggregationNeeds(
+            goals,
+            session,
+            rootProject );
 
         // TODO: probably don't want to do all this up front
         try
@@ -135,14 +142,24 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
         }
         catch ( PluginNotFoundException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
 
-        executeTaskSegments( taskSegments, reactorManager, session, rootProject, dispatcher );
+        executeTaskSegments(
+            taskSegments,
+            reactorManager,
+            session,
+            rootProject,
+            dispatcher );
     }
 
-    private void executeTaskSegments( final List taskSegments, final ReactorManager rm, final MavenSession session,
-                                      final MavenProject rootProject, final EventDispatcher dispatcher )
+    private void executeTaskSegments( final List taskSegments,
+                                      final ReactorManager reactorManager,
+                                      final MavenSession session,
+                                      final MavenProject rootProject,
+                                      final EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -151,7 +168,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
             if ( segment.aggregate() )
             {
-                if ( !rm.isBlackListed( rootProject ) )
+                if ( !reactorManager.isBlackListed( rootProject ) )
                 {
                     line();
 
@@ -171,7 +188,9 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
                     long buildStartTime = System.currentTimeMillis();
 
-                    dispatcher.dispatchStart( event, target );
+                    dispatcher.dispatchStart(
+                        event,
+                        target );
 
                     // NEW: To support forked execution under the new lifecycle architecture, the current project
                     // is stored in a build-context managed data type. This context type holds the current project
@@ -180,7 +199,10 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                     ctx.store( buildContextManager );
 
                     // NEW: Build up the execution plan, including configuration.
-                    List mojoBindings = getLifecycleBindings( segment.getTasks(), rootProject, target );
+                    List mojoBindings = getLifecycleBindings(
+                        segment.getTasks(),
+                        rootProject,
+                        target );
 
                     // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
                     // only call once, with the top-level project (assumed to be provided as a parameter)...
@@ -188,15 +210,26 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                     {
                         MojoBinding binding = (MojoBinding) mojoIterator.next();
 
-                        executeGoalAndHandleFailures( binding, session, dispatcher, event, rm, buildStartTime, target );
+                        executeGoalAndHandleFailures(
+                            binding,
+                            session,
+                            dispatcher,
+                            event,
+                            reactorManager,
+                            buildStartTime,
+                            target );
                     }
 
                     // clean up the execution context, so we don't pollute for future project-executions.
                     LifecycleExecutionContext.delete( buildContextManager );
 
-                    rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
+                    reactorManager.registerBuildSuccess(
+                        rootProject,
+                        System.currentTimeMillis() - buildStartTime );
 
-                    dispatcher.dispatchEnd( event, target );
+                    dispatcher.dispatchEnd(
+                        event,
+                        target );
                 }
                 else
                 {
@@ -220,7 +253,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
 
-                    if ( !rm.isBlackListed( currentProject ) )
+                    if ( !reactorManager.isBlackListed( currentProject ) )
                     {
                         line();
 
@@ -238,29 +271,44 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
                         long buildStartTime = System.currentTimeMillis();
 
-                        dispatcher.dispatchStart( event, target );
+                        dispatcher.dispatchStart(
+                            event,
+                            target );
 
                         LifecycleExecutionContext ctx = new LifecycleExecutionContext( currentProject );
                         ctx.store( buildContextManager );
 
-                        List mojoBindings = getLifecycleBindings( segment.getTasks(), currentProject, target );
+                        List mojoBindings = getLifecycleBindings(
+                            segment.getTasks(),
+                            currentProject,
+                            target );
 
                         for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
                         {
                             MojoBinding mojoBinding = (MojoBinding) mojoIterator.next();
 
                             getLogger().debug(
-                                               "Mojo: " + mojoBinding.getGoal() + " has config:\n"
-                                                               + mojoBinding.getConfiguration() );
-                            executeGoalAndHandleFailures( mojoBinding, session, dispatcher, event, rm, buildStartTime,
-                                                          target );
+                                "Mojo: " + mojoBinding.getGoal() + " has config:\n"
+                                    + mojoBinding.getConfiguration() );
+                            executeGoalAndHandleFailures(
+                                mojoBinding,
+                                session,
+                                dispatcher,
+                                event,
+                                reactorManager,
+                                buildStartTime,
+                                target );
                         }
 
                         LifecycleExecutionContext.delete( buildContextManager );
 
-                        rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
+                        reactorManager.registerBuildSuccess(
+                            currentProject,
+                            System.currentTimeMillis() - buildStartTime );
 
-                        dispatcher.dispatchEnd( event, target );
+                        dispatcher.dispatchEnd(
+                            event,
+                            target );
                     }
                     else
                     {
@@ -271,7 +319,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                         getLogger().info( "  " + segment );
 
                         getLogger().info(
-                                          "This project has been banned from further executions due to previous failures." );
+                            "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -285,33 +333,46 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
      * of MojoBindings, each fully configured to execute, which enables us to enumerate the full build plan to the debug
      * log-level, complete with the configuration each mojo will use.
      */
-    private List getLifecycleBindings( final List tasks, final MavenProject project, final String targetDescription )
+    private List getLifecycleBindings( final List tasks,
+                                       final MavenProject project,
+                                       final String targetDescription )
         throws LifecycleExecutionException
     {
         List mojoBindings;
         try
         {
-            BuildPlan plan = buildPlanner.constructBuildPlan( tasks, project );
+            BuildPlan plan = buildPlanner.constructBuildPlan(
+                tasks,
+                project );
 
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "\n\nOur build plan is:\n" + BuildPlanUtils.listBuildPlan( plan, false ) + "\n\n" );
+                getLogger().debug(
+                    "\n\nOur build plan is:\n" + BuildPlanUtils.listBuildPlan(
+                        plan,
+                        false ) + "\n\n" );
             }
 
             mojoBindings = plan.renderExecutionPlan( new Stack() );
         }
         catch ( LifecycleException e )
         {
-            throw new LifecycleExecutionException( "Failed to construct build plan for: " + targetDescription
-                            + ". Reason: " + e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                "Failed to construct build plan for: " + targetDescription
+                    + ". Reason: " + e.getMessage(),
+                e );
         }
 
         return mojoBindings;
     }
 
-    private void executeGoalAndHandleFailures( final MojoBinding mojoBinding, final MavenSession session,
-                                               final EventDispatcher dispatcher, final String event,
-                                               final ReactorManager rm, final long buildStartTime, final String target )
+    private void executeGoalAndHandleFailures( final MojoBinding mojoBinding,
+                                               final MavenSession session,
+                                               final EventDispatcher dispatcher,
+                                               final String event,
+                                               final ReactorManager rm,
+                                               final long buildStartTime,
+                                               final String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         // NEW: Retrieve/use the current project stored in the execution context, for consistency.
@@ -327,7 +388,9 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
             PluginDescriptor pluginDescriptor = null;
             try
             {
-                pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project );
+                pluginDescriptor = pluginLoader.loadPlugin(
+                    mojoBinding,
+                    project );
             }
             catch ( PluginLoaderException e )
             {
@@ -337,8 +400,10 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                 }
                 else
                 {
-                    throw new LifecycleExecutionException( "Failed to load plugin for: "
-                                    + MojoBindingUtils.toString( mojoBinding ) + ". Reason: " + e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        "Failed to load plugin for: "
+                            + MojoBindingUtils.toString( mojoBinding ) + ". Reason: " + e.getMessage(),
+                        e );
                 }
             }
 
@@ -351,69 +416,110 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
                 try
                 {
-                    pluginManager.executeMojo( project, mojoExecution, session );
+                    pluginManager.executeMojo(
+                        project,
+                        mojoExecution,
+                        session );
                 }
                 catch ( PluginManagerException e )
                 {
-                    throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '"
-                                    + mojoDescriptor.getId() + "': " + e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        "Internal error in the plugin manager executing goal '"
+                            + mojoDescriptor.getId() + "': " + e.getMessage(),
+                        e );
                 }
                 catch ( ArtifactNotFoundException e )
                 {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        e.getMessage(),
+                        e );
                 }
                 catch ( InvalidDependencyVersionException e )
                 {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        e.getMessage(),
+                        e );
                 }
                 catch ( ArtifactResolutionException e )
                 {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        e.getMessage(),
+                        e );
                 }
                 catch ( MojoFailureException e )
                 {
-                    throw new BuildFailureException( e.getMessage(), e );
+                    throw new BuildFailureException(
+                        e.getMessage(),
+                        e );
                 }
                 catch ( MojoExecutionException e )
                 {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        e.getMessage(),
+                        e );
                 }
                 catch ( PluginConfigurationException e )
                 {
-                    throw new LifecycleExecutionException( e.getMessage(), e );
+                    throw new LifecycleExecutionException(
+                        e.getMessage(),
+                        e );
                 }
             }
             else
             {
-                throw new LifecycleExecutionException( "Failed to load plugin for: "
-                                + MojoBindingUtils.toString( mojoBinding ) + ". Reason: unknown" );
+                throw new LifecycleExecutionException(
+                    "Failed to load plugin for: "
+                        + MojoBindingUtils.toString( mojoBinding ) + ". Reason: unknown" );
             }
         }
         catch ( LifecycleExecutionException e )
         {
-            dispatcher.dispatchError( event, target, e );
+            dispatcher.dispatchError(
+                event,
+                target,
+                e );
 
-            if ( handleExecutionFailure( rm, project, e, mojoBinding, buildStartTime ) )
+            if ( handleExecutionFailure(
+                rm,
+                project,
+                e,
+                mojoBinding,
+                buildStartTime ) )
             {
                 throw e;
             }
         }
         catch ( BuildFailureException e )
         {
-            dispatcher.dispatchError( event, target, e );
+            dispatcher.dispatchError(
+                event,
+                target,
+                e );
 
-            if ( handleExecutionFailure( rm, project, e, mojoBinding, buildStartTime ) )
+            if ( handleExecutionFailure(
+                rm,
+                project,
+                e,
+                mojoBinding,
+                buildStartTime ) )
             {
                 throw e;
             }
         }
     }
 
-    private boolean handleExecutionFailure( final ReactorManager rm, final MavenProject project, final Exception e,
-                                            final MojoBinding mojoBinding, final long buildStartTime )
+    private boolean handleExecutionFailure( final ReactorManager rm,
+                                            final MavenProject project,
+                                            final Exception e,
+                                            final MojoBinding mojoBinding,
+                                            final long buildStartTime )
     {
-        rm.registerBuildFailure( project, e, MojoBindingUtils.toString( mojoBinding ), System.currentTimeMillis()
-                        - buildStartTime );
+        rm.registerBuildFailure(
+            project,
+            e,
+            MojoBindingUtils.toString( mojoBinding ),
+            System.currentTimeMillis()
+                - buildStartTime );
 
         if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
         {
@@ -427,7 +533,8 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
         return false;
     }
 
-    private List segmentTaskListByAggregationNeeds( final List tasks, final MavenSession session,
+    private List segmentTaskListByAggregationNeeds( final List tasks,
+                                                    final MavenSession session,
                                                     final MavenProject rootProject )
         throws LifecycleExecutionException, BuildFailureException
     {
@@ -464,33 +571,42 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
                     // definitely a CLI goal, can use prefix
                     try
                     {
-                        mojo = getMojoDescriptorForDirectInvocation( task, session, rootProject );
+                        mojo = getMojoDescriptorForDirectInvocation(
+                            task,
+                            session,
+                            rootProject );
                     }
                     catch ( PluginLoaderException e )
                     {
                         // TODO: shouldn't hit this, investigate using the same resolution logic as
                         // others for plugins in the reactor
                         getLogger().info(
-                                          "Cannot find mojo descriptor for: \'" + task
-                                                          + "\' - Treating as non-aggregator." );
+                            "Cannot find mojo descriptor for: \'" + task
+                                + "\' - Treating as non-aggregator." );
 
-                        getLogger().debug( "", e );
+                        getLogger().debug(
+                            "",
+                            e );
                     }
                     catch ( LifecycleSpecificationException e )
                     {
                         String message =
                             "Invalid task '"
-                                            + task
-                                            + "': you must specify a valid lifecycle phase, or"
-                                            + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+                                + task
+                                + "': you must specify a valid lifecycle phase, or"
+                                + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
 
-                        throw new BuildFailureException( message, e );
+                        throw new BuildFailureException(
+                            message,
+                            e );
                     }
                     catch ( LifecycleLoaderException e )
                     {
                         String message = "Cannot find plugin to match task '" + task + "'.";
 
-                        throw new BuildFailureException( message, e );
+                        throw new BuildFailureException(
+                            message,
+                            e );
                     }
 
                     // if the mojo descriptor was found, determine aggregator status according to:
@@ -546,8 +662,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
     /**
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
-     *       lookup directly, or have them passed in
-     *
+     * lookup directly, or have them passed in
      * @todo Move this sort of thing to the tail end of the project-building process
      */
     private Map findArtifactTypeHandlers( final MavenSession session )
@@ -564,23 +679,32 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
 
                 if ( plugin.isExtensions() )
                 {
-                    verifyPlugin( plugin, project, session );
+                    verifyPlugin(
+                        plugin,
+                        project,
+                        session );
 
                     // TODO: if moved to the plugin manager we already have the descriptor from above and so do can
                     // lookup the container directly
                     try
                     {
-                        Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
+                        Map components = pluginManager.getPluginComponents(
+                            plugin,
+                            ArtifactHandler.ROLE );
                         map.putAll( components );
                     }
                     catch ( ComponentLookupException e )
                     {
-                        getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                        getLogger().debug(
+                            "Unable to find the lifecycle component in the extension",
+                            e );
                     }
                     catch ( PluginManagerException e )
                     {
-                        throw new LifecycleExecutionException( "Error looking up available components from plugin '"
-                                        + plugin.getKey() + "': " + e.getMessage(), e );
+                        throw new LifecycleExecutionException(
+                            "Error looking up available components from plugin '"
+                                + plugin.getKey() + "': " + e.getMessage(),
+                            e );
                     }
 
                     // shudder...
@@ -598,7 +722,9 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
         return map;
     }
 
-    private PluginDescriptor verifyPlugin( final Plugin plugin, final MavenProject project, final MavenSession session )
+    private PluginDescriptor verifyPlugin( final Plugin plugin,
+                                           final MavenProject project,
+                                           final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         getLogger().debug( "Verifying plugin: " + plugin.getKey() );
@@ -606,49 +732,73 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
         PluginDescriptor pluginDescriptor;
         try
         {
-            pluginDescriptor = pluginManager.verifyPlugin( plugin, project, session );
+            pluginDescriptor = pluginManager.verifyPlugin(
+                plugin,
+                project,
+                session );
         }
         catch ( PluginManagerException e )
         {
-            throw new LifecycleExecutionException( "Internal error in the plugin manager getting plugin '"
-                            + plugin.getKey() + "': " + e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                "Internal error in the plugin manager getting plugin '"
+                    + plugin.getKey() + "': " + e.getMessage(),
+                e );
         }
         catch ( PluginVersionResolutionException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( InvalidVersionSpecificationException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( InvalidPluginException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( PluginVersionNotFoundException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
+            throw new LifecycleExecutionException(
+                e.getMessage(),
+                e );
         }
         return pluginDescriptor;
     }
 
-    private MojoDescriptor getMojoDescriptorForDirectInvocation( final String task, final MavenSession session,
+    private MojoDescriptor getMojoDescriptorForDirectInvocation( final String task,
+                                                                 final MavenSession session,
                                                                  final MavenProject project )
         throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException
     {
         // we don't need to include report configuration here, since we're just looking for
         // an @aggregator flag...
-        MojoBinding binding = mojoBindingFactory.parseMojoBinding( task, project, true, false );
+        MojoBinding binding = mojoBindingFactory.parseMojoBinding(
+            task,
+            project,
+            true,
+            false );
 
-        PluginDescriptor descriptor = pluginLoader.loadPlugin( binding, project );
+        PluginDescriptor descriptor = pluginLoader.loadPlugin(
+            binding,
+            project );
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
 
         return mojoDescriptor;
