@@ -346,6 +346,7 @@ public class MavenEmbedderTest
         assertEquals( 3, result.getProject().getTestClasspathElements().size() );
     }
 
+    /*
     public void testProjectReadingWithDistributionStatus()
         throws Exception
     {
@@ -365,6 +366,7 @@ public class MavenEmbedderTest
 
         assertEquals( "deployed", result.getProject().getDistributionManagement().getStatus() );
     }
+    */
 
     // ----------------------------------------------------------------------------
     // Model Writing

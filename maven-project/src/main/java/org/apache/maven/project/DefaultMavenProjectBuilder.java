@@ -464,6 +464,10 @@ public class DefaultMavenProjectBuilder
             profileManager,
             STRICT_MODEL_PARSING );
 
+        /*
+
+        MNG-3178: What is this actually for as we're not deploying this anymore.
+
         if ( checkDistributionManagementStatus )
         {
             if ( ( project.getDistributionManagement() != null ) && ( project.getDistributionManagement().getStatus() != null ) )
@@ -474,6 +478,7 @@ public class DefaultMavenProjectBuilder
                     "Invalid project file: distribution status must not be specified for a project outside of the repository" );
             }
         }
+        */
 
         return project;
     }

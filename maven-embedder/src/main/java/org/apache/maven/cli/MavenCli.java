@@ -26,6 +26,7 @@ import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
+import org.apache.maven.embedder.ConfigurationValidationResult;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -342,6 +343,22 @@ public class MavenCli
             .setUserSettingsFile( userSettingsFile )
             .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
             .setClassWorld( classWorld );
+
+        ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
+
+        if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
+        {
+            showFatalError( "Error reading user settings: " + cvr.getUserSettingsException().getMessage(), cvr.getUserSettingsException(), showErrors );
+
+            return 1;
+        }
+
+        if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
+        {
+            showFatalError( "Error reading global settings: " + cvr.getGlobalSettingsException().getMessage(), cvr.getGlobalSettingsException(), showErrors );
+
+            return 1;
+        }
 
         String localRepoProperty = executionProperties.getProperty( LOCAL_REPO_PROPERTY );
 

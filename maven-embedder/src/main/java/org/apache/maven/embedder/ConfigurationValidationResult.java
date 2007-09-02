@@ -47,12 +47,12 @@ public interface ConfigurationValidationResult
     /**
      * Any exception that happened during parsing user settings, or null if there were no errors.
      */
-    Throwable getUserSettingsException();
+    Exception getUserSettingsException();
 
     /**
      * Any exception that happened during parsing global settings, or null if there were no errors.
      */
-    Throwable getGlobalSettingsException();
+    Exception getGlobalSettingsException();
 
     /**
      * @deprecated

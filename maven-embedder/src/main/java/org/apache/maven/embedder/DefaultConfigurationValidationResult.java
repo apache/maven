@@ -29,9 +29,9 @@ import org.apache.maven.settings.Settings;
 public class DefaultConfigurationValidationResult
     implements ConfigurationValidationResult
 {
-    private Throwable userSettingsException;
+    private Exception userSettingsException;
 
-    private Throwable globalSettingsException;
+    private Exception globalSettingsException;
 
     private Settings userSettings, globalSettings;
 
@@ -40,22 +40,22 @@ public class DefaultConfigurationValidationResult
         return ( getUserSettingsException() == null ) && ( getGlobalSettingsException() == null );
     }
 
-    public Throwable getUserSettingsException()
+    public Exception getUserSettingsException()
     {
         return userSettingsException;
     }
 
-    public void setUserSettingsException( Throwable e )
+    public void setUserSettingsException( Exception e )
     {
         this.userSettingsException = e;
     }
 
-    public Throwable getGlobalSettingsException()
+    public Exception getGlobalSettingsException()
     {
         return globalSettingsException;
     }
 
-    public void setGlobalSettingsException( Throwable e )
+    public void setGlobalSettingsException( Exception e )
     {
         this.globalSettingsException = e;
     }
