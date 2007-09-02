@@ -25,15 +25,15 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,9 +50,12 @@ public class RegexBasedModelInterpolator
 {
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.|env\\.)?([^}]+)\\}" );
 
+    private Properties envars;
+
     public RegexBasedModelInterpolator()
         throws IOException
     {
+        envars = CommandLineUtils.getSystemEnvVars();                                                                                                        
     }
 
     public Model interpolate( Model model, Map context )
@@ -181,6 +184,11 @@ public class RegexBasedModelInterpolator
                 value = model.getProperties().getProperty( realExpr );
             }
 
+            if ( value == null )
+            {
+                value = envars.getProperty( realExpr );
+            }
+
             // Any expression, not just artifactId, version etc., but also scm.repository 
             // were evaluated against the model, even if there is no prefix.
             // If the 2.1 strategy fails, try the legacy approach. If it yields a result, warn for it.
@@ -213,6 +221,8 @@ public class RegexBasedModelInterpolator
                 // but this could result in multiple lookups of stringValue, and replaceAll is not correct behaviour
                 matcher.reset( result );
             }
+
+            
 /*
         // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
         // timing of executing the interpolation
