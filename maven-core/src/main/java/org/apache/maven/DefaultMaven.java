@@ -139,7 +139,7 @@ public class DefaultMaven
 
             if ( projects.isEmpty() )
             {
-                projects.add( getSuperProject( request ) );
+                projects.add( projectBuilder.buildStandaloneSuperProject() );
 
                 foundProjects = false;
             }
@@ -305,22 +305,6 @@ public class DefaultMaven
 
             line();
         }
-    }
-
-    private MavenProject getSuperProject( MavenExecutionRequest request )
-        throws MavenExecutionException
-    {
-        MavenProject superProject;
-        try
-        {
-            superProject = projectBuilder.buildStandaloneSuperProject();
-
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
-        return superProject;
     }
 
     private List getProjects( MavenExecutionRequest request )
