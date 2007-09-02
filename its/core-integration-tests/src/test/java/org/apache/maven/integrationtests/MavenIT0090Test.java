@@ -11,12 +11,6 @@ import java.util.Map;
 public class MavenIT0090Test
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0090Test()
-        throws InvalidVersionSpecificationException
-    {
-        super( "[,2.1-SNAPSHOT)" );
-    }
-
     /**
      * Test that ensures that envars are interpolated correctly into plugin
      * configurations.
