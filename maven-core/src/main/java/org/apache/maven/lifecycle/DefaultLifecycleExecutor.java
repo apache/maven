@@ -65,7 +65,7 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
@@ -97,15 +97,15 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
      * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
      *
      * @param session
-     * @param rm
+     * @param reactorManager
      * @param dispatcher
      */
-    public void execute( final MavenSession session, final ReactorManager rm, final EventDispatcher dispatcher )
+    public void execute( final MavenSession session, final ReactorManager reactorManager, final EventDispatcher dispatcher )
         throws BuildFailureException, LifecycleExecutionException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
         // within the same reactor (using an inclusion pattern to gather them up)...
-        MavenProject rootProject = rm.getTopLevelProject();
+        MavenProject rootProject = reactorManager.getTopLevelProject();
 
         List goals = session.getGoals();
 
@@ -138,7 +138,7 @@ public class DefaultLifecycleExecutor extends AbstractLogEnabled implements Life
             throw new LifecycleExecutionException( e.getMessage(), e );
         }
 
-        executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
+        executeTaskSegments( taskSegments, reactorManager, session, rootProject, dispatcher );
     }
 
     private void executeTaskSegments( final List taskSegments, final ReactorManager rm, final MavenSession session,
