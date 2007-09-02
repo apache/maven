@@ -34,7 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator;
+import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -95,7 +95,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -159,7 +158,7 @@ public class MavenEmbedder
 
     private MavenSettingsBuilder settingsBuilder;
 
-    private MavenExecutionRequestDefaultsPopulator defaultsPopulator;
+    private MavenExecutionRequestPopulator populator;
 
     // ----------------------------------------------------------------------
     // Configuration
@@ -426,7 +425,7 @@ public class MavenEmbedder
 
         try
         {
-            request = defaultsPopulator.populateDefaults( request, this );
+            request = populator.populateDefaults( request, this );
             //mkleint: copied from DefaultLifecycleExecutor
 
             project = readProject( new File( request.getPomFile() ) );
@@ -458,7 +457,7 @@ public class MavenEmbedder
         }
         catch ( ProjectBuildingException e )
         {
-
+            result.addException( e );
         }
 
         result.setProject( r.getProject() );
@@ -645,8 +644,8 @@ public class MavenEmbedder
             defaultArtifactRepositoryLayout =
                 (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
 
-            defaultsPopulator = (MavenExecutionRequestDefaultsPopulator) container.lookup(
-                MavenExecutionRequestDefaultsPopulator.ROLE );
+            populator = (MavenExecutionRequestPopulator) container.lookup(
+                MavenExecutionRequestPopulator.ROLE );
 
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
@@ -925,7 +924,7 @@ public class MavenEmbedder
 
             try
             {
-                request = defaultsPopulator.populateDefaults( request, this );
+                request = populator.populateDefaults( request, this );
             }
             catch ( MavenEmbedderException e )
             {

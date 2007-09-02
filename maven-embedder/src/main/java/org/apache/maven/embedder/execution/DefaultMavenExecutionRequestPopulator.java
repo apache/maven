@@ -29,6 +29,8 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -150,6 +152,10 @@ public class DefaultMavenExecutionRequestPopulator
 
         container.getLoggerManager().setThreshold( request.getLoggingLevel() );
 
+        // Create the standard profile manager
+
+        request.setProfileManager( createProfileManager( request ) );
+
         return request;
     }
 
@@ -207,6 +213,23 @@ public class DefaultMavenExecutionRequestPopulator
         {
             container.release( wagonManager );
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Profile Manager
+    // ------------------------------------------------------------------------
+
+    public ProfileManager createProfileManager( MavenExecutionRequest request )
+    {
+        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
+
+        globalProfileManager.loadSettingsProfiles( request.getSettings() );
+
+        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
+
+        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
+
+        return globalProfileManager;        
     }
 
     // ----------------------------------------------------------------------------

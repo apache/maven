@@ -20,8 +20,8 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.embedder.execution.MavenExecutionRequestDefaultsPopulator</role>
-      <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestDefaultsPopulator</implementation>
+      <role>org.apache.maven.embedder.execution.MavenExecutionRequestPopulator</role>
+      <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestPopulator</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
