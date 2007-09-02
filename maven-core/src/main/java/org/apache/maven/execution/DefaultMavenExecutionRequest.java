@@ -58,7 +58,7 @@ public class DefaultMavenExecutionRequest
 
     private boolean usePluginUpdateOverride;
 
-    private boolean isProjectPresent;
+    private boolean isProjectPresent = true;
 
     // ----------------------------------------------------------------------------
     // Request
