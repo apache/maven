@@ -41,6 +41,7 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -421,7 +422,7 @@ public class MavenEmbedder
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        MavenProject project = null;
+        MavenProject project;
 
         try
         {
@@ -446,6 +447,18 @@ public class MavenEmbedder
         }
 
         MavenProjectBuildingResult r = null;
+
+        ReactorManager reactorManager = maven.createReactorManager( request, result );
+
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }
+
+        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+
+        // Now I should be able to pass this projects to the next request so that I don't have to process
+        // any local projects again. And this logic is still too complicated.
 
         try
         {
