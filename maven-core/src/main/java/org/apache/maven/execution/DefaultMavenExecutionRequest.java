@@ -21,6 +21,7 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -92,6 +93,8 @@ public class DefaultMavenExecutionRequest
     private String globalChecksumPolicy = CHECKSUM_POLICY_WARN;
 
     private boolean updateSnapshots = false;
+
+    private ProfileManager profileManager;
 
     /**
      * Suppress SNAPSHOT updates. 
@@ -501,5 +504,17 @@ public class DefaultMavenExecutionRequest
     public Settings getSettings()
     {
         return settings;
+    }
+
+    public ProfileManager getProfileManager()
+    {
+        return profileManager;
+    }
+
+    public MavenExecutionRequest setProfileManager( ProfileManager profileManager )
+    {
+        this.profileManager = profileManager;
+
+        return this;
     }
 }

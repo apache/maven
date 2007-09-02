@@ -129,13 +129,6 @@ public class DefaultMaven
 
         // old doExecute
         
-        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
-
-        globalProfileManager.loadSettingsProfiles( request.getSettings() );
-
-        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
-
-        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
 
         getLogger().info( "Scanning for projects..." );
 
@@ -145,7 +138,7 @@ public class DefaultMaven
 
         try
         {
-            projects = getProjects( request, globalProfileManager );
+            projects = getProjects( request );
 
             if ( projects.isEmpty() )
             {
@@ -332,7 +325,7 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
@@ -351,7 +344,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), globalProfileManager );
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
         }
         catch ( ExtensionScanningException e )
         {
@@ -361,7 +354,7 @@ public class DefaultMaven
         try
         {
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), globalProfileManager, !request.useReactor() );
+                                        request.getSettings(), request.getProfileManager(), !request.useReactor() );
 
         }
         catch ( ArtifactResolutionException e )
