@@ -175,14 +175,9 @@ public class MavenSession
         return request.getBaseDirectory();
     }
 
-    public void setUsingPOMsFromFilesystem( boolean usingPOMsFromFilesystem )
-    {
-        this.usingPOMsFromFilesystem = usingPOMsFromFilesystem;
-    }
-
     public boolean isUsingPOMsFromFilesystem()
     {
-        return usingPOMsFromFilesystem;
+        return request.isProjectPresent();
     }
 
     public Date getStartTime()
