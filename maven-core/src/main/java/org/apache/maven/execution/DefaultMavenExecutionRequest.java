@@ -58,6 +58,8 @@ public class DefaultMavenExecutionRequest
 
     private boolean usePluginUpdateOverride;
 
+    private boolean isProjectPresent;
+
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -514,6 +516,18 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setProfileManager( ProfileManager profileManager )
     {
         this.profileManager = profileManager;
+
+        return this;
+    }
+
+    public boolean isProjectPresent()
+    {
+        return isProjectPresent;
+    }
+
+    public MavenExecutionRequest setProjectPresent( boolean projectPresent )
+    {
+        isProjectPresent = projectPresent;
 
         return this;
     }

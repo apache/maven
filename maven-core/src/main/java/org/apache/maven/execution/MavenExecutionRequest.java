@@ -186,4 +186,7 @@ public interface MavenExecutionRequest
 
     ProfileManager getProfileManager();
     MavenExecutionRequest setProfileManager( ProfileManager profileManager );
+
+    boolean isProjectPresent();
+    MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
 }
