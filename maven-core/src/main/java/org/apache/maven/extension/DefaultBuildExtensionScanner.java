@@ -105,7 +105,7 @@ public class DefaultBuildExtensionScanner
 
         try
         {
-            List originalRemoteRepositories = getInitialRemoteRepositories( localRepository, globalProfileManager );
+            List originalRemoteRepositories = getInitialRemoteRepositories();
 
             getLogger().debug( "Pre-scanning POM lineage of: " + pom + " for build extensions." );
 
@@ -342,7 +342,7 @@ public class DefaultBuildExtensionScanner
         return lineage;
     }
 
-    private List getInitialRemoteRepositories( ArtifactRepository localRepository, ProfileManager globalProfileManager )
+    private List getInitialRemoteRepositories()
         throws ExtensionScanningException
     {
         MavenProject superProject;
@@ -357,8 +357,6 @@ public class DefaultBuildExtensionScanner
                                                   "Error building super-POM for retrieving the default remote repository list: "
                                                       + e.getMessage(), e );
         }
-
-        System.out.println( "superProject = " + superProject );
 
         return superProject.getRemoteArtifactRepositories();
     }
