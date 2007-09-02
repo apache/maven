@@ -21,6 +21,7 @@ package org.apache.maven;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.ReactorManager;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -51,4 +52,6 @@ public interface Maven
     static final int LOGGING_LEVEL_DISABLE = 5;
 
     MavenExecutionResult execute( MavenExecutionRequest request );
+
+    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
 }

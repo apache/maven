@@ -40,7 +40,6 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
@@ -79,7 +78,8 @@ import java.util.TimeZone;
  */
 public class DefaultMaven
     extends AbstractLogEnabled
-    implements Maven, Contextualizable
+    implements Maven,
+    Contextualizable
 {
     // ----------------------------------------------------------------------
     // Components
@@ -113,24 +113,9 @@ public class DefaultMaven
     // artifact resolution
     // lifecycle execution
 
-    public MavenExecutionResult execute( MavenExecutionRequest request )
+    public ReactorManager createReactorManager( MavenExecutionRequest request,
+                                                MavenExecutionResult result )
     {
-        request.setStartTime( new Date() );
-
-        initializeBuildContext( request );
-
-        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
-
-        String event = MavenEvents.REACTOR_EXECUTION;
-
-        dispatcher.dispatchStart( event, request.getBaseDirectory() );
-
-        MavenExecutionResult result = new DefaultMavenExecutionResult();
-
-        getLogger().info( "Scanning for projects..." );
-
-        boolean foundProjects = true;
-
         List projects;
 
         try
@@ -141,38 +126,74 @@ public class DefaultMaven
             {
                 projects.add( projectBuilder.buildStandaloneSuperProject() );
 
-                foundProjects = false;
+                request.setProjectPresent( false );
             }
         }
         catch ( Exception e )
         {
             result.addException( e );
 
-            return result;
+            return null;
         }
 
         ReactorManager reactorManager;
 
         try
         {
-            reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
+            reactorManager = new ReactorManager(
+                projects,
+                request.getReactorFailureBehavior() );
         }
         catch ( CycleDetectedException e )
         {
-            result.addException( new BuildFailureException(
-                "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e ) );
+            result.addException(
+                new BuildFailureException(
+                    "The projects in the reactor contain a cyclic reference: " + e.getMessage(),
+                    e ) );
 
-            return result;
+            return null;
         }
         catch ( DuplicateProjectException e )
         {
-            result.addException( new BuildFailureException( e.getMessage(), e ) );
+            result.addException(
+                new BuildFailureException(
+                    e.getMessage(),
+                    e ) );
 
-            return result;
+            return null;
         }
 
-        // Display the order of the projects
-        //CLI:move
+        return reactorManager;
+    }
+
+    public MavenExecutionResult execute( MavenExecutionRequest request )
+    {
+        request.setStartTime( new Date() );
+
+        initializeBuildContext( request );
+
+        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
+
+        String event = MavenEvents.REACTOR_EXECUTION;
+
+        dispatcher.dispatchStart(
+            event,
+            request.getBaseDirectory() );
+
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        getLogger().info( "Scanning for projects..." );
+
+        ReactorManager reactorManager = createReactorManager(
+            request,
+            result );
+
+        // Check and make sure the creation of the reactor manager didn't cause a problem.
+
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }
 
         if ( reactorManager.hasMultipleProjects() )
         {
@@ -186,17 +207,24 @@ public class DefaultMaven
             }
         }
 
-        MavenSession session = createSession( request, reactorManager, dispatcher );
-
-        session.setUsingPOMsFromFilesystem( foundProjects );
+        MavenSession session = createSession(
+            request,
+            reactorManager,
+            dispatcher );
 
         try
         {
-            lifecycleExecutor.execute( session, reactorManager, dispatcher );
+            lifecycleExecutor.execute(
+                session,
+                reactorManager,
+                dispatcher );
         }
         catch ( Exception e )
         {
-            result.addException( new BuildFailureException( e.getMessage(), e ) );
+            result.addException(
+                new BuildFailureException(
+                    e.getMessage(),
+                    e ) );
         }
 
         // old doExecute
@@ -207,9 +235,14 @@ public class DefaultMaven
             {
                 Exception e = (Exception) i.next();
 
-                dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+                dispatcher.dispatchError(
+                    event,
+                    request.getBaseDirectory(),
+                    e );
 
-                logError( e, request.isShowErrors() );
+                logError(
+                    e,
+                    request.isShowErrors() );
 
                 stats( request.getStartTime() );
 
@@ -224,11 +257,16 @@ public class DefaultMaven
 
         if ( reactorManager != null && reactorManager.hasBuildFailures() )
         {
-            logErrors( reactorManager, request.isShowErrors() );
+            logErrors(
+                reactorManager,
+                request.isShowErrors() );
 
             if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
             {
-                dispatcher.dispatchError( event, request.getBaseDirectory(), null );
+                dispatcher.dispatchError(
+                    event,
+                    request.getBaseDirectory(),
+                    null );
 
                 getLogger().info( "BUILD ERRORS" );
 
@@ -254,7 +292,9 @@ public class DefaultMaven
 
         line();
 
-        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+        dispatcher.dispatchEnd(
+            event,
+            request.getBaseDirectory() );
 
         result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
 
@@ -272,13 +312,16 @@ public class DefaultMaven
     {
         new ExecutionBuildContext( request ).store( buildContextManager );
 
-        SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
+        SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext(
+            buildContextManager,
+            true );
 
         systemContext.setSystemProperties( request.getProperties() );
         systemContext.store( buildContextManager );
     }
 
-    private void logErrors( ReactorManager rm, boolean showErrors )
+    private void logErrors( ReactorManager rm,
+                            boolean showErrors )
     {
         for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
         {
@@ -295,7 +338,9 @@ public class DefaultMaven
 
                 logDiagnostics( buildFailure.getCause() );
 
-                logTrace( buildFailure.getCause(), showErrors );
+                logTrace(
+                    buildFailure.getCause(),
+                    showErrors );
             }
         }
 
@@ -319,47 +364,71 @@ public class DefaultMaven
         }
         catch ( IOException e )
         {
-            throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
+            throw new MavenExecutionException(
+                "Error selecting project files for the reactor: " + e.getMessage(),
+                e );
         }
 
         // TODO: We should probably do this discovery just-in-time, if we can move to building project
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
+            buildExtensionScanner.scanForBuildExtensions(
+                files,
+                request.getLocalRepository(),
+                request.getProfileManager() );
         }
         catch ( ExtensionScanningException e )
         {
-            throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
+            throw new MavenExecutionException(
+                "Error scanning for extensions: " + e.getMessage(),
+                e );
         }
 
         try
         {
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), request.getProfileManager(), !request.useReactor() );
+            projects = collectProjects(
+                files,
+                request.getLocalRepository(),
+                request.isRecursive(),
+                request.getSettings(),
+                request.getProfileManager(),
+                !request.useReactor() );
 
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new MavenExecutionException( e.getMessage(), e );
+            throw new MavenExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( ProjectBuildingException e )
         {
-            throw new MavenExecutionException( e.getMessage(), e );
+            throw new MavenExecutionException(
+                e.getMessage(),
+                e );
         }
         catch ( ProfileActivationException e )
         {
-            throw new MavenExecutionException( e.getMessage(), e );
+            throw new MavenExecutionException(
+                e.getMessage(),
+                e );
         }
         return projects;
     }
 
-    private void logReactorSummaryLine( String name, String status )
+    private void logReactorSummaryLine( String name,
+                                        String status )
     {
-        logReactorSummaryLine( name, status, -1 );
+        logReactorSummaryLine(
+            name,
+            status,
+            -1 );
     }
 
-    private void logReactorSummaryLine( String name, String status, long time )
+    private void logReactorSummaryLine( String name,
+                                        String status,
+                                        long time )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
@@ -408,8 +477,12 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                  ProfileManager globalProfileManager, boolean isRoot )
+    private List collectProjects( List files,
+                                  ArtifactRepository localRepository,
+                                  boolean recursive,
+                                  Settings settings,
+                                  ProfileManager globalProfileManager,
+                                  boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
@@ -427,7 +500,11 @@ public class DefaultMaven
                 usingReleasePom = true;
             }
 
-            MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
+            MavenProject project = getProject(
+                file,
+                localRepository,
+                settings,
+                globalProfileManager );
 
             if ( isRoot )
             {
@@ -439,8 +516,9 @@ public class DefaultMaven
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
-                    throw new BuildFailureException( "Unable to build project '" + project.getFile() +
-                        "; it requires Maven version " + version.toString() );
+                    throw new BuildFailureException(
+                        "Unable to build project '" + project.getFile() +
+                            "; it requires Maven version " + version.toString() );
                 }
             }
 
@@ -469,11 +547,15 @@ public class DefaultMaven
 
                     if ( usingReleasePom )
                     {
-                        moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                        moduleFile = new File(
+                            basedir,
+                            name + "/" + Maven.RELEASE_POMv4 );
                     }
                     else
                     {
-                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                        moduleFile = new File(
+                            basedir,
+                            name + "/" + Maven.POMv4 );
                     }
 
                     if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
@@ -486,7 +568,9 @@ public class DefaultMaven
                         }
                         catch ( IOException e )
                         {
-                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                            throw new MavenExecutionException(
+                                "Unable to canonicalize file name " + moduleFile,
+                                e );
                         }
                     }
 
@@ -494,7 +578,13 @@ public class DefaultMaven
                 }
 
                 List collectedProjects =
-                    collectProjects( moduleFiles, localRepository, recursive, settings, globalProfileManager, false );
+                    collectProjects(
+                        moduleFiles,
+                        localRepository,
+                        recursive,
+                        settings,
+                        globalProfileManager,
+                        false );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -504,7 +594,9 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
+    public MavenProject getProject( File pom,
+                                    ArtifactRepository localRepository,
+                                    Settings settings,
                                     ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
@@ -512,12 +604,17 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException( "unknown", "The file " + pom.getAbsolutePath() +
-                    " you specified has zero length." );
+                throw new ProjectBuildingException(
+                    "unknown",
+                    "The file " + pom.getAbsolutePath() +
+                        " you specified has zero length." );
             }
         }
 
-        return projectBuilder.build( pom, localRepository, globalProfileManager );
+        return projectBuilder.build(
+            pom,
+            localRepository,
+            globalProfileManager );
     }
 
     // ----------------------------------------------------------------------
@@ -529,10 +626,15 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm,
+    protected MavenSession createSession( MavenExecutionRequest request,
+                                          ReactorManager rpm,
                                           EventDispatcher dispatcher )
     {
-        MavenSession session = new MavenSession( container, request, dispatcher, rpm );
+        MavenSession session = new MavenSession(
+            container,
+            request,
+            dispatcher,
+            rpm );
 
         SessionContext ctx = new SessionContext( session );
         ctx.store( buildContextManager );
@@ -564,10 +666,13 @@ public class DefaultMaven
 
         logDiagnostics( error );
 
-        logTrace( error, true );
+        logTrace(
+            error,
+            true );
     }
 
-    protected void logError( Exception e, boolean showErrors )
+    protected void logError( Exception e,
+                             boolean showErrors )
     {
         line();
 
@@ -577,7 +682,9 @@ public class DefaultMaven
 
         logDiagnostics( e );
 
-        logTrace( e, showErrors );
+        logTrace(
+            e,
+            showErrors );
 
         if ( !showErrors )
         {
@@ -587,7 +694,8 @@ public class DefaultMaven
         }
     }
 
-    protected void logFailure( BuildFailureException e, boolean showErrors )
+    protected void logFailure( BuildFailureException e,
+                               boolean showErrors )
     {
         line();
 
@@ -597,20 +705,27 @@ public class DefaultMaven
 
         logDiagnostics( e );
 
-        logTrace( e, showErrors );
+        logTrace(
+            e,
+            showErrors );
     }
 
-    private void logTrace( Throwable t, boolean showErrors )
+    private void logTrace( Throwable t,
+                           boolean showErrors )
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Trace", t );
+            getLogger().debug(
+                "Trace",
+                t );
 
             line();
         }
         else if ( showErrors )
         {
-            getLogger().info( "Trace", t );
+            getLogger().info(
+                "Trace",
+                t );
 
             line();
         }
@@ -667,19 +782,29 @@ public class DefaultMaven
 
                 if ( rm.hasBuildFailure( project ) )
                 {
-                    logReactorSummaryLine( project.getName(), "FAILED", rm.getBuildFailure( project ).getTime() );
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "FAILED",
+                        rm.getBuildFailure( project ).getTime() );
                 }
                 else if ( rm.isBlackListed( project ) )
                 {
-                    logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "SKIPPED (dependency build failed or was skipped)" );
                 }
                 else if ( rm.hasBuildSuccess( project ) )
                 {
-                    logReactorSummaryLine( project.getName(), "SUCCESS", rm.getBuildSuccess( project ).getTime() );
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "SUCCESS",
+                        rm.getBuildSuccess( project ).getTime() );
                 }
                 else
                 {
-                    logReactorSummaryLine( project.getName(), "NOT BUILT" );
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "NOT BUILT" );
                 }
             }
             line();
@@ -753,10 +878,17 @@ public class DefaultMaven
 
         if ( request.useReactor() )
         {
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
+            String includes = System.getProperty(
+                "maven.reactor.includes",
+                "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
+            String excludes = System.getProperty(
+                "maven.reactor.excludes",
+                POMv4 + "," + RELEASE_POMv4 );
 
-            files = FileUtils.getFiles( userDir, includes, excludes );
+            files = FileUtils.getFiles(
+                userDir,
+                includes,
+                excludes );
 
             filterOneProjectFilePerDirectory( files );
 
@@ -774,11 +906,15 @@ public class DefaultMaven
         }
         else
         {
-            File projectFile = new File( userDir, RELEASE_POMv4 );
+            File projectFile = new File(
+                userDir,
+                RELEASE_POMv4 );
 
             if ( !projectFile.exists() )
             {
-                projectFile = new File( userDir, POMv4 );
+                projectFile = new File(
+                    userDir,
+                    POMv4 );
             }
 
             if ( projectFile.exists() )
