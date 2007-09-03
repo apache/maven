@@ -532,6 +532,53 @@ public class DefaultLifecycleExecutor
         // if NEVER, don't blacklist
         return false;
     }
+    
+    public TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject )
+    {
+        if ( LifecycleUtils.isValidPhaseName( task ) )
+        {
+            return new TaskValidationResult();
+        }
+        else
+        {
+            MojoDescriptor mojo = null;
+            // definitely a CLI goal, can use prefix
+            try
+            {
+                mojo = getMojoDescriptorForDirectInvocation(
+                    task,
+                    session,
+                    rootProject );
+
+                return new TaskValidationResult();
+            }
+            catch ( PluginLoaderException e )
+            {
+                // TODO: shouldn't hit this, investigate using the same resolution logic as
+                // others for plugins in the reactor
+
+                return new TaskValidationResult( task, "Cannot find mojo descriptor for: \'" + task
+                        + "\' - Treating as non-aggregator." );
+            }
+            catch ( LifecycleSpecificationException e )
+            {
+                String message =
+                    "Invalid task '"
+                        + task
+                        + "': you must specify a valid lifecycle phase, or"
+                        + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+
+                return new TaskValidationResult( task, message );
+
+            }
+            catch ( LifecycleLoaderException e )
+            {
+                String message = "Cannot find plugin to match task '" + task + "'.";
+
+                return new TaskValidationResult( task, message );
+            }
+        }
+    }
 
     private List segmentTaskListByAggregationNeeds( final List tasks,
                                                     final MavenSession session,
@@ -542,8 +589,8 @@ public class DefaultLifecycleExecutor
 
         if ( rootProject != null )
         {
-
             TaskSegment currentSegment = null;
+
             for ( Iterator it = tasks.iterator(); it.hasNext(); )
             {
                 String task = (String) it.next();
@@ -568,7 +615,7 @@ public class DefaultLifecycleExecutor
                 else
                 {
                     MojoDescriptor mojo = null;
-                    // definitely a CLI goal, can use prefix
+
                     try
                     {
                         mojo = getMojoDescriptorForDirectInvocation(
@@ -576,37 +623,10 @@ public class DefaultLifecycleExecutor
                             session,
                             rootProject );
                     }
-                    catch ( PluginLoaderException e )
+                    catch ( Exception e )
                     {
-                        // TODO: shouldn't hit this, investigate using the same resolution logic as
-                        // others for plugins in the reactor
-                        getLogger().info(
-                            "Cannot find mojo descriptor for: \'" + task
-                                + "\' - Treating as non-aggregator." );
-
-                        getLogger().debug(
-                            "",
-                            e );
-                    }
-                    catch ( LifecycleSpecificationException e )
-                    {
-                        String message =
-                            "Invalid task '"
-                                + task
-                                + "': you must specify a valid lifecycle phase, or"
-                                + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-
-                        throw new BuildFailureException(
-                            message,
-                            e );
-                    }
-                    catch ( LifecycleLoaderException e )
-                    {
-                        String message = "Cannot find plugin to match task '" + task + "'.";
-
-                        throw new BuildFailureException(
-                            message,
-                            e );
+                        // Won't happen as we've validated. So we need to change the code so that
+                        // we don't have to do this.
                     }
 
                     // if the mojo descriptor was found, determine aggregator status according to:

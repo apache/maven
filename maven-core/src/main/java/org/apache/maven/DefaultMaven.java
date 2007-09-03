@@ -37,7 +37,7 @@ import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.LifecycleUtils;
+import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -171,7 +171,16 @@ public class DefaultMaven
     {
         request.setStartTime( new Date() );
 
-        initializeBuildContext( request );
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        ReactorManager reactorManager = createReactorManager(
+            request,
+            result );
+
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
 
@@ -181,20 +190,26 @@ public class DefaultMaven
             event,
             request.getBaseDirectory() );
 
-        MavenExecutionResult result = new DefaultMavenExecutionResult();
+        MavenSession session = createSession(
+            request,
+            reactorManager,
+            dispatcher );
+
+        for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
+        {
+            String goal = (String) i.next();
+
+            TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
+
+            if ( !tvr.isTaskValid() )
+            {
+                result.addException( new BuildFailureException( tvr.getMessage() ) );
+
+                return result;
+            }
+        }
 
         getLogger().info( "Scanning for projects..." );
-
-        ReactorManager reactorManager = createReactorManager(
-            request,
-            result );
-
-        // Check and make sure the creation of the reactor manager didn't cause a problem.
-
-        if ( result.hasExceptions() )
-        {
-            return result;
-        }
 
         if ( reactorManager.hasMultipleProjects() )
         {
@@ -208,10 +223,7 @@ public class DefaultMaven
             }
         }
 
-        MavenSession session = createSession(
-            request,
-            reactorManager,
-            dispatcher );
+        initializeBuildContext( request );
 
         try
         {

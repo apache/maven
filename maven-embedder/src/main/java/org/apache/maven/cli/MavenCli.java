@@ -402,7 +402,9 @@ public class MavenCli
                                    Exception e,
                                    boolean show )
     {
+        System.err.println();
         System.err.println( message );
+        System.err.println();
 
         if ( show )
         {
