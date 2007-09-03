@@ -159,7 +159,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0105Test.class );
         // suite.addTestSuite(MavenIT0106Test.class);
         // suite.addTestSuite(MavenIT0107Test.class);
-        suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class );
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3158
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
         //Superceded by IT0114 - see readme in resources folder
         //suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
