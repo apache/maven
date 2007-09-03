@@ -25,7 +25,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.SystemBuildContext;
-import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionBuildContext;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -63,14 +62,11 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author jason van zyl
@@ -99,12 +95,6 @@ public class DefaultMaven
     protected RuntimeInformation runtimeInformation;
 
     private BuildExtensionScanner buildExtensionScanner;
-
-    private static final long MB = 1024 * 1024;
-
-    private static final int MS_PER_SEC = 1000;
-
-    private static final int SEC_PER_MIN = 60;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -144,6 +134,8 @@ public class DefaultMaven
             reactorManager = new ReactorManager(
                 projects,
                 request.getReactorFailureBehavior() );
+
+            result.setReactorManager( reactorManager );
         }
         catch ( CycleDetectedException e )
         {
@@ -242,75 +234,6 @@ public class DefaultMaven
             return result;
         }
 
-        // old doExecute
-
-        if ( result.hasExceptions() )
-        {
-            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
-            {
-                Exception e = (Exception) i.next();
-
-                dispatcher.dispatchError(
-                    event,
-                    request.getBaseDirectory(),
-                    e );
-
-                logError(
-                    e,
-                    request.isShowErrors() );
-
-                stats( request.getStartTime() );
-
-                line();
-            }
-        }
-
-        // Either the build was successful, or it was a fail_at_end/fail_never reactor build
-
-        // TODO: should all the logging be left to the CLI?
-        logReactorSummary( reactorManager );
-
-        if ( reactorManager != null && reactorManager.hasBuildFailures() )
-        {
-            logErrors(
-                reactorManager,
-                request.isShowErrors() );
-
-            if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
-            {
-                dispatcher.dispatchError(
-                    event,
-                    request.getBaseDirectory(),
-                    null );
-
-                getLogger().info( "BUILD ERRORS" );
-
-                line();
-
-                stats( request.getStartTime() );
-
-                line();
-
-                result.addException( new MavenExecutionException( "Some builds failed" ) );
-
-                return result;
-            }
-            else
-            {
-                getLogger().info( " + Ignoring failures" );
-            }
-        }
-
-        logSuccess( reactorManager );
-
-        stats( request.getStartTime() );
-
-        line();
-
-        dispatcher.dispatchEnd(
-            event,
-            request.getBaseDirectory() );
-
         result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
 
         result.setProject( reactorManager.getTopLevelProject() );
@@ -333,38 +256,6 @@ public class DefaultMaven
 
         systemContext.setSystemProperties( request.getProperties() );
         systemContext.store( buildContextManager );
-    }
-
-    private void logErrors( ReactorManager rm,
-                            boolean showErrors )
-    {
-        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
-        {
-            MavenProject project = (MavenProject) it.next();
-
-            if ( rm.hasBuildFailure( project ) )
-            {
-                BuildFailure buildFailure = rm.getBuildFailure( project );
-
-                getLogger().info(
-                    "Error for project: " + project.getName() + " (during " + buildFailure.getTask() + ")" );
-
-                line();
-
-                logDiagnostics( buildFailure.getCause() );
-
-                logTrace(
-                    buildFailure.getCause(),
-                    showErrors );
-            }
-        }
-
-        if ( !showErrors )
-        {
-            getLogger().info( "For more information, run Maven with the -e switch" );
-
-            line();
-        }
     }
 
     private List getProjects( MavenExecutionRequest request )
@@ -430,66 +321,6 @@ public class DefaultMaven
                 e );
         }
         return projects;
-    }
-
-    private void logReactorSummaryLine( String name,
-                                        String status )
-    {
-        logReactorSummaryLine(
-            name,
-            status,
-            -1 );
-    }
-
-    private void logReactorSummaryLine( String name,
-                                        String status,
-                                        long time )
-    {
-        StringBuffer messageBuffer = new StringBuffer();
-
-        messageBuffer.append( name );
-
-        int dotCount = 54;
-
-        dotCount -= name.length();
-
-        messageBuffer.append( " " );
-
-        for ( int i = 0; i < dotCount; i++ )
-        {
-            messageBuffer.append( '.' );
-        }
-
-        messageBuffer.append( " " );
-
-        messageBuffer.append( status );
-
-        if ( time >= 0 )
-        {
-            messageBuffer.append( " [" );
-
-            messageBuffer.append( getFormattedTime( time ) );
-
-            messageBuffer.append( "]" );
-        }
-
-        getLogger().info( messageBuffer.toString() );
-    }
-
-    private static String getFormattedTime( long time )
-    {
-        String pattern = "s.SSS's'";
-        if ( time / 60000L > 0 )
-        {
-            pattern = "m:s" + pattern;
-            if ( time / 3600000L > 0 )
-            {
-                pattern = "H:m" + pattern;
-            }
-        }
-        DateFormat fmt = new SimpleDateFormat( pattern );
-        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-        return fmt.format( new Date( time ) );
     }
 
     private List collectProjects( List files,
@@ -642,223 +473,6 @@ public class DefaultMaven
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    // ----------------------------------------------------------------------
-    // Reporting / Logging
-    // ----------------------------------------------------------------------
-
-    protected void logFatal( Throwable error )
-    {
-        line();
-
-        getLogger().error( "FATAL ERROR" );
-
-        line();
-
-        logDiagnostics( error );
-
-        logTrace(
-            error,
-            true );
-    }
-
-    protected void logError( Exception e,
-                             boolean showErrors )
-    {
-        line();
-
-        getLogger().error( "BUILD ERROR" );
-
-        line();
-
-        logDiagnostics( e );
-
-        logTrace(
-            e,
-            showErrors );
-
-        if ( !showErrors )
-        {
-            getLogger().info( "For more information, run Maven with the -e switch" );
-
-            line();
-        }
-    }
-
-    protected void logFailure( BuildFailureException e,
-                               boolean showErrors )
-    {
-        line();
-
-        getLogger().error( "BUILD FAILURE" );
-
-        line();
-
-        logDiagnostics( e );
-
-        logTrace(
-            e,
-            showErrors );
-    }
-
-    private void logTrace( Throwable t,
-                           boolean showErrors )
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug(
-                "Trace",
-                t );
-
-            line();
-        }
-        else if ( showErrors )
-        {
-            getLogger().info(
-                "Trace",
-                t );
-
-            line();
-        }
-    }
-
-    private void logDiagnostics( Throwable t )
-    {
-        String message = null;
-        if ( errorDiagnostics != null )
-        {
-            message = errorDiagnostics.diagnose( t );
-        }
-
-        if ( message == null )
-        {
-            message = t.getMessage();
-        }
-
-        getLogger().info( message );
-
-        line();
-    }
-
-    protected void logSuccess( ReactorManager rm )
-    {
-        line();
-
-        getLogger().info( "BUILD SUCCESSFUL" );
-
-        line();
-    }
-
-    private void logReactorSummary( ReactorManager rm )
-    {
-        if ( rm != null && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
-        {
-            getLogger().info( "" );
-            getLogger().info( "" );
-
-            // -------------------------
-            // Reactor Summary:
-            // -------------------------
-            // o project-name...........FAILED
-            // o project2-name..........SKIPPED (dependency build failed or was skipped)
-            // o project-3-name.........SUCCESS
-
-            line();
-            getLogger().info( "Reactor Summary:" );
-            line();
-
-            for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
-            {
-                MavenProject project = (MavenProject) it.next();
-
-                if ( rm.hasBuildFailure( project ) )
-                {
-                    logReactorSummaryLine(
-                        project.getName(),
-                        "FAILED",
-                        rm.getBuildFailure( project ).getTime() );
-                }
-                else if ( rm.isBlackListed( project ) )
-                {
-                    logReactorSummaryLine(
-                        project.getName(),
-                        "SKIPPED (dependency build failed or was skipped)" );
-                }
-                else if ( rm.hasBuildSuccess( project ) )
-                {
-                    logReactorSummaryLine(
-                        project.getName(),
-                        "SUCCESS",
-                        rm.getBuildSuccess( project ).getTime() );
-                }
-                else
-                {
-                    logReactorSummaryLine(
-                        project.getName(),
-                        "NOT BUILT" );
-                }
-            }
-            line();
-        }
-    }
-
-    protected void stats( Date start )
-    {
-        Date finish = new Date();
-
-        long time = finish.getTime() - start.getTime();
-
-        getLogger().info( "Total time: " + formatTime( time ) );
-
-        getLogger().info( "Finished at: " + finish );
-
-        //noinspection CallToSystemGC
-        System.gc();
-
-        Runtime r = Runtime.getRuntime();
-
-        getLogger().info(
-            "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
-    }
-
-    protected void line()
-    {
-        getLogger().info( "------------------------------------------------------------------------" );
-    }
-
-    protected static String formatTime( long ms )
-    {
-        long secs = ms / MS_PER_SEC;
-
-        long min = secs / SEC_PER_MIN;
-
-        secs = secs % SEC_PER_MIN;
-
-        String msg = "";
-
-        if ( min > 1 )
-        {
-            msg = min + " minutes ";
-        }
-        else if ( min == 1 )
-        {
-            msg = "1 minute ";
-        }
-
-        if ( secs > 1 )
-        {
-            msg += secs + " seconds";
-        }
-        else if ( secs == 1 )
-        {
-            msg += "1 second";
-        }
-        else if ( min == 0 )
-        {
-            msg += "< 1 second";
-        }
-        return msg;
     }
 
     private List getProjectFiles( MavenExecutionRequest request )

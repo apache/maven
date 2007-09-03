@@ -30,16 +30,16 @@ import java.util.List;
 public interface MavenExecutionResult
 {
     MavenExecutionResult setProject( MavenProject project );
-
     MavenProject getProject();
 
     MavenExecutionResult setTopologicallySortedProjects( List projects );
-
     List getTopologicallySortedProjects();
 
     MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult result );
-
     ArtifactResolutionResult getArtifactResolutionResult();
+
+    MavenExecutionResult setReactorManager( ReactorManager reactorManager );
+    ReactorManager getReactorManager();
 
     // for each exception
     // - knowing what artifacts are missing
@@ -47,8 +47,6 @@ public interface MavenExecutionResult
     // - invalid project model exception: list of markers
     // - xmlpull parser exception
     List getExceptions();
-
     MavenExecutionResult addException( Throwable t );
-
     boolean hasExceptions();
 }

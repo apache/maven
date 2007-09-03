@@ -23,23 +23,35 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.Configuration;
+import org.apache.maven.embedder.ConfigurationValidationResult;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.embedder.ConfigurationValidationResult;
+import org.apache.maven.embedder.MavenEmbedderFileLogger;
+import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 /**
  * @author jason van zyl
@@ -68,6 +80,14 @@ public class MavenCli
     /** @noinspection ConfusingMainMethod */
     public static int main( String[] args,
                             ClassWorld classWorld )
+    {
+        MavenCli cli = new MavenCli();
+
+        return cli.doMain( args, classWorld );
+    }
+
+    public int doMain( String[] args,
+                       ClassWorld classWorld )
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -121,6 +141,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp();
+
             return 0;
         }
 
@@ -344,6 +365,19 @@ public class MavenCli
             .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
             .setClassWorld( classWorld );
 
+        if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            File logFile = new File(
+                baseDirectory,
+                commandLine.getOptionValue( CLIManager.LOG_FILE ) );
+
+            configuration.setMavenEmbedderLogger( new MavenEmbedderFileLogger( logFile ) );
+        }
+        else
+        {
+            configuration.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
+        }
+
         ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
@@ -372,6 +406,8 @@ public class MavenCli
         try
         {
             mavenEmbedder = new MavenEmbedder( configuration );
+
+            logger = mavenEmbedder.getLogger();
         }
         catch ( MavenEmbedderException e )
         {
@@ -382,40 +418,20 @@ public class MavenCli
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
+        logResult( request, result );
+
         if ( result.hasExceptions() )
         {
             showError( (Exception) result.getExceptions().get( 0 ), showErrors );
 
+            logger.close();
+
             return 1;
         }
 
+        logger.close();
+
         return 0;
-    }
-
-    private static void showError( Exception e,
-                                   boolean show )
-    {
-        showError( e.getMessage(), e, show );
-    }
-
-    private static void showError( String message,
-                                   Exception e,
-                                   boolean show )
-    {
-        System.err.println();
-        System.err.println( message );
-        System.err.println();
-
-        if ( show )
-        {
-            System.err.println( "Error stacktrace:" );
-
-            e.printStackTrace();
-        }
-        else
-        {
-            System.err.println( "For more information, run with the -e flag" );
-        }
     }
 
     private static void showVersion()
@@ -508,5 +524,315 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         System.setProperty( name, value );
+    }
+
+    // ----------------------------------------------------------------------
+    // Reporting / Logging
+    // ----------------------------------------------------------------------
+
+    private static final long MB = 1024 * 1024;
+
+    private static final int MS_PER_SEC = 1000;
+
+    private static final int SEC_PER_MIN = 60;
+
+    private MavenEmbedderLogger logger;
+
+    private MavenEmbedderLogger getLogger()
+    {
+        return logger;
+    }
+
+    private void logResult( MavenExecutionRequest request, MavenExecutionResult result )
+    {
+        ReactorManager reactorManager = result.getReactorManager();
+
+        // TODO: should all the logging be left to the CLI?
+        logReactorSummary( reactorManager );
+
+        if ( reactorManager != null && reactorManager.hasBuildFailures() )
+        {
+            logErrors(
+                reactorManager,
+                request.isShowErrors() );
+
+            if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
+            {
+                getLogger().info( "BUILD ERRORS" );
+
+                line();
+
+                stats( request.getStartTime() );
+
+                line();
+            }
+            else
+            {
+                getLogger().info( " + Ignoring failures" );
+            }
+        }
+
+        logSuccess( reactorManager );
+
+        stats( request.getStartTime() );
+
+        line();
+    }
+
+    private void logErrors( ReactorManager rm,
+                            boolean showErrors )
+    {
+        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
+        {
+            MavenProject project = (MavenProject) it.next();
+
+            if ( rm.hasBuildFailure( project ) )
+            {
+                BuildFailure buildFailure = rm.getBuildFailure( project );
+
+                getLogger().info(
+                    "Error for project: " + project.getName() + " (during " + buildFailure.getTask() + ")" );
+
+                line();
+
+                logTrace(
+                    buildFailure.getCause(),
+                    showErrors );
+            }
+        }
+
+        if ( !showErrors )
+        {
+            getLogger().info( "For more information, run Maven with the -e switch" );
+
+            line();
+        }
+    }
+
+    private static void showError( Exception e,
+                                   boolean show )
+    {
+        showError( e.getMessage(), e, show );
+    }
+
+    private static void showError( String message,
+                                   Exception e,
+                                   boolean show )
+    {
+        System.err.println();
+        System.err.println( message );
+        System.err.println();
+
+        if ( show )
+        {
+            System.err.println( "Error stacktrace:" );
+
+            e.printStackTrace();
+        }
+        else
+        {
+            System.err.println( "For more information, run with the -e flag" );
+        }
+    }
+    
+    private void logTrace( Throwable t,
+                           boolean showErrors )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Trace",
+                t );
+
+            line();
+        }
+        else if ( showErrors )
+        {
+            getLogger().info(
+                "Trace",
+                t );
+
+            line();
+        }
+    }
+
+    private void logSuccess( ReactorManager rm )
+    {
+        line();
+
+        getLogger().info( "BUILD SUCCESSFUL" );
+
+        line();
+    }
+
+    private void logReactorSummary( ReactorManager rm )
+    {
+        if ( rm != null && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
+        {
+            getLogger().info( "" );
+            getLogger().info( "" );
+
+            // -------------------------
+            // Reactor Summary:
+            // -------------------------
+            // o project-name...........FAILED
+            // o project2-name..........SKIPPED (dependency build failed or was skipped)
+            // o project-3-name.........SUCCESS
+
+            line();
+            getLogger().info( "Reactor Summary:" );
+            line();
+
+            for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
+            {
+                MavenProject project = (MavenProject) it.next();
+
+                if ( rm.hasBuildFailure( project ) )
+                {
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "FAILED",
+                        rm.getBuildFailure( project ).getTime() );
+                }
+                else if ( rm.isBlackListed( project ) )
+                {
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "SKIPPED (dependency build failed or was skipped)" );
+                }
+                else if ( rm.hasBuildSuccess( project ) )
+                {
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "SUCCESS",
+                        rm.getBuildSuccess( project ).getTime() );
+                }
+                else
+                {
+                    logReactorSummaryLine(
+                        project.getName(),
+                        "NOT BUILT" );
+                }
+            }
+            line();
+        }
+    }
+
+    private void stats( Date start )
+    {
+        Date finish = new Date();
+
+        long time = finish.getTime() - start.getTime();
+
+        getLogger().info( "Total time: " + formatTime( time ) );
+
+        getLogger().info( "Finished at: " + finish );
+
+        //noinspection CallToSystemGC
+        System.gc();
+
+        Runtime r = Runtime.getRuntime();
+
+        getLogger().info(
+            "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
+    }
+
+    private void line()
+    {
+        getLogger().info( "------------------------------------------------------------------------" );
+    }
+
+    private static String formatTime( long ms )
+    {
+        long secs = ms / MS_PER_SEC;
+
+        long min = secs / SEC_PER_MIN;
+
+        secs = secs % SEC_PER_MIN;
+
+        String msg = "";
+
+        if ( min > 1 )
+        {
+            msg = min + " minutes ";
+        }
+        else if ( min == 1 )
+        {
+            msg = "1 minute ";
+        }
+
+        if ( secs > 1 )
+        {
+            msg += secs + " seconds";
+        }
+        else if ( secs == 1 )
+        {
+            msg += "1 second";
+        }
+        else if ( min == 0 )
+        {
+            msg += "< 1 second";
+        }
+        return msg;
+    }
+
+    private void logReactorSummaryLine( String name,
+                                        String status )
+    {
+        logReactorSummaryLine(
+            name,
+            status,
+            -1 );
+    }
+
+    private void logReactorSummaryLine( String name,
+                                        String status,
+                                        long time )
+    {
+        StringBuffer messageBuffer = new StringBuffer();
+
+        messageBuffer.append( name );
+
+        int dotCount = 54;
+
+        dotCount -= name.length();
+
+        messageBuffer.append( " " );
+
+        for ( int i = 0; i < dotCount; i++ )
+        {
+            messageBuffer.append( '.' );
+        }
+
+        messageBuffer.append( " " );
+
+        messageBuffer.append( status );
+
+        if ( time >= 0 )
+        {
+            messageBuffer.append( " [" );
+
+            messageBuffer.append( getFormattedTime( time ) );
+
+            messageBuffer.append( "]" );
+        }
+
+        getLogger().info( messageBuffer.toString() );
+    }
+
+    private static String getFormattedTime( long time )
+    {
+        String pattern = "s.SSS's'";
+        if ( time / 60000L > 0 )
+        {
+            pattern = "m:s" + pattern;
+            if ( time / 3600000L > 0 )
+            {
+                pattern = "H:m" + pattern;
+            }
+        }
+        DateFormat fmt = new SimpleDateFormat( pattern );
+        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+        return fmt.format( new Date( time ) );
     }
 }

@@ -37,6 +37,8 @@ public class DefaultMavenExecutionResult
 
     private List exceptions;
 
+    private ReactorManager reactorManager;
+
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -93,5 +95,17 @@ public class DefaultMavenExecutionResult
     public boolean hasExceptions()
     {
         return (exceptions != null && exceptions.size() > 0 );
+    }
+
+    public ReactorManager getReactorManager()
+    {
+        return reactorManager;
+    }
+
+    public MavenExecutionResult setReactorManager( ReactorManager reactorManager )
+    {
+        this.reactorManager = reactorManager;
+
+        return this;
     }
 }

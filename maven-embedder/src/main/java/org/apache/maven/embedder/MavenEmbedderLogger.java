@@ -75,4 +75,6 @@ public interface MavenEmbedderLogger
     void setThreshold( int threshold );
 
     int getThreshold();
+
+    void close();
 }

@@ -84,6 +84,8 @@ public class CLIManager
 
     public static final String FAIL_NEVER = "fn";
 
+    public static final String LOG_FILE = "l";
+
     private Options options;
 
     public CLIManager()
@@ -156,6 +158,9 @@ public class CLIManager
 
         options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription(
             "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription(
+            "Log file to where all build output will go." ).create( LOG_FILE ) );
     }
 
     public CommandLine parse( String[] args )
@@ -179,8 +184,6 @@ public class CLIManager
         {
             String arg = args[i];
 
-//                System.out.println( "Processing raw arg: " + arg );
-
             boolean addedToBuffer = false;
 
             if ( arg.startsWith( "\"" ) )
@@ -189,7 +192,6 @@ public class CLIManager
                 // this is for the case: "-Dfoo=bar "-Dfoo2=bar two" (note the first unterminated quote)
                 if ( currentArg != null )
                 {
-//                        System.out.println( "Flushing last arg buffer: \'" + currentArg + "\' to cleaned list." );
                     cleaned.add( currentArg.toString() );
                 }
 
@@ -209,32 +211,24 @@ public class CLIManager
                     // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
                     if ( addedToBuffer )
                     {
-//                            System.out.println( "Adjusting argument already appended to the arg buffer." );
                         currentArg.setLength( currentArg.length() - 1 );
                     }
                     // otherwise, we trim the trailing " and append to the buffer.
                     else
                     {
-//                            System.out.println( "Appending arg part: \'" + cleanArgPart + "\' with preceding space to arg buffer." );
                         // TODO: introducing a space here...not sure what else to do but collapse whitespace
                         currentArg.append( ' ' ).append( cleanArgPart );
                     }
 
-//                        System.out.println( "Flushing completed arg buffer: \'" + currentArg + "\' to cleaned list." );
-
-                    // we're done with this argument, so add it.
                     cleaned.add( currentArg.toString() );
                 }
                 else
                 {
-//                        System.out.println( "appending cleaned arg: \'" + cleanArgPart + "\' directly to cleaned list." );
-                    // this is a simple argument...just add it.
                     cleaned.add( cleanArgPart );
                 }
 
-//                    System.out.println( "Clearing arg buffer." );
-                // the currentArg MUST be finished when this completes.
                 currentArg = null;
+
                 continue;
             }
 
@@ -244,39 +238,32 @@ public class CLIManager
             // NOTE: The case of a trailing quote is handled by nullifying the arg buffer.
             if ( !addedToBuffer )
             {
-                // append to the argument we're building, collapsing whitespace to a single space.
                 if ( currentArg != null )
                 {
-//                        System.out.println( "Append unquoted arg part: \'" + arg + "\' to arg buffer." );
                     currentArg.append( ' ' ).append( arg );
                 }
-                // this is a loner, just add it directly.
                 else
                 {
-//                        System.out.println( "Append unquoted arg part: \'" + arg + "\' directly to cleaned list." );
                     cleaned.add( arg );
                 }
             }
         }
 
-        // clean up.
         if ( currentArg != null )
         {
-//                System.out.println( "Adding unterminated arg buffer: \'" + currentArg + "\' to cleaned list." );
             cleaned.add( currentArg.toString() );
         }
 
         int cleanedSz = cleaned.size();
+
         String[] cleanArgs = null;
 
         if ( cleanedSz == 0 )
         {
-            // if we didn't have any arguments to clean, simply pass the original array through
             cleanArgs = args;
         }
         else
         {
-//                System.out.println( "Cleaned argument list:\n" + cleaned );
             cleanArgs = (String[]) cleaned.toArray( new String[cleanedSz] );
         }
 

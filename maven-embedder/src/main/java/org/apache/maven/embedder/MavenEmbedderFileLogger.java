@@ -1,4 +1,6 @@
-package org.apache.maven.embedder;/*
+package org.apache.maven.embedder;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,24 +19,37 @@ package org.apache.maven.embedder;/*
  * under the License.
  */
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+
 /**
- * Logger sending everything to the standard output streams.
- * This is mainly for the cases when you have a utility that
- * does not have a logger to supply.
- *
- * @author <a href="mailto:dev@avalon.codehaus.org">Avalon Development Team</a>
- * @version $Id$
+ * @author Jason van Zyl
  */
-public final class MavenEmbedderConsoleLogger
+public final class MavenEmbedderFileLogger
     extends AbstractMavenEmbedderLogger
 {
+    private PrintWriter log;
+
+    public MavenEmbedderFileLogger( File logFile )
+    {
+        try
+        {
+            this.log = new PrintWriter( logFile );
+        }
+        catch ( FileNotFoundException e )
+        {
+            // The client must make sure the file is valid.
+        }
+    }
+
     public void debug( String message,
                        Throwable throwable )
     {
         if ( isDebugEnabled() )
         {
-            System.out.print( "[DEBUG] " );
-            System.out.println( message );
+            print( "[DEBUG] " );
+            println( message );
 
             if ( null != throwable )
             {
@@ -48,8 +63,8 @@ public final class MavenEmbedderConsoleLogger
     {
         if ( isInfoEnabled() )
         {
-            System.out.print( "[INFO] " );
-            System.out.println( message );
+            print( "[INFO] " );
+            println( message );
 
             if ( null != throwable )
             {
@@ -63,8 +78,8 @@ public final class MavenEmbedderConsoleLogger
     {
         if ( isWarnEnabled() )
         {
-            System.out.print( "[WARNING] " );
-            System.out.println( message );
+            print( "[WARNING] " );
+            println( message );
 
             if ( null != throwable )
             {
@@ -78,8 +93,8 @@ public final class MavenEmbedderConsoleLogger
     {
         if ( isErrorEnabled() )
         {
-            System.out.print( "[ERROR] " );
-            System.out.println( message );
+            print( "[ERROR] " );
+            println( message );
 
             if ( null != throwable )
             {
@@ -93,8 +108,8 @@ public final class MavenEmbedderConsoleLogger
     {
         if ( isFatalErrorEnabled() )
         {
-            System.out.print( "[ERROR] " );
-            System.out.println( message );
+            print( "[ERROR] " );
+            println( message );
 
             if ( null != throwable )
             {
@@ -103,7 +118,20 @@ public final class MavenEmbedderConsoleLogger
         }
     }
 
+    protected void print( String message )
+    {
+        log.print( message );
+    }
+
+    protected void println( String message )
+    {
+        log.println( message );
+    }
+
     public void close()
     {
+        log.flush();
+
+        log.close();
     }
 }
