@@ -532,52 +532,64 @@ public class DefaultLifecycleExecutor
         // if NEVER, don't blacklist
         return false;
     }
-    
-    public TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject )
+
+    public TaskValidationResult isTaskValid( String task,
+                                             MavenSession session,
+                                             MavenProject rootProject )
     {
-        if ( LifecycleUtils.isValidPhaseName( task ) )
+        //jvz: have to investigate plugins that are run without a root project or using Maven in reactor mode. Looks like we
+        // were never validating these anyway if you look in the execution code.
+
+        if ( rootProject != null )
         {
-            return new TaskValidationResult();
+            if ( !LifecycleUtils.isValidPhaseName( task ) )
+            {
+                MojoDescriptor mojo = null;
+                // definitely a CLI goal, can use prefix
+                try
+                {
+                    mojo = getMojoDescriptorForDirectInvocation(
+                        task,
+                        session,
+                        rootProject );
+
+                    return new TaskValidationResult();
+                }
+                catch ( PluginLoaderException e )
+                {
+                    // TODO: shouldn't hit this, investigate using the same resolution logic as
+                    // others for plugins in the reactor
+
+                    return new TaskValidationResult(
+                        task,
+                        "Cannot find mojo descriptor for: \'" + task
+                            + "\' - Treating as non-aggregator." );
+                }
+                catch ( LifecycleSpecificationException e )
+                {
+                    String message =
+                        "Invalid task '"
+                            + task
+                            + "': you must specify a valid lifecycle phase, or"
+                            + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+
+                    return new TaskValidationResult(
+                        task,
+                        message );
+
+                }
+                catch ( LifecycleLoaderException e )
+                {
+                    String message = "Cannot find plugin to match task '" + task + "'.";
+
+                    return new TaskValidationResult(
+                        task,
+                        message );
+                }
+            }
         }
-        else
-        {
-            MojoDescriptor mojo = null;
-            // definitely a CLI goal, can use prefix
-            try
-            {
-                mojo = getMojoDescriptorForDirectInvocation(
-                    task,
-                    session,
-                    rootProject );
 
-                return new TaskValidationResult();
-            }
-            catch ( PluginLoaderException e )
-            {
-                // TODO: shouldn't hit this, investigate using the same resolution logic as
-                // others for plugins in the reactor
-
-                return new TaskValidationResult( task, "Cannot find mojo descriptor for: \'" + task
-                        + "\' - Treating as non-aggregator." );
-            }
-            catch ( LifecycleSpecificationException e )
-            {
-                String message =
-                    "Invalid task '"
-                        + task
-                        + "': you must specify a valid lifecycle phase, or"
-                        + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-
-                return new TaskValidationResult( task, message );
-
-            }
-            catch ( LifecycleLoaderException e )
-            {
-                String message = "Cannot find plugin to match task '" + task + "'.";
-
-                return new TaskValidationResult( task, message );
-            }
-        }
+        return new TaskValidationResult();
     }
 
     private List segmentTaskListByAggregationNeeds( final List tasks,

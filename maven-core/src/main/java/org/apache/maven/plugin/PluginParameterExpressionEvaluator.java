@@ -355,11 +355,7 @@ public class PluginParameterExpressionEvaluator
 
         if ( value == null )
         {
-            // Check POM-level properties before we default over to system properties.
-            if ( project != null && project.getProperties() != null )
-            {
-                value = project.getProperties().getProperty( expression );
-            }
+            // The CLI should win for defining properties
 
             if ( value == null && properties != null )
             {
@@ -370,6 +366,12 @@ public class PluginParameterExpressionEvaluator
 
                 value = properties.getProperty( expression );
             }
+
+            if ( value == null && ( project != null && project.getProperties() != null ) )
+            {
+                value = project.getProperties().getProperty( expression );
+            }
+
         }
 
         if ( value instanceof String )
