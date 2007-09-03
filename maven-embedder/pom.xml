@@ -220,7 +220,7 @@ under the License.
                 </goals>
                 <configuration>
                   <descriptor>src/main/assembly/bin.xml</descriptor>
-                  <finalName>maven-${version}</finalName>
+                  <finalName>maven-${pom.version}</finalName>
                 </configuration>
               </execution>
             </executions>
