@@ -1668,6 +1668,30 @@ public class MavenProject
                         return resultArtifact;
                     }
                 }
+
+                /**
+                 * Patch/workaround for: MNG-2871
+                 *
+                 * We want to use orginal artifact (packaging:ejb) when we are
+                 * resolving ejb-client package and we didn't manage to find
+                 * attached to project one.
+                 *
+                 * The scenario is such that somebody run "mvn test" in composity project,
+                 * and ejb-client.jar will not be attached to ejb.jar (because it is done in package phase)
+                 *
+                 * We prefer in such a case use orginal sources (of ejb.jar) instead of failure
+                 */
+                if ( ( ref.getArtifactId().equals( pluginArtifact.getArtifactId() ) ) &&
+                    ( ref.getGroupId().equals( pluginArtifact.getGroupId() ) ) &&
+                    ( ref.getArtifact().getType().equals( "ejb" ) ) &&
+                    ( pluginArtifact.getType().equals( "ejb-client" ) ) &&
+                    ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() ) )
+                {
+                    pluginArtifact = new ActiveProjectArtifact(
+                        ref,
+                        pluginArtifact );
+                    return pluginArtifact;
+                }
             }
         }
         return pluginArtifact;
