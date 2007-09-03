@@ -271,7 +271,7 @@ public class MavenCli
             {
                 transferListener = new BatchModeDownloadMonitor();
             }
-            
+
             transferListener.setShowChecksumEvents( false );
 
             // This means to scan a directory structure for POMs and process them.
@@ -348,14 +348,14 @@ public class MavenCli
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
         {
-            showFatalError( "Error reading user settings: " + cvr.getUserSettingsException().getMessage(), cvr.getUserSettingsException(), showErrors );
+            showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
 
             return 1;
         }
 
         if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
         {
-            showFatalError( "Error reading global settings: " + cvr.getGlobalSettingsException().getMessage(), cvr.getGlobalSettingsException(), showErrors );
+            showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
 
             return 1;
         }
@@ -375,17 +375,16 @@ public class MavenCli
         }
         catch ( MavenEmbedderException e )
         {
-            showFatalError( "Unable to start the embedded plexus container", e, showErrors );
+            showError( "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
 
-
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
         if ( result.hasExceptions() )
-        {                        
-            showFatalError( "Unable to configure the Maven application", (Exception) result.getExceptions().get( 0 ), showErrors );
+        {
+            showError( (Exception) result.getExceptions().get( 0 ), showErrors );
 
             return 1;
         }
@@ -393,11 +392,18 @@ public class MavenCli
         return 0;
     }
 
-    private static void showFatalError( String message,
-                                        Exception e,
-                                        boolean show )
+    private static void showError( Exception e,
+                                   boolean show )
     {
-        System.err.println( "FATAL ERROR: " + message );
+        showError( e.getMessage(), e, show );
+    }
+
+    private static void showError( String message,
+                                   Exception e,
+                                   boolean show )
+    {
+        System.err.println( message );
+
         if ( show )
         {
             System.err.println( "Error stacktrace:" );
@@ -407,19 +413,6 @@ public class MavenCli
         else
         {
             System.err.println( "For more information, run with the -e flag" );
-        }
-    }
-
-    private static void showError( String message,
-                                   Exception e,
-                                   boolean show )
-    {
-        System.err.println( message );
-        if ( show )
-        {
-            System.err.println( "Error stacktrace:" );
-
-            e.printStackTrace();
         }
     }
 

@@ -37,6 +37,7 @@ import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -225,6 +226,8 @@ public class DefaultMaven
                 new BuildFailureException(
                     e.getMessage(),
                     e ) );
+
+            return result;
         }
 
         // old doExecute
