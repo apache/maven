@@ -512,13 +512,13 @@ public class DefaultMaven
             if ( RELEASE_POMv4.equals( file.getName() ) )
             {
                 getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
+
                 usingReleasePom = true;
             }
 
-            MavenProject project = getProject(
+            MavenProject project = projectBuilder.build(
                 file,
                 localRepository,
-                settings,
                 globalProfileManager );
 
             if ( isRoot )
@@ -607,29 +607,6 @@ public class DefaultMaven
         }
 
         return projects;
-    }
-
-    public MavenProject getProject( File pom,
-                                    ArtifactRepository localRepository,
-                                    Settings settings,
-                                    ProfileManager globalProfileManager )
-        throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
-    {
-        if ( pom.exists() )
-        {
-            if ( pom.length() == 0 )
-            {
-                throw new ProjectBuildingException(
-                    "unknown",
-                    "The file " + pom.getAbsolutePath() +
-                        " you specified has zero length." );
-            }
-        }
-
-        return projectBuilder.build(
-            pom,
-            localRepository,
-            globalProfileManager );
     }
 
     // ----------------------------------------------------------------------

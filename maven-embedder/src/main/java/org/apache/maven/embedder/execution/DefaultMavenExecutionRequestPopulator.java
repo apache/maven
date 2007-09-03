@@ -75,9 +75,16 @@ public class DefaultMavenExecutionRequestPopulator
     {
         // Actual POM File
 
-        if ( request.getBaseDirectory() != null )
+        if ( request.getPomFile() == null && request.getBaseDirectory() != null )
         {
-            request.setPomFile( new File( request.getBaseDirectory(), Maven.POMv4 ).getAbsolutePath() );
+            File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
+
+            if ( !pom.exists() )
+            {
+                pom = new File( request.getBaseDirectory(), Maven.POMv4 );
+            }
+
+            request.setPomFile( pom.getAbsolutePath() );
         }
 
         if ( request.getSettings() == null )
