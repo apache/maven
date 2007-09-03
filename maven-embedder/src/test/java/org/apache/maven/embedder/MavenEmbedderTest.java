@@ -29,7 +29,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
@@ -46,18 +45,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class MavenEmbedderTest
     extends TestCase
 {
-    private String basedir;
+    protected String basedir;
 
-    private MavenEmbedder maven;
+    protected MavenEmbedder maven;
 
     protected void setUp()
         throws Exception
@@ -86,7 +83,7 @@ public class MavenEmbedderTest
         maven.stop();
     }
 
-    private void assertNoExceptions( MavenExecutionResult result )
+    protected void assertNoExceptions( MavenExecutionResult result )
     {
         List exceptions = result.getExceptions();
         if ( ( exceptions == null ) || exceptions.isEmpty() )
@@ -330,22 +327,6 @@ public class MavenEmbedderTest
         artifacts.iterator().next();
     }
 
-    public void testProjectWithExtensionsReading()
-        throws Exception
-    {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( new File( basedir, "src/test/resources/pom2.xml" ).getAbsolutePath() );
-
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        MavenExecutionResult result = new ExtendableMavenEmbedder( classLoader ).readProjectWithDependencies( request );
-
-        assertNoExceptions( result );
-
-        // sources, test sources, and the junit jar..
-        assertEquals( 3, result.getProject().getTestClasspathElements().size() );
-    }
-
     /*
     public void testProjectReadingWithDistributionStatus()
         throws Exception
@@ -532,73 +513,5 @@ public class MavenEmbedderTest
     protected File getPomFile()
     {
         return new File( basedir, "src/test/resources/pom.xml" );
-    }
-
-    private class ExtendableMavenEmbedder
-        extends MavenEmbedder
-    {
-
-        public ExtendableMavenEmbedder( ClassLoader classLoader )
-            throws MavenEmbedderException
-        {
-            super( new DefaultConfiguration()
-                .setClassLoader( classLoader )
-                .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() ) );
-        }
-
-        protected Map getPluginExtensionComponents( Plugin plugin )
-            throws PluginManagerException
-        {
-            Map toReturn = new HashMap();
-            MyArtifactHandler handler = new MyArtifactHandler();
-            toReturn.put( "mkleint", handler );
-            return toReturn;
-        }
-
-        protected void verifyPlugin( Plugin plugin,
-                                     MavenProject project )
-        {
-            //ignore don't want to actually verify in test
-        }
-    }
-
-    private class MyArtifactHandler
-        implements ArtifactHandler
-    {
-
-        public String getExtension()
-        {
-            return "jar";
-        }
-
-        public String getDirectory()
-        {
-            throw new UnsupportedOperationException( "Not supported yet." );
-        }
-
-        public String getClassifier()
-        {
-            return null;
-        }
-
-        public String getPackaging()
-        {
-            return "mkleint";
-        }
-
-        public boolean isIncludesDependencies()
-        {
-            return false;
-        }
-
-        public String getLanguage()
-        {
-            return "java";
-        }
-
-        public boolean isAddedToClasspath()
-        {
-            return true;
-        }
     }
 }

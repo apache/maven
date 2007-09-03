@@ -31,8 +31,8 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * We want to make sure when projects are newly created and have dependencies between them that
@@ -60,22 +60,31 @@ public class MavenEmbedderProjectNotInRepositoryTest
 
         MavenEmbedder embedder = new MavenEmbedder( configuration );
 
-        File projectDirectory = new File( getBasedir(), "src/test/projects/no-artifact-in-repository-test" );
+        File pom = new File( getBasedir(), "src/test/projects/no-artifact-in-repository-test" );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( projectDirectory );
+            .setBaseDirectory( pom );
 
         MavenExecutionResult result = embedder.readProjectWithDependencies( request );        
 
         List projects = result.getTopologicallySortedProjects();
 
-        /*
-        for ( Iterator i = projects.iterator(); i.hasNext(); )
-        {
-            MavenProject project = (MavenProject) i.next();
+        MavenProject project;
 
-            System.out.println( "project = " + project );
-        }
-        */
+        project = (MavenProject) projects.get( 0 );
+
+        assertEquals( "child-1", project.getArtifactId() );
+
+        project = (MavenProject) projects.get( 1 );
+
+        assertEquals( "child-2", project.getArtifactId() );
+
+        List deps = project.getDependencies();
+
+        assertEquals( 2, deps.size() );
+
+        project = (MavenProject) projects.get( 2 );
+
+        assertEquals( "parent", project.getArtifactId() );        
     }
 }

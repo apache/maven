@@ -96,6 +96,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -422,31 +423,34 @@ public class MavenEmbedder
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        MavenProject project;
-
         try
         {
             request = populator.populateDefaults( request, this );
-            //mkleint: copied from DefaultLifecycleExecutor
 
-            project = readProject( new File( request.getPomFile() ) );
+            // This is necessary to make the MavenEmbedderProjectWithExtensionReadingTest work which uses
+            // a custom type for a dependency like this:
+            //
+            // <dependency>
+            //   <groupId>junit</groupId>
+            //   <artifactId>junit</artifactId>
+            //   <version>3.8.1</version>
+            //   <scope>test</scope>
+            //   <type>mkleint</type>
+            // </dependency>
+            //
+            // If the artifact handlers are not loaded up-front then this dependency element is not
+            // registered as an artifact and is not added to the classpath elements.
+
+            MavenProject project = readProject( new File( request.getPomFile() ) );
 
             Map handlers = findArtifactTypeHandlers( project );
 
-            //is this necessary in this context, I doubt it..mkleint
             artifactHandlerManager.addHandlers( handlers );
-
         }
         catch ( Exception e )
         {
-            // At this point real project building, and artifact resolution have not occured.
-
-            result.addException( e );
-
-            return result;
+            return result.addException( e );
         }
-
-        MavenProjectBuildingResult r = null;
 
         ReactorManager reactorManager = maven.createReactorManager( request, result );
 
@@ -455,14 +459,11 @@ public class MavenEmbedder
             return result;
         }
 
-        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-
-        // Now I should be able to pass this projects to the next request so that I don't have to process
-        // any local projects again. And this logic is still too complicated.
+        MavenProjectBuildingResult projectBuildingResult = null;
 
         try
         {
-            r = mavenProjectBuilder.buildWithDependencies(
+            projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
                 new File( request.getPomFile() ),
                 request.getLocalRepository(),
                 profileManager,
@@ -473,10 +474,28 @@ public class MavenEmbedder
             result.addException( e );
         }
 
-        result.setProject( r.getProject() );
+        if ( reactorManager.hasMultipleProjects() )
+        {
+            result.setProject( projectBuildingResult.getProject() );
 
-        result.setArtifactResolutionResult( r.getArtifactResolutionResult() );
+            result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+        }
+        else
+        {
+            result.setProject( projectBuildingResult.getProject() );
 
+            result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
+        }
+
+        result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
+
+        // From this I could produce something that would help IDE integrators create importers:
+        // - topo sorted list of projects
+        // - binary dependencies
+        // - source dependencies (projects in the reactor)
+        //
+        // We could create a layer approach here. As to do anything you must resolve a projects artifacts,
+        // and with that set you could then subsequently execute goals for each of those project.
 
         return result;
     }

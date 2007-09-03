@@ -78,7 +78,7 @@ public class DefaultMavenExecutionResult
         return exceptions;
     }
 
-    public void addException( Throwable t )
+    public MavenExecutionResult addException( Throwable t )
     {
         if ( exceptions == null )
         {
@@ -86,6 +86,8 @@ public class DefaultMavenExecutionResult
         }
 
         exceptions.add( t );
+
+        return this;
     }
 
     public boolean hasExceptions()

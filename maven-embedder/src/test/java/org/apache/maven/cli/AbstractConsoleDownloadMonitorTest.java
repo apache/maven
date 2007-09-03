@@ -37,18 +37,7 @@ import org.apache.maven.wagon.resource.Resource;
 public abstract class AbstractConsoleDownloadMonitorTest
     extends TestCase
 {
-
-    private AbstractConsoleDownloadMonitor monitor;
-
-    public AbstractConsoleDownloadMonitorTest()
-    {
-        super();
-    }
-
-    public void setMonitor( AbstractConsoleDownloadMonitor monitor )
-    {
-        this.monitor = monitor;
-    }
+    protected AbstractConsoleDownloadMonitor monitor;
 
     public AbstractConsoleDownloadMonitor getMonitor()
     {

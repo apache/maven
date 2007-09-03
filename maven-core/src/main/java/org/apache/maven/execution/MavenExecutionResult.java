@@ -48,7 +48,7 @@ public interface MavenExecutionResult
     // - xmlpull parser exception
     List getExceptions();
 
-    void addException( Throwable t );
+    MavenExecutionResult addException( Throwable t );
 
     boolean hasExceptions();
 }

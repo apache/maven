@@ -31,8 +31,6 @@ public class BatchModeDownloadMonitorTest
     protected void setUp()
         throws Exception
     {
-        super.setMonitor( new BatchModeDownloadMonitor() );
-
-        super.setUp();
+        monitor = new BatchModeDownloadMonitor();
     }
 }

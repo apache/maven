@@ -21,19 +21,16 @@ package org.apache.maven.cli;
 
 /**
  * Test for {@link ConsoleDownloadMonitor}
- * 
+ *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @version $Id$
  */
 public class ConsoleDownloadMonitorTest
     extends AbstractConsoleDownloadMonitorTest
 {
-
     protected void setUp()
         throws Exception
     {
-        super.setMonitor( new ConsoleDownloadMonitor() );
-
-        super.setUp();
+        monitor = new ConsoleDownloadMonitor();
     }
 }
