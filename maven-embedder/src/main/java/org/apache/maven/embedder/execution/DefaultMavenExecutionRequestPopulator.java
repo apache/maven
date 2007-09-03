@@ -19,6 +19,7 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
+import org.apache.maven.Maven;
 import org.apache.maven.SettingsConfigurationException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -29,8 +30,8 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -72,6 +73,13 @@ public class DefaultMavenExecutionRequestPopulator
                                                    MavenEmbedder embedder )
         throws MavenEmbedderException
     {
+        // Actual POM File
+
+        if ( request.getBaseDirectory() != null )
+        {
+            request.setPomFile( new File( request.getBaseDirectory(), Maven.POMv4 ).getAbsolutePath() );
+        }
+
         if ( request.getSettings() == null )
         {
             request.setSettings( embedder.getSettings() );
