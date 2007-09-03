@@ -36,8 +36,12 @@ public class MavenIT0120EjbClientDependency
         verifier.deleteArtifact( "org.apache.maven.its.it0120", "parent", "1.0-SNAPSHOT", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.it0120", "client", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.it0120", "model", "1.0-SNAPSHOT", "ejb" );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
+
+	/* Not "install" or "higher" goal to repeat the bug */
+        verifier.executeGoal( "compile" ); 
+
+	verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
     }
 }

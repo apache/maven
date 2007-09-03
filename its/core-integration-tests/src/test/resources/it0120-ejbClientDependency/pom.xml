@@ -33,6 +33,6 @@ under the License.
     <module>client</module>
   </modules>
   <properties>
-    <issue>MNG-2921</issue>
+    <issue>MNG-2921,MNG-2871</issue>
   </properties>
 </project>
