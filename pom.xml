@@ -119,7 +119,6 @@ under the License.
     <module>maven-profile</module>
     <module>maven-project</module>
     <module>maven-reporting</module>
-    <module>maven-script</module>
     <module>maven-settings</module>
     <module>maven-embedder</module>
   </modules>
