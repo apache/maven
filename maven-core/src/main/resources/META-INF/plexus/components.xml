@@ -145,9 +145,6 @@ under the License.
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.usability.diagnostics.ErrorDiagnostics</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.execution.RuntimeInformation</role>
         </requirement>
       </requirements>

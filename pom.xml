@@ -112,10 +112,8 @@ under the License.
   <modules>
     <module>maven-build-context</module>
     <module>maven-core</module>
-    <module>maven-error-diagnostics</module>
     <module>maven-lifecycle</module>
     <module>maven-model</module>
-    <module>maven-monitor</module>
     <module>maven-plugin-api</module>
     <module>maven-plugin-descriptor</module>
     <module>maven-plugin-parameter-documenter</module>

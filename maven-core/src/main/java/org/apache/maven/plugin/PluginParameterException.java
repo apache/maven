@@ -94,7 +94,7 @@ public class PluginParameterException
                 messageBuffer.append( "\n\n-OR-\n\n" );
             }
 
-            addParameterUsageInfo( expression, messageBuffer );
+            //addParameterUsageInfo( expression, messageBuffer );
         }
     }
 

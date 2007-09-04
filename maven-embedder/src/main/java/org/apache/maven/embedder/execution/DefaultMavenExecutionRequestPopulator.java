@@ -36,7 +36,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -125,7 +124,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.isOffline() )
         {
-            getLogger().info( SystemWarnings.getOfflineWarning() );
+            getLogger().info( "You are working in offline mode." );
 
             wagonManager.setOnline( false );
         }

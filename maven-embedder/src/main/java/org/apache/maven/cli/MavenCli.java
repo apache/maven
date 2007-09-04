@@ -35,9 +35,9 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -422,16 +422,12 @@ public class MavenCli
 
         if ( result.hasExceptions() )
         {
-            showError( (Exception) result.getExceptions().get( 0 ), showErrors );
-
-            logger.close();
-
             return 1;
         }
-
-        logger.close();
-
-        return 0;
+        else
+        {
+            return 0;
+        }
     }
 
     private static void showVersion()
@@ -547,7 +543,6 @@ public class MavenCli
     {
         ReactorManager reactorManager = result.getReactorManager();
 
-        // TODO: should all the logging be left to the CLI?
         logReactorSummary( reactorManager );
 
         if ( reactorManager != null && reactorManager.hasBuildFailures() )
@@ -572,11 +567,29 @@ public class MavenCli
             }
         }
 
-        logSuccess( reactorManager );
+        if ( result.hasExceptions() )
+        {
+            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
+            {
+                Exception e = (Exception) i.next();
 
-        stats( request.getStartTime() );
+                showError( e.getMessage(), e, request.isShowErrors() );
+            }
+        }
+        else
+        {
+            line();
 
-        line();
+            getLogger().info( "BUILD SUCCESSFUL" );
+
+            line();
+
+            stats( request.getStartTime() );
+
+            line();
+        }
+
+        logger.close();
     }
 
     private void logErrors( ReactorManager rm,
@@ -594,10 +607,6 @@ public class MavenCli
                     "Error for project: " + project.getName() + " (during " + buildFailure.getTask() + ")" );
 
                 line();
-
-                logTrace(
-                    buildFailure.getCause(),
-                    showErrors );
             }
         }
 
@@ -607,12 +616,6 @@ public class MavenCli
 
             line();
         }
-    }
-
-    private static void showError( Exception e,
-                                   boolean show )
-    {
-        showError( e.getMessage(), e, show );
     }
 
     private static void showError( String message,
@@ -633,36 +636,6 @@ public class MavenCli
         {
             System.err.println( "For more information, run with the -e flag" );
         }
-    }
-    
-    private void logTrace( Throwable t,
-                           boolean showErrors )
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug(
-                "Trace",
-                t );
-
-            line();
-        }
-        else if ( showErrors )
-        {
-            getLogger().info(
-                "Trace",
-                t );
-
-            line();
-        }
-    }
-
-    private void logSuccess( ReactorManager rm )
-    {
-        line();
-
-        getLogger().info( "BUILD SUCCESSFUL" );
-
-        line();
     }
 
     private void logReactorSummary( ReactorManager rm )
