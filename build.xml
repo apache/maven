@@ -222,7 +222,6 @@ under the License.
     <!-- DGF TODO turn this into a big <apply> task? write a custom task? -->
     <modello file="maven-lifecycle/src/main/mdo/maven-lifecycle.mdo"/>
     <modello file="maven-plugin-descriptor/src/main/mdo/lifecycle.mdo"/>
-    <modello file="maven-plugin-parameter-documenter/src/main/mdo/paramdoc.mdo"/>
     <modello file="maven-profile/profiles.mdo"/>
     <modello file="maven-settings/src/main/mdo/settings.mdo"/>
   </target>
