@@ -126,5 +126,8 @@
     <!-- <module>it0124-pomExtensionComponentOverride</module> MNG-2771 -->
     <!-- <module>it0125-newestConflictResolver</module> MNG-612 -->
     <module>it0126-testJarDependency</module>
+    <!--
+    <module>it0127-antrunDependencies</module>
+    -->
   </modules>
 </project>
