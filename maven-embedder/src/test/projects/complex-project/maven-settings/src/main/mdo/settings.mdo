@@ -1,0 +1,1090 @@
+<?xml version="1.0"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<model>
+  <id>settings</id>
+  <name>Settings</name>
+  <description>
+    <![CDATA[
+    <p>This is a reference for the user-specific configuration for Maven.</p>
+    <p>Includes things that should not be distributed with the pom.xml file, such as developer identity, along with
+    local settings, like proxy information.</p>
+    <p>The default location for the settings file is <i>~/.m2/settings.xml</i></p>
+    <p>An XSD is available at:</p>
+    <ul>
+      <li><a href="http://maven.apache.org/xsd/settings-1.0.0.xsd">http://maven.apache.org/xsd/settings-1.0.0.xsd</a>.</li>
+    </ul>
+    ]]>
+  </description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.settings</value>
+    </default>
+  </defaults>
+  <classes>
+    <class>
+      <name>TrackableBase</name>
+      <version>1.0.0</version>
+      <description>
+        common base class that contains code to track the source for
+        this instance (USER|GLOBAL)
+      </description>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            <![CDATA[
+    public static final String USER_LEVEL = "user-level";
+    public static final String GLOBAL_LEVEL = "global-level";
+
+    private String sourceLevel = USER_LEVEL;
+    private boolean sourceLevelSet = false;
+
+    public void setSourceLevel( String sourceLevel )
+    {
+        if ( sourceLevelSet )
+        {
+            throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
+        }
+        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+        {
+            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+        }
+        else
+        {
+            this.sourceLevel = sourceLevel;
+            this.sourceLevelSet = true;
+        }
+    }
+
+    public String getSourceLevel()
+    {
+        return sourceLevel;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>IdentifiableBase</name>
+      <superClass>TrackableBase</superClass>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        Base class for <code>Mirror</code>, <code>Profile</code>, <code>Proxy</code> and <code>Server</code>.
+        ]]></description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    <class rootElement="true" xml.tagName="settings">
+      <name>Settings</name>
+      <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
+      <description>
+        Root element of the user configuration file.
+      </description>
+      <fields>
+        <field>
+          <name>localRepository</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The local repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>interactiveMode</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Whether Maven should attempt to interact with the user for input.
+            ]]>
+          </description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>usePluginRegistry</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Whether Maven should use the plugin-registry.xml file to manage plugin versions.
+            ]]>
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
+        <!-- field>
+          <name>passwordStore</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <description><![CDATA[The keystore used to store passwords.]]></description>
+          <type>String</type>
+          </field -->
+        <field>
+          <name>offline</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Indicate whether maven should operate in offline mode full-time.
+            ]]>
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
+        <!-- field>
+          <name>jdks</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+          Configuration for different java environment profiles. One good use
+          for this might be to configure both JDK 1.4 and JDK 1.5 to work with
+          maven. Profiles will allow switching of entire java environments
+          based on the profile id, either in the defaults section below, or on
+          the command line.
+          ]]></description>
+          <association>
+          <type>Jdk</type>
+          <multiplicity>*</multiplicity>
+          </association>
+          </field -->
+        <field>
+          <name>proxies</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Configuration for different proxy profiles. Multiple proxy profiles
+            might come in handy for anyone working from a notebook or other
+            mobile platform, to enable easy switching of entire proxy
+            configurations by simply specifying the profile id, again either from
+            the command line or from the defaults section below.
+            ]]>
+          </description>
+          <association>
+            <type>Proxy</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>servers</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Configuration of server-specific settings, mainly authentication
+            method. This allows configuration of authentication on a per-server
+            basis.
+            ]]>
+          </description>
+          <association>
+            <type>Server</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>mirrors</name>
+          <version>1.0.0</version>
+          <description>
+            Configuration of download mirrors for repositories.
+          </description>
+          <association>
+            <type>Mirror</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>profiles</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Configuration of build profiles for adjusting the build
+            according to environmental parameters.
+            ]]>
+          </description>
+          <association>
+            <type>Profile</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>activeProfiles</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            List of manually-activated build profiles, specified in the order in which
+            they should be applied.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginGroups</name>
+          <version>1.0.0</version>
+          <description>
+            List of groupIds to search for a plugin when that plugin
+            groupId is not explicitly provided.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            <![CDATA[
+    public Boolean getInteractiveMode()
+    {
+        return Boolean.valueOf( isInteractiveMode() );
+    }
+
+    private Proxy activeProxy;
+
+    /**
+     * Reset the <code>activeProxy</code> field to <code>null</code>
+     */
+    public void flushActiveProxy()
+    {
+        this.activeProxy = null;
+    }
+
+    /**
+     * @return the first active proxy
+     */
+    public synchronized Proxy getActiveProxy()
+    {
+        if(activeProxy == null)
+        {
+            java.util.List proxies = getProxies();
+            if ( proxies != null && !proxies.isEmpty() )
+            {
+                if ( proxies.size() > 1 )
+                {
+                    for ( java.util.Iterator it = proxies.iterator(); it.hasNext(); )
+                    {
+                        Proxy proxy = (Proxy) it.next();
+                        if ( proxy.isActive() )
+                        {
+                            activeProxy = proxy;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // If we only have one proxy, use it as the active one.
+                    activeProxy = (Proxy) proxies.get( 0 );
+                }
+            }
+        }
+
+        return activeProxy;
+    }
+
+    public Server getServer( String serverId )
+    {
+        Server match = null;
+
+        java.util.List servers = getServers();
+        if ( servers != null && serverId != null )
+        {
+            for ( java.util.Iterator it = servers.iterator(); it.hasNext(); )
+            {
+                Server server = (Server) it.next();
+                if ( serverId.equals( server.getId() ) )
+                {
+                    match = server;
+                    break;
+                }
+            }
+        }
+
+        return match;
+    }
+
+    public Mirror getMirrorOf( String repositoryId )
+    {
+        Mirror match = null;
+
+        java.util.List mirrors = getMirrors();
+        if ( mirrors != null && repositoryId != null )
+        {
+            for ( java.util.Iterator it = mirrors.iterator(); it.hasNext(); )
+            {
+                Mirror mirror = (Mirror) it.next();
+                if ( repositoryId.equals( mirror.getMirrorOf() ) )
+                {
+                    match = mirror;
+                    break;
+                }
+            }
+        }
+
+        return match;
+    }
+
+    private java.util.Map profileMap;
+
+    /**
+     * Reset the <code>profileMap</code> field to <code>null</code>
+     */
+    public void flushProfileMap()
+    {
+        this.profileMap = null;
+    }
+
+    /**
+     * @return a Map of profiles field with <code>Profile#getId()</code> as key
+     * @see org.apache.maven.settings.Profile#getId()
+     */
+    public java.util.Map getProfilesAsMap()
+    {
+        if ( profileMap == null )
+        {
+            profileMap = new java.util.HashMap();
+
+            if ( getProfiles() != null )
+            {
+                for ( java.util.Iterator it = getProfiles().iterator(); it.hasNext(); )
+                {
+                    Profile profile = (Profile) it.next();
+
+                    profileMap.put( profile.getId(), profile );
+                }
+            }
+        }
+
+        return profileMap;
+    }
+
+    private RuntimeInfo runtimeInfo;
+
+    public void setRuntimeInfo( RuntimeInfo runtimeInfo )
+    {
+        this.runtimeInfo = runtimeInfo;
+    }
+
+    public RuntimeInfo getRuntimeInfo()
+    {
+        return runtimeInfo;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
+    <!-- [JC] Commenting out until we're ready to use it... -->
+    <!-- class>
+      <name>Jdk</name>
+      <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
+      <description><![CDATA[Describes one Java environment]]></description>
+      <fields>
+      <field>
+      <name>active</name>
+      <version>1.0.0</version>
+      <required>false</required>
+      <defaultValue>false</defaultValue>
+      <description><![CDATA[Whether this JDK is the active one.]]></description>
+      <type>boolean</type>
+      </field>
+      <field>
+      <name>version</name>
+      <version>1.0.0</version>
+      <required>true</required>
+      <description><![CDATA[The JDK major version (eg. '1.4').]]></description>
+      <type>String</type>
+      </field>
+      <field>
+      <name>javaHome</name>
+      <version>1.0.0</version>
+      <required>true</required>
+      <description><![CDATA[The JDK home.]]></description>
+      <type>String</type>
+      </field>
+      </fields>
+      </class -->
+    <class>
+      <name>Proxy</name>
+      <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;proxy&gt;</code> element contains informations required to a proxy settings.
+        ]]></description>
+      <fields>
+        <field>
+          <name>active</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <defaultValue>false</defaultValue>
+          <description>
+            <![CDATA[
+            Whether this proxy configuration is the active one.
+            ]]>
+          </description>
+          <type>boolean</type>
+        </field>
+        <field>
+          <name>protocol</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The proxy protocol.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>http</defaultValue>
+        </field>
+        <field>
+          <name>username</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The proxy user.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>password</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The proxy password.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>port</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The proxy port.
+            ]]>
+          </description>
+          <type>int</type>
+          <defaultValue>8080</defaultValue>
+        </field>
+        <field>
+          <name>host</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The proxy host.
+            ]]>
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>nonProxyHosts</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The list of non-proxied hosts (delimited by |).
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Server</name>
+      <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;server&gt;</code> element contains informations required to a server settings.
+        ]]></description>
+      <fields>
+        <field>
+          <name>username</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The username used to authenticate.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>password</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The password used in conjunction with the username to authenticate.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>privateKey</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The private key location used to authenticate.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>passphrase</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The passphrase used in conjunction with the privateKey to authenticate.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filePermissions</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The permissions for files when they are created.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>directoryPermissions</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The permissions for directories when they are created.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <type>DOM</type>
+          <description>
+            <![CDATA[
+            Extra configuration for the transport layer.
+            ]]>
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Mirror</name>
+      <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
+      <description>
+        A download mirror for a given repository.
+      </description>
+      <fields>
+        <field>
+          <name>mirrorOf</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The server ID of the repository being mirrored, eg
+            "central". This MUST NOT match the mirror id.
+          </description>
+        </field>
+        <field>
+          <name>name</name>
+          <required>false</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The optional name that describes the mirror.
+          </description>
+        </field>
+        <field>
+          <name>url</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The URL of the mirror repository.</description>
+        </field>
+        <!--
+          <field>
+          <name>allowOriginal</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+          <description>
+          Whether to allow the user of the original as a fallback if an artifact is not found on the mirror.
+          </description>
+          </field>
+        -->
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            <![CDATA[
+
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append( "Mirror[" );
+        sb.append( "id=" ).append( this.getId() );
+        sb.append( ",mirrorOf=" ).append( mirrorOf );
+        sb.append( ",url=" ).append( this.url );
+        sb.append( ",name=" ).append( this.name );
+        sb.append( "]" );
+        return sb.toString();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <!-- Profile support -->
+    <class>
+      <name>Profile</name>
+      <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
+      <description>
+        <![CDATA[
+        Modifications to the build process which is keyed on some
+        sort of environmental parameter.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>activation</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The conditional logic which will automatically
+            trigger the inclusion of this profile.
+            ]]>
+          </description>
+          <association>
+            <type>Activation</type>
+          </association>
+        </field>
+        <field>
+          <name>properties</name>
+          <description>
+            Extended configuration specific to this profile goes here.
+            Contents take the form of
+            &lt;property.name&gt;property.value&lt;/property.name&gt;
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>repositories</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories for discovering plugins.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <comment>
+            <![CDATA[
+            This may be removed or relocated in the near
+            future. It is undecided whether plugins really need a remote
+            repository set of their own.
+            ]]>
+          </comment>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Activation</name>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        The conditions within the build runtime environment which will trigger
+        the automatic inclusion of the parent build profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>activeByDefault</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <description>
+            Flag specifying whether this profile is active as a default.
+          </description>
+        </field>
+        <field>
+          <name>jdk</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when a matching JDK is detected.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>os</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when matching OS attributes are detected.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationOS</type>
+          </association>
+        </field>
+        <field>
+          <name>property</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when this System property is specified.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationProperty</type>
+          </association>
+        </field>
+        <field>
+          <name>file</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated based on existence of a file.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationFile</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <!-- TODO: reproduced from maven-model/maven.mdo, instead should inherit code and link to external docs -->
+    <class>
+      <name>RepositoryBase</name>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        Repository contains the information needed
+        for establishing connections with remote repoistory
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            A unique identifier for a repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            Human readable name of the repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.0</version>
+          <description>
+            <![CDATA[
+            The url of the repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>layout</name>
+          <version>1.0.0</version>
+          <description>
+            The type of layout this repository uses for locating and
+            storing artifacts - can be "legacy" or "default".
+          </description>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        RepositoryBase other =  (RepositoryBase) obj;
+
+        boolean retValue = false;
+
+        if ( id != null )
+        {
+            retValue = id.equals( other.id );
+        }
+
+        return retValue;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>Repository</name>
+      <superClass>RepositoryBase</superClass>
+      <version>1.0.0</version>
+      <description>
+        Repository contains the information needed for establishing
+        connections with remote repoistory
+      </description>
+      <fields>
+        <field>
+          <name>releases</name>
+          <version>1.0.0</version>
+          <description>
+            How to handle downloading of releases from this repository
+          </description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+        <field>
+          <name>snapshots</name>
+          <version>1.0.0</version>
+          <description>
+            How to handle downloading of snapshots from this repository
+          </description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+      </fields>
+      <!-- prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see org.apache.maven.settings.RepositoryBase#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>RepositoryPolicy</name>
+      <version>1.0.0</version>
+      <description>Download policy</description>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>1.0.0</version>
+          <description>
+            Whether to use this repository for downloading this type of
+            artifact.
+          </description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>updatePolicy</name>
+          <version>1.0.0</version>
+          <description>
+            The frequency for downloading updates - can be "always",
+            "daily" (default), "interval:XXX" (in minutes) or "never"
+            (only if it doesn't exist locally).
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksumPolicy</name>
+          <version>1.0.0</version>
+          <description>
+            What to do when verification of an artifact checksum fails -
+            warn, fail, etc. Valid values are "fail" or "warn".
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ActivationProperty</name>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        This is the property specification used to activate a profile. If the value field is empty,
+        then the existence of the named property will activate the profile, otherwise it does a case-sensitive
+        match against the property value as well.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <description>
+            The name of the property to be used to activate a profile.
+          </description>
+        </field>
+        <field>
+          <name>value</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The value of the property to be used to activate a profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationOS</name>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        This is an activator which will detect an operating system's attributes in order to activate
+        its profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The name of the OS to be used to activate a profile.
+          </description>
+        </field>
+        <field>
+          <name>family</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The general family of the OS to be used to activate a
+            profile (e.g. 'windows')
+          </description>
+        </field>
+        <field>
+          <name>arch</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The architecture of the OS to be used to activate a profile.
+          </description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The version of the OS to be used to activate a profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationFile</name>
+      <version>1.0.0</version>
+      <description>
+        <![CDATA[
+        This is the file specification used to activate a profile. The missing value will be a the location
+        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test
+        for the existence of the file and if it is there will run the profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>missing</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The name of the file that should be missing to activate a
+            profile.
+          </description>
+        </field>
+        <field>
+          <name>exists</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The name of the file that should exist to activate a profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <!-- /BuildProfile support -->
+  </classes>
+</model>

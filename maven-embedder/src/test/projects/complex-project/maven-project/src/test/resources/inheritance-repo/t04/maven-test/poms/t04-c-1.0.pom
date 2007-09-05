@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven-test</groupId>
+  <artifactId>t04-c</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+</project>

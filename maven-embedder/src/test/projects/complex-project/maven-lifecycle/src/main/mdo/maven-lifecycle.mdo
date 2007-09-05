@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<!-- 
+    *** NOTE: If you add a new lifecycle or phase, be sure to update the codeSegments! *** 
+-->
+<model>
+  <id>build-lifecycle</id>
+  <name>LifecycleBindings</name>
+  <description>Model for lifecycle specifications starting in Maven 2.1</description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.lifecycle.model</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="lifecycles">
+      <name>LifecycleBindings</name>
+      <version>1.0.0</version>
+      <description>Specifies phase bindings for clean, site, and default lifecycles.</description>
+      <fields>
+        <field>
+          <version>1.0.0</version>
+          <name>packaging</name>
+          <type>String</type>
+          <required>true</required>
+          <description>POM packaging to which this lifecycle specification applies.</description>
+        </field>
+        <field xml.tagName="clean">
+          <version>1.0.0</version>
+          <name>cleanBinding</name>
+          <defaultValue>new CleanBinding()</defaultValue>
+          <description>The binding for the clean lifecycle</description>
+          <association>
+            <type>CleanBinding</type>
+          </association>
+        </field>
+        <field xml.tagName="build">
+          <version>1.0.0</version>
+          <name>buildBinding</name>
+          <defaultValue>new BuildBinding()</defaultValue>
+          <description>The binding for the main build (default) lifecycle</description>
+          <association>
+            <type>BuildBinding</type>
+          </association>
+        </field>
+        <field xml.tagName="site">
+          <version>1.0.0</version>
+          <name>siteBinding</name>
+          <defaultValue>new SiteBinding()</defaultValue>
+          <description>The binding for the site lifecycle</description>
+          <association>
+            <type>SiteBinding</type>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public java.util.List getBindingList()
+    {
+        java.util.List lifecycles = new java.util.ArrayList();
+        
+        if ( getCleanBinding() != null )
+        {
+            lifecycles.add( getCleanBinding() );
+        }
+        
+        if ( getBuildBinding() != null )
+        {
+            lifecycles.add( getBuildBinding() );
+        }
+        
+        if ( getSiteBinding() != null )
+        {
+            lifecycles.add( getSiteBinding() );
+        }
+        
+        return java.util.Collections.unmodifiableList( lifecycles );
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>LifecycleBinding</name>
+      <version>1.0.0</version>
+      <description>Base-class for all lifecycle bindings.</description>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getId()
+    {
+        throw new UnsupportedOperationException( "Unsupported in base-class." );
+    }
+          
+    public java.util.List getPhasesInOrder()
+    {
+        throw new UnsupportedOperationException( "Unsupported in base-class." );
+    }
+    
+    public java.util.List getPhaseNamesInOrder()
+    {
+        throw new UnsupportedOperationException( "Unsupported in base-class." );
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>CleanBinding</name>
+      <superClass>LifecycleBinding</superClass>
+      <version>1.0.0</version>
+      <fields>
+        <field xml.tagName="pre-clean">
+          <name>preClean</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="clean">
+          <name>clean</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="post-clean">
+          <name>postClean</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getId()
+    {
+        return "clean";
+    }
+          
+    public java.util.List getPhasesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( getPreClean() );
+        phases.add( getClean() );
+        phases.add( getPostClean() );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+    
+    public java.util.List getPhaseNamesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( "pre-clean" );
+        phases.add( "clean" );
+        phases.add( "post-clean" );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>BuildBinding</name>
+      <superClass>LifecycleBinding</superClass>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>validate</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field>
+          <name>initialize</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="generate-sources">
+          <name>generateSources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-sources">
+          <name>processSources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="generate-resources">
+          <name>generateResources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-resources">
+          <name>processResources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field>
+          <name>compile</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-classes">
+          <name>processClasses</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="generate-test-sources">
+          <name>generateTestSources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-test-sources">
+          <name>processTestSources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="generate-test-resources">
+          <name>generateTestResources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-test-resources">
+          <name>processTestResources</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="test-compile">
+          <name>testCompile</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="process-test-classes">
+          <name>processTestClasses</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="test">
+          <name>test</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="prepare-package">
+          <name>preparePackage</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="package">
+          <name>createPackage</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="pre-integration-test">
+          <name>preIntegrationTest</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="integration-test">
+          <name>integrationTest</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="post-integration-test">
+          <name>postIntegrationTest</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field>
+          <name>verify</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field>
+          <name>install</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field>
+          <name>deploy</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getId()
+    {
+        return "build";
+    }
+          
+    public java.util.List getPhasesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( getValidate() );
+        phases.add( getInitialize() );
+        phases.add( getGenerateSources() );
+        phases.add( getProcessSources() );
+        phases.add( getGenerateResources() );
+        phases.add( getProcessResources() );
+        phases.add( getCompile() );
+        phases.add( getProcessClasses() );
+        phases.add( getGenerateTestSources() );
+        phases.add( getProcessTestSources() );
+        phases.add( getGenerateTestResources() );
+        phases.add( getProcessTestResources() );
+        phases.add( getTestCompile() );
+        phases.add( getProcessTestClasses() );
+        phases.add( getTest() );
+        phases.add( getPreparePackage() );
+        phases.add( getCreatePackage() );
+        phases.add( getPreIntegrationTest() );
+        phases.add( getIntegrationTest() );
+        phases.add( getPostIntegrationTest() );
+        phases.add( getVerify() );
+        phases.add( getInstall() );
+        phases.add( getDeploy() );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+    
+    public java.util.List getPhaseNamesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( "validate" );
+        phases.add( "initialize" );
+        phases.add( "generate-sources" );
+        phases.add( "process-sources" );
+        phases.add( "generate-resources" );
+        phases.add( "process-resources" );
+        phases.add( "compile" );
+        phases.add( "process-classes" );
+        phases.add( "generate-test-sources" );
+        phases.add( "process-test-sources" );
+        phases.add( "generate-test-resources" );
+        phases.add( "process-test-resources" );
+        phases.add( "test-compile" );
+        phases.add( "process-test-classes" );
+        phases.add( "test" );
+        phases.add( "prepare-package" );
+        phases.add( "package" );
+        phases.add( "pre-integration-test" );
+        phases.add( "integration-test" );
+        phases.add( "post-integration-test" );
+        phases.add( "verify" );
+        phases.add( "install" );
+        phases.add( "deploy" );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>SiteBinding</name>
+      <superClass>LifecycleBinding</superClass>
+      <version>1.0.0</version>
+      <fields>
+        <field xml.tagName="pre-site">
+          <name>preSite</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="site">
+          <name>site</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="post-site">
+          <name>postSite</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+        <field xml.tagName="site-deploy">
+          <name>siteDeploy</name>
+          <version>1.0.0</version>
+          <defaultValue>new Phase()</defaultValue>
+          <association>
+            <type>Phase</type>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getId()
+    {
+        return "site";
+    }
+          
+    public java.util.List getPhasesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( getPreSite() );
+        phases.add( getSite() );
+        phases.add( getPostSite() );
+        phases.add( getSiteDeploy() );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+    
+    public java.util.List getPhaseNamesInOrder()
+    {
+        java.util.List phases = new java.util.ArrayList();
+        
+        phases.add( "pre-site" );
+        phases.add( "site" );
+        phases.add( "post-site" );
+        phases.add( "site-deploy" );
+        
+        return java.util.Collections.unmodifiableList( phases );
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Phase</name>
+      <version>1.0.0</version>
+      <description>Contains a series of mojo bindings for a given phase of a lifecycle.</description>
+      <fields>
+        <field>
+          <name>bindings</name>
+          <version>1.0.0</version>
+          <description>Collection of mojo bindings for a phase.</description>
+          <association>
+            <type>MojoBinding</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>LifecycleStep</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        Some step in the build process. This could be a mojo, or it could be a signal to start/stop 
+        forked-mode of execution, etc.
+      ]]></description>
+    </class>
+    <class>
+      <name>MojoBinding</name>
+      <superClass>LifecycleStep</superClass>
+      <version>1.0.0</version>
+      <description>A binding of one mojo to one lifecycle phase, possibly including configuration.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <required>true</required>
+          <identifier>true</identifier>
+          <version>1.0.0</version>
+          <description>Plugin's groupId.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <required>true</required>
+          <identifier>true</identifier>
+          <version>1.0.0</version>
+          <description>Plugin's artifactId.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>Plugin's version.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>goal</name>
+          <required>true</required>
+          <identifier>true</identifier>
+          <version>1.0.0</version>
+          <description>Mojo's goal name.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>executionId</name>
+          <version>1.0.0</version>
+          <identifier>true</identifier>
+          <defaultValue>default</defaultValue>
+          <description>A name for this mojo binding, for purposes of merging configurations via inheritance, etc.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>origin</name>
+          <type>String</type>
+          <description>Specific location from which this set of mojo binding was loaded.</description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>1.0.0</version>
+          <description>Mojo binding's configuration.</description>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>optional</name>
+          <version>1.0.0</version>
+          <description>Marks a mojo binding as optional (not required for execution of the lifecycle).</description>
+          <type>boolean</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    private boolean lateBound = false;
+          
+    public boolean isLateBound()
+    {
+        return lateBound;
+    }
+          
+    public void setLateBound( boolean lateBound )
+    {
+        this.lateBound = lateBound;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
+</model>

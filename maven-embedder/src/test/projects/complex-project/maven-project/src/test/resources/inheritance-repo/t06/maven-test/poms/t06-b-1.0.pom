@@ -1,0 +1,24 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven-test</groupId>
+  <artifactId>t06-b</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>t06-c</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>t06-d</artifactId>
+      <version>1.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>false</optional>
+    </dependency>
+  </dependencies>
+</project>

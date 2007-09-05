@@ -1,0 +1,18 @@
+<project>
+  <parent>
+    <artifactId>p1</artifactId>
+    <groupId>maven</groupId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>p2</artifactId>
+  <packaging>pom</packaging>
+  <name>p2</name>
+  <version>1.0</version>
+  <mailingLists>
+    <mailingList>
+      <name>mailing-list</name>
+    </mailingList>
+  </mailingLists>
+</project>

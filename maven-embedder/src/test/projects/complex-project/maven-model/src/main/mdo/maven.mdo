@@ -1,0 +1,3902 @@
+<?xml version="1.0"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<!--
+  |
+  | o add specification element to a field, this would be more a technical description of
+  |   what is allowed in the field.
+  |
+  | o validators: there could be several levels of validation. Simple type validation could
+  |   be done with a regex, but we need inter-field validation and rules which could be
+  |   dealt with by something like drools.
+  |
+  | o i18n: would be good to be able to have names/descriptions/specifications
+  |   in as many languages as possible.
+  |
+  | o annotation mechanism so that changes to the model can be accurately tracked.
+  |
+  | o need to clean up all the descriptions, matching anything to the current project-descriptor.xml file and
+  |   improving on that
+  |
+  | o use enums where appropriate (eg dependency scope)
+  |
+  | o a number of elements have a grouId/artifactId and sometimes version. It would be good to have them all extend one
+  |   definition of these types
+  |
+-->
+<model xsd.namespace="http://maven.apache.org/POM/4.0.0"
+  xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
+  <id>maven</id>
+  <name>Maven</name>
+  <description>
+    <![CDATA[
+    <p>This is a reference for the Maven project descriptor used in Maven.</p>
+    <p>An XSD is available at:</p>
+    <ul>
+      <li><a href="http://maven.apache.org/maven-v3_0_0.xsd">http://maven.apache.org/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
+      <li><a href="http://maven.apache.org/maven-v4_0_0.xsd">http://maven.apache.org/maven-v4_0_0.xsd</a> for Maven 2.0.</li>
+    </ul>
+    ]]>
+  </description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.model</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="project">
+      <name>Model</name>
+      <superClass>ModelBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;project&gt;</code> element is the root of the descriptor.
+        The following table lists all of the possible child elements.
+        ]]>
+      </description>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>extend</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The location of the parent project, if one exists. Values from the
+            parent project will be the default for this project if they are
+            left unspecified. The path may be absolute, or relative to the
+            current <code>project.xml</code> file. For example,
+            <code>&lt;extend&gt;${basedir}/../project.xml&lt;/extend&gt;</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>parent</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The location of the parent project, if one exists. Values from the
+            parent project will be the default for this project if they are
+            left unspecified. The location is given as a group ID, artifact ID
+            and version.
+            ]]>
+          </description>
+          <association>
+            <type>Parent</type>
+          </association>
+          <comment></comment>
+        </field>
+        <field>
+          <name>modelVersion</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            Declares to which version of project descriptor this POM conforms.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>pomVersion</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Declares to which version of project descriptor this POM conforms.
+            The only valid value is <code>3</code>.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            A universally unique identifier for a project. It is normal to
+            use a fully-qualified package name to distinguish it from other
+            projects with a similar name (eg. <code>org.apache.maven</code>).
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The identifier for this artifact that is unique within the group
+            given by the group ID.
+            An artifact is something that is either produced or used by a project.
+            Examples of artifacts produced by Maven for a project include: JARs,
+            source and binary distributions, and WARs.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            <b>Deprecated</b>. When used, this sets both the <code>groupId</code>
+            and <code>artifactId</code> elements if they were previously empty.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>packaging</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The type of artifact this project produces, for example <code>jar</code>
+              <code>war</code>
+              <code>ear</code>
+              <code>pom</code>.
+            Plugins can create their own packaging, and
+            therefore their own packaging types,
+            so this list does not contain all possible types.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The full name of the project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>currentVersion</name>
+          <description>
+            <![CDATA[
+            The current version of the artifact produced by this project.
+            ]]>
+          </description>
+          <version>3.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The current version of the artifact produced by this project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>shortDescription</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            A short description of the project. The short description should be
+            limited to a single line.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>description</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            A detailed description of the project, used by Maven whenever it needs
+            to describe the project, such as on the web site. While this element can
+            be specified as CDATA to enable the use of HTML tags within the description,
+            it is discouraged to allow plain text representation.
+            If you need to modify the index page of the generated web site, you are able
+            to specify your own instead of adjusting this text.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The URL to the project's homepage.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The URL of the project's logo image.  This can be an URL relative
+            to the base directory of the generated web site,
+            (e.g., <code>/images/project-logo.png</code>) or an absolute URL
+            (e.g., <code>http://my.corp/project-logo.png</code>). This is used
+            when generating the project documentation.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>prerequisites</name>
+          <version>4.0.0</version>
+          <description>
+            Describes the prerequisites in the build environment for
+            this project.
+          </description>
+          <association>
+            <type>Prerequisites</type>
+          </association>
+        </field>
+        <field>
+          <name>issueTrackingUrl</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The URL of the project's issue tracking system.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The project's issue management system information.
+            ]]>
+          </description>
+          <association>
+            <type>IssueManagement</type>
+          </association>
+        </field>
+        <field>
+          <name>ciManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The project's continuous integration information.
+            ]]>
+          </description>
+          <association>
+            <type>CiManagement</type>
+          </association>
+        </field>
+        <field>
+          <name>inceptionYear</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The year of the project's inception, specified with 4 digits.
+            This value is used when generating copyright notices as well as being informational.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>gumpRepositoryId</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This is the repository identifier in Gump that this project is part of.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteAddress</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The hostname of the web server that hosts the project's web site.
+            This is used when the web site is deployed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteDirectory</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The directory on the web server where the public web site
+            for this project resides. This is used when the web site is deployed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionSite</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The server where the final distributions will be published. This is used when the
+            distributions are deployed. If this isn't defined, the central repository is used instead as
+            determined by <code>maven.repo.central</code> and <code>maven.repo.central.directory</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionDirectory</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The directory on the web server where the final distributions will be published.
+            This is used when the distributions are deployed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>mailingLists</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Contains information about a project's mailing lists.
+            ]]>
+          </description>
+          <association>
+            <type>MailingList</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>developers</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Describes the committers of a project.
+            ]]>
+          </description>
+          <association>
+            <type>Developer</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>contributors</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Describes the contributors to a project that are not yet committers.
+            ]]>
+          </description>
+          <association>
+            <type>Contributor</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>licenses</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes all of the licenses for this project.
+            Each license is described by a <code>license</code> element, which
+            is then described by additional elements.
+            Projects should only list the license(s) that applies to the project
+            and not the licenses that apply to dependencies.
+            If multiple licenses are listed, it is assumed that the user can select
+            any of them, not that they must accept all.
+            ]]>
+          </description>
+          <association>
+            <type>License</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>versions</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Contains information on previous versions of the project.
+            ]]>
+          </description>
+          <association>
+            <type>Version</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>branches</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Contains information on SCM branches of the project.
+            ]]>
+          </description>
+          <association>
+            <type>Branch</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>packageGroups</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Package groups required for complete javadocs.
+            ]]>
+          </description>
+          <association>
+            <type>PackageGroup</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>scm</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Specification for the SCM used by the project, such as CVS, Subversion, etc.
+            ]]>
+          </description>
+          <association>
+            <type>Scm</type>
+          </association>
+        </field>
+        <field>
+          <name>repository</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Specification for the SCM used by the project, such as CVS, Subversion, etc.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+          </association>
+        </field>
+        <field>
+          <name>organization</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes various attributes of the organization to
+            which the project belongs.  These attributes are utilized when
+            documentation is created (for copyright notices and links).
+            ]]>
+          </description>
+          <alias>organisation</alias>
+          <association>
+            <type>Organization</type>
+          </association>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Project properties that will be used by various plugins.
+            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
+            ]]>
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xml.tagName="package">
+          <name>packageName</name>
+          <version>3.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            The Java package name of the project.  This value is used
+            when generating JavaDoc.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>build</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            Information required to build the project.
+            ]]>
+          </description>
+          <association>
+            <type>Build</type>
+          </association>
+        </field>
+        <field>
+          <name>profiles</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            A listing of project-local build profiles which will modify
+            the build process when activated.
+            ]]>
+          </description>
+          <association>
+            <type>Profile</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            <![CDATA[
+              public void setVersion(String version)
+              {
+                  this.currentVersion = version;
+              }
+
+              public String getVersion()
+              {
+                  return currentVersion;
+              }
+
+              /* We need this because we can't use package as a field name.*/
+              public void setPackage(String packageName)
+              {
+                  this.packageName = packageName;
+              }
+
+              public String getPackage()
+              {
+                  return packageName;
+              }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @return the model id as <code>groupId:artifactId:packaging:version</code>
+     */
+      public String getId()
+      {
+          StringBuffer id = new StringBuffer();
+
+          id.append( getGroupId() == null ? "[inherited]" : getGroupId() );
+          id.append( ":" );
+          id.append( getArtifactId() );
+          id.append( ":" );
+          id.append( getPackaging() );
+          id.append( ":" );
+          id.append( getVersion() == null ? "[inherited]" : getVersion() );
+
+          return id.toString();
+      }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>ModelBase</name>
+      <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Base class for the <code>Model</code> and the <code>Profile</code> objects.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>modules</name>
+          <version>4.0.0</version>
+          <description>
+            The modules (sometimes called subprojects) to build as a
+            part of this project. Each module listed is a relative path
+            to the directory containing the module.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>repositories</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories for discovering dependencies and
+            extensions.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories for discovering plugins for builds and reports.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>dependencies</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes all of the dependencies associated with a
+            project.
+            These dependencies are used to construct a classpath for your
+            project during the build process. They are automatically downloaded from the
+            repositories defined in this project.
+            See <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
+            dependency mechanism</a> for more information.
+            ]]>
+          </description>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            <b>Deprecated</b>. Now ignored by Maven.
+            ]]>
+          </description>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>reporting</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            This element includes the specification of report plugins to use
+            to generate the reports on the Maven-generated site.
+            These reports will be run when a user executes <code>mvn site</code>.
+            All of the reports will be included in the navigation bar for browsing.
+            ]]>
+          </description>
+          <association>
+            <type>Reporting</type>
+          </association>
+        </field>
+        <field>
+          <name>dependencyManagement</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Default dependency information for projects that inherit from
+            this one. The dependencies in this section are not immediately resolved.
+            Instead, when a POM derived from this one declares a dependency
+            described by a matching groupId and artifactId, the version and other values from this
+            section are used for that dependency if they were not already specified.
+            ]]>
+          </description>
+          <association>
+            <type>DependencyManagement</type>
+          </association>
+        </field>
+        <field>
+          <name>distributionManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Distribution information for a project that enables deployment of the site
+            and artifacts to remote web servers and repositories respectively.
+            ]]>
+          </description>
+          <association>
+            <type>DistributionManagement</type>
+          </association>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Properties that can be used throughout the POM as a substitution, and
+            are used as filters in resources if enabled.
+            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
+            ]]>
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Branch</name>
+      <version>3.0.0</version>
+      <description>
+        <![CDATA[
+        Contains information on the SCM branches of the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>tag</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The branch tag in the version control system (e.g. cvs) used by the
+            project for the source code associated with this branch of the
+            project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PluginContainer</name>
+      <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Contains the plugins informations for the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>The list of plugins to use.</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    java.util.Map pluginMap;
+
+    /**
+     * Reset the <code>pluginsMap</code> field to <code>null</code>
+     */
+    public void flushPluginMap()
+    {
+        this.pluginMap = null;
+    }
+
+    /**
+     * @return a Map of plugins field with <code>Plugins#getKey()</code> as key
+     * @see org.apache.maven.model.Plugin#getKey()
+     */
+    public java.util.Map getPluginsAsMap()
+    {
+        if ( pluginMap == null )
+        {
+            pluginMap = new java.util.HashMap();
+            if ( plugins != null )
+            {
+                for ( java.util.Iterator it = plugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    pluginMap.put( plugin.getKey(), plugin );
+                }
+            }
+        }
+
+        return pluginMap;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>PluginConfiguration</name>
+      <version>3.0.0+</version>
+      <superClass>PluginContainer</superClass>
+      <description>
+        <![CDATA[
+        Contains the plugins management informations for the project.
+        ]]>
+      </description>
+      <fields>
+        <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
+          | plugins to be used in sub-projects. -->
+        <field>
+          <name>pluginManagement</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Default plugin information to be made available for reference by
+            projects derived from this one. This plugin configuration will not
+            be resolved or bound to the lifecycle unless referenced. Any local
+            configuration for a given plugin will override the plugin's entire
+            definition here.
+            ]]>
+          </description>
+          <association>
+            <type>PluginManagement</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>BuildBase</name>
+      <version>3.0.0+</version>
+      <superClass>PluginConfiguration</superClass>
+      <description>
+        <![CDATA[
+        Generic informations for a build.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>defaultGoal</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The default goal (or phase in Maven 2) to execute when none is
+            specified for the project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>resources</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes all of the classpath resources such as
+            properties files associated with a project.
+            These resources are often included in the final package.
+            ]]>
+          </description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>testResources</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            This element describes all of the classpath resources such as
+            properties files associated with a project's unit tests.
+            ]]>
+          </description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>directory</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The directory where all files generated by the build are placed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>finalName</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The filename (excluding the extension, and with no path information) that
+            the produced artifact will be called.
+            The default value is <code>${artifactId}-${version}</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filters</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The list of filter properties files that are used when filtering is enabled.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Build</name>
+      <version>3.0.0+</version>
+      <superClass>BuildBase</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;build&gt;</code> element contains informations required to build the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>nagEmailAddress</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            An address to which notifications regarding the status of builds
+            for this project can be sent. This is intended for use by tools
+            which do unattended builds, for example those providing for
+            continuous integration.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sourceDirectory</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element specifies a directory containing the source
+            of the project. The generated build system will compile
+            the source in this directory when the project is built.
+            The path given is relative to the project descriptor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>scriptSourceDirectory</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element specifies a directory containing the script sources
+            of the project. This directory is meant to be different from the
+            sourceDirectory, in that its contents will be copied to the output
+            directory in most cases (since scripts are interpreted rather than
+            compiled).
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unitTestSourceDirectory</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The path given is relative to the project descriptor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>testSourceDirectory</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The path given is relative to the project descriptor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>aspectSourceDirectory</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This element specifies a directory containing Aspect
+            sources of the project.  The generated build system will
+            compile the Aspects in this directory when the project is
+            built if Aspects have been enabled.
+            The path given is relative to the project descriptor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>integrationUnitTestSourceDirectory</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This element is <strong>deprecated</strong> and should no longer be used.
+            Initially it was used by the first Cactus plugin. Now
+            the location of the Cactus test sources is defined
+            through a plugin property. See the Cactus plugin
+            <a href="http://jakarta.apache.org/cactus/integration/maven/properties.html">properties</a>
+            page.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sourceModifications</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element describes all of the sourceModifications associated
+            with a project. These modifications are used
+            to exclude or include various source depending on the environment
+            the build is running in.
+            ]]>
+          </description>
+          <association>
+            <type>SourceModification</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>unitTest</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            This element specifies unit tests associated with the project.
+            ]]>
+          </description>
+          <defaultValue>new UnitTest()</defaultValue>
+          <association>
+            <type>UnitTest</type>
+          </association>
+        </field>
+        <field>
+          <name>outputDirectory</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The directory where compiled application classes are placed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>testOutputDirectory</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The directory where compiled test classes are placed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>extensions</name>
+          <version>4.0.0</version>
+          <description>
+            A set of build extensions to use from this project.
+          </description>
+          <association>
+            <type>Extension</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>CiManagement</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;CiManagement&gt;</code> element contains informations required to the
+        continuous integration system of the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The name of the continuous integration system, e.g. <code>continuum</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            URL for the continuous integration system used by the project if it has a web interface.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>notifiers</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Configuration for notifying developers/users when a build is
+            unsuccessful, including user information and notification mode.
+            ]]>
+          </description>
+          <association>
+            <multiplicity>*</multiplicity>
+            <type>Notifier</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Notifier</name>
+      <description>
+        Configures one method for notifying users/developers when a
+        build breaks.
+      </description>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <defaultValue>mail</defaultValue>
+          <type>String</type>
+          <description>
+            The mechanism used to deliver notifications.
+          </description>
+        </field>
+        <field>
+          <name>sendOnError</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>
+            Whether to send notifications on error.
+          </description>
+        </field>
+        <field>
+          <name>sendOnFailure</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>
+            Whether to send notifications on failure.
+          </description>
+        </field>
+        <field>
+          <name>sendOnSuccess</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>
+            Whether to send notifications on success.
+          </description>
+        </field>
+        <field>
+          <name>sendOnWarning</name>
+          <version>4.0.0</version>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+          <description>
+            Whether to send notifications on warning.
+          </description>
+        </field>
+        <!-- TODO: Remove it after continuum alpha-3 release -->
+        <field>
+          <name>address</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            <b>Deprecated</b>. Where to send the notification to - eg email address.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <description>
+            Extended configuration specific to this notifier goes here.
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Contributor</name>
+      <description>
+        Description of a person who has contributed to the project, but
+        who does not have commit privileges. Usually, these
+        contributions come in the form of patches submitted.
+      </description>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The full name of the contributor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>email</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The email address of the contributor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The URL for the homepage of the contributor.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <!-- TODO: should this just be a single Organization element -->
+        <field>
+          <name>organization</name>
+          <alias>organisation</alias>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The organization to which the contributor belongs.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>organizationUrl</name>
+          <alias>organisationUrl</alias>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The URL of the organization.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>roles</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The roles the contributor plays in the project.  Each role is
+            described by a <code>role</code> element, the body of which is a
+            role name. This can also be used to describe the contribution.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>timezone</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The timezone the contributor is in. This is a number in the range -11 to 12.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Properties about the contributor, such as an instant messenger handle.
+            ]]>
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Dependency</name>
+      <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;dependency&gt;</code> element contains informations required to a dependency
+        of the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            <strong>Deprecated</strong>. Please use <code>groupId</code> and
+            <code>artifactId</code> together instead.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The project group that produced the dependency, e.g.
+            <code>org.apache.maven</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The unique id for an artifact produced by the project group, e.g.
+            <code>maven-artifact</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The version of the dependency, e.g. <code>3.2.1</code>. In Maven 2, this can also be
+            specified as a range of versions.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This url will be provided to the user if the jar file cannot be downloaded
+            from the central repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>jar</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Literal name of the artifact in the repository. Used to override the
+            calculated artifact name.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The type of dependency. This defaults to <code>jar</code>. While it
+            usually represents the extension on the filename of the dependency,
+            that is not always the case.
+            Some examples are <code>jar</code>, <code>war</code>, and <code>plugin</code>.
+            A dependency of type <code>plugin</code> is loaded as a Maven plugin and
+            not added to the project build classpath.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The type of dependency. This defaults to <code>jar</code>. While it
+            usually represents the extension on the filename of the dependency,
+            that is not always the case. A type can be mapped to a different
+            extension and a classifier.
+            The type often correspongs to the packaging used, though this is also
+            not always the case.
+            Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code>
+            and <code>test-jar</code>.
+            New types can be defined by plugins that set
+            <code>extensions</code> to <code>true</code>, so this is not a complete list.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>classifier</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The classifier of the dependency. This allows distinguishing two artifacts
+            that belong to the same POM but were built differently, and is appended to
+            the filename after the version. For example, <code>jdk14</code> and <code>jdk15</code>.
+            ]]>
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Properties about the dependency. Various plugins allow you to
+            mark dependencies with properties. For example the war plugin looks for a
+            <code>war.bundle</code> property, and if found will include the
+            dependency in <code>WEB-INF/lib</code>.
+            ]]>
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>scope</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The scope of the dependency - <code>compile</code>, <code>runtime</code>,
+            <code>test</code>, <code>system</code>, and <code>provided</code>. Used to
+            calculate the various classpaths used for compilation, testing, and so on.
+            It also assists in determining which artifacts to include in a distribution of
+            this project. For more information, see
+            <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
+            dependency mechanism</a>.
+            ]]>
+          </description>
+          <type>String</type>
+          <!-- This default has to be enforced at the maven-artifact layer, to allow
+            | injection of defaults from <dependencyManagement/>.
+            | TODO: how can we document it?
+            |-->
+          <!-- defaultValue>compile</defaultValue -->
+        </field>
+        <field>
+          <name>systemPath</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            FOR SYSTEM SCOPE ONLY. Note that use of this property is <b>discouraged</b>
+            and may be replaced in later versions. This specifies the path on the filesystem
+            for this dependency.
+            Requires an absolute path for the value, not relative.
+            Use a property that gives the machine specific absolute path,
+            e.g. <code>${java.home}</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>exclusions</name>
+          <version>4.0.0</version>
+          <description>
+            Lists a set of artifacts that should be excluded from this
+            dependency's artifact list when it comes to calculating
+            transitive dependencies.
+          </description>
+          <association>
+            <type>Exclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>optional</name>
+          <version>4.0.0</version>
+          <description>
+            Indicates the dependency is optional for use of this
+            library. While the version of the dependency will be taken
+            into account for dependency calculation if the library is
+            used elsewhere, it will not be passed on transitively.
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return groupId + "/" + type + "s:" + artifactId + "-" + version;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Dependency {groupId=" + groupId + ", artifactId=" + artifactId + ", version=" + version + ", type=" + type + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @return the management key as <code>groupId:artifactId:type</code>
+     */
+    public String getManagementKey()
+    {
+        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @return the key as <code>id:type</code>
+     */
+    public String getKey()
+    {
+        return getId() + ":" + getType();
+    }
+
+    /**
+     * @return the groupId as artifact directory
+     */
+    public String getArtifactDirectory()
+    {
+        return getGroupId();
+    }
+
+    /**
+     * @return the artifact name as <code>artifactId-version.extension</code> if &lt;jar/&gt; not set
+     */
+    public String getArtifact()
+    {
+        // If the jar name has been explicty set then use that. This
+        // is when the <jar/> element is explicity used in the POM.
+        if ( getJar() != null)
+        {
+            return getJar();
+        }
+
+        String artifact;
+
+        if ("ejb-client".equals(getType())) {
+          artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
+        } else {
+          artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
+        }
+
+        return artifact;
+    }
+
+    public String getTypeDirectory()
+    {
+        String path;
+        if (getType().equals("ejb-client")) {
+            path = "ejbs";
+        } else {
+            path = getType() + "s";
+        }
+
+        return path;
+    }
+
+    public String getExtension()
+    {
+        if ("ejb".equals(getType()) || "ejb-client".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
+        return getType();
+    }
+
+    public boolean isAddedToClasspath()
+    {
+        return ("jar".equals(getType()) || "ejb".equals(getType()) || "ejb-client".equals(getType()) || "sar".equals(getType()));
+    }
+
+    public boolean isPlugin()
+    {
+        return ("plugin".equals(getType()));
+    }
+
+    public String getProperty( String property )
+    {
+        return getProperties().getProperty( property );
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( !( o instanceof Dependency ) )
+        {
+            return false;
+        }
+
+        Dependency d  = (Dependency) o;
+        return getId().equals( d.getId() );
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <superClass>Contributor</superClass>
+      <name>Developer</name>
+      <description>
+        <![CDATA[
+        Information about one of the committers on this project.
+        ]]>
+      </description>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The unique ID of the developer in the SCM.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Exclusion</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;exclusion&gt;</code> element contains informations required to exclude
+        an artifact to the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The artifact ID of the project to exclude.
+            ]]>
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The group ID of the project to exclude.
+            ]]>
+          </description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>IssueManagement</name>
+      <description>
+        Information about the issue tracking (or bug tracking) system
+        used to manage this project.
+      </description>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The name of the issue management system, e.g. Bugzilla
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            URL for the issue management system used by the project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>DistributionManagement</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        This elements describes all that pertains to distribution for a project.
+        It is primarily used for deployment of artifacts and the site
+        produced by the build.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>repository</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Information needed to deploy the artifacts generated by the project to a remote repository.
+            ]]>
+          </description>
+          <association>
+            <type>DeploymentRepository</type>
+          </association>
+        </field>
+        <field>
+          <name>snapshotRepository</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Where to deploy snapshots of artifacts to. If not given, it defaults to the
+            <code>repository</code> element.
+            ]]>
+          </description>
+          <association>
+            <type>DeploymentRepository</type>
+          </association>
+        </field>
+        <field>
+          <name>site</name>
+          <description>
+            <![CDATA[
+            Information needed for deploying the web site of the project.
+            ]]>
+          </description>
+          <version>4.0.0</version>
+          <association>
+            <type>Site</type>
+          </association>
+        </field>
+        <field>
+          <name>downloadUrl</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            The URL of the project's download page. If not given users will be
+            referred to the homepage given by <code>url</code>.
+            This is given to assist in locating artifacts that are not in the repository due to
+            licensing restrictions.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>relocation</name>
+          <version>4.0.0</version>
+          <description>
+            Relocation information of the artifact if it has been moved
+            to a new group ID and/or artifact ID.
+          </description>
+          <association>
+            <type>Relocation</type>
+          </association>
+        </field>
+        <field>
+          <name>status</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Gives the status of this artifact in the remote repository.
+            This must not be set in your local project, as it is updated by
+            tools placing it in the reposiory. Valid values are: <code>none</code> (default),
+            <code>converted</code> (repository manager converted this from an Maven 1 POM),
+            <code>partner</code>
+            (directly synced from a partner Maven 2 repository), <code>deployed</code> (was deployed from a Maven 2
+            instance), <code>verified</code> (has been hand verified as correct and final).
+            ]]>
+          </description>
+          <required>false</required>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>License</name>
+      <description>
+        <![CDATA[
+        Describes the licenses for this project.  This is used to generate
+        the license page of the project's web site, as well as being taken into
+        consideration in other reporting and validation. The licenses listed for
+        the project are that of the project itself, and not of dependencies.
+        ]]>
+      </description>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The full legal name of the license.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The official url for the license text.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distribution</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The primary method by which this project may be distributed.
+            <dl>
+              <dt>repo</dt>
+              <dd>may be downloaded from the Maven repository</dd>
+              <dt>manual</dt>
+              <dd>user must manually download and install the dependency.</dd>
+            </dl>
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>comments</name>
+          <description>
+            Addendum information pertaining to this license.
+          </description>
+          <version>3.0.0+</version>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>MailingList</name>
+      <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        This element describes all of the mailing lists associated with
+        a project. The auto-generated site references this information.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The name of the mailing list.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>subscribe</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The email address or link that can be used to subscribe to the mailing list.
+            If this is an email address, a
+            <code>mailto:</code> link will automatically be created when
+            the documentation is created.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unsubscribe</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The email address or link that can be used to unsubscribe to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>post</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The email address or link that can be used to post to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>archive</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The link to a URL where you can browse the mailing list archive.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>otherArchives</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The link to alternate URLs where you can browse the list archive.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <comment>
+        We could probably have a specific element for a dev mailing list
+        for things like CI, and maybe even a specific element for the
+        user and scm mailing lists. Then leave the more lose structure
+        for any other type of mailing list.
+      </comment>
+    </class>
+    <class>
+      <name>Organization</name>
+      <description>
+        Specifies the organization that produces this project.
+      </description>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The full name of the organization.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            The URL to the organization's home page.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The URL to the organization's logo image.  This can be an URL relative
+            to the base directory of the generated web site,
+            (e.g., <code>/images/org-logo.png</code>) or an absolute URL
+            (e.g., <code>http://my.corp/logo.png</code>).  This value is used
+            when generating the project documentation.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PackageGroup</name>
+      <version>3.0.0</version>
+      <description>A JavaDoc package group.</description>
+      <fields>
+        <field>
+          <name>title</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The title to use for the package group.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>packages</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The packages in the group
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PatternSet</name>
+      <version>3.0.0+</version>
+      <description>
+        <![CDATA[
+        Definition of include or exclude patterns.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>includes</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            A list of patterns to include, e.g. <code>**&#47;*.xml</code>.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>excludes</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            A list of patterns to exclude, e.g. <code>**&#47;*.xml</code>
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Parent</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;parent&gt;</code> element contains informations required to the parent project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The artifact id of the parent project to inherit from.
+            ]]>
+          </description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The group id of the parent project to inherit from.
+            ]]>
+          </description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The version of the parent project to inherit.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>relativePath</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The relative path of the parent <code>pom.xml</code> file within the check out.
+            The default value is <code>../pom.xml</code>.
+            Maven looks for the parent pom first in the reactor of currently building projects, then in this location on
+            the filesystem, then the local repository, and lastly in the remote repo.
+            <code>relativePath</code> allows you to select a different location,
+            for example when your structure is flat, or deeper without an intermediate parent pom.
+            However, the group ID, artifact ID and version are still required,
+            and must match the file in the location given or it will revert to the repository for the POM.
+            This feature is only for enhancing the development in a local checkout of that project.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>../pom.xml</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @return the id as <code>groupId:artifactId:version</code>
+     */
+    public String getId()
+    {
+        StringBuffer id = new StringBuffer();
+
+        id.append( getGroupId() );
+        id.append( ":" );
+        id.append( getArtifactId() );
+        id.append( ":" );
+      //  id.append( getPackaging() );
+        id.append( ":" );
+        id.append( getVersion() );
+
+        return id.toString();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+
+    </class>
+    <class>
+      <name>Repository</name>
+      <version>3.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;repository&gt;</code> element contains informations required to a repository
+        used by the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>connection</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The source control management system URL
+            that describes the repository and how to connect to the
+            repository. For more information, see the
+            <a href="http://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            and <a href="http://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            This connection is read-only.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Just like <code>connection</code>, but for developers, i.e. this scm connection
+            will not be read only.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Scm</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;scm&gt;</code> element contains informations required to the SCM
+        (Source Control Management) of the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>connection</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The source control management system URL
+            that describes the repository and how to connect to the
+            repository. For more information, see the
+            <a href="http://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            and <a href="http://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            This connection is read-only.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Just like <code>connection</code>, but for developers, i.e. this scm connection
+            will not be read only.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>tag</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The tag of current code. By default, it's set to HEAD during development.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>HEAD</defaultValue>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>FileSet</name>
+      <version>3.0.0+</version>
+      <superClass>PatternSet</superClass>
+      <description>
+        <![CDATA[
+        A PatternSet for files.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>directory</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Describe the directory where the resources are stored.
+            The path is relative to the POM.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Resource</name>
+      <description>
+        <![CDATA[
+        This element describes all of the classpath resources associated with a project or
+        unit tests.
+        ]]>
+      </description>
+      <version>3.0.0+</version>
+      <superClass>FileSet</superClass>
+      <fields>
+        <field>
+          <name>targetPath</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Describe the resource target path. For example, if you want that
+            resource to appear in a specific package
+            (<code>org.apache.maven.messages</code>), you must specify this
+            element with this value: <code>org/apache/maven/messages</code>.
+            This is not required if you simply put the resources in that directory
+            structure at the source, however.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filtering</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            Whether resources are filtered to replace tokens with parameterised values or not.
+            The values are taken from the <code>properties</code> element and from the
+            properties in the files listed in the <code>filters</code> element.
+            ]]>
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>SourceModification</name>
+      <description>
+        <![CDATA[
+        This element describes all of the source modifications associated with a
+        project. These modifications are used
+        to exclude or include various source depending on the environment
+        the build is running in.
+        ]]>
+      </description>
+      <version>3.0.0</version>
+      <superClass>FileSet</superClass>
+      <fields>
+        <field>
+          <name>className</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            If the class with this name can <strong>not</strong> be
+            loaded, then the includes and excludes specified below
+            will be applied to the contents of the <code>sourceDirectory</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>property</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            If the property with this name is <strong>not</strong> set,
+            then the includes and excludes specified below
+            will be applied to the contents of the <code>sourceDirectory</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>UnitTest</name>
+      <version>3.0.0</version>
+      <superClass>PatternSet</superClass>
+      <description>
+        <![CDATA[
+        A PatternSet for unit tests.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>resources</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The classpath resources to use when executing the unit tests.
+              ]]>
+          </description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Version</name>
+      <version>3.0.0</version>
+      <description>
+        <![CDATA[
+        This element describes each of the previous versions of the
+        project. Each version is described by a <code>version</code>
+        element
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The external version number under which this release was distributed. Examples include:
+            <code>1.0</code>,
+            <code>1.1-alpha1</code>,
+            <code>1.2-beta</code>,
+            <code>1.3.2</code> etc.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>tag</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The name given in the SCM (e.g. CVS) used by the project for the source
+            code associated with this version of the project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            A unique identifier for a version. This is usually identical to the name.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return getId();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>RepositoryBase</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+         A repository contains the information needed
+         for establishing connections with remote repository.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            A unique identifier for a repository. This is used to match the repository
+            to configuration in the <code>settings.xml</code> file, for example.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Human readable name of the repository.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The url of the repository, in the form <code>protocol://hostname/path</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>layout</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The type of layout this repository uses for locating and storing artifacts -
+            can be <code>legacy</code> or <code>default</code>.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        RepositoryBase other =  (RepositoryBase) obj;
+
+        boolean retValue = false;
+
+        if ( id != null )
+        {
+            retValue = id.equals( other.id );
+        }
+
+        return retValue;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>Repository</name>
+      <superClass>RepositoryBase</superClass>
+      <version>4.0.0</version>
+      <description>
+        A repository contains the information needed for establishing
+        connections with remote repository.
+      </description>
+      <fields>
+        <field>
+          <name>releases</name>
+          <version>4.0.0</version>
+          <description>
+            How to handle downloading of releases from this repository.
+          </description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+        <field>
+          <name>snapshots</name>
+          <version>4.0.0</version>
+          <description>
+            How to handle downloading of snapshots from this repository.
+          </description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+      </fields>
+      <!-- TODO:prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>DeploymentRepository</name>
+      <superClass>RepositoryBase</superClass>
+      <version>4.0.0</version>
+      <description>
+        Repository contains the information needed for deploying to the
+        remote repository.
+      </description>
+      <fields>
+        <field>
+          <name>uniqueVersion</name>
+          <description>
+            Whether to assign snapshots a unique version comprised of
+            the timestamp and build number, or to use the same version
+            each time
+          </description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+          <version>4.0.0</version>
+        </field>
+      </fields>
+      <!-- TODO:prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj )
+    {
+        return super.equals( obj );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>RepositoryPolicy</name>
+      <version>4.0.0</version>
+      <description>
+        Download policy.
+      </description>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>4.0.0</version>
+          <description>
+            Whether to use this repository for downloading this type of
+            artifact.
+          </description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>updatePolicy</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The frequency for downloading updates - can be
+            <code>always,</code>
+            <code>daily</code>
+            (default),
+            <code>interval:XXX</code>
+            (in minutes) or
+            <code>never</code>
+            (only if it doesn't exist locally).
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksumPolicy</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            What to do when verification of an artifact checksum fails. Valid values are
+            <code>ignore</code>
+            ,
+            <code>fail</code>
+            or
+            <code>warn</code>
+            (the default).
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+    <!--@todo find better solution for management of site deployments -->
+    <class>
+      <name>Site</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        Contains the information needed for deploying websites.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            A unique identifier for a deployment location. This is used to match the
+            site to configuration in the <code>settings.xml</code> file, for example.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Human readable name of the deployment location.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ConfigurationContainer</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        Contains the configuration information of the container like Plugin.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Whether any configuration should be propagated to child POMs.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <description>
+            <![CDATA[
+            The configuration as DOM object.
+            ]]>
+          </description>
+          <name>configuration</name>
+          <type>DOM</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    private boolean inheritanceApplied = true;
+
+    public void unsetInheritanceApplied()
+    {
+        this.inheritanceApplied = false;
+    }
+
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Plugin</name>
+      <version>4.0.0</version>
+      <superClass>ConfigurationContainer</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;plugin&gt;</code> element contains informations required for a plugin.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <description>
+            The group ID of the plugin in the repository.
+          </description>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>org.apache.maven.plugins</defaultValue>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <description>
+            The artifact ID of the plugin in the repository.
+          </description>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The version (or valid range of verisons) of the plugin to be used.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>extensions</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>
+            Whether to load Maven extensions (such as packaging and type
+            handlers) from this plugin. For performance reasons, this
+            should only be enabled when necessary.
+          </description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>executions</name>
+          <version>4.0.0</version>
+          <description>
+            Multiple specifications of a set of goals to execute during
+            the build lifecycle, each having (possibly) different
+            configuration.
+          </description>
+          <association>
+            <type>PluginExecution</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>dependencies</name>
+          <description>
+            Additional dependencies that this project needs to introduce
+            to the plugin's classloader.
+          </description>
+          <version>4.0.0</version>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            <b>Deprecated</b>. Unused by Maven.
+            ]]>
+          </description>
+          <type>DOM</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    private java.util.Map executionMap = null;
+
+    /**
+     * Reset the <code>executionMap</code> field to <code>null</code>
+     */
+    public void flushExecutionMap()
+    {
+        this.executionMap = null;
+    }
+
+    /**
+     * @return a Map of executions field with <code>PluginExecution#getId()</code> as key
+     * @see org.apache.maven.model.PluginExecution#getId()
+     */
+    public java.util.Map getExecutionsAsMap()
+    {
+        if ( executionMap == null )
+        {
+            executionMap = new java.util.HashMap();
+            if ( getExecutions() != null )
+            {
+                for ( java.util.Iterator i = getExecutions().iterator(); i.hasNext(); )
+                {
+                    PluginExecution exec = (PluginExecution) i.next();
+
+                    if ( executionMap.containsKey( exec.getId() ) )
+                    {
+                        throw new IllegalStateException( "You cannot have two plugin executions with the same (or missing) <id/> elements.\nOffending execution\n\nId: \'" + exec.getId() + "\'\nPlugin:\'" + getKey() + "\'\n\n" );
+                    }
+
+                    executionMap.put( exec.getId(), exec );
+                }
+            }
+        }
+
+        return executionMap;
+    }
+
+    /**
+     * @return the key of the plugin, ie <code>groupId:artifactId</code>
+     */
+    public String getKey()
+    {
+        return constructKey( groupId, artifactId );
+    }
+
+    /**
+     * @param groupId
+     * @param artifactId
+     * @return the key of the plugin, ie <code>groupId:artifactId</code>
+     */
+    public static String constructKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object other )
+    {
+        if ( other instanceof Plugin )
+        {
+            Plugin otherPlugin = (Plugin) other;
+
+            return getKey().equals( otherPlugin.getKey() );
+        }
+
+        return false;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return getKey().hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Plugin [" + getKey() + "]";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>PluginExecution</name>
+      <version>4.0.0</version>
+      <superClass>ConfigurationContainer</superClass>
+      <description>
+        <![CDATA[
+        The <code>&lt;execution&gt;</code> element contains informations required for the
+        execution of a plugin.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+          <description>
+            The identifier of this execution for labelling the goals
+            during the build, and for matching exections to merge during
+            inheritance.
+          </description>
+        </field>
+        <field>
+          <name>phase</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The build lifecycle phase to bind the goals in this
+            execution to. If omitted, the goals will be bound to the
+            default specified in their metadata.
+          </description>
+        </field>
+        <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <description>
+            The goals to execute with the given configuration.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    public static final String DEFAULT_EXECUTION_ID = "default";
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>DependencyManagement</name>
+      <version>4.0.0</version>
+      <description>
+        Section for management of default dependency information for use
+        in a group of POMs.
+      </description>
+      <fields>
+        <field>
+          <name>dependencies</name>
+          <version>4.0.0</version>
+          <description>
+            The dependencies specified here are not used until they are
+            referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            dependency.
+          </description>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PluginManagement</name>
+      <version>4.0.0</version>
+      <superClass>PluginContainer</superClass>
+      <description>
+        Section for management of default plugin information for use in
+        a group of POMs.
+      </description>
+    </class>
+    <class>
+      <name>Reporting</name>
+      <version>4.0.0</version>
+      <description>
+        Section for management of reports and their configuration.
+      </description>
+      <fields>
+        <field>
+          <name>excludeDefaults</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>
+            If true, then the default reports are not included in the
+            site generation. This includes the reports in the "Project
+            Info" menu.
+          </description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>outputDirectory</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Where to store all of the generated reports. The default is
+            <code>${project.build.directory}/site</code>
+            .
+            ]]>
+          </description>
+          <!-- TODO: why isn't default set here? -->
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>
+            The reporting plugins to use and their configuration.
+          </description>
+          <association>
+            <type>ReportPlugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    java.util.Map reportPluginMap;
+
+    /**
+     * Reset the <code>reportPluginMap</code> field to <code>null</code>
+     */
+    public void flushReportPluginMap()
+    {
+        this.reportPluginMap = null;
+    }
+
+    /**
+     * @return a Map of plugins field with <code>ReportPlugin#getKey()</code> as key
+     * @see org.apache.maven.model.ReportPlugin#getKey()
+     */
+    public java.util.Map getReportPluginsAsMap()
+    {
+        if ( reportPluginMap == null )
+        {
+            reportPluginMap = new java.util.HashMap();
+            if ( getPlugins() != null )
+            {
+                for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
+                {
+                    ReportPlugin reportPlugin = (ReportPlugin) it.next();
+                    reportPluginMap.put( reportPlugin.getKey(), reportPlugin );
+                }
+            }
+        }
+
+        return reportPluginMap;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <!-- Profile support -->
+    <class>
+      <name>Profile</name>
+      <superClass>ModelBase</superClass>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        Modifications to the build process which is activated based on environmental
+        parameters or command line arguments.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <required>true</required>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+          <description>
+            The identifier of this build profile. This used both for
+            command line activation, and identifies identical profiles
+            to merge with during inheritance.
+          </description>
+        </field>
+        <field>
+          <name>activation</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The conditional logic which will automatically
+            trigger the inclusion of this profile.
+            ]]>
+          </description>
+          <association>
+            <type>Activation</type>
+          </association>
+        </field>
+        <field xml.tagName="build">
+          <name>build</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            Information required to build the project.
+            ]]>
+          </description>
+          <association>
+            <type>BuildBase</type>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    // We don't want this to be parseable...it's sort of 'hidden'
+    // default source for this profile is in the pom itself.
+    private String source = "pom";
+
+    public void setSource( String source )
+    {
+        this.source = source;
+    }
+
+    public String getSource()
+    {
+        return source;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Profile {id: " + getId() + ", source: " + getSource() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Activation</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The conditions within the build runtime environment which will trigger
+        the automatic inclusion of the build profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>activeByDefault</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>
+            Flag specifying whether this profile is active by default.
+          </description>
+        </field>
+        <field>
+          <name>jdk</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when a matching JDK is detected.
+            For example, <code>1.4</code> only activates on JDKs versioned 1.4,
+            while <code>!1.4</code> matches any JDK that is not version 1.4.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>os</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when matching operating
+            system attributes are detected.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationOS</type>
+          </association>
+        </field>
+        <field>
+          <name>property</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated when this system property is specified.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationProperty</type>
+          </association>
+        </field>
+        <field>
+          <name>file</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Specifies that this profile will be activated based on existence of a file.
+            ]]>
+          </description>
+          <association>
+            <type>ActivationFile</type>
+          </association>
+        </field>
+        <field>
+          <name>custom</name>
+          <version>4.0.0</version>
+          <description>
+            Describes a custom profile activation trigger, brought in
+            via build extension.
+          </description>
+          <association>
+            <type>ActivationCustom</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationProperty</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        This is the property specification used to activate a profile.
+        If the value field is empty, then the existence of the named property
+        will activate the profile, otherwise it does a case-sensitive
+        match against the property value as well.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <description>
+            The name of the property to be used to activate a profile.
+          </description>
+        </field>
+        <field>
+          <name>value</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The value of the property required to activate a profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationOS</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        This is an activator which will detect an operating system's attributes in order to activate
+        its profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            The name of the operating system to be used to activate the profile. This must be an exact match
+            of the <code>${os.name}</code> Java property, such as <code>Windows XP</code>.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>family</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            The general family of the OS to be used to activate the profile, such as
+            <code>windows</code> or <code>unix</code>.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>arch</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The architecture of the operating system to be used to
+            activate the profile.
+          </description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The version of the operating system to be used to activate
+            the profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationFile</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        This is the file specification used to activate the profile.
+        The missing value will be the location of a file that needs to exist,
+        and if it doesn't the profile will be activated.  On the other hand exists will test
+        for the existence of the file and if it is there the profile will be activated.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>missing</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The name of the file that must be missing to activate the
+            profile.
+          </description>
+        </field>
+        <field>
+          <name>exists</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            The name of the file that must exist to activate the
+            profile.
+          </description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationCustom</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        This activation allows users to specify their own custom trigger for a profile.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <type>DOM</type>
+          <description>
+            <![CDATA[
+            The specification for triggering the profile according to the rules of the custom
+            activation type.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            The type (role-hint) of activation which is to be used to activate the profile.
+            ]]>
+          </description>
+        </field>
+      </fields>
+    </class>
+    <!-- /BuildProfile support -->
+    <class xml.tagName="plugin">
+      <name>ReportPlugin</name>
+      <version>4.0.0</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;plugin&gt;</code> element contains informations required for a report plugin.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <defaultValue>org.apache.maven.plugins</defaultValue>
+          <description>
+            The group ID of the reporting plugin in the repository.
+          </description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <description>
+            The artifact ID of the reporting plugin in the repository.
+          </description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The version of the reporting plugin to be used.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            Whether the configuration in this plugin should be made
+            available to projects that inherit from this one.
+          </description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <type>DOM</type>
+          <description>
+            The configuration of the reporting plugin.
+          </description>
+        </field>
+        <field>
+          <name>reportSets</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Multiple specifications of a set of reports, each having (possibly) different
+            configuration. This is the reporting parallel to an <code>execution</code> in the build.
+            ]]>
+          </description>
+          <association>
+            <type>ReportSet</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    private java.util.Map reportSetMap = null;
+
+    /**
+     * Reset the <code>reportSetMap</code> field to <code>null</code>
+     */
+    public void flushReportSetMap()
+    {
+        this.reportSetMap = null;
+    }
+
+    /**
+     * @return a Map of reportSets field with <code>ReportSet#getId()</code> as key
+     * @see org.apache.maven.model.ReportSet#getId()
+     */
+    public java.util.Map getReportSetsAsMap()
+    {
+        if ( reportSetMap == null )
+        {
+            reportSetMap = new java.util.HashMap();
+            if ( getReportSets() != null )
+            {
+                for ( java.util.Iterator i = getReportSets().iterator(); i.hasNext(); )
+                {
+                    ReportSet reportSet = (ReportSet) i.next();
+                    reportSetMap.put( reportSet.getId(), reportSet );
+                }
+            }
+        }
+
+        return reportSetMap;
+    }
+
+    /**
+     * @return the key of the report plugin, ie <code>groupId:artifactId</code>
+     */
+    public String getKey()
+    {
+        return constructKey( groupId, artifactId );
+    }
+
+    /**
+     * @param groupId
+     * @param artifactId
+     * @return the key of the report plugin, ie <code>groupId:artifactId</code>
+     */
+    public static String constructKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
+    }
+
+    private boolean inheritanceApplied = true;
+
+    public void unsetInheritanceApplied()
+    {
+        this.inheritanceApplied = false;
+    }
+
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>ReportSet</name>
+      <version>4.0.0</version>
+      <description>
+        Represents a set of reports and configuration to be used to
+        generate them.
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <type>String</type>
+          <required>true</required>
+          <description>
+            The unique id for this report set, to be used during POM
+            inheritance.
+          </description>
+          <defaultValue>default</defaultValue>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <description>
+            Configuration of the report to be used when generating this
+            set.
+          </description>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Whether any configuration should be propagated to child POMs.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The list of reports from this plugin which should be generated from this set.
+            ]]>
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    private boolean inheritanceApplied = true;
+
+    public void unsetInheritanceApplied()
+    {
+        this.inheritanceApplied = false;
+    }
+
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Prerequisites</name>
+      <version>4.0.0</version>
+      <description>
+        Describes the prerequisites a project can have.
+      </description>
+      <fields>
+        <field>
+          <name>maven</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>2.0</defaultValue>
+          <description>
+            The minimum version of Maven required to build the project,
+            or to use this plugin.
+          </description>
+          <required>false</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Relocation</name>
+      <version>4.0.0</version>
+      <description>
+        Describes where an artifact has moved to. If any of the values
+        are omitted, it is assumed to be the same as it was before.
+      </description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>
+            The group ID the artifact has moved to.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>
+            The new artifact ID of the artifact.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>The new version of the artifact.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>message</name>
+          <version>4.0.0</version>
+          <description>
+            An additional message to show the user about the move, such
+            as the reason.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Extension</name>
+      <version>4.0.0</version>
+      <description>
+        Describes a build extension to utilise.
+      </description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>
+            The group ID of the extension's artifact.
+          </description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>The artifact ID of the extension.</description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>The version of the extension.</description>
+          <type>String</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( !( o instanceof Extension ) )
+        {
+            return false;
+        }
+
+        Extension e = (Extension) o;
+
+        if ( !e.getArtifactId().equals( getArtifactId() ) )
+        {
+            return false;
+        }
+        else if ( !e.getGroupId().equals( getGroupId() ) )
+        {
+            return false;
+        }
+        else if ( e.getVersion() != null ? !e.getVersion().equals( getVersion() ) : getVersion() != null )
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        int result = 17;
+        result = 37 * result + getArtifactId() != null ? getArtifactId().hashCode() : 0;                                                    
+        result = 37 * result + getGroupId() != null ? getGroupId().hashCode() : 0;                                                          
+        result = 37 * result + getVersion() != null ? getVersion().hashCode() : 0;         
+        return result;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
+</model>
