@@ -1,0 +1,83 @@
+ -----
+ Inheritance in Maven
+ -----
+ The Maven Team
+ -----
+
+Inheritance in Maven
+
+ In order the understand how inheritance works in Maven there are a few notions that you must be familiar with:
+
+ * The maven super model
+
+ * how parent poms are processed
+
+ * the order in which elements in the POM are overridden
+ 
+ * minimum element-set for a valid project pom
+
+
+Maven super model
+
+ Inheritance is recursive in Maven but there is a special model which is the implicit super parent in the lineage
+ of models you may specify:
+
+ all of the models that you specify are collected to produce a lineage and then the super model is place at
+ the top of that lineage to provide default values.
+
+ The super model is where we place all the values which we believe to be standard, values that can be shared and
+ utilized across all your maven projects.
+
++-----+
+ m0 <- m1 <- m2
++-----+
+
+ which is transformed into
+
++-----+
+ super model <- m0 <- m1 <- m2
++-----+
+
++-----+
+<project>
+ <modelVersion>4.0.0</modelVersion>
+ <parent>
+   <groupId></groupId>
+   <artifactId></artifactId>
+   <version></version>
+ </parent>
+</project>
++-----+
+
+Extending the POM in the future
+
+  In order to anticipate changes in the structure of the POM as new releases of
+  maven occur, the maven inheritance model must be pinned against a particular
+  modelVersion. This is required so that a change from modelVersion 4.0.0 to 
+  4.1.0 doesn't cause compatibility problems with users who have not upgraded 
+  their projects. It also allows for a certain amount of legacy support into the
+  future. Therefore, we should rename this file from pom.xml in the maven-core
+  jarfile to pom-4.0.0.xml (and successive revisions to the base pom made to 
+  accommodate changes in the model will be named accordingly - 4.0.1, 4.0.2, ...).
+  
+Minimum Element-Set for a Project POM
+
+  In order to furnish a basic set of information which we need to distinguish one
+  project from another, maven requires a minimum set of elements to be specified
+  in each project's pom.xml.
+  
+   - [modelVersion] tells maven which version of the object model this project
+       is compliant with (to support future legacy concerns)
+   
+   - [artifactId] tells maven what the artifact name is for this particular
+       project. Each project should have a distinct artifactId.
+       
+   - [version] tells maven what release of this artifact we're trying to produce.
+       The fact that a project has a distinct pom.xml should indicate a separate
+       release cycle that is also distinct to that project, so a concrete version
+       declaration is required.
+       
+   - [name] tells maven what the user-friendly name of this project is. The name 
+       element is similar to artifactId in that it is a unique descriptor for
+       this and only this project, and therefore should be concretely defined.
+       

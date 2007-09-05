@@ -1,0 +1,21 @@
+<model>
+  <groupId>maven-test</groupId>
+  <artifactId>maven-test-a</artifactId>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>maven-test-b</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>maven-test-z</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</model>
