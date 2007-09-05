@@ -61,15 +61,6 @@ public class DefaultPluginVersionManager
     // TODO: Revisit to remove this piece of state. PLUGIN REGISTRY MAY BE UPDATED ON DISK OUT-OF-PROCESS!
     private Map resolvedMetaVersions = new HashMap();
 
-    /**
-     * @deprecated
-     */
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        return resolvePluginVersion( groupId, artifactId, project, localRepository, false );
-    }
-
     public String resolvePluginVersion( String groupId,
                                         String artifactId,
                                         MavenProject project,
@@ -133,15 +124,6 @@ public class DefaultPluginVersionManager
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
             getLogger().debug( "Version from RELEASE metadata: " + version );
-        }
-
-        // if we're still empty here, and the current project matches the plugin in question, use the current project's
-        // version, I guess...
-        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId ) &&
-            project.getArtifactId().equals( artifactId ) )
-        {
-            version = project.getVersion();
-            getLogger().debug( "Version from POM itself (this project IS the plugin project): " + version );
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
