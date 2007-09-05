@@ -21,7 +21,6 @@
 
     import org.apache.maven.ArtifactFilterManager;
     import org.apache.maven.artifact.Artifact;
-    import org.apache.maven.artifact.ArtifactUtils;
     import org.apache.maven.artifact.factory.ArtifactFactory;
     import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
     import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -480,12 +479,12 @@ public class DefaultPluginManager
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
-                                                                                project.getManagedVersionMap(),
+                                                                                Collections.EMPTY_MAP,
                                                                                 localRepository, repositories,
                                                                                 artifactMetadataSource,
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
-        List resolved = new ArrayList( result.getArtifacts() );
+        Set resolved = new HashSet( result.getArtifacts() );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {
@@ -497,33 +496,9 @@ public class DefaultPluginManager
             }
         }
 
-        // This code below removes dependencies added by the project
-        // with the same group/artifactId as those specified
-        // by the plugin itself.
+        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
 
-        Set allResolved = new LinkedHashSet( resolved.size() );
-
-        Set seenVersionlessKeys = new HashSet();
-
-        for ( Iterator it = resolved.iterator(); it.hasNext(); )
-        {
-            Artifact resolvedArtifact = (Artifact) it.next();
-
-            String versionlessKey = ArtifactUtils.versionlessKey( resolvedArtifact );
-            if ( !seenVersionlessKeys.contains( versionlessKey ) )
-            {
-                allResolved.add( resolvedArtifact );
-                seenVersionlessKeys.add( versionlessKey );
-            }
-            else
-            {
-                getLogger().warn( "NOT including: " + resolvedArtifact.getId() + " in plugin dependencies." );
-            }
-        }
-
-        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + allResolved.toString().replace( ',', '\n' ) );
-
-        return allResolved;
+        return resolved;
     }
 
     // ----------------------------------------------------------------------
@@ -612,8 +587,6 @@ public class DefaultPluginManager
 
         try
         {
-            //ClassRealm pluginRealm = container.getComponentRealm(  )
-
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
             ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
@@ -1270,7 +1243,7 @@ public class DefaultPluginManager
         }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 artifact,
-                                                                                project.getManagedVersionMap(),
+                                                                                Collections.EMPTY_MAP,
                                                                                 context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
                                                                                 artifactMetadataSource, filter );
