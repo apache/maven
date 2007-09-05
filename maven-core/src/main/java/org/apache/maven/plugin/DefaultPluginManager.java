@@ -19,79 +19,78 @@
  * under the License.
  */
 
-import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.LifecycleExecutionContext;
-import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.monitor.logging.DefaultLog;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.version.PluginVersionManager;
-import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.reporting.MavenReport;
-import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
-import org.codehaus.plexus.component.configurator.ComponentConfigurator;
-import org.codehaus.plexus.component.configurator.ConfigurationListener;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+    import org.apache.maven.ArtifactFilterManager;
+    import org.apache.maven.artifact.Artifact;
+    import org.apache.maven.artifact.ArtifactUtils;
+    import org.apache.maven.artifact.factory.ArtifactFactory;
+    import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+    import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+    import org.apache.maven.artifact.metadata.ResolutionGroup;
+    import org.apache.maven.artifact.repository.ArtifactRepository;
+    import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+    import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+    import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+    import org.apache.maven.artifact.resolver.ArtifactResolver;
+    import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+    import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+    import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+    import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+    import org.apache.maven.artifact.versioning.VersionRange;
+    import org.apache.maven.context.BuildContextManager;
+    import org.apache.maven.execution.MavenSession;
+    import org.apache.maven.execution.RuntimeInformation;
+    import org.apache.maven.lifecycle.LifecycleExecutionContext;
+    import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
+    import org.apache.maven.model.Plugin;
+    import org.apache.maven.model.ReportPlugin;
+    import org.apache.maven.monitor.event.EventDispatcher;
+    import org.apache.maven.monitor.event.MavenEvents;
+    import org.apache.maven.monitor.logging.DefaultLog;
+    import org.apache.maven.plugin.descriptor.MojoDescriptor;
+    import org.apache.maven.plugin.descriptor.Parameter;
+    import org.apache.maven.plugin.descriptor.PluginDescriptor;
+    import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+    import org.apache.maven.plugin.logging.Log;
+    import org.apache.maven.plugin.version.PluginVersionManager;
+    import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+    import org.apache.maven.plugin.version.PluginVersionResolutionException;
+    import org.apache.maven.project.MavenProject;
+    import org.apache.maven.project.MavenProjectBuilder;
+    import org.apache.maven.project.ProjectBuildingException;
+    import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+    import org.apache.maven.project.artifact.MavenMetadataSource;
+    import org.apache.maven.project.path.PathTranslator;
+    import org.apache.maven.reporting.MavenReport;
+    import org.codehaus.plexus.PlexusConstants;
+    import org.codehaus.plexus.PlexusContainer;
+    import org.codehaus.plexus.PlexusContainerException;
+    import org.codehaus.plexus.classworlds.realm.ClassRealm;
+    import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+    import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+    import org.codehaus.plexus.component.configurator.ComponentConfigurator;
+    import org.codehaus.plexus.component.configurator.ConfigurationListener;
+    import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+    import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+    import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+    import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+    import org.codehaus.plexus.configuration.PlexusConfiguration;
+    import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+    import org.codehaus.plexus.context.Context;
+    import org.codehaus.plexus.context.ContextException;
+    import org.codehaus.plexus.logging.AbstractLogEnabled;
+    import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+    import org.codehaus.plexus.util.StringUtils;
+    import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+    import java.util.ArrayList;
+    import java.util.Collection;
+    import java.util.Collections;
+    import java.util.HashSet;
+    import java.util.Iterator;
+    import java.util.LinkedHashSet;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Set;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -164,28 +163,6 @@ public class DefaultPluginManager
                                                  session.getLocalRepository() );
     }
 
-    /**
-     * @deprecated
-     */
-    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                          ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
-        // TODO: this should be possibly outside
-        // All version-resolution logic has been moved to DefaultPluginVersionManager.
-        if ( plugin.getVersion() == null )
-        {
-            getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
-            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
-                                                                        project, localRepository );
-            plugin.setVersion( version );
-        }
-
-        return verifyVersionedPlugin( plugin, project, localRepository );
-    }
-
     public PluginDescriptor verifyPlugin( Plugin plugin,
                                           MavenProject project,
                                           MavenSession session )
@@ -250,9 +227,6 @@ public class DefaultPluginManager
 
                 artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-//                if ( !pluginCollector.isPluginInstalled( plugin ) )
-//                {
-//                }
                 addPlugin( plugin, pluginArtifact, project, localRepository );
             }
             else

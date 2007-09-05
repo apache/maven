@@ -28,12 +28,6 @@ public interface PluginVersionManager
 {
     String ROLE = PluginVersionManager.class.getName();
 
-    /**
-     * @deprecated
-     */
-    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
-
     String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
 

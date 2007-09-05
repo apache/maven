@@ -58,9 +58,6 @@ public class DefaultPluginVersionManager
 
     private RuntimeInformation runtimeInformation;
 
-    // TODO: Revisit to remove this piece of state. PLUGIN REGISTRY MAY BE UPDATED ON DISK OUT-OF-PROCESS!
-    private Map resolvedMetaVersions = new HashMap();
-
     public String resolvePluginVersion( String groupId,
                                         String artifactId,
                                         MavenProject project,
@@ -186,10 +183,6 @@ public class DefaultPluginVersionManager
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         String key = artifact.getDependencyConflictId();
-        if ( resolvedMetaVersions.containsKey( key ) )
-        {
-            return (String) resolvedMetaVersions.get( key );
-        }
 
         String version = null;
 
@@ -283,7 +276,6 @@ public class DefaultPluginVersionManager
         if ( !metaVersionId.equals( artifactVersion ) )
         {
             version = artifactVersion;
-            resolvedMetaVersions.put( key, version );
         }
 
         return version;
