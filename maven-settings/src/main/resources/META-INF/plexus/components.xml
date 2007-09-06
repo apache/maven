@@ -19,12 +19,10 @@ under the License.
 
 <component-set>
   <components>
-      
     <component>
       <role>org.apache.maven.settings.validation.SettingsValidator</role>
       <implementation>org.apache.maven.settings.validation.DefaultSettingsValidator</implementation>
     </component>
-
     <component>
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
@@ -36,13 +34,6 @@ under the License.
           <role>org.apache.maven.context.BuildContextManager</role>
         </requirement>
       </requirements>
-      <!--
-      <configuration>
-        <globalSettingsPath>${maven.home}/conf/settings.xml</globalSettingsPath>
-        <userSettingsPath>${user.home}/.m2/settings.xml</userSettingsPath>
-      </configuration>
-      -->
     </component>
-    
   </components>
 </component-set>
