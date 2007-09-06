@@ -1,4 +1,4 @@
-package org.apache.maven.project.injection;
+package org.apache.maven.profiles.injection;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

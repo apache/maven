@@ -1,4 +1,4 @@
-package org.apache.maven.project.build.profile;
+package org.apache.maven.profiles.build;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,7 +20,7 @@ package org.apache.maven.project.build.profile;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.manager.ProfileManager;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;

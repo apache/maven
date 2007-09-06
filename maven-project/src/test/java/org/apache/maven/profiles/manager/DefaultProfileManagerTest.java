@@ -1,4 +1,4 @@
-package org.apache.maven.profiles;
+package org.apache.maven.profiles.manager;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -27,6 +27,8 @@ import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.profiles.manager.DefaultProfileManager;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.List;

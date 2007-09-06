@@ -28,7 +28,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.manager.ProfileManager;
 import org.apache.maven.profiles.activation.CustomActivatorAdvice;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;

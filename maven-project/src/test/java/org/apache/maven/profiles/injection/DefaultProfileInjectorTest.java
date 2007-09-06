@@ -1,4 +1,4 @@
-package org.apache.maven.project.injection;
+package org.apache.maven.profiles.injection;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,6 +28,7 @@ import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.profiles.injection.DefaultProfileInjector;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Collections;

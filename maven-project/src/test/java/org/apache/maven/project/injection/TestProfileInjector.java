@@ -21,6 +21,7 @@ package org.apache.maven.project.injection;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.injection.ProfileInjector;
 
 public class TestProfileInjector
     implements ProfileInjector

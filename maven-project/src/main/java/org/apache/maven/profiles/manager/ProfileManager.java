@@ -1,4 +1,4 @@
-package org.apache.maven.profiles;
+package org.apache.maven.profiles.manager;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,7 +28,6 @@ import java.util.Map;
 
 public interface ProfileManager
 {
-
     void addProfile( Profile profile );
 
     void explicitlyActivate( String profileId );

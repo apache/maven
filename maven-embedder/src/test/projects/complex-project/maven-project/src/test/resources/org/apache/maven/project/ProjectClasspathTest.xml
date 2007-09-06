@@ -34,14 +34,14 @@ under the License.
     </component>
     -->
     <component>
-      <role>org.apache.maven.project.injection.ProfileInjector</role>
+      <role>org.apache.maven.profiles.injection.ProfileInjector</role>
       <role-hint>test</role-hint>
       <implementation>org.apache.maven.project.injection.TestProfileInjector</implementation>
     </component>
     <component>
-      <role>org.apache.maven.project.build.profile.ProfileAdvisor</role>
+      <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
       <role-hint>default</role-hint>
-      <implementation>org.apache.maven.project.build.profile.DefaultProfileAdvisor</implementation>
+      <implementation>org.apache.maven.profiles.build.DefaultProfileAdvisor</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.MavenTools</role>
@@ -50,7 +50,7 @@ under the License.
           <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.injection.ProfileInjector</role>
+          <role>org.apache.maven.profiles.injection.ProfileInjector</role>
           <role-hint>test</role-hint>
         </requirement>
       </requirements>
@@ -85,7 +85,7 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.build.profile.ProfileAdvisor</role>
+          <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
