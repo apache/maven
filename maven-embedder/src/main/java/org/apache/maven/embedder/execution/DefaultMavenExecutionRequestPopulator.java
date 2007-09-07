@@ -32,8 +32,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.profiles.manager.DefaultProfileManager;
-import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -110,9 +110,7 @@ public class DefaultMavenExecutionRequestPopulator
             try
             {
                 request.setSettings(
-                    settingsBuilder.buildSettings(
-                        configuration.getUserSettingsFile(),
-                        configuration.getGlobalSettingsFile() ) );
+                    settingsBuilder.buildSettings( request ) );
             }
             catch ( Exception e )
             {

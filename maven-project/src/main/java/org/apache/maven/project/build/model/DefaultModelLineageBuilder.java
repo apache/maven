@@ -31,7 +31,7 @@ import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.profiles.build.ProfileAdvisor;

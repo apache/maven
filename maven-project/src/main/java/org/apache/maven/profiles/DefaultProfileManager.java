@@ -1,4 +1,4 @@
-package org.apache.maven.profiles.manager;
+package org.apache.maven.profiles;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -63,7 +63,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#addProfile(org.apache.maven.model.Profile)
+    * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
     */
     public void addProfile( Profile profile )
     {
@@ -87,7 +87,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#explicitlyActivate(java.lang.String)
+    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
     */
     public void explicitlyActivate( String profileId )
     {
@@ -100,7 +100,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#explicitlyActivate(java.util.List)
+    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
     */
     public void explicitlyActivate( List profileIds )
     {
@@ -113,7 +113,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#explicitlyDeactivate(java.lang.String)
+    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
     */
     public void explicitlyDeactivate( String profileId )
     {
@@ -126,7 +126,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#explicitlyDeactivate(java.util.List)
+    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
     */
     public void explicitlyDeactivate( List profileIds )
     {
@@ -139,7 +139,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.manager.ProfileManager#getActiveProfiles()
+    * @see org.apache.maven.profiles.ProfileManager#getActiveProfiles()
     */
     public List getActiveProfiles()
         throws ProfileActivationException
@@ -247,7 +247,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-     * @see org.apache.maven.profiles.manager.ProfileManager#addProfiles(java.util.List)
+     * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
      */
     public void addProfiles( List profiles )
     {

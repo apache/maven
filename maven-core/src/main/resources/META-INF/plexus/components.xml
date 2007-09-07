@@ -726,9 +726,6 @@ under the License.
         <requirement>
           <role>org.apache.maven.settings.validation.SettingsValidator</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-        </requirement>
       </requirements>
     </component>
   </components>

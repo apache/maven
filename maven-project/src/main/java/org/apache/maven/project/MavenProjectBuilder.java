@@ -40,7 +40,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
