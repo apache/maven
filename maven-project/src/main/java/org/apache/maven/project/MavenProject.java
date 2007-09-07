@@ -261,6 +261,16 @@ public class MavenProject
         {
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
+        
+        if ( project.releaseArtifactRepository != null )
+        {
+            releaseArtifactRepository = project.releaseArtifactRepository;
+        }
+        
+        if ( project.snapshotArtifactRepository != null )
+        {
+            snapshotArtifactRepository = project.snapshotArtifactRepository;
+        }
     }
     
     public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
