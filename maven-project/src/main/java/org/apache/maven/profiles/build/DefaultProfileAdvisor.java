@@ -26,14 +26,14 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
-import org.apache.maven.profiles.manager.DefaultProfileManager;
 import org.apache.maven.profiles.MavenProfilesBuilder;
-import org.apache.maven.profiles.manager.ProfileManager;
 import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.profiles.injection.ProfileInjector;
+import org.apache.maven.profiles.manager.DefaultProfileManager;
+import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -47,7 +47,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Properties;
 
 public class DefaultProfileAdvisor
     implements ProfileAdvisor, Contextualizable
