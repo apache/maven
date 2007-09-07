@@ -33,7 +33,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -54,13 +53,10 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.profiles.manager.DefaultProfileManager;
-import org.apache.maven.profiles.manager.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
@@ -77,7 +73,6 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
@@ -142,8 +137,6 @@ public class MavenEmbedder
 
     private MavenJDOMWriter modelWriter;
 
-    private ProfileManager profileManager;
-
     private PluginDescriptorBuilder pluginDescriptorBuilder;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
@@ -158,17 +151,11 @@ public class MavenEmbedder
 
     private Maven maven;
 
-    private MavenSettingsBuilder settingsBuilder;
-
     private MavenExecutionRequestPopulator populator;
 
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
-
-    private Settings settings;
-
-    private ArtifactRepository localRepository;
 
     private ClassWorld classWorld;
 
@@ -183,8 +170,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private Configuration configuration;
-
-    private BuildContextManager buildContextManager;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -207,12 +192,12 @@ public class MavenEmbedder
 
     public ArtifactRepository getLocalRepository()
     {
-        return localRepository;
+        return request.getLocalRepository();
     }
 
     public Settings getSettings()
     {
-        return settings;
+        return request.getSettings();
     }
 
     public MavenEmbedderLogger getLogger()
@@ -342,10 +327,6 @@ public class MavenEmbedder
     {
         PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setSettings( settings )
-            .setLocalRepository( localRepository );
-
         MavenSession session = new MavenSession( container, request, null, null );
 
         pluginManager.verifyPlugin( plugin, project, session );
@@ -411,7 +392,7 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
     {
-        return mavenProjectBuilder.build( mavenProject, localRepository, profileManager, false );
+        return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager(), false );
     }
 
     /**
@@ -466,7 +447,7 @@ public class MavenEmbedder
             projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
                 new File( request.getPomFile() ),
                 request.getLocalRepository(),
-                profileManager,
+                request.getProfileManager(),
                 request.getTransferListener() );
         }
         catch ( ProjectBuildingException e )
@@ -576,12 +557,10 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    // Remote Repository
-    // ----------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------
     //  LegacyLifecycle
     // ----------------------------------------------------------------------
+    
+    private MavenExecutionRequest request;
 
     private void start( Configuration configuration )
         throws MavenEmbedderException
@@ -649,19 +628,9 @@ public class MavenEmbedder
 
             maven = (Maven) container.lookup( Maven.ROLE );
 
-            settingsBuilder = (MavenSettingsBuilder) container.lookup( MavenSettingsBuilder.ROLE );
-
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
-            profileManager = new DefaultProfileManager( container, configuration.getSystemProperties() );
-
-            profileManager.explicitlyActivate( configuration.getActiveProfiles() );
-
-            profileManager.explicitlyDeactivate( configuration.getInactiveProfiles() );
-
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-
-            buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE, "default" );
 
             // ----------------------------------------------------------------------
             // Artifact related components
@@ -681,21 +650,11 @@ public class MavenEmbedder
 
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
-            try
-            {
-                settings = settingsBuilder.buildSettings( configuration.getUserSettingsFile(),
-                    configuration.getGlobalSettingsFile() );
-            }
-            catch ( Exception e )
-            {
-                // If something goes wrong with parsing the settings
-                settings = new Settings();
-            }
+            // This is temporary as we can probably cache a single request and use it for default values and
+            // simply cascade values in from requests used for individual executions.
+            request = new DefaultMavenExecutionRequest();
 
-            localRepository = createLocalRepository( settings );
-
-            profileManager.loadSettingsProfiles( settings );
-
+            populator.populateDefaults( request, this );
         }
         catch ( ComponentLookupException e )
         {
@@ -749,20 +708,7 @@ public class MavenEmbedder
     public void stop()
         throws MavenEmbedderException
     {
-        try
-        {
-            buildContextManager.clearBuildContext();
-
-            container.release( buildContextManager );
-
-            container.release( mavenProjectBuilder );
-
-            container.release( artifactRepositoryFactory );
-        }
-        catch ( ComponentLifecycleException e )
-        {
-            throw new MavenEmbedderException( "Cannot stop the embedder.", e );
-        }
+        container.dispose();
     }
 
     // ----------------------------------------------------------------------------

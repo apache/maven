@@ -28,14 +28,17 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.manager.DefaultProfileManager;
 import org.apache.maven.profiles.manager.ProfileManager;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -50,6 +53,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * DefaultMavenExecutionRequestPopulator
@@ -67,6 +71,8 @@ public class DefaultMavenExecutionRequestPopulator
     private PlexusContainer container;
 
     private WagonManager wagonManager;
+
+    private MavenSettingsBuilder settingsBuilder;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
                                                    MavenEmbedder embedder )
@@ -88,12 +94,22 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getSettings() == null )
         {
-            request.setSettings( embedder.getSettings() );
+            try
+            {
+                request.setSettings(
+                    settingsBuilder.buildSettings(
+                        embedder.getConfiguration().getUserSettingsFile(),
+                        embedder.getConfiguration().getGlobalSettingsFile() ) );
+            }
+            catch( Exception e )
+            {
+                request.setSettings( new Settings() );
+            }
         }
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( embedder.getLocalRepository() );
+            request.setLocalRepository( embedder.createLocalRepository( request.getSettings() ) );
         }
 
         // Repository update policies
@@ -168,7 +184,15 @@ public class DefaultMavenExecutionRequestPopulator
 
         // Create the standard profile manager
 
-        request.setProfileManager( createProfileManager( request ) );
+        ProfileManager globalProfileManager = new DefaultProfileManager( container );
+
+        loadSettingsProfiles( globalProfileManager, request.getSettings() );
+
+        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
+
+        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
+
+        request.setProfileManager( globalProfileManager );
 
         return request;
     }
@@ -229,23 +253,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    // ------------------------------------------------------------------------
-    // Profile Manager
-    // ------------------------------------------------------------------------
-
-    public ProfileManager createProfileManager( MavenExecutionRequest request )
-    {
-        ProfileManager globalProfileManager = new DefaultProfileManager( container, request.getProperties() );
-
-        globalProfileManager.loadSettingsProfiles( request.getSettings() );
-
-        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
-
-        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
-
-        return globalProfileManager;        
-    }
-
     // ----------------------------------------------------------------------------
     // LegacyLifecycle
     // ----------------------------------------------------------------------------
@@ -255,4 +262,26 @@ public class DefaultMavenExecutionRequestPopulator
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+
+    public void loadSettingsProfiles( ProfileManager profileManager, Settings settings )
+    {
+        List settingsProfiles = settings.getProfiles();
+
+        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
+        {
+            List settingsActiveProfileIds = settings.getActiveProfiles();
+
+            profileManager.explicitlyActivate( settingsActiveProfileIds );
+
+            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
+            {
+                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
+
+                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
+
+                profileManager.addProfile( profile );
+            }
+        }
+    }
+
 }
