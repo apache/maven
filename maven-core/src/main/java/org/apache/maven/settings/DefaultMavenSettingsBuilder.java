@@ -21,6 +21,7 @@ package org.apache.maven.settings;
 
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.SystemBuildContext;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.SettingsValidationResult;
@@ -37,7 +38,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -95,11 +95,12 @@ public class DefaultMavenSettingsBuilder
     }
 
     private Settings interpolate( Settings settings )
-        throws IOException
+        throws IOException, XmlPullParserException
     {
         List activeProfiles = settings.getActiveProfiles();
 
         StringWriter writer = new StringWriter();
+        
         new SettingsXpp3Writer().write( writer, settings );
 
         String serializedSettings = writer.toString();
@@ -109,24 +110,14 @@ public class DefaultMavenSettingsBuilder
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
         interpolator.addValueSource( new PropertiesBasedValueSource( sysContext.getSystemProperties() ) );
+
         interpolator.addValueSource( new EnvarBasedValueSource() );
 
         serializedSettings = interpolator.interpolate( serializedSettings, "settings" );
 
-        Settings result;
-        try
-        {
-            result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
+        Settings result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
 
-            result.setActiveProfiles( activeProfiles );
-        }
-        catch ( XmlPullParserException e )
-        {
-            IOException error = new IOException( "Failed to parse interpolated settings: " + e.getMessage() );
-            error.initCause( e );
-
-            throw error;
-        }
+        result.setActiveProfiles( activeProfiles );
 
         return result;
     }
