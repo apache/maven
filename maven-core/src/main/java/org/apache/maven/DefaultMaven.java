@@ -294,7 +294,6 @@ public class DefaultMaven
                 files,
                 request.getLocalRepository(),
                 request.isRecursive(),
-                request.getSettings(),
                 request.getProfileManager(),
                 !request.useReactor() );
 
@@ -323,7 +322,6 @@ public class DefaultMaven
     private List collectProjects( List files,
                                   ArtifactRepository localRepository,
                                   boolean recursive,
-                                  Settings settings,
                                   ProfileManager globalProfileManager,
                                   boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
@@ -425,7 +423,6 @@ public class DefaultMaven
                         moduleFiles,
                         localRepository,
                         recursive,
-                        settings,
                         globalProfileManager,
                         false );
                 projects.addAll( collectedProjects );

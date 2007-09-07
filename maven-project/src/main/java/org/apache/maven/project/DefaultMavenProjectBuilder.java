@@ -269,6 +269,8 @@ public class DefaultMavenProjectBuilder
         try
         {
             superProject.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+
+            superProject.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -974,6 +976,7 @@ public class DefaultMavenProjectBuilder
         project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( model.getPluginRepositories() ) );
 
         DistributionManagement dm = model.getDistributionManagement();
+
         if ( dm != null )
         {
             ArtifactRepository repo = mavenTools.buildDeploymentArtifactRepository( dm.getRepository() );
@@ -990,10 +993,6 @@ public class DefaultMavenProjectBuilder
 
         if ( parentProject != null )
         {
-//            Artifact parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
-//                                                                            parentProject.getArtifactId(),
-//                                                                            parentProject.getVersion() );
-            // the parent artifact from the parameter passed project instance is resolved.
             project.setParentArtifact( parentArtifact );
         }
 
