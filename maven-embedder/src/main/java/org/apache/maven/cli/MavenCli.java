@@ -351,7 +351,7 @@ public class MavenCli
 
         File userSettingsFile;
 
-        if ( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) != null )
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
         }
