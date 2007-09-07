@@ -264,6 +264,16 @@ public class MavenProject
         {
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
+        
+        if ( project.releaseArtifactRepository != null )
+        {
+            releaseArtifactRepository = project.releaseArtifactRepository;
+        }
+        
+        if ( project.snapshotArtifactRepository != null )
+        {
+            snapshotArtifactRepository = project.snapshotArtifactRepository;
+        }
     }
     
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject

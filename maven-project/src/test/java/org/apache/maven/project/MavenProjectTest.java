@@ -146,4 +146,14 @@ public class MavenProjectTest
 
         assertEquals( "..", pathAdjustment );
     }
+    
+    public void testCopyConstructorWithDistributionManagement() throws Exception
+    {
+        
+        File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
+        MavenProject projectToClone = getProject( f );
+
+        MavenProject clonedProject = new MavenProject( projectToClone );
+        assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
+    }
 }
