@@ -23,8 +23,6 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -55,33 +53,9 @@ public class DefaultProfileManager
      * are passed to maven, possibly containing profile activator properties
      *
      */
-    public DefaultProfileManager( PlexusContainer container, Properties props )
-    {
-        this( container, null, props );
-        
-    }
-
-    /**
-     * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work correctly
-     * in embedded envirnments.
-     */
-    public DefaultProfileManager( PlexusContainer container, Settings settings )
+    public DefaultProfileManager( PlexusContainer container )
     {
         this.container = container;
-
-        loadSettingsProfiles( settings );
-    }
-    
-    /**
-     * the properties passed to the profile manager are the props that
-     * are passed to maven, possibly containing profile activator properties
-     *
-     */
-    public DefaultProfileManager( PlexusContainer container, Settings settings, Properties props )
-    {
-        this.container = container;
-
-        loadSettingsProfiles( settings );
     }
     
     public Map getProfilesById()
@@ -307,31 +281,5 @@ public class DefaultProfileManager
     public List getIdsActivatedByDefault()
     {
         return defaultIds;
-    }
-
-    public void loadSettingsProfiles( Settings settings )
-    {
-        if ( settings == null )
-        {
-            return;
-        }
-
-        List settingsProfiles = settings.getProfiles();
-
-        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
-        {
-            List settingsActiveProfileIds = settings.getActiveProfiles();
-
-            explicitlyActivate( settingsActiveProfileIds );
-
-            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
-            {
-                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
-
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                addProfile( profile );
-            }
-        }
     }
 }

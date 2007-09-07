@@ -51,8 +51,5 @@ public interface ProfileManager
 
     List getExplicitlyDeactivatedIds();
 
-    List getIdsActivatedByDefault();
-
-    void loadSettingsProfiles( Settings settings );
-    
+    List getIdsActivatedByDefault();    
 }

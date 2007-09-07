@@ -128,7 +128,7 @@ public class DefaultProfileAdvisor
                                                 List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = new DefaultProfileManager( container, new Properties() );
+        ProfileManager profileManager = new DefaultProfileManager( container );
 
         profileManager.explicitlyActivate( explicitlyActiveIds );
         profileManager.explicitlyDeactivate( explicitlyInactiveIds );
