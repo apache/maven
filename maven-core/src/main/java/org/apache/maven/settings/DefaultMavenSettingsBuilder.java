@@ -21,7 +21,6 @@ package org.apache.maven.settings;
 
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.context.SystemBuildContext;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.SettingsValidationResult;
@@ -182,20 +181,5 @@ public class DefaultMavenSettingsBuilder
         {
             throw new IOException( "Failed to validate Settings file at " + location + "\n" + validationResult.render( "\n" ) );
         }
-    }
-
-    /**
-      * @return a <code>Settings</code> object from the user and global settings file.
-      * @throws IOException if any
-      * @throws XmlPullParserException if any
-      * @deprecated Use {@link org.apache.maven.settings.MavenSettingsBuilder#buildSettings(java.io.File,java.io.File)} instead.
-     */
-    public Settings buildSettings()
-        throws IOException, XmlPullParserException
-    {
-        String mavenHome = System.getProperty( "maven.home" );
-        String userHome = System.getProperty( "user.home" );
-
-        return buildSettings( new File( userHome, ".m2/settings.xml" ), new File( mavenHome, "conf/settings.xml" ) );
     }
 }

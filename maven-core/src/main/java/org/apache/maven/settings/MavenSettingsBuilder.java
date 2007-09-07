@@ -39,15 +39,6 @@ public interface MavenSettingsBuilder
     String ROLE = MavenSettingsBuilder.class.getName();
 
     /**
-    * @return a <code>Settings</code> object from the user and global settings file.
-    * @throws IOException if any
-    * @throws XmlPullParserException if any
-    * @deprecated Use {@link org.apache.maven.settings.MavenSettingsBuilder#buildSettings(java.io.File,java.io.File)} instead.
-    */
-   Settings buildSettings()
-       throws IOException, XmlPullParserException;
-
-    /**
      *
      * @param userSettingsFile
      * @param globalSettingsFile
