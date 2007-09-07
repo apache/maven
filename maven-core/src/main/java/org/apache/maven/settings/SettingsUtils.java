@@ -73,27 +73,12 @@ public final class SettingsUtils
                 if ( !dominantActiveProfiles.contains( profileId ) )
                 {
                     dominantActiveProfiles.add( profileId );
-
-                    if ( dominant.getRuntimeInfo() != null )
-                    {
-                        dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
-                    }
                 }
             }
         }
 
-        if ( dominant.getRuntimeInfo() != null && recessive.getRuntimeInfo() != null )
-        {
-            List recessiveLocations = recessive.getRuntimeInfo().getLocations();
-            for ( Iterator it = recessiveLocations.iterator(); it.hasNext(); )
-            {
-                String path = (String) it.next();
-
-                dominant.getRuntimeInfo().addLocation( path );
-            }
-        }
-
         List dominantPluginGroupIds = dominant.getPluginGroups();
+
         List recessivePluginGroupIds = recessive.getPluginGroups();
 
         if ( recessivePluginGroupIds != null )
@@ -111,11 +96,6 @@ public final class SettingsUtils
                 if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
                 {
                     dominantPluginGroupIds.add( pluginGroupId );
-
-                    if ( dominant.getRuntimeInfo() != null )
-                    {
-                        dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
-                    }
                 }
             }
         }
@@ -123,11 +103,6 @@ public final class SettingsUtils
         if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
-
-            if ( dominant.getRuntimeInfo() != null )
-            {
-                dominant.getRuntimeInfo().setLocalRepositorySourceLevel( recessiveSourceLevel );
-            }
         }
 
         shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );

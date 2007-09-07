@@ -19,8 +19,7 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.context.SystemBuildContext;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.SettingsValidationResult;
@@ -49,18 +48,18 @@ public class DefaultMavenSettingsBuilder
 {
     private SettingsValidator validator;
 
-    private BuildContextManager manager;
-
-    /**
-     * @since 2.1
-     */
-    public Settings buildSettings( File userSettingsFile, File globalSettingsFile )
+    /** @since 2.1 */
+    public Settings buildSettings( MavenExecutionRequest request )        
         throws IOException, XmlPullParserException
     {
+        File userSettingsFile = request.getUserSettingsFile();
+
+        File globalSettingsFile = request.getGlobalSettingsFile();
+
         if ( ( globalSettingsFile == null ) && ( userSettingsFile == null ) )
         {
             getLogger().debug(
-                               "No settings files provided, and default locations are disabled for this request. Returning empty Settings instance." );
+                "No settings files provided, and default locations are disabled for this request. Returning empty Settings instance." );
             return new Settings();
         }
 
@@ -82,37 +81,46 @@ public class DefaultMavenSettingsBuilder
             userSettings = new Settings();
         }
 
-        validateSettings( globalSettings, globalSettingsFile );
+        validateSettings(
+            globalSettings,
+            globalSettingsFile );
 
-        validateSettings( userSettings, userSettingsFile );
+        validateSettings(
+            userSettings,
+            userSettingsFile );
 
-        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        SettingsUtils.merge(
+            userSettings,
+            globalSettings,
+            TrackableBase.GLOBAL_LEVEL );
 
-        userSettings = interpolate( userSettings );
+        userSettings = interpolate( userSettings, request );
 
         return userSettings;
     }
 
-    private Settings interpolate( Settings settings )
+    private Settings interpolate( Settings settings, MavenExecutionRequest request )
         throws IOException, XmlPullParserException
     {
         List activeProfiles = settings.getActiveProfiles();
 
         StringWriter writer = new StringWriter();
-        
-        new SettingsXpp3Writer().write( writer, settings );
+
+        new SettingsXpp3Writer().write(
+            writer,
+            settings );
 
         String serializedSettings = writer.toString();
 
-        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( manager, true );
-
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
-        interpolator.addValueSource( new PropertiesBasedValueSource( sysContext.getSystemProperties() ) );
+        interpolator.addValueSource( new PropertiesBasedValueSource( request.getProperties() ) );
 
         interpolator.addValueSource( new EnvarBasedValueSource() );
 
-        serializedSettings = interpolator.interpolate( serializedSettings, "settings" );
+        serializedSettings = interpolator.interpolate(
+            serializedSettings,
+            "settings" );
 
         Settings result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
 
@@ -127,52 +135,44 @@ public class DefaultMavenSettingsBuilder
         if ( settingsFile == null )
         {
             getLogger().debug( "Settings file is null. Returning." );
+
             return null;
         }
 
         Settings settings = null;
 
-        if ( settingsFile.exists() && settingsFile.isFile() )
+        FileReader reader = null;
+
+        try
         {
-            getLogger().debug( "Settings file is a proper file. Reading." );
+            reader = new FileReader( settingsFile );
 
-            FileReader reader = null;
-            try
-            {
-                reader = new FileReader( settingsFile );
+            SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
-                SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
+            settings = modelReader.read( reader );
+        }
+        catch ( XmlPullParserException e )
+        {
+            getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing XmlPullParserException..." );
 
-                settings = modelReader.read( reader );
+            throw e;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing IOException..." );
 
-                RuntimeInfo rtInfo = new RuntimeInfo( settings );
-
-                rtInfo.addLocation( settingsFile.getAbsolutePath() );
-
-                settings.setRuntimeInfo( rtInfo );
-            }
-            catch ( XmlPullParserException e )
-            {
-                getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing XmlPullParserException..." );
-
-                throw e;
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing IOException..." );
-
-                throw e;
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
+            throw e;
+        }
+        finally
+        {
+            IOUtil.close( reader );
         }
 
         return settings;
     }
 
-    private void validateSettings( Settings settings, File location )
+    private void validateSettings( Settings settings,
+                                   File location )
         throws IOException
     {
         SettingsValidationResult validationResult = validator.validate( settings );

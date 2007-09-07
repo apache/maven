@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class DefaultMavenExecutionRequest
@@ -59,6 +59,16 @@ public class DefaultMavenExecutionRequest
     private boolean usePluginUpdateOverride;
 
     private boolean isProjectPresent = true;
+
+    // ----------------------------------------------------------------------------
+    // We need to allow per execution user and global settings as the embedder
+    // might be running in a mode where its executing many threads with totally
+    // different settings.
+    // ----------------------------------------------------------------------------
+
+    private File userSettingsFile;
+
+    private File globalSettingsFile;
 
     // ----------------------------------------------------------------------------
     // Request
@@ -528,6 +538,32 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setProjectPresent( boolean projectPresent )
     {
         isProjectPresent = projectPresent;
+
+        return this;
+    }
+
+    // Settings files
+
+    public File getUserSettingsFile()
+    {
+        return userSettingsFile;
+    }
+
+    public MavenExecutionRequest setUserSettingsFile( File userSettingsFile )
+    {
+        this.userSettingsFile = userSettingsFile;
+
+        return this;
+    }
+
+    public File getGlobalSettingsFile()
+    {
+        return globalSettingsFile;
+    }
+
+    public MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile )
+    {
+        this.globalSettingsFile = globalSettingsFile;
 
         return this;
     }

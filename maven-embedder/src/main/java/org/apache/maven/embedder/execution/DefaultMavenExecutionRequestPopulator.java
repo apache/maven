@@ -20,11 +20,12 @@ package org.apache.maven.embedder.execution;
  */
 
 import org.apache.maven.Maven;
-import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -38,6 +39,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
@@ -49,9 +51,11 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,7 +66,8 @@ import java.util.List;
  */
 public class DefaultMavenExecutionRequestPopulator
     extends AbstractLogEnabled
-    implements MavenExecutionRequestPopulator, Contextualizable
+    implements MavenExecutionRequestPopulator,
+    Contextualizable
 {
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
@@ -75,22 +80,30 @@ public class DefaultMavenExecutionRequestPopulator
     private MavenSettingsBuilder settingsBuilder;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
-                                                   MavenEmbedder embedder )
+                                                   Configuration configuration )
         throws MavenEmbedderException
     {
         // Actual POM File
 
         if ( request.getPomFile() == null && request.getBaseDirectory() != null )
         {
-            File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
+            File pom = new File(
+                request.getBaseDirectory(),
+                Maven.RELEASE_POMv4 );
 
             if ( !pom.exists() )
             {
-                pom = new File( request.getBaseDirectory(), Maven.POMv4 );
+                pom = new File(
+                    request.getBaseDirectory(),
+                    Maven.POMv4 );
             }
 
             request.setPomFile( pom.getAbsolutePath() );
         }
+
+        request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+
+        request.setUserSettingsFile( configuration.getUserSettingsFile() );
 
         if ( request.getSettings() == null )
         {
@@ -98,10 +111,10 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 request.setSettings(
                     settingsBuilder.buildSettings(
-                        embedder.getConfiguration().getUserSettingsFile(),
-                        embedder.getConfiguration().getGlobalSettingsFile() ) );
+                        configuration.getUserSettingsFile(),
+                        configuration.getGlobalSettingsFile() ) );
             }
-            catch( Exception e )
+            catch ( Exception e )
             {
                 request.setSettings( new Settings() );
             }
@@ -109,7 +122,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( embedder.createLocalRepository( request.getSettings() ) );
+            request.setLocalRepository( createLocalRepository( request.getSettings(), configuration ) );
         }
 
         // Repository update policies
@@ -161,7 +174,9 @@ public class DefaultMavenExecutionRequestPopulator
         }
         catch ( Exception e )
         {
-            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
+            throw new MavenEmbedderException(
+                "Unable to configure Maven for execution",
+                e );
         }
 
         // BaseDirectory in MavenExecutionRequest
@@ -186,7 +201,9 @@ public class DefaultMavenExecutionRequestPopulator
 
         ProfileManager globalProfileManager = new DefaultProfileManager( container );
 
-        loadSettingsProfiles( globalProfileManager, request.getSettings() );
+        loadSettingsProfiles(
+            globalProfileManager,
+            request.getSettings() );
 
         globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
 
@@ -213,27 +230,41 @@ public class DefaultMavenExecutionRequestPopulator
                     throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                 }
 
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       proxy.getPassword(), proxy.getNonProxyHosts() );
+                wagonManager.addProxy(
+                    proxy.getProtocol(),
+                    proxy.getHost(),
+                    proxy.getPort(),
+                    proxy.getUsername(),
+                    proxy.getPassword(),
+                    proxy.getNonProxyHosts() );
             }
 
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
             {
                 Server server = (Server) i.next();
 
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                    server.getPrivateKey(), server.getPassphrase() );
+                wagonManager.addAuthenticationInfo(
+                    server.getId(),
+                    server.getUsername(),
+                    server.getPassword(),
+                    server.getPrivateKey(),
+                    server.getPassphrase() );
 
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
+                wagonManager.addPermissionInfo(
+                    server.getId(),
+                    server.getFilePermissions(),
+                    server.getDirectoryPermissions() );
 
                 if ( server.getConfiguration() != null )
                 {
-                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
+                    wagonManager.addConfiguration(
+                        server.getId(),
+                        (Xpp3Dom) server.getConfiguration() );
                 }
             }
 
             RepositoryPermissions defaultPermissions = new RepositoryPermissions();
-            
+
             defaultPermissions.setDirectoryMode( "775" );
 
             defaultPermissions.setFileMode( "664" );
@@ -244,7 +275,10 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 Mirror mirror = (Mirror) i.next();
 
-                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+                wagonManager.addMirror(
+                    mirror.getId(),
+                    mirror.getMirrorOf(),
+                    mirror.getUrl() );
             }
         }
         finally
@@ -263,7 +297,8 @@ public class DefaultMavenExecutionRequestPopulator
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    public void loadSettingsProfiles( ProfileManager profileManager, Settings settings )
+    public void loadSettingsProfiles( ProfileManager profileManager,
+                                      Settings settings )
     {
         List settingsProfiles = settings.getProfiles();
 
@@ -284,4 +319,111 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
+    // ----------------------------------------------------------------------
+    // Local Repository
+    // ----------------------------------------------------------------------
+
+    public ArtifactRepository createLocalRepository( Settings settings, Configuration configuration )
+        throws MavenEmbedderException
+    {
+        String localRepositoryPath = null;
+
+        if ( configuration.getLocalRepository() != null )
+        {
+            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
+        }
+
+        if ( StringUtils.isEmpty( localRepositoryPath ) )
+        {
+            localRepositoryPath = settings.getLocalRepository();
+        }
+
+        if ( StringUtils.isEmpty( localRepositoryPath ) )
+        {
+            localRepositoryPath = MavenEmbedder.defaultUserLocalRepository.getAbsolutePath();
+        }
+
+        return createLocalRepository(
+            localRepositoryPath,
+            MavenEmbedder.DEFAULT_LOCAL_REPO_ID );
+    }
+
+    public ArtifactRepository createLocalRepository( String url,
+                                                     String repositoryId )
+        throws MavenEmbedderException
+    {
+        try
+        {
+            return createRepository(
+                canonicalFileUrl( url ),
+                repositoryId );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenEmbedderException(
+                "Unable to resolve canonical path for local repository " + url,
+                e );
+        }
+    }
+
+    private String canonicalFileUrl( String url )
+        throws IOException
+    {
+        if ( !url.startsWith( "file:" ) )
+        {
+            url = "file://" + url;
+        }
+        else if ( url.startsWith( "file:" ) && !url.startsWith( "file://" ) )
+        {
+            url = "file://" + url.substring( "file:".length() );
+        }
+
+        // So now we have an url of the form file://<path>
+
+        // We want to eliminate any relative path nonsense and lock down the path so we
+        // need to fully resolve it before any sub-modules use the path. This can happen
+        // when you are using a custom settings.xml that contains a relative path entry
+        // for the local repository setting.
+
+        File localRepository = new File( url.substring( "file://".length() ) );
+
+        if ( !localRepository.isAbsolute() )
+        {
+            url = "file://" + localRepository.getCanonicalPath();
+        }
+
+        return url;
+    }
+
+    public ArtifactRepository createRepository( String url,
+                                                String repositoryId )
+    {
+        // snapshots vs releases
+        // offline = to turning the update policy off
+
+        //TODO: we'll need to allow finer grained creation of repositories but this will do for now
+
+        String updatePolicyFlag = ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS;
+
+        String checksumPolicyFlag = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+
+        ArtifactRepositoryPolicy snapshotsPolicy =
+            new ArtifactRepositoryPolicy(
+                true,
+                updatePolicyFlag,
+                checksumPolicyFlag );
+
+        ArtifactRepositoryPolicy releasesPolicy =
+            new ArtifactRepositoryPolicy(
+                true,
+                updatePolicyFlag,
+                checksumPolicyFlag );
+
+        return artifactRepositoryFactory.createArtifactRepository(
+            repositoryId,
+            url,
+            defaultArtifactRepositoryLayout,
+            snapshotsPolicy,
+            releasesPolicy );
+    }
 }

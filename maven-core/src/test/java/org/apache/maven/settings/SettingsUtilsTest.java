@@ -32,13 +32,9 @@ public class SettingsUtilsTest
         Settings dominant = new Settings();
         dominant.addPluginGroup( "org.apache.maven.plugins" );
         dominant.addPluginGroup( "org.codehaus.modello" );
-        
-        dominant.setRuntimeInfo(new RuntimeInfo(dominant));
 
         Settings recessive = new Settings();
         recessive.addPluginGroup( "org.codehaus.plexus" );
-
-        recessive.setRuntimeInfo(new RuntimeInfo(recessive));
 
         SettingsUtils.merge( dominant, recessive, Settings.GLOBAL_LEVEL );
 

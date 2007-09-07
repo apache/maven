@@ -59,7 +59,7 @@ public class MavenEmbedderExampleTest
 
             if ( result.hasExceptions() )
             {
-                // Notify user that exceptions have occured.
+                fail( ((Exception)result.getExceptions().get( 0 )).getMessage() );
             }
 
             // ----------------------------------------------------------------------------

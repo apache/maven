@@ -28,10 +28,14 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
+          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
+          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>

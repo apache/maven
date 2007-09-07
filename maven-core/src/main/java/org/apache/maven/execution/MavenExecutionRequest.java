@@ -189,4 +189,10 @@ public interface MavenExecutionRequest
 
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
+
+    File getUserSettingsFile();    
+    MavenExecutionRequest setUserSettingsFile( File userSettingsFile );
+
+    File getGlobalSettingsFile();
+    MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
 }

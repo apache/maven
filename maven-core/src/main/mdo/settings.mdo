@@ -392,18 +392,6 @@
 
         return profileMap;
     }
-
-    private RuntimeInfo runtimeInfo;
-
-    public void setRuntimeInfo( RuntimeInfo runtimeInfo )
-    {
-        this.runtimeInfo = runtimeInfo;
-    }
-
-    public RuntimeInfo getRuntimeInfo()
-    {
-        return runtimeInfo;
-    }
             ]]>
           </code>
         </codeSegment>

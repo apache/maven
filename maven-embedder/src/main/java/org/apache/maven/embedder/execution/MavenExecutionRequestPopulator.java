@@ -19,7 +19,7 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
-import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 
@@ -27,6 +27,6 @@ public interface MavenExecutionRequestPopulator
 {
     String ROLE = MavenExecutionRequestPopulator.class.getName();
 
-    MavenExecutionRequest populateDefaults( MavenExecutionRequest request, MavenEmbedder embedder )
+    MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException;
 }
