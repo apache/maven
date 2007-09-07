@@ -20,7 +20,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import org.apache.maven.Maven;
-import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;

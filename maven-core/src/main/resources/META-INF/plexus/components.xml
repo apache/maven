@@ -43,7 +43,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.ArtifactFilterManager</role>
       <implementation>org.apache.maven.DefaultArtifactFilterManager</implementation>
@@ -110,8 +110,8 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-	      <role>org.apache.maven.artifact.manager.WagonManager</role>
-    	  <role-hint>default</role-hint>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>
@@ -538,7 +538,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.codehaus.plexus.collections.ActiveMap</role>
       <role-hint>lifecycle-loaders-by-packaging</role-hint>
@@ -547,7 +547,7 @@ under the License.
         <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
       </configuration>
     </component>
-    
+
     <component>
       <role>org.codehaus.plexus.collections.ActiveMap</role>
       <role-hint>legacy-lifecycle-mappings-by-packaging</role-hint>
@@ -556,7 +556,7 @@ under the License.
         <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.plugin.loader.PluginLoader</role>
       <role-hint>default</role-hint>
@@ -576,7 +576,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
       <role-hint>default</role-hint>
@@ -675,7 +675,7 @@ under the License.
         <!-- END SNIPPET: default-reports -->
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.plan.BuildPlanner</role>
       <role-hint>default</role-hint>
@@ -692,7 +692,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
       <role-hint>default</role-hint>
@@ -703,7 +703,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
       <role-hint>default</role-hint>
@@ -714,6 +714,22 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
+    <component>
+      <role>org.apache.maven.settings.validation.SettingsValidator</role>
+      <implementation>org.apache.maven.settings.validation.DefaultSettingsValidator</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.settings.validation.SettingsValidator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+        </requirement>
+      </requirements>
+    </component>
   </components>
 </component-set>

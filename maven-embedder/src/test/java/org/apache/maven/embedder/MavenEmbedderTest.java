@@ -20,9 +20,8 @@ package org.apache.maven.embedder;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.SettingsConfigurationException;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;

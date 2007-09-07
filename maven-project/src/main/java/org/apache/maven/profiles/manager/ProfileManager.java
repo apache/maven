@@ -21,7 +21,6 @@ package org.apache.maven.profiles.manager;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.settings.Settings;
 
 import java.util.List;
 import java.util.Map;
