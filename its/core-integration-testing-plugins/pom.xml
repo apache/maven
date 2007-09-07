@@ -23,4 +23,15 @@
     <module>maven-it-plugin-touch</module>    
     <module>maven-it-plugin-uses-properties</module>    
   </modules>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

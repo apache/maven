@@ -29,6 +29,11 @@
   <name>Maven Integration Test Plugin :: Context Passing</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2006</inceptionYear>
+
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
