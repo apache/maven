@@ -89,8 +89,6 @@ public class DefaultMavenSettingsBuilder
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
-        activateDefaultProfiles( userSettings );
-
         userSettings = interpolate( userSettings );
 
         return userSettings;
@@ -182,21 +180,6 @@ public class DefaultMavenSettingsBuilder
         }
 
         return settings;
-    }
-
-    private void activateDefaultProfiles( Settings settings )
-    {
-        List activeProfiles = settings.getActiveProfiles();
-
-        for ( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
-        {
-            Profile profile = (Profile) profiles.next();
-            if ( ( profile.getActivation() != null ) && profile.getActivation().isActiveByDefault()
-                && !activeProfiles.contains( profile.getId() ) )
-            {
-                settings.addActiveProfile( profile.getId() );
-            }
-        }
     }
 
     private void validateSettings( Settings settings, File location )
