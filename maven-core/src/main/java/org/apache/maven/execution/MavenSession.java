@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class MavenSession
@@ -52,40 +52,6 @@ public class MavenSession
 
     private Map reports = new LinkedHashMap();
     
-    /**
-     * @deprecated Use {@link MavenSession#MavenSession(PlexusContainer, MavenExecutionRequest, EventDispatcher, ReactorManager)}
-     * instead. MavenExecutionRequest is now used for the rest of this information.
-     * 
-     * @param container
-     * @param settings
-     * @param localRepository
-     * @param eventDispatcher
-     * @param reactorManager
-     * @param goals
-     * @param executionRootDir
-     * @param executionProperties
-     * @param startTime
-     */
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
-                         String executionRootDir, Properties executionProperties, Date startTime )
-    {
-        this.container = container;
-        this.eventDispatcher = eventDispatcher;
-        this.reactorManager = reactorManager;
-        
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        
-        request.setBaseDirectory( new File( executionRootDir ) );
-        request.setSettings( settings );
-        request.setLocalRepository( localRepository );
-        request.setGoals( goals );
-        request.setProperties( executionProperties );
-        request.setStartTime( startTime );
-        
-        this.request = request;
-    }
-
     public MavenSession( PlexusContainer container,
                          MavenExecutionRequest request,
                          EventDispatcher eventDispatcher,
