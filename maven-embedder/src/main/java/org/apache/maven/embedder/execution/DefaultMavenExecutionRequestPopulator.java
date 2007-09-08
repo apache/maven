@@ -60,7 +60,16 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * DefaultMavenExecutionRequestPopulator
+ * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest} 
+ *
+ * - POM
+ * - Settings
+ * - Local Repository
+ * - Snapshot update policies
+ * - Repository checksum policies
+ * - Artifact transfer mechanism configuration
+ * - Eventing/Logging configuration
+ * - Profile manager configuration
  *
  * @version $Id$
  */
@@ -83,10 +92,48 @@ public class DefaultMavenExecutionRequestPopulator
                                                    Configuration configuration )
         throws MavenEmbedderException
     {
-        // Actual POM File
+        pom( request, configuration );
 
-        if ( request.getPomFile() == null && request.getBaseDirectory() != null )
+        settings( request, configuration );
+
+        localRepository( request, configuration );
+
+        snapshotPolicy( request, configuration );
+
+        localRepository( request, configuration );
+
+        checksumPolicy( request, configuration );
+
+        artifactTransferMechanism( request, configuration );
+
+        eventing( request, configuration );
+
+        profileManager( request, configuration );
+
+        return request;
+    }
+
+    // ------------------------------------------------------------------------
+    // POM
+    // ------------------------------------------------------------------------
+
+    private void pom( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // POM
+        //
+        // If we are not given a specific POM file, but passed a base directory
+        // then we will use a release POM in the directory provide, or and then
+        // look for the standard POM.
+        // ------------------------------------------------------------------------
+
+        if ( request.getPomFile() != null )
         {
+            request.setBaseDirectory( new File( request.getPomFile() ) );
+        }
+        else if ( request.getBaseDirectory() != null )
+        {
+            // Look for a release POM
             File pom = new File(
                 request.getBaseDirectory(),
                 Maven.RELEASE_POMv4 );
@@ -100,13 +147,35 @@ public class DefaultMavenExecutionRequestPopulator
 
             request.setPomFile( pom.getAbsolutePath() );
         }
+    }
 
-        request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+    // ------------------------------------------------------------------------
+    // Settings
+    // ------------------------------------------------------------------------
 
-        request.setUserSettingsFile( configuration.getUserSettingsFile() );
+    private void settings( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // Settings
+        //
+        // If a settings instance has been provided in the request the we use
+        // that for execution, otherwise we will look in the embedder configuration
+        // for a user/global settings file to use. The settings file should have
+        // been validated upfront but we will still catch any parsing exception
+        // ------------------------------------------------------------------------
 
         if ( request.getSettings() == null )
         {
+            if ( configuration.getGlobalSettingsFile() != null )
+            {
+                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+            }
+
+            if ( configuration.getUserSettingsFile() != null )
+            {
+                request.setUserSettingsFile( configuration.getUserSettingsFile() );
+            }
+
             try
             {
                 request.setSettings(
@@ -117,209 +186,29 @@ public class DefaultMavenExecutionRequestPopulator
                 request.setSettings( new Settings() );
             }
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Local Repository
+    // ------------------------------------------------------------------------
+
+    private void localRepository( MavenExecutionRequest request, Configuration configuration )
+        throws MavenEmbedderException
+    {
+        // ------------------------------------------------------------------------
+        // Local Repository
+        //
+        // 1. Use a value has been passed in via the configuration
+        // 2. Use value in the resultant settings
+        // 3. Use default value
+        // ------------------------------------------------------------------------
 
         if ( request.getLocalRepository() == null )
         {
             request.setLocalRepository( createLocalRepository( request.getSettings(), configuration ) );
         }
-
-        // Repository update policies
-
-        boolean snapshotPolicySet = false;
-
-        if ( request.isOffline() )
-        {
-            snapshotPolicySet = true;
-        }
-
-        if ( !snapshotPolicySet )
-        {
-            if ( request.isUpdateSnapshots() )
-            {
-                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-            }
-            else if ( request.isNoSnapshotUpdates() )
-            {
-                getLogger().info( "+ Supressing SNAPSHOT updates." );
-                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-            }
-        }
-
-        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
-
-        // Wagon
-
-        if ( request.isOffline() )
-        {
-            getLogger().info( "You are working in offline mode." );
-
-            wagonManager.setOnline( false );
-        }
-        else
-        {
-            wagonManager.findAndRegisterWagons( container );
-
-            wagonManager.setInteractive( request.isInteractiveMode() );
-
-            wagonManager.setDownloadMonitor( request.getTransferListener() );
-
-            wagonManager.setOnline( true );
-        }
-
-        try
-        {
-            resolveParameters( request.getSettings() );
-        }
-        catch ( Exception e )
-        {
-            throw new MavenEmbedderException(
-                "Unable to configure Maven for execution",
-                e );
-        }
-
-        // BaseDirectory in MavenExecutionRequest
-
-        if ( request.getPomFile() != null && request.getBaseDirectory() == null )
-        {
-            request.setBaseDirectory( new File( request.getPomFile() ) );
-        }
-
-        // EventMonitor/Logger
-
-        Logger logger = container.getLoggerManager().getLoggerForComponent( Mojo.ROLE );
-
-        if ( request.getEventMonitors() == null )
-        {
-            request.addEventMonitor( new DefaultEventMonitor( logger ) );
-        }
-
-        container.getLoggerManager().setThreshold( request.getLoggingLevel() );
-
-        // Create the standard profile manager
-
-        ProfileManager globalProfileManager = new DefaultProfileManager( container );
-
-        loadSettingsProfiles(
-            globalProfileManager,
-            request.getSettings() );
-
-        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
-
-        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
-
-        request.setProfileManager( globalProfileManager );
-
-        return request;
     }
 
-    private void resolveParameters( Settings settings )
-        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
-    {
-        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-        try
-        {
-            Proxy proxy = settings.getActiveProxy();
-
-            if ( proxy != null )
-            {
-                if ( proxy.getHost() == null )
-                {
-                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-                }
-
-                wagonManager.addProxy(
-                    proxy.getProtocol(),
-                    proxy.getHost(),
-                    proxy.getPort(),
-                    proxy.getUsername(),
-                    proxy.getPassword(),
-                    proxy.getNonProxyHosts() );
-            }
-
-            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
-            {
-                Server server = (Server) i.next();
-
-                wagonManager.addAuthenticationInfo(
-                    server.getId(),
-                    server.getUsername(),
-                    server.getPassword(),
-                    server.getPrivateKey(),
-                    server.getPassphrase() );
-
-                wagonManager.addPermissionInfo(
-                    server.getId(),
-                    server.getFilePermissions(),
-                    server.getDirectoryPermissions() );
-
-                if ( server.getConfiguration() != null )
-                {
-                    wagonManager.addConfiguration(
-                        server.getId(),
-                        (Xpp3Dom) server.getConfiguration() );
-                }
-            }
-
-            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
-
-            defaultPermissions.setDirectoryMode( "775" );
-
-            defaultPermissions.setFileMode( "664" );
-
-            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
-
-            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-            {
-                Mirror mirror = (Mirror) i.next();
-
-                wagonManager.addMirror(
-                    mirror.getId(),
-                    mirror.getMirrorOf(),
-                    mirror.getUrl() );
-            }
-        }
-        finally
-        {
-            container.release( wagonManager );
-        }
-    }
-
-    // ----------------------------------------------------------------------------
-    // LegacyLifecycle
-    // ----------------------------------------------------------------------------
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    public void loadSettingsProfiles( ProfileManager profileManager,
-                                      Settings settings )
-    {
-        List settingsProfiles = settings.getProfiles();
-
-        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
-        {
-            List settingsActiveProfileIds = settings.getActiveProfiles();
-
-            profileManager.explicitlyActivate( settingsActiveProfileIds );
-
-            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
-            {
-                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
-
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                profileManager.addProfile( profile );
-            }
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // Local Repository
-    // ----------------------------------------------------------------------
 
     public ArtifactRepository createLocalRepository( Settings settings, Configuration configuration )
         throws MavenEmbedderException
@@ -423,5 +312,247 @@ public class DefaultMavenExecutionRequestPopulator
             defaultArtifactRepositoryLayout,
             snapshotsPolicy,
             releasesPolicy );
+    }
+
+    // ------------------------------------------------------------------------
+    // Snapshot Policy 
+    // ------------------------------------------------------------------------
+
+    private void snapshotPolicy( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // Snapshot Repository Update Policies
+        //
+        // Set the global policies for snapshot updates.
+        // ------------------------------------------------------------------------
+
+        boolean snapshotPolicySet = false;
+
+        if ( request.isOffline() )
+        {
+            snapshotPolicySet = true;
+        }
+
+        if ( !snapshotPolicySet )
+        {
+            if ( request.isUpdateSnapshots() )
+            {
+                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+            }
+            else if ( request.isNoSnapshotUpdates() )
+            {
+                getLogger().info( "+ Supressing SNAPSHOT updates." );
+                artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Checksum Policy
+    // ------------------------------------------------------------------------
+
+    private void checksumPolicy( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // Repository Checksum Policies
+        //
+        // We take the checksum passed in via the request.
+        // ------------------------------------------------------------------------
+
+        artifactRepositoryFactory.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
+    }
+
+    // ------------------------------------------------------------------------
+    // Artifact Transfer Mechanism
+    // ------------------------------------------------------------------------
+
+    private void artifactTransferMechanism( MavenExecutionRequest request, Configuration configuration )
+        throws MavenEmbedderException
+    {
+        // ------------------------------------------------------------------------
+        // Artifact Transfer Mechanism
+        //
+        //
+        // ------------------------------------------------------------------------
+
+        if ( request.isOffline() )
+        {
+            getLogger().info( "You are working in offline mode." );
+
+            wagonManager.setOnline( false );
+        }
+        else
+        {
+            wagonManager.findAndRegisterWagons( container );
+
+            wagonManager.setInteractive( request.isInteractiveMode() );
+
+            wagonManager.setDownloadMonitor( request.getTransferListener() );
+
+            wagonManager.setOnline( true );
+        }
+
+        try
+        {
+            resolveParameters( request.getSettings() );
+        }
+        catch ( Exception e )
+        {
+            throw new MavenEmbedderException(
+                "Unable to configure Maven for execution",
+                e );
+        }
+    }
+
+    private void resolveParameters( Settings settings )
+        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
+    {
+        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+
+        try
+        {
+            Proxy proxy = settings.getActiveProxy();
+
+            if ( proxy != null )
+            {
+                if ( proxy.getHost() == null )
+                {
+                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                }
+
+                wagonManager.addProxy(
+                    proxy.getProtocol(),
+                    proxy.getHost(),
+                    proxy.getPort(),
+                    proxy.getUsername(),
+                    proxy.getPassword(),
+                    proxy.getNonProxyHosts() );
+            }
+
+            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            {
+                Server server = (Server) i.next();
+
+                wagonManager.addAuthenticationInfo(
+                    server.getId(),
+                    server.getUsername(),
+                    server.getPassword(),
+                    server.getPrivateKey(),
+                    server.getPassphrase() );
+
+                wagonManager.addPermissionInfo(
+                    server.getId(),
+                    server.getFilePermissions(),
+                    server.getDirectoryPermissions() );
+
+                if ( server.getConfiguration() != null )
+                {
+                    wagonManager.addConfiguration(
+                        server.getId(),
+                        (Xpp3Dom) server.getConfiguration() );
+                }
+            }
+
+            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
+
+            defaultPermissions.setDirectoryMode( "775" );
+
+            defaultPermissions.setFileMode( "664" );
+
+            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
+
+            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+            {
+                Mirror mirror = (Mirror) i.next();
+
+                wagonManager.addMirror(
+                    mirror.getId(),
+                    mirror.getMirrorOf(),
+                    mirror.getUrl() );
+            }
+        }
+        finally
+        {
+            container.release( wagonManager );
+        }
+    }
+    
+    // ------------------------------------------------------------------------
+    // Eventing
+    // ------------------------------------------------------------------------
+
+    private void eventing( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // Event Monitor/Logging
+        //
+        //
+        // ------------------------------------------------------------------------
+
+        Logger logger = container.getLoggerManager().getLoggerForComponent( Mojo.ROLE );
+
+        if ( request.getEventMonitors() == null )
+        {
+            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+        }
+
+        container.getLoggerManager().setThreshold( request.getLoggingLevel() );
+    }
+
+    // ------------------------------------------------------------------------
+    // Profile Manager 
+    // ------------------------------------------------------------------------
+
+    private void profileManager( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // Profile Manager
+        //
+        //
+        // ------------------------------------------------------------------------
+
+        ProfileManager globalProfileManager = new DefaultProfileManager( container );
+
+        loadSettingsProfiles(
+            globalProfileManager,
+            request.getSettings() );
+
+        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
+
+        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
+
+        request.setProfileManager( globalProfileManager );
+    }
+
+    // ----------------------------------------------------------------------------
+    // LegacyLifecycle
+    // ----------------------------------------------------------------------------
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    public void loadSettingsProfiles( ProfileManager profileManager,
+                                      Settings settings )
+    {
+        List settingsProfiles = settings.getProfiles();
+
+        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
+        {
+            List settingsActiveProfileIds = settings.getActiveProfiles();
+
+            profileManager.explicitlyActivate( settingsActiveProfileIds );
+
+            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
+            {
+                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
+
+                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
+
+                profileManager.addProfile( profile );
+            }
+        }
     }
 }

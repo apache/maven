@@ -104,20 +104,17 @@ public class MavenEmbedder
 {
     public static final String DEFAULT_LOCAL_REPO_ID = "local";
 
-    public static final String DEFAULT_LAYOUT_ID = "default";
-
     public static final String userHome = System.getProperty( "user.home" );
 
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
-
-    public static final String mavenHome = System.getProperty( "maven.home" );
 
     public static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
 
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System
-        .getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
+        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+
 
     // ----------------------------------------------------------------------------
     //
@@ -641,7 +638,7 @@ public class MavenEmbedder
             artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE, "default" );
 
             defaultArtifactRepositoryLayout =
-                (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, DEFAULT_LAYOUT_ID );
+                (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
             populator = (MavenExecutionRequestPopulator) container.lookup(
                 MavenExecutionRequestPopulator.ROLE );

@@ -41,6 +41,8 @@ under the License.
         <exclude>jmock:jmock</exclude>
         <exclude>xml-apis:xml-apis</exclude>
         <exclude>org.apache.maven:maven-artifact</exclude>
+        <exclude>org.apache.maven:maven-monitor</exclude>
+        <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
