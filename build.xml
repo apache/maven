@@ -27,7 +27,7 @@ under the License.
 
     To run this script, you must set the M2_HOME environment variable or the maven.home
     property to the location that should contain Maven. This directory *must* be named
-    after the maven version you want to install, e.g. /usr/local/maven-2.1-SNAPSHOT.
+    after the maven version you want to install, e.g. /usr/local/apache-maven-2.1-SNAPSHOT.
 
     You can set the maven.repo.local property to specify a custom location for your
     local repository for the bootstrap process.
@@ -54,7 +54,7 @@ under the License.
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <xmlproperty prefix="pom" file="pom.xml"/>
-    <property name="maven.home.basename.expected" value="maven-${pom.project.version}"/>
+    <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.home.recommended" location="${maven.home.dirname}/${maven.home.basename.expected}"/>
     <condition property="build.failed">
       <not>
