@@ -119,7 +119,7 @@ public class BootstrapInstaller
 
         Model mavenRootModel = bootstrapper.readModel(new File(basedir, "pom.xml"), false);
 
-        String finalName = "maven-" + mavenRootModel.getVersion();
+        String finalName = "apache-maven-" + mavenRootModel.getVersion();
         
         File destDirFile = new File(destDir);
         if (!finalName.equals(destDirFile.getName())) {
