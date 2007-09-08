@@ -142,14 +142,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0088Test.class );
         suite.addTestSuite( MavenIT0089Test.class );
         suite.addTestSuite(MavenIT0090Test.class);
-        // suite.addTestSuite(MavenIT0091Test.class);
         suite.addTestSuite( MavenIT0092Test.class );
-        // suite.addTestSuite( MavenIT0093Test.class );
         suite.addTestSuite( MavenIT0094Test.class );
         suite.addTestSuite( MavenIT0095Test.class );
         suite.addTestSuite( MavenIT0096Test.class );
         suite.addTestSuite( MavenIT0097Test.class );
-        // suite.addTestSuite(MavenIT0098Test.class);
         suite.addTestSuite( MavenIT0099Test.class );
         suite.addTestSuite( MavenIT0100Test.class );
         suite.addTestSuite( MavenIT0101Test.class );
@@ -157,27 +154,34 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0103Test.class );
         suite.addTestSuite( MavenIT0104Test.class );
         suite.addTestSuite( MavenIT0105Test.class );
-        // suite.addTestSuite(MavenIT0106Test.class);
-        // suite.addTestSuite(MavenIT0107Test.class);
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3158
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
-        //Superceded by IT0114 - see readme in resources folder
-        //suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
 
-        // 2.0.7 only (TODO: detect what version is used before running them)
-        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
-        suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
-        suite.addTestSuite( MavenIT0120EjbClientDependency.class );
-        // not fixed yet
-        //suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
+        // ----------------------------------------------------------------------------------------------------
+        // Tests that need to be fixed.
+        // ----------------------------------------------------------------------------------------------------
+
+        // suite.addTestSuite(MavenIT0091Test.class);
+        // suite.addTestSuite( MavenIT0093Test.class );
+        // suite.addTestSuite(MavenIT0098Test.class);
+        // suite.addTestSuite(MavenIT0106Test.class);
+        // suite.addTestSuite(MavenIT0107Test.class);
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3158
+        // Superceded by IT0114 - see readme in resources folder
+        // suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
+        // suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
+
+        // 2.0.7 only (TODO: detect what version is used before running them)
+        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
+        suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
+        suite.addTestSuite( MavenIT0120EjbClientDependency.class );
         return suite;
     }
 }
