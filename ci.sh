@@ -158,7 +158,7 @@ fi
 
     version=`cat $DIR/maven-components/pom.xml | tr '\n' ' ' | $SED 's#<parent>.*</parent>##g' | $SED 's#<dependencies>.*</dependencies>##g' | $SED 's#<build>.*</build>##g' | $SED 's#^.*<version>##g' | $SED 's#</version>.*$##g'`
 
-    M2_HOME=$DIR/maven-$version
+    M2_HOME=$DIR/apache-maven-$version
     export M2_HOME
     PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
     export PATH
