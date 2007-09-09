@@ -20,11 +20,13 @@ package org.apache.maven.embedder;
  */
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.FileNotFoundException;
 
 /**
  * @author Jason van Zyl
+ * @todo document the need to call close() once successfully constructed, otherwise file handles can be leaked. Might be good to add a finalizer too, just in case.
  */
 public final class MavenEmbedderFileLogger
     extends AbstractMavenEmbedderLogger
@@ -35,11 +37,13 @@ public final class MavenEmbedderFileLogger
     {
         try
         {
-            this.log = new PrintWriter( logFile );
+            this.log = new PrintWriter( new FileWriter( logFile ) );
         }
-        catch ( FileNotFoundException e )
+        catch ( IOException e )
         {
             // The client must make sure the file is valid.
+            // TODO: [BP] would just throwing the IOE be better? We can't just ignore it, since that would give misleading NPE's later
+            throw new RuntimeException( "The embedder was unable to write to the specified log file: " + logFile, e );
         }
     }
 
