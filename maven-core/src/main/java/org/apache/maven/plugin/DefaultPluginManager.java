@@ -418,6 +418,14 @@ public class DefaultPluginManager
                                        Xpp3Dom.class.getName() );
             componentRealm.importFrom( componentRealm.getParentRealm().getId(),
                                        "org.codehaus.plexus.util.xml.pull" );
+
+            // Adding for MNG-2878, since maven-reporting-impl was removed from the
+            // internal list of artifacts managed by maven, the classloader is different
+            // between maven-reporting-impl and maven-reporting-api...so this resource
+            // is not available from the AbstractMavenReport since it uses:
+            // getClass().getResourceAsStream( "/default-report.xml" )
+            // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
+            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "/default-report.xml" );
         }
         catch ( PlexusContainerException e )
         {
