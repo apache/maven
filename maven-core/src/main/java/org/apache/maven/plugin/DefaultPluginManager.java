@@ -1,4 +1,4 @@
-    package org.apache.maven.plugin;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,77 +19,77 @@
  * under the License.
  */
 
-    import org.apache.maven.ArtifactFilterManager;
-    import org.apache.maven.artifact.Artifact;
-    import org.apache.maven.artifact.factory.ArtifactFactory;
-    import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-    import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-    import org.apache.maven.artifact.metadata.ResolutionGroup;
-    import org.apache.maven.artifact.repository.ArtifactRepository;
-    import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-    import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-    import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-    import org.apache.maven.artifact.resolver.ArtifactResolver;
-    import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-    import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-    import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-    import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-    import org.apache.maven.artifact.versioning.VersionRange;
-    import org.apache.maven.context.BuildContextManager;
-    import org.apache.maven.execution.MavenSession;
-    import org.apache.maven.execution.RuntimeInformation;
-    import org.apache.maven.lifecycle.LifecycleExecutionContext;
-    import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
-    import org.apache.maven.model.Plugin;
-    import org.apache.maven.model.ReportPlugin;
-    import org.apache.maven.monitor.event.EventDispatcher;
-    import org.apache.maven.monitor.event.MavenEvents;
-    import org.apache.maven.monitor.logging.DefaultLog;
-    import org.apache.maven.plugin.descriptor.MojoDescriptor;
-    import org.apache.maven.plugin.descriptor.Parameter;
-    import org.apache.maven.plugin.descriptor.PluginDescriptor;
-    import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-    import org.apache.maven.plugin.logging.Log;
-    import org.apache.maven.plugin.version.PluginVersionManager;
-    import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-    import org.apache.maven.plugin.version.PluginVersionResolutionException;
-    import org.apache.maven.project.MavenProject;
-    import org.apache.maven.project.MavenProjectBuilder;
-    import org.apache.maven.project.ProjectBuildingException;
-    import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-    import org.apache.maven.project.artifact.MavenMetadataSource;
-    import org.apache.maven.project.path.PathTranslator;
-    import org.apache.maven.reporting.MavenReport;
-    import org.codehaus.plexus.PlexusConstants;
-    import org.codehaus.plexus.PlexusContainer;
-    import org.codehaus.plexus.PlexusContainerException;
-    import org.codehaus.plexus.classworlds.realm.ClassRealm;
-    import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-    import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
-    import org.codehaus.plexus.component.configurator.ComponentConfigurator;
-    import org.codehaus.plexus.component.configurator.ConfigurationListener;
-    import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-    import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-    import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-    import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-    import org.codehaus.plexus.configuration.PlexusConfiguration;
-    import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-    import org.codehaus.plexus.context.Context;
-    import org.codehaus.plexus.context.ContextException;
-    import org.codehaus.plexus.logging.AbstractLogEnabled;
-    import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-    import org.codehaus.plexus.util.StringUtils;
-    import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.lifecycle.LifecycleExecutionContext;
+import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.monitor.logging.DefaultLog;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.version.PluginVersionManager;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.path.PathTranslator;
+import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurator;
+import org.codehaus.plexus.component.configurator.ConfigurationListener;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-    import java.util.ArrayList;
-    import java.util.Collection;
-    import java.util.Collections;
-    import java.util.HashSet;
-    import java.util.Iterator;
-    import java.util.LinkedHashSet;
-    import java.util.List;
-    import java.util.Map;
-    import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -165,16 +165,17 @@ public class DefaultPluginManager
     public PluginDescriptor verifyPlugin( Plugin plugin,
                                           MavenProject project,
                                           MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
+        throws ArtifactResolutionException, PluginVersionResolutionException,
+        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException,
+        PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         if ( plugin.getVersion() == null )
         {
             getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
-            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
+            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
+                                                                        plugin.getArtifactId(),
                                                                         project, session );
             plugin.setVersion( version );
         }
@@ -185,18 +186,21 @@ public class DefaultPluginManager
     private PluginDescriptor verifyVersionedPlugin( Plugin plugin,
                                                     MavenProject project,
                                                     MavenSession session )
-        throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
+        throws PluginVersionResolutionException, ArtifactNotFoundException,
+        ArtifactResolutionException, InvalidVersionSpecificationException, InvalidPluginException,
+        PluginManagerException, PluginNotFoundException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
 
         return verifyVersionedPlugin( plugin, project, localRepository );
     }
 
-    private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project,
+    private PluginDescriptor verifyVersionedPlugin( Plugin plugin,
+                                                    MavenProject project,
                                                     ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException
+        throws PluginVersionResolutionException, ArtifactNotFoundException,
+        ArtifactResolutionException, InvalidVersionSpecificationException, InvalidPluginException,
+        PluginManagerException, PluginNotFoundException
     {
         getLogger().debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
 
@@ -219,18 +223,23 @@ public class DefaultPluginManager
 
                 checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
 
-                Artifact pluginArtifact =
-                    artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+                Artifact pluginArtifact = artifactFactory.createPluginArtifact(
+                                                                                plugin.getGroupId(),
+                                                                                plugin.getArtifactId(),
+                                                                                versionRange );
 
                 pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-                artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
+                artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(),
+                                          localRepository );
 
                 addPlugin( plugin, pluginArtifact, project, localRepository );
             }
             else
             {
-                getLogger().debug( "Skipping resolution for Maven built-in plugin: " + plugin.getKey() );
+                getLogger().debug(
+                                   "Skipping resolution for Maven built-in plugin: "
+                                                   + plugin.getKey() );
 
                 PluginDescriptor pd = pluginCollector.getPluginDescriptor( plugin );
                 pd.setClassRealm( container.getContainerRealm() );
@@ -250,8 +259,8 @@ public class DefaultPluginManager
             {
                 throw new PluginNotFoundException( e );
             }
-            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
-                version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
+                      && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
             {
                 throw new PluginNotFoundException( e );
             }
@@ -277,26 +286,32 @@ public class DefaultPluginManager
     {
         try
         {
-            Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(),
+            Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(),
+                                                                       plugin.getArtifactId(),
                                                                        plugin.getVersion() );
-            MavenProject project =
-                mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, false );
+            MavenProject project = mavenProjectBuilder.buildFromRepository( artifact,
+                                                                            remoteRepositories,
+                                                                            localRepository, false );
             // if we don't have the required Maven version, then ignore an update
-            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
+            if ( ( project.getPrerequisites() != null )
+                 && ( project.getPrerequisites().getMaven() != null ) )
             {
-                DefaultArtifactVersion requiredVersion =
-                    new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
+                DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
+                                                                                     project.getPrerequisites()
+                                                                                            .getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
                 {
-                    throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
-                                                                "Plugin requires Maven version " + requiredVersion );
+                    throw new PluginVersionResolutionException( plugin.getGroupId(),
+                                                                plugin.getArtifactId(),
+                                                                "Plugin requires Maven version "
+                                                                                + requiredVersion );
                 }
             }
         }
         catch ( ProjectBuildingException e )
         {
-            throw new InvalidPluginException(
-                "Unable to build project for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
+            throw new InvalidPluginException( "Unable to build project for plugin '"
+                                              + plugin.getKey() + "': " + e.getMessage(), e );
         }
     }
 
@@ -304,7 +319,8 @@ public class DefaultPluginManager
                               Artifact pluginArtifact,
                               MavenProject project,
                               ArtifactRepository localRepository )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
+        InvalidPluginException
     {
         // ----------------------------------------------------------------------------
         // Get the dependencies for the Plugin
@@ -329,7 +345,8 @@ public class DefaultPluginManager
                               Artifact pluginArtifact,
                               MavenProject project,
                               MavenSession session )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
+        InvalidPluginException
     {
         // ----------------------------------------------------------------------------
         // Get the dependencies for the Plugin
@@ -345,13 +362,18 @@ public class DefaultPluginManager
             projectPlugin = plugin;
         }
 
-        Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
+        Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
+                                            session.getLocalRepository() );
 
         addPlugin( plugin, projectPlugin, pluginArtifact, artifacts );
     }
 
-    private void addPlugin( Plugin plugin, Plugin projectPlugin, Artifact pluginArtifact, Set artifacts )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
+    private void addPlugin( Plugin plugin,
+                            Plugin projectPlugin,
+                            Artifact pluginArtifact,
+                            Set artifacts )
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
+        InvalidPluginException
     {
         // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the
         // POM), we need to undo this somehow.
@@ -359,7 +381,9 @@ public class DefaultPluginManager
 
         if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
         {
-            getLogger().debug( "Realm already exists for: " + projectPlugin.getKey() + ". Skipping addition..." );
+            getLogger().debug(
+                               "Realm already exists for: " + projectPlugin.getKey()
+                                               + ". Skipping addition..." );
             // we've already discovered this plugin, and configured it, so skip it this time.
 
             return;
@@ -390,30 +414,37 @@ public class DefaultPluginManager
 
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(), Xpp3Dom.class.getName() );
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "org.codehaus.plexus.util.xml.pull" );            
+            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
+                                       Xpp3Dom.class.getName() );
+            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
+                                       "org.codehaus.plexus.util.xml.pull" );
         }
         catch ( PlexusContainerException e )
         {
-            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin + ".", e );
+            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin
+                                              + ".", e );
         }
         catch ( NoSuchRealmException e )
         {
-            throw new PluginManagerException( "Failed to import Xpp3Dom from parent realm for plugin: '" + projectPlugin + ".", e );
+            throw new PluginManagerException(
+                                              "Failed to import Xpp3Dom from parent realm for plugin: '"
+                                                              + projectPlugin + ".", e );
         }
 
         // ----------------------------------------------------------------------------
         // The PluginCollector will now know about the plugin we are trying to load
         // ----------------------------------------------------------------------------
 
-        getLogger().debug( "Checking for plugin descriptor for: " + plugin.getKey() + " in collector: " + pluginCollector );
+        getLogger().debug(
+                           "Checking for plugin descriptor for: " + plugin.getKey()
+                                           + " in collector: " + pluginCollector );
 
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( projectPlugin );
 
         if ( pluginDescriptor == null )
         {
-            throw new IllegalStateException(
-                "The PluginDescriptor for the plugin " + projectPlugin.getKey() + " was not found" );
+            throw new IllegalStateException( "The PluginDescriptor for the plugin "
+                                             + projectPlugin.getKey() + " was not found" );
         }
 
         pluginDescriptor.setPluginArtifact( pluginArtifact );
@@ -432,7 +463,9 @@ public class DefaultPluginManager
         pluginDescriptor.setClassRealm( componentRealm );
     }
 
-    private Set getPluginArtifacts( Artifact pluginArtifact, Plugin plugin, MavenProject project,
+    private Set getPluginArtifacts( Artifact pluginArtifact,
+                                    Plugin plugin,
+                                    MavenProject project,
                                     ArtifactRepository localRepository )
         throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
@@ -441,25 +474,35 @@ public class DefaultPluginManager
 
         try
         {
-            projectPluginDependencies = MavenMetadataSource.createArtifacts( artifactFactory, plugin.getDependencies(), null,
-                                                             coreArtifactFilterManager.getCoreArtifactFilter(), project );
+            projectPluginDependencies = MavenMetadataSource.createArtifacts(
+                                                                             artifactFactory,
+                                                                             plugin.getDependencies(),
+                                                                             null,
+                                                                             coreArtifactFilterManager.getCoreArtifactFilter(),
+                                                                             project );
         }
         catch ( InvalidDependencyVersionException e )
         {
-            throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: " + e.getMessage(), e );
+            throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: "
+                                              + e.getMessage(), e );
         }
 
         ResolutionGroup resolutionGroup;
 
         try
         {
-            resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
+            resolutionGroup = artifactMetadataSource.retrieve(
+                                                               pluginArtifact,
+                                                               localRepository,
                                                                project.getPluginArtifactRepositories() );
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
-            throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
-                pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
+            throw new ArtifactResolutionException(
+                                                   "Unable to download metadata from repository for plugin '"
+                                                                   + pluginArtifact.getId() + "': "
+                                                                   + e.getMessage(),
+                                                   pluginArtifact, e );
         }
 
         checkPlexusUtils( resolutionGroup, artifactFactory );
@@ -478,9 +521,12 @@ public class DefaultPluginManager
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+                                                                                dependencies,
+                                                                                pluginArtifact,
                                                                                 Collections.EMPTY_MAP,
-                                                                                localRepository, repositories,
+                                                                                localRepository,
+                                                                                repositories,
                                                                                 artifactMetadataSource,
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
@@ -496,7 +542,10 @@ public class DefaultPluginManager
             }
         }
 
-        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
+        getLogger().debug(
+                           "Using the following artifacts for classpath of: "
+                                           + pluginArtifact.getId() + ":\n\n"
+                                           + resolved.toString().replace( ',', '\n' ) );
 
         return resolved;
     }
@@ -508,8 +557,9 @@ public class DefaultPluginManager
     public void executeMojo( MavenProject project,
                              MojoExecution mojoExecution,
                              MavenSession session )
-        throws ArtifactResolutionException, MojoExecutionException, MojoFailureException, ArtifactNotFoundException,
-        InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
+        throws ArtifactResolutionException, MojoExecutionException, MojoFailureException,
+        ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException,
+        PluginConfigurationException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -517,15 +567,19 @@ public class DefaultPluginManager
         // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() +
-                ". It requires a project with an existing pom.xml, but the build is not using one." );
+            throw new MojoExecutionException(
+                                              "Cannot execute mojo: "
+                                                              + mojoDescriptor.getGoal()
+                                                              + ". It requires a project with an existing pom.xml, but the build is not using one." );
         }
 
         if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
-            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal() +
-                " requires online mode for execution. Maven is currently offline." );
+            throw new MojoExecutionException(
+                                              "Mojo: "
+                                                              + mojoDescriptor.getGoal()
+                                                              + " requires online mode for execution. Maven is currently offline." );
         }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -546,7 +600,8 @@ public class DefaultPluginManager
                 MavenProject p = (MavenProject) i.next();
 
                 resolveTransitiveDependencies( session, artifactResolver,
-                                               mojoDescriptor.isDependencyResolutionRequired(), artifactFactory, p );
+                                               mojoDescriptor.isDependencyResolutionRequired(),
+                                               artifactFactory, p );
             }
 
             downloadDependencies( project, session, artifactResolver );
@@ -638,7 +693,8 @@ public class DefaultPluginManager
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
-        Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(), descriptor.getArtifactId(),
+        Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(),
+                                                      descriptor.getArtifactId(),
                                                       mojoExecution.getExecutionId() );
         if ( mojoExecution.getConfiguration() != null )
         {
@@ -651,16 +707,18 @@ public class DefaultPluginManager
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
                                                 MavenProject project,
                                                 MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
+        throws PluginVersionResolutionException, ArtifactResolutionException,
+        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException,
+        PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         String version = reportPlugin.getVersion();
 
         if ( version == null )
         {
-            version = pluginVersionManager.resolveReportPluginVersion( reportPlugin.getGroupId(),
-                                                                       reportPlugin.getArtifactId(), project, session );
+            version = pluginVersionManager.resolveReportPluginVersion(
+                                                                       reportPlugin.getGroupId(),
+                                                                       reportPlugin.getArtifactId(),
+                                                                       project, session );
 
             reportPlugin.setVersion( version );
         }
@@ -705,39 +763,48 @@ public class DefaultPluginManager
             {
                 ClassRealm oldRealm = container.setLookupRealm( realm );
 
-                getLogger().debug( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + realm.getId() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
+                getLogger().debug(
+                                   "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
+                                                   + realm.getId() + " - descRealmId="
+                                                   + mojoDescriptor.getRealmId() );
 
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
 
                 if ( plugin != null )
                 {
-                    getLogger().debug( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                    getLogger().debug(
+                                       "Looked up - " + plugin + " - "
+                                                       + plugin.getClass().getClassLoader() );
                 }
                 else
                 {
-                    getLogger().warn("No luck.");
+                    getLogger().warn( "No luck." );
                 }
 
                 container.setLookupRealm( oldRealm );
             }
             else
             {
-                getLogger().info( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in default realm " + container.getLookupRealm() + " - descRealmId=" + mojoDescriptor.getRealmId()  );
+                getLogger().info(
+                                  "Looking up mojo " + mojoDescriptor.getRoleHint()
+                                                  + " in default realm "
+                                                  + container.getLookupRealm() + " - descRealmId="
+                                                  + mojoDescriptor.getRealmId() );
 
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
 
                 if ( plugin != null )
                 {
-                    getLogger().info( "Looked up - " + plugin + " - " + plugin.getClass().getClassLoader() );
+                    getLogger().info(
+                                      "Looked up - " + plugin + " - "
+                                                      + plugin.getClass().getClassLoader() );
                 }
                 else
                 {
-                    getLogger().warn("No luck.");
+                    getLogger().warn( "No luck." );
                 }
 
             }
-
-
 
             if ( report && !( plugin instanceof MavenReport ) )
             {
@@ -747,8 +814,9 @@ public class DefaultPluginManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginManagerException( "Unable to find the mojo '" + mojoDescriptor.getRoleHint() +
-                "' in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'", e );
+            throw new PluginManagerException( "Unable to find the mojo '"
+                                              + mojoDescriptor.getRoleHint() + "' in the plugin '"
+                                              + pluginDescriptor.getPluginLookupKey() + "'", e );
         }
 
         if ( plugin instanceof ContextEnabled )
@@ -763,7 +831,6 @@ public class DefaultPluginManager
         }
 
         plugin.setLog( mojoLogger );
-
 
         XmlPlexusConfiguration pomConfiguration;
 
@@ -780,7 +847,8 @@ public class DefaultPluginManager
         // override in the POM.
         validatePomConfiguration( mojoDescriptor, pomConfiguration );
 
-        PlexusConfiguration mergedConfiguration = mergeMojoConfiguration( pomConfiguration, mojoDescriptor );
+        PlexusConfiguration mergedConfiguration = mergeMojoConfiguration( pomConfiguration,
+                                                                          mojoDescriptor );
 
         // TODO: plexus changes to make this more like the component descriptor so this can be used instead
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
@@ -794,16 +862,22 @@ public class DefaultPluginManager
             ctx = new LifecycleExecutionContext( project );
         }
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution, pathTranslator,
-                                                                                          ctx, getLogger(),
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(
+                                                                                          session,
+                                                                                          mojoExecution,
+                                                                                          pathTranslator,
+                                                                                          ctx,
+                                                                                          getLogger(),
                                                                                           session.getExecutionProperties() );
 
-        PlexusConfiguration extractedMojoConfiguration =
-            extractMojoConfiguration( mergedConfiguration, mojoDescriptor );
+        PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration(
+                                                                                   mergedConfiguration,
+                                                                                   mojoDescriptor );
 
         checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 
-        populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, container, expressionEvaluator );
+        populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, container,
+                              expressionEvaluator );
 
         return plugin;
     }
@@ -831,8 +905,11 @@ public class DefaultPluginManager
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
                 // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
                 // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                getLogger().debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
-                    mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
+                getLogger().debug(
+                                   "*** WARNING: Configuration \'" + child.getName()
+                                                   + "\' is not used in goal \'"
+                                                   + mojoDescriptor.getFullGoalName()
+                                                   + "; this may indicate a typo... ***" );
             }
         }
 
@@ -897,11 +974,13 @@ public class DefaultPluginManager
                 }
                 catch ( ExpressionEvaluationException e )
                 {
-                    throw new PluginConfigurationException( goal.getPluginDescriptor(), e.getMessage(), e );
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(),
+                                                            e.getMessage(), e );
                 }
 
                 // only mark as invalid if there are no child nodes
-                if ( ( fieldValue == null ) && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
+                if ( ( fieldValue == null )
+                     && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
                 {
                     parameter.setExpression( expression );
                     invalidParameters.add( parameter );
@@ -946,12 +1025,12 @@ public class DefaultPluginManager
                 // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
                 if ( !parameter.isEditable() )
                 {
-                    StringBuffer errorMessage = new StringBuffer()
-                        .append( "ERROR: Cannot override read-only parameter: " );
+                    StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
                     errorMessage.append( key );
                     errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
-                    throw new PluginConfigurationException( goal.getPluginDescriptor(), errorMessage.toString() );
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(),
+                                                            errorMessage.toString() );
                 }
 
                 String deprecated = parameter.getDeprecated();
@@ -1009,7 +1088,8 @@ public class DefaultPluginManager
                 {
                     pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
 
-                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || ( pomConfig.getChildCount() > 0 ) )
+                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) )
+                         || ( pomConfig.getChildCount() > 0 ) )
                     {
                         toAdd = pomConfig;
                     }
@@ -1022,12 +1102,15 @@ public class DefaultPluginManager
 
                 if ( toAdd != null )
                 {
-                    if ( ( implementation != null ) && ( toAdd.getAttribute( "implementation", null ) == null ) )
+                    if ( ( implementation != null )
+                         && ( toAdd.getAttribute( "implementation", null ) == null ) )
                     {
 
-                        XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
+                        XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration(
+                                                                                                paramName );
 
-                        implementationConf.setAttribute( "implementation", parameter.getImplementation() );
+                        implementationConf.setAttribute( "implementation",
+                                                         parameter.getImplementation() );
 
                         toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf );
                     }
@@ -1082,14 +1165,15 @@ public class DefaultPluginManager
         for ( int i = 0; i < children.length; i++ )
         {
             PlexusConfiguration childDom = children[i];
-            PlexusConfiguration childRec = recessive == null ? null : recessive.getChild( childDom.getName(), false );
+            PlexusConfiguration childRec = recessive == null ? null
+                            : recessive.getChild( childDom.getName(), false );
 
             if ( childRec != null )
             {
                 result.addChild( buildTopDownMergedConfiguration( childDom, childRec ) );
             }
             else
-            {   // FIXME: copy, or use reference?
+            { // FIXME: copy, or use reference?
                 result.addChild( copyConfiguration( childDom ) );
             }
         }
@@ -1142,12 +1226,16 @@ public class DefaultPluginManager
             // so that this meethod could entirely be handled by a plexus lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
-                configurator =
-                    (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, configuratorId, pluginRealm );
+                configurator = (ComponentConfigurator) pluginContainer.lookup(
+                                                                               ComponentConfigurator.ROLE,
+                                                                               configuratorId,
+                                                                               pluginRealm );
             }
             else
             {
-                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, "basic", pluginRealm );
+                configurator = (ComponentConfigurator) pluginContainer.lookup(
+                                                                               ComponentConfigurator.ROLE,
+                                                                               "basic", pluginRealm );
             }
 
             ConfigurationListener listener = new DebugConfigurationListener( getLogger() );
@@ -1155,18 +1243,22 @@ public class DefaultPluginManager
             getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' -->" );
 
             // This needs to be able to use methods
-            configurator.configureComponent( plugin, configuration, expressionEvaluator, pluginRealm, listener );
+            configurator.configureComponent( plugin, configuration, expressionEvaluator,
+                                             pluginRealm, listener );
 
             getLogger().debug( "-- end configuration --" );
         }
         catch ( ComponentConfigurationException e )
         {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to parse the created DOM for plugin configuration", e );
+            throw new PluginConfigurationException(
+                                                    mojoDescriptor.getPluginDescriptor(),
+                                                    "Unable to parse the created DOM for plugin configuration",
+                                                    e );
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+            throw new PluginConfigurationException(
+                                                    mojoDescriptor.getPluginDescriptor(),
                                                     "Unable to retrieve component configurator for plugin configuration",
                                                     e );
         }
@@ -1226,13 +1318,16 @@ public class DefaultPluginManager
                                                 String scope,
                                                 ArtifactFactory artifactFactory,
                                                 MavenProject project )
-        throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
+        throws ArtifactResolutionException, ArtifactNotFoundException,
+        InvalidDependencyVersionException
     {
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                 project.getVersion(), project.getPackaging() );
+        Artifact artifact = artifactFactory.createBuildArtifact( project.getGroupId(),
+                                                                 project.getArtifactId(),
+                                                                 project.getVersion(),
+                                                                 project.getPackaging() );
 
         // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
         // check this with yourkit as a hot spot.
@@ -1241,12 +1336,14 @@ public class DefaultPluginManager
         {
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+                                                                                project.getDependencyArtifacts(),
                                                                                 artifact,
                                                                                 Collections.EMPTY_MAP,
                                                                                 context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
-                                                                                artifactMetadataSource, filter );
+                                                                                artifactMetadataSource,
+                                                                                filter );
 
         project.setArtifacts( result.getArtifacts() );
     }
@@ -1271,21 +1368,26 @@ public class DefaultPluginManager
         }
     }
 
-    public Object getPluginComponent( Plugin plugin, String role, String roleHint )
+    public Object getPluginComponent( Plugin plugin,
+                                      String role,
+                                      String roleHint )
         throws PluginManagerException, ComponentLookupException
     {
         ClassRealm pluginRealm = pluginCollector.getPluginDescriptor( plugin ).getClassRealm();
 
         if ( pluginRealm == null )
         {
-            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+            getLogger().warn(
+                              "getPluginComponent(" + plugin + ", " + role
+                                              + "): descriptor is missing classRealm" );
             pluginRealm = container.getLookupRealm();
         }
 
         return container.lookup( role, roleHint, pluginRealm );
     }
 
-    public Map getPluginComponents( Plugin plugin, String role )
+    public Map getPluginComponents( Plugin plugin,
+                                    String role )
         throws ComponentLookupException, PluginManagerException
     {
         getLogger().debug( "Looking for plugin realm: " + plugin + " using: " + pluginCollector );
@@ -1294,14 +1396,17 @@ public class DefaultPluginManager
 
         if ( pluginRealm == null )
         {
-            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+            getLogger().warn(
+                              "getPluginComponent(" + plugin + ", " + role
+                                              + "): descriptor is missing classRealm" );
             pluginRealm = container.getLookupRealm();
         }
 
         return container.lookupMap( role, pluginRealm );
     }
 
-    public static void checkPlexusUtils( ResolutionGroup resolutionGroup, ArtifactFactory artifactFactory )
+    public static void checkPlexusUtils( ResolutionGroup resolutionGroup,
+                                         ArtifactFactory artifactFactory )
     {
         // ----------------------------------------------------------------------------
         // If the plugin already declares a dependency on plexus-utils then we're all
@@ -1330,8 +1435,8 @@ public class DefaultPluginManager
         {
             Artifact a = (Artifact) i.next();
 
-            if ( a.getArtifactId().equals( "plexus-utils" ) &&
-                vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
+            if ( a.getArtifactId().equals( "plexus-utils" )
+                 && vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
             {
                 plexusUtilsPresent = true;
 
@@ -1345,9 +1450,11 @@ public class DefaultPluginManager
             // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
             // as this is what's implicitly happening in 2.0.6.
 
-            resolutionGroup.getArtifacts().add( artifactFactory.createArtifact( "org.codehaus.plexus",
-                                                                                "plexus-utils", "1.1",
-                                                                                Artifact.SCOPE_RUNTIME, "jar" ) );
+            resolutionGroup.getArtifacts()
+                           .add(
+                                 artifactFactory.createArtifact( "org.codehaus.plexus",
+                                                                 "plexus-utils", "1.1",
+                                                                 Artifact.SCOPE_RUNTIME, "jar" ) );
         }
     }
 }
