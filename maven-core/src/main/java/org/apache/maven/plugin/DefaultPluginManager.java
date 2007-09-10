@@ -202,7 +202,7 @@ public class DefaultPluginManager
 
             File pluginFile = pluginArtifact.getFile();
 
-            if ( !pluginCollector.isPluginInstalled( plugin ) || pluginContainer == null )
+            if ( !pluginCollector.isPluginInstalled( plugin ) || ( pluginContainer == null ) )
             {
                 addPlugin( plugin, pluginArtifact, project, localRepository );
             }
@@ -226,7 +226,7 @@ public class DefaultPluginManager
             String artifactId = plugin.getArtifactId();
             String version = plugin.getVersion();
 
-            if ( groupId == null || artifactId == null || version == null )
+            if ( ( groupId == null ) || ( artifactId == null ) || ( version == null ) )
             {
                 throw new PluginNotFoundException( e );
             }
@@ -260,7 +260,7 @@ public class DefaultPluginManager
             MavenProject project =
                 mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, false );
             // if we don't have the required Maven version, then ignore an update
-            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
+            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
                 DefaultArtifactVersion requiredVersion =
                     new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
@@ -296,6 +296,9 @@ public class DefaultPluginManager
             {
                 child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.Xpp3Dom" );
                 child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull" );
+
+                // MNG-2878
+                child.getContainerRealm().importFrom( "plexus.core", "/default-report.xml" );
             }
             catch ( NoSuchRealmException e )
             {
@@ -624,7 +627,7 @@ public class DefaultPluginManager
     {
         // if the plugin's already been used once, don't re-do this step...
         // otherwise, we have to finish resolving the plugin's classpath and start the container.
-        if ( pluginDescriptor.getArtifacts() != null && pluginDescriptor.getArtifacts().size() == 1 )
+        if ( ( pluginDescriptor.getArtifacts() != null ) && ( pluginDescriptor.getArtifacts().size() == 1 ) )
         {
             Artifact pluginArtifact = (Artifact) pluginDescriptor.getArtifacts().get( 0 );
 
@@ -874,7 +877,7 @@ public class DefaultPluginManager
                         }
                     }
 
-                    if ( fieldValue == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                    if ( ( fieldValue == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
                     {
                         value = configuration.getChild( parameter.getAlias(), false );
                         if ( value != null )
@@ -894,7 +897,7 @@ public class DefaultPluginManager
                 }
 
                 // only mark as invalid if there are no child nodes
-                if ( fieldValue == null && ( value == null || value.getChildCount() == 0 ) )
+                if ( ( fieldValue == null ) && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
                 {
                     parameter.setExpression( expression );
                     invalidParameters.add( parameter );
@@ -928,7 +931,7 @@ public class DefaultPluginManager
 
             PlexusConfiguration value = pomConfiguration.getChild( key, false );
 
-            if ( value == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+            if ( ( value == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
             {
                 key = parameter.getAlias();
                 value = pomConfiguration.getChild( key, false );
@@ -1002,20 +1005,20 @@ public class DefaultPluginManager
                 {
                     pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
 
-                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || pomConfig.getChildCount() > 0 )
+                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || ( pomConfig.getChildCount() > 0 ) )
                     {
                         toAdd = pomConfig;
                     }
                 }
 
-                if ( toAdd == null && mojoConfig != null )
+                if ( ( toAdd == null ) && ( mojoConfig != null ) )
                 {
                     toAdd = copyConfiguration( mojoConfig );
                 }
 
                 if ( toAdd != null )
                 {
-                    if ( implementation != null && toAdd.getAttribute( "implementation", null ) == null )
+                    if ( ( implementation != null ) && ( toAdd.getAttribute( "implementation", null ) == null ) )
                     {
 
                         XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
@@ -1039,7 +1042,7 @@ public class DefaultPluginManager
 
         String value = dominant.getValue( null );
 
-        if ( StringUtils.isEmpty( value ) && recessive != null )
+        if ( StringUtils.isEmpty( value ) && ( recessive != null ) )
         {
             value = recessive.getValue( null );
         }
