@@ -83,160 +83,162 @@ public class DefaultArtifactResolver
                           boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        if ( artifact != null )
+        if ( artifact == null )
         {
-            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+            return;
+        }
+
+        if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+        {
+            File systemFile = artifact.getFile();
+
+            if ( systemFile == null )
             {
-                File systemFile = artifact.getFile();
-
-                if ( systemFile == null )
-                {
-                    throw new ArtifactNotFoundException(
-                        "System artifact: " + artifact + " has no file attached", artifact );
-                }
-
-                if ( !systemFile.exists() )
-                {
-                    throw new ArtifactNotFoundException(
-                        "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
-                }
-                else
-                {
-                    artifact.setResolved( true );
-                }
+                throw new ArtifactNotFoundException(
+                    "System artifact: " + artifact + " has no file attached", artifact );
             }
-            else if ( !artifact.isResolved() )
+
+            if ( !systemFile.exists() )
             {
-                // ----------------------------------------------------------------------
-                // Check for the existence of the artifact in the specified local
-                // ArtifactRepository. If it is present then simply return as the
-                // request for resolution has been satisfied.
-                // ----------------------------------------------------------------------
+                throw new ArtifactNotFoundException(
+                    "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
+            }
+            else
+            {
+                artifact.setResolved( true );
+            }
+        }
+        else if ( !artifact.isResolved() )
+        {
+            // ----------------------------------------------------------------------
+            // Check for the existence of the artifact in the specified local
+            // ArtifactRepository. If it is present then simply return as the
+            // request for resolution has been satisfied.
+            // ----------------------------------------------------------------------
 
-                String localPath = localRepository.pathOf( artifact );
+            String localPath = localRepository.pathOf( artifact );
 
-                artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
+            artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
-                transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
+            transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
-                boolean localCopy = false;
-                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            boolean localCopy = false;
+            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata m = (ArtifactMetadata) i.next();
+                if ( m instanceof SnapshotArtifactRepositoryMetadata )
                 {
-                    ArtifactMetadata m = (ArtifactMetadata) i.next();
-                    if ( m instanceof SnapshotArtifactRepositoryMetadata )
-                    {
-                        SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
+                    SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
 
-                        Metadata metadata = snapshotMetadata.getMetadata();
-                        if ( metadata != null )
+                    Metadata metadata = snapshotMetadata.getMetadata();
+                    if ( metadata != null )
+                    {
+                        Versioning versioning = metadata.getVersioning();
+                        if ( versioning != null )
                         {
-                            Versioning versioning = metadata.getVersioning();
-                            if ( versioning != null )
+                            Snapshot snapshot = versioning.getSnapshot();
+                            if ( snapshot != null )
                             {
-                                Snapshot snapshot = versioning.getSnapshot();
-                                if ( snapshot != null )
-                                {
-                                    localCopy = snapshot.isLocalCopy();
-                                }
+                                localCopy = snapshot.isLocalCopy();
                             }
                         }
                     }
                 }
+            }
 
-                File destination = artifact.getFile();
-                List repositories = remoteRepositories;
+            File destination = artifact.getFile();
+            List repositories = remoteRepositories;
 
-                // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
-                if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                    destination.exists() && !localCopy )
+            // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
+            if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
+                destination.exists() && !localCopy )
+            {
+                Date comparisonDate = new Date( destination.lastModified() );
+
+                // cull to list of repositories that would like an update
+                repositories = new ArrayList( remoteRepositories );
+                for ( Iterator i = repositories.iterator(); i.hasNext(); )
                 {
-                    Date comparisonDate = new Date( destination.lastModified() );
-
-                    // cull to list of repositories that would like an update
-                    repositories = new ArrayList( remoteRepositories );
-                    for ( Iterator i = repositories.iterator(); i.hasNext(); )
+                    ArtifactRepository repository = (ArtifactRepository) i.next();
+                    ArtifactRepositoryPolicy policy = repository.getSnapshots();
+                    if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
                     {
-                        ArtifactRepository repository = (ArtifactRepository) i.next();
-                        ArtifactRepositoryPolicy policy = repository.getSnapshots();
-                        if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
-                        {
-                            i.remove();
-                        }
-                    }
-
-                    if ( !repositories.isEmpty() )
-                    {
-                        // someone wants to check for updates
-                        force = true;
+                        i.remove();
                     }
                 }
-                boolean resolved = false;
-                if ( !destination.exists() || force )
+
+                if ( !repositories.isEmpty() )
                 {
-                    if ( !wagonManager.isOnline() )
+                    // someone wants to check for updates
+                    force = true;
+                }
+            }
+            boolean resolved = false;
+            if ( !destination.exists() || force )
+            {
+                if ( !wagonManager.isOnline() )
+                {
+                    throw new ArtifactNotFoundException( "System is offline.", artifact );
+                }
+
+                try
+                {
+                    // TODO: force should be passed to the wagon manager
+                    if ( artifact.getRepository() != null )
                     {
-                        throw new ArtifactNotFoundException( "System is offline.", artifact );
+                        // the transformations discovered the artifact - so use it exclusively
+                        wagonManager.getArtifact( artifact, artifact.getRepository() );
+                    }
+                    else
+                    {
+                        wagonManager.getArtifact( artifact, repositories );
                     }
 
+                    if ( !artifact.isResolved() && !destination.exists() )
+                    {
+                        throw new ArtifactResolutionException(
+                            "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                            artifact, remoteRepositories );
+                    }
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    throw new ArtifactNotFoundException( e.getMessage(), artifact, remoteRepositories, e );
+                }
+                catch ( TransferFailedException e )
+                {
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                }
+
+                resolved = true;
+            }
+            else if ( destination.exists() )
+            {
+                // locally resolved...no need to hit the remote repo.
+                artifact.setResolved( true );
+            }
+
+            if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+            {
+                String version = artifact.getVersion();
+                artifact.selectVersion( artifact.getBaseVersion() );
+                File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                if ( resolved || !copy.exists() )
+                {
+                    // recopy file if it was reresolved, or doesn't exist.
                     try
                     {
-                        // TODO: force should be passed to the wagon manager
-                        if ( artifact.getRepository() != null )
-                        {
-                            // the transformations discovered the artifact - so use it exclusively
-                            wagonManager.getArtifact( artifact, artifact.getRepository() );
-                        }
-                        else
-                        {
-                            wagonManager.getArtifact( artifact, repositories );
-                        }
-
-                        if ( !artifact.isResolved() && !destination.exists() )
-                        {
-                            throw new ArtifactResolutionException(
-                                "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                                artifact, remoteRepositories );
-                        }
+                        FileUtils.copyFile( destination, copy );
                     }
-                    catch ( ResourceDoesNotExistException e )
+                    catch ( IOException e )
                     {
-                        throw new ArtifactNotFoundException( e.getMessage(), artifact, remoteRepositories, e );
+                        throw new ArtifactResolutionException(
+                            "Unable to copy resolved artifact for local use: " + e.getMessage(), artifact,
+                            remoteRepositories, e );
                     }
-                    catch ( TransferFailedException e )
-                    {
-                        throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                    }
-
-                    resolved = true;
                 }
-                else if ( destination.exists() )
-                {
-                    // locally resolved...no need to hit the remote repo.
-                    artifact.setResolved( true );
-                }
-
-                if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
-                {
-                    String version = artifact.getVersion();
-                    artifact.selectVersion( artifact.getBaseVersion() );
-                    File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-                    if ( resolved || !copy.exists() )
-                    {
-                        // recopy file if it was reresolved, or doesn't exist.
-                        try
-                        {
-                            FileUtils.copyFile( destination, copy );
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new ArtifactResolutionException(
-                                "Unable to copy resolved artifact for local use: " + e.getMessage(), artifact,
-                                remoteRepositories, e );
-                        }
-                    }
-                    artifact.setFile( copy );
-                    artifact.selectVersion( version );
-                }
+                artifact.setFile( copy );
+                artifact.selectVersion( version );
             }
         }
     }
