@@ -105,6 +105,8 @@ public class DefaultPluginManager
 
         RESERVED_GROUP_IDS = rgids;
     }
+    
+    protected PluginRealmManager pluginRealmManager;
 
     protected PlexusContainer container;
 
@@ -377,67 +379,70 @@ public class DefaultPluginManager
     {
         // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the
         // POM), we need to undo this somehow.
-        ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
 
-        if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
-        {
-            getLogger().debug(
-                               "Realm already exists for: " + projectPlugin.getKey()
-                                               + ". Skipping addition..." );
-            // we've already discovered this plugin, and configured it, so skip it this time.
+    	ClassRealm componentRealm = pluginRealmManager.getOrCreateRealm(projectPlugin, pluginArtifact, artifacts);
+    	
+//        ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey()+":"+projectPlugin.getVersion() );
 
-            return;
-        }
-
-        // ----------------------------------------------------------------------------
-        // Realm creation for a plugin
-        // ----------------------------------------------------------------------------
-
-        ClassRealm componentRealm = null;
-
-        try
-        {
-            List jars = new ArrayList();
-
-            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-            {
-                Artifact artifact = (Artifact) i.next();
-
-                jars.add( artifact.getFile() );
-            }
-
-            jars.add( pluginArtifact.getFile() );
-
-            // Now here we need the artifact coreArtifactFilter stuff
-
-            componentRealm = container.createComponentRealm( projectPlugin.getKey(), jars );
-
-            // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
-            // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
-                                       Xpp3Dom.class.getName() );
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
-                                       "org.codehaus.plexus.util.xml.pull" );
-
-            // Adding for MNG-2878, since maven-reporting-impl was removed from the
-            // internal list of artifacts managed by maven, the classloader is different
-            // between maven-reporting-impl and maven-reporting-api...so this resource
-            // is not available from the AbstractMavenReport since it uses:
-            // getClass().getResourceAsStream( "/default-report.xml" )
-            // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "/default-report.xml" );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin
-                                              + ".", e );
-        }
-        catch ( NoSuchRealmException e )
-        {
-            throw new PluginManagerException(
-                                              "Failed to import Xpp3Dom from parent realm for plugin: '"
-                                                              + projectPlugin + ".", e );
-        }
+//        if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
+//        {
+//            getLogger().debug(
+//                               "Realm already exists for: " + projectPlugin.getKey()
+//                                               + ". Skipping addition..." );
+//            // we've already discovered this plugin, and configured it, so skip it this time.
+//
+//            return;
+//        }
+//
+//        // ----------------------------------------------------------------------------
+//        // Realm creation for a plugin
+//        // ----------------------------------------------------------------------------
+//
+//        ClassRealm componentRealm = null;
+//
+//        try
+//        {
+//            List jars = new ArrayList();
+//
+//            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+//            {
+//                Artifact artifact = (Artifact) i.next();
+//
+//                jars.add( artifact.getFile() );
+//            }
+//
+//            jars.add( pluginArtifact.getFile() );
+//
+//            // Now here we need the artifact coreArtifactFilter stuff
+//
+//            componentRealm = container.createComponentRealm( projectPlugin.getKey()+projectPlugin.getVersion(), jars );
+//
+//            // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
+//            // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
+//            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
+//                                       Xpp3Dom.class.getName() );
+//            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
+//                                       "org.codehaus.plexus.util.xml.pull" );
+//
+//            // Adding for MNG-2878, since maven-reporting-impl was removed from the
+//            // internal list of artifacts managed by maven, the classloader is different
+//            // between maven-reporting-impl and maven-reporting-api...so this resource
+//            // is not available from the AbstractMavenReport since it uses:
+//            // getClass().getResourceAsStream( "/default-report.xml" )
+//            // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
+//            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "/default-report.xml" );
+//        }
+//        catch ( PlexusContainerException e )
+//        {
+//            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin
+//                                              + ".", e );
+//        }
+//        catch ( NoSuchRealmException e )
+//        {
+//            throw new PluginManagerException(
+//                                              "Failed to import Xpp3Dom from parent realm for plugin: '"
+//                                                              + projectPlugin + ".", e );
+//        }
 
         // ----------------------------------------------------------------------------
         // The PluginCollector will now know about the plugin we are trying to load

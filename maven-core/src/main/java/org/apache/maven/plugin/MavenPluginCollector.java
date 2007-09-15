@@ -26,23 +26,33 @@ import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import com.sun.jmx.remote.util.OrderClassLoaders;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class MavenPluginCollector
     extends AbstractLogEnabled
     implements ComponentDiscoveryListener
 {
+    /**
+     * Map from pluginDescriptor.getKey (groupId:artifactId) into (ordered) map from version into pluginDescriptor
+     * Internal map is ordered to make sure that builds are determinic (used pluginVersion is determined)
+     */
+    private Map/* <String,OrderedMap<String,PluginDescriptor>> */pluginDescriptors = new HashMap();
 
-    private Set pluginsInProcess = new HashSet();
+    private Map/* <String,OrderedMap<String,PluginDescriptor>> */pluginIdsByPrefix = new HashMap();
 
-    private Map pluginDescriptors = new HashMap();
-
-    private Map pluginIdsByPrefix = new HashMap();
-
+    public String getId()
+    {
+        return "maven-plugin-collector";
+    }
+    
     // ----------------------------------------------------------------------
     // Mojo discovery
     // ----------------------------------------------------------------------
@@ -53,66 +63,125 @@ public class MavenPluginCollector
         if ( componentSetDescriptor instanceof PluginDescriptor )
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-
-            // TODO: see comment in getPluginDescriptor
-            String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
             
-            if ( !pluginsInProcess.contains( key ) )
-            {
-                pluginsInProcess.add( key );
-
-                getLogger().debug( this + ": Discovered plugin: " + key );
-                
-                pluginDescriptors.put( key, pluginDescriptor );
-
-                // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere
-                // we also need to deal with multiple versions somehow - currently, first wins
-                if ( !pluginIdsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
-                {
-                    pluginIdsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor );
-                }
-            }
+            putIntoPluginDescriptors( pluginDescriptor );
+            putIntoPluginIdsByPrefix( pluginDescriptor );
         }
-    }
-
-    public String getId()
-    {
-        return "maven-plugin-collector";    
     }
 
     public PluginDescriptor getPluginDescriptor( Plugin plugin )
     {
-        // TODO: include version, but can't do this in the plugin manager as it is not resolved to the right version
-        // at that point. Instead, move the duplication check to the artifact container, or store it locally based on
-        // the unresolved version?
-        return (PluginDescriptor) pluginDescriptors.get( plugin.getKey() );
+        SortedMap/* <String,PluginDescriptor> */pluginVersions = (SortedMap) pluginDescriptors.get( plugin.getKey() );
+        if ( pluginVersions != null )
+        {
+            PluginDescriptor res;
+            if ( plugin.getVersion() != null )
+            {
+                res = (PluginDescriptor) pluginVersions.get( plugin.getVersion() );
+            }
+            else
+            {
+                res = getDefaultPluginDescriptorVersion( pluginVersions );
+            }
+           return res;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private PluginDescriptor getDefaultPluginDescriptorVersion( SortedMap pluginVersions )
+    {
+        if ( pluginVersions.size() > 0 )
+        {
+            return (PluginDescriptor) pluginVersions.get( pluginVersions.lastKey() );
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean isPluginInstalled( Plugin plugin )
     {
         // TODO: see comment in getPluginDescriptor
-        return pluginDescriptors.containsKey( plugin.getKey() );
+        return getPluginDescriptor( plugin ) != null;
     }
 
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
     {
-        return (PluginDescriptor) pluginIdsByPrefix.get( prefix );
+        return getPluginDescriptorForPrefix( prefix, null );
     }
 
-    public void flushPluginDescriptor( Plugin plugin )
+    public PluginDescriptor getPluginDescriptorForPrefix( String prefix, String version )
     {
-        pluginsInProcess.remove( plugin.getKey() );
-        pluginDescriptors.remove( plugin.getKey() );
-        
-        for ( Iterator it = pluginIdsByPrefix.entrySet().iterator(); it.hasNext(); )
+        SortedMap/* <String,PluginDescriptor> */pluginVersions = (SortedMap) pluginIdsByPrefix.get( prefix );
+        if ( pluginVersions != null )
         {
-            Map.Entry entry = (Map.Entry) it.next();
-            
-            if ( plugin.getKey().equals( entry.getValue() ) )
+            PluginDescriptor res;
+            if ( version != null )
             {
-                it.remove();
+                res = (PluginDescriptor) pluginVersions.get( version );
             }
+            else
+            {
+                res = getDefaultPluginDescriptorVersion( pluginVersions );
+            }
+            return res;
         }
+        else
+        {
+            return null;
+        }
+    }
+
+//    public void flushPluginDescriptor( Plugin plugin )
+//    {
+//        getPluginDescriptor( plugin ).cleanPluginDescriptor();
+//    }
+
+    /**
+     * Puts given pluginDescriptor into pluginDescriptors map (if the map does not contains plugin for specified maven
+     * version)
+     * 
+     * @param pluginDescriptor
+     */
+    protected void putIntoPluginDescriptors( PluginDescriptor pluginDescriptor )
+    {
+        String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
+
+        SortedMap/* <String,PluginDescriptor> */descriptorsVersions = (SortedMap) pluginDescriptors.get( key );
+        if ( descriptorsVersions == null )
+        {
+            descriptorsVersions = new TreeMap();
+            pluginDescriptors.put( key, descriptorsVersions );
+        }
+
+        putIntoVersionsMap( descriptorsVersions, pluginDescriptor );
+    }
+
+    protected void putIntoVersionsMap( SortedMap/* <String(version),PluginDescriptor> */pluginVersions,
+                                       PluginDescriptor pluginDescriptor )
+    {
+        if ( !pluginVersions.containsKey( pluginDescriptor.getVersion() ) )
+        {
+            pluginVersions.put( pluginDescriptor.getVersion(), pluginDescriptor );
+        }
+    }
+
+    protected void putIntoPluginIdsByPrefix( PluginDescriptor pluginDescriptor )
+    {
+        String goalPrefix = pluginDescriptor.getGoalPrefix();
+
+        SortedMap/* <String,PluginDescriptor> */descriptorsVersions = (SortedMap) pluginIdsByPrefix.get( goalPrefix );
+        if ( descriptorsVersions == null )
+        {
+            descriptorsVersions = new TreeMap();
+            pluginIdsByPrefix.put( goalPrefix, descriptorsVersions );
+        }
+
+        putIntoVersionsMap( descriptorsVersions, pluginDescriptor );
     }
 
 }
