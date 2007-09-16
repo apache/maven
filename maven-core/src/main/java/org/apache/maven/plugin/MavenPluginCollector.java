@@ -26,8 +26,6 @@ import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-import com.sun.jmx.remote.util.OrderClassLoaders;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
