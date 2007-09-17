@@ -61,7 +61,8 @@ public class MojoExecutionExceptionDiagnoser
 
             String directCauseMessage = directCause.getMessage();
 
-            if ( directCauseMessage != null && mee.getMessage().indexOf( directCauseMessage ) < 0 )
+            String meeMessage = mee.getMessage();
+            if ( ( directCauseMessage != null ) && ( meeMessage != null ) && meeMessage.indexOf( directCauseMessage ) < 0 )
             {
                 message.append( "\nEmbedded error: " ).append( directCauseMessage );
             }
