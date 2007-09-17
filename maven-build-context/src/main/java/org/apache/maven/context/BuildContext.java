@@ -48,7 +48,7 @@ public interface BuildContext
      * Add a new piece of managed build data to the build context. Managed data elements supply their
      * own storage key.
      * 
-     * @deprecated Use store(..) instead.
+     * @deprecated Use {@link #store(ManagedBuildData)} instead.
      */
     void put( ManagedBuildData managedData );
     
