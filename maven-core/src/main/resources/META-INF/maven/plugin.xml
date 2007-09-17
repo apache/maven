@@ -11,7 +11,7 @@
       <goal>start-fork</goal>
       <description>Setup the appropriate build state to initiate a forked execution.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
+      <requiresProject>false</requiresProject>
       <requiresReports>false</requiresReports>
       <aggregator>false</aggregator>
       <requiresOnline>false</requiresOnline>
@@ -51,7 +51,7 @@
       <goal>end-fork</goal>
       <description>Restore the non-fork currentProject instance, for use in the forking mojo.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
+      <requiresProject>false</requiresProject>
       <requiresReports>false</requiresReports>
       <aggregator>false</aggregator>
       <requiresOnline>false</requiresOnline>
@@ -83,7 +83,7 @@
       <goal>clear-fork-context</goal>
       <description>Tear down any build state used during the previous forked execution.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
+      <requiresProject>false</requiresProject>
       <requiresReports>false</requiresReports>
       <aggregator>false</aggregator>
       <requiresOnline>false</requiresOnline>
@@ -117,7 +117,7 @@
       <goal>resolve-late-bound-plugin</goal>
       <description>Resolve a late-bound plugin during a build, right before it is to be used.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
+      <requiresProject>false</requiresProject>
       <requiresReports>false</requiresReports>
       <aggregator>false</aggregator>
       <requiresOnline>false</requiresOnline>
