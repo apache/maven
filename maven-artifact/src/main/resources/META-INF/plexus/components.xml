@@ -171,6 +171,17 @@ under the License.
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>rar</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>rar</type>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>par</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
