@@ -64,10 +64,7 @@ under the License.
         <requirement>
           <role>org.apache.maven.plugin.MavenPluginCollector</role>
         </requirement>
-	<requirement>  
-	  <role>org.apache.maven.plugin.PluginRealmManager</role>
-        </requirement>
-	<requirement>
+        <requirement>
           <role>org.apache.maven.plugin.version.PluginVersionManager</role>
           <role-hint>default</role-hint>
         </requirement>
@@ -731,14 +728,5 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    <component>
-      <role>org.apache.maven.plugin.PluginRealmManager</role>
-      <implementation>org.apache.maven.plugin.DefaultPluginRealmManager</implementation>
-      <requirements>
-        <requirement>
-          <role>org.codehaus.plexus.PlexusContainer</role>
-        </requirement>
-      </requirements>
-    </component>    
   </components>
 </component-set>
