@@ -1,13 +1,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-parent</artifactId>
-    <version>7-SNAPSHOT</version>
+    <groupId>org.apache.maven.its</groupId>
+    <artifactId>core-integration-testing</artifactId>
+    <version>2.1-SNAPSHOT</version>
   </parent>
   <groupId>org.apache.maven.its</groupId>
   <artifactId>maven-integration-test-helper</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>Maven Integration Tests</name>
   <dependencies>
     <!-- needed for VersionRange and Version -->

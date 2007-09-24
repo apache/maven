@@ -21,7 +21,7 @@
   <parent>
     <artifactId>maven-it-plugins</artifactId>
     <groupId>org.apache.maven.its.plugins</groupId>
-    <version>1-SNAPSHOT</version>
+    <version>2.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-it-plugin-configuration</artifactId>
@@ -31,7 +31,6 @@
     A plugin that allows any configuration in the form of a DOM which allows inspection after
     configuration processing inside Maven's core.
   </description>
-  <version>1.0-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
   <dependencies>
     <dependency>

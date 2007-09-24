@@ -2,13 +2,13 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.it.util.FileUtils;
 
 import java.io.File;
 
 public class MavenIT0002Test
     extends AbstractMavenIntegrationTestCase
 {
-
     /**
      * Builds upon it0001: we add the download of a dependency. We delete
      * the JAR from the local repository and make sure it is there post build.

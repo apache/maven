@@ -1,17 +1,48 @@
+* Instructions
+
+Running the following from the top-level directory builds a distributable:
+
+----
+mvn install
+----
+
+If you wish to also run the integration tests themselves:
+
+----
+mvn -Prun-its install
+----
+
+This command can also be run from the core-integration-tests directory if the prerequisite artifacts have already been
+installed or deployed.
+
+* Outstanding Issues
+
 The top things that could be done:
 
-1) The issues that would be most helpful that could be tackled on a piecewise basis by many would be to take plugin specific ITs out of the ITs. There are many in there for the surefire plugin so while you're doing that you can look at it. Piecewise but probably totally simple because you have to replace it with an IT that actually tests what it was testing. A lot of time I have had to make a new IT plugin flavour.
+1) The issues that would be most helpful that could be tackled on a piecewise basis by many would be to take plugin
+   specific ITs out of the ITs. There are many in there for the surefire plugin so while you're doing that you can look
+   at it. Piecewise but probably totally simple because you have to replace it with an IT that actually tests what it
+   was testing. A lot of time I have had to make a new IT plugin flavour.
 
-2) The next issue of importance would be to collect all the in IT plugin plugins, invokers and verifiers and align all theses.
+2) The next issue of importance would be to collect all the in IT plugin plugins, invokers and verifiers and align all
+   these.
 
 3) Once 2) is done then we wire the embedder option into the resulting invoker.
 
-As far as them working in situ: the ITs could now run from the top level of http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/ with an addition to the POM. It's not there because I generally build from the top-level and then walk into  http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests/. The invoker plugin has been released and that's what I used to install the supporting artifacts because they can't install in a reactor run normally because there are 5 artifacts with the id.
+4) Proper isolation. The tests currently pick up your Maven settings file and current local repository. A clean local
+   repo can be used but it would result in a lot of unnecessary artifact retrieval. This fails in a locked down
+   environment (as additional repositories declared in IT 92, 94 and 120 are ignored). It also causes other risks.
+   A possible solution is to construct a repository artifact (using a POM with the dependency plugin to create an
+   assembly) that represents everything used by the ITs, then to have the setUp lay that out as a remote repo and use a
+   controlled settings.xml that uses a clean local repository, and mirrors central to that remote repository.
 
-I am not entirely happy with the structure we have but I don't think it's worth changing right now until 1) and 2) are done. It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
+5) The support artifacts are currently deployed to the central repository, meaning they can get out of sync with those
+   in SVN (unless they are assumed to have been 'released'). After solving (4), these could be injected into the
+   constructed repository instead.
 
+I am not entirely happy with the structure we have but I don't think it's worth changing right now until 1) and 2) are
+done. It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
 
-- [-] Goals
     - [ ] An IT should be completely self-contained so that the problem
           can be understood by looking in one place, in one Maven
           project.
@@ -19,11 +50,6 @@ I am not entirely happy with the structure we have but I don't think it's worth 
           easily create ITs for us. The is not completed but we do have the
           core-integration-test-sample directory with has a sample I 
           offered to users.
-    - [+] The ITs should be in a project of their own so that we can
-          reuse them across versions of Maven. We could actually run
-          new versions of integration tests against old versions of
-          Maven. Solution: the ITs are now in a separate build and it
-          is possible to run them
     - [ ] We should be able to easily integrate the IT into a larger
           run where we can use forked or embedded execution.
     - [ ] We should create Archetypes for all categories of problems so
@@ -52,17 +78,6 @@ I am not entirely happy with the structure we have but I don't think it's worth 
           set that up. Needs to be fully fixed. But it is much nicer
           running this stuff in your IDE.
 - [-] Problems with ITs
-    - [+] Verifier jar required by the bootstrap requires a special
-          verifier.jar there is no released version of this tool.
-          Solution: the bootstrap now uses Ant and we've gotten rid of
-          a lot of the complexity.
-    - [+] The maven-core-it plugin needs to be decoupled into its
-          separate purposes because there are currently 12 different
-          things going on in the plugin and it would be really
-          confusing for a new user to figure out what's going on in the
-          plugin and how it applies to the integration testing.
-          Solution: these have now been broken down into plugins that
-          correspond to their function in the ITs.
     - [ ] it0006 is an integration test for the verifier plugin.
     - [ ] it0014 uses the compiler plugin to test plugin configuration.
     - [ ] it0016 is an integration test for the WAR plugin.
