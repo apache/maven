@@ -15,6 +15,12 @@ mvn -Prun-its install
 This command can also be run from the core-integration-tests directory if the prerequisite artifacts have already been
 installed or deployed.
 
+* Reusing the suite
+
+The suite is bundled up as a JAR containing all the tests and resources. All artifacts are now versioned according to the
+version of Maven they are testing (currently, 2.1-SNAPSHOT), though it can be run against older versions as the verifier
+will detect and omit tests that require the newer version of Maven to pass.
+
 * Outstanding Issues
 
 The top things that could be done:
@@ -40,8 +46,10 @@ The top things that could be done:
    in SVN (unless they are assumed to have been 'released'). After solving (4), these could be injected into the
    constructed repository instead.
 
-I am not entirely happy with the structure we have but I don't think it's worth changing right now until 1) and 2) are
-done. It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
+6) It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
+   In particular, the resources directory is treated as test sources, which is not the case as each are projects
+
+Other issues:
 
     - [ ] An IT should be completely self-contained so that the problem
           can be understood by looking in one place, in one Maven
