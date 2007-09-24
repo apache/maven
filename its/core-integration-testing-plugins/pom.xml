@@ -8,6 +8,7 @@
   <groupId>org.apache.maven.its.plugins</groupId>
   <artifactId>maven-it-plugins</artifactId>
   <packaging>pom</packaging>
+  <name>Maven Integration Tests :: Plugins</name>
   <modules>
     <module>maven-it-plugin-configuration</module>
     <module>maven-it-plugin-context-passing</module>    

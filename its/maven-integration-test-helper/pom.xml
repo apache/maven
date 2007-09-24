@@ -7,7 +7,7 @@
   </parent>
   <groupId>org.apache.maven.its</groupId>
   <artifactId>maven-integration-test-helper</artifactId>
-  <name>Maven Integration Tests</name>
+  <name>Maven Integration Test Helper Library</name>
   <dependencies>
     <!-- needed for VersionRange and Version -->
     <dependency>
