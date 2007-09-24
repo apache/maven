@@ -26,6 +26,7 @@ under the License.
     <version>2.1-SNAPSHOT</version>
   </parent>
   <artifactId>maven-core-it-runner</artifactId>
+  <name>Integration Test Executor</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
