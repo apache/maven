@@ -134,7 +134,14 @@ public class DefaultMavenSettingsBuilder
     {
         if ( settingsFile == null )
         {
-            getLogger().debug( "Settings file is null. Returning." );
+            getLogger().debug( "Settings file is null. Returning null." );
+
+            return null;
+        }
+
+        if ( !settingsFile.exists() )
+        {
+            getLogger().debug( "Settings file doesn't exist. Returning null." );
 
             return null;
         }
