@@ -290,5 +290,11 @@ under the License.
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>run-its</id>
+      <modules>
+        <module>maven-core-it-runner</module>
+      </modules>
+    </profile>
   </profiles>
 </project>
