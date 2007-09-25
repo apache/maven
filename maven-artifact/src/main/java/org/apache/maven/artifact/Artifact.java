@@ -58,8 +58,6 @@ public interface Artifact
 
     String SCOPE_SYSTEM = "system";
 
-    String SCOPE_IMPORT = "import";   // Used to import dependencyManagement dependencies 
-
     String RELEASE_VERSION = "RELEASE";
 
     String getGroupId();
