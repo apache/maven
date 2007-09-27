@@ -20,14 +20,24 @@ package org.apache.maven.reporting;
  */
 
 /**
+ * Basis for rendering report.
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
- * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
+ * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer
+ * that could take a velocity template and pipe that through Doxia rather than coding
+ * them up like this.
  */
 public interface MavenReportRenderer
 {
+    /**
+     * @return the wanted report's title.
+     */
     String getTitle();
 
+    /**
+     * Renderer a report.
+     */
     void render();
 }

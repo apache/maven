@@ -28,11 +28,22 @@ package org.apache.maven.reporting;
  */
 public class MavenReportException extends Exception
 {
+    /**
+     * Default constructor.
+     *
+     * @param msg the exception message.
+     */
     public MavenReportException( String msg )
     {
         super( msg );
     }
 
+    /**
+     * Other constructor.
+     *
+     * @param msg the exception message.
+     * @param e the exception.
+     */
     public MavenReportException( String msg, Exception e )
     {
         super( msg, e );

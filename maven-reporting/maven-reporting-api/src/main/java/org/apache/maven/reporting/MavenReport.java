@@ -29,34 +29,83 @@ import org.apache.maven.doxia.sink.Sink;
  *
  * @author Brett Porter
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
  */
 public interface MavenReport
 {
+    /** Plexus lookup name */
     String ROLE = MavenReport.class.getName();
 
+    /** Category for project information reports */
     String CATEGORY_PROJECT_INFORMATION = "Project Info";
 
+    /** Category for project reports */
     String CATEGORY_PROJECT_REPORTS = "Project Reports";
 
-    // eventually, we must replace this with the o.a.m.d.s.Sink class as a parameter
+    /**
+     * Generate the report depending the wanted locale.
+     *
+     * @param sink the sink to use for the generation.
+     * @param locale the wanted locale to generate the report, could be null.
+     * @throws MavenReportException if any
+     */
     void generate( Sink sink, Locale locale )
         throws MavenReportException;
 
+    /**
+     * @return the output name of this report.
+     */
     String getOutputName();
 
-    String getName( Locale locale );
-
+    /**
+     * Get the category name for this report.
+     *
+     * @return the category name of this report. Should be <code>CATEGORY_PROJECT_INFORMATION</code>
+     * or <code>CATEGORY_PROJECT_REPORTS</code>
+     * {@link #CATEGORY_PROJECT_INFORMATION}
+     * {@link #CATEGORY_PROJECT_REPORTS}
+     */
     String getCategoryName();
 
+    /**
+     * @param locale the wanted locale to return the report's name, could be null.
+     * @return the name of this report.
+     */
+    String getName( Locale locale );
+
+    /**
+     * @param locale the wanted locale to return the report's description, could be null.
+     * @return the description of this report.
+     */
     String getDescription( Locale locale );
 
-    // TODO: remove?
+    /**
+     * Set a new output directory. Useful for staging.
+     *
+     * @param outputDirectory the new output directory
+     */
     void setReportOutputDirectory( File outputDirectory );
 
+    /**
+     * @return the current report output directory.
+     */
     File getReportOutputDirectory();
 
+    /**
+     * An external report is a report which calls a third party program which generates some reports too.
+     * A good example is javadoc tool.
+     *
+     * @return <tt>true</tt> if this report is external, <tt>false</tt> otherwise.
+     * Default should <tt>false</tt>.
+     */
     boolean isExternalReport();
 
+    /**
+     * Verify some conditions before generate the report.
+     *
+     * @return <tt>true</tt> if this report could be generated, <tt>false</tt> otherwise.
+     * Default should <tt>true</tt>.
+     */
     boolean canGenerateReport();
 }
