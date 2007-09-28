@@ -31,6 +31,7 @@ import org.apache.maven.doxia.sink.Sink;
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
+ * @since 2.0
  */
 public interface MavenReport
 {
@@ -45,6 +46,8 @@ public interface MavenReport
 
     /**
      * Generate the report depending the wanted locale.
+     * <br/>
+     * Mainly used for external reports like javadoc.
      *
      * @param sink the sink to use for the generation.
      * @param locale the wanted locale to generate the report, could be null.

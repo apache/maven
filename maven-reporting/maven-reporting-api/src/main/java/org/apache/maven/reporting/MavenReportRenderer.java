@@ -25,7 +25,8 @@ package org.apache.maven.reporting;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
- * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer
+ * @since 2.0
+ * @TODO Later it may be appropriate to create something like a VelocityMavenReportRenderer
  * that could take a velocity template and pipe that through Doxia rather than coding
  * them up like this.
  */
