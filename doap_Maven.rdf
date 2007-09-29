@@ -39,7 +39,7 @@ under the License.
     <maintainer>
       <foaf:Person>
         <foaf:name>Jason van Zyl</foaf:name>
-        <foaf:mbox rdf:resource="mailto:jason@maven.org"/>
+        <foaf:mbox rdf:resource="mailto:jason@sonatype.com"/>
       </foaf:Person>
     </maintainer>
     <maintainer>
