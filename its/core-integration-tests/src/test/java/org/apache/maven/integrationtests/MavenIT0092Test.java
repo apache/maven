@@ -2,13 +2,19 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;                                                                            
 
 import java.io.File;
 
 public class MavenIT0092Test
     extends AbstractMavenIntegrationTestCase
 {
-
+    public MavenIT0092Test()                                                                                                                                 
+        throws InvalidVersionSpecificationException                                                                                                          
+    {                                                                                                                                                        
+        super( "[,2.1-SNAPSHOT)" );                                                                                                                          
+    }    
+    
     /**
      * Test that legacy repositories with legacy snapshots download correctly.
      */
