@@ -262,6 +262,8 @@ public class AbstractArtifactResolutionException
 
             // If people want to deploy it
 
+            sb.append( LS );
+            sb.append( indentation );
             sb.append( "Alternatively, if you host your own repository you can deploy the file there: " );
             sb.append( LS );
             sb.append( indentation );
