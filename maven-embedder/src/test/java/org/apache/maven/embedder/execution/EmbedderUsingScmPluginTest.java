@@ -34,14 +34,19 @@ public class EmbedderUsingScmPluginTest
     public void testRunningScmPlugin()
         throws Exception
     {
-        Properties p = new Properties();
+        File svnDirectory = new File( getBasedir(), ".svn" );
 
-        File outputDirectory = new File( getBasedir(), "target/scm.diff" );
+        if ( svnDirectory.exists() )
+        {
+            Properties p = new Properties();
 
-        p.setProperty( "outputDirectory", outputDirectory.getCanonicalPath() );
+            File outputDirectory = new File( getBasedir(), "target/scm.diff" );
 
-        p.setProperty( "connectionUrl", "scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder" );
+            p.setProperty( "outputDirectory", outputDirectory.getCanonicalPath() );
 
-        File basedir = runWithProject( "scm:diff", p );
+            p.setProperty( "connectionUrl", "scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder" );
+
+            File basedir = runWithProject( "scm:diff", p );
+        }
     }
 }
