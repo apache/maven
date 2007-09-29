@@ -92,6 +92,7 @@ public class DefaultExtensionManager
         Parent originatingParent = originatingModel.getParent();
 
         String groupId = originatingModel.getGroupId();
+
         if ( ( groupId == null ) && ( originatingParent != null ) )
         {
             groupId = originatingParent.getGroupId();
@@ -100,6 +101,7 @@ public class DefaultExtensionManager
         String artifactId = originatingModel.getArtifactId();
 
         String version = originatingModel.getVersion();
+
         if ( ( version == null ) && ( originatingParent != null ) )
         {
             version = originatingParent.getVersion();

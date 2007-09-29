@@ -58,56 +58,34 @@ public interface MavenProjectBuilder
 
     boolean STRICT_MODEL_PARSING = true;
 
-    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
+    MavenProject build( File project,
+                        ArtifactRepository localRepository,
+                        ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager,
-                        boolean checkDistributionManagementStatus )
+
+    MavenProjectBuildingResult buildWithDependencies( File project,
+                                                      ArtifactRepository localRepository,
+                                                      ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-    // ----------------------------------------------------------------------
-    // These methods are used by the MavenEmbedder
-    // ----------------------------------------------------------------------
-
-    MavenProjectBuildingResult buildWithDependencies( File project, ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager, TransferListener transferListener )
-        throws ProjectBuildingException;
-
-    MavenProjectBuildingResult buildWithDependencies( File project, ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager )
-        throws ProjectBuildingException;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    /**
-     * Build the artifact from the local repository, resolving it if necessary.
-     *
-     * @param artifact the artifact description
-     * @param localRepository the local repository
-     * @param remoteArtifactRepositories the remote repository list
-     * @return the built project
-     * @throws ProjectBuildingException
-     */
-    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+    MavenProject buildFromRepository( Artifact artifact,
+                                      List remoteArtifactRepositories,
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    /**
-     * Build the artifact from the local repository, resolving it if necessary.
-     *
-     * @param artifact the artifact description
-     * @param localRepository the local repository
-     * @param remoteArtifactRepositories the remote repository list
-     * @param allowStubModel return a stub if the POM is not found
-     * @return the built project
-     * @throws ProjectBuildingException
-     */
-    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                      ArtifactRepository localRepository, boolean allowStubModel )
+    /** @deprecated We do not want to allow projects to not have POMs. Maven 1.x repositories be damned. */
+    MavenProject buildFromRepository( Artifact artifact,
+                                      List remoteArtifactRepositories,
+                                      ArtifactRepository localRepository,
+                                      boolean allowStub )
         throws ProjectBuildingException;
 
+    /**
+     * 
+     * @return
+     * @throws ProjectBuildingException
+     */
     MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException;
 }

@@ -25,7 +25,6 @@ import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -52,6 +51,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.build.ProjectBuildContext;
@@ -59,7 +59,6 @@ import org.apache.maven.project.build.model.DefaultModelLineage;
 import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
 import org.apache.maven.project.build.model.ModelLineageIterator;
-import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -67,7 +66,6 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -141,7 +139,9 @@ Notes
  */
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
-    implements MavenProjectBuilder, Initializable, Contextualizable
+    implements MavenProjectBuilder,
+    Initializable,
+    Contextualizable
 {
     protected PlexusContainer container;
 
@@ -174,16 +174,6 @@ public class DefaultMavenProjectBuilder
 
     private MavenTools mavenTools;
 
-    // ----------------------------------------------------------------------
-    // I am making this available for use with a new method that takes a
-    // a monitor wagon monitor as a parameter so that tools can use the
-    // methods here and receive callbacks. MNG-1015
-    //
-    //    Probably no longer relevant with wagonManager/wagonManager change - joakime
-    // ----------------------------------------------------------------------
-
-    private WagonManager wagonManager;
-
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
     public void initialize()
@@ -200,28 +190,24 @@ public class DefaultMavenProjectBuilder
                                ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager, true );
+        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager );
     }
 
-    public MavenProject build( File projectDescriptor,
-                               ArtifactRepository localRepository,
-                               ProfileManager profileManager,
-                               boolean checkDistributionManagementStatus )
-        throws ProjectBuildingException
-    {
-        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager, checkDistributionManagementStatus );
-    }
-
-    // jvz:note
-    // When asked for something from the repository are we getting it from the reactor? Yes, when using this call
-    // we are assuming that the reactor has been run and we have collected the projects required to satisfy it0042
-    // which means the projects in the reactor are required for finding classes in <project>/target/classes. Not
-    // sure this is ideal. I remove all caching from the builder and all reactor related ITs which assume
-    // access to simbling project resources failed.
+    /** @deprecated  */
     public MavenProject buildFromRepository( Artifact artifact,
                                              List remoteArtifactRepositories,
                                              ArtifactRepository localRepository,
-                                             boolean allowStubModel )
+                                             boolean allowStub )
+        throws ProjectBuildingException
+
+    {
+        return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
+    }
+
+
+    public MavenProject buildFromRepository( Artifact artifact,
+                                             List remoteArtifactRepositories,
+                                             ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
@@ -233,17 +219,9 @@ public class DefaultMavenProjectBuilder
             return project;
         }
 
-        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
+        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null, false );
-    }
-
-    public MavenProject buildFromRepository( Artifact artifact,
-                                             List remoteArtifactRepositories,
-                                             ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-        return buildFromRepository( artifact, remoteArtifactRepositories, localRepository, true );
     }
 
     private MavenProject superProject;
@@ -289,19 +267,7 @@ public class DefaultMavenProjectBuilder
                                                              ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        return buildWithDependencies( projectDescriptor, localRepository, profileManager, null );
-    }
-
-    // note:jvz This was added for the embedder.
-
-    /** @todo move to metadatasource itself? */
-    public MavenProjectBuildingResult buildWithDependencies( File projectDescriptor,
-                                                             ArtifactRepository localRepository,
-                                                             ProfileManager profileManager,
-                                                             TransferListener transferListener )
-        throws ProjectBuildingException
-    {
-        MavenProject project = build( projectDescriptor, localRepository, profileManager, false );
+        MavenProject project = build( projectDescriptor, localRepository, profileManager );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -333,11 +299,6 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( projectId,
                 "Unable to build project due to an invalid dependency version: " +
                     e.getMessage(), e );
-        }
-
-        if ( transferListener != null )
-        {
-            wagonManager.setDownloadMonitor( transferListener );
         }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
@@ -377,8 +338,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private Map createManagedVersionMap( String projectId,
-                                         DependencyManagement dependencyManagement,
-                                         MavenProject parent )
+                                         DependencyManagement dependencyManagement )
         throws ProjectBuildingException
     {
         Map map = null;
@@ -399,10 +359,10 @@ public class DefaultMavenProjectBuilder
                 try
                 {
                     VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
-                    Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                        versionRange, d.getType(),
-                        d.getClassifier(), d.getScope(),
-                        d.isOptional() );
+
+                    Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
+                        d.getClassifier(), d.getScope(), d.isOptional() );
+
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "  " + artifact );
@@ -411,22 +371,27 @@ public class DefaultMavenProjectBuilder
                     // If the dependencyManagement section listed exclusions,
                     // add them to the managed artifacts here so that transitive
                     // dependencies will be excluded if necessary.
+
                     if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
                     {
                         List exclusions = new ArrayList();
-                        Iterator exclItr = d.getExclusions().iterator();
-                        while ( exclItr.hasNext() )
+
+                        for ( Iterator j = d.getExclusions().iterator(); j.hasNext(); )
                         {
-                            Exclusion e = (Exclusion) exclItr.next();
+                            Exclusion e = (Exclusion) j.next();
+
                             exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
                         }
+
                         ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
+
                         artifact.setDependencyFilter( eaf );
                     }
                     else
                     {
                         artifact.setDependencyFilter( null );
                     }
+
                     map.put( d.getManagementKey(), artifact );
                 }
                 catch ( InvalidVersionSpecificationException e )
@@ -445,15 +410,16 @@ public class DefaultMavenProjectBuilder
 
     private MavenProject buildFromSourceFileInternal( File projectDescriptor,
                                                       ArtifactRepository localRepository,
-                                                      ProfileManager profileManager,
-                                                      boolean checkDistributionManagementStatus )
+                                                      ProfileManager profileManager )
         throws ProjectBuildingException
     {
+        /*
         // TODO: Remove this once we have build-context stuff working...
         if ( !container.getContext().contains( "SystemProperties" ) )
         {
             container.addContextValue( "SystemProperties", System.getProperties() );
         }
+        */
 
         Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
@@ -465,29 +431,12 @@ public class DefaultMavenProjectBuilder
             profileManager,
             STRICT_MODEL_PARSING );
 
-        /*
-
-        MNG-3178: What is this actually for as we're not deploying this anymore.
-
-        if ( checkDistributionManagementStatus )
-        {
-            if ( ( project.getDistributionManagement() != null ) && ( project.getDistributionManagement().getStatus() != null ) )
-            {
-                String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
-
-                throw new ProjectBuildingException( projectId,
-                    "Invalid project file: distribution status must not be specified for a project outside of the repository" );
-            }
-        }
-        */
-
         return project;
     }
 
     private Model findModelFromRepository( Artifact artifact,
                                            List remoteArtifactRepositories,
-                                           ArtifactRepository localRepository,
-                                           boolean allowStubModel )
+                                           ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Artifact projectArtifact;
@@ -553,16 +502,7 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ArtifactNotFoundException e )
         {
-            if ( allowStubModel )
-            {
-                getLogger().debug( "Artifact not found - using stub model: " + e.getMessage() );
-
-                model = createStubModel( projectArtifact );
-            }
-            else
-            {
-                throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
-            }
+            throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
         }
 
         return model;
@@ -609,33 +549,6 @@ public class DefaultMavenProjectBuilder
     }
 
     // jvz:note
-    // This is used when requested artifacts do not have an associated POM. This is for the case where we are
-    // using an m1 repo where the only thing required to be present are the JAR files.
-    private Model createStubModel( Artifact projectArtifact )
-    {
-        getLogger().debug( "Using defaults for missing POM " + projectArtifact );
-
-        Model model = new Model();
-
-        model.setModelVersion( "4.0.0" );
-
-        model.setArtifactId( projectArtifact.getArtifactId() );
-
-        model.setGroupId( projectArtifact.getGroupId() );
-
-        model.setVersion( projectArtifact.getVersion() );
-
-        // TODO: not correct in some instances
-        model.setPackaging( projectArtifact.getType() );
-
-        model.setDistributionManagement( new DistributionManagement() );
-
-        model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );
-
-        return model;
-    }
-
-    // jvz:note
     // We've got a mixture of things going in the USD and from the repository, sometimes the descriptor
     // is a real file and sometimes null which makes things confusing.
     private MavenProject buildInternal( String pomLocation,
@@ -661,6 +574,7 @@ public class DefaultMavenProjectBuilder
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
         List explicitlyActive;
+
         List explicitlyInactive;
 
         if ( externalProfileManager != null )
@@ -676,11 +590,13 @@ public class DefaultMavenProjectBuilder
             }
 
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
+
             explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
         }
         else
         {
             explicitlyActive = Collections.EMPTY_LIST;
+
             explicitlyInactive = Collections.EMPTY_LIST;
         }
 
@@ -696,17 +612,11 @@ public class DefaultMavenProjectBuilder
 
         Model originalModel = ModelUtils.cloneModel( model );
 
-        MavenProject project = null;
+        MavenProject project;
+
         try
         {
-            project = assembleLineage( model,
-                lineage,
-                localRepository,
-                projectDir,
-                parentSearchRepositories,
-                aggregatedRemoteWagonRepositories,
-                externalProfileManager,
-                strict );
+            project = assembleLineage( model, lineage, localRepository, projectDir, aggregatedRemoteWagonRepositories, externalProfileManager, strict );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -734,7 +644,9 @@ public class DefaultMavenProjectBuilder
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(), e );
+                getLogger().debug(
+                    "Cannot determine whether " + currentProject.getId() + " is a module of " + previousProject.getId() + ". Reason: " + e.getMessage(),
+                    e );
             }
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
@@ -760,7 +672,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, externalProfileManager, projectDir, strict );
+            project = processProjectLogic( pomLocation, project, projectDir, strict );
         }
         catch ( ModelInterpolationException e )
         {
@@ -772,14 +684,13 @@ public class DefaultMavenProjectBuilder
         }
 
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
+
         projectBuildCache.cacheProject( project );
+
         projectBuildCache.store( buildContextManager );
 
-        // jvz:note
-        // this only happens if we are building from a source file
         if ( projectDescriptor != null )
         {
-            // Only translate the base directory for files in the source tree
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor.getParentFile() );
 
             Build build = project.getBuild();
@@ -807,8 +718,7 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement(),
-            project.getParent() ) );
+        project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement() ) );
 
         return project;
     }
@@ -851,9 +761,7 @@ public class DefaultMavenProjectBuilder
                                                       List explicitlyInactive )
         throws ProjectBuildingException
     {
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
-            explicitlyActive,
-            explicitlyInactive );
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir, explicitlyActive, explicitlyInactive );
 
         if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
@@ -861,6 +769,7 @@ public class DefaultMavenProjectBuilder
         }
 
         List modelRepos = model.getRepositories();
+
         if ( ( modelRepos != null ) && !modelRepos.isEmpty() )
         {
             try
@@ -920,7 +829,6 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject processProjectLogic( String pomLocation,
                                               MavenProject project,
-                                              ProfileManager profileMgr,
                                               File projectDir,
                                               boolean strict )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
@@ -1029,29 +937,31 @@ public class DefaultMavenProjectBuilder
                                           LinkedList lineage,
                                           ArtifactRepository localRepository,
                                           File projectDir,
-                                          List parentSearchRepositories,
                                           Set aggregatedRemoteWagonRepositories,
                                           ProfileManager externalProfileManager,
                                           boolean strict )
         throws ProjectBuildingException, InvalidRepositoryException
     {
         ModelLineage modelLineage = new DefaultModelLineage();
+
         modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
 
-        // strict means "no stubs", so we invert it here for the allowStubs parameter.
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
         ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
 
         projectContext.setModelLineage( modelLineage );
+
         projectContext.store( buildContextManager );
 
         List explicitlyActive;
+
         List explicitlyInactive;
 
         if ( externalProfileManager != null )
         {
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
+
             explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
         }
         else

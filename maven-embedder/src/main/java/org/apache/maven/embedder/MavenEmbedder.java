@@ -387,7 +387,7 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException
     {
-        return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager(), false );
+        return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager() );
     }
 
     /**
@@ -442,8 +442,7 @@ public class MavenEmbedder
             projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
                 new File( request.getPomFile() ),
                 request.getLocalRepository(),
-                request.getProfileManager(),
-                request.getTransferListener() );
+                request.getProfileManager() );
         }
         catch ( ProjectBuildingException e )
         {

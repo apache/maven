@@ -60,7 +60,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest} 
+ * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
  *
  * - POM
  * - Settings
@@ -134,15 +134,11 @@ public class DefaultMavenExecutionRequestPopulator
         else if ( request.getBaseDirectory() != null )
         {
             // Look for a release POM
-            File pom = new File(
-                request.getBaseDirectory(),
-                Maven.RELEASE_POMv4 );
+            File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
 
             if ( !pom.exists() )
             {
-                pom = new File(
-                    request.getBaseDirectory(),
-                    Maven.POMv4 );
+                pom = new File( request.getBaseDirectory(), Maven.POMv4 );                                
             }
 
             request.setPomFile( pom.getAbsolutePath() );
@@ -476,7 +472,7 @@ public class DefaultMavenExecutionRequestPopulator
             container.release( wagonManager );
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Eventing
     // ------------------------------------------------------------------------

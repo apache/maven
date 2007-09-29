@@ -252,6 +252,7 @@ public class DefaultMaven
             true );
 
         systemContext.setSystemProperties( request.getProperties() );
+
         systemContext.store( buildContextManager );
     }
 
@@ -276,45 +277,29 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions(
-                files,
-                request.getLocalRepository(),
-                request.getProfileManager() );
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
         }
         catch ( ExtensionScanningException e )
         {
-            throw new MavenExecutionException(
-                "Error scanning for extensions: " + e.getMessage(),
-                e );
+            throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
 
         try
         {
-            projects = collectProjects(
-                files,
-                request.getLocalRepository(),
-                request.isRecursive(),
-                request.getProfileManager(),
-                !request.useReactor() );
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(), request.getProfileManager(), !request.useReactor() );
 
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new MavenExecutionException(
-                e.getMessage(),
-                e );
+            throw new MavenExecutionException( e.getMessage(), e );
         }
         catch ( ProjectBuildingException e )
         {
-            throw new MavenExecutionException(
-                e.getMessage(),
-                e );
+            throw new MavenExecutionException( e.getMessage(), e );
         }
         catch ( ProfileActivationException e )
         {
-            throw new MavenExecutionException(
-                e.getMessage(),
-                e );
+            throw new MavenExecutionException( e.getMessage(), e );
         }
         return projects;
     }
@@ -342,10 +327,7 @@ public class DefaultMaven
                 usingReleasePom = true;
             }
 
-            MavenProject project = projectBuilder.build(
-                file,
-                localRepository,
-                globalProfileManager );
+            MavenProject project = projectBuilder.build( file, localRepository, globalProfileManager );
 
             if ( isRoot )
             {
@@ -355,6 +337,7 @@ public class DefaultMaven
             if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
+
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
                     throw new BuildFailureException(
@@ -372,14 +355,14 @@ public class DefaultMaven
 
                 // Initial ordering is as declared in the modules section
                 List moduleFiles = new ArrayList( project.getModules().size() );
+
                 for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
                     String name = (String) i.next();
 
                     if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
                     {
-                        getLogger().warn(
-                            "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
 
                         continue;
                     }
@@ -388,15 +371,11 @@ public class DefaultMaven
 
                     if ( usingReleasePom )
                     {
-                        moduleFile = new File(
-                            basedir,
-                            name + "/" + Maven.RELEASE_POMv4 );
+                        moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
                     }
                     else
                     {
-                        moduleFile = new File(
-                            basedir,
-                            name + "/" + Maven.POMv4 );
+                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                     }
 
                     if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
@@ -409,9 +388,7 @@ public class DefaultMaven
                         }
                         catch ( IOException e )
                         {
-                            throw new MavenExecutionException(
-                                "Unable to canonicalize file name " + moduleFile,
-                                e );
+                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
                         }
                     }
 
@@ -478,17 +455,11 @@ public class DefaultMaven
 
         if ( request.useReactor() )
         {
-            String includes = System.getProperty(
-                "maven.reactor.includes",
-                "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
-            String excludes = System.getProperty(
-                "maven.reactor.excludes",
-                POMv4 + "," + RELEASE_POMv4 );
+            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
 
-            files = FileUtils.getFiles(
-                userDir,
-                includes,
-                excludes );
+            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
+
+            files = FileUtils.getFiles( userDir, includes, excludes );
 
             filterOneProjectFilePerDirectory( files );
 
@@ -506,15 +477,11 @@ public class DefaultMaven
         }
         else
         {
-            File projectFile = new File(
-                userDir,
-                RELEASE_POMv4 );
+            File projectFile = new File( userDir, RELEASE_POMv4 );
 
             if ( !projectFile.exists() )
             {
-                projectFile = new File(
-                    userDir,
-                    POMv4 );
+                projectFile = new File( userDir, POMv4 );
             }
 
             if ( projectFile.exists() )

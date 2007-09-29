@@ -62,12 +62,10 @@ public class DefaultProfileAdvisor
 
     private PlexusContainer container;
 
-    public List applyActivatedProfiles( Model model, File projectDir, List explicitlyActiveIds,
-                                        List explicitlyInactiveIds )
+    public List applyActivatedProfiles( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds,
-                                                             explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
 
         return applyActivatedProfiles( model, projectDir, profileManager );
     }
@@ -123,13 +121,13 @@ public class DefaultProfileAdvisor
         return activeProfiles;
     }
 
-    private ProfileManager buildProfileManager( Model model, File projectDir, List explicitlyActiveIds,
-                                                List explicitlyInactiveIds )
+    private ProfileManager buildProfileManager( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
         ProfileManager profileManager = new DefaultProfileManager( container );
 
         profileManager.explicitlyActivate( explicitlyActiveIds );
+
         profileManager.explicitlyDeactivate( explicitlyInactiveIds );
 
         profileManager.addProfiles( model.getProfiles() );
@@ -146,8 +144,7 @@ public class DefaultProfileAdvisor
                                                                     List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds,
-                                                             explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
 
         List activeExternalProfiles;
         {
@@ -171,7 +168,7 @@ public class DefaultProfileAdvisor
                 {
                     Repository mavenRepo = (Repository) repoIterator.next();
 
-                    ArtifactRepository artifactRepo = null;
+                    ArtifactRepository artifactRepo;
                     try
                     {
                         artifactRepo = mavenTools.buildArtifactRepository( mavenRepo );

@@ -215,9 +215,8 @@ public class DefaultPluginVersionManager
                 try
                 {
                     artifact = artifactFactory.createProjectArtifact( groupId, artifactId, artifactVersion );
-                    pluginProject = mavenProjectBuilder.buildFromRepository( artifact,
-                                                                             project.getPluginArtifactRepositories(),
-                                                                             localRepository, false );
+                    
+                    pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getPluginArtifactRepositories(), localRepository );
                 }
                 catch ( ProjectBuildingException e )
                 {
