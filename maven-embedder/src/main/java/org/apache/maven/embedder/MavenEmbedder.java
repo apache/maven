@@ -206,22 +206,24 @@ public class MavenEmbedder
     }
 
     public Model readModel( File file )
-        throws XmlPullParserException, IOException
+    throws XmlPullParserException, IOException
     {
-        Reader reader = new FileReader( file );
+    	Reader reader = new FileReader( file );
+    	
+    	try
+    	{
+    		return readModel( reader );
+    	}
+    	finally
+    	{
+    		IOUtil.close( reader );
+    	}
+    }
 
-        Model model;
-
-        try
-        {
-            model = modelReader.read( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        return model;
+    public Model readModel( Reader reader )
+    throws XmlPullParserException, IOException
+    {
+    	return modelReader.read( reader );
     }
 
     public void writeModel( Writer writer,
