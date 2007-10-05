@@ -195,4 +195,7 @@ public interface MavenExecutionRequest
 
     File getGlobalSettingsFile();
     MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
+
+    MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
+    List getRemoteRepositories();
 }

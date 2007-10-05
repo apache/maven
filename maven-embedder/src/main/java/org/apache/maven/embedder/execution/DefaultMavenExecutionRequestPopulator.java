@@ -30,6 +30,7 @@ import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -61,7 +62,7 @@ import java.util.List;
 
 /**
  * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
- *
+ * <p/>
  * - POM
  * - Settings
  * - Local Repository
@@ -110,14 +111,85 @@ public class DefaultMavenExecutionRequestPopulator
 
         profileManager( request, configuration );
 
+        processSettings( request, configuration );
+
         return request;
+    }
+
+    private void processSettings( MavenExecutionRequest request,
+                                  Configuration configuration )
+    {
+        ProfileManager profileManager = request.getProfileManager();
+
+        Settings settings = request.getSettings();
+
+        List settingsProfiles = settings.getProfiles();
+
+        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
+        {
+            List settingsActiveProfileIds = settings.getActiveProfiles();
+
+            profileManager.explicitlyActivate( settingsActiveProfileIds );
+
+            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
+            {
+                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
+
+                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
+
+                profileManager.addProfile( profile );
+
+                // We need to convert profile repositories to artifact repositories
+
+                for ( Iterator j = profile.getRepositories().iterator(); j.hasNext(); )
+                {
+                    Repository r = (Repository) j.next();
+
+                    ArtifactRepositoryPolicy releases = new ArtifactRepositoryPolicy();
+
+                    if ( r.getReleases() != null )
+                    {
+                        releases.setChecksumPolicy( r.getReleases().getChecksumPolicy() );
+
+                        releases.setUpdatePolicy( r.getReleases().getUpdatePolicy() );
+                    }
+                    else
+                    {
+                        releases.setChecksumPolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY );
+
+                        releases.setUpdatePolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                    }
+
+                    ArtifactRepositoryPolicy snapshots = new ArtifactRepositoryPolicy();
+
+                    if ( r.getSnapshots() != null )
+                    {
+                        snapshots.setChecksumPolicy( r.getSnapshots().getChecksumPolicy() );
+
+                        snapshots.setUpdatePolicy( r.getSnapshots().getUpdatePolicy() );
+                    }
+                    else
+                    {
+                        snapshots.setChecksumPolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY );
+
+                        snapshots.setUpdatePolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                    }
+
+                    ArtifactRepository ar = artifactRepositoryFactory.createArtifactRepository( r.getId(), r.getUrl(),
+                        defaultArtifactRepositoryLayout, snapshots, releases );
+
+                    request.addRemoteRepository( ar );
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
     // POM
     // ------------------------------------------------------------------------
 
-    private void pom( MavenExecutionRequest request, Configuration configuration )
+    private void pom( MavenExecutionRequest request,
+                      Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // POM
@@ -138,7 +210,7 @@ public class DefaultMavenExecutionRequestPopulator
 
             if ( !pom.exists() )
             {
-                pom = new File( request.getBaseDirectory(), Maven.POMv4 );                                
+                pom = new File( request.getBaseDirectory(), Maven.POMv4 );
             }
 
             request.setPomFile( pom.getAbsolutePath() );
@@ -149,7 +221,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Settings
     // ------------------------------------------------------------------------
 
-    private void settings( MavenExecutionRequest request, Configuration configuration )
+    private void settings( MavenExecutionRequest request,
+                           Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Settings
@@ -188,7 +261,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Local Repository
     // ------------------------------------------------------------------------
 
-    private void localRepository( MavenExecutionRequest request, Configuration configuration )
+    private void localRepository( MavenExecutionRequest request,
+                                  Configuration configuration )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
@@ -206,7 +280,8 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
 
-    public ArtifactRepository createLocalRepository( Settings settings, Configuration configuration )
+    public ArtifactRepository createLocalRepository( Settings settings,
+                                                     Configuration configuration )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -314,7 +389,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Snapshot Policy 
     // ------------------------------------------------------------------------
 
-    private void snapshotPolicy( MavenExecutionRequest request, Configuration configuration )
+    private void snapshotPolicy( MavenExecutionRequest request,
+                                 Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Snapshot Repository Update Policies
@@ -347,7 +423,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Checksum Policy
     // ------------------------------------------------------------------------
 
-    private void checksumPolicy( MavenExecutionRequest request, Configuration configuration )
+    private void checksumPolicy( MavenExecutionRequest request,
+                                 Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Repository Checksum Policies
@@ -362,7 +439,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    private void artifactTransferMechanism( MavenExecutionRequest request, Configuration configuration )
+    private void artifactTransferMechanism( MavenExecutionRequest request,
+                                            Configuration configuration )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
@@ -477,7 +555,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Eventing
     // ------------------------------------------------------------------------
 
-    private void eventing( MavenExecutionRequest request, Configuration configuration )
+    private void eventing( MavenExecutionRequest request,
+                           Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Event Monitor/Logging
@@ -499,7 +578,8 @@ public class DefaultMavenExecutionRequestPopulator
     // Profile Manager 
     // ------------------------------------------------------------------------
 
-    private void profileManager( MavenExecutionRequest request, Configuration configuration )
+    private void profileManager( MavenExecutionRequest request,
+                                 Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Profile Manager
@@ -508,10 +588,6 @@ public class DefaultMavenExecutionRequestPopulator
         // ------------------------------------------------------------------------
 
         ProfileManager globalProfileManager = new DefaultProfileManager( container );
-
-        loadSettingsProfiles(
-            globalProfileManager,
-            request.getSettings() );
 
         globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
 
@@ -528,27 +604,5 @@ public class DefaultMavenExecutionRequestPopulator
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    public void loadSettingsProfiles( ProfileManager profileManager,
-                                      Settings settings )
-    {
-        List settingsProfiles = settings.getProfiles();
-
-        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
-        {
-            List settingsActiveProfileIds = settings.getActiveProfiles();
-
-            profileManager.explicitlyActivate( settingsActiveProfileIds );
-
-            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
-            {
-                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
-
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                profileManager.addProfile( profile );
-            }
-        }
     }
 }

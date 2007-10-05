@@ -108,6 +108,8 @@ public class DefaultMavenExecutionRequest
 
     private ProfileManager profileManager;
 
+    private List remoteRepositories;
+
     /**
      * Suppress SNAPSHOT updates. 
      * @issue MNG-2681
@@ -566,5 +568,22 @@ public class DefaultMavenExecutionRequest
         this.globalSettingsFile = globalSettingsFile;
 
         return this;
+    }
+
+    public MavenExecutionRequest addRemoteRepository( ArtifactRepository repository )
+    {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = new ArrayList();
+        }
+
+        remoteRepositories.add( repository ); 
+
+        return this;
+    }
+
+    public List getRemoteRepositories()
+    {
+        return remoteRepositories;
     }
 }
