@@ -35,6 +35,7 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -47,7 +48,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -221,13 +221,14 @@ public class DefaultMaven
                 reactorManager,
                 dispatcher );
         }
-        catch ( Exception e )
+        catch ( LifecycleExecutionException e )
         {
-            result.addException(
-                new BuildFailureException(
-                    e.getMessage(),
-                    e ) );
-
+            result.addException( e );
+            return result;
+        }
+        catch ( BuildFailureException e )
+        {
+            result.addException( e );
             return result;
         }
 
@@ -334,7 +335,7 @@ public class DefaultMaven
                 project.setExecutionRoot( true );
             }
 
-            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
+            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
 
@@ -346,7 +347,7 @@ public class DefaultMaven
                 }
             }
 
-            if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
+            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
             {
                 // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                 project.setPackaging( "pom" );

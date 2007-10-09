@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.maven.BuildFailureException;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
@@ -35,6 +36,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -544,7 +546,7 @@ public class MavenCli
 
         logReactorSummary( reactorManager );
 
-        if ( reactorManager != null && reactorManager.hasBuildFailures() )
+        if ( ( reactorManager != null ) && reactorManager.hasBuildFailures() )
         {
             logErrors(
                 reactorManager,
@@ -572,7 +574,14 @@ public class MavenCli
             {
                 Exception e = (Exception) i.next();
 
-                showError( e.getMessage(), e, request.isShowErrors() );
+                if ( e instanceof BuildFailureException )
+                {
+                    showFailure( e, request.isShowErrors() );
+                }
+                else
+                {
+                    showError( e.getMessage(), e, request.isShowErrors() );
+                }
             }
         }
         else
@@ -617,6 +626,40 @@ public class MavenCli
         }
     }
 
+    private static void showFailure( Exception e,
+                                   boolean show )
+    {
+        String message = e.getMessage();
+        Throwable cause = e.getCause();
+        if ( ( cause != null ) && ( cause instanceof AbstractMojoExecutionException ) )
+        {
+            message = ((AbstractMojoExecutionException)cause).getLongMessage();
+            if ( message == null )
+            {
+                message = cause.getMessage();
+            }
+        }
+        else
+        {
+            cause = e;
+        }
+
+        System.err.println();
+        System.err.println( message );
+        System.err.println();
+
+        if ( show )
+        {
+            System.err.println( "Error stacktrace:" );
+
+            cause.printStackTrace();
+        }
+        else
+        {
+            System.err.println( "For more information, run with the -e flag" );
+        }
+    }
+
     private static void showError( String message,
                                    Exception e,
                                    boolean show )
@@ -639,7 +682,7 @@ public class MavenCli
 
     private void logReactorSummary( ReactorManager rm )
     {
-        if ( rm != null && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
+        if ( ( rm != null ) && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
         {
             getLogger().info( "" );
             getLogger().info( "" );
