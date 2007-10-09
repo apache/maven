@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<settings>
+  <profiles>
+    <profile>
+      <id>company</id>
+      <repositories>
+        <repository>
+          <id>repo</id>
+          <url>file:///tmp/repo</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+        </repository>
+      </repositories>
+    </profile>  
+  </profiles>
+  <activeProfiles>
+    <activeProfile>company</activeProfile>
+  </activeProfiles>      
+</settings>
