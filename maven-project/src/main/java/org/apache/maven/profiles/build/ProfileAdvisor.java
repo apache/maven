@@ -28,18 +28,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * 
+ *
  * @author jdcasey
  *
  */
 public interface ProfileAdvisor
 {
-    
+
     String ROLE = ProfileAdvisor.class.getName();
-    
+
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager, String modelId )
+        throws ProjectBuildingException;
+
     LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException;
-    
+
     List applyActivatedProfiles( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException;
 

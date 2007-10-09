@@ -231,8 +231,6 @@ public class DefaultModelLineageBuilder
 
         File projectDir = pomFile == null ? null : pomFile.getParentFile();
 
-        loadActiveProfileRepositories( repositories, model, externalProfileManager, projectDir );
-
         Set artifactRepositories = null;
 
         if ( repositories != null )
@@ -241,6 +239,8 @@ public class DefaultModelLineageBuilder
             {
                 List lastRemoteRepos = oldArtifactRepositories;
                 List remoteRepos = mavenTools.buildArtifactRepositories( repositories );
+
+                loadActiveProfileRepositories( remoteRepos, model, externalProfileManager, projectDir );
 
                 artifactRepositories = new LinkedHashSet( remoteRepos.size() + oldArtifactRepositories.size() );
 
@@ -275,9 +275,15 @@ public class DefaultModelLineageBuilder
             explicitlyInactive = Collections.EMPTY_LIST;
         }
 
-        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
+        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager, model.getId() );
+
+        getLogger().debug( "Got the following repos from global profile manager:\n\n" + profileRepos );
+
+        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
                                                                                                explicitlyActive,
-                                                                                               explicitlyInactive );
+                                                                                               explicitlyInactive ) );
+
+        getLogger().debug( "Got the following repos from all profile managers:\n\n" + profileRepos );
 
         if ( !profileRepos.isEmpty() )
         {

@@ -140,11 +140,15 @@ public class DefaultProfileAdvisor
         return profileManager;
     }
 
-    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File projectDir,
-                                                                    List explicitlyActiveIds, List explicitlyInactiveIds )
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager,
+                                                                    String modelId )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
+
+        if ( profileManager == null )
+        {
+            return new LinkedHashSet();
+        }
 
         List activeExternalProfiles;
         {
@@ -154,7 +158,7 @@ public class DefaultProfileAdvisor
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException( model.getId(),
+                throw new ProjectBuildingException( modelId,
                                                     "Failed to compute active profiles for repository aggregation.", e );
             }
 
@@ -175,7 +179,7 @@ public class DefaultProfileAdvisor
                     }
                     catch ( InvalidRepositoryException e )
                     {
-                        throw new ProjectBuildingException( model.getId(), e.getMessage(), e );
+                        throw new ProjectBuildingException( modelId, e.getMessage(), e );
                     }
 
                     remoteRepositories.add( artifactRepo );
@@ -184,6 +188,15 @@ public class DefaultProfileAdvisor
 
             return remoteRepositories;
         }
+    }
+
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File projectDir,
+                                                                    List explicitlyActiveIds, List explicitlyInactiveIds )
+        throws ProjectBuildingException
+    {
+        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
+
+        return getArtifactRepositoriesFromActiveProfiles( profileManager, model.getId() );
     }
 
     private void loadExternalProjectProfiles( ProfileManager profileManager, Model model, File projectDir )
@@ -199,7 +212,7 @@ public class DefaultProfileAdvisor
                 {
                     List active = root.getActiveProfiles();
 
-                    if ( active != null && !active.isEmpty() )
+                    if ( ( active != null ) && !active.isEmpty() )
                     {
                         profileManager.explicitlyActivate( root.getActiveProfiles() );
                     }
@@ -231,7 +244,7 @@ public class DefaultProfileAdvisor
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }
