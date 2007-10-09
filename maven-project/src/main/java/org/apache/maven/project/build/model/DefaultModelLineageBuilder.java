@@ -277,13 +277,9 @@ public class DefaultModelLineageBuilder
 
         LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager, model.getId() );
 
-        getLogger().debug( "Got the following repos from global profile manager:\n\n" + profileRepos );
-
         profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
                                                                                                explicitlyActive,
                                                                                                explicitlyInactive ) );
-
-        getLogger().debug( "Got the following repos from all profile managers:\n\n" + profileRepos );
 
         if ( !profileRepos.isEmpty() )
         {
