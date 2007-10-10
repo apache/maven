@@ -32,6 +32,8 @@ import junit.framework.TestCase;
 public class ArtifactResolutionExceptionTest
     extends TestCase
 {
+    private static final String LS = System.getProperty( "line.separator" );
+
     public void testMissingArtifactMessageFormat()
     {
         String message = "Missing artifact";
@@ -43,27 +45,25 @@ public class ArtifactResolutionExceptionTest
         String classifier = "aClassifier";
         String downloadUrl = "http://somewhere.com/download";
         List path = Arrays.asList(new String[]{"dependency1", "dependency2"});
-        String expected = "Missing artifact\n" +
-        		"\n" +
-        		"  Try downloading the file manually from: \n" +
-        		"      http://somewhere.com/download\n" +
-        		"\n" +
-        		"  Then, install it using the command: \n" +
-        		"      mvn install:install-file -DgroupId=aGroupId -DartifactId=anArtifactId \\\n" +
-        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file\n" +
-        		"\n" +
-        		"  Alternatively, if you host your own repository you can deploy the file there: \n" +
-        		"      mvn deploy:deploy-file -DgroupId=aGroupId -DartifactId=anArtifactId \\\n" +
-        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file \\\n" +
-        		"           -Durl=[url] -DrepositoryId=[id]\n" +
-        		"\n" +
-        		"  Path to dependency: \n" +
-        		"  \t1) dependency1\n" +
-        		"  \t2) dependency2\n" + 
-        		"\n";
+        String expected = "Missing artifact" + LS +
+        		LS +
+        		"  Try downloading the file manually from: " + LS +
+        		"      http://somewhere.com/download" + LS +
+        		LS +
+        		"  Then, install it using the command: " + LS +
+        		"      mvn install:install-file -DgroupId=aGroupId -DartifactId=anArtifactId \\" + LS +
+        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file" + LS +
+        		LS +
+        		"  Alternatively, if you host your own repository you can deploy the file there: " + LS +
+        		"      mvn deploy:deploy-file -DgroupId=aGroupId -DartifactId=anArtifactId \\" + LS +
+        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file \\" + LS +
+        		"           -Durl=[url] -DrepositoryId=[id]" + LS +
+        		LS +
+        		"  Path to dependency: " + LS +
+        		"  \t1) dependency1" + LS +
+        		"  \t2) dependency2" + LS + 
+        		LS;
         String actual = AbstractArtifactResolutionException.constructMissingArtifactMessage(message, indentation, groupId, artifactId, version, type, classifier, downloadUrl, path);
-        System.out.println(expected);
-        System.out.println(actual);
         assertEquals(expected, actual);
     }
 }
