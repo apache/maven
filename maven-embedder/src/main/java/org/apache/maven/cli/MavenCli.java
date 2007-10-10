@@ -191,164 +191,164 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-            List goals = commandLine.getArgList();
+        List goals = commandLine.getArgList();
 
-            boolean recursive = true;
+        boolean recursive = true;
 
-            // this is the default behavior.
-            String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
+        // this is the default behavior.
+        String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
 
-            if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
+        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
+        {
+            recursive = false;
+        }
+
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
+        }
+
+        boolean offline = false;
+
+        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
+        {
+            offline = true;
+        }
+
+        boolean updateSnapshots = false;
+
+        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        {
+            updateSnapshots = true;
+        }
+
+        String globalChecksumPolicy = null;
+
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            // todo; log
+            System.out.println( "+ Enabling strict checksum verification on all artifact downloads." );
+
+            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            // todo: log
+            System.out.println( "+ Disabling strict checksum verification on all artifact downloads." );
+
+            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
+        }
+
+        File baseDirectory = new File( System.getProperty( "user.dir" ) );
+
+        // ----------------------------------------------------------------------
+        // Profile Activation
+        // ----------------------------------------------------------------------
+
+        List activeProfiles = new ArrayList();
+
+        List inactiveProfiles = new ArrayList();
+
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
+
+            StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
+
+            while ( profileTokens.hasMoreTokens() )
             {
-                recursive = false;
-            }
+                String profileAction = profileTokens.nextToken().trim();
 
-            if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
-            {
-                reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-            }
-            else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
-            {
-                reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
-            }
-            else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
-            {
-                reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
-            }
-
-            boolean offline = false;
-
-            if ( commandLine.hasOption( CLIManager.OFFLINE ) )
-            {
-                offline = true;
-            }
-
-            boolean updateSnapshots = false;
-
-            if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
-            {
-                updateSnapshots = true;
-            }
-
-            String globalChecksumPolicy = null;
-
-            if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-            {
-                // todo; log
-                System.out.println( "+ Enabling strict checksum verification on all artifact downloads." );
-
-                globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-            }
-            else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
-            {
-                // todo: log
-                System.out.println( "+ Disabling strict checksum verification on all artifact downloads." );
-
-                globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
-            }
-
-            File baseDirectory = new File( System.getProperty( "user.dir" ) );
-
-            // ----------------------------------------------------------------------
-            // Profile Activation
-            // ----------------------------------------------------------------------
-
-            List activeProfiles = new ArrayList();
-
-            List inactiveProfiles = new ArrayList();
-
-            if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-            {
-                String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
-
-                StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
-
-                while ( profileTokens.hasMoreTokens() )
+                if ( profileAction.startsWith( "-" ) )
                 {
-                    String profileAction = profileTokens.nextToken().trim();
-
-                    if ( profileAction.startsWith( "-" ) )
-                    {
-                        activeProfiles.add( profileAction.substring( 1 ) );
-                    }
-                    else if ( profileAction.startsWith( "+" ) )
-                    {
-                        inactiveProfiles.add( profileAction.substring( 1 ) );
-                    }
-                    else
-                    {
-                        // TODO: deprecate this eventually!
-                        activeProfiles.add( profileAction );
-                    }
+                    activeProfiles.add( profileAction.substring( 1 ) );
+                }
+                else if ( profileAction.startsWith( "+" ) )
+                {
+                    inactiveProfiles.add( profileAction.substring( 1 ) );
+                }
+                else
+                {
+                    // TODO: deprecate this eventually!
+                    activeProfiles.add( profileAction );
                 }
             }
+        }
 
-            MavenTransferListener transferListener;
+        MavenTransferListener transferListener;
 
-            if ( interactive )
-            {
-                transferListener = new ConsoleDownloadMonitor();
-            }
-            else
-            {
-                transferListener = new BatchModeDownloadMonitor();
-            }
+        if ( interactive )
+        {
+            transferListener = new ConsoleDownloadMonitor();
+        }
+        else
+        {
+            transferListener = new BatchModeDownloadMonitor();
+        }
 
-            transferListener.setShowChecksumEvents( false );
+        transferListener.setShowChecksumEvents( false );
 
-            // This means to scan a directory structure for POMs and process them.
-            boolean useReactor = false;
+        // This means to scan a directory structure for POMs and process them.
+        boolean useReactor = false;
 
-            if ( commandLine.hasOption( CLIManager.REACTOR ) )
-            {
-                useReactor = true;
-            }
+        if ( commandLine.hasOption( CLIManager.REACTOR ) )
+        {
+            useReactor = true;
+        }
 
-            String alternatePomFile = null;
-            if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
-            {
-                alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
-            }
+        String alternatePomFile = null;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+        {
+            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+        }
 
-            int loggingLevel;
+        int loggingLevel;
 
-            if ( debug )
-            {
-                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
-            }
-            else if ( quiet )
-            {
-                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
-                // Ideally, we could use Warn across the board
-                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
-                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
-            }
-            else
-            {
-                loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
-            }
+        if ( debug )
+        {
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
+        }
+        else if ( quiet )
+        {
+            // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+            // Ideally, we could use Warn across the board
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
+            // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+        }
+        else
+        {
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
+        }
 
-            Properties executionProperties = getExecutionProperties( commandLine );
+        Properties executionProperties = getExecutionProperties( commandLine );
 
-            MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-                .setBaseDirectory( baseDirectory )
-                .setGoals( goals )
-                .setProperties( executionProperties ) // optional
-                .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
-                .setRecursive( recursive ) // default: true
-                .setUseReactor( useReactor ) // default: false
-                .setPomFile( alternatePomFile ) // optional
-                .setShowErrors( showErrors ) // default: false
-                .setInteractiveMode( interactive ) // default: false
-                .setOffline( offline ) // default: false
-                .setUsePluginUpdateOverride( pluginUpdateOverride )
-                .addActiveProfiles( activeProfiles ) // optional
-                .addInactiveProfiles( inactiveProfiles ) // optional
-                .setLoggingLevel( loggingLevel ) // default: info
-                .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
-                .setUpdateSnapshots( updateSnapshots ) // default: false
-                .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-                .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setBaseDirectory( baseDirectory )
+            .setGoals( goals )
+            .setProperties( executionProperties ) // optional
+            .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
+            .setRecursive( recursive ) // default: true
+            .setUseReactor( useReactor ) // default: false
+            .setPomFile( alternatePomFile ) // optional
+            .setShowErrors( showErrors ) // default: false
+            .setInteractiveMode( interactive ) // default: false
+            .setOffline( offline ) // default: false
+            .setUsePluginUpdateOverride( pluginUpdateOverride )
+            .addActiveProfiles( activeProfiles ) // optional
+            .addInactiveProfiles( inactiveProfiles ) // optional
+            .setLoggingLevel( loggingLevel ) // default: info
+            .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
+            .setUpdateSnapshots( updateSnapshots ) // default: false
+            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
+            .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
 
         File userSettingsFile;
 
