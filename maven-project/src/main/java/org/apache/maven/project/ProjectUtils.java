@@ -19,17 +19,14 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,7 +41,7 @@ public final class ProjectUtils
     public static List buildArtifactRepositories( List repositories,
                                                   ArtifactRepositoryFactory artifactRepositoryFactory,
                                                   PlexusContainer container )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
 
         List repos = new ArrayList();
@@ -67,17 +64,14 @@ public final class ProjectUtils
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
                                                                         ArtifactRepositoryFactory artifactRepositoryFactory,
                                                                         PlexusContainer container )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
 
-            // TODO: make this a map inside the factory instead, so no lookup needed
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
-
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, layout,
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(),
                                                                                  repo.isUniqueVersion() );
         }
         else
@@ -89,20 +83,17 @@ public final class ProjectUtils
     public static ArtifactRepository buildArtifactRepository( Repository repo,
                                                               ArtifactRepositoryFactory artifactRepositoryFactory,
                                                               PlexusContainer container )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
 
-            // TODO: make this a map inside the factory instead, so no lookup needed
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
-
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshots, releases );
+            return artifactRepositoryFactory.createArtifactRepository( id, url, repo.getLayout(), snapshots, releases );
         }
         else
         {
@@ -130,24 +121,6 @@ public final class ProjectUtils
         }
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
-    }
-
-    private static ArtifactRepositoryLayout getRepositoryLayout( RepositoryBase mavenRepo, PlexusContainer container )
-        throws InvalidRepositoryException
-    {
-        String layout = mavenRepo.getLayout();
-
-        ArtifactRepositoryLayout repositoryLayout;
-        try
-        {
-            repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InvalidRepositoryException( "Cannot find layout implementation corresponding to: \'" + layout +
-                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
-        }
-        return repositoryLayout;
     }
 
 }

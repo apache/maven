@@ -19,21 +19,13 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.RepositoryPolicy;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,13 +33,9 @@ import java.util.List;
 
 /** @author Jason van Zyl */
 public class DefaultMavenTools
-    implements MavenTools, Contextualizable
+    implements MavenTools
 {
-    private ArtifactRepositoryLayout repositoryLayout;
-
     private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    private PlexusContainer container;
 
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
@@ -55,7 +43,7 @@ public class DefaultMavenTools
     // ----------------------------------------------------------------------------
 
     public List buildArtifactRepositories( List repositories )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
         List repos = new ArrayList();
 
@@ -74,17 +62,14 @@ public class DefaultMavenTools
     }
 
     public ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
 
-            // TODO: make this a map inside the factory instead, so no lookup needed
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
-
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, layout,
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(),
                                                                                  repo.isUniqueVersion() );
         }
         else
@@ -94,21 +79,18 @@ public class DefaultMavenTools
     }
 
     public ArtifactRepository buildArtifactRepository( Repository repo )
-        throws InvalidRepositoryException
+        throws UnknownRepositoryLayoutException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
 
-            // TODO: make this a map inside the factory instead, so no lookup needed
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
-
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
 
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshots, releases );
+            return artifactRepositoryFactory.createArtifactRepository( id, url, repo.getLayout(), snapshots, releases );
         }
         else
         {
@@ -139,33 +121,5 @@ public class DefaultMavenTools
         }
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
-    }
-
-    private ArtifactRepositoryLayout getRepositoryLayout( RepositoryBase mavenRepo )
-        throws InvalidRepositoryException
-    {
-        String layout = mavenRepo.getLayout();
-
-        ArtifactRepositoryLayout repositoryLayout;
-        try
-        {
-            repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InvalidRepositoryException( "Cannot find layout implementation corresponding to: \'" + layout +
-                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
-        }
-        return repositoryLayout;
-    }
-
-    // ----------------------------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------------------------
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

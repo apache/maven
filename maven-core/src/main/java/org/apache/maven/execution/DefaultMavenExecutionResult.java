@@ -19,8 +19,13 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +85,49 @@ public class DefaultMavenExecutionResult
         return exceptions;
     }
 
-    public MavenExecutionResult addException( Throwable t )
+    public MavenExecutionResult addProjectBuildingException( ProjectBuildingException e )
+    {
+        addException( e );
+
+        return this;
+    }
+
+    public MavenExecutionResult addMavenExecutionException( MavenExecutionException e )
+    {
+        addException( e );
+
+        return this;
+    }
+
+    public MavenExecutionResult addBuildFailureException( BuildFailureException e )
+    {
+        addException( e );
+
+        return this;
+    }
+
+    public MavenExecutionResult addDuplicateProjectException( DuplicateProjectException e )
+    {
+        addException( e );
+
+        return this;
+    }
+
+    public MavenExecutionResult addLifecycleExecutionException( LifecycleExecutionException e )
+    {
+        addException( e );
+
+        return this;
+    }
+
+    public MavenExecutionResult addUnknownException( Throwable t )
+    {
+        addException( t );
+
+        return this;
+    }
+
+    private void addException( Throwable t )
     {
         if ( exceptions == null )
         {
@@ -88,13 +135,11 @@ public class DefaultMavenExecutionResult
         }
 
         exceptions.add( t );
-
-        return this;
     }
 
     public boolean hasExceptions()
     {
-        return (exceptions != null && exceptions.size() > 0 );
+        return (( exceptions != null ) && ( exceptions.size() > 0 ) );
     }
 
     public ReactorManager getReactorManager()

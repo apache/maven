@@ -1,5 +1,8 @@
 package org.apache.maven.plugin;
 
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,8 +31,14 @@ package org.apache.maven.plugin;
 public class InvalidPluginException
     extends Exception
 {
-    public InvalidPluginException( String message, Exception e )
+    public InvalidPluginException( String message, ProjectBuildingException e )
     {
         super( message, e );
     }
+
+    public InvalidPluginException( String message, InvalidDependencyVersionException e )
+    {
+        super( message, e );
+    }
+
 }

@@ -19,12 +19,14 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.BuildFailureException;
+import org.apache.maven.NoGoalsSpecifiedException;
+import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
@@ -101,6 +103,7 @@ public class DefaultLifecycleExecutor
      * @param session
      * @param reactorManager
      * @param dispatcher
+     * @throws MojoFailureException
      */
     public void execute( final MavenSession session,
                          final ReactorManager reactorManager,
@@ -125,7 +128,7 @@ public class DefaultLifecycleExecutor
 
         if ( goals.isEmpty() )
         {
-            throw new BuildFailureException( "You must specify at least one goal. Try 'install'" );
+            throw new NoGoalsSpecifiedException( "You must specify at least one goal. Try 'install'" );
         }
 
         List taskSegments = segmentTaskListByAggregationNeeds(
@@ -143,7 +146,7 @@ public class DefaultLifecycleExecutor
         catch ( PluginNotFoundException e )
         {
             throw new LifecycleExecutionException(
-                e.getMessage(),
+                "Plugin could not be not found while searching for artifact-type handlers.",
                 e );
         }
 
@@ -210,14 +213,31 @@ public class DefaultLifecycleExecutor
                     {
                         MojoBinding binding = (MojoBinding) mojoIterator.next();
 
-                        executeGoalAndHandleFailures(
-                            binding,
-                            session,
-                            dispatcher,
-                            event,
-                            reactorManager,
-                            buildStartTime,
-                            target );
+                        try
+                        {
+                            executeGoalAndHandleFailures(
+                                binding,
+                                session,
+                                dispatcher,
+                                event,
+                                reactorManager,
+                                buildStartTime,
+                                target );
+                        }
+                        catch ( MojoFailureException e )
+                        {
+                            AggregatedBuildFailureException error = new AggregatedBuildFailureException(
+                                                                                                         session.getExecutionRootDirectory(),
+                                                                                                         binding,
+                                                                                                         e );
+
+                            dispatcher.dispatchError( event, target, error );
+
+                            if ( handleExecutionFailure( reactorManager, rootProject, error, binding, buildStartTime ) )
+                            {
+                                throw error;
+                            }
+                        }
                     }
 
                     // clean up the execution context, so we don't pollute for future project-executions.
@@ -285,19 +305,32 @@ public class DefaultLifecycleExecutor
 
                         for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
                         {
-                            MojoBinding mojoBinding = (MojoBinding) mojoIterator.next();
+                            MojoBinding binding = (MojoBinding) mojoIterator.next();
 
                             getLogger().debug(
-                                "Mojo: " + mojoBinding.getGoal() + " has config:\n"
-                                    + mojoBinding.getConfiguration() );
-                            executeGoalAndHandleFailures(
-                                mojoBinding,
-                                session,
-                                dispatcher,
-                                event,
-                                reactorManager,
-                                buildStartTime,
-                                target );
+                                "Mojo: " + binding.getGoal() + " has config:\n"
+                                    + binding.getConfiguration() );
+
+                            try
+                            {
+                                executeGoalAndHandleFailures( binding, session, dispatcher,
+                                                              event, reactorManager,
+                                                              buildStartTime, target );
+                            }
+                            catch ( MojoFailureException e )
+                            {
+                                ProjectBuildFailureException error = new ProjectBuildFailureException(
+                                                                                                       currentProject.getId(),
+                                                                                                       binding,
+                                                                                                       e );
+
+                                dispatcher.dispatchError( event, target, error );
+
+                                if ( handleExecutionFailure( reactorManager, currentProject, error, binding, buildStartTime ) )
+                                {
+                                    throw error;
+                                }
+                            }
                         }
 
                         LifecycleExecutionContext.delete( buildContextManager );
@@ -373,7 +406,7 @@ public class DefaultLifecycleExecutor
                                                final ReactorManager rm,
                                                final long buildStartTime,
                                                final String target )
-        throws BuildFailureException, LifecycleExecutionException
+        throws LifecycleExecutionException, MojoFailureException
     {
         // NEW: Retrieve/use the current project stored in the execution context, for consistency.
         LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
@@ -446,12 +479,6 @@ public class DefaultLifecycleExecutor
                         e.getMessage(),
                         e );
                 }
-                catch ( MojoFailureException e )
-                {
-                    throw new BuildFailureException(
-                        e.getMessage(),
-                        e );
-                }
                 catch ( MojoExecutionException e )
                 {
                     throw new LifecycleExecutionException(
@@ -474,34 +501,9 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            dispatcher.dispatchError(
-                event,
-                target,
-                e );
+            dispatcher.dispatchError( event, target, e );
 
-            if ( handleExecutionFailure(
-                rm,
-                project,
-                e,
-                mojoBinding,
-                buildStartTime ) )
-            {
-                throw e;
-            }
-        }
-        catch ( BuildFailureException e )
-        {
-            dispatcher.dispatchError(
-                event,
-                target,
-                e );
-
-            if ( handleExecutionFailure(
-                rm,
-                project,
-                e,
-                mojoBinding,
-                buildStartTime ) )
+            if ( handleExecutionFailure( rm, project, e, mojoBinding, buildStartTime ) )
             {
                 throw e;
             }
@@ -542,13 +544,13 @@ public class DefaultLifecycleExecutor
 
         if ( rootProject != null )
         {
+
             if ( !LifecycleUtils.isValidPhaseName( task ) )
             {
-                MojoDescriptor mojo = null;
                 // definitely a CLI goal, can use prefix
                 try
                 {
-                    mojo = getMojoDescriptorForDirectInvocation(
+                    getMojoDescriptorForDirectInvocation(
                         task,
                         session,
                         rootProject );
@@ -595,7 +597,6 @@ public class DefaultLifecycleExecutor
     private List segmentTaskListByAggregationNeeds( final List tasks,
                                                     final MavenSession session,
                                                     final MavenProject rootProject )
-        throws LifecycleExecutionException, BuildFailureException
     {
         List segments = new ArrayList();
 
@@ -777,12 +778,6 @@ public class DefaultLifecycleExecutor
                 e );
         }
         catch ( PluginVersionResolutionException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                e );
-        }
-        catch ( InvalidVersionSpecificationException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),

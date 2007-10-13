@@ -87,7 +87,14 @@ public class ProjectSorter
 
             if ( dag.getVertex( id ) != null )
             {
-                throw new DuplicateProjectException( "Project '" + id + "' is duplicated in the reactor" );
+                MavenProject conflictingProject = (MavenProject) projectMap.get( id );
+
+                throw new DuplicateProjectException( id,
+                                                     conflictingProject.getFile(),
+                                                     project.getFile(),
+                                                     "Project '"
+                                                     + id
+                                                     + "' is duplicated in the reactor" );
             }
 
             dag.addVertex( id );
@@ -138,7 +145,7 @@ public class ProjectSorter
                 {
                     Plugin plugin = (Plugin) j.next();
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
-                    if ( dag.getVertex( pluginId ) != null && !pluginId.equals( id ) )
+                    if ( ( dag.getVertex( pluginId ) != null ) && !pluginId.equals( id ) )
                     {
                         addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
@@ -152,7 +159,7 @@ public class ProjectSorter
                 {
                     ReportPlugin plugin = (ReportPlugin) j.next();
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
-                    if ( dag.getVertex( pluginId ) != null && !pluginId.equals( id ) )
+                    if ( ( dag.getVertex( pluginId ) != null ) && !pluginId.equals( id ) )
                     {
                         addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
@@ -186,7 +193,7 @@ public class ProjectSorter
         throws CycleDetectedException
     {
         MavenProject extProject = (MavenProject) projectMap.get( projectRefId );
-        
+
         if ( extProject == null )
         {
             return;
@@ -211,7 +218,7 @@ public class ProjectSorter
     {
         if ( topLevelProject == null )
         {
-            for ( Iterator i = sortedProjects.iterator(); i.hasNext() && topLevelProject == null; )
+            for ( Iterator i = sortedProjects.iterator(); i.hasNext() && ( topLevelProject == null ); )
             {
                 MavenProject project = (MavenProject) i.next();
                 if ( project.isExecutionRoot() )

@@ -47,7 +47,13 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -65,7 +71,7 @@ import java.util.Set;
  */
 public class MavenMetadataSource
     extends AbstractLogEnabled
-    implements ArtifactMetadataSource
+    implements ArtifactMetadataSource, Contextualizable
 {
     public static final String ROLE_HINT = "default";
 
@@ -74,11 +80,13 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     private RepositoryMetadataManager repositoryMetadataManager;
-    
+
     private BuildContextManager buildContextManager;
 
     // lazily instantiated and cached.
     private MavenProject superProject;
+
+    private PlexusContainer container;
 
     /**
      * Retrieve the metadata for the project from the repository.
@@ -88,8 +96,17 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        try
+        {
+            loadProjectBuilder();
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Cannot lookup MavenProjectBuilder component instance: " + e.getMessage(), e );
+        }
+
         ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
-        
+
         MavenProject project = null;
 
         Artifact pomArtifact;
@@ -107,7 +124,7 @@ public class MavenMetadataSource
             else
             {
                 project = cache.getCachedProject( artifact );
-                
+
                 if ( project == null )
                 {
                     try
@@ -122,7 +139,7 @@ public class MavenMetadataSource
                         if ( getLogger().isDebugEnabled() )
                         {
                             getLogger().debug( "Reason: " + e.getMessage() );
-                            
+
                             ModelValidationResult validationResult = e.getValidationResult();
 
                             if ( validationResult != null )
@@ -144,7 +161,7 @@ public class MavenMetadataSource
                             artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
                     }
                 }
-                
+
 
                 if ( project != null )
                 {
@@ -154,7 +171,7 @@ public class MavenMetadataSource
                     if ( distMgmt != null )
                     {
                         relocation = distMgmt.getRelocation();
-                        
+
                         artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                         pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                     }
@@ -174,7 +191,7 @@ public class MavenMetadataSource
                             artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
                         }
 
-                        if ( artifact.getDependencyFilter() != null &&
+                        if ( ( artifact.getDependencyFilter() != null ) &&
                             !artifact.getDependencyFilter().include( artifact ) )
                         {
                             return null;
@@ -188,7 +205,7 @@ public class MavenMetadataSource
                             message += "  " + relocation.getMessage() + "\n";
                         }
 
-                        if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
+                        if ( ( artifact.getDependencyTrail() != null ) && ( artifact.getDependencyTrail().size() == 1 ) )
                         {
                             getLogger().warn( "While downloading " + artifact.getGroupId() + ":" +
                                 artifact.getArtifactId() + ":" + artifact.getVersion() + message + "\n" );
@@ -217,8 +234,8 @@ public class MavenMetadataSource
         {
             // TODO: this could come straight from the project, negating the need to set it in the project itself?
             artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-        }        
-        
+        }
+
         ResolutionGroup result;
 
         if ( project == null )
@@ -255,6 +272,15 @@ public class MavenMetadataSource
         return result;
     }
 
+    private void loadProjectBuilder()
+        throws ComponentLookupException
+    {
+        if ( mavenProjectBuilder == null )
+        {
+            mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.class );
+        }
+    }
+
     private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
         throws ArtifactMetadataRetrievalException
     {
@@ -284,7 +310,7 @@ public class MavenMetadataSource
             {
                 ArtifactRepository repo = (ArtifactRepository) aggregatedIterator.next();
 
-                // if the repository exists in the list and was introduced by another POM's super-pom, 
+                // if the repository exists in the list and was introduced by another POM's super-pom,
                 // remove it...the repository definitions from the super-POM should only be at the end of
                 // the list.
                 // if the repository has been redefined, leave it.
@@ -352,10 +378,10 @@ public class MavenMetadataSource
             }
 
             ArtifactFilter artifactFilter = dependencyFilter;
-            
-            if ( artifact != null && ( artifactFilter == null || artifactFilter.include( artifact ) ) )
+
+            if ( ( artifact != null ) && ( ( artifactFilter == null ) || artifactFilter.include( artifact ) ) )
             {
-                if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )
+                if ( ( d.getExclusions() != null ) && !d.getExclusions().isEmpty() )
                 {
                     List exclusions = new ArrayList();
                     for ( Iterator j = d.getExclusions().iterator(); j.hasNext(); )
@@ -409,7 +435,7 @@ public class MavenMetadataSource
 
         List versions;
         Metadata repoMetadata = metadata.getMetadata();
-        if ( repoMetadata != null && repoMetadata.getVersioning() != null )
+        if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
             List metadataVersions = repoMetadata.getVersioning().getVersions();
             versions = new ArrayList( metadataVersions.size() );
@@ -425,5 +451,11 @@ public class MavenMetadataSource
         }
 
         return versions;
+    }
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

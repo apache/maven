@@ -62,12 +62,12 @@ public class DefaultProfileAdvisor
 
     private PlexusContainer container;
 
-    public List applyActivatedProfiles( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
+    public List applyActivatedProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds );
 
-        return applyActivatedProfiles( model, projectDir, profileManager );
+        return applyActivatedProfiles( model, pomFile, profileManager );
     }
 
     public List applyActivatedExternalProfiles( Model model, File projectDir, ProfileManager externalProfileManager )
@@ -76,7 +76,7 @@ public class DefaultProfileAdvisor
         return applyActivatedProfiles( model, projectDir, externalProfileManager );
     }
 
-    private List applyActivatedProfiles( Model model, File projectDir, ProfileManager profileManager )
+    private List applyActivatedProfiles( Model model, File pomFile, ProfileManager profileManager )
         throws ProjectBuildingException
     {
         List activeProfiles;
@@ -103,7 +103,7 @@ public class DefaultProfileAdvisor
 
                 String projectId = ArtifactUtils.versionlessKey( groupId, artifactId );
 
-                throw new ProjectBuildingException( projectId, e.getMessage(), e );
+                throw new ProjectBuildingException( projectId, e.getMessage(), pomFile.getAbsolutePath(), e );
             }
 
             for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
@@ -121,7 +121,7 @@ public class DefaultProfileAdvisor
         return activeProfiles;
     }
 
-    private ProfileManager buildProfileManager( Model model, File projectDir, List explicitlyActiveIds, List explicitlyInactiveIds )
+    private ProfileManager buildProfileManager( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
         ProfileManager profileManager = new DefaultProfileManager( container );
@@ -132,15 +132,20 @@ public class DefaultProfileAdvisor
 
         profileManager.addProfiles( model.getProfiles() );
 
-        if ( projectDir != null )
+        if ( pomFile != null )
         {
-            loadExternalProjectProfiles( profileManager, model, projectDir );
+            File projectDir = pomFile.getParentFile();
+            if ( projectDir != null )
+            {
+                loadExternalProjectProfiles( profileManager, model, projectDir );
+            }
         }
 
         return profileManager;
     }
 
     public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager,
+                                                                    File pomFile,
                                                                     String modelId )
         throws ProjectBuildingException
     {
@@ -159,7 +164,7 @@ public class DefaultProfileAdvisor
             catch ( ProfileActivationException e )
             {
                 throw new ProjectBuildingException( modelId,
-                                                    "Failed to compute active profiles for repository aggregation.", e );
+                                                    "Failed to compute active profiles for repository aggregation.", pomFile.getAbsolutePath(), e );
             }
 
             LinkedHashSet remoteRepositories = new LinkedHashSet();
@@ -190,20 +195,21 @@ public class DefaultProfileAdvisor
         }
     }
 
-    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File projectDir,
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile,
                                                                     List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, projectDir, explicitlyActiveIds, explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds );
 
-        return getArtifactRepositoriesFromActiveProfiles( profileManager, model.getId() );
+        return getArtifactRepositoriesFromActiveProfiles( profileManager, pomFile, model.getId() );
     }
 
-    private void loadExternalProjectProfiles( ProfileManager profileManager, Model model, File projectDir )
+    private void loadExternalProjectProfiles( ProfileManager profileManager, Model model, File pomFile )
         throws ProjectBuildingException
     {
-        if ( projectDir != null )
+        if ( pomFile != null )
         {
+            File projectDir = pomFile.getParentFile();
             try
             {
                 ProfilesRoot root = profilesBuilder.buildProfiles( projectDir );
@@ -230,13 +236,13 @@ public class DefaultProfileAdvisor
             catch ( IOException e )
             {
                 throw new ProjectBuildingException( model.getId(), "Cannot read profiles.xml resource from directory: "
-                    + projectDir, e );
+                    + projectDir, pomFile.getAbsolutePath(), e );
             }
             catch ( XmlPullParserException e )
             {
                 throw new ProjectBuildingException( model.getId(),
                                                     "Cannot parse profiles.xml resource from directory: " + projectDir,
-                                                    e );
+                                                    pomFile.getAbsolutePath(), e );
             }
         }
     }

@@ -1,5 +1,12 @@
 package org.apache.maven.plugin;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,13 +35,74 @@ package org.apache.maven.plugin;
 public class PluginManagerException
     extends Exception
 {
-    public PluginManagerException( String message )
+
+    private final String pluginGroupId;
+
+    private final String pluginArtifactId;
+
+    private final String pluginVersion;
+
+    private String goal;
+
+    protected PluginManagerException( Plugin plugin,
+                                   String message,
+                                   PlexusContainerException cause )
     {
-        super( message );
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( String message, Exception e )
+    protected PluginManagerException( Plugin plugin, String message,
+                                   NoSuchRealmException cause )
     {
-        super( message, e );
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    protected PluginManagerException( MojoDescriptor mojoDescriptor,
+                                   String message,
+                                   ComponentLookupException cause )
+    {
+        super( message, cause );
+        pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
+        pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
+        pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
+        goal = mojoDescriptor.getGoal();
+    }
+
+    public PluginManagerException( Plugin plugin,
+                                   InvalidVersionSpecificationException cause )
+    {
+        super( cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    public String getPluginGroupId()
+    {
+        return pluginGroupId;
+    }
+
+    public String getPluginArtifactId()
+    {
+        return pluginArtifactId;
+    }
+
+    public String getPluginVersion()
+    {
+        return pluginVersion;
+    }
+
+    public String getGoal()
+    {
+        return goal;
     }
 }

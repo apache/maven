@@ -1,5 +1,6 @@
 package org.apache.maven;
 
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,15 +26,15 @@ package org.apache.maven;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class BuildFailureException
+public abstract class BuildFailureException
     extends Exception
 {
-    public BuildFailureException( String message )
+    protected BuildFailureException( String message )
     {
         super( message );
     }
 
-    public BuildFailureException( String message, Throwable cause )
+    protected BuildFailureException( String message, Throwable cause )
     {
         super( message, cause );
     }

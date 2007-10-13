@@ -1,5 +1,11 @@
 package org.apache.maven.reactor;
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.extension.ExtensionScanningException;
+import org.apache.maven.project.ProjectBuildingException;
+
+import java.io.IOException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -59,7 +65,22 @@ public class MavenExecutionException
         super( cause );
     }
 
-    public MavenExecutionException( String message, Throwable cause )
+    public MavenExecutionException( String message, IOException cause )
+    {
+        super( message, cause );
+    }
+
+    public MavenExecutionException( String message, ProjectBuildingException cause )
+    {
+        super( message, cause );
+    }
+
+    public MavenExecutionException( String message, ArtifactResolutionException cause )
+    {
+        super( message, cause );
+    }
+
+    public MavenExecutionException( String message, ExtensionScanningException cause )
     {
         super( message, cause );
     }

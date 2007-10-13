@@ -44,16 +44,6 @@ public class PluginParameterException
         this.parameters = parameters;
     }
 
-    public PluginParameterException( MojoDescriptor mojo, List parameters, Throwable cause )
-    {
-        super( mojo.getPluginDescriptor(),
-               "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
-
-        this.mojo = mojo;
-
-        this.parameters = parameters;
-    }
-
     public MojoDescriptor getMojoDescriptor()
     {
         return mojo;

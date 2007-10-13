@@ -66,13 +66,7 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -140,11 +134,8 @@ Notes
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
     implements MavenProjectBuilder,
-    Initializable,
-    Contextualizable
+    Initializable
 {
-    protected PlexusContainer container;
-
     protected MavenProfilesBuilder profilesBuilder;
 
     protected ArtifactResolver artifactResolver;
@@ -229,9 +220,9 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException
     {
-        if ( this.superProject != null )
+        if ( superProject != null )
         {
-            return this.superProject;
+            return superProject;
         }
 
         Model superModel = getSuperModel();
@@ -252,7 +243,12 @@ public class DefaultMavenProjectBuilder
         }
         catch ( InvalidRepositoryException e )
         {
-            // This will never happen with the repositories in the SuperPOM
+            // we shouldn't be swallowing exceptions, no matter how unlikely.
+            // or, if we do, we should pay attention to the one coming from getSuperModel()...
+            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":"
+                                                + STANDALONE_SUPERPOM_ARTIFACTID,
+                                                "Maven super-POM contains an invalid repository!",
+                                                e );
         }
 
         superProject.setOriginalModel( superModel );
@@ -288,8 +284,6 @@ public class DefaultMavenProjectBuilder
 
         Map managedVersions = project.getManagedVersionMap();
 
-        ensureMetadataSourceIsInitialized();
-
         try
         {
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
@@ -298,7 +292,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( projectId,
                 "Unable to build project due to an invalid dependency version: " +
-                    e.getMessage(), e );
+                    e.getMessage(), projectDescriptor.getAbsolutePath(), e );
         }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
@@ -320,25 +314,8 @@ public class DefaultMavenProjectBuilder
     //
     // ----------------------------------------------------------------------
 
-    private void ensureMetadataSourceIsInitialized()
-        throws ProjectBuildingException
-    {
-        if ( artifactMetadataSource == null )
-        {
-            try
-            {
-                artifactMetadataSource = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new ProjectBuildingException( "all", "Cannot lookup metadata source for building the project.",
-                    e );
-            }
-        }
-    }
-
     private Map createManagedVersionMap( String projectId,
-                                         DependencyManagement dependencyManagement )
+                                         DependencyManagement dependencyManagement, File pomFile )
         throws ProjectBuildingException
     {
         Map map = null;
@@ -397,7 +374,7 @@ public class DefaultMavenProjectBuilder
                 catch ( InvalidVersionSpecificationException e )
                 {
                     throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
-                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
+                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), pomFile.getAbsolutePath(), e );
                 }
             }
         }
@@ -560,13 +537,6 @@ public class DefaultMavenProjectBuilder
                                         boolean strict )
         throws ProjectBuildingException
     {
-        File projectDir = null;
-
-        if ( projectDescriptor != null )
-        {
-            projectDir = projectDescriptor.getAbsoluteFile().getParentFile();
-        }
-
         Model superModel = getSuperModel();
 
         MavenProject superProject = new MavenProject( superModel );
@@ -586,7 +556,7 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", e );
+                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor.getAbsolutePath(), e );
             }
 
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
@@ -600,14 +570,14 @@ public class DefaultMavenProjectBuilder
             explicitlyInactive = Collections.EMPTY_LIST;
         }
 
-        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, null, explicitlyActive, explicitlyInactive ) );
+        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive ) );
 
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
 
         LinkedHashSet aggregatedRemoteWagonRepositories = collectInitialRepositories( model, superModel,
             parentSearchRepositories,
-            projectDir, explicitlyActive,
+            projectDescriptor, explicitlyActive,
             explicitlyInactive );
 
         Model originalModel = ModelUtils.cloneModel( model );
@@ -616,7 +586,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = assembleLineage( model, lineage, localRepository, projectDir, aggregatedRemoteWagonRepositories, externalProfileManager, strict );
+            project = assembleLineage( model, lineage, localRepository, projectDescriptor, aggregatedRemoteWagonRepositories, externalProfileManager, strict );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -672,7 +642,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, projectDir, strict );
+            project = processProjectLogic( pomLocation, project, projectDescriptor, strict );
         }
         catch ( ModelInterpolationException e )
         {
@@ -718,7 +688,7 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement() ) );
+        project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement(), projectDescriptor ) );
 
         return project;
     }
@@ -735,16 +705,16 @@ public class DefaultMavenProjectBuilder
     private LinkedHashSet collectInitialRepositories( Model model,
                                                       Model superModel,
                                                       List parentSearchRepositories,
-                                                      File projectDir,
+                                                      File pomFile,
                                                       List explicitlyActive,
                                                       List explicitlyInactive )
         throws ProjectBuildingException
     {
         LinkedHashSet collected = new LinkedHashSet();
 
-        collectInitialRepositoriesFromModel( collected, model, projectDir, explicitlyActive, explicitlyInactive );
+        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive );
 
-        collectInitialRepositoriesFromModel( collected, superModel, projectDir, explicitlyActive, explicitlyInactive );
+        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive );
 
         if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
         {
@@ -756,12 +726,12 @@ public class DefaultMavenProjectBuilder
 
     private void collectInitialRepositoriesFromModel( LinkedHashSet collected,
                                                       Model model,
-                                                      File projectDir,
+                                                      File pomFile,
                                                       List explicitlyActive,
                                                       List explicitlyInactive )
         throws ProjectBuildingException
     {
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir, explicitlyActive, explicitlyInactive );
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive );
 
         if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
@@ -829,7 +799,7 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject processProjectLogic( String pomLocation,
                                               MavenProject project,
-                                              File projectDir,
+                                              File pomFile,
                                               boolean strict )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
@@ -843,9 +813,9 @@ public class DefaultMavenProjectBuilder
         // mkleint - using System.getProperties() is almost definitely bad for embedding.
         Map context = new HashMap( System.getProperties() );
 
-        if ( projectDir != null )
+        if ( pomFile != null )
         {
-            context.put( "basedir", projectDir.getAbsolutePath() );
+            context.put( "basedir", pomFile.getParentFile().getAbsolutePath() );
         }
 
         // TODO: this is a hack to ensure MNG-2124 can be satisfied without triggering MNG-1927
@@ -919,11 +889,11 @@ public class DefaultMavenProjectBuilder
             mavenTools.buildArtifactRepositories( model.getRepositories() ) );
 
         // TODO: these aren't taking active project artifacts into consideration in the reactor
-        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins() ) );
+        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins(), pomLocation ) );
 
-        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins() ) );
+        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins(), pomLocation ) );
 
-        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions() ) );
+        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions(), pomLocation ) );
 
         return project;
     }
@@ -936,7 +906,7 @@ public class DefaultMavenProjectBuilder
     private MavenProject assembleLineage( Model model,
                                           LinkedList lineage,
                                           ArtifactRepository localRepository,
-                                          File projectDir,
+                                          File pomFile,
                                           Set aggregatedRemoteWagonRepositories,
                                           ProfileManager externalProfileManager,
                                           boolean strict )
@@ -944,7 +914,7 @@ public class DefaultMavenProjectBuilder
     {
         ModelLineage modelLineage = new DefaultModelLineage();
 
-        modelLineage.setOrigin( model, new File( projectDir, "pom.xml" ), new ArrayList( aggregatedRemoteWagonRepositories ) );
+        modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ) );
 
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
@@ -983,7 +953,7 @@ public class DefaultMavenProjectBuilder
             projectContext.setCurrentProject( project );
             projectContext.store( buildContextManager );
 
-            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, projectDir, explicitlyActive,
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, currentPom, explicitlyActive,
                 explicitlyInactive ) );
 
             if ( lastProject != null )
@@ -1011,7 +981,7 @@ public class DefaultMavenProjectBuilder
                 active.addAll( existingActiveProfiles );
             }
 
-            profileAdvisor.applyActivatedExternalProfiles( result.getModel(), projectDir, externalProfileManager );
+            profileAdvisor.applyActivatedExternalProfiles( result.getModel(), pomFile, externalProfileManager );
         }
 
         return result;
@@ -1031,12 +1001,12 @@ public class DefaultMavenProjectBuilder
         catch ( FileNotFoundException e )
         {
             throw new ProjectBuildingException( projectId,
-                "Could not find the model file '" + file.getAbsolutePath() + "'.", e );
+                "Could not find the model file '" + file.getAbsolutePath() + "'.", file.getAbsolutePath(), e );
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException( projectId, "Failed to build model from file '" +
-                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
+                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", file.getAbsolutePath(), e );
         }
         finally
         {
@@ -1088,7 +1058,7 @@ public class DefaultMavenProjectBuilder
         catch ( IOException e )
         {
             throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
-                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+                "\'\nError: \'" + e.getLocalizedMessage() + "\'", url.toExternalForm(), e );
         }
         finally
         {
@@ -1096,15 +1066,8 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private static String createCacheKey( String groupId,
-                                          String artifactId,
-                                          String version )
-    {
-        return groupId + ":" + artifactId + ":" + version;
-    }
-
     protected Set createPluginArtifacts( String projectId,
-                                         List plugins )
+                                         List plugins, String pomLocation )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1133,7 +1096,7 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
                     "' for plugin '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                    e.getMessage(), e );
+                    e.getMessage(), pomLocation, e );
             }
 
             if ( artifact != null )
@@ -1147,7 +1110,7 @@ public class DefaultMavenProjectBuilder
 
     // TODO: share with createPluginArtifacts?
     protected Set createReportArtifacts( String projectId,
-                                         List reports )
+                                         List reports, String pomLocation )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1178,7 +1141,7 @@ public class DefaultMavenProjectBuilder
                 {
                     throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
                         "' for report '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                        e.getMessage(), e );
+                        e.getMessage(), pomLocation, e );
                 }
 
                 if ( artifact != null )
@@ -1193,7 +1156,7 @@ public class DefaultMavenProjectBuilder
 
     // TODO: share with createPluginArtifacts?
     protected Set createExtensionArtifacts( String projectId,
-                                            List extensions )
+                                            List extensions, String pomLocation )
         throws ProjectBuildingException
     {
         Set extensionArtifacts = new HashSet();
@@ -1225,7 +1188,7 @@ public class DefaultMavenProjectBuilder
                 {
                     throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
                         "' for extension '" + ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() ) +
-                        "': " + e.getMessage(), e );
+                        "': " + e.getMessage(), pomLocation, e );
                 }
 
                 if ( artifact != null )
@@ -1250,11 +1213,5 @@ public class DefaultMavenProjectBuilder
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
         return readModel( projectId, url, STRICT_MODEL_PARSING );
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

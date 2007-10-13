@@ -1,5 +1,8 @@
 package org.apache.maven.plugin.version;
 
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -47,7 +50,16 @@ public class PluginVersionResolutionException
 
     private final String baseMessage;
 
-    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, Throwable cause )
+    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, ArtifactMetadataRetrievalException cause )
+    {
+        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.baseMessage = baseMessage;
+    }
+
+    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, InvalidVersionSpecificationException cause )
     {
         super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
 

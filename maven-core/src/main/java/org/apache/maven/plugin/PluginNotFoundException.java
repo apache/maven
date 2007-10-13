@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.model.Plugin;
 
 /**
  * Exception occurring trying to resolve a plugin.
@@ -31,9 +32,17 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 public class PluginNotFoundException
     extends AbstractArtifactResolutionException
 {
-    public PluginNotFoundException( ArtifactNotFoundException e )
+    private final Plugin plugin;
+
+    public PluginNotFoundException( Plugin plugin, ArtifactNotFoundException e )
     {
         super( "Plugin could not be found - check that the goal name is correct: " + e.getMessage(), e.getGroupId(),
                e.getArtifactId(), e.getVersion(), "maven-plugin",null, e.getRemoteRepositories(), null, e.getCause() );
+        this.plugin = plugin;
+    }
+
+    public Plugin getPlugin()
+    {
+        return plugin;
     }
 }

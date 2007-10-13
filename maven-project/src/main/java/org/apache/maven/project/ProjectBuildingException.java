@@ -1,5 +1,16 @@
 package org.apache.maven.project;
 
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.IOException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,25 +39,160 @@ public class ProjectBuildingException
 {
     private final String projectId;
 
-    public ProjectBuildingException( String projectId, String message )
+    private String pomLocation;
+
+    public ProjectBuildingException( String projectId,
+                                     String message )
     {
         super( message );
         this.projectId = projectId;
     }
 
-    public ProjectBuildingException( String projectId, String message, Throwable cause )
+    protected ProjectBuildingException( String projectId,
+                                        String message,
+                                        String pomLocation )
+    {
+        super( message );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     ProfileActivationException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     IOException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     XmlPullParserException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    protected ProjectBuildingException( String projectId,
+                                     String message,
+                                     XmlPullParserException cause )
     {
         super( message, cause );
         this.projectId = projectId;
     }
-    
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     InvalidRepositoryException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     InvalidRepositoryException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     ArtifactResolutionException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     ArtifactNotFoundException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     ArtifactResolutionException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     ArtifactNotFoundException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     InvalidVersionSpecificationException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     String pomLocation,
+                                     InvalidDependencyVersionException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    protected ProjectBuildingException( String projectId,
+                                        String message,
+                                        String pomLocation,
+                                        ModelInterpolationException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+        this.pomLocation = pomLocation;
+    }
+
+    public String getPomLocation()
+    {
+        return pomLocation;
+    }
+
     public String getProjectId()
     {
         return projectId;
     }
 
-    public String getMessage() 
+    public String getMessage()
     {
-        return super.getMessage() + " for project " + this.projectId;
+        return super.getMessage() + " for project " + projectId
+               + ( ( pomLocation == null ? "" : " at " + pomLocation ) );
     }
+
 }

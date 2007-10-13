@@ -19,8 +19,13 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
 
 import java.util.List;
 
@@ -47,6 +52,13 @@ public interface MavenExecutionResult
     // - invalid project model exception: list of markers
     // - xmlpull parser exception
     List getExceptions();
-    MavenExecutionResult addException( Throwable t );
+
+    MavenExecutionResult addLifecycleExecutionException( LifecycleExecutionException e );
+    MavenExecutionResult addDuplicateProjectException( DuplicateProjectException duplicateProjectException );
+    MavenExecutionResult addBuildFailureException( BuildFailureException buildFailureException );
+    MavenExecutionResult addMavenExecutionException( MavenExecutionException e );
+    MavenExecutionResult addProjectBuildingException (ProjectBuildingException e );
+    MavenExecutionResult addUnknownException( Throwable t );
+
     boolean hasExceptions();
 }

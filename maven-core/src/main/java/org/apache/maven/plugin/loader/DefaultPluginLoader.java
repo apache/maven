@@ -3,7 +3,6 @@ package org.apache.maven.plugin.loader;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.SessionContext;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -30,7 +29,7 @@ import java.util.Iterator;
 /**
  * Responsible for loading plugins, reports, and any components contained therein. Will resolve
  * plugin versions and plugin prefixes as necessary for plugin resolution.
- * 
+ *
  * @author jdcasey
  *
  */
@@ -66,7 +65,7 @@ public class DefaultPluginLoader
         {
             Throwable cause = e.getCause();
 
-            if ( cause != null && ( cause instanceof ComponentLookupException ) )
+            if ( ( cause != null ) && ( cause instanceof ComponentLookupException ) )
             {
                 StringBuffer message = new StringBuffer();
                 message.append( "ComponentLookupException in PluginManager while looking up a component in the realm of: " );
@@ -98,8 +97,8 @@ public class DefaultPluginLoader
     }
 
     /**
-     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding, 
-     * using the project for {@link ArtifactRepository} and other supplemental plugin information as 
+     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
+     * using the project for {@link ArtifactRepository} and other supplemental plugin information as
      * necessary.
      */
     public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project )
@@ -193,7 +192,7 @@ public class DefaultPluginLoader
     }
 
     /**
-     * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix 
+     * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix
      * matching the one specified. Return the {@link PluginDescriptor} if a match is found.
      */
     private PluginDescriptor loadByPrefix( String prefix, MavenProject project )
@@ -254,10 +253,6 @@ public class DefaultPluginLoader
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
         catch ( InvalidPluginException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
@@ -278,8 +273,8 @@ public class DefaultPluginLoader
     }
 
     /**
-     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding, 
-     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as 
+     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding,
+     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
      * necessary.
      */
     public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project )
@@ -325,10 +320,6 @@ public class DefaultPluginLoader
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
         catch ( PluginVersionResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( InvalidVersionSpecificationException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }

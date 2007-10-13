@@ -148,6 +148,10 @@ under the License.
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
           <role-hint>default</role-hint>
         </requirement>
@@ -312,9 +316,6 @@ under the License.
       <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
@@ -333,9 +334,6 @@ under the License.
       <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
@@ -352,10 +350,6 @@ under the License.
       <role>org.apache.maven.MavenTools</role>
       <implementation>org.apache.maven.DefaultMavenTools</implementation>
       <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
-          <role-hint>default</role-hint>
-        </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>

@@ -166,7 +166,7 @@ public class DefaultPluginManager
                                           MavenProject project,
                                           MavenSession session )
         throws ArtifactResolutionException, PluginVersionResolutionException,
-        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException,
+        ArtifactNotFoundException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         // TODO: this should be possibly outside
@@ -187,7 +187,7 @@ public class DefaultPluginManager
                                                     MavenProject project,
                                                     MavenSession session )
         throws PluginVersionResolutionException, ArtifactNotFoundException,
-        ArtifactResolutionException, InvalidVersionSpecificationException, InvalidPluginException,
+        ArtifactResolutionException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
@@ -199,7 +199,7 @@ public class DefaultPluginManager
                                                     MavenProject project,
                                                     ArtifactRepository localRepository )
         throws PluginVersionResolutionException, ArtifactNotFoundException,
-        ArtifactResolutionException, InvalidVersionSpecificationException, InvalidPluginException,
+        ArtifactResolutionException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException
     {
         getLogger().debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
@@ -213,7 +213,15 @@ public class DefaultPluginManager
             // if the groupId is internal, don't try to resolve it...
             if ( !RESERVED_GROUP_IDS.contains( plugin.getGroupId() ) )
             {
-                VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+                VersionRange versionRange;
+                try
+                {
+                    versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    throw new PluginManagerException( plugin, e );
+                }
 
                 List remoteRepositories = new ArrayList();
 
@@ -257,12 +265,12 @@ public class DefaultPluginManager
 
             if ( ( groupId == null ) || ( artifactId == null ) || ( version == null ) )
             {
-                throw new PluginNotFoundException( e );
+                throw new PluginNotFoundException( plugin, e );
             }
             else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
                       && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
             {
-                throw new PluginNotFoundException( e );
+                throw new PluginNotFoundException( plugin, e );
             }
             else
             {
@@ -412,12 +420,12 @@ public class DefaultPluginManager
 
             componentRealm = container.createComponentRealm( projectPlugin.getKey(), jars );
 
+            String parentRealmId = componentRealm.getParentRealm().getId();
+
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
-                                       Xpp3Dom.class.getName() );
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(),
-                                       "org.codehaus.plexus.util.xml.pull" );
+            componentRealm.importFrom( parentRealmId, Xpp3Dom.class.getName() );
+            componentRealm.importFrom( parentRealmId, "org.codehaus.plexus.util.xml.pull" );
 
             // Adding for MNG-2878, since maven-reporting-impl was removed from the
             // internal list of artifacts managed by maven, the classloader is different
@@ -425,17 +433,17 @@ public class DefaultPluginManager
             // is not available from the AbstractMavenReport since it uses:
             // getClass().getResourceAsStream( "/default-report.xml" )
             // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
-            componentRealm.importFrom( componentRealm.getParentRealm().getId(), "/default-report.xml" );
+            componentRealm.importFrom( parentRealmId, "/default-report.xml" );
         }
         catch ( PlexusContainerException e )
         {
-            throw new PluginManagerException( "Failed to create realm for plugin '" + projectPlugin
+            throw new PluginContainerException( plugin, componentRealm, "Failed to create realm for plugin '" + projectPlugin
                                               + ".", e );
         }
         catch ( NoSuchRealmException e )
         {
-            throw new PluginManagerException(
-                                              "Failed to import Xpp3Dom from parent realm for plugin: '"
+            throw new PluginContainerException( plugin, componentRealm,
+                                              "Failed to import Xpp3Dom from core realm for plugin: '"
                                                               + projectPlugin + ".", e );
         }
 
@@ -716,7 +724,7 @@ public class DefaultPluginManager
                                                 MavenProject project,
                                                 MavenSession session )
         throws PluginVersionResolutionException, ArtifactResolutionException,
-        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException,
+        ArtifactNotFoundException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         String version = reportPlugin.getVersion();
@@ -759,72 +767,81 @@ public class DefaultPluginManager
 
         Mojo plugin;
 
-        try
+        ClassRealm realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+
+        // We are forcing the use of the plugin realm for all lookups that might occur during
+        // the lifecycle that is part of the lookup. Here we are specifically trying to keep
+        // lookups that occur in contextualize calls in line with the right realm.
+
+        if ( realm != null )
         {
-            ClassRealm realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+            ClassRealm oldRealm = container.setLookupRealm( realm );
 
-            // We are forcing the use of the plugin realm for all lookups that might occur during
-            // the lifecycle that is part of the lookup. Here we are specifically trying to keep
-            // lookups that occur in contextualize calls in line with the right realm.
+            getLogger().debug(
+                               "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
+                                               + realm.getId() + " - descRealmId="
+                                               + mojoDescriptor.getRealmId() );
 
-            if ( realm != null )
+            try
             {
-                ClassRealm oldRealm = container.setLookupRealm( realm );
-
-                getLogger().debug(
-                                   "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
-                                                   + realm.getId() + " - descRealmId="
-                                                   + mojoDescriptor.getRealmId() );
-
                 plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new PluginContainerException( mojoDescriptor, realm, "Unable to find the mojo '"
+                                                  + mojoDescriptor.getRoleHint() + "' in the plugin '"
+                                                  + pluginDescriptor.getPluginLookupKey() + "'", e );
+            }
 
-                if ( plugin != null )
-                {
-                    getLogger().debug(
-                                       "Looked up - " + plugin + " - "
-                                                       + plugin.getClass().getClassLoader() );
-                }
-                else
-                {
-                    getLogger().warn( "No luck." );
-                }
-
-                container.setLookupRealm( oldRealm );
+            if ( plugin != null )
+            {
+                getLogger().debug(
+                                   "Looked up - " + plugin + " - "
+                                                   + plugin.getClass().getClassLoader() );
             }
             else
             {
-                getLogger().info(
-                                  "Looking up mojo " + mojoDescriptor.getRoleHint()
-                                                  + " in default realm "
-                                                  + container.getLookupRealm() + " - descRealmId="
-                                                  + mojoDescriptor.getRealmId() );
-
-                plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
-
-                if ( plugin != null )
-                {
-                    getLogger().info(
-                                      "Looked up - " + plugin + " - "
-                                                      + plugin.getClass().getClassLoader() );
-                }
-                else
-                {
-                    getLogger().warn( "No luck." );
-                }
-
+                getLogger().warn( "No luck." );
             }
 
-            if ( report && !( plugin instanceof MavenReport ) )
-            {
-                // TODO: the mojoDescriptor should actually capture this information so we don't get this far
-                return null;
-            }
+            container.setLookupRealm( oldRealm );
         }
-        catch ( ComponentLookupException e )
+        else
         {
-            throw new PluginManagerException( "Unable to find the mojo '"
-                                              + mojoDescriptor.getRoleHint() + "' in the plugin '"
-                                              + pluginDescriptor.getPluginLookupKey() + "'", e );
+            getLogger().info(
+                              "Looking up mojo " + mojoDescriptor.getRoleHint()
+                                              + " in default realm "
+                                              + container.getLookupRealm() + " - descRealmId="
+                                              + mojoDescriptor.getRealmId() );
+
+            try
+            {
+                plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new PluginContainerException( mojoDescriptor, container.getContainerRealm(), "Unable to find the mojo '"
+                                                  + mojoDescriptor.getRoleHint() + "' in the plugin '"
+                                                  + pluginDescriptor.getPluginLookupKey() + "' (using core class realm)", e );
+            }
+
+            if ( plugin != null )
+            {
+                getLogger().info(
+                                  "Looked up - " + plugin + " - "
+                                                  + plugin.getClass().getClassLoader() );
+            }
+            else
+            {
+                getLogger().warn( "No luck." );
+            }
+
+        }
+
+        if ( report && !( plugin instanceof MavenReport ) )
+        {
+            // TODO: the mojoDescriptor should actually capture this information so we don't get this far
+            return null;
         }
 
         if ( plugin instanceof ContextEnabled )

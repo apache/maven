@@ -5,6 +5,8 @@ public class TaskValidationResult
 {
     private String invalidTask;
 
+    private Throwable cause;
+
     private String message;
 
     public TaskValidationResult()
@@ -14,8 +16,14 @@ public class TaskValidationResult
     public TaskValidationResult( String invalidTask, String message )
     {
         this.invalidTask = invalidTask;
-
         this.message = message;
+    }
+
+    public TaskValidationResult( String invalidTask, String message, Throwable cause )
+    {
+        this.message = message;
+        this.cause = cause;
+        this.invalidTask = invalidTask;
     }
 
     public String getInvalidTask()
@@ -26,6 +34,11 @@ public class TaskValidationResult
     public String getMessage()
     {
         return message;
+    }
+
+    public Throwable getCause()
+    {
+        return cause;
     }
 
     public boolean isTaskValid()

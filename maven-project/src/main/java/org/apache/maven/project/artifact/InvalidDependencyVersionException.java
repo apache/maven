@@ -1,5 +1,7 @@
 package org.apache.maven.project.artifact;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,7 +30,7 @@ package org.apache.maven.project.artifact;
 public class InvalidDependencyVersionException
     extends Exception
 {
-    public InvalidDependencyVersionException( String message, Exception cause )
+    public InvalidDependencyVersionException( String message, InvalidVersionSpecificationException cause )
     {
         super( message, cause );
     }

@@ -1,5 +1,18 @@
 package org.apache.maven.lifecycle;
 
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.plugin.InvalidPluginException;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -31,13 +44,82 @@ public class LifecycleExecutionException
         super( message );
     }
 
-    public LifecycleExecutionException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public LifecycleExecutionException( String message, Throwable cause )
+    public LifecycleExecutionException( String message,
+                                        PluginManagerException cause )
     {
         super( message, cause );
     }
+
+    public LifecycleExecutionException( String message,
+                                        PluginNotFoundException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        PluginVersionResolutionException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        InvalidVersionSpecificationException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        InvalidPluginException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        ArtifactNotFoundException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        ArtifactResolutionException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        PluginLoaderException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        LifecycleException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        InvalidDependencyVersionException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        MojoExecutionException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        PluginConfigurationException cause )
+    {
+        super( message, cause );
+    }
+
+    public LifecycleExecutionException( String message,
+                                        PluginVersionNotFoundException cause )
+    {
+        super( message, cause );
+    }
+
 }

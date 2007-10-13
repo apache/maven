@@ -1,5 +1,6 @@
 package org.apache.maven.project;
 
+import java.io.File;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,20 +23,42 @@ package org.apache.maven.project;
 
 /**
  * Exception that occurs when the project list contains duplicate projects instead of ignoring one.
- * 
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
 public class DuplicateProjectException
     extends Exception
 {
-    public DuplicateProjectException( String message )
+    private final String projectId;
+
+    private final File existingProjectFile;
+
+    private final File conflictingProjectFile;
+
+    public DuplicateProjectException( String projectId,
+                                      File existingProjectFile,
+                                      File conflictingProjectFile,
+                                      String message )
     {
         super( message );
+        this.projectId = projectId;
+        this.existingProjectFile = existingProjectFile;
+        this.conflictingProjectFile = conflictingProjectFile;
     }
-    
-    public DuplicateProjectException( String message, Exception e )
+
+    public String getProjectId()
     {
-        super( message, e );
+        return projectId;
+    }
+
+    public File getExistingProjectFile()
+    {
+        return existingProjectFile;
+    }
+
+    public File getConflictingProjectFile()
+    {
+        return conflictingProjectFile;
     }
 }

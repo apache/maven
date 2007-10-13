@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.project.validation.ModelValidationResult;
 
 /**
  * @author Jason van Zyl

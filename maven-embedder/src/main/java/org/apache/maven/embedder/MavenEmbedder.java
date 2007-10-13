@@ -30,7 +30,6 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -209,7 +208,7 @@ public class MavenEmbedder
     throws XmlPullParserException, IOException
     {
     	Reader reader = new FileReader( file );
-    	
+
     	try
     	{
     		return readModel( reader );
@@ -319,7 +318,7 @@ public class MavenEmbedder
     protected void verifyPlugin( Plugin plugin,
                                  MavenProject project )
         throws ComponentLookupException, ArtifactResolutionException, PluginVersionResolutionException,
-        ArtifactNotFoundException, InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
+        ArtifactNotFoundException, InvalidPluginException, PluginManagerException,
         PluginNotFoundException, PluginVersionNotFoundException
     {
         PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
@@ -353,7 +352,7 @@ public class MavenEmbedder
      * @todo Move this sort of thing to the tail end of the project-building process
      */
     private Map findArtifactTypeHandlers( MavenProject project )
-        throws Exception
+        throws MavenEmbedderException
     {
         Map map = new HashMap();
 
@@ -363,9 +362,51 @@ public class MavenEmbedder
 
             if ( plugin.isExtensions() )
             {
-                verifyPlugin( plugin, project );
+                try
+                {
+                    verifyPlugin( plugin, project );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( PluginNotFoundException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( ComponentLookupException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( PluginVersionResolutionException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( InvalidPluginException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
+                catch ( PluginVersionNotFoundException e )
+                {
+                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
+                }
 
-                map.putAll( getPluginExtensionComponents( plugin ) );
+                try
+                {
+                    map.putAll( getPluginExtensionComponents( plugin ) );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new PluginLookupException( plugin, "Error looking up plugin components.", e );
+                }
 
                 // shudder...
                 for ( Iterator j = map.values().iterator(); j.hasNext(); )
@@ -425,9 +466,13 @@ public class MavenEmbedder
 
             artifactHandlerManager.addHandlers( handlers );
         }
-        catch ( Exception e )
+        catch ( MavenEmbedderException e )
         {
-            return result.addException( e );
+            return result.addUnknownException( e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            return result.addProjectBuildingException( e );
         }
 
         ReactorManager reactorManager = maven.createReactorManager( request, result );
@@ -448,7 +493,7 @@ public class MavenEmbedder
         }
         catch ( ProjectBuildingException e )
         {
-            result.addException( e );
+            return result.addProjectBuildingException( e );
         }
 
         if ( reactorManager.hasMultipleProjects() )
@@ -555,15 +600,15 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
     //  LegacyLifecycle
     // ----------------------------------------------------------------------
-    
+
     private MavenExecutionRequest request;
 
     private void start( Configuration configuration )
         throws MavenEmbedderException
     {
-        this.classWorld = configuration.getClassWorld();
+        classWorld = configuration.getClassWorld();
 
-        this.logger = configuration.getMavenEmbedderLogger();
+        logger = configuration.getMavenEmbedderLogger();
 
         // ----------------------------------------------------------------------------
         // Don't override any existing SecurityManager if one has been installed. Our
@@ -572,7 +617,7 @@ public class MavenEmbedder
 
         try
         {
-            if ( System.getSecurityManager() == null && activateSystemManager )
+            if ( ( System.getSecurityManager() == null ) && activateSystemManager )
             {
                 System.setSecurityManager( new MavenEmbedderSecurityManager() );
             }
@@ -812,7 +857,7 @@ public class MavenEmbedder
             {
                 MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-                result.addException( e );
+                result.addUnknownException( e );
 
                 return result;
             }

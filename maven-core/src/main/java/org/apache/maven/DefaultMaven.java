@@ -42,7 +42,6 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -117,10 +116,14 @@ public class DefaultMaven
                 request.setProjectPresent( false );
             }
         }
-        catch ( Exception e )
+        catch ( ProjectBuildingException e )
         {
-            result.addException( e );
-
+            result.addProjectBuildingException( e );
+            return null;
+        }
+        catch ( MavenExecutionException e )
+        {
+            result.addMavenExecutionException( e );
             return null;
         }
 
@@ -136,19 +139,18 @@ public class DefaultMaven
         }
         catch ( CycleDetectedException e )
         {
-            result.addException(
-                new BuildFailureException(
-                    "The projects in the reactor contain a cyclic reference: " + e.getMessage(),
-                    e ) );
+            String message = "The projects in the reactor contain a cyclic reference: "
+                             + e.getMessage();
+
+            ProjectCycleException error = new ProjectCycleException( projects, message, e );
+
+            result.addBuildFailureException( error );
 
             return null;
         }
         catch ( DuplicateProjectException e )
         {
-            result.addException(
-                new BuildFailureException(
-                    e.getMessage(),
-                    e ) );
+            result.addDuplicateProjectException( e );
 
             return null;
         }
@@ -192,7 +194,7 @@ public class DefaultMaven
 
             if ( !tvr.isTaskValid() )
             {
-                result.addException( new BuildFailureException( tvr.getMessage() ) );
+                result.addBuildFailureException( new InvalidTaskException( tvr ) );
 
                 return result;
             }
@@ -223,12 +225,12 @@ public class DefaultMaven
         }
         catch ( LifecycleExecutionException e )
         {
-            result.addException( e );
+            result.addLifecycleExecutionException( e );
             return result;
         }
         catch ( BuildFailureException e )
         {
-            result.addException( e );
+            result.addBuildFailureException( e );
             return result;
         }
 
@@ -258,7 +260,7 @@ public class DefaultMaven
     }
 
     private List getProjects( MavenExecutionRequest request )
-        throws MavenExecutionException, BuildFailureException
+        throws MavenExecutionException
     {
         List projects;
 
@@ -298,10 +300,6 @@ public class DefaultMaven
         {
             throw new MavenExecutionException( e.getMessage(), e );
         }
-        catch ( ProfileActivationException e )
-        {
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
         return projects;
     }
 
@@ -310,8 +308,7 @@ public class DefaultMaven
                                   boolean recursive,
                                   ProfileManager globalProfileManager,
                                   boolean isRoot )
-        throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
-        MavenExecutionException, BuildFailureException
+        throws ArtifactResolutionException, ProjectBuildingException, MavenExecutionException
     {
         List projects = new ArrayList( files.size() );
 
@@ -341,7 +338,7 @@ public class DefaultMaven
 
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
-                    throw new BuildFailureException(
+                    throw new MavenExecutionException(
                         "Unable to build project '" + project.getFile() +
                             "; it requires Maven version " + version.toString() );
                 }
@@ -396,13 +393,9 @@ public class DefaultMaven
                     moduleFiles.add( moduleFile );
                 }
 
-                List collectedProjects =
-                    collectProjects(
-                        moduleFiles,
-                        localRepository,
-                        recursive,
-                        globalProfileManager,
-                        false );
+                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,
+                                                          globalProfileManager, false );
+
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }

@@ -197,11 +197,11 @@ public class DefaultModelLineageBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile, e );
+            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile, pomFile.getAbsolutePath(), e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to parse model from: " + pomFile, e );
+            throw new ProjectBuildingException( "unknown", "Failed to parse model from: " + pomFile, pomFile.getAbsolutePath(), e );
         }
         finally
         {
@@ -250,7 +250,7 @@ public class DefaultModelLineageBuilder
             catch ( InvalidRepositoryException e )
             {
                 throw new ProjectBuildingException( model.getId(), "Failed to create ArtifactRepository list for: "
-                    + pomFile, e );
+                    + pomFile, pomFile.getAbsolutePath(), e );
             }
         }
 
@@ -258,7 +258,7 @@ public class DefaultModelLineageBuilder
     }
 
     private void loadActiveProfileRepositories( List repositories, Model model, ProfileManager profileManager,
-                                                File projectDir )
+                                                File pomFile )
         throws ProjectBuildingException
     {
         List explicitlyActive;
@@ -275,9 +275,9 @@ public class DefaultModelLineageBuilder
             explicitlyInactive = Collections.EMPTY_LIST;
         }
 
-        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager, model.getId() );
+        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager, pomFile, model.getId() );
 
-        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, projectDir,
+        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile,
                                                                                                explicitlyActive,
                                                                                                explicitlyInactive ) );
 
@@ -310,7 +310,7 @@ public class DefaultModelLineageBuilder
 
             File parentPomFile = projectBuildCache.getCachedModelFile( modelParent );
 
-            if ( parentPomFile == null )
+            if ( ( parentPomFile == null ) && ( modelPomFile != null ) )
             {
                 parentPomFile = resolveParentWithRelativePath( modelParent, modelPomFile );
             }
@@ -319,7 +319,7 @@ public class DefaultModelLineageBuilder
             {
                 try
                 {
-                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, modelPomFile );
+                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, model.getId() );
                 }
                 catch( ProjectBuildingException e )
                 {
@@ -388,7 +388,7 @@ public class DefaultModelLineageBuilder
     }
 
     private File resolveParentFromRepositories( Parent modelParent, ArtifactRepository localRepository,
-                                                List remoteRepositories, File pomFile )
+                                                List remoteRepositories, String childId )
         throws ProjectBuildingException
     {
         Artifact parentPomArtifact = artifactFactory.createBuildArtifact( modelParent.getGroupId(), modelParent
@@ -405,12 +405,12 @@ public class DefaultModelLineageBuilder
         catch ( ArtifactResolutionException e )
         {
             throw new ProjectBuildingException( "Parent: " + modelParent.getId(),
-                                                "Failed to resolve POM for parent of: " + pomFile, e );
+                                                "Failed to resolve POM for parent of: " + childId, e );
         }
         catch ( ArtifactNotFoundException e )
         {
             throw new ProjectBuildingException( "Parent: " + modelParent.getId(), "Cannot find parent: "
-                + parentPomArtifact.getId() + " of: " + pomFile, e );
+                + parentPomArtifact.getId() + " of: " + childId, e );
         }
 
         if ( parentPomArtifact.isResolved() )

@@ -19,50 +19,60 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class InvalidProjectModelException
     extends ProjectBuildingException
 {
-    private final String pomLocation;
-
     private ModelValidationResult validationResult;
 
-    public InvalidProjectModelException( String projectId, String pomLocation, String message, Throwable cause )
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message,
+                                         ModelInterpolationException cause )
     {
-        super( projectId, message, cause );
-        this.pomLocation = pomLocation;
+        super( projectId, message, pomLocation, cause );
     }
 
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message,
+                                         InvalidRepositoryException cause )
+    {
+        super( projectId, message, pomLocation, cause );
+    }
+
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message,
                                          ModelValidationResult validationResult )
     {
-        super( projectId, message );
+        super( projectId, message, pomLocation );
 
-        this.pomLocation = pomLocation;
         this.validationResult = validationResult;
     }
 
-    public InvalidProjectModelException( String projectId, String pomLocation, String message )
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message )
     {
-        super( projectId, message );
-
-        this.pomLocation = pomLocation;
+        super( projectId, message, pomLocation );
     }
 
-    public final String getPomLocation()
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message,
+                                         XmlPullParserException cause )
     {
-        return pomLocation;
+        super( projectId, message, pomLocation, cause );
     }
 
     public final ModelValidationResult getValidationResult()
     {
         return validationResult;
-    }
-
-    public String getMessage() 
-    {
-        return super.getMessage() + " at " + this.pomLocation;
     }
 
 }
