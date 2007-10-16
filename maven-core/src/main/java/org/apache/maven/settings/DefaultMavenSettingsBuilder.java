@@ -26,14 +26,15 @@ import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -49,7 +50,7 @@ public class DefaultMavenSettingsBuilder
     private SettingsValidator validator;
 
     /** @since 2.1 */
-    public Settings buildSettings( MavenExecutionRequest request )        
+    public Settings buildSettings( MavenExecutionRequest request )
         throws IOException, XmlPullParserException
     {
         File userSettingsFile = request.getUserSettingsFile();
@@ -148,11 +149,11 @@ public class DefaultMavenSettingsBuilder
 
         Settings settings = null;
 
-        FileReader reader = null;
+        Reader reader = null;
 
         try
         {
-            reader = new FileReader( settingsFile );
+            reader = ReaderFactory.newXmlReader( settingsFile );
 
             SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 

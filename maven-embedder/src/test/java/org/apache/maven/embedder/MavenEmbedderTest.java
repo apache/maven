@@ -36,12 +36,13 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -61,7 +62,7 @@ public class MavenEmbedderTest
         super.setUp();
 
         basedir = System.getProperty( "basedir" );
-        
+
         if ( basedir == null )
         {
             basedir = new File( "." ).getCanonicalPath();
@@ -229,8 +230,8 @@ public class MavenEmbedderTest
         model.setBuild( new Build() );
         model.getBuild().addPlugin( plugin );
 
-        FileWriter writer = new FileWriter( pom );
-        maven.writeModel( new FileWriter( pom ), model );
+        Writer writer = WriterFactory.newXmlWriter( pom );
+        maven.writeModel( writer, model );
         writer.close();
 
         /* execute maven */
@@ -248,8 +249,8 @@ public class MavenEmbedderTest
 
         /* Add the surefire plugin 2.3 to the pom */
         plugin.setVersion( "2.3" );
-        writer = new FileWriter( pom );
-        maven.writeModel( new FileWriter( pom ), model );
+        writer = WriterFactory.newXmlWriter( pom );
+        maven.writeModel( writer, model );
         writer.close();
 
         /* execute Maven */
@@ -361,7 +362,7 @@ public class MavenEmbedderTest
 
         File file = new File( basedir, "target/model.xml" );
 
-        Writer writer = new FileWriter( file );
+        Writer writer = WriterFactory.newXmlWriter( file );
 
         maven.writeModel( writer, model );
 
@@ -389,10 +390,10 @@ public class MavenEmbedderTest
         File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
         settingsFile.deleteOnExit();
 
-        FileWriter writer = null;
+        Writer writer = null;
         try
         {
-            writer = new FileWriter( settingsFile );
+            writer = WriterFactory.newXmlWriter( settingsFile );
             new SettingsXpp3Writer().write( writer, s );
         }
         finally
@@ -422,10 +423,10 @@ public class MavenEmbedderTest
         File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
         settingsFile.deleteOnExit();
 
-        FileWriter writer = null;
+        Writer writer = null;
         try
         {
-            writer = new FileWriter( settingsFile );
+            writer = WriterFactory.newXmlWriter( settingsFile );
             new SettingsXpp3Writer().write( writer, s );
         }
         finally
@@ -461,10 +462,10 @@ public class MavenEmbedderTest
 
         MavenEmbedder.writeSettings( settingsFile, s );
 
-        FileReader reader = null;
+        Reader reader = null;
         try
         {
-            reader = new FileReader( settingsFile );
+            reader = ReaderFactory.newXmlReader( settingsFile );
             Settings result = new SettingsXpp3Reader().read( reader );
 
             assertEquals( localRepoPath, result.getLocalRepository() );

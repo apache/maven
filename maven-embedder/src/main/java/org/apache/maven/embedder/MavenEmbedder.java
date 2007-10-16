@@ -78,15 +78,16 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
@@ -211,7 +212,7 @@ public class MavenEmbedder
     public Model readModel( File file )
     throws XmlPullParserException, IOException
     {
-    	Reader reader = new FileReader( file );
+        Reader reader = ReaderFactory.newXmlReader( file );
 
     	try
     	{
@@ -252,8 +253,6 @@ public class MavenEmbedder
                                       Settings settings )
         throws IOException
     {
-        Writer fileWriter = new FileWriter( file );
-
         SettingsValidator settingsValidator = new DefaultSettingsValidator();
 
         SettingsValidationResult validationResult = settingsValidator.validate( settings );
@@ -271,6 +270,8 @@ public class MavenEmbedder
 
         String encoding = settings.getModelEncoding() != null ? settings.getModelEncoding() : "UTF-8";
 
+        Writer fileWriter = new OutputStreamWriter( new FileOutputStream( file ), encoding );
+
         Format format = Format.getPrettyFormat().setEncoding( encoding );
 
         try
@@ -286,7 +287,7 @@ public class MavenEmbedder
     public static Settings readSettings( File file )
         throws IOException, SettingsConfigurationException
     {
-        Reader fileReader = new FileReader( file );
+        Reader fileReader = ReaderFactory.newXmlReader( file );
 
         SettingsValidator settingsValidator = new DefaultSettingsValidator();
 
@@ -795,7 +796,7 @@ public class MavenEmbedder
         {
             try
             {
-                fileReader = new FileReader( configuration.getUserSettingsFile() );
+                fileReader = ReaderFactory.newXmlReader( configuration.getUserSettingsFile() );
 
                 result.setUserSettings( new SettingsXpp3Reader().read( fileReader ) );
             }
@@ -819,7 +820,7 @@ public class MavenEmbedder
         {
             try
             {
-                fileReader = new FileReader( configuration.getGlobalSettingsFile() );
+                fileReader = ReaderFactory.newXmlReader( configuration.getGlobalSettingsFile() );
 
                 result.setGlobalSettings( new SettingsXpp3Reader().read( fileReader ) );
             }

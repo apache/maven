@@ -39,12 +39,13 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -188,11 +189,11 @@ public class DefaultModelLineageBuilder
         }
 
         Model model;
-        FileReader reader = null;
+        Reader reader = null;
 
         try
         {
-            reader = new FileReader( pomFile );
+            reader = ReaderFactory.newXmlReader( pomFile );
             model = new MavenXpp3Reader().read( reader );
         }
         catch ( IOException e )

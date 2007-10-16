@@ -36,10 +36,11 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.WriterFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -103,10 +104,10 @@ public class DefaultModelLineageBuilderTest
         File pomFile = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
         pomFile.deleteOnExit();
 
-        FileWriter writer = null;
+        Writer writer = null;
         try
         {
-            writer = new FileWriter( pomFile );
+            writer = WriterFactory.newXmlWriter( pomFile );
 
             new MavenXpp3Writer().write( writer, model );
         }
@@ -475,12 +476,12 @@ public class DefaultModelLineageBuilderTest
                              File file )
         throws IOException
     {
-        FileWriter writer = null;
+        Writer writer = null;
         try
         {
             file.getParentFile().mkdirs();
 
-            writer = new FileWriter( file );
+            writer = WriterFactory.newXmlWriter( file );
             new MavenXpp3Writer().write( writer, model );
 
             writer.flush();
