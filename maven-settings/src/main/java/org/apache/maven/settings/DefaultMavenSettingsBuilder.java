@@ -23,14 +23,15 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -90,10 +91,10 @@ public class DefaultMavenSettingsBuilder
 
         if ( settingsFile.exists() && settingsFile.isFile() )
         {
-            FileReader reader = null;
+            Reader reader = null;
             try
             {
-                reader = new FileReader( settingsFile );
+                reader = ReaderFactory.newXmlReader( settingsFile );
                 StringWriter sWriter = new StringWriter();
 
                 IOUtil.copy( reader, sWriter );

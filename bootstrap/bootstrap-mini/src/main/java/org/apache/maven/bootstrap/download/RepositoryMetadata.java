@@ -23,8 +23,9 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -177,13 +178,13 @@ public class RepositoryMetadata
         }
         return baseVersion;
     }
-    
+
     public long getLastUpdatedUtc()
     {
         TimeZone timezone = TimeZone.getTimeZone( "UTC" );
         DateFormat fmt = new SimpleDateFormat( "yyyyMMddHHmmss" );
         fmt.setTimeZone( timezone );
-        
+
         try
         {
             return fmt.parse( lastUpdated ).getTime();
@@ -345,7 +346,7 @@ public class RepositoryMetadata
         public void write( File file )
             throws IOException
         {
-            PrintWriter w = new PrintWriter( new FileWriter( file ) );
+            PrintWriter w = new PrintWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
 
             try
             {

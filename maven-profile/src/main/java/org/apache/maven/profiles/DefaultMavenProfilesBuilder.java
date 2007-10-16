@@ -22,13 +22,14 @@ package org.apache.maven.profiles;
 import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -48,22 +49,22 @@ public class DefaultMavenProfilesBuilder
         if ( profilesXml.exists() )
         {
             ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
-            FileReader fileReader = null;
+            Reader profileReader = null;
             try
             {
-                fileReader = new FileReader( profilesXml );
-                
+                profileReader = ReaderFactory.newXmlReader( profilesXml );
+
                 StringWriter sWriter = new StringWriter();
-                
-                IOUtil.copy( fileReader, sWriter );
-                
+
+                IOUtil.copy( profileReader, sWriter );
+
                 String rawInput = sWriter.toString();
-                
+
                 try
                 {
                     RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
                     interpolator.addValueSource( new EnvarBasedValueSource() );
-                    
+
                     rawInput = interpolator.interpolate( rawInput, "settings" );
                 }
                 catch ( Exception e )
@@ -78,7 +79,7 @@ public class DefaultMavenProfilesBuilder
             }
             finally
             {
-                IOUtil.close( fileReader );
+                IOUtil.close( profileReader );
             }
         }
 

@@ -23,12 +23,13 @@ import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 public class DefaultPluginRegistryBuilder
     extends AbstractLogEnabled
@@ -69,19 +70,19 @@ public class DefaultPluginRegistryBuilder
             getLogger().debug( "Building Maven global-level plugin registry from: '" + globalRegistryFile.getAbsolutePath() + "'" );
         }
     }
-    
+
     public PluginRegistry buildPluginRegistry()
         throws IOException, XmlPullParserException
     {
         PluginRegistry global = readPluginRegistry( globalRegistryFile );
-        
+
         PluginRegistry user = readPluginRegistry( userRegistryFile );
 
         if ( user == null && global != null )
         {
             // we'll use the globals, but first we have to recursively mark them as global...
             PluginRegistryUtils.recursivelySetSourceLevel( global, PluginRegistry.GLOBAL_LEVEL );
-            
+
             user = global;
         }
         else
@@ -100,19 +101,19 @@ public class DefaultPluginRegistryBuilder
 
         if ( registryFile != null && registryFile.exists() && registryFile.isFile() )
         {
-            FileReader reader = null;
+            Reader reader = null;
             try
             {
-                reader = new FileReader( registryFile );
+                reader = ReaderFactory.newXmlReader( registryFile );
 
                 PluginRegistryXpp3Reader modelReader = new PluginRegistryXpp3Reader();
 
                 registry = modelReader.read( reader );
-                
+
                 RuntimeInfo rtInfo = new RuntimeInfo( registry );
-                
+
                 registry.setRuntimeInfo( rtInfo );
-                
+
                 rtInfo.setFile( registryFile );
             }
             finally
@@ -138,7 +139,7 @@ public class DefaultPluginRegistryBuilder
         // the path character before we operate on the string as a regex input, and 
         // in order to avoid surprises with the File construction...
         // -------------------------------------------------------------------------------------
-        
+
         String path = System.getProperty( altLocationSysProp );
 
         if ( StringUtils.isEmpty( path ) )
@@ -149,7 +150,7 @@ public class DefaultPluginRegistryBuilder
 
             basedir = basedir.replaceAll( "\\\\", "/" );
             basedir = basedir.replaceAll("\\$", "\\\\\\$");
-            
+
             path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
             path = path.replaceAll( "\\\\", "/" );
             path = path.replaceAll( "//", "/" );
@@ -165,14 +166,14 @@ public class DefaultPluginRegistryBuilder
     public PluginRegistry createUserPluginRegistry()
     {
         PluginRegistry registry = new PluginRegistry();
-        
+
         RuntimeInfo rtInfo = new RuntimeInfo( registry );
-        
+
         registry.setRuntimeInfo( rtInfo );
-        
+
         rtInfo.setFile( userRegistryFile );
-        
+
         return registry;
     }
-    
+
 }

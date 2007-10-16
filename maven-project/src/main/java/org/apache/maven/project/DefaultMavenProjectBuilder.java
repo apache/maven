@@ -76,16 +76,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,8 +132,7 @@ Notes
 */
 
 /**
- * @version $Id: DefaultMavenProjectBuilder.java,v 1.37 2005/03/08 01:55:22
- *          trygvis Exp $
+ * @version $Id$
  */
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
@@ -1376,7 +1373,7 @@ public class DefaultMavenProjectBuilder
         Reader reader = null;
         try
         {
-            reader = new FileReader( file );
+            reader = ReaderFactory.newXmlReader( file );
             return readModel( projectId, file.getAbsolutePath(), reader, strict );
         }
         catch ( FileNotFoundException e )
@@ -1401,15 +1398,11 @@ public class DefaultMavenProjectBuilder
                              boolean strict )
         throws IOException, InvalidProjectModelException
     {
-        StringWriter sw = new StringWriter();
+        String modelSource = IOUtil.toString( reader );
 
-        IOUtil.copy( reader, sw );
-
-        String modelSource = sw.toString();
-
-        if ( modelSource.indexOf( "<modelVersion>4.0.0" ) < 0 )
+        if ( modelSource.indexOf( "<modelVersion>" + MAVEN_MODEL_VERSION ) < 0 )
         {
-            throw new InvalidProjectModelException( projectId, pomLocation, "Not a v4.0.0 POM." );
+            throw new InvalidProjectModelException( projectId, pomLocation, "Not a v" + MAVEN_MODEL_VERSION  + " POM." );
         }
 
         StringReader sReader = new StringReader( modelSource );
@@ -1430,10 +1423,10 @@ public class DefaultMavenProjectBuilder
                              boolean strict )
         throws ProjectBuildingException
     {
-        InputStreamReader reader = null;
+        Reader reader = null;
         try
         {
-            reader = new InputStreamReader( url.openStream() );
+            reader = ReaderFactory.newXmlReader( url.openStream() );
             return readModel( projectId, url.toExternalForm(), reader, strict );
         }
         catch ( IOException e )

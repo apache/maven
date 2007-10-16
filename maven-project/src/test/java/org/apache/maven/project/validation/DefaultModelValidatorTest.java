@@ -22,8 +22,8 @@ package org.apache.maven.project.validation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
+import org.codehaus.plexus.util.ReaderFactory;
 
-import java.io.FileReader;
 import java.io.Reader;
 import java.util.List;
 
@@ -219,7 +219,7 @@ public class DefaultModelValidatorTest
     private ModelValidationResult validate( String testName )
         throws Exception
     {
-        Reader input = new FileReader( getFileForClasspathResource( "validation/" + testName ) );
+        Reader input = ReaderFactory.newXmlReader( getFileForClasspathResource( "validation/" + testName ) );
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
