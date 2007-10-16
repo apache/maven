@@ -94,10 +94,32 @@ public class DefaultExtensionManager
 
     private WagonManager wagonManager;
 
+    // used for unit testing.
+    protected DefaultExtensionManager( ArtifactFactory artifactFactory,
+                                    ArtifactResolver artifactResolver,
+                                    ArtifactMetadataSource artifactMetadataSource,
+                                    MutablePlexusContainer container,
+                                    ArtifactFilterManager artifactFilterManager,
+                                    WagonManager wagonManager )
+    {
+        this.artifactFactory = artifactFactory;
+        this.artifactResolver = artifactResolver;
+        this.artifactMetadataSource = artifactMetadataSource;
+        this.container = container;
+        this.artifactFilterManager = artifactFilterManager;
+        this.wagonManager = wagonManager;
+    }
+
+    public DefaultExtensionManager()
+    {
+        // used for plexus init.
+    }
+
     public void addExtension( Extension extension,
                               Model originatingModel,
                               List remoteRepositories,
-                              ArtifactRepository localRepository, Map projectSessions )
+                              ArtifactRepository localRepository,
+                              Map projectSessions )
         throws ExtensionManagerException
     {
         Artifact extensionArtifact = artifactFactory.createBuildArtifact( extension.getGroupId(),
@@ -135,7 +157,8 @@ public class DefaultExtensionManager
 
     public void addExtension( Extension extension,
                               MavenProject project,
-                              ArtifactRepository localRepository, Map projectSessions )
+                              ArtifactRepository localRepository,
+                              Map projectSessions )
         throws ExtensionManagerException
     {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
@@ -232,8 +255,6 @@ public class DefaultExtensionManager
                 throw new ExtensionManagerException( "Unable to create extension ClassRealm for extension: " + extensionArtifact.getId() + " within session for project: " + projectId, extensionArtifact, projectId, e );
             }
 
-            projectSession.addComponentRealm( extensionRealm );
-
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
@@ -272,7 +293,7 @@ public class DefaultExtensionManager
 
                         try
                         {
-                            getLogger().debug( "Importing: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId() );
+                            getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto project realm: " + projectRealm.getId() );
 
                             projectRealm.importFrom( extensionRealm.getId(), implementation );
 

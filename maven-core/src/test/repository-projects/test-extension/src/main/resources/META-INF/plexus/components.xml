@@ -1,0 +1,9 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <role-hint>test</role-hint>
+      <implementation>org.apache.maven.core.test.MyArtifactFactory</implementation>
+    </component>
+  </components>
+</component-set>

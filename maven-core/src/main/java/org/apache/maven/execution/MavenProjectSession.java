@@ -39,11 +39,6 @@ public class MavenProjectSession
         return projectId;
     }
 
-    public void addComponentRealm( ClassRealm realm )
-    {
-        componentRealms.put( realm.getId(), realm );
-    }
-
     public static String createRealmId( Artifact realmArtifact )
     {
         return ArtifactUtils.versionlessKey( realmArtifact );
