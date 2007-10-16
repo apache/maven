@@ -63,8 +63,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jason van zyl
@@ -101,13 +103,13 @@ public class DefaultMaven
     // lifecycle execution
 
     public ReactorManager createReactorManager( MavenExecutionRequest request,
-                                                MavenExecutionResult result )
+                                                MavenExecutionResult result,
+                                                Map projectSessions )
     {
         List projects;
-
         try
         {
-            projects = getProjects( request );
+            projects = getProjects( request, projectSessions );
 
             if ( projects.isEmpty() )
             {
@@ -164,9 +166,12 @@ public class DefaultMaven
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
+        Map projectSessions = new HashMap();
+
         ReactorManager reactorManager = createReactorManager(
             request,
-            result );
+            result,
+            projectSessions );
 
         if ( result.hasExceptions() )
         {
@@ -184,7 +189,8 @@ public class DefaultMaven
         MavenSession session = createSession(
             request,
             reactorManager,
-            dispatcher );
+            dispatcher,
+            projectSessions );
 
         for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
         {
@@ -259,7 +265,7 @@ public class DefaultMaven
         systemContext.store( buildContextManager );
     }
 
-    private List getProjects( MavenExecutionRequest request )
+    private List getProjects( MavenExecutionRequest request, Map projectSessions )
         throws MavenExecutionException
     {
         List projects;
@@ -280,7 +286,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager(), projectSessions );
         }
         catch ( ExtensionScanningException e )
         {
@@ -415,14 +421,16 @@ public class DefaultMaven
     // or not.
 
     protected MavenSession createSession( MavenExecutionRequest request,
-                                          ReactorManager rpm,
-                                          EventDispatcher dispatcher )
+                                          ReactorManager reactorManager,
+                                          EventDispatcher dispatcher,
+                                          Map projectSessions )
     {
         MavenSession session = new MavenSession(
             container,
             request,
             dispatcher,
-            rpm );
+            reactorManager,
+            projectSessions );
 
         SessionContext ctx = new SessionContext( session );
         ctx.store( buildContextManager );

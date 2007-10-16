@@ -21,8 +21,6 @@ package org.apache.maven.extension;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -38,7 +36,6 @@ import org.apache.maven.project.build.model.ModelLineageBuilder;
 import org.apache.maven.project.build.model.ModelLineageIterator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -69,8 +66,10 @@ public class DefaultBuildExtensionScanner
 
     private ModelInterpolator modelInterpolator;
 
-    public void scanForBuildExtensions( List files, ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager )
+    public void scanForBuildExtensions( List files,
+                                        ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager,
+                                        Map projectSessions )
         throws ExtensionScanningException
     {
         List visited = new ArrayList();
@@ -79,21 +78,27 @@ public class DefaultBuildExtensionScanner
         {
             File pom = (File) it.next();
 
-            scanInternal( pom, localRepository, globalProfileManager, visited, files );
+            scanInternal( pom, localRepository, globalProfileManager, visited, files, projectSessions );
         }
     }
 
-    public void scanForBuildExtensions( File pom, ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager )
+    public void scanForBuildExtensions( File pom,
+                                        ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager,
+                                        Map projectSessions )
         throws ExtensionScanningException
     {
-        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ) );
+        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ), projectSessions );
     }
 
     // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles,
     //       once we move to just-in-time project scanning.
-    private void scanInternal( File pom, ArtifactRepository localRepository, ProfileManager globalProfileManager,
-                               List visitedModelIds, List reactorFiles )
+    private void scanInternal( File pom,
+                               ArtifactRepository localRepository,
+                               ProfileManager globalProfileManager,
+                               List visitedModelIds,
+                               List reactorFiles,
+                               Map projectSessions )
         throws ExtensionScanningException
     {
 
@@ -150,7 +155,7 @@ public class DefaultBuildExtensionScanner
 
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
-                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories );
+                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories, projectSessions );
 
                 if ( !reactorFiles.contains( modelPom ) )
                 {
@@ -160,8 +165,14 @@ public class DefaultBuildExtensionScanner
                 }
                 else
                 {
-                    checkModulesForExtensions( modelPom, model, localRepository, originalRemoteRepositories,
-                                               globalProfileManager, visitedModelIds, reactorFiles );
+                    checkModulesForExtensions( modelPom,
+                                               model,
+                                               localRepository,
+                                               originalRemoteRepositories,
+                                               globalProfileManager,
+                                               visitedModelIds,
+                                               reactorFiles,
+                                               projectSessions );
                 }
 
                 Properties modelProps = model.getProperties();
@@ -173,12 +184,12 @@ public class DefaultBuildExtensionScanner
 
             getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
 
-            extensionManager.registerWagons();
+            extensionManager.registerWagons( projectSessions );
         }
         catch ( ModelInterpolationException e )
         {
             throw new ExtensionScanningException( "Failed to interpolate model from: " + pom
-                + " prior to scanning for extensions.", e );
+                + " prior to scanning for extensions.", pom, e );
         }
         finally
         {
@@ -202,9 +213,14 @@ public class DefaultBuildExtensionScanner
         return groupId + ":" + artifactId;
     }
 
-    private void checkModulesForExtensions( File containingPom, Model model, ArtifactRepository localRepository,
-                                            List originalRemoteRepositories, ProfileManager globalProfileManager,
-                                            List visitedModelIds, List reactorFiles )
+    private void checkModulesForExtensions( File containingPom,
+                                            Model model,
+                                            ArtifactRepository localRepository,
+                                            List originalRemoteRepositories,
+                                            ProfileManager globalProfileManager,
+                                            List visitedModelIds,
+                                            List reactorFiles,
+                                            Map projectSessions )
         throws ExtensionScanningException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
@@ -250,7 +266,7 @@ public class DefaultBuildExtensionScanner
                 }
                 catch ( IOException e )
                 {
-                    throw new ExtensionScanningException( "Error getting canonical path for modulePomDirectory.", e );
+                    throw new ExtensionScanningException( "Error getting canonical path for modulePomDirectory.", containingPom, moduleSubpath, e );
                 }
 
                 if ( modulePomDirectory.isDirectory() )
@@ -270,12 +286,12 @@ public class DefaultBuildExtensionScanner
                     continue;
                 }
 
-                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles );
+                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles, projectSessions );
             }
         }
     }
 
-    private void checkModelBuildForExtensions( Model model, ArtifactRepository localRepository, List remoteRepositories )
+    private void checkModelBuildForExtensions( Model model, ArtifactRepository localRepository, List remoteRepositories, Map projectSessions )
         throws ExtensionScanningException
     {
         Build build = model.getBuild();
@@ -299,22 +315,12 @@ public class DefaultBuildExtensionScanner
 
                     try
                     {
-                        extensionManager.addExtension( extension, model, remoteRepositories, localRepository );
+                        extensionManager.addExtension( extension, model, remoteRepositories, localRepository, projectSessions );
                     }
-                    catch ( ArtifactResolutionException e )
+                    catch ( ExtensionManagerException e )
                     {
                         throw new ExtensionScanningException( "Cannot resolve pre-scanned extension artifact: "
-                            + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(), e );
-                    }
-                    catch ( ArtifactNotFoundException e )
-                    {
-                        throw new ExtensionScanningException( "Cannot find pre-scanned extension artifact: "
-                            + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(), e );
-                    }
-                    catch ( PlexusContainerException e )
-                    {
-                        throw new ExtensionScanningException( "Failed to add pre-scanned extension: "
-                            + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(), e );
+                            + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(), model, extension, e );
                     }
                 }
             }
@@ -336,7 +342,7 @@ public class DefaultBuildExtensionScanner
         catch ( ProjectBuildingException e )
         {
             throw new ExtensionScanningException( "Error building model lineage in order to pre-scan for extensions: "
-                + e.getMessage(), e );
+                + e.getMessage(), pom, e );
         }
 
         return lineage;

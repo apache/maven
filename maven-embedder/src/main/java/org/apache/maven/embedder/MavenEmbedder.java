@@ -38,6 +38,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.extension.BuildExtensionScanner;
+import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -126,6 +128,8 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private MavenProjectBuilder mavenProjectBuilder;
+
+    private BuildExtensionScanner extensionScanner;
 
     private MavenXpp3Reader modelReader;
 
@@ -323,7 +327,7 @@ public class MavenEmbedder
     {
         PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
 
-        MavenSession session = new MavenSession( container, request, null, null );
+        MavenSession session = new MavenSession( container, request, null, null, new HashMap() );
 
         pluginManager.verifyPlugin( plugin, project, session );
     }
@@ -428,8 +432,12 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
-        throws ProjectBuildingException
+        throws ProjectBuildingException, ExtensionScanningException
     {
+        getLogger().info( "Scanning for extensions: " + mavenProject );
+        extensionScanner.scanForBuildExtensions( mavenProject, request.getLocalRepository(), request.getProfileManager(), new HashMap() );
+
+        getLogger().info( "Building MavenProject instance: " + mavenProject );
         return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager() );
     }
 
@@ -474,8 +482,12 @@ public class MavenEmbedder
         {
             return result.addProjectBuildingException( e );
         }
+        catch ( ExtensionScanningException e )
+        {
+            return result.addExtensionScanningException( e );
+        }
 
-        ReactorManager reactorManager = maven.createReactorManager( request, result );
+        ReactorManager reactorManager = maven.createReactorManager( request, result, new HashMap() );
 
         if ( result.hasExceptions() )
         {
@@ -672,6 +684,8 @@ public class MavenEmbedder
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
+
+            extensionScanner = (BuildExtensionScanner) container.lookup( BuildExtensionScanner.ROLE );
 
             // ----------------------------------------------------------------------
             // Artifact related components

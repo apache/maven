@@ -56,7 +56,7 @@ public class ReactorManager
     public ReactorManager( List projects, String failureBehavior )
         throws CycleDetectedException, DuplicateProjectException
     {
-        this.sorter = new ProjectSorter( projects );
+        sorter = new ProjectSorter( projects );
 
         if ( failureBehavior == null )
         {
@@ -108,7 +108,7 @@ public class ReactorManager
 
             List dependents = sorter.getDependents( id );
 
-            if ( dependents != null && !dependents.isEmpty() )
+            if ( ( dependents != null ) && !dependents.isEmpty() )
             {
                 for ( Iterator it = dependents.iterator(); it.hasNext(); )
                 {

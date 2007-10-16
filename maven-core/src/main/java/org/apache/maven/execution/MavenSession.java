@@ -27,7 +27,6 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import java.io.File;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,11 +50,14 @@ public class MavenSession
     private MavenExecutionRequest request;
 
     private Map reports = new LinkedHashMap();
-    
+
+    private final Map projectSessions;
+
     public MavenSession( PlexusContainer container,
                          MavenExecutionRequest request,
                          EventDispatcher eventDispatcher,
-                         ReactorManager reactorManager )
+                         ReactorManager reactorManager,
+                         Map projectSessions )
     {
         this.container = container;
 
@@ -64,6 +66,15 @@ public class MavenSession
         this.eventDispatcher = eventDispatcher;
 
         this.reactorManager = reactorManager;
+
+        this.projectSessions = projectSessions;
+    }
+
+    public MavenProjectSession getProjectSession( MavenProject project )
+    {
+        String id = MavenProjectSession.createProjectId( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+
+        return (MavenProjectSession) projectSessions.get( id );
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor,
@@ -155,5 +166,5 @@ public class MavenSession
     {
         return request;
     }
-    
+
 }

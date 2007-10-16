@@ -1,5 +1,13 @@
 package org.apache.maven.extension;
 
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
+
+import java.io.File;
+import java.io.IOException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,14 +31,71 @@ public class ExtensionScanningException
     extends Exception
 {
 
-    public ExtensionScanningException( String message, Throwable cause )
+    private File pomFile;
+    private String extensionId;
+    private String modelId;
+    private String moduleSubpath;
+
+    public ExtensionScanningException( String message,
+                                       File pomFile,
+                                       ProjectBuildingException cause )
+    {
+        super( message, cause );
+        this.pomFile = pomFile;
+    }
+
+    public ExtensionScanningException( String message,
+                                       Model model,
+                                       Extension extension,
+                                       ExtensionManagerException cause )
+    {
+        super( message, cause );
+        modelId = model.getId();
+        extensionId = extension.getGroupId() + ":" + extension.getArtifactId();
+    }
+
+    public ExtensionScanningException( String message,
+                                       ProjectBuildingException cause )
     {
         super( message, cause );
     }
 
-    public ExtensionScanningException( String message )
+    public ExtensionScanningException( String message,
+                                       File pomFile,
+                                       String moduleSubpath,
+                                       IOException cause )
     {
-        super( message );
+        super( message, cause );
+        this.pomFile = pomFile;
+        this.moduleSubpath = moduleSubpath;
+    }
+
+    public ExtensionScanningException( String message,
+                                       File pomFile,
+                                       ModelInterpolationException cause )
+    {
+        super( message, cause );
+        this.pomFile = pomFile;
+    }
+
+    public File getPomFile()
+    {
+        return pomFile;
+    }
+
+    public String getExtensionId()
+    {
+        return extensionId;
+    }
+
+    public String getModelId()
+    {
+        return modelId;
+    }
+
+    public String getModuleSubpath()
+    {
+        return moduleSubpath;
     }
 
 }

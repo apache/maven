@@ -36,6 +36,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionContext;
@@ -60,10 +61,12 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -72,7 +75,9 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -81,6 +86,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -106,7 +112,7 @@ public class DefaultPluginManager
         RESERVED_GROUP_IDS = rgids;
     }
 
-    protected PlexusContainer container;
+    protected MutablePlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
@@ -190,19 +196,9 @@ public class DefaultPluginManager
         ArtifactResolutionException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException
     {
-        ArtifactRepository localRepository = session.getLocalRepository();
-
-        return verifyVersionedPlugin( plugin, project, localRepository );
-    }
-
-    private PluginDescriptor verifyVersionedPlugin( Plugin plugin,
-                                                    MavenProject project,
-                                                    ArtifactRepository localRepository )
-        throws PluginVersionResolutionException, ArtifactNotFoundException,
-        ArtifactResolutionException, InvalidPluginException,
-        PluginManagerException, PluginNotFoundException
-    {
         getLogger().debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
+
+        ArtifactRepository localRepository = session.getLocalRepository();
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
@@ -241,7 +237,7 @@ public class DefaultPluginManager
                 artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(),
                                           localRepository );
 
-                addPlugin( plugin, pluginArtifact, project, localRepository );
+                addPlugin( plugin, pluginArtifact, project, session );
             }
             else
             {
@@ -326,32 +322,6 @@ public class DefaultPluginManager
     protected void addPlugin( Plugin plugin,
                               Artifact pluginArtifact,
                               MavenProject project,
-                              ArtifactRepository localRepository )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
-        InvalidPluginException
-    {
-        // ----------------------------------------------------------------------------
-        // Get the dependencies for the Plugin
-        // ----------------------------------------------------------------------------
-
-        // the only Plugin instance which will have dependencies is the one specified in the project.
-        // We need to look for a Plugin instance there, in case the instance we're using didn't come from
-        // the project.
-        Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
-
-        if ( projectPlugin == null )
-        {
-            projectPlugin = plugin;
-        }
-
-        Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project, localRepository );
-
-        addPlugin( plugin, projectPlugin, pluginArtifact, artifacts );
-    }
-
-    protected void addPlugin( Plugin plugin,
-                              Artifact pluginArtifact,
-                              MavenProject project,
                               MavenSession session )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
         InvalidPluginException
@@ -373,24 +343,26 @@ public class DefaultPluginManager
         Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
                                             session.getLocalRepository() );
 
-        addPlugin( plugin, projectPlugin, pluginArtifact, artifacts );
-    }
+        String key = projectPlugin.getKey();
 
-    private void addPlugin( Plugin plugin,
-                            Plugin projectPlugin,
-                            Artifact pluginArtifact,
-                            Set artifacts )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
-        InvalidPluginException
-    {
-        // TODO When/if we go to project-level plugin instances (like for plugin-level deps in the
-        // POM), we need to undo this somehow.
-        ClassRealm pluginRealm = container.getComponentRealm( projectPlugin.getKey() );
+        ClassRealm pluginRealm;
+
+        // if we have a project session, it must mean we have extensions...
+        // which in turn may alter the execution of a plugin.
+        MavenProjectSession projectSession = session.getProjectSession( project );
+        if ( projectSession != null )
+        {
+            pluginRealm = projectSession.getComponentRealm( key );
+        }
+        else
+        {
+            pluginRealm = container.getComponentRealm( key );
+        }
 
         if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
         {
             getLogger().debug(
-                               "Realm already exists for: " + projectPlugin.getKey()
+                               "Realm already exists for: " + key
                                                + ". Skipping addition..." );
             // we've already discovered this plugin, and configured it, so skip it this time.
 
@@ -405,22 +377,80 @@ public class DefaultPluginManager
 
         try
         {
-            List jars = new ArrayList();
-
-            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+            if ( projectSession != null )
             {
-                Artifact artifact = (Artifact) i.next();
+                componentRealm = projectSession.createPluginRealm( projectPlugin );
 
-                jars.add( artifact.getFile() );
+                try
+                {
+                    componentRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    throw new PluginContainerException( plugin, componentRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
+                }
+
+                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                {
+                    Artifact artifact = (Artifact) i.next();
+
+                    try
+                    {
+                        getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
+                        componentRealm.addURL( artifact.getFile().toURI().toURL() );
+                    }
+                    catch ( MalformedURLException e )
+                    {
+                        throw new PluginContainerException( plugin, componentRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
+                    }
+                }
+
+                try
+                {
+                    getLogger().debug( "Discovering components in realm: " + componentRealm );
+                    container.discoverComponents( componentRealm, false );
+                }
+                catch ( PlexusConfigurationException e )
+                {
+                    throw new PluginContainerException( plugin, componentRealm, "Error re-scanning project realm for components.", e );
+                }
+                catch ( ComponentRepositoryException e )
+                {
+                    throw new PluginContainerException( plugin, componentRealm, "Error re-scanning project realm for components.", e );
+                }
+            }
+            else
+            {
+                List jars = new ArrayList();
+
+                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                {
+                    Artifact artifact = (Artifact) i.next();
+
+                    jars.add( artifact.getFile() );
+                }
+
+                jars.add( pluginArtifact.getFile() );
+
+                // Now here we need the artifact coreArtifactFilter stuff
+                componentRealm = container.createComponentRealm( key, jars );
             }
 
-            jars.add( pluginArtifact.getFile() );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new PluginContainerException( plugin, componentRealm, "Failed to create realm for plugin '" + projectPlugin
+                                              + ".", e );
+        }
+        catch ( DuplicateRealmException e )
+        {
+            throw new PluginContainerException( plugin, componentRealm, "Failed to create project-specific realm for plugin '" + projectPlugin
+                                                + " in project: " + project.getId(), e );
+        }
 
-            // Now here we need the artifact coreArtifactFilter stuff
-
-            componentRealm = container.createComponentRealm( projectPlugin.getKey(), jars );
-
-            String parentRealmId = componentRealm.getParentRealm().getId();
+        try
+        {
+            String parentRealmId = container.getContainerRealm().getId();
 
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
@@ -434,11 +464,6 @@ public class DefaultPluginManager
             // getClass().getResourceAsStream( "/default-report.xml" )
             // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
             componentRealm.importFrom( parentRealmId, "/default-report.xml" );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginContainerException( plugin, componentRealm, "Failed to create realm for plugin '" + projectPlugin
-                                              + ".", e );
         }
         catch ( NoSuchRealmException e )
         {
@@ -767,7 +792,24 @@ public class DefaultPluginManager
 
         Mojo plugin;
 
-        ClassRealm realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+        ClassRealm realm = null;
+
+        MavenProjectSession projectSession = session.getProjectSession( project );
+        if ( projectSession != null )
+        {
+            try
+            {
+                realm = projectSession.getPluginRealm( pluginDescriptor );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                throw new PluginManagerException( mojoDescriptor, project, "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId(), e );
+            }
+        }
+        else
+        {
+            realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+        }
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
@@ -1329,7 +1371,7 @@ public class DefaultPluginManager
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (MutablePlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
 
         mojoLogger = new DefaultLog( container.getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
     }

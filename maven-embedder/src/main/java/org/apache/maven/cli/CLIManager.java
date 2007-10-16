@@ -92,52 +92,66 @@ public class CLIManager
     {
         options = new Options();
 
-        options.addOption( OptionBuilder.hasArg( true ).create( ALTERNATE_POM_FILE ) );
+        options.addOption( OptionBuilder.withLongOpt( "file" ).hasArg().withDescription(
+            "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
 
         options.addOption(
-            OptionBuilder.hasArg( true ).create(
+            OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create(
                 SET_SYSTEM_PROPERTY ) );
         options.addOption(
-            OptionBuilder.create( OFFLINE ) );
+            OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
         options.addOption(
-            OptionBuilder.create( HELP ) );
+            OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
         options.addOption(
-            OptionBuilder.create(
+            OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
                 VERSION ) );
         options.addOption(
-            OptionBuilder.create(
+            OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create(
                 QUIET ) );
         options.addOption(
-            OptionBuilder.create(
+            OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
                 DEBUG ) );
         options.addOption(
-            OptionBuilder.create(
+            OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
                 ERRORS ) );
-        options.addOption( OptionBuilder.create( REACTOR ) );
-        options.addOption( OptionBuilder.create( NON_RECURSIVE ) );
-        options.addOption( OptionBuilder.create( UPDATE_SNAPSHOTS ) );
-        options.addOption( OptionBuilder.hasArg( true ).create( ACTIVATE_PROFILES ) );
+        options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
+            "Execute goals for project found in the reactor" ).create( REACTOR ) );
+        options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
+            "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
+        options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
+            "Forces a check for updated releases and snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
+        options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
+            "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
 
-        options.addOption( OptionBuilder.create( BATCH_MODE ) );
+        options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription(
+            "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
 
-        options.addOption( OptionBuilder.create( FORCE_PLUGIN_UPDATES ) );
-        options.addOption( OptionBuilder.create( FORCE_PLUGIN_UPDATES2 ) );
-        options.addOption( OptionBuilder.create( SUPPRESS_PLUGIN_UPDATES ) );
+        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription(
+            "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
+        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription(
+            "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
+            "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
 
-        options.addOption(OptionBuilder
+        options.addOption(OptionBuilder.withLongOpt("no-snapshot-updates")
+                .withDescription("Supress SNAPSHOT updates")
                 .create(SUPRESS_SNAPSHOT_UPDATES));
 
-        options.addOption( OptionBuilder.create( SUPPRESS_PLUGIN_REGISTRY ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
+            "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
 
-        options.addOption( OptionBuilder.create( CHECKSUM_FAILURE_POLICY ) );
+        options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription(
+            "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
         options.addOption(
-            OptionBuilder.create(
+            OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create(
                 CHECKSUM_WARNING_POLICY ) );
 
-        options.addOption( OptionBuilder.hasArg( true )
+        options.addOption( OptionBuilder.withLongOpt( "settings" )
+            .withDescription( "Alternate path for the user settings file" ).hasArg()
             .create( ALTERNATE_USER_SETTINGS ) );
 
-        options.addOption( OptionBuilder.create( FAIL_FAST ) );
+        options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription(
+            "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
 
         options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription(
             "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );

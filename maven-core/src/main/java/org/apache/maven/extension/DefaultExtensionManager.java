@@ -20,40 +20,55 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscovererManager;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
+import org.codehaus.plexus.component.discovery.DefaultComponentDiscoverer;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
+import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Used to locate extensions.
@@ -73,7 +88,7 @@ public class DefaultExtensionManager
 
     private ArtifactMetadataSource artifactMetadataSource;
 
-    private PlexusContainer container;
+    private MutablePlexusContainer container;
 
     private ArtifactFilterManager artifactFilterManager;
 
@@ -82,8 +97,8 @@ public class DefaultExtensionManager
     public void addExtension( Extension extension,
                               Model originatingModel,
                               List remoteRepositories,
-                              ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+                              ArtifactRepository localRepository, Map projectSessions )
+        throws ExtensionManagerException
     {
         Artifact extensionArtifact = artifactFactory.createBuildArtifact( extension.getGroupId(),
                                                                           extension.getArtifactId(),
@@ -109,13 +124,19 @@ public class DefaultExtensionManager
 
         Artifact projectArtifact = artifactFactory.createProjectArtifact( groupId, artifactId, version );
 
-        addExtension( extensionArtifact, projectArtifact, remoteRepositories, localRepository, null );
+        addExtension( extensionArtifact,
+                      projectArtifact,
+                      remoteRepositories,
+                      localRepository,
+                      null,
+                      projectSessions,
+                      MavenProjectSession.createProjectId( groupId, artifactId, version ) );
     }
 
     public void addExtension( Extension extension,
                               MavenProject project,
-                              ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+                              ArtifactRepository localRepository, Map projectSessions )
+        throws ExtensionManagerException
     {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
 
@@ -123,23 +144,46 @@ public class DefaultExtensionManager
 
         Artifact artifact = (Artifact) project.getExtensionArtifactMap().get( extensionId );
 
-        addExtension( artifact, project.getArtifact(), project.getRemoteArtifactRepositories(),
-                      localRepository, new ActiveArtifactResolver( project ) );
+        addExtension( artifact,
+                      project.getArtifact(),
+                      project.getRemoteArtifactRepositories(),
+                      localRepository,
+                      new ActiveArtifactResolver( project ),
+                      projectSessions,
+                      MavenProjectSession.createProjectId( project.getGroupId(), project.getArtifactId(), project.getVersion() )  );
     }
 
     private void addExtension( Artifact extensionArtifact,
                                Artifact projectArtifact,
                                List remoteRepositories,
-                               ArtifactRepository localRepository, ActiveArtifactResolver activeArtifactResolver )
-        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+                               ArtifactRepository localRepository,
+                               ActiveArtifactResolver activeArtifactResolver,
+                               Map projectSessions,
+                               String projectId )
+        throws ExtensionManagerException
     {
         getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
 
-        if ( extensionArtifact != null )
+        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( projectId );
+        if ( projectSession == null )
+        {
+            try
+            {
+                projectSession = new MavenProjectSession( projectId, container );
+            }
+            catch ( PlexusContainerException e )
+            {
+                throw new ExtensionManagerException( "Failed to create project realm for: " + projectId, projectId, e );
+            }
+
+            projectSessions.put( projectId, projectSession );
+        }
+
+        // if the extension is null, or if it's already been added to the current project-session, skip it.
+        if ( ( extensionArtifact != null ) && !projectSession.containsRealm( extensionArtifact ) )
         {
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
-
 
             ResolutionGroup resolutionGroup;
 
@@ -149,8 +193,8 @@ public class DefaultExtensionManager
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
-                    extensionArtifact.getId() + "': " + e.getMessage(), extensionArtifact, e );
+                throw new ExtensionManagerException( "Unable to download metadata from repository for extension artifact '" +
+                    extensionArtifact.getId() + "': " + e.getMessage(), extensionArtifact, projectId, e );
             }
 
             // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
@@ -162,10 +206,33 @@ public class DefaultExtensionManager
             dependencies.add( extensionArtifact );
 
             // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
-            ArtifactResolutionResult result =
-                artifactResolver.resolveTransitively( dependencies, projectArtifact,
+            ArtifactResolutionResult result;
+            try
+            {
+                result = artifactResolver.resolveTransitively( dependencies, projectArtifact,
                                                       Collections.EMPTY_MAP, localRepository, remoteRepositories,
                                                       artifactMetadataSource, filter );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new ExtensionManagerException( "Unable to resolve one or more extension artifacts for: " + extensionArtifact.getId(), extensionArtifact, projectId, e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new ExtensionManagerException( "One or more extension artifacts is missing for: " + extensionArtifact.getId(), extensionArtifact, projectId, e );
+            }
+
+            ClassRealm extensionRealm;
+            try
+            {
+                extensionRealm = projectSession.createExtensionRealm( extensionArtifact );
+            }
+            catch ( DuplicateRealmException e )
+            {
+                throw new ExtensionManagerException( "Unable to create extension ClassRealm for extension: " + extensionArtifact.getId() + " within session for project: " + projectId, extensionArtifact, projectId, e );
+            }
+
+            projectSession.addComponentRealm( extensionRealm );
 
             for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
             {
@@ -176,24 +243,78 @@ public class DefaultExtensionManager
                     a = activeArtifactResolver.replaceWithActiveArtifact( a );
                 }
 
-                getLogger().debug( "Adding to extension classpath: " + a.getFile() + " in classRealm: " + container.getContainerRealm().getId() );
+                getLogger().debug( "Adding to extension classpath: " + a.getFile() + " in classRealm: " + extensionRealm.getId() );
 
-                container.addJarResource( a.getFile() );
+                try
+                {
+                    extensionRealm.addURL( a.getFile().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    throw new ExtensionManagerException( "Unable to generate URL from extension artifact file: " + a.getFile(), extensionArtifact, projectId, e );
+                }
+            }
 
-                artifactFilterManager.excludeArtifact( a.getArtifactId() );
+            ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
+            discoverer.setManager( new DummyDiscovererManager() );
+
+            ClassRealm projectRealm = projectSession.getProjectRealm();
+            try
+            {
+                List componentSetDescriptors = discoverer.findComponents( container.getContext(), extensionRealm );
+                for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
+                {
+                    ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
+                    for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
+                    {
+                        ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
+                        String implementation = comp.getImplementation();
+
+                        try
+                        {
+                            getLogger().debug( "Importing: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId() );
+
+                            projectRealm.importFrom( extensionRealm.getId(), implementation );
+
+                            comp.setRealmId( projectRealm.getId() );
+                            container.addComponentDescriptor( comp );
+                        }
+                        catch ( NoSuchRealmException e )
+                        {
+                            throw new ExtensionManagerException( "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId(), extensionArtifact, projectId, e );
+                        }
+                    }
+                }
+            }
+            catch ( PlexusConfigurationException e )
+            {
+                throw new ExtensionManagerException( "Unable to discover extension components.", extensionArtifact, projectId, e );
+            }
+            catch ( ComponentRepositoryException e )
+            {
+                throw new ExtensionManagerException( "Unable to discover extension components from imports added to project-session realm.", extensionArtifact, projectId, e );
             }
         }
     }
 
-    public void registerWagons()
+    public void registerWagons( Map projectSessions )
     {
-        wagonManager.findAndRegisterWagons( container );
+        for ( Iterator it = projectSessions.values().iterator(); it.hasNext(); )
+        {
+            MavenProjectSession projectSession = (MavenProjectSession) it.next();
+
+            ClassRealm oldRealm = container.setLookupRealm( projectSession.getProjectRealm() );
+
+            wagonManager.findAndRegisterWagons( container );
+
+            container.setLookupRealm( oldRealm );
+        }
     }
 
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (MutablePlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private static final class ActiveArtifactResolver
@@ -281,5 +402,41 @@ public class DefaultExtensionManager
                                                                                 "plexus-utils", "1.1",
                                                                                 Artifact.SCOPE_RUNTIME, "jar" ) );
         }
-    }    
+    }
+
+    private static final class DummyDiscovererManager implements ComponentDiscovererManager
+    {
+
+        public void fireComponentDiscoveryEvent( ComponentDiscoveryEvent arg0 )
+        {
+        }
+
+        public List getComponentDiscoverers()
+        {
+            return null;
+        }
+
+        public Map getComponentDiscoveryListeners()
+        {
+            return null;
+        }
+
+        public List getListeners()
+        {
+            return null;
+        }
+
+        public void initialize()
+        {
+        }
+
+        public void registerComponentDiscoveryListener( ComponentDiscoveryListener arg0 )
+        {
+        }
+
+        public void removeComponentDiscoveryListener( ComponentDiscoveryListener arg0 )
+        {
+        }
+
+    }
 }

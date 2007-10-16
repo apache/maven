@@ -21,6 +21,7 @@ package org.apache.maven.execution;
 
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
@@ -83,6 +84,13 @@ public class DefaultMavenExecutionResult
     public List getExceptions()
     {
         return exceptions;
+    }
+
+    public MavenExecutionResult addExtensionScanningException( ExtensionScanningException e )
+    {
+        addException( e );
+
+        return this;
     }
 
     public MavenExecutionResult addProjectBuildingException( ProjectBuildingException e )

@@ -20,14 +20,12 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainerException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used to locate extensions.
@@ -37,12 +35,12 @@ import java.util.List;
  */
 public interface ExtensionManager
 {
-    void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
-    
-    void registerWagons();
+    void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository, Map projectSessions )
+        throws ExtensionManagerException;
+
+    void registerWagons( Map projectSessions );
 
     void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
-                       ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
+                       ArtifactRepository localRepository, Map projectSessions )
+        throws ExtensionManagerException;
 }

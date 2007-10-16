@@ -230,7 +230,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setLocalRepository( repo );
 
         return new MavenSession( container, request, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
+                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ), Collections.EMPTY_MAP );
     }
 
     public void testLocalRepositoryExtraction()

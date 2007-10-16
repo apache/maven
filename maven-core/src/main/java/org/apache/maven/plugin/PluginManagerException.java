@@ -3,9 +3,15 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
+
+import java.net.MalformedURLException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -43,6 +49,8 @@ public class PluginManagerException
     private final String pluginVersion;
 
     private String goal;
+
+    private MavenProject project;
 
     protected PluginManagerException( Plugin plugin,
                                    String message,
@@ -86,6 +94,64 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
+    protected PluginManagerException( Plugin plugin,
+                                   String message,
+                                   DuplicateRealmException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    protected PluginManagerException( Plugin plugin,
+                                   String message,
+                                   MalformedURLException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    public PluginManagerException( Plugin plugin,
+                                   String message,
+                                   PlexusConfigurationException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    public PluginManagerException( Plugin plugin,
+                                   String message,
+                                   ComponentRepositoryException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    public PluginManagerException( MojoDescriptor mojoDescriptor,
+                                   MavenProject project,
+                                   String message,
+                                   NoSuchRealmException cause )
+    {
+        super( message, cause );
+
+        this.project = project;
+        pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
+        pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
+        pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
+        goal = mojoDescriptor.getGoal();
+    }
+
     public String getPluginGroupId()
     {
         return pluginGroupId;
@@ -104,5 +170,10 @@ public class PluginManagerException
     public String getGoal()
     {
         return goal;
+    }
+
+    public MavenProject getProject()
+    {
+        return project;
     }
 }

@@ -24,16 +24,23 @@ import org.apache.maven.profiles.ProfileManager;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public interface BuildExtensionScanner
 {
-    
+
     String ROLE = BuildExtensionScanner.class.getName();
-    
-    void scanForBuildExtensions( List files, ArtifactRepository localRepository, ProfileManager globalProfileManager )
+
+    void scanForBuildExtensions( List files,
+                                 ArtifactRepository localRepository,
+                                 ProfileManager globalProfileManager,
+                                 Map projectSessions )
         throws ExtensionScanningException;
 
-    void scanForBuildExtensions( File pom, ArtifactRepository localRepository, ProfileManager globalProfileManager )
+    void scanForBuildExtensions( File pom,
+                                 ArtifactRepository localRepository,
+                                 ProfileManager globalProfileManager,
+                                 Map projectSessions )
         throws ExtensionScanningException;
 
 }

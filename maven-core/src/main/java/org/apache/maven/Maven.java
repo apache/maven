@@ -23,6 +23,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 
+import java.util.Map;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
@@ -53,5 +55,5 @@ public interface Maven
 
     MavenExecutionResult execute( MavenExecutionRequest request );
 
-    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
+    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result, Map projectSessions );
 }
