@@ -28,11 +28,11 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
@@ -269,14 +269,14 @@ public class DefaultRepositoryMetadataManager
     {
         Metadata result;
 
-        Reader fileReader = null;
+        Reader reader = null;
         try
         {
-            fileReader = new FileReader( mappingFile );
+            reader = ReaderFactory.newXmlReader( mappingFile );
 
             MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
-            result = mappingReader.read( fileReader, false );
+            result = mappingReader.read( reader, false );
         }
         catch ( FileNotFoundException e )
         {
@@ -294,7 +294,7 @@ public class DefaultRepositoryMetadataManager
         }
         finally
         {
-            IOUtil.close( fileReader );
+            IOUtil.close( reader );
         }
         return result;
     }

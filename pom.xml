@@ -86,7 +86,6 @@ under the License.
               </goals>
             </execution>
             <execution>
-
               <id>standard</id>
               <goals>
                 <goal>java</goal>
@@ -95,7 +94,7 @@ under the License.
               </goals>
             </execution>
           </executions>
-        </plugin>        
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -206,7 +205,7 @@ under the License.
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-monitor</artifactId>
         <version>${mavenVersion}</version>
-      </dependency>      
+      </dependency>
       <!-- Plexus -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -216,7 +215,7 @@ under the License.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

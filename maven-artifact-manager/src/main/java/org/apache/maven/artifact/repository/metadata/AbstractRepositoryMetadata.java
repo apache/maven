@@ -25,11 +25,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -93,7 +93,7 @@ public abstract class AbstractRepositoryMetadata
 
             try
             {
-                reader = new FileReader( metadataFile );
+                reader = ReaderFactory.newXmlReader( metadataFile );
 
                 metadata = mappingReader.read( reader, false );
             }
@@ -131,7 +131,7 @@ public abstract class AbstractRepositoryMetadata
             try
             {
                 metadataFile.getParentFile().mkdirs();
-                writer = new FileWriter( metadataFile );
+                writer = WriterFactory.newXmlWriter( metadataFile );
 
                 MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
 
