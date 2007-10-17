@@ -1,15 +1,22 @@
 package org.apache.maven.integrationtests;
 
-import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
-
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MavenIT0114ExtensionThatProvidesResources
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0114ExtensionThatProvidesResources()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[,2.1-SNAPSHOT)" );
+    }
+
     public void testit0114()
         throws Exception
     {
