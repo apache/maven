@@ -43,7 +43,9 @@ under the License.
         <exclude>org.apache.maven:maven-artifact</exclude>
         <exclude>org.apache.maven:maven-monitor</exclude>
         <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
+        <!--
         <exclude>jdom:jdom</exclude>
+        -->
       </excludes>
     </dependencySet>
   </dependencySets>
@@ -82,7 +84,7 @@ under the License.
       <directory>target</directory>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>maven-embedder-std*.jar</include>
+        <include>maven-embedder-*.jar</include>
       </includes>
     </fileSet>
   </fileSets>

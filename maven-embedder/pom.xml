@@ -209,40 +209,6 @@ under the License.
       <build>
         <plugins>
           <plugin>
-            <artifactId>shade-maven-plugin</artifactId>
-            <groupId>org.codehaus.mojo</groupId>
-            <version>1.0-alpha-12</version>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <configuration>
-                  <!-- The IDEA folks don't want to put SNAPSHOT libs in their projects even though they are -->
-                  <finalName>maven-embedder-std-2.1</finalName>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-                  <transformers>
-                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
-                  </transformers>
-                  <relocations>
-                    <relocation>
-                      <pattern>org.codehaus.plexus.util</pattern>
-                      <excludes>
-                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                      </excludes>
-                    </relocation>
-                    <relocation>
-                      <pattern>org.jdom</pattern>
-                    </relocation>
-                  </relocations>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>2.2-beta-1</version>
             <executions>
