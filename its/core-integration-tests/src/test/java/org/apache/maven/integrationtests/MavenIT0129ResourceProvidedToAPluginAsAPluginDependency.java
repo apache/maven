@@ -10,7 +10,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependency
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0114()
+    public void testit0129()
         throws Exception
     {
         File testDir =
