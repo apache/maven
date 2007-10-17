@@ -44,10 +44,14 @@ public class DefaultMavenProfilesBuilder
     {
         File profilesXml = new File( basedir, PROFILES_XML_FILE );
 
+        getLogger().debug( "Checking for external profiles in: " + profilesXml.getAbsolutePath() );
+
         ProfilesRoot profilesRoot = null;
 
         if ( profilesXml.exists() )
         {
+            getLogger().debug( "reading: " + profilesXml.getAbsolutePath() );
+
             ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
             Reader profileReader = null;
             try

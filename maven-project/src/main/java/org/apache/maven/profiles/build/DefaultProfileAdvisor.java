@@ -38,6 +38,8 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -49,7 +51,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class DefaultProfileAdvisor
-    implements ProfileAdvisor, Contextualizable
+    implements ProfileAdvisor, LogEnabled, Contextualizable
 {
 
     public static final String ROLE_HINT = "default";
@@ -62,9 +64,12 @@ public class DefaultProfileAdvisor
 
     private PlexusContainer container;
 
+    private Logger logger;
+
     public List applyActivatedProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
         throws ProjectBuildingException
     {
+        logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: " + pomFile );
         ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds );
 
         return applyActivatedProfiles( model, pomFile, profileManager );
@@ -73,6 +78,7 @@ public class DefaultProfileAdvisor
     public List applyActivatedExternalProfiles( Model model, File projectDir, ProfileManager externalProfileManager )
         throws ProjectBuildingException
     {
+        logger.debug( "Building profile manager for model: " + model.getId() + " with external profile manager including profiles: " + externalProfileManager.getProfilesById() );
         return applyActivatedProfiles( model, projectDir, externalProfileManager );
     }
 
@@ -134,11 +140,7 @@ public class DefaultProfileAdvisor
 
         if ( pomFile != null )
         {
-            File projectDir = pomFile.getParentFile();
-            if ( projectDir != null )
-            {
-                loadExternalProjectProfiles( profileManager, model, projectDir );
-            }
+            loadExternalProjectProfiles( profileManager, model, pomFile );
         }
 
         return profileManager;
@@ -251,6 +253,11 @@ public class DefaultProfileAdvisor
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 
 }
