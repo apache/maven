@@ -156,4 +156,30 @@ public class MavenProjectTest
         MavenProject clonedProject = new MavenProject( projectToClone );
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
+	
+	    
+	/**
+	 * 
+	 * Maven uses FileReaders by default to read POMs. 
+	 * @throws Exception
+	 */
+    public void testUTF8EncodedProject() throws Exception
+    {
+		File f = getFileForClasspathResource( "utf-8-encoded-pom.xml" );
+    		MavenProject utf8EncodedProject = getProject( f );
+    		
+    		assertEquals( "цдья", utf8EncodedProject.getDescription() );
+    }
+
+	/**
+	 * This test case will not fail, because 8bit encodings won't corrupt the parser.
+	 * @throws Exception
+	 */
+    public void testISOEncodedProject() throws Exception
+    {
+		File f = getFileForClasspathResource( "iso-8859-15-encoded-pom.xml" );
+		MavenProject isoEncodedProject = getProject( f );
+		
+		assertEquals( "цдья", isoEncodedProject.getDescription() );
+    }
 }
