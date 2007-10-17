@@ -51,13 +51,13 @@ public class ArtifactResolutionExceptionTest
         		"      http://somewhere.com/download" + LS +
         		LS +
         		"  Then, install it using the command: " + LS +
-        		"      mvn install:install-file -DgroupId=aGroupId -DartifactId=anArtifactId \\" + LS +
-        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file" + LS +
+        		"      mvn install:install-file -DgroupId=aGroupId -DartifactId=anArtifactId -Dversion=aVersion "+
+        		"-Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file" + LS +
         		LS +
         		"  Alternatively, if you host your own repository you can deploy the file there: " + LS +
-        		"      mvn deploy:deploy-file -DgroupId=aGroupId -DartifactId=anArtifactId \\" + LS +
-        		"          -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file \\" + LS +
-        		"           -Durl=[url] -DrepositoryId=[id]" + LS +
+        		"      mvn deploy:deploy-file -DgroupId=aGroupId -DartifactId=anArtifactId"+
+        		" -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file"+
+        		" -Durl=[url] -DrepositoryId=[id]" + LS +
         		LS +
         		"  Path to dependency: " + LS +
         		"  \t1) dependency1" + LS +

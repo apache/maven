@@ -243,11 +243,7 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\");
-            sb.append( LS );
-            sb.append( indentation );
-            sb.append( "        " );
-            sb.append( "-Dversion=" );
+            sb.append( " -Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
@@ -272,11 +268,7 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\");
-            sb.append( LS );
-            sb.append( indentation );
-            sb.append( "        " );
-            sb.append( "-Dversion=" );
+            sb.append( " -Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
@@ -288,10 +280,6 @@ public class AbstractArtifactResolutionException
             sb.append( " -Dpackaging=" );
             sb.append( type );
             sb.append( " -Dfile=/path/to/file" );
-            sb.append( " \\");
-            sb.append( LS );
-            sb.append( indentation );
-            sb.append( "        " );
             sb.append( " -Durl=[url] -DrepositoryId=[id]" );
             sb.append( LS );
 
