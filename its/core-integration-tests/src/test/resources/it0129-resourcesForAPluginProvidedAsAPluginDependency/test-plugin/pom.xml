@@ -1,0 +1,26 @@
+<?xml version="1.0"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0129</groupId>
+  <artifactId>it0129-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0</version>
+  <name>it0129 - plugin</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+  
+ </project>
