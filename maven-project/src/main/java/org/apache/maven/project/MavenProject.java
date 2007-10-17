@@ -1707,15 +1707,30 @@ public class MavenProject
         return pluginArtifact;
     }
     
-    private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
+	private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
     {
         String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
         MavenProject project = (MavenProject) projectReferences.get( refId );
+        
+        boolean projectDirFound = false;
         if ( project != null )
         {
-            list.add( project.getBuild().getOutputDirectory() );
+            if (a.getType().equals("test-jar"))
+            {
+                File testOutputDir = new File( project.getBuild().getTestOutputDirectory() );
+                if ( testOutputDir.exists() )
+                {
+                    list.add( testOutputDir.getAbsolutePath() );
+                    projectDirFound = true;
+                }
+            }
+            else
+            {
+                list.add( project.getBuild().getOutputDirectory() );
+                projectDirFound = true;
+            }
         }
-        else
+        if ( ! projectDirFound )
         {
             File file = a.getFile();
             if ( file == null )
@@ -1725,7 +1740,7 @@ public class MavenProject
             list.add( file.getPath() );
         }
     }
-
+	
     public void clearExecutionProject()
     {
         if ( !previousExecutionProjects.isEmpty() )
