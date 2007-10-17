@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <groupId>testing</groupId>
+    <artifactId>mng-2045-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>first-project</artifactId>
+  <name>first-project</name>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals><goal>test-jar</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

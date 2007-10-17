@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <groupId>testing</groupId>
+    <artifactId>mng-2045-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>second-project</artifactId>
+  <name>second-project</name>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>first-project</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <!-- This also fails: 
+      <classifier>tests</classifier> 
+      -->
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

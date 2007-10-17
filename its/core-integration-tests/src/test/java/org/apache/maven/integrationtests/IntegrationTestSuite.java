@@ -160,6 +160,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class);
+		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class);
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
