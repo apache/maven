@@ -66,11 +66,11 @@ public class DefaultProfileAdvisor
 
     private Logger logger;
 
-    public List applyActivatedProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
+    public List applyActivatedProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds, boolean useProfilesXml )
         throws ProjectBuildingException
     {
         logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: " + pomFile );
-        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds, useProfilesXml );
 
         return applyActivatedProfiles( model, pomFile, profileManager );
     }
@@ -127,7 +127,7 @@ public class DefaultProfileAdvisor
         return activeProfiles;
     }
 
-    private ProfileManager buildProfileManager( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
+    private ProfileManager buildProfileManager( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds, boolean useProfilesXml )
         throws ProjectBuildingException
     {
         ProfileManager profileManager = new DefaultProfileManager( container );
@@ -138,7 +138,7 @@ public class DefaultProfileAdvisor
 
         profileManager.addProfiles( model.getProfiles() );
 
-        if ( pomFile != null )
+        if ( useProfilesXml && ( pomFile != null ) )
         {
             loadExternalProjectProfiles( profileManager, model, pomFile );
         }
@@ -198,10 +198,11 @@ public class DefaultProfileAdvisor
     }
 
     public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile,
-                                                                    List explicitlyActiveIds, List explicitlyInactiveIds )
+                                                                    List explicitlyActiveIds, List explicitlyInactiveIds,
+                                                                    boolean useProfilesXml )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, explicitlyActiveIds, explicitlyInactiveIds, useProfilesXml );
 
         return getArtifactRepositoriesFromActiveProfiles( profileManager, pomFile, model.getId() );
     }

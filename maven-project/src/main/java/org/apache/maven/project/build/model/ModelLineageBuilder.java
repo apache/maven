@@ -54,7 +54,7 @@ public interface ModelLineageBuilder
      *   a parent-POM cannot be resolved.
      */
     ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository, List remoteRepositories,
-                                    ProfileManager profileManager, boolean allowStubs )
+                                    ProfileManager profileManager, boolean allowStubs, boolean validProfilesXmlLocation )
         throws ProjectBuildingException;
 
     /**

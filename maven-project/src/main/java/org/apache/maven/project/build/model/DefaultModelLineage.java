@@ -39,14 +39,14 @@ public class DefaultModelLineage
     /**
      * @see org.apache.maven.project.build.model.ModelLineage#addParent(org.apache.maven.model.Model, java.io.File, java.util.List)
      */
-    public void addParent( Model model, File pomFile, List artifactRepositories )
+    public void addParent( Model model, File pomFile, List artifactRepositories, boolean validProfilesXmlLocation )
     {
         if ( tuples.isEmpty() )
         {
             throw new IllegalStateException( "You must call setOrigin(..) before adding a parent to the lineage." );
         }
 
-        tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories ) );
+        tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories, validProfilesXmlLocation ) );
     }
 
     /**
@@ -264,6 +264,18 @@ public class DefaultModelLineage
         return tuple.model;
     }
 
+    public boolean isDeepestAncestorUsingProfilesXml()
+    {
+        if ( tuples.isEmpty() )
+        {
+            return false;
+        }
+
+        ModelLineageTuple tuple = (ModelLineageTuple) tuples.get( tuples.size() - 1 );
+
+        return tuple.validProfilesXmlLocation;
+    }
+
     /**
      * @see org.apache.maven.project.build.model.ModelLineage#modelIterator()
      */
@@ -292,14 +304,14 @@ public class DefaultModelLineage
         };
     }
 
-    public void setOrigin( Model model, File pomFile, List artifactRepositories )
+    public void setOrigin( Model model, File pomFile, List artifactRepositories, boolean validProfilesXmlLocation )
     {
         if ( !tuples.isEmpty() )
         {
             throw new IllegalStateException( "Origin already set; you must use addParent(..) for successive additions to the lineage." );
         }
 
-        tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories ) );
+        tuples.add( new ModelLineageTuple( model, pomFile, artifactRepositories, validProfilesXmlLocation ) );
     }
 
     /**
@@ -318,16 +330,20 @@ public class DefaultModelLineage
 
         private List remoteRepositories;
 
+        private final boolean validProfilesXmlLocation;
+
         private ModelLineageTuple( Model model )
         {
             this.model = model;
+            validProfilesXmlLocation = false;
         }
 
-        private ModelLineageTuple( Model model, File file, List remoteRepositories )
+        private ModelLineageTuple( Model model, File file, List remoteRepositories, boolean validProfilesXmlLocation )
         {
             this.model = model;
             this.file = file;
             this.remoteRepositories = remoteRepositories;
+            this.validProfilesXmlLocation = validProfilesXmlLocation;
         }
 
         public boolean equals( Object other )

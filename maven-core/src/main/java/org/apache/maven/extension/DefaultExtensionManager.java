@@ -45,6 +45,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -203,7 +204,7 @@ public class DefaultExtensionManager
         }
 
         // if the extension is null, or if it's already been added to the current project-session, skip it.
-        if ( ( extensionArtifact != null ) && !projectSession.containsRealm( extensionArtifact ) )
+        if ( ( extensionArtifact != null ) && !projectSession.containsExtensionRealm( extensionArtifact ) )
         {
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
@@ -276,45 +277,65 @@ public class DefaultExtensionManager
                 }
             }
 
-            ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
-            discoverer.setManager( new DummyDiscovererManager() );
+            importLocalExtensionComponents( extensionRealm, projectSession, extensionArtifact );
+        }
+    }
 
-            ClassRealm projectRealm = projectSession.getProjectRealm();
-            try
+    private void importLocalExtensionComponents( ClassRealm extensionRealm,
+                                                 MavenProjectSession projectSession,
+                                                 Artifact extensionArtifact )
+        throws ExtensionManagerException
+    {
+        String projectId = projectSession.getProjectId();
+
+        ClassRealm discoveryRealm = new ClassRealm( new ClassWorld(), "discovery", Thread.currentThread().getContextClassLoader() );
+        try
+        {
+            discoveryRealm.addURL( extensionArtifact.getFile().toURL() );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new ExtensionManagerException( "Unable to generate URL from extension artifact for local-component discovery: " + extensionArtifact.getFile(), extensionArtifact, projectId, e );
+        }
+
+        ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
+        discoverer.setManager( new DummyDiscovererManager() );
+
+        ClassRealm projectRealm = projectSession.getProjectRealm();
+        try
+        {
+            List componentSetDescriptors = discoverer.findComponents( container.getContext(), discoveryRealm );
+            for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
             {
-                List componentSetDescriptors = discoverer.findComponents( container.getContext(), extensionRealm );
-                for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
+                ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
+                for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
                 {
-                    ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
-                    for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
+                    ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
+                    String implementation = comp.getImplementation();
+
+                    try
                     {
-                        ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
-                        String implementation = comp.getImplementation();
+                        getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto project realm: " + projectRealm.getId() );
 
-                        try
-                        {
-                            getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto project realm: " + projectRealm.getId() );
+                        projectRealm.importFrom( extensionRealm.getId(), implementation );
 
-                            projectRealm.importFrom( extensionRealm.getId(), implementation );
-
-                            comp.setRealmId( projectRealm.getId() );
-                            container.addComponentDescriptor( comp );
-                        }
-                        catch ( NoSuchRealmException e )
-                        {
-                            throw new ExtensionManagerException( "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId(), extensionArtifact, projectId, e );
-                        }
+                        comp.setRealmId( projectRealm.getId() );
+                        container.addComponentDescriptor( comp );
+                    }
+                    catch ( NoSuchRealmException e )
+                    {
+                        throw new ExtensionManagerException( "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId(), extensionArtifact, projectId, e );
                     }
                 }
             }
-            catch ( PlexusConfigurationException e )
-            {
-                throw new ExtensionManagerException( "Unable to discover extension components.", extensionArtifact, projectId, e );
-            }
-            catch ( ComponentRepositoryException e )
-            {
-                throw new ExtensionManagerException( "Unable to discover extension components from imports added to project-session realm.", extensionArtifact, projectId, e );
-            }
+        }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new ExtensionManagerException( "Unable to discover extension components.", extensionArtifact, projectId, e );
+        }
+        catch ( ComponentRepositoryException e )
+        {
+            throw new ExtensionManagerException( "Unable to discover extension components from imports added to project-session realm.", extensionArtifact, projectId, e );
         }
     }
 

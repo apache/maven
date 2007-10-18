@@ -11,9 +11,9 @@ import java.util.List;
  * MojoBinding instances that carry all the information necessary to execute a mojo, including configuration from the
  * POM and other sources. NOTE: the build plan may be constructed of a main lifecycle binding-set, plus any number of
  * lifecycle modifiers and direct-invocation modifiers, to handle cases of forked execution.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public interface BuildPlanner
 {

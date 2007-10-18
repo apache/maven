@@ -2,6 +2,7 @@ package org.apache.maven.extension;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -9,6 +10,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenProjectSession;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
@@ -102,7 +104,10 @@ public class DefaultExtensionManagerTest
                                                                       null,
                                                                       null ) );
 
-        DefaultArtifactRepository localRepository = new DefaultArtifactRepository("local", localRepo.getAbsolutePath(), new DefaultRepositoryLayout() );
+        DefaultArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                                   "local",
+                                                                                   localRepo.getAbsolutePath(),
+                                                                                   new DefaultRepositoryLayout() );
         localRepository.setBasedir( localRepo.getAbsolutePath() );
 
         ExtensionManager mgr = newDefaultExtensionManager();
@@ -115,7 +120,8 @@ public class DefaultExtensionManagerTest
                                                                                                                              model.getArtifactId(),
                                                                                                                              model.getVersion() ) );
 
-        List compList = getContainer().getComponentDescriptorList( ArtifactFactory.ROLE, projectSession.getProjectRealm() );
+        List compList = getContainer().getComponentDescriptorList( ArtifactFactory.ROLE,
+                                                                   projectSession.getProjectRealm() );
 
         System.out.println( "Got: " + compList );
 
@@ -127,12 +133,69 @@ public class DefaultExtensionManagerTest
         getContainer().setLookupRealm( oldRealm );
     }
 
+    public void test_addExtension_usingModel_ShouldLoadCustomLifecycleMappingAndArtifactHandler()
+        throws Exception
+    {
+        File remoteRepoDir = findRemoteRepositoryDirectory();
+        File localRepo = createTempDir();
+
+        Model model = createModel( "org.test", "artifact-name", "1" );
+        Extension ext = addExtension( model, "org.apache.maven.core.test", "test-lifecycle-and-artifactHandler", "1" );
+
+        List remoteRepositories = new ArrayList();
+        remoteRepositories.add( repoFactory.createArtifactRepository( "central",
+                                                                      remoteRepoDir.toURI()
+                                                                                   .toURL()
+                                                                                   .toExternalForm(),
+                                                                      "default",
+                                                                      null,
+                                                                      null ) );
+
+        DefaultArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                                   "local",
+                                                                                   localRepo.getAbsolutePath(),
+                                                                                   new DefaultRepositoryLayout() );
+        localRepository.setBasedir( localRepo.getAbsolutePath() );
+
+        ExtensionManager mgr = newDefaultExtensionManager();
+
+        Map projectSessions = new HashMap();
+
+        mgr.addExtension( ext, model, remoteRepositories, localRepository, projectSessions );
+
+        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( MavenProjectSession.createProjectId( model.getGroupId(),
+                                                                                                                             model.getArtifactId(),
+                                                                                                                             model.getVersion() ) );
+
+        List lcCompList = getContainer().getComponentDescriptorList( LifecycleMapping.ROLE,
+                                                                   projectSession.getProjectRealm() );
+
+        System.out.println( "Got lifecyle mappings: " + lcCompList );
+
+        List ahCompList = getContainer().getComponentDescriptorList( ArtifactHandler.ROLE,
+                                                                   projectSession.getProjectRealm() );
+
+        System.out.println( "Got artifact handlers: " + ahCompList );
+
+        ClassRealm oldRealm = getContainer().setLookupRealm( projectSession.getProjectRealm() );
+
+        LifecycleMapping lcResult = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "test" );
+        assertNotNull( lcResult );
+
+        ArtifactHandler ahResult = (ArtifactHandler) lookup( ArtifactHandler.ROLE, "test" );
+        assertNotNull( ahResult );
+
+        getContainer().setLookupRealm( oldRealm );
+    }
+
     private ExtensionManager newDefaultExtensionManager()
     {
-        DefaultExtensionManager mgr = new DefaultExtensionManager( factory, resolver, metadataSource,
-                                                            container, filterManager, wagonManager );
+        DefaultExtensionManager mgr = new DefaultExtensionManager( factory, resolver,
+                                                                   metadataSource, container,
+                                                                   filterManager, wagonManager );
 
-        Logger logger = getContainer().getLoggerManager().getLoggerForComponent( DefaultExtensionManager.class.getName() );
+        Logger logger = getContainer().getLoggerManager()
+                                      .getLoggerForComponent( DefaultExtensionManager.class.getName() );
 
         mgr.enableLogging( logger );
 

@@ -42,6 +42,12 @@ public interface ModelLineage
     Model getDeepestAncestorModel();
 
     /**
+     * Retrieve the flag telling whether discovery of a profiles.xml file is appropriate
+     * for the deepest model in this lineage.
+     */
+    boolean isDeepestAncestorUsingProfilesXml();
+
+    /**
      * Retrieve the POM file for the deepest ancestor which has been resolved so far in this
      * lineage.
      */
@@ -80,7 +86,7 @@ public interface ModelLineage
      *
      * @throws IllegalStateException When the originating POM information has already been set.
      */
-    void setOrigin( Model model, File pomFile, List artifactRepositories );
+    void setOrigin( Model model, File pomFile, List artifactRepositories, boolean validProfilesXmlLocation );
 
     /**
      * Add a parent model, along with its file and the repositories used to resolve it.
@@ -88,7 +94,7 @@ public interface ModelLineage
      *
      * @throws IllegalStateException When the originating POM information has not yet been set.
      */
-    void addParent( Model model, File pomFile, List artifactRepositories );
+    void addParent( Model model, File pomFile, List artifactRepositories, boolean validProfilesXmlLocation );
 
     /**
      * Retrieve the models in this lineage, with the deepest parent at the zero index, and the current

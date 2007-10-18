@@ -28,6 +28,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
@@ -54,8 +55,14 @@ import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
@@ -75,7 +82,7 @@ import java.util.Stack;
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor
+    implements LifecycleExecutor, Contextualizable
 {
     // ----------------------------------------------------------------------
     // Components
@@ -92,6 +99,9 @@ public class DefaultLifecycleExecutor
     private MojoBindingFactory mojoBindingFactory;
 
     private BuildContextManager buildContextManager;
+
+    // this is needed for setting the lookup realm before we start building a project.
+    private PlexusContainer container;
 
     // ----------------------------------------------------------------------
     //
@@ -195,53 +205,63 @@ public class DefaultLifecycleExecutor
                         event,
                         target );
 
-                    // NEW: To support forked execution under the new lifecycle architecture, the current project
-                    // is stored in a build-context managed data type. This context type holds the current project
-                    // for the fork being executed, plus a stack of projects used in the ancestor execution contexts.
-                    LifecycleExecutionContext ctx = new LifecycleExecutionContext( rootProject );
-                    ctx.store( buildContextManager );
+                    ClassRealm oldLookupRealm = setProjectLookupRealm( session, rootProject );
 
-                    // NEW: Build up the execution plan, including configuration.
-                    List mojoBindings = getLifecycleBindings(
-                        segment.getTasks(),
-                        rootProject,
-                        target );
-
-                    // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
-                    // only call once, with the top-level project (assumed to be provided as a parameter)...
-                    for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
+                    try
                     {
-                        MojoBinding binding = (MojoBinding) mojoIterator.next();
+                        // NEW: To support forked execution under the new lifecycle architecture, the current project
+                        // is stored in a build-context managed data type. This context type holds the current project
+                        // for the fork being executed, plus a stack of projects used in the ancestor execution contexts.
+                        LifecycleExecutionContext ctx = new LifecycleExecutionContext( rootProject );
+                        ctx.store( buildContextManager );
 
-                        try
+                        // NEW: Build up the execution plan, including configuration.
+                        List mojoBindings = getLifecycleBindings(
+                            segment.getTasks(),
+                            rootProject,
+                            target );
+
+                        // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
+                        // only call once, with the top-level project (assumed to be provided as a parameter)...
+                        for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
                         {
-                            executeGoalAndHandleFailures(
-                                binding,
-                                session,
-                                dispatcher,
-                                event,
-                                reactorManager,
-                                buildStartTime,
-                                target );
-                        }
-                        catch ( MojoFailureException e )
-                        {
-                            AggregatedBuildFailureException error = new AggregatedBuildFailureException(
-                                                                                                         session.getExecutionRootDirectory(),
-                                                                                                         binding,
-                                                                                                         e );
+                            MojoBinding binding = (MojoBinding) mojoIterator.next();
 
-                            dispatcher.dispatchError( event, target, error );
-
-                            if ( handleExecutionFailure( reactorManager, rootProject, error, binding, buildStartTime ) )
+                            try
                             {
-                                throw error;
+                                executeGoalAndHandleFailures(
+                                    binding,
+                                    session,
+                                    dispatcher,
+                                    event,
+                                    reactorManager,
+                                    buildStartTime,
+                                    target );
+                            }
+                            catch ( MojoFailureException e )
+                            {
+                                AggregatedBuildFailureException error = new AggregatedBuildFailureException(
+                                                                                                             session.getExecutionRootDirectory(),
+                                                                                                             binding,
+                                                                                                             e );
+
+                                dispatcher.dispatchError( event, target, error );
+
+                                if ( handleExecutionFailure( reactorManager, rootProject, error, binding, buildStartTime ) )
+                                {
+                                    throw error;
+                                }
                             }
                         }
                     }
+                    finally
+                    {
+                        // clean up the execution context, so we don't pollute for future project-executions.
+                        LifecycleExecutionContext.delete( buildContextManager );
 
-                    // clean up the execution context, so we don't pollute for future project-executions.
-                    LifecycleExecutionContext.delete( buildContextManager );
+                        restoreLookupRealm( oldLookupRealm );
+                    }
+
 
                     reactorManager.registerBuildSuccess(
                         rootProject,
@@ -295,45 +315,54 @@ public class DefaultLifecycleExecutor
                             event,
                             target );
 
-                        LifecycleExecutionContext ctx = new LifecycleExecutionContext( currentProject );
-                        ctx.store( buildContextManager );
+                        ClassRealm oldLookupRealm = setProjectLookupRealm( session, currentProject );
 
-                        List mojoBindings = getLifecycleBindings(
-                            segment.getTasks(),
-                            currentProject,
-                            target );
-
-                        for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
+                        try
                         {
-                            MojoBinding binding = (MojoBinding) mojoIterator.next();
+                            LifecycleExecutionContext ctx = new LifecycleExecutionContext( currentProject );
+                            ctx.store( buildContextManager );
 
-                            getLogger().debug(
-                                "Mojo: " + binding.getGoal() + " has config:\n"
-                                    + binding.getConfiguration() );
+                            List mojoBindings = getLifecycleBindings(
+                                segment.getTasks(),
+                                currentProject,
+                                target );
 
-                            try
+                            for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
                             {
-                                executeGoalAndHandleFailures( binding, session, dispatcher,
-                                                              event, reactorManager,
-                                                              buildStartTime, target );
-                            }
-                            catch ( MojoFailureException e )
-                            {
-                                ProjectBuildFailureException error = new ProjectBuildFailureException(
-                                                                                                       currentProject.getId(),
-                                                                                                       binding,
-                                                                                                       e );
+                                MojoBinding binding = (MojoBinding) mojoIterator.next();
 
-                                dispatcher.dispatchError( event, target, error );
+                                getLogger().debug(
+                                    "Mojo: " + binding.getGoal() + " has config:\n"
+                                        + binding.getConfiguration() );
 
-                                if ( handleExecutionFailure( reactorManager, currentProject, error, binding, buildStartTime ) )
+                                try
                                 {
-                                    throw error;
+                                    executeGoalAndHandleFailures( binding, session, dispatcher,
+                                                                  event, reactorManager,
+                                                                  buildStartTime, target );
+                                }
+                                catch ( MojoFailureException e )
+                                {
+                                    ProjectBuildFailureException error = new ProjectBuildFailureException(
+                                                                                                           currentProject.getId(),
+                                                                                                           binding,
+                                                                                                           e );
+
+                                    dispatcher.dispatchError( event, target, error );
+
+                                    if ( handleExecutionFailure( reactorManager, currentProject, error, binding, buildStartTime ) )
+                                    {
+                                        throw error;
+                                    }
                                 }
                             }
                         }
+                        finally
+                        {
+                            LifecycleExecutionContext.delete( buildContextManager );
 
-                        LifecycleExecutionContext.delete( buildContextManager );
+                            restoreLookupRealm( oldLookupRealm );
+                        }
 
                         reactorManager.registerBuildSuccess(
                             currentProject,
@@ -358,6 +387,28 @@ public class DefaultLifecycleExecutor
                     }
                 }
             }
+        }
+    }
+
+    private void restoreLookupRealm( ClassRealm oldLookupRealm )
+    {
+        if ( oldLookupRealm != null )
+        {
+            container.setLookupRealm( oldLookupRealm );
+        }
+    }
+
+    private ClassRealm setProjectLookupRealm( MavenSession session,
+                                              MavenProject rootProject )
+    {
+        MavenProjectSession projectSession = session.getProjectSession( rootProject );
+        if ( projectSession != null )
+        {
+            return container.setLookupRealm( projectSession.getProjectRealm() );
+        }
+        else
+        {
+            return null;
         }
     }
 
@@ -429,7 +480,8 @@ public class DefaultLifecycleExecutor
             {
                 if ( mojoBinding.isOptional() )
                 {
-                    getLogger().debug( "Skipping optional mojo execution: " + MojoBindingUtils.toString( mojoBinding ) );
+                    getLogger().debug( "Skipping optional mojo execution: " + MojoBindingUtils.toString( mojoBinding ), e );
+                    return;
                 }
                 else
                 {
@@ -894,5 +946,11 @@ public class DefaultLifecycleExecutor
         {
             return tasks;
         }
+    }
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

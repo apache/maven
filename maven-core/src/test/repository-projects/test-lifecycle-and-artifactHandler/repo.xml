@@ -1,0 +1,22 @@
+<assembly>
+  <id>repo</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <repositories>
+    <repository>
+      <scope>runtime</scope>
+      <outputDirectory>/</outputDirectory>
+    </repository>
+  </repositories>
+  <fileSets>
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory>/org/apache/maven/core/test/test-lifecycle-and-artifactHandler/1</outputDirectory>
+      <includes>
+        <include>test-lifecycle-and-artifactHandler*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>

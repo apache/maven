@@ -39,21 +39,22 @@ public class MavenProjectSession
         return projectId;
     }
 
-    public static String createRealmId( Artifact realmArtifact )
+    private String createExtensionRealmId( Artifact realmArtifact )
     {
-        return ArtifactUtils.versionlessKey( realmArtifact );
+        return projectId + "/extensions/" + ArtifactUtils.versionlessKey( realmArtifact );
     }
 
-    public boolean containsRealm( Artifact extensionArtifact )
+    public boolean containsExtensionRealm( Artifact extensionArtifact )
     {
-        String id = createRealmId( extensionArtifact );
+        String id = createExtensionRealmId( extensionArtifact );
         return componentRealms.containsKey( id );
     }
 
     public boolean containsRealm( Plugin plugin )
     {
-        String id = createRealmId( plugin );
-        return componentRealms.containsKey( id );
+        String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
+
+        return componentRealms.containsKey( realmId );
     }
 
     public ClassRealm getProjectRealm()
@@ -64,8 +65,8 @@ public class MavenProjectSession
     public ClassRealm createExtensionRealm( Artifact extensionArtifact )
         throws DuplicateRealmException
     {
-        String realmId = MavenProjectSession.createRealmId( extensionArtifact );
-        ClassRealm extRealm = container.getContainerRealm().createChildRealm( projectId + "/" + realmId );
+        String realmId = createExtensionRealmId( extensionArtifact );
+        ClassRealm extRealm = container.getContainerRealm().createChildRealm( realmId );
 
         componentRealms.put( realmId, extRealm );
 
@@ -79,16 +80,20 @@ public class MavenProjectSession
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    public ClassRealm getComponentRealm( String key )
+    public ClassRealm getPluginRealm( Plugin plugin )
+        throws NoSuchRealmException
     {
-        return (ClassRealm) componentRealms.get( key );
+        String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
+
+        return projectRealm.getWorld().getRealm( realmId );
     }
 
 
-    public ClassRealm createPluginRealm( Plugin projectPlugin )
+    public ClassRealm createPluginRealm( Plugin plugin )
         throws DuplicateRealmException
     {
-        String realmId = MavenProjectSession.createRealmId( projectPlugin );
+        String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
+
         ClassRealm extRealm = projectRealm.createChildRealm( realmId );
 
         componentRealms.put( realmId, extRealm );
@@ -96,20 +101,16 @@ public class MavenProjectSession
         return extRealm;
     }
 
-    public static String createRealmId( Plugin plugin )
+    private String createPluginRealmId( String baseId )
     {
-        return ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
+        return projectId + "/plugins/" + baseId;
     }
 
-    public static String createRealmId( PluginDescriptor pd )
-    {
-        return ArtifactUtils.versionlessKey( pd.getGroupId(), pd.getArtifactId() );
-    }
-
-    public ClassRealm getPluginRealm( PluginDescriptor pluginDescriptor )
+    public ClassRealm getPluginRealm( PluginDescriptor pd )
         throws NoSuchRealmException
     {
-        String realmId = MavenProjectSession.createRealmId( pluginDescriptor );
+        String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( pd.getGroupId(), pd.getArtifactId() ) );
+
         ClassRealm extRealm = projectRealm.getWorld().getRealm( realmId );
 
         componentRealms.put( realmId, extRealm );

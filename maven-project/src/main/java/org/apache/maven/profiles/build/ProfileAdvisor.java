@@ -37,16 +37,28 @@ public interface ProfileAdvisor
 
     String ROLE = ProfileAdvisor.class.getName();
 
-    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager, File pomFile, String modelId )
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager,
+                                                             File pomFile,
+                                                             String modelId )
         throws ProjectBuildingException;
 
-    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
+                                                             File pomFile,
+                                                             List explicitlyActiveIds,
+                                                             List explicitlyInactiveIds,
+                                                             boolean useProfilesXml )
         throws ProjectBuildingException;
 
-    List applyActivatedProfiles( Model model, File pomFile, List explicitlyActiveIds, List explicitlyInactiveIds )
+    List applyActivatedProfiles( Model model,
+                                 File pomFile,
+                                 List explicitlyActiveIds,
+                                 List explicitlyInactiveIds,
+                                 boolean useProfilesXml )
         throws ProjectBuildingException;
 
-    List applyActivatedExternalProfiles( Model model, File pomFile, ProfileManager externalProfileManager )
+    List applyActivatedExternalProfiles( Model model,
+                                         File pomFile,
+                                         ProfileManager externalProfileManager )
         throws ProjectBuildingException;
 
 }

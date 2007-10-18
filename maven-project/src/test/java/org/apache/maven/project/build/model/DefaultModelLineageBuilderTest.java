@@ -117,7 +117,7 @@ public class DefaultModelLineageBuilderTest
         }
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null,
-                                                                      false );
+                                                                      false, true );
 
         assertEquals( 1, lineage.size() );
 
@@ -181,7 +181,7 @@ public class DefaultModelLineageBuilderTest
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
                                                                       Collections.EMPTY_LIST, null,
-                                                                      false );
+                                                                      false, true );
 
         assertEquals( 3, lineage.size() );
 
@@ -230,7 +230,7 @@ public class DefaultModelLineageBuilderTest
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
                                                                       Collections.EMPTY_LIST, null,
-                                                                      true );
+                                                                      true, true );
 
         assertEquals( 2, lineage.size() );
 
@@ -318,7 +318,7 @@ public class DefaultModelLineageBuilderTest
                                                                       currentPOM,
                                                                       localRepository,
                                                                       Collections.singletonList( remoteRepository ),
-                                                                      null, false );
+                                                                      null, false, true );
 
         assertEquals( 3, lineage.size() );
 
@@ -379,7 +379,7 @@ public class DefaultModelLineageBuilderTest
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
                                                                       Collections.EMPTY_LIST, null,
-                                                                      false );
+                                                                      false, true );
 
         assertEquals( 2, lineage.size() );
 
@@ -445,7 +445,7 @@ public class DefaultModelLineageBuilderTest
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
                                                                       Collections.EMPTY_LIST, profileManager,
-                                                                      false );
+                                                                      false, true );
 
         assertEquals( 2, lineage.size() );
 
@@ -535,7 +535,7 @@ public class DefaultModelLineageBuilderTest
         // 7. build the lineage.
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, null,
                                                                       Collections.EMPTY_LIST, null,
-                                                                      false );
+                                                                      false, true );
 
         assertEquals( 2, lineage.size() );
 

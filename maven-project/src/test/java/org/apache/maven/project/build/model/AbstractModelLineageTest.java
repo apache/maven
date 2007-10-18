@@ -45,7 +45,7 @@ public abstract class AbstractModelLineageTest
 
         try
         {
-            ml.addParent( new Model(), null, null );
+            ml.addParent( new Model(), null, null, false );
 
             fail( "Should throw IllegalStateException when setOrigin(..) is not called first." );
         }
@@ -61,13 +61,13 @@ public abstract class AbstractModelLineageTest
 
         assertEquals( 0, ml.size() );
 
-        ml.setOrigin( new Model(), null, null );
+        ml.setOrigin( new Model(), null, null, false );
 
         assertEquals( 1, ml.size() );
 
         try
         {
-            ml.setOrigin( new Model(), null, null );
+            ml.setOrigin( new Model(), null, null, false );
 
             fail( "Should throw IllegalStateException when setOrigin(..) called multiple times." );
         }
@@ -83,7 +83,7 @@ public abstract class AbstractModelLineageTest
 
         assertEquals( 0, ml.size() );
 
-        ml.setOrigin( new Model(), null, null );
+        ml.setOrigin( new Model(), null, null, false );
 
         assertEquals( 1, ml.size() );
     }
@@ -106,7 +106,7 @@ public abstract class AbstractModelLineageTest
         File fOne = File.createTempFile( "ModelLineageTest.modelLineageIterator-test.", "" );
         fOne.deleteOnExit();
 
-        ml.setOrigin( mOne, fOne, null );
+        ml.setOrigin( mOne, fOne, null, false );
 
         String gTwo = "group2";
         String aTwo = "artifact2";
@@ -120,8 +120,8 @@ public abstract class AbstractModelLineageTest
 
         File fTwo = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fTwo.deleteOnExit();
-        
-        ml.addParent( mTwo, fTwo, null );
+
+        ml.addParent( mTwo, fTwo, null, false );
 
         ModelLineageIterator it = ml.lineageIterator();
 
@@ -150,7 +150,7 @@ public abstract class AbstractModelLineageTest
         mOne.setArtifactId( aOne );
         mOne.setVersion( vOne );
 
-        ml.setOrigin( mOne, null, null );
+        ml.setOrigin( mOne, null, null, false );
 
         String gTwo = "group2";
         String aTwo = "artifact2";
@@ -162,7 +162,7 @@ public abstract class AbstractModelLineageTest
         mOne.setArtifactId( aTwo );
         mOne.setVersion( vTwo );
 
-        ml.addParent( mTwo, null, null );
+        ml.addParent( mTwo, null, null, false );
 
         Iterator it = ml.modelIterator();
 
@@ -181,20 +181,20 @@ public abstract class AbstractModelLineageTest
         File fOne = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fOne.deleteOnExit();
 
-        ml.setOrigin( new Model(), fOne, null );
+        ml.setOrigin( new Model(), fOne, null, false );
 
         File fTwo = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fTwo.deleteOnExit();
 
-        ml.addParent( new Model(), fTwo, null );
+        ml.addParent( new Model(), fTwo, null, false );
 
         Iterator it = ml.fileIterator();
 
         assertTrue( it.hasNext() );
-        assertEquals( fOne, (File) it.next() );
+        assertEquals( fOne, it.next() );
 
         assertTrue( it.hasNext() );
-        assertEquals( fTwo, (File) it.next() );
+        assertEquals( fTwo, it.next() );
     }
 
     public void testArtifactRepositoryListIterator_ShouldAddTwoParentsAndIterateInFIFOOrder()
@@ -205,11 +205,11 @@ public abstract class AbstractModelLineageTest
 
         ArtifactRepository arOne = new DefaultArtifactRepository( "", "", layout );
 
-        ml.setOrigin( new Model(), null, Collections.singletonList( arOne ) );
+        ml.setOrigin( new Model(), null, Collections.singletonList( arOne ), false );
 
         ArtifactRepository arTwo = new DefaultArtifactRepository( "", "", layout );
 
-        ml.addParent( new Model(), null, Collections.singletonList( arTwo ) );
+        ml.addParent( new Model(), null, Collections.singletonList( arTwo ), false );
 
         Iterator it = ml.artifactRepositoryListIterator();
 
@@ -238,12 +238,12 @@ public abstract class AbstractModelLineageTest
         mOne.setArtifactId( aOne );
         mOne.setVersion( vOne );
 
-        ml.setOrigin( mOne, fOne, null );
+        ml.setOrigin( mOne, fOne, null, false );
 
         File fTwo = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fTwo.deleteOnExit();
 
-        ml.addParent( new Model(), fTwo, null );
+        ml.addParent( new Model(), fTwo, null, false );
 
         Model retriever = new Model();
 
@@ -273,11 +273,11 @@ public abstract class AbstractModelLineageTest
 
         ArtifactRepository arOne = new DefaultArtifactRepository( "", "", layout );
 
-        ml.setOrigin( mOne, null, Collections.singletonList( arOne ) );
+        ml.setOrigin( mOne, null, Collections.singletonList( arOne ), false );
 
         ArtifactRepository arTwo = new DefaultArtifactRepository( "", "", layout );
 
-        ml.addParent( new Model(), null, Collections.singletonList( arTwo ) );
+        ml.addParent( new Model(), null, Collections.singletonList( arTwo ), false );
 
         Model retriever = new Model();
 
@@ -285,7 +285,7 @@ public abstract class AbstractModelLineageTest
         retriever.setArtifactId( aOne );
         retriever.setVersion( vOne );
 
-        assertSame( arOne, ( (List) ml.getArtifactRepositories( retriever ) ).get( 0 ) );
+        assertSame( arOne, ( ml.getArtifactRepositories( retriever ) ).get( 0 ) );
     }
 
     public void testSetOriginAndGetOriginatingModel()
@@ -297,7 +297,7 @@ public abstract class AbstractModelLineageTest
 
         ModelLineage ml = newModelLineage();
 
-        ml.setOrigin( model, null, null );
+        ml.setOrigin( model, null, null, false );
 
         assertEquals( model.getId(), ml.getOriginatingModel().getId() );
     }
@@ -310,7 +310,7 @@ public abstract class AbstractModelLineageTest
         File pomFile = File.createTempFile( "ModelLineage.test.", ".pom" );
         pomFile.deleteOnExit();
 
-        ml.setOrigin( null, pomFile, null );
+        ml.setOrigin( null, pomFile, null, false );
 
         assertEquals( pomFile, ml.getOriginatingPOMFile() );
     }
@@ -333,7 +333,7 @@ public abstract class AbstractModelLineageTest
 
         ArtifactRepository arOne = new DefaultArtifactRepository( "", "", layout );
 
-        ml.setOrigin( mOne, null, Collections.singletonList( arOne ) );
+        ml.setOrigin( mOne, null, Collections.singletonList( arOne ), false );
 
         assertSame( arOne, ml.getOriginatingArtifactRepositoryList().get( 0 ) );
     }
@@ -352,7 +352,7 @@ public abstract class AbstractModelLineageTest
         mOne.setArtifactId( aOne );
         mOne.setVersion( vOne );
 
-        ml.setOrigin( mOne, null, null );
+        ml.setOrigin( mOne, null, null, false );
 
         String gTwo = "group2";
         String aTwo = "artifact2";
@@ -364,7 +364,7 @@ public abstract class AbstractModelLineageTest
         mOne.setArtifactId( aTwo );
         mOne.setVersion( vTwo );
 
-        ml.addParent( mTwo, null, null );
+        ml.addParent( mTwo, null, null, false );
 
         Iterator it = ml.getModelsInDescendingOrder().iterator();
 
@@ -383,20 +383,20 @@ public abstract class AbstractModelLineageTest
         File fOne = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fOne.deleteOnExit();
 
-        ml.setOrigin( new Model(), fOne, null );
+        ml.setOrigin( new Model(), fOne, null, false );
 
         File fTwo = File.createTempFile( "ModelLineageTest.fileIterator-test.", "" );
         fTwo.deleteOnExit();
 
-        ml.addParent( new Model(), fTwo, null );
+        ml.addParent( new Model(), fTwo, null, false );
 
         Iterator it = ml.getFilesInDescendingOrder().iterator();
 
         assertTrue( it.hasNext() );
-        assertEquals( fTwo, (File) it.next() );
+        assertEquals( fTwo, it.next() );
 
         assertTrue( it.hasNext() );
-        assertEquals( fOne, (File) it.next() );
+        assertEquals( fOne, it.next() );
     }
 
     public void testGetArtifactRepositoryListsInDescendingOrder_ShouldAddTwoAndRetrieveInLIFOOrder()
@@ -407,11 +407,11 @@ public abstract class AbstractModelLineageTest
 
         ArtifactRepository arOne = new DefaultArtifactRepository( "", "", layout );
 
-        ml.setOrigin( new Model(), null, Collections.singletonList( arOne ) );
+        ml.setOrigin( new Model(), null, Collections.singletonList( arOne ), false );
 
         ArtifactRepository arTwo = new DefaultArtifactRepository( "", "", layout );
 
-        ml.addParent( new Model(), null, Collections.singletonList( arTwo ) );
+        ml.addParent( new Model(), null, Collections.singletonList( arTwo ), false );
 
         Iterator it = ml.getArtifactRepositoryListsInDescendingOrder().iterator();
 

@@ -209,7 +209,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null, false );
+        return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null, false, false );
     }
 
     private MavenProject superProject;
@@ -403,7 +403,8 @@ public class DefaultMavenProjectBuilder
             buildArtifactRepositories( getSuperModel() ),
             projectDescriptor,
             profileManager,
-            STRICT_MODEL_PARSING );
+            STRICT_MODEL_PARSING,
+            true );
 
         return project;
     }
@@ -531,7 +532,7 @@ public class DefaultMavenProjectBuilder
                                         List parentSearchRepositories,
                                         File projectDescriptor,
                                         ProfileManager externalProfileManager,
-                                        boolean strict )
+                                        boolean strict, boolean validProfilesXmlLocation )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -567,7 +568,7 @@ public class DefaultMavenProjectBuilder
             explicitlyInactive = Collections.EMPTY_LIST;
         }
 
-        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive ) );
+        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation ) );
 
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
@@ -575,7 +576,8 @@ public class DefaultMavenProjectBuilder
         LinkedHashSet aggregatedRemoteWagonRepositories = collectInitialRepositories( model, superModel,
             parentSearchRepositories,
             projectDescriptor, explicitlyActive,
-            explicitlyInactive );
+            explicitlyInactive,
+            validProfilesXmlLocation );
 
         Model originalModel = ModelUtils.cloneModel( model );
 
@@ -583,7 +585,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = assembleLineage( model, lineage, localRepository, projectDescriptor, aggregatedRemoteWagonRepositories, externalProfileManager, strict );
+            project = assembleLineage( model, lineage, localRepository, projectDescriptor, aggregatedRemoteWagonRepositories, externalProfileManager, strict, validProfilesXmlLocation );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -704,14 +706,15 @@ public class DefaultMavenProjectBuilder
                                                       List parentSearchRepositories,
                                                       File pomFile,
                                                       List explicitlyActive,
-                                                      List explicitlyInactive )
+                                                      List explicitlyInactive,
+                                                      boolean validProfilesXmlLocation )
         throws ProjectBuildingException
     {
         LinkedHashSet collected = new LinkedHashSet();
 
-        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive );
+        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
 
-        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive );
+        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
 
         if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
         {
@@ -725,10 +728,11 @@ public class DefaultMavenProjectBuilder
                                                       Model model,
                                                       File pomFile,
                                                       List explicitlyActive,
-                                                      List explicitlyInactive )
+                                                      List explicitlyInactive,
+                                                      boolean validProfilesXmlLocation )
         throws ProjectBuildingException
     {
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive );
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
 
         if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
@@ -896,6 +900,7 @@ public class DefaultMavenProjectBuilder
     }
 
     /**
+     * @param validProfilesXmlLocation
      * @noinspection CollectionDeclaredAsConcreteClass
      * @todo We need to find an effective way to unit test parts of this method!
      * @todo Refactor this into smaller methods with discrete purposes.
@@ -906,12 +911,12 @@ public class DefaultMavenProjectBuilder
                                           File pomFile,
                                           Set aggregatedRemoteWagonRepositories,
                                           ProfileManager externalProfileManager,
-                                          boolean strict )
+                                          boolean strict, boolean validProfilesXmlLocation )
         throws ProjectBuildingException, InvalidRepositoryException
     {
         ModelLineage modelLineage = new DefaultModelLineage();
 
-        modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ) );
+        modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ), validProfilesXmlLocation );
 
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
@@ -951,7 +956,7 @@ public class DefaultMavenProjectBuilder
             projectContext.store( buildContextManager );
 
             project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, currentPom, explicitlyActive,
-                explicitlyInactive ) );
+                explicitlyInactive, validProfilesXmlLocation ) );
 
             if ( lastProject != null )
             {

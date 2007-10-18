@@ -336,8 +336,12 @@ public class DefaultBuildExtensionScanner
         {
             getLogger().debug( "Building model-lineage for: " + pom + " to pre-scan for extensions." );
 
+            // NOTE: We're assuming that this scan happens only for local filesystem POMs,
+            // not for POMs from the repository...otherwise, we would need to be more careful with
+            // the last parameter here and determine whether it's appropriate for the POM to have
+            // an accompanying profiles.xml file.
             lineage = modelLineageBuilder.buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                             globalProfileManager, false );
+                                                             globalProfileManager, false, true );
         }
         catch ( ProjectBuildingException e )
         {

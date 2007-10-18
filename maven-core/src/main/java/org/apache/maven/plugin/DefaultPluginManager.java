@@ -345,14 +345,21 @@ public class DefaultPluginManager
 
         String key = projectPlugin.getKey();
 
-        ClassRealm pluginRealm;
+        ClassRealm pluginRealm = null;
 
         // if we have a project session, it must mean we have extensions...
         // which in turn may alter the execution of a plugin.
         MavenProjectSession projectSession = session.getProjectSession( project );
         if ( projectSession != null )
         {
-            pluginRealm = projectSession.getComponentRealm( key );
+            try
+            {
+                pluginRealm = projectSession.getPluginRealm( projectPlugin );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                getLogger().debug( "Plugin realm is missing for: " + projectPlugin.getKey() + ". New realm will be created." );
+            }
         }
         else
         {
@@ -373,21 +380,21 @@ public class DefaultPluginManager
         // Realm creation for a plugin
         // ----------------------------------------------------------------------------
 
-        ClassRealm componentRealm = null;
+        getLogger().debug( "Creating a ClassRealm instance for plugin: " + projectPlugin.getKey() + " for project: " + project.getId() );
 
         try
         {
             if ( projectSession != null )
             {
-                componentRealm = projectSession.createPluginRealm( projectPlugin );
+                pluginRealm = projectSession.createPluginRealm( projectPlugin );
 
                 try
                 {
-                    componentRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
+                    pluginRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
                 }
                 catch ( MalformedURLException e )
                 {
-                    throw new PluginContainerException( plugin, componentRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
+                    throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
                 }
 
                 for ( Iterator i = artifacts.iterator(); i.hasNext(); )
@@ -397,26 +404,26 @@ public class DefaultPluginManager
                     try
                     {
                         getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
-                        componentRealm.addURL( artifact.getFile().toURI().toURL() );
+                        pluginRealm.addURL( artifact.getFile().toURI().toURL() );
                     }
                     catch ( MalformedURLException e )
                     {
-                        throw new PluginContainerException( plugin, componentRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
+                        throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
                     }
                 }
 
                 try
                 {
-                    getLogger().debug( "Discovering components in realm: " + componentRealm );
-                    container.discoverComponents( componentRealm, false );
+                    getLogger().debug( "Discovering components in realm: " + pluginRealm );
+                    container.discoverComponents( pluginRealm, false );
                 }
                 catch ( PlexusConfigurationException e )
                 {
-                    throw new PluginContainerException( plugin, componentRealm, "Error re-scanning project realm for components.", e );
+                    throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
                 }
                 catch ( ComponentRepositoryException e )
                 {
-                    throw new PluginContainerException( plugin, componentRealm, "Error re-scanning project realm for components.", e );
+                    throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
                 }
             }
             else
@@ -433,18 +440,18 @@ public class DefaultPluginManager
                 jars.add( pluginArtifact.getFile() );
 
                 // Now here we need the artifact coreArtifactFilter stuff
-                componentRealm = container.createComponentRealm( key, jars );
+                pluginRealm = container.createComponentRealm( key, jars );
             }
 
         }
         catch ( PlexusContainerException e )
         {
-            throw new PluginContainerException( plugin, componentRealm, "Failed to create realm for plugin '" + projectPlugin
+            throw new PluginContainerException( plugin, pluginRealm, "Failed to create realm for plugin '" + projectPlugin
                                               + ".", e );
         }
         catch ( DuplicateRealmException e )
         {
-            throw new PluginContainerException( plugin, componentRealm, "Failed to create project-specific realm for plugin '" + projectPlugin
+            throw new PluginContainerException( plugin, pluginRealm, "Failed to create project-specific realm for plugin '" + projectPlugin
                                                 + " in project: " + project.getId(), e );
         }
 
@@ -454,8 +461,8 @@ public class DefaultPluginManager
 
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
-            componentRealm.importFrom( parentRealmId, Xpp3Dom.class.getName() );
-            componentRealm.importFrom( parentRealmId, "org.codehaus.plexus.util.xml.pull" );
+            pluginRealm.importFrom( parentRealmId, Xpp3Dom.class.getName() );
+            pluginRealm.importFrom( parentRealmId, "org.codehaus.plexus.util.xml.pull" );
 
             // Adding for MNG-2878, since maven-reporting-impl was removed from the
             // internal list of artifacts managed by maven, the classloader is different
@@ -463,11 +470,11 @@ public class DefaultPluginManager
             // is not available from the AbstractMavenReport since it uses:
             // getClass().getResourceAsStream( "/default-report.xml" )
             // (maven-reporting-impl version 2.0; line 134; affects: checkstyle plugin, and probably others)
-            componentRealm.importFrom( parentRealmId, "/default-report.xml" );
+            pluginRealm.importFrom( parentRealmId, "/default-report.xml" );
         }
         catch ( NoSuchRealmException e )
         {
-            throw new PluginContainerException( plugin, componentRealm,
+            throw new PluginContainerException( plugin, pluginRealm,
                                               "Failed to import Xpp3Dom from core realm for plugin: '"
                                                               + projectPlugin + ".", e );
         }
@@ -499,9 +506,9 @@ public class DefaultPluginManager
 
         pluginDescriptor.setArtifacts( new ArrayList( artifacts ) );
 
-        getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + componentRealm );
+        getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + pluginRealm );
 
-        pluginDescriptor.setClassRealm( componentRealm );
+        pluginDescriptor.setClassRealm( pluginRealm );
     }
 
     private Set getPluginArtifacts( Artifact pluginArtifact,
