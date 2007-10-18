@@ -1,6 +1,8 @@
 package org.apache.maven.cli;
 
+import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.BuildFailureException;
+import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
@@ -10,7 +12,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.plugin.AbstractMojoExecutionException;
+import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.project.DuplicateProjectException;
@@ -68,8 +70,7 @@ public final class CLIReportingUtils
         {
             Properties properties = new Properties();
             resourceAsStream = MavenCli.class.getClassLoader()
-                                             .getResourceAsStream(
-                                                                   "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+                                             .getResourceAsStream( "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
             properties.load( resourceAsStream );
 
             if ( properties.getProperty( "builtOn" ) != null )
@@ -184,12 +185,15 @@ public final class CLIReportingUtils
         showError( message, e, showErrors, new MavenEmbedderConsoleLogger() );
     }
 
-    static void showError( Exception e, boolean show, MavenEmbedderLogger logger )
+    static void showError( Exception e,
+                           boolean show,
+                           MavenEmbedderLogger logger )
     {
         showError( null, e, show, logger );
     }
 
-    static void showError( String message, Exception e,
+    static void showError( String message,
+                           Exception e,
                            boolean showStackTraces,
                            MavenEmbedderLogger logger )
     {
@@ -222,7 +226,9 @@ public final class CLIReportingUtils
         logger.error( writer.toString() );
     }
 
-    private static void buildErrorMessage( Exception e, boolean showStackTraces, StringWriter writer )
+    private static void buildErrorMessage( Exception e,
+                                           boolean showStackTraces,
+                                           StringWriter writer )
     {
         boolean handled = false;
 
@@ -236,7 +242,9 @@ public final class CLIReportingUtils
         }
         else if ( e instanceof LifecycleExecutionException )
         {
-            handled = handleLifecycleExecutionException( (LifecycleExecutionException) e, showStackTraces, writer );
+            handled = handleLifecycleExecutionException( (LifecycleExecutionException) e,
+                                                         showStackTraces,
+                                                         writer );
         }
         else if ( e instanceof DuplicateProjectException )
         {
@@ -246,7 +254,6 @@ public final class CLIReportingUtils
         {
             handled = handleMavenExecutionException( (MavenExecutionException) e, writer );
         }
-
 
         if ( !handled )
         {
@@ -278,7 +285,8 @@ public final class CLIReportingUtils
                 Throwable nestedCause = cause.getCause();
                 if ( ( nestedCause != null ) && ( nestedCause instanceof ProjectBuildingException ) )
                 {
-                    return handleProjectBuildingException( (ProjectBuildingException) nestedCause, writer );
+                    return handleProjectBuildingException( (ProjectBuildingException) nestedCause,
+                                                           writer );
                 }
                 else
                 {
@@ -317,14 +325,16 @@ public final class CLIReportingUtils
         return true;
     }
 
-    private static void handleGenericException( Throwable exception, StringWriter writer )
+    private static void handleGenericException( Throwable exception,
+                                                StringWriter writer )
     {
         writer.write( exception.getMessage() );
         writer.write( NEWLINE );
     }
 
     private static boolean handleLifecycleExecutionException( LifecycleExecutionException e,
-                                                              boolean showStackTraces, StringWriter writer )
+                                                              boolean showStackTraces,
+                                                              StringWriter writer )
     {
         Throwable cause = e.getCause();
         if ( cause != null )
@@ -403,17 +413,77 @@ public final class CLIReportingUtils
         return result;
     }
 
-    private static boolean handleBuildFailureException( BuildFailureException e, StringWriter writer )
+    private static boolean handleBuildFailureException( BuildFailureException e,
+                                                        StringWriter writer )
     {
-        Throwable cause = e.getCause();
-        if ( ( cause != null ) && ( cause instanceof MojoFailureException ) )
+        if ( e instanceof AggregatedBuildFailureException )
         {
-            writer.write( ( (AbstractMojoExecutionException) cause ).getLongMessage() );
+            writer.write( "Mojo (aggregator): " );
             writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "    " );
+            writer.write( MojoBindingUtils.toString( ( (AggregatedBuildFailureException) e ).getBinding() ) );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "FAILED while executing in directory:" );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "    " );
+            writer.write( ( (AggregatedBuildFailureException) e ).getExecutionRootDirectory() );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Reason:" );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+
+            handleMojoFailureException( ( (AggregatedBuildFailureException) e ).getMojoFailureException(),
+                                        writer );
+
+
+            return true;
+        }
+        else if ( e instanceof ProjectBuildFailureException )
+        {
+            writer.write( NEWLINE );
+            writer.write( "Mojo: " );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "    " );
+            writer.write( MojoBindingUtils.toString( ( (ProjectBuildFailureException) e ).getBinding() ) );
+            writer.write( NEWLINE );
+            writer.write( "FAILED for project: " );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "    " );
+            writer.write( ( (ProjectBuildFailureException) e ).getProjectId() );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Reason:" );
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+
+            handleMojoFailureException( ( (ProjectBuildFailureException) e ).getMojoFailureException(),
+                                        writer );
+
             return true;
         }
 
         return false;
+    }
+
+    private static boolean handleMojoFailureException( MojoFailureException error,
+                                                       StringWriter writer )
+    {
+        String message = error.getLongMessage();
+        if ( message == null )
+        {
+            message = error.getMessage();
+        }
+
+        writer.write( message );
+        writer.write( NEWLINE );
+
+        return true;
     }
 
     private static void logReactorSummary( ReactorManager rm,
@@ -441,8 +511,10 @@ public final class CLIReportingUtils
 
                 if ( rm.hasBuildFailure( project ) )
                 {
-                    logReactorSummaryLine( project.getName(), "FAILED",
-                                           rm.getBuildFailure( project ).getTime(), logger );
+                    logReactorSummaryLine( project.getName(),
+                                           "FAILED",
+                                           rm.getBuildFailure( project ).getTime(),
+                                           logger );
                 }
                 else if ( rm.isBlackListed( project ) )
                 {
@@ -452,7 +524,8 @@ public final class CLIReportingUtils
                 }
                 else if ( rm.hasBuildSuccess( project ) )
                 {
-                    logReactorSummaryLine( project.getName(), "SUCCESS",
+                    logReactorSummaryLine( project.getName(),
+                                           "SUCCESS",
                                            rm.getBuildSuccess( project ).getTime(),
                                            logger );
                 }
