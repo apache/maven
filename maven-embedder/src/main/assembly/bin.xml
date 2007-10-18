@@ -43,9 +43,10 @@ under the License.
         <exclude>org.apache.maven:maven-artifact</exclude>
         <exclude>org.apache.maven:maven-monitor</exclude>
         <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
-        <!--
-        <exclude>jdom:jdom</exclude>
+        <!-- NOTE: Excluding to avoid maven-model and maven-profile inclusions,
+             since we're not using the jdom modello stuff here.
         -->
+        <exclude>jdom:jdom</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
