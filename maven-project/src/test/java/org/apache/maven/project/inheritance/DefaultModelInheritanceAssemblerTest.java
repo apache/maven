@@ -53,6 +53,66 @@ public class DefaultModelInheritanceAssemblerTest
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
     
+    public void testSiteUrlWithTrailingForwardSlashInParentHasArtifactIdAppendedInChild()
+    {
+    	Site site = new Site();
+    	site.setName("docs");
+    	site.setUrl("sftp://machine/path/to/site/");
+    	
+    	DistributionManagement distributionManagement = new DistributionManagement();
+    	distributionManagement.setSite(site);
+    	
+    	Model parent = makeBaseModel( "parent" );
+    	parent.setDistributionManagement(distributionManagement);
+    	
+    	Model child = makeBaseModel( "child" );
+    	child.setParent(parent.getParent());
+    	
+    	assembler.assembleModelInheritance(child, parent);
+    	
+    	assertEquals(site.getUrl()+ "child", child.getDistributionManagement().getSite().getUrl());
+    }
+
+    public void testSiteUrlWithTrailingBackSlashInParentHasArtifactIdAppendedInChild()
+    {
+    	Site site = new Site();
+    	site.setName("docs");
+    	site.setUrl("file://machine\\path\\to\\site\\");
+    	
+    	DistributionManagement distributionManagement = new DistributionManagement();
+    	distributionManagement.setSite(site);
+    	
+    	Model parent = makeBaseModel( "parent" );
+    	parent.setDistributionManagement(distributionManagement);
+    	
+    	Model child = makeBaseModel( "child" );
+    	child.setParent(parent.getParent());
+    	
+    	assembler.assembleModelInheritance(child, parent);
+    	
+    	assertEquals(site.getUrl()+ "child", child.getDistributionManagement().getSite().getUrl());
+    }
+    
+    public void testSiteUrlWithoutTrailingSlashInParentHasNoArtifactIdAppendedInChild()
+    {
+    	Site site = new Site();
+    	site.setName("docs");
+    	site.setUrl("sftp://machine/path/to/site");
+    	
+    	DistributionManagement distributionManagement = new DistributionManagement();
+    	distributionManagement.setSite(site);
+    	
+    	Model parent = makeBaseModel( "parent" );
+    	parent.setDistributionManagement(distributionManagement);
+    	
+    	Model child = makeBaseModel( "child" );
+    	child.setParent(parent.getParent());
+    	
+    	assembler.assembleModelInheritance(child, parent);
+    	
+    	assertEquals(site.getUrl(), child.getDistributionManagement().getSite().getUrl());
+    }
+    
     public void testShouldAdjustChildUrlBasedOnParentAndModulePathInSiblingDir()
     {
         Model parent = makeBaseModel( "parent" );

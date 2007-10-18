@@ -432,7 +432,7 @@ public class DefaultModelInheritanceAssembler
 
                     site.setUrl( parentDistMgmt.getSite().getUrl() );
 
-                    if ( site.getUrl() != null )
+                    if ( site.getUrl() != null && (site.getUrl().endsWith( "/" )||  site.getUrl().endsWith( "\\" )))
                     {
                         site.setUrl(
                             appendPath( site.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
@@ -494,10 +494,30 @@ public class DefaultModelInheritanceAssembler
         if ( appendPaths )
         {
             if ( pathAdjustment != null )
-                uncleanPath += "/" + pathAdjustment;
+            {
+                if (uncleanPath.endsWith( "/" )|| uncleanPath.endsWith( "\\" ))
+                {
+                    uncleanPath += pathAdjustment;
+                    
+                }
+                else
+                {
+                    uncleanPath += "/" + pathAdjustment;
+                }
+            }
 
             if ( childPath != null )
-                uncleanPath += "/" + childPath;
+            {
+               
+                if (uncleanPath.endsWith( "/" )|| uncleanPath.endsWith( "\\" ))
+                {
+                    uncleanPath += childPath;
+                }
+                else
+                {
+                    uncleanPath += "/" + childPath;
+                }
+            }
         }
 
         String cleanedPath = "";
