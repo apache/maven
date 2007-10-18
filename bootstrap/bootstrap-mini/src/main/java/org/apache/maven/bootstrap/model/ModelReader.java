@@ -48,6 +48,8 @@ public class ModelReader
 
     private Resource currentResource;
 
+    private boolean insideProfiles;
+
     private boolean insideParent;
 
     private boolean insideDependency;
@@ -118,9 +120,19 @@ public class ModelReader
 
     public void startElement( String uri, String localName, String rawName, Attributes attributes )
     {
+        // skip profile contents
+        if ( insideProfiles )
+        {
+            return;
+        }
+
         if ( rawName.equals( "parent" ) )
         {
             insideParent = true;
+        }
+        else if ( rawName.equals( "profiles" ) )
+        {
+            insideProfiles = true;
         }
         else if ( rawName.equals( "repository" ) )
         {
@@ -187,6 +199,12 @@ public class ModelReader
 
     public void characters( char buffer[], int start, int length )
     {
+        // skip profile contents
+        if ( insideProfiles )
+        {
+            return;
+        }
+
         bodyText.append( buffer, start, length );
     }
 
@@ -198,6 +216,16 @@ public class ModelReader
     public void endElement( String uri, String localName, String rawName )
         throws SAXException
     {
+        if ( rawName.equals( "profiles" ) )
+        {
+            insideProfiles = false;
+        }
+
+        if ( insideProfiles )
+        {
+            return;
+        }
+
         // support both v3 <extend> and v4 <parent>
         if ( rawName.equals( "parent" ) )
         {
