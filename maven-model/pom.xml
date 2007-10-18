@@ -38,15 +38,7 @@ under the License.
         <configuration>
           <version>4.0.0</version>
           <model>src/main/mdo/maven.mdo</model>
-        </configuration>
-        <executions>
-          <execution>
-            <id>jdom</id>
-            <goals>
-              <goal>jdom-writer</goal>
-            </goals>
-          </execution>
-        </executions>
+        </configuration> 
       </plugin>
     </plugins>
   </build>
@@ -111,10 +103,6 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
 </project>

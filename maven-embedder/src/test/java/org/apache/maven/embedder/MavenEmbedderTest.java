@@ -451,24 +451,31 @@ public class MavenEmbedderTest
         throws IOException, SettingsConfigurationException, MavenEmbedderException, XmlPullParserException
     {
         Settings s = new Settings();
+
         s.setOffline( true );
 
         String localRepoPath = "/path/to/local/repo";
 
         s.setLocalRepository( localRepoPath );
 
-        File settingsFile = File.createTempFile( "embedder-test.settings.", "" );
+        File settingsFile = new File( System.getProperty( "basedir" ), "target/test-settings.xml" );
+
+        settingsFile.getParentFile().mkdirs();
+
         settingsFile.deleteOnExit();
 
         MavenEmbedder.writeSettings( settingsFile, s );
 
         Reader reader = null;
+
         try
         {
             reader = ReaderFactory.newXmlReader( settingsFile );
+
             Settings result = new SettingsXpp3Reader().read( reader );
 
             assertEquals( localRepoPath, result.getLocalRepository() );
+
             assertTrue( result.isOffline() );
         }
         finally

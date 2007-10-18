@@ -39,10 +39,6 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-    </dependency>
     <!-- CLI -->
     <dependency>
       <groupId>commons-cli</groupId>

@@ -148,14 +148,6 @@ under the License.
           <version>1.0.0</version>
           <model>src/main/mdo/settings.mdo</model>
         </configuration>
-        <executions>
-          <execution>
-            <id>jdom</id>
-            <goals>
-              <goal>jdom-writer</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>

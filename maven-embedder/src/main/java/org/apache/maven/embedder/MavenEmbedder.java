@@ -31,7 +31,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
-import org.apache.maven.embedder.writer.WriterUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -43,8 +42,8 @@ import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.io.jdom.MavenJDOMWriter;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -58,8 +57,8 @@ import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
-import org.apache.maven.settings.io.jdom.SettingsJDOMWriter;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.DefaultSettingsValidator;
 import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
@@ -80,14 +79,10 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
@@ -134,7 +129,9 @@ public class MavenEmbedder
 
     private MavenXpp3Reader modelReader;
 
-    private MavenJDOMWriter modelWriter;
+    private MavenXpp3Writer modelWriter;
+
+    private SettingsXpp3Writer settingsWriter;
 
     private PluginDescriptorBuilder pluginDescriptorBuilder;
 
@@ -235,14 +232,14 @@ public class MavenEmbedder
                             boolean namespaceDeclaration )
         throws IOException
     {
-        WriterUtils.write( writer, model, true );
+        modelWriter.write( writer, model );
     }
 
     public void writeModel( Writer writer,
                             Model model )
         throws IOException
     {
-        WriterUtils.write( writer, model, false );
+        modelWriter.write( writer, model );
     }
 
     // ----------------------------------------------------------------------
@@ -262,25 +259,17 @@ public class MavenEmbedder
             throw new IOException( "Failed to validate Settings.\n" + validationResult.render( "\n" ) );
         }
 
-        Element root = new Element( "settings" );
+        SettingsXpp3Writer writer = new SettingsXpp3Writer();
 
-        Document doc = new Document( root );
-
-        SettingsJDOMWriter writer = new SettingsJDOMWriter();
-
-        String encoding = settings.getModelEncoding() != null ? settings.getModelEncoding() : "UTF-8";
-
-        Writer fileWriter = new OutputStreamWriter( new FileOutputStream( file ), encoding );
-
-        Format format = Format.getPrettyFormat().setEncoding( encoding );
+        Writer fileWriter = new FileWriter( file );
 
         try
         {
-            writer.write( settings, doc, fileWriter, format );
+            writer.write( fileWriter, settings );
         }
         finally
         {
-            fileWriter.close();
+            IOUtil.close( fileWriter );
         }
     }
 
@@ -678,7 +667,9 @@ public class MavenEmbedder
 
             modelReader = new MavenXpp3Reader();
 
-            modelWriter = new MavenJDOMWriter();
+            modelWriter = new MavenXpp3Writer();
+
+            settingsWriter = new SettingsXpp3Writer();
 
             maven = (Maven) container.lookup( Maven.ROLE );
 

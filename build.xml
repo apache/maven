@@ -134,9 +134,7 @@ under the License.
     <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
     <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="${modello.version}" name="modello-plugin-xpp3" repository="codehaus"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-jdom" version="${modello.version}" name="modello-plugin-jdom" repository="codehaus"/>
     <pull orgpath="junit/junit" version="${junit.version}" name="junit"/>
-    <pull orgpath="jdom/jdom" version="${jdom.version}" name="jdom"/>
     <pull orgpath="org/apache/maven/artifact/maven-artifact" version="${maven-artifact.version}" name="maven-artifact"/>    
   </target>
 

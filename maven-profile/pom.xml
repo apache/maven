@@ -38,14 +38,6 @@ under the License.
           <version>1.0.0</version>
           <model>profiles.mdo</model>
         </configuration>
-        <executions>
-          <execution>
-            <id>jdom</id>
-            <goals>
-              <goal>jdom-writer</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -63,10 +55,6 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
   </dependencies>
 </project>
