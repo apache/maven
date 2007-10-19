@@ -83,17 +83,7 @@ public class DefaultExtensionManagerTest
 
             if ( f.exists() )
             {
-                try
-                {
-                    FileUtils.forceDelete( f );
-                }
-                catch ( IOException e )
-                {
-                    // TODO carlos: delete fails on windows, needs investigation
-                    // the test-extension-1.jar is locked for deletion
-                    // I traced it and seems to get locked at getRealm().findRealmResources(
-                    // name ) in org.codehaus.plexus.classworlds.strategy.DefaultStrategy:146
-                }
+                FileUtils.forceDelete( f );
             }
         }
     }
