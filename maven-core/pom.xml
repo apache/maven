@@ -96,17 +96,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interactivity-api</artifactId>
-      <version>1.0-alpha-4</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-utils</artifactId>
-          <groupId>plexus</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-      </exclusions>
+      <version>1.0-alpha-6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
