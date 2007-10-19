@@ -2619,16 +2619,18 @@
      */
     public boolean equals( Object obj )
     {
-        RepositoryBase other =  (RepositoryBase) obj;
-
-        boolean retValue = false;
-
-        if ( id != null )
-        {
-            retValue = id.equals( other.id );
-        }
-
-        return retValue;
+        if ( obj instanceof RepositoryBase ) {
+        
+            final RepositoryBase other =  (RepositoryBase) obj;
+    
+            if ( id != null )
+            {
+                return id.equals( other.id );
+            }
+            return super.equals(obj);
+        }    
+        
+        return false;
     }
             ]]>
           </code>
