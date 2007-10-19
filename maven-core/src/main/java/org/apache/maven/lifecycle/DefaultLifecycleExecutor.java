@@ -57,6 +57,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
@@ -146,7 +147,7 @@ public class DefaultLifecycleExecutor
             session,
             rootProject );
 
-        // TODO: probably don't want to do all this up front
+        // FIXME: This should be handled by the extension scanner.
         try
         {
             Map handlers = findArtifactTypeHandlers( session );
@@ -157,6 +158,7 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException(
                 "Plugin could not be not found while searching for artifact-type handlers.",
+                rootProject,
                 e );
         }
 
@@ -400,8 +402,20 @@ public class DefaultLifecycleExecutor
 
     private ClassRealm setProjectLookupRealm( MavenSession session,
                                               MavenProject rootProject )
+        throws LifecycleExecutionException
     {
-        MavenProjectSession projectSession = session.getProjectSession( rootProject );
+        MavenProjectSession projectSession;
+        try
+        {
+            projectSession = session.getProjectSession( rootProject );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new LifecycleExecutionException(
+                                                   "Failed to create project-specific session for: "
+                                                                   + rootProject.getId(),
+                                                   rootProject, e );
+        }
         if ( projectSession != null )
         {
             return container.setLookupRealm( projectSession.getProjectRealm() );
@@ -443,7 +457,7 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException(
                 "Failed to construct build plan for: " + targetDescription
-                    + ". Reason: " + e.getMessage(),
+                    + ". Reason: " + e.getMessage(), project,
                 e );
         }
 
@@ -488,6 +502,7 @@ public class DefaultLifecycleExecutor
                     throw new LifecycleExecutionException(
                         "Failed to load plugin for: "
                             + MojoBindingUtils.toString( mojoBinding ) + ". Reason: " + e.getMessage(),
+                            project,
                         e );
                 }
             }
@@ -511,36 +526,42 @@ public class DefaultLifecycleExecutor
                     throw new LifecycleExecutionException(
                         "Internal error in the plugin manager executing goal '"
                             + mojoDescriptor.getId() + "': " + e.getMessage(),
+                            project,
                         e );
                 }
                 catch ( ArtifactNotFoundException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),
+                        project,
                         e );
                 }
                 catch ( InvalidDependencyVersionException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),
+                        project,
                         e );
                 }
                 catch ( ArtifactResolutionException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),
+                        project,
                         e );
                 }
                 catch ( MojoExecutionException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),
+                        project,
                         e );
                 }
                 catch ( PluginConfigurationException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),
+                        project,
                         e );
                 }
             }
@@ -548,7 +569,7 @@ public class DefaultLifecycleExecutor
             {
                 throw new LifecycleExecutionException(
                     "Failed to load plugin for: "
-                        + MojoBindingUtils.toString( mojoBinding ) + ". Reason: unknown" );
+                        + MojoBindingUtils.toString( mojoBinding ) + ". Reason: unknown", project );
             }
         }
         catch ( LifecycleExecutionException e )
@@ -789,6 +810,7 @@ public class DefaultLifecycleExecutor
                         throw new LifecycleExecutionException(
                             "Error looking up available components from plugin '"
                                 + plugin.getKey() + "': " + e.getMessage(),
+                                project,
                             e );
                     }
 
@@ -827,36 +849,42 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException(
                 "Internal error in the plugin manager getting plugin '"
                     + plugin.getKey() + "': " + e.getMessage(),
+                    project,
                 e );
         }
         catch ( PluginVersionResolutionException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),
+                project,
                 e );
         }
         catch ( InvalidPluginException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),
+                project,
                 e );
         }
         catch ( ArtifactNotFoundException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),
+                project,
                 e );
         }
         catch ( ArtifactResolutionException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),
+                project,
                 e );
         }
         catch ( PluginVersionNotFoundException e )
         {
             throw new LifecycleExecutionException(
                 e.getMessage(),
+                project,
                 e );
         }
         return pluginDescriptor;

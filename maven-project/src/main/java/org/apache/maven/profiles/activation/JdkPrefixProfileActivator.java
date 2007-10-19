@@ -22,6 +22,9 @@ package org.apache.maven.profiles.activation;
 import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
@@ -29,9 +32,11 @@ import java.util.List;
 
 public class JdkPrefixProfileActivator
     extends DetectedProfileActivator
+    implements LogEnabled
 {
 
     public static final String JDK_VERSION = "java.version";
+    private Logger logger;
 
     public boolean isActive( Profile profile )
     {
@@ -41,6 +46,11 @@ public class JdkPrefixProfileActivator
 
         SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext( getBuildContextManager(), true );
         String javaVersion = systemContext.getSystemProperty( JDK_VERSION );
+        if ( javaVersion == null )
+        {
+            getLogger().warn( "Cannot locate java version property in SystemBuildContext: " + JDK_VERSION + ". NOT enabling profile: " + profile.getId() );
+            return false;
+        }
 
         return isActive( javaVersion, jdk );
     }
@@ -141,5 +151,20 @@ public class JdkPrefixProfileActivator
             }
         }
         return 0;
+    }
+
+    protected Logger getLogger()
+    {
+        if ( logger == null )
+        {
+            logger = new ConsoleLogger( Logger.LEVEL_INFO, "jdk-activator internal" );
+        }
+
+        return logger;
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 }

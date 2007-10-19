@@ -11,7 +11,9 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.codehaus.plexus.PlexusContainerException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -39,87 +41,116 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 public class LifecycleExecutionException
     extends Exception
 {
-    public LifecycleExecutionException( String message )
+    private final MavenProject project;
+
+    public LifecycleExecutionException( String message, MavenProject project )
     {
         super( message );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginManagerException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginNotFoundException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginVersionResolutionException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         InvalidVersionSpecificationException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         InvalidPluginException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         ArtifactNotFoundException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         ArtifactResolutionException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
     public LifecycleExecutionException( String message,
-                                        PluginLoaderException cause )
+                                        MavenProject project, PluginLoaderException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
     public LifecycleExecutionException( String message,
-                                        LifecycleException cause )
+                                        MavenProject project, LifecycleException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         InvalidDependencyVersionException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         MojoExecutionException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginConfigurationException cause )
     {
         super( message, cause );
+        this.project = project;
     }
 
-    public LifecycleExecutionException( String message,
+    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginVersionNotFoundException cause )
     {
         super( message, cause );
+        this.project = project;
+    }
+
+    public LifecycleExecutionException( String message,
+                                        MavenProject project,
+                                        PlexusContainerException cause )
+    {
+        super( message, cause );
+        this.project = project;
+    }
+
+    public MavenProject getProject()
+    {
+        return project;
     }
 
 }

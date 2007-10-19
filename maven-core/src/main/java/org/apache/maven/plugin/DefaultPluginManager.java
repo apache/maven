@@ -347,30 +347,31 @@ public class DefaultPluginManager
 
         ClassRealm pluginRealm = null;
 
-        // if we have a project session, it must mean we have extensions...
-        // which in turn may alter the execution of a plugin.
-        MavenProjectSession projectSession = session.getProjectSession( project );
-        if ( projectSession != null )
+        MavenProjectSession projectSession;
+        try
         {
-            try
-            {
-                pluginRealm = projectSession.getPluginRealm( projectPlugin );
-            }
-            catch ( NoSuchRealmException e )
-            {
-                getLogger().debug( "Plugin realm is missing for: " + projectPlugin.getKey() + ". New realm will be created." );
-            }
+            projectSession = session.getProjectSession( project );
         }
-        else
+        catch ( PlexusContainerException e )
         {
-            pluginRealm = container.getComponentRealm( key );
+            throw new PluginManagerException( plugin, "Failed to create project-specific session for project: " + project.getId()
+                                                + ".", project, e );
+        }
+
+        try
+        {
+            pluginRealm = projectSession.getPluginRealm( projectPlugin );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            getLogger().debug( "Plugin realm is missing for: " + projectPlugin.getKey() + ". New realm will be created." );
         }
 
         if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
         {
             getLogger().debug(
                                "Realm already exists for: " + key
-                                               + ". Skipping addition..." );
+                                               + " (realm id: " + pluginRealm.getId() + "). Skipping addition..." );
             // we've already discovered this plugin, and configured it, so skip it this time.
 
             return;
@@ -384,70 +385,45 @@ public class DefaultPluginManager
 
         try
         {
-            if ( projectSession != null )
+            pluginRealm = projectSession.createPluginRealm( projectPlugin );
+
+            try
             {
-                pluginRealm = projectSession.createPluginRealm( projectPlugin );
+                pluginRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
+            }
+
+            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+            {
+                Artifact artifact = (Artifact) i.next();
 
                 try
                 {
-                    pluginRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
+                    getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
+                    pluginRealm.addURL( artifact.getFile().toURI().toURL() );
                 }
                 catch ( MalformedURLException e )
                 {
-                    throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
-                }
-
-                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) i.next();
-
-                    try
-                    {
-                        getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
-                        pluginRealm.addURL( artifact.getFile().toURI().toURL() );
-                    }
-                    catch ( MalformedURLException e )
-                    {
-                        throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
-                    }
-                }
-
-                try
-                {
-                    getLogger().debug( "Discovering components in realm: " + pluginRealm );
-                    container.discoverComponents( pluginRealm, false );
-                }
-                catch ( PlexusConfigurationException e )
-                {
-                    throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
-                }
-                catch ( ComponentRepositoryException e )
-                {
-                    throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
+                    throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
                 }
             }
-            else
+
+            try
             {
-                List jars = new ArrayList();
-
-                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) i.next();
-
-                    jars.add( artifact.getFile() );
-                }
-
-                jars.add( pluginArtifact.getFile() );
-
-                // Now here we need the artifact coreArtifactFilter stuff
-                pluginRealm = container.createComponentRealm( key, jars );
+                getLogger().debug( "Discovering components in realm: " + pluginRealm );
+                container.discoverComponents( pluginRealm, false );
             }
-
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginContainerException( plugin, pluginRealm, "Failed to create realm for plugin '" + projectPlugin
-                                              + ".", e );
+            catch ( PlexusConfigurationException e )
+            {
+                throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
+            }
+            catch ( ComponentRepositoryException e )
+            {
+                throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
+            }
         }
         catch ( DuplicateRealmException e )
         {
@@ -687,12 +663,15 @@ public class DefaultPluginManager
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
+        ClassRealm oldRealm = null;
 
         try
         {
+            getLogger().debug( "Setting lookup realm and context classloader for plugin to: " + pluginRealm.getId() + " (instance is: " + pluginRealm + ")" );
+
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
-            ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
+            oldRealm = container.setLookupRealm( pluginRealm );
 
             plugin.execute();
 
@@ -710,8 +689,6 @@ public class DefaultPluginManager
                 ctx.store( buildContextManager );
             }
 
-            container.setLookupRealm( oldRealm );
-
             dispatcher.dispatchEnd( event, goalExecId );
         }
         catch ( MojoExecutionException e )
@@ -728,6 +705,10 @@ public class DefaultPluginManager
         }
         finally
         {
+            if ( oldRealm != null )
+            {
+                container.setLookupRealm( oldRealm );
+            }
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
@@ -801,90 +782,62 @@ public class DefaultPluginManager
 
         ClassRealm realm = null;
 
-        MavenProjectSession projectSession = session.getProjectSession( project );
-        if ( projectSession != null )
+        MavenProjectSession projectSession;
+        try
         {
-            try
-            {
-                realm = projectSession.getPluginRealm( pluginDescriptor );
-            }
-            catch ( NoSuchRealmException e )
-            {
-                throw new PluginManagerException( mojoDescriptor, project, "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId(), e );
-            }
+            projectSession = session.getProjectSession( project );
         }
-        else
+        catch ( PlexusContainerException e )
         {
-            realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
+                                                + ".", project, e );
+        }
+
+        try
+        {
+            realm = projectSession.getPluginRealm( pluginDescriptor );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
+            realm = projectSession.getProjectRealm();
         }
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
 
-        if ( realm != null )
+        ClassRealm oldRealm = container.setLookupRealm( realm );
+
+        getLogger().debug(
+                           "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
+                                           + realm.getId() + " - descRealmId="
+                                           + mojoDescriptor.getRealmId() );
+
+        try
         {
-            ClassRealm oldRealm = container.setLookupRealm( realm );
-
-            getLogger().debug(
-                               "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
-                                               + realm.getId() + " - descRealmId="
-                                               + mojoDescriptor.getRealmId() );
-
-            try
-            {
-                plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new PluginContainerException( mojoDescriptor, realm, "Unable to find the mojo '"
-                                                  + mojoDescriptor.getRoleHint() + "' in the plugin '"
-                                                  + pluginDescriptor.getPluginLookupKey() + "'", e );
-            }
-
-            if ( plugin != null )
-            {
-                getLogger().debug(
-                                   "Looked up - " + plugin + " - "
-                                                   + plugin.getClass().getClassLoader() );
-            }
-            else
-            {
-                getLogger().warn( "No luck." );
-            }
-
+            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new PluginContainerException( mojoDescriptor, realm, "Unable to find the mojo '"
+                                              + mojoDescriptor.getRoleHint() + "' in the plugin '"
+                                              + pluginDescriptor.getPluginLookupKey() + "'", e );
+        }
+        finally
+        {
             container.setLookupRealm( oldRealm );
+        }
+
+        if ( plugin != null )
+        {
+            getLogger().debug(
+                               "Looked up - " + plugin + " - "
+                                               + plugin.getClass().getClassLoader() );
         }
         else
         {
-            getLogger().info(
-                              "Looking up mojo " + mojoDescriptor.getRoleHint()
-                                              + " in default realm "
-                                              + container.getLookupRealm() + " - descRealmId="
-                                              + mojoDescriptor.getRealmId() );
-
-            try
-            {
-                plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new PluginContainerException( mojoDescriptor, container.getContainerRealm(), "Unable to find the mojo '"
-                                                  + mojoDescriptor.getRoleHint() + "' in the plugin '"
-                                                  + pluginDescriptor.getPluginLookupKey() + "' (using core class realm)", e );
-            }
-
-            if ( plugin != null )
-            {
-                getLogger().info(
-                                  "Looked up - " + plugin + " - "
-                                                  + plugin.getClass().getClassLoader() );
-            }
-            else
-            {
-                getLogger().warn( "No luck." );
-            }
-
+            getLogger().warn( "No luck." );
         }
 
         if ( report && !( plugin instanceof MavenReport ) )

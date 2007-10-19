@@ -3,6 +3,7 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -54,10 +55,12 @@ public class PluginManagerException
 
     protected PluginManagerException( Plugin plugin,
                                    String message,
+                                   MavenProject project,
                                    PlexusContainerException cause )
     {
         super( message, cause );
 
+        this.project = project;
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
@@ -149,6 +152,23 @@ public class PluginManagerException
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
         pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
         pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
+        goal = mojoDescriptor.getGoal();
+    }
+
+    public PluginManagerException( MojoDescriptor mojoDescriptor,
+                                   String message,
+                                   MavenProject project,
+                                   PlexusContainerException cause )
+    {
+        super( message, cause );
+
+        this.project = project;
+
+        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
+        pluginGroupId = pd.getGroupId();
+        pluginArtifactId = pd.getArtifactId();
+        pluginVersion = pd.getVersion();
+
         goal = mojoDescriptor.getGoal();
     }
 
