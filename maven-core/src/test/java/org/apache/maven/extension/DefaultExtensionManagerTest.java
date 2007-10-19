@@ -75,18 +75,25 @@ public class DefaultExtensionManagerTest
     public void tearDown()
         throws Exception
     {
+        super.tearDown();
+
         for ( Iterator it = toDelete.iterator(); it.hasNext(); )
         {
             File f = (File) it.next();
 
             if ( f.exists() )
             {
-                File f2 = File.createTempFile( "xx.", "" );
-
-                f2.delete();
-                f.renameTo( f2 );
-
-                FileUtils.forceDelete( f2 );
+                try
+                {
+                    FileUtils.forceDelete( f );
+                }
+                catch ( IOException e )
+                {
+                    // TODO carlos: delete fails on windows, needs investigation
+                    // the test-extension-1.jar is locked for deletion
+                    // I traced it and seems to get locked at getRealm().findRealmResources(
+                    // name ) in org.codehaus.plexus.classworlds.strategy.DefaultStrategy:146
+                }
             }
         }
     }
