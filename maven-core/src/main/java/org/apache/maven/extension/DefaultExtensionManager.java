@@ -188,6 +188,10 @@ public class DefaultExtensionManager
     {
         getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
 
+        // create a new MavenProjectSession instance for the current project.
+        // This session instance will house the plugin and extension realms that
+        // pertain to this specific project, along with containing the project-level
+        // realm to use as a lookupRealm in the lifecycle executor and plugin manager.
         MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( projectId );
         if ( projectSession == null )
         {
@@ -288,6 +292,9 @@ public class DefaultExtensionManager
     {
         String projectId = projectSession.getProjectId();
 
+        // Create an entire new ClassWorld, ClassRealm for discovering
+        // the immediate components of the extension artifact, so we don't pollute the
+        // container with component descriptors or realms that don't have any meaning beyond discovery.
         ClassRealm discoveryRealm = new ClassRealm( new ClassWorld(), "discovery", Thread.currentThread().getContextClassLoader() );
         try
         {
@@ -304,12 +311,16 @@ public class DefaultExtensionManager
         ClassRealm projectRealm = projectSession.getProjectRealm();
         try
         {
+            // Find the extension component descriptors that exist ONLY in the immediate extension
+            // artifact...this prevents us from adding plexus-archiver components to the mix, for instance,
+            // when the extension uses that dependency.
             List componentSetDescriptors = discoverer.findComponents( container.getContext(), discoveryRealm );
             for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
             {
                 ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
                 for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
                 {
+                    // For each component in the extension artifact:
                     ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
                     String implementation = comp.getImplementation();
 
@@ -317,9 +328,19 @@ public class DefaultExtensionManager
                     {
                         getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto project realm: " + projectRealm.getId() );
 
+                        // Import the extension component's implementation class into the project-level
+                        // realm.
                         projectRealm.importFrom( extensionRealm.getId(), implementation );
 
+                        // Set the realmId to be used in looking up this extension component to the
+                        // project-level realm, since we now have a restricted import
+                        // that allows most of the extension to stay hidden, and the
+                        // specific local extension components are still accessible
+                        // from the project-level realm.
                         comp.setRealmId( projectRealm.getId() );
+
+                        // Finally, add the extension component's descriptor (with projectRealm
+                        // set as the lookup realm) to the container.
                         container.addComponentDescriptor( comp );
                     }
                     catch ( NoSuchRealmException e )
