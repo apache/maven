@@ -72,6 +72,11 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
@@ -99,6 +104,11 @@ under the License.
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>1.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -198,12 +208,10 @@ under the License.
     <profile>
       <id>osgi</id>
       <build>
-        <pluginManagement>
           <plugins>
             <plugin>
               <groupId>org.apache.felix</groupId>
               <artifactId>maven-bundle-plugin</artifactId>
-              <version>1.0.0</version>
               <executions>
                 <execution>
                   <goals>
@@ -224,7 +232,6 @@ under the License.
               </configuration>
             </plugin>
           </plugins>
-        </pluginManagement>
       </build>
     </profile>
     <profile>
