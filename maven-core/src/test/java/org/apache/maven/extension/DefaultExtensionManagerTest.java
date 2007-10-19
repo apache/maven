@@ -81,7 +81,7 @@ public class DefaultExtensionManagerTest
 
             if ( f.exists() )
             {
-                File f2 = File.createTempFile( "preDeleteRename.", "" );
+                File f2 = File.createTempFile( "xx.", "" );
 
                 f2.delete();
                 f.renameTo( f2 );
