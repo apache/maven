@@ -204,6 +204,19 @@ under the License.
     </site>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>org.codehaus</id>
+      <name>Codehaus Snapshot Development Repository</name>
+      <url>http://snapshots.repository.codehaus.org</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+
+  </repositories>
+
+
   <profiles>
     <profile>
       <id>osgi</id>
