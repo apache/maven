@@ -20,7 +20,6 @@ import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.collections.ActiveMap;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -31,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -44,10 +44,9 @@ import java.util.StringTokenizer;
 public class DefaultLifecycleBindingManager
     implements LifecycleBindingManager, LogEnabled
 {
+    private Map bindingsByPackaging;
 
-    private ActiveMap bindingsByPackaging;
-
-    private ActiveMap legacyMappingsByPackaging;
+    private Map legacyMappingsByPackaging;
 
     private PluginLoader pluginLoader;
 

@@ -33,10 +33,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class MavenPluginCollector
-    extends AbstractLogEnabled
     implements ComponentDiscoveryListener
 {
-
     private Set pluginsInProcess = new HashSet();
 
     private Map pluginDescriptors = new HashMap();
@@ -56,13 +54,11 @@ public class MavenPluginCollector
 
             // TODO: see comment in getPluginDescriptor
             String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
-            
+
             if ( !pluginsInProcess.contains( key ) )
             {
                 pluginsInProcess.add( key );
 
-                getLogger().debug( this + ": Discovered plugin: " + key );
-                
                 pluginDescriptors.put( key, pluginDescriptor );
 
                 // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere

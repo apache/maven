@@ -45,6 +45,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.InvalidPluginException;
+import org.apache.maven.plugin.MavenPluginCollector;
+import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -329,11 +331,13 @@ public class MavenEmbedder
         try
         {
             PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
+
             return pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
         }
         catch ( ComponentLookupException e )
         {
             getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+
             return new HashMap();
         }
     }
@@ -395,7 +399,9 @@ public class MavenEmbedder
 
                 try
                 {
-                    map.putAll( getPluginExtensionComponents( plugin ) );
+                    Map extensionComponents = getPluginExtensionComponents( plugin );
+
+                    map.putAll( extensionComponents );
                 }
                 catch ( PluginManagerException e )
                 {
@@ -406,6 +412,7 @@ public class MavenEmbedder
                 for ( Iterator j = map.values().iterator(); j.hasNext(); )
                 {
                     ArtifactHandler handler = (ArtifactHandler) j.next();
+
                     if ( project.getPackaging().equals( handler.getPackaging() ) )
                     {
                         project.getArtifact().setArtifactHandler( handler );
@@ -425,9 +432,11 @@ public class MavenEmbedder
         throws ProjectBuildingException, ExtensionScanningException
     {
         getLogger().info( "Scanning for extensions: " + mavenProject );
+
         extensionScanner.scanForBuildExtensions( mavenProject, request.getLocalRepository(), request.getProfileManager(), new HashMap() );
 
         getLogger().info( "Building MavenProject instance: " + mavenProject );
+
         return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager() );
     }
 
@@ -462,6 +471,9 @@ public class MavenEmbedder
 
             Map handlers = findArtifactTypeHandlers( project );
 
+            //TODO: ok this is crappy, now there are active collections so when new artifact handlers 
+            // enter the system they should be available.
+
             artifactHandlerManager.addHandlers( handlers );
         }
         catch ( MavenEmbedderException e )
@@ -484,7 +496,7 @@ public class MavenEmbedder
             return result;
         }
 
-        MavenProjectBuildingResult projectBuildingResult = null;
+        MavenProjectBuildingResult projectBuildingResult;
 
         try
         {
@@ -633,7 +645,9 @@ public class MavenEmbedder
 
         try
         {
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
+            ContainerConfiguration cc = new DefaultContainerConfiguration()                
+                .addComponentDiscoverer( new MavenPluginDiscoverer() )                
+                .addComponentDiscoveryListener( new MavenPluginCollector() )
                 .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() ).setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );

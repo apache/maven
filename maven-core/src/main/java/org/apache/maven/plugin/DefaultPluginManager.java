@@ -348,6 +348,7 @@ public class DefaultPluginManager
         ClassRealm pluginRealm = null;
 
         MavenProjectSession projectSession;
+
         try
         {
             projectSession = session.getProjectSession( project );
@@ -414,6 +415,7 @@ public class DefaultPluginManager
             try
             {
                 getLogger().debug( "Discovering components in realm: " + pluginRealm );
+
                 container.discoverComponents( pluginRealm, false );
             }
             catch ( PlexusConfigurationException e )
@@ -1423,9 +1425,8 @@ public class DefaultPluginManager
 
         if ( pluginRealm == null )
         {
-            getLogger().warn(
-                              "getPluginComponent(" + plugin + ", " + role
-                                              + "): descriptor is missing classRealm" );
+            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+
             pluginRealm = container.getLookupRealm();
         }
 

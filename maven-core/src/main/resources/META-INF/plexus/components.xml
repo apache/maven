@@ -540,24 +540,6 @@ under the License.
     </component>
 
     <component>
-      <role>org.codehaus.plexus.collections.ActiveMap</role>
-      <role-hint>lifecycle-loaders-by-packaging</role-hint>
-      <implementation>org.codehaus.plexus.collections.DefaultActiveMap</implementation>
-      <configuration>
-        <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
-      </configuration>
-    </component>
-
-    <component>
-      <role>org.codehaus.plexus.collections.ActiveMap</role>
-      <role-hint>legacy-lifecycle-mappings-by-packaging</role-hint>
-      <implementation>org.codehaus.plexus.collections.DefaultActiveMap</implementation>
-      <configuration>
-        <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      </configuration>
-    </component>
-
-    <component>
       <role>org.apache.maven.plugin.loader.PluginLoader</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.plugin.loader.DefaultPluginLoader</implementation>
@@ -586,13 +568,11 @@ under the License.
           <role>org.apache.maven.plugin.loader.PluginLoader</role>
         </requirement>
         <requirement>
-          <role>org.codehaus.plexus.collections.ActiveMap</role>
-          <role-hint>lifecycle-loaders-by-packaging</role-hint>
+          <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
           <field-name>bindingsByPackaging</field-name>
         </requirement>
         <requirement>
-          <role>org.codehaus.plexus.collections.ActiveMap</role>
-          <role-hint>legacy-lifecycle-mappings-by-packaging</role-hint>
+          <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
           <field-name>legacyMappingsByPackaging</field-name>
         </requirement>
         <requirement>

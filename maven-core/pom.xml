@@ -112,11 +112,6 @@ under the License.
       <artifactId>plexus-classworlds</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-active-collections</artifactId>
-      <version>1.0-beta-1</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
       <version>1.0-beta-2</version>

@@ -49,8 +49,11 @@ public class MavenEmbedderProjectWithExtensionReadingTest
             throws PluginManagerException
         {
             Map toReturn = new HashMap();
+
             MyArtifactHandler handler = new MyArtifactHandler();
+
             toReturn.put( "mkleint", handler );
+
             return toReturn;
         }
 

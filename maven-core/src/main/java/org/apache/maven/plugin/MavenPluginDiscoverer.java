@@ -27,7 +27,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import java.io.Reader;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
