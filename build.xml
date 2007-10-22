@@ -158,7 +158,6 @@ under the License.
       <pathelement location="${maven.repo.local}/com/jcraft/jsch/${jsch.version}/jsch-${jsch.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
       <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
-      <pathelement location="${maven.repo.local}/jdom/jdom/${jdom.version}/jdom-${jdom.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/apache/maven/artifact/maven-artifact/${maven-artifact.version}/maven-artifact-${maven-artifact.version}.jar"/>
     </path>
     
@@ -169,10 +168,6 @@ under the License.
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/${modello.version}/modello-core-${modello.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/${modello.version}/modello-plugin-xml-${modello.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/${modello.version}/modello-plugin-xpp3-${modello.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-jdom/${modello.version}/modello-plugin-jdom-${modello.version}.jar"/>
-      <!--
-      <pathelement location="modello.jar"/>
-      -->
     </path>
     <!-- DGF pathconvert immediately so we can validate the classpath -->
     <pathconvert property="pre.classpath.str" refid="pre.classpath" pathsep="&#xa;"/>
@@ -210,7 +205,6 @@ under the License.
         <modello-single-mode file="@{file}" version="@{version}" mode="java"/>
         <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-reader"/>
         <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-writer"/>
-        <modello-single-mode file="@{file}" version="@{version}" mode="jdom-writer"/>
       </sequential>
     </macrodef>
 
