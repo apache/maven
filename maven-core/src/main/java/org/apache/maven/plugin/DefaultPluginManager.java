@@ -1255,25 +1255,19 @@ public class DefaultPluginManager
             // so that this meethod could entirely be handled by a plexus lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
-                configurator = (ComponentConfigurator) pluginContainer.lookup(
-                                                                               ComponentConfigurator.ROLE,
-                                                                               configuratorId,
-                                                                               pluginRealm );
+                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, configuratorId, pluginRealm );
             }
             else
             {
-                configurator = (ComponentConfigurator) pluginContainer.lookup(
-                                                                               ComponentConfigurator.ROLE,
-                                                                               "basic", pluginRealm );
+                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, "basic", pluginRealm );
             }
 
             ConfigurationListener listener = new DebugConfigurationListener( getLogger() );
 
-            getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' -->" );
+            getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with " + configuratorId + " configurator -->" );
 
             // This needs to be able to use methods
-            configurator.configureComponent( plugin, configuration, expressionEvaluator,
-                                             pluginRealm, listener );
+            configurator.configureComponent( plugin, configuration, expressionEvaluator, pluginRealm, listener );
 
             getLogger().debug( "-- end configuration --" );
         }

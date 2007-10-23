@@ -82,7 +82,6 @@ public class DefaultExtensionManager
     extends AbstractLogEnabled
     implements ExtensionManager, Contextualizable
 {
-
     private ArtifactFactory artifactFactory;
 
     private ArtifactResolver artifactResolver;
