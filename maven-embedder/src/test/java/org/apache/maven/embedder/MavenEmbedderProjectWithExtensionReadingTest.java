@@ -73,8 +73,6 @@ public class MavenEmbedderProjectWithExtensionReadingTest
             }
             catch ( ComponentLookupException e )
             {
-                e.printStackTrace();
-
                 throw new PluginManagerException( plugin, null );
             }
 
