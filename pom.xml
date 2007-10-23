@@ -16,7 +16,9 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
@@ -28,14 +30,16 @@ under the License.
   <packaging>pom</packaging>
   <name>Apache Maven</name>
   <version>2.1-SNAPSHOT</version>
-  <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</description>
+  <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency
+    management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be
+    extended by plugins to utilise a number of other development tools for reporting or the build process.
+  </description>
   <url>http://maven.apache.org/</url>
   <inceptionYear>2001</inceptionYear>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
-
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
@@ -116,9 +120,9 @@ under the License.
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.3</version>
-		<configuration>
+        <configuration>
           <forkMode>never</forkMode>
-		</configuration>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -191,7 +195,12 @@ under the License.
         <groupId>org.apache.maven.artifact</groupId>
         <artifactId>maven-artifact</artifactId>
         <version>3.0-SNAPSHOT</version>
-      </dependency>      
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.doxia</groupId>
+        <artifactId>doxia-sink-api</artifactId>
+        <version>1.0-alpha-9</version>
+      </dependency>
       <dependency>
         <groupId>easymock</groupId>
         <artifactId>easymock</artifactId>
@@ -206,48 +215,34 @@ under the License.
       <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
     </site>
   </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>org.codehaus</id>
-      <name>Codehaus Snapshot Development Repository</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-
-  </repositories>
-
-
   <profiles>
     <profile>
       <id>osgi</id>
       <build>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>maven-bundle-plugin</artifactId>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>manifest</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
-            <!-- Needed for including the manifest, see MJAR-71 -->
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-jar-plugin</artifactId>
-              <version>2.1</version>
-              <configuration>
-                <archive>
-                  <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                </archive>
-              </configuration>
-            </plugin>
-          </plugins>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>manifest</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Needed for including the manifest, see MJAR-71 -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+              <archive>
+                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
     <profile>
@@ -284,5 +279,4 @@ under the License.
       </modules>
     </profile>
   </profiles>
-  
 </project>
