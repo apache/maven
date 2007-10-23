@@ -34,4 +34,12 @@ public class InvalidDependencyVersionException
     {
         super( message, cause );
     }
+
+    /**
+     * @deprecated use {@link #InvalidDependencyVersionException(String, InvalidVersionSpecificationException)}
+     */
+    public InvalidDependencyVersionException( String message, Exception cause )
+    {
+        super( message, cause );
+    }
 }
