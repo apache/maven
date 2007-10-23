@@ -32,8 +32,7 @@
 @REM set MAVEN_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 @REM ----------------------------------------------------------------------------
 
-set ORIG_MAVEN_OPTS=%MAVEN_OPTS%
-set MAVEN_OPTS=%ORIG_MAVEN_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+set INT_MAVEN_OPTS=%MAVEN_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 @echo Preparing to Execute Maven in Debug Mode
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
@@ -145,7 +144,7 @@ goto runm2
 @REM Start MAVEN2
 :runm2
 
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %INT_MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
@@ -172,6 +171,6 @@ if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
 if "%MAVEN_BATCH_PAUSE%" == "on" pause
 
 if "%MAVEN_TERMINATE_CMD%" == "on" exit %ERROR_CODE%
-set MAVEN_OPTS=%ORIG_MAVEN_OPTS%
+
 exit /B %ERROR_CODE%
 
