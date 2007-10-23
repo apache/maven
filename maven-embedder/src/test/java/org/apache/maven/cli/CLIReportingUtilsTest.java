@@ -1,5 +1,13 @@
 package org.apache.maven.cli;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -16,13 +24,6 @@ import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import junit.framework.TestCase;
 
 public class CLIReportingUtilsTest
     extends TestCase
@@ -71,10 +72,10 @@ public class CLIReportingUtilsTest
         results.addMessage( validationMessage );
 
         String projectId = "test:project";
-        String projectPath = "/path/to/somewhere";
+        File projectPath = new File( "/path/to/somewhere" );
         String message = "message";
 
-        InvalidProjectModelException e = new InvalidProjectModelException( projectId, projectPath, message, results );
+        InvalidProjectModelException e = new InvalidProjectModelException( projectId, message, projectPath, results );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenExecutionResult result = new DefaultMavenExecutionResult();
@@ -98,7 +99,7 @@ public class CLIReportingUtilsTest
 
         CLIReportingUtils.logResult( request, result, logger );
         assertPresent( projectId, logger.getErrorMessages() );
-        assertPresent( projectPath, logger.getErrorMessages() );
+        assertPresent( projectPath.getPath(), logger.getErrorMessages() );
         assertPresent( message, logger.getErrorMessages() );
         assertPresent( validationMessage, logger.getErrorMessages() );
     }
