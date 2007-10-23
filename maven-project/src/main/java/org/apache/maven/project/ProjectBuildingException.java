@@ -1,5 +1,10 @@
 package org.apache.maven.project;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -8,8 +13,6 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -39,149 +42,247 @@ public class ProjectBuildingException
 {
     private final String projectId;
 
-    private String pomLocation;
+    private URI pomUri;
 
-    public ProjectBuildingException( String projectId,
-                                     String message )
+    public ProjectBuildingException( String projectId, String message )
     {
-        super( message );
-        this.projectId = projectId;
+        this( projectId, message, (URI) null );
     }
 
-    protected ProjectBuildingException( String projectId,
-                                        String message,
-                                        String pomLocation )
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @param projectId
+     * @param message
+     * @param pomLocation absolute path of the pom file
+     */
+    protected ProjectBuildingException( String projectId, String message, String pomLocation )
     {
-        super( message );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) null );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @param projectId
+     * @param message
+     * @param pomLocation absolute path of the pom file
+     * @param cause
+     */
+    private ProjectBuildingException( String projectId, String message, String pomLocation, Throwable cause )
+    {
+        this( projectId, message, new File( pomLocation ), cause );
+    }
+
+    /**
+     * 
+     * @param projectId
+     * @param message
+     * @param pomFile pom file location
+     */
+    public ProjectBuildingException( String projectId, String message, File pomFile )
+    {
+        this( projectId, message, pomFile, (Throwable) null );
+    }
+
+    /**
+     * 
+     * @param projectId
+     * @param message
+     * @param cause
+     */
+    private ProjectBuildingException( String projectId, String message, Throwable cause )
+    {
+        this( projectId, message, (URI) null, cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, URISyntaxException cause )
+    {
+        this( projectId, message, (Throwable) cause );
+    }
+
+    /**
+     * @param projectId
+     * @param message
+     * @param pomFile pom file location
+     * @param cause
+     */
+    public ProjectBuildingException( String projectId, String message, File pomFile, Throwable cause )
+    {
+        this( projectId, message, pomFile.toURI(), cause );
+    }
+
+    /**
+     * Equivalent to new ProjectBuildingException(projectId, message, pomUri, null)
+     * 
+     * @see #ProjectBuildingException(String, String, URI, Throwable)
+     */
+    public ProjectBuildingException( String projectId, String message, URI pomUri )
+    {
+        this( projectId, message, pomUri, (Throwable) null );
+    }
+
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
                                      ProfileActivationException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, new File( pomLocation ), cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
-                                     IOException cause )
+    public ProjectBuildingException( String projectId, String message, File pomLocation,
+                                     ProfileActivationException cause )
+    {
+        this( projectId, message, pomLocation, (Throwable) cause );
+    }
+
+    /**
+     * @param projectId
+     * @param message
+     * @param pomUri location of the pom
+     * @param cause
+     */
+    private ProjectBuildingException( String projectId, String message, URI pomUri, Throwable cause )
     {
         super( message, cause );
         this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this.pomUri = pomUri;
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
-                                     XmlPullParserException cause )
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation, IOException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, new File( pomLocation ), cause );
     }
 
-    protected ProjectBuildingException( String projectId,
-                                     String message,
-                                     XmlPullParserException cause )
+    public ProjectBuildingException( String projectId, String message, URI pomLocation, IOException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
-                                     InvalidRepositoryException cause )
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation, XmlPullParserException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, new File( pomLocation ), cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     InvalidRepositoryException cause )
+    public ProjectBuildingException( String projectId, String message, URI pomLocation, XmlPullParserException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
+        this( message, projectId, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
+    protected ProjectBuildingException( String projectId, String message, XmlPullParserException cause )
+    {
+        this( message, projectId, (URI) null, cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, ArtifactResolutionException cause )
+    {
+        this( projectId, message, (Throwable) cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, InvalidRepositoryException cause )
+    {
+        this( projectId, message, (Throwable) cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, ArtifactNotFoundException cause )
+    {
+        this( projectId, message, (Throwable) cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, File pomLocation,
                                      ArtifactResolutionException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     ArtifactNotFoundException cause )
-    {
-        super( message, cause );
-        this.projectId = projectId;
-    }
-
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
                                      ArtifactResolutionException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
+    public ProjectBuildingException( String projectId, String message, File pomLocation, ArtifactNotFoundException cause )
+    {
+        this( projectId, message, pomLocation, (Throwable) cause );
+    }
+
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
                                      ArtifactNotFoundException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
+    public ProjectBuildingException( String projectId, String message, File pomLocation,
                                      InvalidVersionSpecificationException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     String pomLocation,
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
+                                     InvalidVersionSpecificationException cause )
+    {
+        this( projectId, message, pomLocation, (Throwable) cause );
+    }
+
+    public ProjectBuildingException( String projectId, String message, File pomLocation,
                                      InvalidDependencyVersionException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
-    protected ProjectBuildingException( String projectId,
-                                        String message,
-                                        String pomLocation,
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
+                                     InvalidDependencyVersionException cause )
+    {
+        this( projectId, message, pomLocation, (Throwable) cause );
+    }
+
+    protected ProjectBuildingException( String projectId, String message, File pomLocation,
                                         ModelInterpolationException cause )
     {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomLocation = pomLocation;
+        this( projectId, message, pomLocation, (Throwable) cause );
     }
 
+    /**
+     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     */
+    protected ProjectBuildingException( String projectId, String message, String pomLocation,
+                                        ModelInterpolationException cause )
+    {
+        this( projectId, message, pomLocation, (Throwable) cause );
+    }
+
+    public URI getPomUri()
+    {
+        return pomUri;
+    }
+
+    /**
+     * @deprecated use {@link #getPomUri()}
+     */
     public String getPomLocation()
     {
-        return pomLocation;
+        if ( "file".equals( getPomUri().getScheme() ) )
+        {
+            return new File( getPomUri() ).getAbsolutePath();
+        }
+        return getPomUri().toString();
     }
 
     public String getProjectId()
@@ -192,7 +293,6 @@ public class ProjectBuildingException
     public String getMessage()
     {
         return super.getMessage() + " for project " + projectId
-               + ( ( pomLocation == null ? "" : " at " + pomLocation ) );
+            + ( ( getPomUri() == null ? "" : " at " + getPomLocation() ) );
     }
-
 }
