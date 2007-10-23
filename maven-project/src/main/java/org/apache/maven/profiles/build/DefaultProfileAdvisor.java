@@ -109,7 +109,7 @@ public class DefaultProfileAdvisor
 
                 String projectId = ArtifactUtils.versionlessKey( groupId, artifactId );
 
-                throw new ProjectBuildingException( projectId, e.getMessage(), pomFile, e );
+                throw new ProjectBuildingException( projectId, e.getMessage(), pomFile.getAbsolutePath(), e );
             }
 
             for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
@@ -166,7 +166,7 @@ public class DefaultProfileAdvisor
             catch ( ProfileActivationException e )
             {
                 throw new ProjectBuildingException( modelId,
-                                                    "Failed to compute active profiles for repository aggregation.", pomFile, e );
+                                                    "Failed to compute active profiles for repository aggregation.", pomFile.getAbsolutePath(), e );
             }
 
             LinkedHashSet remoteRepositories = new LinkedHashSet();
@@ -239,13 +239,13 @@ public class DefaultProfileAdvisor
             catch ( IOException e )
             {
                 throw new ProjectBuildingException( model.getId(), "Cannot read profiles.xml resource from directory: "
-                    + projectDir, pomFile, e );
+                    + projectDir, pomFile.getAbsolutePath(), e );
             }
             catch ( XmlPullParserException e )
             {
                 throw new ProjectBuildingException( model.getId(),
                                                     "Cannot parse profiles.xml resource from directory: " + projectDir,
-                                                    pomFile, e );
+                                                    pomFile.getAbsolutePath(), e );
             }
         }
     }
