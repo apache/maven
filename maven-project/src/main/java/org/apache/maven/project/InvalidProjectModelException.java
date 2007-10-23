@@ -19,117 +19,55 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.net.URI;
-
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class InvalidProjectModelException
     extends ProjectBuildingException
 {
     private ModelValidationResult validationResult;
 
-    /**
-     * 
-     * @param projectId
-     * @param message
-     * @param pomFile pom file
-     * @param cause
-     */
     public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
                                          String message,
-                                         File pomFile,
-                                         Throwable cause )
-    {
-        super( projectId, message, pomFile, cause );
-    }
-
-    /**
-     * 
-     * @param projectId
-     * @param message
-     * @param pomLocation pom location
-     * @param cause
-     */
-    public InvalidProjectModelException( String projectId,
-                                         String message,
-                                         URI pomLocation,
-                                         Throwable cause )
+                                         ModelInterpolationException cause )
     {
         super( projectId, message, pomLocation, cause );
     }
 
-    /**
-     * 
-     * @param projectId
-     * @param message
-     * @param pomLocation pom location
-     */
     public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
                                          String message,
-                                         URI pomLocation )
+                                         InvalidRepositoryException cause )
+    {
+        super( projectId, message, pomLocation, cause );
+    }
+
+    public InvalidProjectModelException( String projectId,
+                                         String pomLocation,
+                                         String message,
+                                         ModelValidationResult validationResult )
     {
         super( projectId, message, pomLocation );
-    }
-
-    /**
-     * @deprecated use {@link #InvalidProjectModelException(String, String, File, Throwable)}
-     * @param projectId
-     * @param pomLocation absolute path of the pom file
-     * @param message
-     * @param cause
-     */
-    public InvalidProjectModelException( String projectId,
-                                         String pomLocation,
-                                         String message,
-                                         Throwable cause )
-    {
-        super( projectId, message, new File( pomLocation ), cause );
-    }
-
-    /**
-     * @deprecated use {@link #InvalidProjectModelException(String, String, File, ModelValidationResult)}
-     * @param projectId
-     * @param pomLocation absolute path of the pom file
-     * @param message
-     * @param validationResult
-     */
-    public InvalidProjectModelException( String projectId,
-                                         String pomLocation,
-                                         String message,
-                                         ModelValidationResult validationResult )
-    {
-        this( projectId, message, new File( pomLocation ), validationResult );
-    }
-
-    public InvalidProjectModelException( String projectId,
-                                         String message,
-                                         File pomFile,
-                                         ModelValidationResult validationResult )
-    {
-        super( projectId, message, pomFile );
 
         this.validationResult = validationResult;
     }
 
     public InvalidProjectModelException( String projectId,
-                                         String message,
-                                         File pomLocation )
+                                         String pomLocation,
+                                         String message )
     {
         super( projectId, message, pomLocation );
     }
 
-    /**
-     * @deprecated use {@link #InvalidProjectModelException(String, String, File)}
-     * @param projectId
-     * @param pomLocation absolute path of the pom file
-     * @param message
-     */
     public InvalidProjectModelException( String projectId,
                                          String pomLocation,
-                                         String message )
+                                         String message,
+                                         XmlPullParserException cause )
     {
-        super( projectId, message, new File( pomLocation ) );
+        super( projectId, message, pomLocation, cause );
     }
 
     public final ModelValidationResult getValidationResult()

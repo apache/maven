@@ -78,8 +78,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -211,8 +209,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return buildInternal( artifact.getFile(), model, localRepository, remoteArtifactRepositories, null, null,
-                              false, false );
+        return buildInternal( "Artifact [" + artifact + "]", model, localRepository, remoteArtifactRepositories, null, null, false, false );
     }
 
     private MavenProject superProject;
@@ -292,7 +289,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( projectId,
                 "Unable to build project due to an invalid dependency version: " +
-                    e.getMessage(), projectDescriptor, e );
+                    e.getMessage(), projectDescriptor.getAbsolutePath(), e );
         }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
@@ -374,7 +371,7 @@ public class DefaultMavenProjectBuilder
                 catch ( InvalidVersionSpecificationException e )
                 {
                     throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
-                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), pomFile, e );
+                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), pomFile.getAbsolutePath(), e );
                 }
             }
         }
@@ -400,7 +397,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
-        MavenProject project = buildInternal( projectDescriptor,
+        MavenProject project = buildInternal( projectDescriptor.getAbsolutePath(),
             model,
             localRepository,
             buildArtifactRepositories( getSuperModel() ),
@@ -529,7 +526,7 @@ public class DefaultMavenProjectBuilder
     // jvz:note
     // We've got a mixture of things going in the USD and from the repository, sometimes the descriptor
     // is a real file and sometimes null which makes things confusing.
-    private MavenProject buildInternal( File pomLocation,
+    private MavenProject buildInternal( String pomLocation,
                                         Model model,
                                         ArtifactRepository localRepository,
                                         List parentSearchRepositories,
@@ -557,7 +554,7 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor, e );
+                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor.getAbsolutePath(), e );
             }
 
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
@@ -648,11 +645,11 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            throw new InvalidProjectModelException( projectId, e.getMessage(), pomLocation, e );
+            throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new InvalidProjectModelException( projectId, e.getMessage(), pomLocation, e );
+            throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
         }
 
         ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
@@ -801,7 +798,7 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( File pomLocation,
+    private MavenProject processProjectLogic( String pomLocation,
                                               MavenProject project,
                                               File pomFile,
                                               boolean strict )
@@ -885,7 +882,7 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomLocation,
+            throw new InvalidProjectModelException( projectId, pomLocation, "Failed to validate POM",
                 validationResult );
         }
 
@@ -1001,17 +998,17 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = ReaderFactory.newXmlReader( file );
-            return readModel( projectId, file.toURI(), reader, strict );
+            return readModel( projectId, file.getAbsolutePath(), reader, strict );
         }
         catch ( FileNotFoundException e )
         {
             throw new ProjectBuildingException( projectId,
-                "Could not find the model file '" + file.getAbsolutePath() + "'.", file, e );
+                "Could not find the model file '" + file.getAbsolutePath() + "'.", file.getAbsolutePath(), e );
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException( projectId, "Failed to build model from file '" +
-                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", file, e );
+                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", file.getAbsolutePath(), e );
         }
         finally
         {
@@ -1020,7 +1017,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private Model readModel( String projectId,
-                             URI pomLocation,
+                             String pomLocation,
                              Reader reader,
                              boolean strict )
         throws IOException, InvalidProjectModelException
@@ -1029,7 +1026,7 @@ public class DefaultMavenProjectBuilder
 
         if ( modelSource.indexOf( "<modelVersion>" + MAVEN_MODEL_VERSION ) < 0 )
         {
-            throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", pomLocation );
+            throw new InvalidProjectModelException( projectId, pomLocation, "Not a v" + MAVEN_MODEL_VERSION  + " POM." );
         }
 
         StringReader sReader = new StringReader( modelSource );
@@ -1040,8 +1037,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( XmlPullParserException e )
         {
-            throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(),
-                                                    pomLocation, e );
+            throw new InvalidProjectModelException( projectId, pomLocation,
+                "Parse error reading POM. Reason: " + e.getMessage(), e );
         }
     }
 
@@ -1051,22 +1048,15 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Reader reader = null;
-        URI uri = null;
         try
         {
-            uri = url.toURI();
             reader = ReaderFactory.newXmlReader( url.openStream() );
-            return readModel( projectId, uri, reader, strict );
+            return readModel( projectId, url.toExternalForm(), reader, strict );
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
-                "\'\nError: \'" + e.getLocalizedMessage() + "\'", uri, e );
-        }
-        catch ( URISyntaxException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm()
-                + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+                "\'\nError: \'" + e.getLocalizedMessage() + "\'", url.toExternalForm(), e );
         }
         finally
         {
@@ -1074,31 +1064,8 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    /**
-     * @deprecated use {@link #createPluginArtifacts(String, List, File)}
-     * @param projectId
-     * @param plugins
-     * @param pomLocation absolute path of pom file
-     * @return
-     * @throws ProjectBuildingException
-     */
     protected Set createPluginArtifacts( String projectId,
                                          List plugins, String pomLocation )
-        throws ProjectBuildingException
-    {
-        return createPluginArtifacts( projectId, plugins, new File( pomLocation ) );
-    }
-
-    /**
-     * 
-     * @param projectId
-     * @param plugins
-     * @param pomLocation pom file
-     * @return
-     * @throws ProjectBuildingException
-     */
-    protected Set createPluginArtifacts( String projectId,
-                                         List plugins, File pomLocation )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1139,24 +1106,9 @@ public class DefaultMavenProjectBuilder
         return pluginArtifacts;
     }
 
-    /**
-     * @deprecated use {@link #createReportArtifacts(String, List, File)}
-     * @param projectId
-     * @param reports
-     * @param pomLocation absolute path of pom file
-     * @return
-     * @throws ProjectBuildingException
-     */
-    protected Set createReportArtifacts( String projectId,
-                                         List reports, String pomLocation )
-        throws ProjectBuildingException
-    {
-        return createReportArtifacts( projectId, reports, new File( pomLocation ) );
-    }
-
     // TODO: share with createPluginArtifacts?
     protected Set createReportArtifacts( String projectId,
-                                         List reports, File pomLocation )
+                                         List reports, String pomLocation )
         throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
@@ -1200,24 +1152,9 @@ public class DefaultMavenProjectBuilder
         return pluginArtifacts;
     }
 
-    /**
-     * @deprecated use {@link #createExtensionArtifacts(String, List, File)}
-     * @param projectId
-     * @param extensions
-     * @param pomLocation absolute path of pom file
-     * @return
-     * @throws ProjectBuildingException
-     */
-    protected Set createExtensionArtifacts( String projectId,
-                                            List extensions, String pomLocation )
-        throws ProjectBuildingException
-    {
-        return createExtensionArtifacts( projectId, extensions, new File( pomLocation ) );
-    }
-
     // TODO: share with createPluginArtifacts?
     protected Set createExtensionArtifacts( String projectId,
-                                            List extensions, File pomLocation )
+                                            List extensions, String pomLocation )
         throws ProjectBuildingException
     {
         Set extensionArtifacts = new HashSet();
