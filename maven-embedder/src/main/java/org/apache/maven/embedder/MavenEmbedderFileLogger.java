@@ -37,7 +37,7 @@ public final class MavenEmbedderFileLogger
     {
         try
         {
-            this.log = new PrintWriter( new FileWriter( logFile ) );
+            this.log = new PrintWriter( new FileWriter( logFile ) ); // platform encoding
         }
         catch ( IOException e )
         {

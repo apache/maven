@@ -80,10 +80,10 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -263,7 +263,7 @@ public class MavenEmbedder
 
         SettingsXpp3Writer writer = new SettingsXpp3Writer();
 
-        Writer fileWriter = new FileWriter( file );
+        Writer fileWriter = WriterFactory.newXmlWriter( file );
 
         try
         {
