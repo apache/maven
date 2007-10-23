@@ -198,11 +198,11 @@ public class DefaultModelLineageBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile, pomFile.getAbsolutePath(), e );
+            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile, pomFile, e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to parse model from: " + pomFile, pomFile.getAbsolutePath(), e );
+            throw new ProjectBuildingException( "unknown", "Failed to parse model from: " + pomFile, pomFile, e );
         }
         finally
         {
@@ -251,7 +251,7 @@ public class DefaultModelLineageBuilder
             catch ( InvalidRepositoryException e )
             {
                 throw new ProjectBuildingException( model.getId(), "Failed to create ArtifactRepository list for: "
-                    + pomFile, pomFile.getAbsolutePath(), e );
+                    + pomFile, pomFile, e );
             }
         }
 
