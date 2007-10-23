@@ -1711,4 +1711,30 @@ public class MavenProject
         }
     }
     
+    /**
+     * Default toString
+     */
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(30);
+        sb.append( "MavenProject: " );
+        sb.append( this.getGroupId() );
+        sb.append( ":" );
+        sb.append( this.getArtifactId() );
+        sb.append( ":" );
+        sb.append( this.getVersion() );
+        sb.append( " @ " );
+        
+        try 
+        {
+            sb.append( this.getFile().getPath() );
+        }
+        catch (NullPointerException e)
+        {
+            //don't log it.
+        }
+        
+        return sb.toString();        
+    }
+    
 }
