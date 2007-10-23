@@ -40,8 +40,4 @@ public interface ArtifactVersion
     String getQualifier();
 
     void parseVersion( String version );
-
-    boolean equals( Object other );
-
-    int hashCode();
 }
