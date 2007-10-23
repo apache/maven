@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;

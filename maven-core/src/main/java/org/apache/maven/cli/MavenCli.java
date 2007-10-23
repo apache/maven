@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -213,14 +212,14 @@ public class MavenCli
                 // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
             }
 
-            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer() );
+            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer(),System.getProperties() );
 
             if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
             {
                 String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
 
                 StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
-
+                
                 while ( profileTokens.hasMoreTokens() )
                 {
                     String profileAction = profileTokens.nextToken().trim();
