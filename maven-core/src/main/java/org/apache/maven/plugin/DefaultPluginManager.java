@@ -1400,9 +1400,8 @@ public class DefaultPluginManager
 
         if ( pluginRealm == null )
         {
-            getLogger().warn(
-                              "getPluginComponent(" + plugin + ", " + role
-                                              + "): descriptor is missing classRealm" );
+            getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
+            
             pluginRealm = container.getLookupRealm();
         }
 

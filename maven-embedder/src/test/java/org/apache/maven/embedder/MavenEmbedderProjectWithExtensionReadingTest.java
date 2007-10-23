@@ -1,16 +1,17 @@
 package org.apache.maven.embedder;
 
-import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.util.Map;
-import java.util.HashMap;
 
 /** @author Jason van Zyl */
 public class MavenEmbedderProjectWithExtensionReadingTest
@@ -24,7 +25,25 @@ public class MavenEmbedderProjectWithExtensionReadingTest
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        MavenExecutionResult result = new ExtendableMavenEmbedder( classLoader ).readProjectWithDependencies( request );
+        MavenEmbedder embedder = new ExtendableMavenEmbedder( classLoader );
+
+        // Here we take the artifact handler and programmatically place it into the container
+
+        ComponentDescriptor cd = new ComponentDescriptor();
+
+        cd.setRole( ArtifactHandler.ROLE );
+
+        cd.setRoleHint( "mkleint" );
+
+        cd.setImplementation( MyArtifactHandler.class.getName() );
+
+        embedder.getPlexusContainer().addComponentDescriptor( cd );
+
+        // At this point the artifact handler will be inside the container and 
+        // Maven internally will pick up the artifact handler and use it accordingly to
+        // create the classpath appropriately.
+
+        MavenExecutionResult result = embedder.readProjectWithDependencies( request );
 
         assertNoExceptions( result );
 
@@ -48,13 +67,17 @@ public class MavenEmbedderProjectWithExtensionReadingTest
         protected Map getPluginExtensionComponents( Plugin plugin )
             throws PluginManagerException
         {
-            Map toReturn = new HashMap();
+            try
+            {
+                return getPlexusContainer().lookupMap( ArtifactHandler.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                e.printStackTrace();
 
-            MyArtifactHandler handler = new MyArtifactHandler();
+                throw new PluginManagerException( plugin, null );
+            }
 
-            toReturn.put( "mkleint", handler );
-
-            return toReturn;
         }
 
         protected void verifyPlugin( Plugin plugin,
@@ -64,43 +87,4 @@ public class MavenEmbedderProjectWithExtensionReadingTest
         }
     }
 
-    private class MyArtifactHandler
-        implements ArtifactHandler
-    {
-
-        public String getExtension()
-        {
-            return "jar";
-        }
-
-        public String getDirectory()
-        {
-            throw new UnsupportedOperationException( "Not supported yet." );
-        }
-
-        public String getClassifier()
-        {
-            return null;
-        }
-
-        public String getPackaging()
-        {
-            return "mkleint";
-        }
-
-        public boolean isIncludesDependencies()
-        {
-            return false;
-        }
-
-        public String getLanguage()
-        {
-            return "java";
-        }
-
-        public boolean isAddedToClasspath()
-        {
-            return true;
-        }
-    }    
 }
