@@ -36,6 +36,25 @@ public class DuplicateProjectException
 
     private final File conflictingProjectFile;
 
+    /**
+     * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
+     */
+    public DuplicateProjectException( String message )
+    {
+        this( null, null, null, message );
+    }
+    
+    /**
+     * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
+     */
+    public DuplicateProjectException( String message, Exception e )
+    {
+        super( message, e );
+        this.projectId = null;
+        this.existingProjectFile = null;
+        this.conflictingProjectFile = null;
+    }
+
     public DuplicateProjectException( String projectId,
                                       File existingProjectFile,
                                       File conflictingProjectFile,
