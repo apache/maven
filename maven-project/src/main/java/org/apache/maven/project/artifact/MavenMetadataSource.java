@@ -132,7 +132,7 @@ public class MavenMetadataSource
                 catch ( ProjectBuildingException e )
                 {
                     throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
-                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
                 }
 
                 if ( project != null )
