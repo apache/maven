@@ -25,6 +25,7 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -55,7 +56,7 @@ public class DefaultMavenExecutionRequest
 
     private boolean reactorActive;
 
-    private String pomFilename;
+    private File pom;
 
     private String failureBehavior;
 
@@ -160,14 +161,26 @@ public class DefaultMavenExecutionRequest
         return reactorActive;
     }
 
+    /** @deprecated use {@link #setPom(File)} */
     public void setPomFile( String pomFilename )
     {
-        this.pomFilename = pomFilename;
+        this.pom = new File( pomFilename );
     }
 
+    public void setPom( File pom )
+    {
+        this.pom = pom;
+    }
+
+    /** @deprecated use {@link #getPom()} */
     public String getPomFile()
     {
-        return pomFilename;
+        return pom.getAbsolutePath();
+    }
+
+    public File getPom()
+    {
+        return pom;
     }
 
     public void setFailureBehavior( String failureBehavior )

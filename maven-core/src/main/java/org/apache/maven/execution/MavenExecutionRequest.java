@@ -25,6 +25,7 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -59,9 +60,13 @@ public interface MavenExecutionRequest
 
     boolean isReactorActive();
 
+    /** @deprecated use {@link #setPom(File)} */
     void setPomFile( String pomFile );
-
+    /** @deprecated use {@link #getPom()} */
     String getPomFile();
+
+    void setPom( File pom );
+    File getPom();
 
     void setFailureBehavior( String failureBehavior );
 
