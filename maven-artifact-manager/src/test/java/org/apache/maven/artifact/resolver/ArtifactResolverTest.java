@@ -109,13 +109,15 @@ public class ArtifactResolverTest
 
                 if ( "g".equals( artifact.getArtifactId() ) )
                 {
+                    Artifact a = null;
                     try
                     {
-                        dependencies.add( createArtifact( "org.apache.maven", "h", "1.0", "jar" ) );
+                        a = createArtifact( "org.apache.maven", "h", "1.0", "jar" );
+                        dependencies.add( a );
                     }
                     catch ( Exception e )
                     {
-                        throw new ArtifactMetadataRetrievalException( e );
+                        throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
                     }
                 }
 
@@ -163,13 +165,15 @@ public class ArtifactResolverTest
 
                 if ( "i".equals( artifact.getArtifactId() ) )
                 {
+                    Artifact a = null;
                     try
                     {
-                        dependencies.add( createArtifact( "org.apache.maven", "j", "1.0", "jar" ) );
+                        a = createArtifact( "org.apache.maven", "j", "1.0", "jar" );
+                        dependencies.add( a );
                     }
                     catch ( Exception e )
                     {
-                        throw new ArtifactMetadataRetrievalException( e );
+                        throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
                     }
                 }
 
