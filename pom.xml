@@ -40,6 +40,18 @@ under the License.
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
+  
+  <!-- TODO: Disable this once we've released the next version of plexus-container-default. -->
+  <repositories>
+    <repository>
+      <id>codehaus.snapshots</id>
+      <url>http://snapshots.repository.codehaus.org/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
