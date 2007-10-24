@@ -323,7 +323,7 @@ public class MavenEmbedder
 
         try
         {
-            pluginManager.verifyPlugin( plugin, project, session );
+        pluginManager.verifyPlugin( plugin, project, session );
         }
         finally
         {
@@ -478,7 +478,7 @@ public class MavenEmbedder
 
             Map handlers = findArtifactTypeHandlers( project );
 
-            //TODO: ok this is crappy, now there are active collections so when new artifact handlers
+            //TODO: ok this is crappy, now there are active collections so when new artifact handlers 
             // enter the system they should be available.
 
             artifactHandlerManager.addHandlers( handlers );
@@ -508,7 +508,7 @@ public class MavenEmbedder
         try
         {
             projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
-                new File( request.getPomFile() ),
+                request.getPom(),
                 request.getLocalRepository(),
                 request.getProfileManager() );
         }
@@ -652,8 +652,8 @@ public class MavenEmbedder
 
         try
         {
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .addComponentDiscoverer( new MavenPluginDiscoverer() )
+            ContainerConfiguration cc = new DefaultContainerConfiguration()                
+                .addComponentDiscoverer( new MavenPluginDiscoverer() )                
                 .addComponentDiscoveryListener( new MavenPluginCollector() )
                 .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() ).setName( "embedder" );
 
