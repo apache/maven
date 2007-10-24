@@ -1054,7 +1054,7 @@ public class DefaultMavenProjectBuilder
         URI uri = null;
         try
         {
-            uri = url.toURI();
+            uri = new URI( url.toString() );
             reader = ReaderFactory.newXmlReader( url.openStream() );
             return readModel( projectId, uri, reader, strict );
         }
