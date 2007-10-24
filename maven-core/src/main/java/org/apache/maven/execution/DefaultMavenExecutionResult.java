@@ -29,6 +29,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** @author Jason van Zyl */
@@ -83,7 +84,7 @@ public class DefaultMavenExecutionResult
 
     public List getExceptions()
     {
-        return exceptions;
+        return exceptions == null ? Collections.EMPTY_LIST : exceptions;
     }
 
     public MavenExecutionResult addExtensionScanningException( ExtensionScanningException e )
@@ -147,7 +148,7 @@ public class DefaultMavenExecutionResult
 
     public boolean hasExceptions()
     {
-        return (( exceptions != null ) && ( exceptions.size() > 0 ) );
+        return !getExceptions().isEmpty();
     }
 
     public ReactorManager getReactorManager()
