@@ -861,9 +861,9 @@ public class DefaultMaven
             // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
             Collections.sort( files );
         }
-        else if ( request.getPom() != null )
+        else if ( request.getPomFile() != null )
         {
-            File projectFile = request.getPom().getAbsoluteFile();
+            File projectFile = new File( request.getPomFile() ).getAbsoluteFile();
 
             if ( projectFile.exists() )
             {
