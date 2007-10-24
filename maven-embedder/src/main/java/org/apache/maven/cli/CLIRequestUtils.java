@@ -193,14 +193,13 @@ public final class CLIRequestUtils
 
         Properties executionProperties = getExecutionProperties( commandLine );
 
-        return new DefaultMavenExecutionRequest()
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
             .setProperties( executionProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setUseReactor( useReactor ) // default: false
-            .setPomFile( alternatePomFile ) // optional
             .setShowErrors( showErrors ) // default: false
             .setInteractiveMode( interactive ) // default: false
             .setOffline( offline ) // default: false
@@ -212,6 +211,13 @@ public final class CLIRequestUtils
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
+
+        if ( alternatePomFile != null )
+        {
+            request.setPom( new File( alternatePomFile ) );
+        }
+
+        return request;
     }
 
     // ----------------------------------------------------------------------

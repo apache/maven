@@ -39,7 +39,7 @@ public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
     private ArtifactRepository localRepository;
-    
+
     private File localRepositoryPath;
 
     private boolean offline = false;
@@ -81,7 +81,7 @@ public class DefaultMavenExecutionRequest
     private boolean useReactor = false;
 
     private boolean recursive = true;
-    
+
     private File pom;
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
@@ -111,7 +111,7 @@ public class DefaultMavenExecutionRequest
     private List remoteRepositories;
 
     /**
-     * Suppress SNAPSHOT updates. 
+     * Suppress SNAPSHOT updates.
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
@@ -276,14 +276,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setLocalRepositoryPath( File localRepository )
     {
-        this.localRepositoryPath = localRepository;
+        localRepositoryPath = localRepository;
 
         return this;
     }
 
     public MavenExecutionRequest setLocalRepositoryPath( String localRepository )
     {
-        this.localRepositoryPath = new File( localRepository );
+        localRepositoryPath = new File( localRepository );
 
         return this;
     }
@@ -316,7 +316,7 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setReactorFailureBehavior( String failureBehavior )
     {
-        this.reactorFailureBehavior = failureBehavior;
+        reactorFailureBehavior = failureBehavior;
 
         return this;
     }
@@ -363,7 +363,7 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setUseReactor( boolean reactorActive )
     {
-        this.useReactor = reactorActive;
+        useReactor = reactorActive;
 
         return this;
     }
@@ -376,7 +376,10 @@ public class DefaultMavenExecutionRequest
     /** @deprecated use {@link #setPom(File)} */
     public MavenExecutionRequest setPomFile( String pomFilename )
     {
-        this.pom = new File( pomFilename );
+        if ( pomFilename != null )
+        {
+            pom = new File( pomFilename );
+        }
 
         return this;
     }
@@ -390,7 +393,7 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setInteractiveMode( boolean interactive )
     {
-        this.interactiveMode = interactive;
+        interactiveMode = interactive;
 
         return this;
     }
@@ -438,7 +441,7 @@ public class DefaultMavenExecutionRequest
     }
 
     // ----------------------------------------------------------------------------
-    // Settings equivalents 
+    // Settings equivalents
     // ----------------------------------------------------------------------------
 
     public List getProxies()
@@ -591,7 +594,7 @@ public class DefaultMavenExecutionRequest
             remoteRepositories = new ArrayList();
         }
 
-        remoteRepositories.add( repository ); 
+        remoteRepositories.add( repository );
 
         return this;
     }
