@@ -141,10 +141,9 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request =
-            new DefaultMavenExecutionRequest().setPomFile( new File( targetDirectory, "pom.xml" )
-                .getAbsolutePath() )
-                .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"package"} ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "package" } ) );
 
         MavenExecutionResult result = maven.execute( request );
 
@@ -171,8 +170,8 @@ public class MavenEmbedderTest
         // Check with profile not active
 
         MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
-            .setPomFile( new File( targetDirectory, "pom.xml" ).getAbsolutePath() ).setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{"validate"} ) );
+            .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "validate" } ) );
 
         MavenExecutionResult r0 = maven.execute( requestWithoutProfile );
 
@@ -188,11 +187,11 @@ public class MavenEmbedderTest
 
         // Check with profile activated
 
-        MavenExecutionRequest request =
-            new DefaultMavenExecutionRequest().setPomFile( new File( targetDirectory, "pom.xml" )
-                .getAbsolutePath() )
-                .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"validate"} ) )
-                .addActiveProfile( "embedderProfile" );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setPom( new File( targetDirectory, "pom.xml" ) )
+            .setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "validate" } ) )
+            .addActiveProfile( "embedderProfile" );
 
         MavenExecutionResult r1 = maven.execute( request );
 
@@ -235,8 +234,8 @@ public class MavenEmbedderTest
         writer.close();
 
         /* execute maven */
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPomFile( pom.getAbsolutePath() )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[] { "package" } ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "package" } ) );
 
         MavenExecutionResult result = maven.execute( request );
 
@@ -254,7 +253,7 @@ public class MavenEmbedderTest
         writer.close();
 
         /* execute Maven */
-        request = new DefaultMavenExecutionRequest().setPomFile( pom.getAbsolutePath() ).setShowErrors( true )
+        request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
         result = maven.execute( request );
 
@@ -311,8 +310,7 @@ public class MavenEmbedderTest
     public void testProjectReading()
         throws Exception
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( getPomFile().getAbsolutePath() );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true ).setPom( getPomFile() );
 
         MavenExecutionResult result = maven.readProjectWithDependencies( request );
 

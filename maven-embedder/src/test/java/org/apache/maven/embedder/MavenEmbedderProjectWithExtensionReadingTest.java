@@ -21,7 +21,7 @@ public class MavenEmbedderProjectWithExtensionReadingTest
         throws Exception
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( new File( basedir, "src/test/resources/pom2.xml" ).getAbsolutePath() );
+            .setPom( new File( basedir, "src/test/resources/pom2.xml" ) );
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
