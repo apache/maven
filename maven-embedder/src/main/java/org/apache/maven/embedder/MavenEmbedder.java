@@ -467,7 +467,7 @@ public class MavenEmbedder
             // If the artifact handlers are not loaded up-front then this dependency element is not
             // registered as an artifact and is not added to the classpath elements.
 
-            MavenProject project = readProject( new File( request.getPomFile() ) );
+            MavenProject project = readProject( request.getPom() );
 
             Map handlers = findArtifactTypeHandlers( project );
 

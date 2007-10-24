@@ -199,9 +199,9 @@ public class DefaultMavenExecutionRequestPopulator
         // look for the standard POM.
         // ------------------------------------------------------------------------
 
-        if ( request.getPomFile() != null )
+        if ( request.getPom() != null )
         {
-            request.setBaseDirectory( new File( request.getPomFile() ) );
+            request.setBaseDirectory( request.getPom() );
         }
         else if ( request.getBaseDirectory() != null )
         {
@@ -213,7 +213,7 @@ public class DefaultMavenExecutionRequestPopulator
                 pom = new File( request.getBaseDirectory(), Maven.POMv4 );
             }
 
-            request.setPomFile( pom.getAbsolutePath() );
+            request.setPom( pom );
         }
     }
 
