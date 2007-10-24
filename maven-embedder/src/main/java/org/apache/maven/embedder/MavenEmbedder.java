@@ -321,7 +321,14 @@ public class MavenEmbedder
 
         MavenSession session = new MavenSession( container, request, null, null, new HashMap() );
 
-        pluginManager.verifyPlugin( plugin, project, session );
+        try
+        {
+            pluginManager.verifyPlugin( plugin, project, session );
+        }
+        finally
+        {
+            session.dispose();
+        }
     }
 
     /** protected for tests only.. */
@@ -471,7 +478,7 @@ public class MavenEmbedder
 
             Map handlers = findArtifactTypeHandlers( project );
 
-            //TODO: ok this is crappy, now there are active collections so when new artifact handlers 
+            //TODO: ok this is crappy, now there are active collections so when new artifact handlers
             // enter the system they should be available.
 
             artifactHandlerManager.addHandlers( handlers );
@@ -645,8 +652,8 @@ public class MavenEmbedder
 
         try
         {
-            ContainerConfiguration cc = new DefaultContainerConfiguration()                
-                .addComponentDiscoverer( new MavenPluginDiscoverer() )                
+            ContainerConfiguration cc = new DefaultContainerConfiguration()
+                .addComponentDiscoverer( new MavenPluginDiscoverer() )
                 .addComponentDiscoveryListener( new MavenPluginCollector() )
                 .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() ).setName( "embedder" );
 

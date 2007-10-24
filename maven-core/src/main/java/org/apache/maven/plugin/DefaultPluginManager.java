@@ -664,7 +664,28 @@ public class DefaultPluginManager
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
-        ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
+        MavenProjectSession projectSession;
+        try
+        {
+            projectSession = session.getProjectSession( project );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
+                                                + ".", project, e );
+        }
+
+        ClassRealm pluginRealm;
+        try
+        {
+            pluginRealm = projectSession.getPluginRealm( pluginDescriptor );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
+            pluginRealm = projectSession.getProjectRealm();
+        }
+
         ClassRealm oldRealm = null;
 
         try
@@ -707,6 +728,7 @@ public class DefaultPluginManager
         }
         finally
         {
+            pluginDescriptor.setClassRealm( null );
             if ( oldRealm != null )
             {
                 container.setLookupRealm( oldRealm );
@@ -810,6 +832,7 @@ public class DefaultPluginManager
         // lookups that occur in contextualize calls in line with the right realm.
 
         ClassRealm oldRealm = container.setLookupRealm( realm );
+        pluginDescriptor.setClassRealm( realm );
 
         getLogger().debug(
                            "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "

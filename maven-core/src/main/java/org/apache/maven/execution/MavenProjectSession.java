@@ -12,6 +12,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -54,6 +55,40 @@ public class MavenProjectSession
         projectRealm = container.createComponentRealm( projectId, Collections.EMPTY_LIST );
     }
 
+    public void dispose()
+    {
+        for ( Iterator it = componentRealms.values().iterator(); it.hasNext(); )
+        {
+            ClassRealm realm = (ClassRealm) it.next();
+            disposeRealm( realm );
+        }
+
+        disposeRealm( projectRealm );
+        try
+        {
+            container.removeComponentRealm( projectRealm );
+        }
+        catch( PlexusContainerException e )
+        {
+            e.printStackTrace();
+        }
+
+        componentRealms.clear();
+        projectRealm = null;
+    }
+
+    private void disposeRealm( ClassRealm realm )
+    {
+        try
+        {
+            realm.getWorld().disposeRealm( realm.getId() );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            // impossible
+        }
+    }
+
     public String getProjectId()
     {
         return projectId;
@@ -66,12 +101,24 @@ public class MavenProjectSession
 
     public boolean containsExtensionRealm( Artifact extensionArtifact )
     {
+        checkDisposed();
+
         String id = createExtensionRealmId( extensionArtifact );
         return componentRealms.containsKey( id );
     }
 
+    private void checkDisposed()
+    {
+        if ( projectRealm == null )
+        {
+            throw new IllegalStateException( "MavenProjectSession for: " + projectId + " with hashcode: " + hashCode() + " has been disposed, and is no longer valid for use." );
+        }
+    }
+
     public boolean containsPluginRealm( Plugin plugin )
     {
+        checkDisposed();
+
         String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
 
         return componentRealms.containsKey( realmId );
@@ -96,6 +143,8 @@ public class MavenProjectSession
     public ClassRealm createExtensionRealm( Artifact extensionArtifact )
         throws DuplicateRealmException
     {
+        checkDisposed();
+
         String realmId = createExtensionRealmId( extensionArtifact );
         ClassRealm extRealm = container.getContainerRealm().createChildRealm( realmId );
 
@@ -124,6 +173,8 @@ public class MavenProjectSession
     public ClassRealm getPluginRealm( Plugin plugin )
         throws NoSuchRealmException
     {
+        checkDisposed();
+
         String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
 
         return projectRealm.getWorld().getRealm( realmId );
@@ -133,6 +184,8 @@ public class MavenProjectSession
     public ClassRealm createPluginRealm( Plugin plugin )
         throws DuplicateRealmException
     {
+        checkDisposed();
+
         String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() ) );
 
         ClassRealm extRealm = projectRealm.createChildRealm( realmId );
@@ -150,6 +203,8 @@ public class MavenProjectSession
     public ClassRealm getPluginRealm( PluginDescriptor pd )
         throws NoSuchRealmException
     {
+        checkDisposed();
+
         String realmId = createPluginRealmId( ArtifactUtils.versionlessKey( pd.getGroupId(), pd.getArtifactId() ) );
 
         ClassRealm extRealm = projectRealm.getWorld().getRealm( realmId );
