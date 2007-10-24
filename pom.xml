@@ -131,7 +131,7 @@ under the License.
     </dependency>
   </dependencies>
   <properties>
-    <mavenVersion>2.0.8-SNAPSHOT</mavenVersion>
+    <mavenVersion>2.0.8</mavenVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
