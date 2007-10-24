@@ -19,6 +19,8 @@ package org.apache.maven.artifact.metadata;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 /**
  * Error while retrieving repository metadata from the repository.
  * 
@@ -28,18 +30,41 @@ package org.apache.maven.artifact.metadata;
 public class ArtifactMetadataRetrievalException
     extends Exception
 {
+
+    private Artifact artifact;
+
+    /**
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     public ArtifactMetadataRetrievalException( String message )
     {
-        super( message );
+        this( message, null, null );
     }
 
+    /**
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     public ArtifactMetadataRetrievalException( Throwable cause )
     {
-        super( cause );
+        this( null, cause, null );
     }
 
+    /**
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     public ArtifactMetadataRetrievalException( String message, Throwable cause )
     {
+        this( message, cause, null );
+    }
+
+    public ArtifactMetadataRetrievalException( String message, Throwable cause, Artifact artifact )
+    {
         super( message, cause );
+        this.artifact = artifact;
+    }
+
+    public Artifact getArtifact()
+    {
+        return artifact;
     }
 }
