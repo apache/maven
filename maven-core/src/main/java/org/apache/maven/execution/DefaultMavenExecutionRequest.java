@@ -82,7 +82,7 @@ public class DefaultMavenExecutionRequest
 
     private boolean recursive = true;
     
-    private String pomFile;
+    private File pom;
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
@@ -146,9 +146,15 @@ public class DefaultMavenExecutionRequest
         return properties;
     }
 
+    /** @deprecated use {@link #getPom()} */
     public String getPomFile()
     {
-        return pomFile;
+        return pom.getAbsolutePath();
+    }
+
+    public File getPom()
+    {
+        return pom;
     }
 
     public String getReactorFailureBehavior()
@@ -367,9 +373,17 @@ public class DefaultMavenExecutionRequest
         return useReactor;
     }
 
+    /** @deprecated use {@link #setPom(File)} */
     public MavenExecutionRequest setPomFile( String pomFilename )
     {
-        this.pomFile = pomFilename;
+        this.pom = new File( pomFilename );
+
+        return this;
+    }
+
+    public MavenExecutionRequest setPom( File pom )
+    {
+        this.pom = pom;
 
         return this;
     }

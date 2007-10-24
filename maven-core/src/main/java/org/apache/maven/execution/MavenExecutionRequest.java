@@ -109,8 +109,13 @@ public interface MavenExecutionRequest
     List getEventMonitors();
 
     // Pom
+    /** @deprecated use {@link #setPom(File)} */
     MavenExecutionRequest setPomFile( String pomFilename );
+    /** @deprecated use {@link #getPom()} */
     String getPomFile();
+
+    MavenExecutionRequest setPom( File pom );
+    File getPom();
 
     // Errors
     MavenExecutionRequest setShowErrors( boolean showErrors );

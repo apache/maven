@@ -108,7 +108,7 @@ public class ExecutionBuildContext
 
     public String getPomFile()
     {
-        return request.getPomFile();
+        return request.getPom().getAbsolutePath();
     }
 
     public List getProfiles()
