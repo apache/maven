@@ -1385,7 +1385,7 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = artifactResolver.resolveTransitively(
                                                                                 project.getDependencyArtifacts(),
                                                                                 artifact,
-                                                                                Collections.EMPTY_MAP,
+                                                                                project.getManagedVersionMap(),
                                                                                 context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
                                                                                 artifactMetadataSource,
@@ -1424,7 +1424,7 @@ public class DefaultPluginManager
         if ( pluginRealm == null )
         {
             getLogger().warn( "getPluginComponent(" + plugin + ", " + role + "): descriptor is missing classRealm" );
-            
+
             pluginRealm = container.getLookupRealm();
         }
 

@@ -340,6 +340,11 @@ public class DefaultMavenProjectBuilder
                     Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
                         d.getClassifier(), d.getScope(), d.isOptional() );
 
+                    if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && ( d.getSystemPath() != null ) )
+                    {
+                        artifact.setFile( new File( d.getSystemPath() ) );
+                    }
+
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "  " + artifact );
@@ -1090,7 +1095,7 @@ public class DefaultMavenProjectBuilder
     }
 
     /**
-     * 
+     *
      * @param projectId
      * @param plugins
      * @param pomLocation pom file
