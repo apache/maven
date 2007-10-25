@@ -53,7 +53,7 @@ public interface Maven
 
     static final int LOGGING_LEVEL_DISABLE = 5;
 
-    MavenExecutionResult execute( MavenExecutionRequest request );
+    MavenExecutionResult execute( MavenExecutionRequest request, Map projectSessions );
 
     ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result, Map projectSessions );
 }

@@ -30,7 +30,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,15 +70,6 @@ public class MavenSession
         this.reactorManager = reactorManager;
 
         this.projectSessions = projectSessions == null ? new HashMap() : projectSessions;
-    }
-
-    public void dispose()
-    {
-        for ( Iterator it = projectSessions.values().iterator(); it.hasNext(); )
-        {
-            MavenProjectSession session = (MavenProjectSession) it.next();
-            session.dispose();
-        }
     }
 
     // TODO: Figure out how/when we can shut down all the realms for extensions/plugins connected to each project session...

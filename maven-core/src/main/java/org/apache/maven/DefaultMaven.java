@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -160,13 +159,11 @@ public class DefaultMaven
         return reactorManager;
     }
 
-    public MavenExecutionResult execute( MavenExecutionRequest request )
+    public MavenExecutionResult execute( MavenExecutionRequest request, Map projectSessions )
     {
         request.setStartTime( new Date() );
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
-
-        Map projectSessions = new HashMap();
 
         ReactorManager reactorManager = createReactorManager(
             request,
@@ -192,66 +189,59 @@ public class DefaultMaven
             dispatcher,
             projectSessions );
 
+        for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
+        {
+            String goal = (String) i.next();
+
+            TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
+
+            if ( !tvr.isTaskValid() )
+            {
+                result.addBuildFailureException( new InvalidTaskException( tvr ) );
+
+                return result;
+            }
+        }
+
+        getLogger().info( "Scanning for projects..." );
+
+        if ( reactorManager.hasMultipleProjects() )
+        {
+            getLogger().info( "Reactor build order: " );
+
+            for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
+            {
+                MavenProject project = (MavenProject) i.next();
+
+                getLogger().info( "  " + project.getName() );
+            }
+        }
+
+        initializeBuildContext( request );
+
         try
         {
-            for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
-            {
-                String goal = (String) i.next();
-
-                TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
-
-                if ( !tvr.isTaskValid() )
-                {
-                    result.addBuildFailureException( new InvalidTaskException( tvr ) );
-
-                    return result;
-                }
-            }
-
-            getLogger().info( "Scanning for projects..." );
-
-            if ( reactorManager.hasMultipleProjects() )
-            {
-                getLogger().info( "Reactor build order: " );
-
-                for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
-                {
-                    MavenProject project = (MavenProject) i.next();
-
-                    getLogger().info( "  " + project.getName() );
-                }
-            }
-
-            initializeBuildContext( request );
-
-            try
-            {
-                lifecycleExecutor.execute(
-                    session,
-                    reactorManager,
-                    dispatcher );
-            }
-            catch ( LifecycleExecutionException e )
-            {
-                result.addLifecycleExecutionException( e );
-                return result;
-            }
-            catch ( BuildFailureException e )
-            {
-                result.addBuildFailureException( e );
-                return result;
-            }
-
-            result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-
-            result.setProject( reactorManager.getTopLevelProject() );
-
+            lifecycleExecutor.execute(
+                session,
+                reactorManager,
+                dispatcher );
+        }
+        catch ( LifecycleExecutionException e )
+        {
+            result.addLifecycleExecutionException( e );
             return result;
         }
-        finally
+        catch ( BuildFailureException e )
         {
-            session.dispose();
+            result.addBuildFailureException( e );
+            return result;
         }
+
+        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+
+        result.setProject( reactorManager.getTopLevelProject() );
+
+        return result;
     }
 
     /**
