@@ -2,8 +2,7 @@ package org.apache.maven.extension;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -18,6 +17,7 @@ public class ExtensionManagerException
 
     private Artifact extensionArtifact;
     private final String projectId;
+    private ArtifactResolutionResult resolutionResult;
 
     public ExtensionManagerException( String message,
                                       Artifact extensionArtifact,
@@ -33,26 +33,6 @@ public class ExtensionManagerException
                                       Artifact extensionArtifact,
                                       String projectId,
                                       DuplicateRealmException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectId = projectId;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectId,
-                                      ArtifactResolutionException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectId = projectId;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectId,
-                                      ArtifactNotFoundException cause )
     {
         super( message, cause );
         this.extensionArtifact = extensionArtifact;
@@ -115,6 +95,26 @@ public class ExtensionManagerException
         this.projectId = projectId;
     }
 
+    public ExtensionManagerException( String message,
+                                      Artifact extensionArtifact,
+                                      String projectId )
+    {
+        super( message );
+        this.extensionArtifact = extensionArtifact;
+        this.projectId = projectId;
+    }
+
+    public ExtensionManagerException( String message,
+                                      Artifact extensionArtifact,
+                                      String projectId,
+                                      ArtifactResolutionResult result )
+    {
+        super( message );
+        this.extensionArtifact = extensionArtifact;
+        this.projectId = projectId;
+        resolutionResult = result;
+    }
+
     public Artifact getExtensionArtifact()
     {
         return extensionArtifact;
@@ -123,6 +123,11 @@ public class ExtensionManagerException
     public String getProjectId()
     {
         return projectId;
+    }
+
+    public ArtifactResolutionResult getArtifactResolutionResult()
+    {
+        return resolutionResult;
     }
 
 }

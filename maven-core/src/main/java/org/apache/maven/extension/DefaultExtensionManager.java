@@ -28,8 +28,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -65,9 +64,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 import java.net.MalformedURLException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -207,11 +205,19 @@ public class DefaultExtensionManager
             projectSessions.put( projectId, projectSession );
         }
 
-        // if the extension is null, or if it's already been added to the current project-session, skip it.
-        if ( ( extensionArtifact != null ) && !projectSession.containsExtensionRealm( extensionArtifact ) )
+        ArtifactFilter coreFilter = artifactFilterManager.getArtifactFilter();
+
+        // if the extension is null,
+        // if it's already been added to the current project-session,
+        // or if it's excluded by the core filter,
+        //
+        // skip it.
+        if ( ( extensionArtifact != null )
+             && !projectSession.containsExtensionRealm( extensionArtifact )
+             && coreFilter.include( extensionArtifact ) )
         {
             ArtifactFilter filter =
-                new ProjectArtifactExceptionFilter( artifactFilterManager.getArtifactFilter(), projectArtifact );
+                new ProjectArtifactExceptionFilter( coreFilter, projectArtifact );
 
             ResolutionGroup resolutionGroup;
 
@@ -229,25 +235,32 @@ public class DefaultExtensionManager
             // not declare plexus-utils but need it. MNG-2900
             DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
 
-            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+            Set dependencies = new LinkedHashSet();
 
             dependencies.add( extensionArtifact );
+            dependencies.addAll( resolutionGroup.getArtifacts() );
+
+            ArtifactResolutionRequest dependencyReq = new ArtifactResolutionRequest().setArtifact( projectArtifact )
+                                                                           .setArtifactDependencies( dependencies )
+                                                                           .setFilter( filter )
+                                                                           .setLocalRepository( localRepository )
+                                                                           .setRemoteRepostories( remoteRepositories )
+                                                                           .setMetadataSource( artifactMetadataSource );
 
             // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
-            ArtifactResolutionResult result;
-            try
+            ArtifactResolutionResult result = artifactResolver.resolve( dependencyReq );
+
+            if ( result.hasCircularDependencyExceptions() || result.hasErrorArtifactExceptions()
+                 || result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations() )
             {
-                result = artifactResolver.resolveTransitively( dependencies, projectArtifact,
-                                                      Collections.EMPTY_MAP, localRepository, remoteRepositories,
-                                                      artifactMetadataSource, filter );
+                throw new ExtensionManagerException( "Failed to resolve extension: " + extensionArtifact, extensionArtifact, projectId, result );
             }
-            catch ( ArtifactResolutionException e )
+
+            Set resultArtifacts = result.getArtifacts();
+
+            if ( !extensionArtifact.isResolved() || ( extensionArtifact.getFile() == null ) )
             {
-                throw new ExtensionManagerException( "Unable to resolve one or more extension artifacts for: " + extensionArtifact.getId(), extensionArtifact, projectId, e );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new ExtensionManagerException( "One or more extension artifacts is missing for: " + extensionArtifact.getId(), extensionArtifact, projectId, e );
+                throw new ExtensionManagerException( "Extension artifact was not resolved, or has no file associated with it.", extensionArtifact, projectId );
             }
 
             ClassRealm extensionRealm;
@@ -260,7 +273,7 @@ public class DefaultExtensionManager
                 throw new ExtensionManagerException( "Unable to create extension ClassRealm for extension: " + extensionArtifact.getId() + " within session for project: " + projectId, extensionArtifact, projectId, e );
             }
 
-            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            for ( Iterator i = resultArtifacts.iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
 
