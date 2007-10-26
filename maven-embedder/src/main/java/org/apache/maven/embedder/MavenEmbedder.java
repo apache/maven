@@ -470,12 +470,12 @@ public class MavenEmbedder
 
             MavenProject project = readProject( request.getPom() );
 
-            Map handlers = findArtifactTypeHandlers( project );
+//            Map handlers = findArtifactTypeHandlers( project );
 
             //TODO: ok this is crappy, now there are active collections so when new artifact handlers
             // enter the system they should be available.
 
-            artifactHandlerManager.addHandlers( handlers );
+//            artifactHandlerManager.addHandlers( handlers );
         }
         catch ( MavenEmbedderException e )
         {

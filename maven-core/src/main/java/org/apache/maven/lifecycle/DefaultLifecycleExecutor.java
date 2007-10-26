@@ -148,19 +148,19 @@ public class DefaultLifecycleExecutor
             rootProject );
 
         // FIXME: This should be handled by the extension scanner.
-        try
-        {
-            Map handlers = findArtifactTypeHandlers( session );
-
-            artifactHandlerManager.addHandlers( handlers );
-        }
-        catch ( PluginNotFoundException e )
-        {
-            throw new LifecycleExecutionException(
-                "Plugin could not be not found while searching for artifact-type handlers.",
-                rootProject,
-                e );
-        }
+//        try
+//        {
+//            Map handlers = findArtifactTypeHandlers( session );
+//
+//            artifactHandlerManager.addHandlers( handlers );
+//        }
+//        catch ( PluginNotFoundException e )
+//        {
+//            throw new LifecycleExecutionException(
+//                "Plugin could not be not found while searching for artifact-type handlers.",
+//                rootProject,
+//                e );
+//        }
 
         executeTaskSegments(
             taskSegments,
