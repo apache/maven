@@ -66,4 +66,9 @@ public class ArtifactResolutionResult
         // clear the cache
         this.artifacts = null;
     }
+    
+    public String toString()
+    {
+        return "Artifacts: "+this.artifacts+" Nodes: "+ this.resolutionNodes;
+    }
 }
