@@ -2,6 +2,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -81,6 +82,16 @@ public class PluginContainerException
                                      ClassRealm pluginRealm,
                                      String message,
                                      ComponentRepositoryException e )
+    {
+        super( plugin, message, e );
+
+        this.pluginRealm = pluginRealm;
+    }
+
+    public PluginContainerException( Plugin plugin,
+                                     ClassRealm pluginRealm,
+                                     String message,
+                                     PlexusContainerException e )
     {
         super( plugin, message, e );
 

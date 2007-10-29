@@ -71,8 +71,7 @@ public class DefaultBuildExtensionScanner
 
     public void scanForBuildExtensions( List files,
                                         ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager,
-                                        Map projectSessions )
+                                        ProfileManager globalProfileManager )
         throws ExtensionScanningException
     {
         List visited = new ArrayList();
@@ -81,17 +80,16 @@ public class DefaultBuildExtensionScanner
         {
             File pom = (File) it.next();
 
-            scanInternal( pom, localRepository, globalProfileManager, visited, files, projectSessions );
+            scanInternal( pom, localRepository, globalProfileManager, visited, files );
         }
     }
 
     public void scanForBuildExtensions( File pom,
                                         ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager,
-                                        Map projectSessions )
+                                        ProfileManager globalProfileManager )
         throws ExtensionScanningException
     {
-        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ), projectSessions );
+        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ) );
     }
 
     // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles,
@@ -100,8 +98,7 @@ public class DefaultBuildExtensionScanner
                                ArtifactRepository localRepository,
                                ProfileManager globalProfileManager,
                                List visitedModelIds,
-                               List reactorFiles,
-                               Map projectSessions )
+                               List reactorFiles )
         throws ExtensionScanningException
     {
 
@@ -158,7 +155,7 @@ public class DefaultBuildExtensionScanner
 
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
-                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories, projectSessions );
+                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories );
 
                 if ( !reactorFiles.contains( modelPom ) )
                 {
@@ -174,8 +171,7 @@ public class DefaultBuildExtensionScanner
                                                originalRemoteRepositories,
                                                globalProfileManager,
                                                visitedModelIds,
-                                               reactorFiles,
-                                               projectSessions );
+                                               reactorFiles );
                 }
 
                 Properties modelProps = model.getProperties();
@@ -187,7 +183,7 @@ public class DefaultBuildExtensionScanner
 
             getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
 
-            extensionManager.registerWagons( projectSessions );
+            extensionManager.registerWagons();
         }
         catch ( ModelInterpolationException e )
         {
@@ -222,8 +218,7 @@ public class DefaultBuildExtensionScanner
                                             List originalRemoteRepositories,
                                             ProfileManager globalProfileManager,
                                             List visitedModelIds,
-                                            List reactorFiles,
-                                            Map projectSessions )
+                                            List reactorFiles )
         throws ExtensionScanningException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
@@ -289,12 +284,12 @@ public class DefaultBuildExtensionScanner
                     continue;
                 }
 
-                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles, projectSessions );
+                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles );
             }
         }
     }
 
-    private void checkModelBuildForExtensions( Model model, ArtifactRepository localRepository, List remoteRepositories, Map projectSessions )
+    private void checkModelBuildForExtensions( Model model, ArtifactRepository localRepository, List remoteRepositories )
         throws ExtensionScanningException
     {
         Build build = model.getBuild();
@@ -318,7 +313,7 @@ public class DefaultBuildExtensionScanner
 
                     try
                     {
-                        extensionManager.addExtension( extension, model, remoteRepositories, localRepository, projectSessions );
+                        extensionManager.addExtension( extension, model, remoteRepositories, localRepository );
                     }
                     catch ( ExtensionManagerException e )
                     {

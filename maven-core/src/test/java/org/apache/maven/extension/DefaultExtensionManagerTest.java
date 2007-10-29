@@ -9,14 +9,12 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -24,11 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class DefaultExtensionManagerTest
@@ -114,25 +110,14 @@ public class DefaultExtensionManagerTest
 
         ExtensionManager mgr = newDefaultExtensionManager();
 
-        Map projectSessions = new HashMap();
+        mgr.addExtension( ext, model, remoteRepositories, localRepository );
 
-        mgr.addExtension( ext, model, remoteRepositories, localRepository, projectSessions );
-
-        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( MavenProjectSession.createProjectId( model.getGroupId(),
-                                                                                                                             model.getArtifactId(),
-                                                                                                                             model.getVersion() ) );
-
-        List compList = getContainer().getComponentDescriptorList( ArtifactFactory.ROLE,
-                                                                   projectSession.getProjectRealm() );
+        List compList = getContainer().getComponentDescriptorList( ArtifactFactory.ROLE );
 
         System.out.println( "Got: " + compList );
 
-        ClassRealm oldRealm = getContainer().setLookupRealm( projectSession.getProjectRealm() );
-
         ArtifactFactory result = (ArtifactFactory) lookup( ArtifactFactory.ROLE, "test" );
         assertNotNull( result );
-
-        getContainer().setLookupRealm( oldRealm );
     }
 
     public void test_addExtension_usingModel_ShouldLoadCustomLifecycleMappingAndArtifactHandler()
@@ -161,33 +146,21 @@ public class DefaultExtensionManagerTest
 
         ExtensionManager mgr = newDefaultExtensionManager();
 
-        Map projectSessions = new HashMap();
+        mgr.addExtension( ext, model, remoteRepositories, localRepository );
 
-        mgr.addExtension( ext, model, remoteRepositories, localRepository, projectSessions );
-
-        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( MavenProjectSession.createProjectId( model.getGroupId(),
-                                                                                                                             model.getArtifactId(),
-                                                                                                                             model.getVersion() ) );
-
-        List lcCompList = getContainer().getComponentDescriptorList( LifecycleMapping.ROLE,
-                                                                   projectSession.getProjectRealm() );
+        List lcCompList = getContainer().getComponentDescriptorList( LifecycleMapping.ROLE );
 
         System.out.println( "Got lifecyle mappings: " + lcCompList );
 
-        List ahCompList = getContainer().getComponentDescriptorList( ArtifactHandler.ROLE,
-                                                                   projectSession.getProjectRealm() );
+        List ahCompList = getContainer().getComponentDescriptorList( ArtifactHandler.ROLE );
 
         System.out.println( "Got artifact handlers: " + ahCompList );
-
-        ClassRealm oldRealm = getContainer().setLookupRealm( projectSession.getProjectRealm() );
 
         LifecycleMapping lcResult = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "test" );
         assertNotNull( lcResult );
 
         ArtifactHandler ahResult = (ArtifactHandler) lookup( ArtifactHandler.ROLE, "test" );
         assertNotNull( ahResult );
-
-        getContainer().setLookupRealm( oldRealm );
     }
 
     private ExtensionManager newDefaultExtensionManager()

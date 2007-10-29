@@ -30,7 +30,6 @@ import org.codehaus.plexus.logging.Logger;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -203,7 +202,4 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
     List getRemoteRepositories();
-
-    MavenExecutionRequest setProjectSessions( Map projectSessions );
-    Map getProjectSessions();
 }

@@ -25,11 +25,9 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,13 +51,10 @@ public class MavenSession
 
     private Map reports = new LinkedHashMap();
 
-    private final Map projectSessions;
-
     public MavenSession( PlexusContainer container,
                          MavenExecutionRequest request,
                          EventDispatcher eventDispatcher,
-                         ReactorManager reactorManager,
-                         Map projectSessions )
+                         ReactorManager reactorManager )
     {
         this.container = container;
 
@@ -68,24 +63,6 @@ public class MavenSession
         this.eventDispatcher = eventDispatcher;
 
         this.reactorManager = reactorManager;
-
-        this.projectSessions = projectSessions == null ? new HashMap() : projectSessions;
-    }
-
-    // TODO: Figure out how/when we can shut down all the realms for extensions/plugins connected to each project session...
-    public MavenProjectSession getProjectSession( MavenProject project )
-        throws PlexusContainerException
-    {
-        String id = MavenProjectSession.createProjectId( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-
-        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( id );
-        if ( projectSession == null )
-        {
-            projectSession = new MavenProjectSession( id, container );
-            projectSessions.put( id, projectSession );
-        }
-
-        return projectSession;
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor,

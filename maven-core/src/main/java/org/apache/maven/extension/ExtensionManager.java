@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Used to locate extensions.
@@ -35,12 +34,12 @@ import java.util.Map;
  */
 public interface ExtensionManager
 {
-    void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository, Map projectSessions )
+    void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ExtensionManagerException;
 
-    void registerWagons( Map projectSessions );
+    void registerWagons();
 
     void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
-                       ArtifactRepository localRepository, Map projectSessions )
+                       ArtifactRepository localRepository )
         throws ExtensionManagerException;
 }

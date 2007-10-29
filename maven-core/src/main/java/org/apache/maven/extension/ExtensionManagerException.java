@@ -16,8 +16,8 @@ public class ExtensionManagerException
 {
 
     private Artifact extensionArtifact;
-    private final String projectId;
     private ArtifactResolutionResult resolutionResult;
+    private String projectId;
 
     public ExtensionManagerException( String message,
                                       Artifact extensionArtifact,

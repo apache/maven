@@ -24,7 +24,6 @@ import org.apache.maven.profiles.ProfileManager;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 public interface BuildExtensionScanner
 {
@@ -33,14 +32,12 @@ public interface BuildExtensionScanner
 
     void scanForBuildExtensions( List files,
                                  ArtifactRepository localRepository,
-                                 ProfileManager globalProfileManager,
-                                 Map projectSessions )
+                                 ProfileManager globalProfileManager )
         throws ExtensionScanningException;
 
     void scanForBuildExtensions( File pom,
                                  ArtifactRepository localRepository,
-                                 ProfileManager globalProfileManager,
-                                 Map projectSessions )
+                                 ProfileManager globalProfileManager )
         throws ExtensionScanningException;
 
 }

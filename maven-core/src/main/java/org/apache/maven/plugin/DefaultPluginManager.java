@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -36,7 +37,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionContext;
@@ -66,7 +66,6 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -86,7 +85,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -319,6 +317,11 @@ public class DefaultPluginManager
         }
     }
 
+    private String createPluginRealmId( String groupId, String artifactId )
+    {
+        return "/plugins/" + ArtifactUtils.versionlessKey( groupId, artifactId );
+    }
+
     protected void addPlugin( Plugin plugin,
                               Artifact pluginArtifact,
                               MavenProject project,
@@ -347,21 +350,25 @@ public class DefaultPluginManager
 
         ClassRealm pluginRealm = null;
 
-        MavenProjectSession projectSession;
+//        MavenProjectSession projectSession;
+//
+//        try
+//        {
+//            projectSession = session.getProjectSession( project );
+//        }
+//        catch ( PlexusContainerException e )
+//        {
+//            throw new PluginManagerException( plugin, "Failed to create project-specific session for project: " + project.getId()
+//                                                + ".", project, e );
+//        }
+//
+
+        String pluginRealmId = createPluginRealmId( projectPlugin.getGroupId(), projectPlugin.getArtifactId() );
 
         try
         {
-            projectSession = session.getProjectSession( project );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginManagerException( plugin, "Failed to create project-specific session for project: " + project.getId()
-                                                + ".", project, e );
-        }
-
-        try
-        {
-            pluginRealm = projectSession.getPluginRealm( projectPlugin );
+//            pluginRealm = projectSession.getPluginRealm( projectPlugin );
+            pluginRealm = container.getClassWorld().getRealm( pluginRealmId );
         }
         catch ( NoSuchRealmException e )
         {
@@ -386,31 +393,39 @@ public class DefaultPluginManager
 
         try
         {
-            pluginRealm = projectSession.createPluginRealm( projectPlugin );
+//            pluginRealm = projectSession.createPluginRealm( projectPlugin );
 
-            try
-            {
-                pluginRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
-            }
+            List jars = new ArrayList();
+
+            jars.add( pluginArtifact.getFile() );
+//            try
+//            {
+//                pluginRealm.addURL( pluginArtifact.getFile().toURI().toURL() );
+//            }
+//            catch ( MalformedURLException e )
+//            {
+//                throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + pluginArtifact.getId() + " as URL.", e );
+//            }
 
             for ( Iterator i = artifacts.iterator(); i.hasNext(); )
             {
                 Artifact artifact = (Artifact) i.next();
 
-                try
-                {
-                    getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
-                    pluginRealm.addURL( artifact.getFile().toURI().toURL() );
-                }
-                catch ( MalformedURLException e )
-                {
-                    throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
-                }
+//                getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key + " in project-session: " + project.getId() );
+
+                getLogger().debug( "Adding: " + artifact.getId() + " to plugin class-realm: " + key );
+                jars.add( artifact.getFile() );
+//                try
+//                {
+//                    pluginRealm.addURL( artifact.getFile().toURI().toURL() );
+//                }
+//                catch ( MalformedURLException e )
+//                {
+//                    throw new PluginContainerException( plugin, pluginRealm, "Error rendering plugin artifact: " + artifact.getId() + " as URL.", e );
+//                }
             }
+
+            pluginRealm = container.createComponentRealm( pluginRealmId, jars );
 
             try
             {
@@ -427,10 +442,16 @@ public class DefaultPluginManager
                 throw new PluginContainerException( plugin, pluginRealm, "Error re-scanning project realm for components.", e );
             }
         }
-        catch ( DuplicateRealmException e )
+//        catch ( DuplicateRealmException e )
+//        {
+//            throw new PluginContainerException( plugin, pluginRealm, "Failed to create project-specific realm for plugin '" + projectPlugin
+//                                                + " in project: " + project.getId(), e );
+//        }
+        catch ( PlexusContainerException e )
         {
-            throw new PluginContainerException( plugin, pluginRealm, "Failed to create project-specific realm for plugin '" + projectPlugin
-                                                + " in project: " + project.getId(), e );
+          throw new PluginContainerException( plugin, pluginRealm,
+                                                "Failed to create realm for plugin '"
+                                                                + projectPlugin, e );
         }
 
         try
@@ -664,26 +685,31 @@ public class DefaultPluginManager
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
-        MavenProjectSession projectSession;
-        try
-        {
-            projectSession = session.getProjectSession( project );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
-                                                + ".", project, e );
-        }
+//        MavenProjectSession projectSession;
+//        try
+//        {
+//            projectSession = session.getProjectSession( project );
+//        }
+//        catch ( PlexusContainerException e )
+//        {
+//            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
+//                                                + ".", project, e );
+//        }
 
+        String pluginRealmId = createPluginRealmId( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
         ClassRealm pluginRealm;
         try
         {
-            pluginRealm = projectSession.getPluginRealm( pluginDescriptor );
+//            pluginRealm = projectSession.getPluginRealm( pluginDescriptor );
+            pluginRealm = container.getClassWorld().getRealm( pluginRealmId );
         }
         catch ( NoSuchRealmException e )
         {
-            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
-            pluginRealm = projectSession.getProjectRealm();
+//            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
+//            pluginRealm = projectSession.getProjectRealm();
+
+            getLogger().debug( "Plugin realm: " + pluginRealmId + " not found. Using container realm instead." );
+            pluginRealm = container.getContainerRealm();
         }
 
         ClassRealm oldRealm = null;
@@ -804,48 +830,60 @@ public class DefaultPluginManager
 
         Mojo plugin;
 
-        ClassRealm realm = null;
+//        ClassRealm pluginRealm = null;
+//
+//        MavenProjectSession projectSession;
+//        try
+//        {
+//            projectSession = session.getProjectSession( project );
+//        }
+//        catch ( PlexusContainerException e )
+//        {
+//            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
+//                                                + ".", project, e );
+//        }
+//
+//        try
+//        {
+//            pluginRealm = projectSession.getPluginRealm( pluginDescriptor );
+//        }
+//        catch ( NoSuchRealmException e )
+//        {
+//            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
+//            pluginRealm = projectSession.getProjectRealm();
+//        }
 
-        MavenProjectSession projectSession;
+        String pluginRealmId = createPluginRealmId( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
+        ClassRealm pluginRealm;
         try
         {
-            projectSession = session.getProjectSession( project );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new PluginManagerException( mojoDescriptor, "Failed to create project-specific session for project: " + project.getId()
-                                                + ".", project, e );
-        }
-
-        try
-        {
-            realm = projectSession.getPluginRealm( pluginDescriptor );
+            pluginRealm = container.getClassWorld().getRealm( pluginRealmId );
         }
         catch ( NoSuchRealmException e )
         {
-            getLogger().debug( "Plugin realm: " + pluginDescriptor.getId() + " not found in project session for: " + project.getId() + ". Using project realm instead." );
-            realm = projectSession.getProjectRealm();
+            getLogger().debug( "Plugin realm: " + pluginRealmId + " not found. Using container realm instead." );
+            pluginRealm = container.getContainerRealm();
         }
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
 
-        ClassRealm oldRealm = container.setLookupRealm( realm );
-        pluginDescriptor.setClassRealm( realm );
+        ClassRealm oldRealm = container.setLookupRealm( pluginRealm );
+        pluginDescriptor.setClassRealm( pluginRealm );
 
         getLogger().debug(
                            "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
-                                           + realm.getId() + " - descRealmId="
+                                           + pluginRealm.getId() + " - descRealmId="
                                            + mojoDescriptor.getRealmId() );
 
         try
         {
-            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), realm );
+            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), pluginRealm );
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginContainerException( mojoDescriptor, realm, "Unable to find the mojo '"
+            throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '"
                                               + mojoDescriptor.getRoleHint() + "' in the plugin '"
                                               + pluginDescriptor.getPluginLookupKey() + "'", e );
         }

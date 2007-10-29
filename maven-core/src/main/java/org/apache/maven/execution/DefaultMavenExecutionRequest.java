@@ -28,9 +28,7 @@ import org.apache.maven.wagon.events.TransferListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -61,13 +59,6 @@ public class DefaultMavenExecutionRequest
     private boolean usePluginUpdateOverride;
 
     private boolean isProjectPresent = true;
-
-    /**
-     * These are {@link MavenProjectSession} instances, keyed by
-     * groupId:artifactId:version of the project, and used to lookup and store
-     * extension and plugin realms specific to that project.
-     */
-    private Map projectSessions;
 
     // ----------------------------------------------------------------------------
     // We need to allow per execution user and global settings as the embedder
@@ -611,21 +602,5 @@ public class DefaultMavenExecutionRequest
     public List getRemoteRepositories()
     {
         return remoteRepositories;
-    }
-
-    public Map getProjectSessions()
-    {
-        if ( projectSessions == null )
-        {
-            projectSessions = new HashMap();
-        }
-
-        return projectSessions;
-    }
-
-    public MavenExecutionRequest setProjectSessions( Map projectSessions )
-    {
-        this.projectSessions = projectSessions;
-        return this;
     }
 }

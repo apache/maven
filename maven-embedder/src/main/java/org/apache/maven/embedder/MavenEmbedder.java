@@ -35,7 +35,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.BuildExtensionScanner;
@@ -320,7 +319,8 @@ public class MavenEmbedder
     {
         PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
 
-        MavenSession session = new MavenSession( container, request, null, null, projectSessions );
+//        MavenSession session = new MavenSession( container, request, null, null, projectSessions );
+        MavenSession session = new MavenSession( container, request, null, null );
 
         pluginManager.verifyPlugin( plugin, project, session );
     }
@@ -434,7 +434,7 @@ public class MavenEmbedder
     {
         getLogger().info( "Scanning for extensions: " + mavenProject );
 
-        extensionScanner.scanForBuildExtensions( mavenProject, request.getLocalRepository(), request.getProfileManager(), projectSessions );
+        extensionScanner.scanForBuildExtensions( mavenProject, request.getLocalRepository(), request.getProfileManager() );
 
         getLogger().info( "Building MavenProject instance: " + mavenProject );
 
@@ -618,30 +618,12 @@ public class MavenEmbedder
 
     private MavenExecutionRequest request;
 
-    private Map projectSessions;
-
-    public void clearProjectSessions()
-    {
-        if ( ( projectSessions != null ) && !projectSessions.isEmpty() )
-        {
-            for ( Iterator it = projectSessions.values().iterator(); it.hasNext(); )
-            {
-                MavenProjectSession session = (MavenProjectSession) it.next();
-                session.dispose();
-            }
-
-            projectSessions.clear();
-        }
-    }
-
     private void start( Configuration configuration )
         throws MavenEmbedderException
     {
         classWorld = configuration.getClassWorld();
 
         logger = configuration.getMavenEmbedderLogger();
-
-        projectSessions = new HashMap();
 
         // ----------------------------------------------------------------------------
         // Don't override any existing SecurityManager if one has been installed. Our

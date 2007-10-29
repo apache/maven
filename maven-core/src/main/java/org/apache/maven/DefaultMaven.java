@@ -65,7 +65,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author jason van zyl
@@ -184,8 +183,7 @@ public class DefaultMaven
         MavenSession session = createSession(
             request,
             reactorManager,
-            dispatcher,
-            request.getProjectSessions() );
+            dispatcher );
 
         for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
         {
@@ -281,7 +279,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager(), request.getProjectSessions() );
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
         }
         catch ( ExtensionScanningException e )
         {
@@ -417,15 +415,13 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request,
                                           ReactorManager reactorManager,
-                                          EventDispatcher dispatcher,
-                                          Map projectSessions )
+                                          EventDispatcher dispatcher )
     {
         MavenSession session = new MavenSession(
             container,
             request,
             dispatcher,
-            reactorManager,
-            projectSessions );
+            reactorManager );
 
         SessionContext ctx = new SessionContext( session );
         ctx.store( buildContextManager );

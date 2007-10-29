@@ -229,8 +229,11 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
+//        return new MavenSession( container, request, new DefaultEventDispatcher(),
+//                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ), Collections.EMPTY_MAP );
+
         return new MavenSession( container, request, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ), Collections.EMPTY_MAP );
+                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
     }
 
     public void testLocalRepositoryExtraction()

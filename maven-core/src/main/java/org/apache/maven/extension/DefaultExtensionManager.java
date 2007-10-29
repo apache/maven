@@ -43,7 +43,6 @@ import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -117,8 +116,7 @@ public class DefaultExtensionManager
     public void addExtension( Extension extension,
                               Model originatingModel,
                               List remoteRepositories,
-                              ArtifactRepository localRepository,
-                              Map projectSessions )
+                              ArtifactRepository localRepository )
         throws ExtensionManagerException
     {
         Artifact extensionArtifact = artifactFactory.createBuildArtifact( extension.getGroupId(),
@@ -150,14 +148,12 @@ public class DefaultExtensionManager
                       remoteRepositories,
                       localRepository,
                       null,
-                      projectSessions,
                       MavenProjectSession.createProjectId( groupId, artifactId, version ) );
     }
 
     public void addExtension( Extension extension,
                               MavenProject project,
-                              ArtifactRepository localRepository,
-                              Map projectSessions )
+                              ArtifactRepository localRepository )
         throws ExtensionManagerException
     {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
@@ -171,8 +167,12 @@ public class DefaultExtensionManager
                       project.getRemoteArtifactRepositories(),
                       localRepository,
                       new ActiveArtifactResolver( project ),
-                      projectSessions,
                       MavenProjectSession.createProjectId( project.getGroupId(), project.getArtifactId(), project.getVersion() )  );
+    }
+
+    private String createExtensionRealmId( Artifact realmArtifact )
+    {
+        return "/extensions/" + ArtifactUtils.versionlessKey( realmArtifact );
     }
 
     private void addExtension( Artifact extensionArtifact,
@@ -180,30 +180,10 @@ public class DefaultExtensionManager
                                List remoteRepositories,
                                ArtifactRepository localRepository,
                                ActiveArtifactResolver activeArtifactResolver,
-                               Map projectSessions,
                                String projectId )
         throws ExtensionManagerException
     {
         getLogger().debug( "Starting extension-addition process for: " + extensionArtifact );
-
-        // create a new MavenProjectSession instance for the current project.
-        // This session instance will house the plugin and extension realms that
-        // pertain to this specific project, along with containing the project-level
-        // realm to use as a lookupRealm in the lifecycle executor and plugin manager.
-        MavenProjectSession projectSession = (MavenProjectSession) projectSessions.get( projectId );
-        if ( projectSession == null )
-        {
-            try
-            {
-                projectSession = new MavenProjectSession( projectId, container );
-            }
-            catch ( PlexusContainerException e )
-            {
-                throw new ExtensionManagerException( "Failed to create project realm for: " + projectId, projectId, e );
-            }
-
-            projectSessions.put( projectId, projectSession );
-        }
 
         ArtifactFilter coreFilter = artifactFilterManager.getArtifactFilter();
 
@@ -213,9 +193,21 @@ public class DefaultExtensionManager
         //
         // skip it.
         if ( ( extensionArtifact != null )
-             && !projectSession.containsExtensionRealm( extensionArtifact )
              && coreFilter.include( extensionArtifact ) )
         {
+            String realmId = createExtensionRealmId( extensionArtifact );
+            try
+            {
+                container.getClassWorld().getRealm( realmId );
+
+                // if we find the realm, we don't need to proceed, we've already added this extension.
+                return;
+            }
+            catch ( NoSuchRealmException e )
+            {
+                // proceed.
+            }
+
             ArtifactFilter filter =
                 new ProjectArtifactExceptionFilter( coreFilter, projectArtifact );
 
@@ -266,7 +258,7 @@ public class DefaultExtensionManager
             ClassRealm extensionRealm;
             try
             {
-                extensionRealm = projectSession.createExtensionRealm( extensionArtifact );
+                extensionRealm = container.getContainerRealm().createChildRealm( realmId );
             }
             catch ( DuplicateRealmException e )
             {
@@ -294,17 +286,15 @@ public class DefaultExtensionManager
                 }
             }
 
-            importLocalExtensionComponents( extensionRealm, projectSession, extensionArtifact );
+            importLocalExtensionComponents( extensionRealm, projectId, extensionArtifact );
         }
     }
 
     private void importLocalExtensionComponents( ClassRealm extensionRealm,
-                                                 MavenProjectSession projectSession,
+                                                 String projectId,
                                                  Artifact extensionArtifact )
         throws ExtensionManagerException
     {
-        String projectId = projectSession.getProjectId();
-
         ClassWorld discoveryWorld = new ClassWorld();
         try
         {
@@ -324,7 +314,7 @@ public class DefaultExtensionManager
             ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
             discoverer.setManager( new DummyDiscovererManager() );
 
-            ClassRealm projectRealm = projectSession.getProjectRealm();
+            ClassRealm realm = container.getContainerRealm();
             try
             {
                 // Find the extension component descriptors that exist ONLY in the immediate extension
@@ -342,18 +332,18 @@ public class DefaultExtensionManager
 
                         try
                         {
-                            getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto project realm: " + projectRealm.getId() );
+                            getLogger().debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealm.getId() + "\nto container realm: " + realm.getId() );
 
                             // Import the extension component's implementation class into the project-level
                             // realm.
-                            projectRealm.importFrom( extensionRealm.getId(), implementation );
+                            realm.importFrom( extensionRealm.getId(), implementation );
 
                             // Set the realmId to be used in looking up this extension component to the
                             // project-level realm, since we now have a restricted import
                             // that allows most of the extension to stay hidden, and the
                             // specific local extension components are still accessible
                             // from the project-level realm.
-                            comp.setRealmId( projectRealm.getId() );
+                            comp.setRealmId( realm.getId() );
 
                             // Finally, add the extension component's descriptor (with projectRealm
                             // set as the lookup realm) to the container.
@@ -361,7 +351,7 @@ public class DefaultExtensionManager
                         }
                         catch ( NoSuchRealmException e )
                         {
-                            throw new ExtensionManagerException( "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + projectRealm.getId(), extensionArtifact, projectId, e );
+                            throw new ExtensionManagerException( "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealm.getId() + " to project realm: " + realm.getId(), extensionArtifact, projectId, e );
                         }
                     }
                 }
@@ -392,18 +382,9 @@ public class DefaultExtensionManager
         }
     }
 
-    public void registerWagons( Map projectSessions )
+    public void registerWagons()
     {
-        for ( Iterator it = projectSessions.values().iterator(); it.hasNext(); )
-        {
-            MavenProjectSession projectSession = (MavenProjectSession) it.next();
-
-            ClassRealm oldRealm = container.setLookupRealm( projectSession.getProjectRealm() );
-
-            wagonManager.findAndRegisterWagons( container );
-
-            container.setLookupRealm( oldRealm );
-        }
+        wagonManager.findAndRegisterWagons( container );
     }
 
     public void contextualize( Context context )

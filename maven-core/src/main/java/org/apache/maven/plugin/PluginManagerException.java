@@ -172,6 +172,17 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
+    public PluginManagerException( Plugin plugin,
+                                   String message,
+                                   PlexusContainerException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
     public String getPluginGroupId()
     {
         return pluginGroupId;

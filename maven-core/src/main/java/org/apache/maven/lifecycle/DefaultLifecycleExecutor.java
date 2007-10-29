@@ -28,7 +28,6 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
@@ -57,7 +56,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
@@ -404,26 +402,29 @@ public class DefaultLifecycleExecutor
                                               MavenProject rootProject )
         throws LifecycleExecutionException
     {
-        MavenProjectSession projectSession;
-        try
-        {
-            projectSession = session.getProjectSession( rootProject );
-        }
-        catch ( PlexusContainerException e )
-        {
-            throw new LifecycleExecutionException(
-                                                   "Failed to create project-specific session for: "
-                                                                   + rootProject.getId(),
-                                                   rootProject, e );
-        }
-        if ( projectSession != null )
-        {
-            return container.setLookupRealm( projectSession.getProjectRealm() );
-        }
-        else
-        {
-            return null;
-        }
+//        MavenProjectSession projectSession;
+//        try
+//        {
+//            projectSession = session.getProjectSession( rootProject );
+//        }
+//        catch ( PlexusContainerException e )
+//        {
+//            throw new LifecycleExecutionException(
+//                                                   "Failed to create project-specific session for: "
+//                                                                   + rootProject.getId(),
+//                                                   rootProject, e );
+//        }
+//        if ( projectSession != null )
+//        {
+//            return container.setLookupRealm( projectSession.getProjectRealm() );
+//        }
+//        else
+//        {
+//            return null;
+//        }
+
+        // TODO: Fix this to use project-level realm!
+        return container.getLookupRealm();
     }
 
     /**
