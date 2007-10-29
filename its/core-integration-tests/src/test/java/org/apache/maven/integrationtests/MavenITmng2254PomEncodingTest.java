@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -17,6 +18,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng2254PomEncodingTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng2254PomEncodingTest()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.7,)" ); // 2.0.8+
+    }
+
     public void testitMNG2254 ()
         throws Exception
     {
