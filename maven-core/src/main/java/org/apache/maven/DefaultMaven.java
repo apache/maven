@@ -102,13 +102,12 @@ public class DefaultMaven
     // lifecycle execution
 
     public ReactorManager createReactorManager( MavenExecutionRequest request,
-                                                MavenExecutionResult result,
-                                                Map projectSessions )
+                                                MavenExecutionResult result )
     {
         List projects;
         try
         {
-            projects = getProjects( request, projectSessions );
+            projects = getProjects( request );
 
             if ( projects.isEmpty() )
             {
@@ -159,7 +158,7 @@ public class DefaultMaven
         return reactorManager;
     }
 
-    public MavenExecutionResult execute( MavenExecutionRequest request, Map projectSessions )
+    public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
 
@@ -167,8 +166,7 @@ public class DefaultMaven
 
         ReactorManager reactorManager = createReactorManager(
             request,
-            result,
-            projectSessions );
+            result );
 
         if ( result.hasExceptions() )
         {
@@ -187,7 +185,7 @@ public class DefaultMaven
             request,
             reactorManager,
             dispatcher,
-            projectSessions );
+            request.getProjectSessions() );
 
         for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
         {
@@ -262,7 +260,7 @@ public class DefaultMaven
         systemContext.store( buildContextManager );
     }
 
-    private List getProjects( MavenExecutionRequest request, Map projectSessions )
+    private List getProjects( MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List projects;
@@ -283,7 +281,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager(), projectSessions );
+            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager(), request.getProjectSessions() );
         }
         catch ( ExtensionScanningException e )
         {

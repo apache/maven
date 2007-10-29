@@ -490,7 +490,7 @@ public class MavenEmbedder
             return result.addExtensionScanningException( e );
         }
 
-        ReactorManager reactorManager = maven.createReactorManager( request, result, projectSessions );
+        ReactorManager reactorManager = maven.createReactorManager( request, result );
 
         if ( result.hasExceptions() )
         {
@@ -901,7 +901,7 @@ public class MavenEmbedder
                 return result;
             }
 
-            return maven.execute( request, projectSessions );
+            return maven.execute( request );
         }
         finally
         {

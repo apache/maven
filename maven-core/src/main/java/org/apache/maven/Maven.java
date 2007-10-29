@@ -23,8 +23,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 
-import java.util.Map;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
@@ -53,7 +51,7 @@ public interface Maven
 
     static final int LOGGING_LEVEL_DISABLE = 5;
 
-    MavenExecutionResult execute( MavenExecutionRequest request, Map projectSessions );
+    MavenExecutionResult execute( MavenExecutionRequest request );
 
-    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result, Map projectSessions );
+    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
 }
