@@ -5,6 +5,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;                                                                            
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MavenIT0092Test
     extends AbstractMavenIntegrationTestCase
@@ -23,6 +25,9 @@ public class MavenIT0092Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0092" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "--settings settings.xml" );
+        verifier.setCliOptions( cliOptions );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "compile" );
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
