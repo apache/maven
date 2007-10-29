@@ -24,7 +24,7 @@ public class MavenIT0067Test
         cliOptions.add( "-P test-profile" );
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0021/Person.class" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0067/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

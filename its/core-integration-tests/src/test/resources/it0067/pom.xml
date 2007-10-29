@@ -4,7 +4,6 @@
   <groupId>org.apache.maven.its.it0067</groupId>
   <artifactId>maven-it-it0067</artifactId>
   <description>Test activation of a profile from the command line.</description>
-  <packaging>maven-plugin</packaging>
   <version>1.0-SNAPSHOT</version>
   
   <profiles>
