@@ -552,7 +552,7 @@ public class DefaultPluginManager
                                                    pluginArtifact, e );
         }
 
-        checkPlexusUtils( resolutionGroup, artifactFactory );
+//        checkPlexusUtils( resolutionGroup, artifactFactory );
 
         Set dependencies = new LinkedHashSet();
 

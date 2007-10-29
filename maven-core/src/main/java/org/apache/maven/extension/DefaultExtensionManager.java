@@ -39,7 +39,6 @@ import org.apache.maven.execution.MavenProjectSession;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
@@ -225,7 +224,7 @@ public class DefaultExtensionManager
 
             // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
             // not declare plexus-utils but need it. MNG-2900
-            DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
+//            DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
 
             Set dependencies = new LinkedHashSet();
 

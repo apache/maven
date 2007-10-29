@@ -77,6 +77,18 @@ under the License.
   </distributionManagement>
   <profiles>
     <profile>
+      <id>compat</id>
+      
+      <dependencies>
+        <dependency>
+          <groupId>aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+          <version>1.5.3</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
       <!--
        |
        | This profile is specifically for creating an embedder that can be used for IntelliJ integration. We need to
