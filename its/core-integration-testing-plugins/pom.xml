@@ -24,6 +24,11 @@
     <module>maven-it-plugin-uses-properties</module>
     <module>maven-it-plugin-all</module>    
   </modules>
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-testing-plugins</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-testing-plugins</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk/core-integration-testing-plugins</url>
+  </scm>     
   
   <build>
     <pluginManagement>
