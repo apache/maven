@@ -11,12 +11,6 @@ import java.util.List;
 public class MavenIT0114ExtensionThatProvidesResources
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0114ExtensionThatProvidesResources()
-        throws InvalidVersionSpecificationException
-    {
-        super( "[,2.1-SNAPSHOT)" );
-    }
-
     public void testit0114()
         throws Exception
     {
