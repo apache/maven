@@ -66,6 +66,7 @@ public privileged aspect Maven20xCompatAspect
         && this( session )
         && notHere();
 
+    // capture the session instance in play.
     after( MavenSession session ): sessionCreation( session )
     {
         this.session = session;
@@ -76,6 +77,7 @@ public privileged aspect Maven20xCompatAspect
         && args( request )
         && notHere();
 
+    // capture the request instance in play.
     before( MavenExecutionRequest request ): methodsTakingRequest( request )
     {
         this.request = request;
@@ -88,6 +90,7 @@ public privileged aspect Maven20xCompatAspect
         && target( manager )
         && notHere();
 
+    // redirect the old verifyPlugin(..) call to the new one, using the captured session instance above.
     PluginDescriptor around( Plugin plugin,
                              MavenProject project,
                              PluginManager manager )
@@ -147,6 +150,7 @@ public privileged aspect Maven20xCompatAspect
         && target( builder )
         && notHere();
 
+    // redirect old buildSettings() call to the new one, using the request captured above.
     Settings around( MavenSettingsBuilder builder )
         throws IOException, XmlPullParserException:
             buildSettings( builder )

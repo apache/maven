@@ -120,6 +120,13 @@ under the License.
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- Needed for backward compat aspect. -->
+    <dependency>
+      <groupId>aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.5.3</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -139,23 +146,6 @@ under the License.
           </excludes>
         </configuration>
       </plugin>
-    </plugins>
-  </build>
-  
-  <profiles>
-    <profile>
-      <id>compat</id>
-      
-      <dependencies>
-        <dependency>
-          <groupId>aspectj</groupId>
-          <artifactId>aspectjrt</artifactId>
-          <version>1.5.3</version>
-        </dependency>
-      </dependencies>
-      
-      <build>
-        <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>aspectj-maven-plugin</artifactId>
@@ -169,8 +159,6 @@ under the License.
               </execution>
             </executions>
           </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+    </plugins>
+  </build>
 </project>
