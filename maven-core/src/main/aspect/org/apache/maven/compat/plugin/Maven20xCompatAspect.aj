@@ -28,18 +28,43 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public privileged aspect Maven20xCompatAspect
 {
 
+    // pointcut to avoid recursive matching on behavior injected by this aspect.
+    private pointcut notHere(): !within( Maven20xCompatAspect );
+
+    private pointcut showVersion( PrintStream stream, String string):
+        cflow( execution( void org.apache.maven.cli.CLIReportingUtils.showVersion() ) )
+        && call( void PrintStream.println( String ) )
+        && args( string )
+        && target( stream )
+        && notHere();
+
+    void around( PrintStream stream, String string ): showVersion( stream, string )
+    {
+        if ( stream == System.out && string != null && string.startsWith( "Maven version:" ) )
+        {
+            System.out.println( string + " (compat enabled)" );
+        }
+        else
+        {
+            proceed( stream, string );
+        }
+    }
+
     // GRAB Session and Request.
     private MavenSession session;
     private MavenExecutionRequest request;
 
-    private pointcut sessionCreation( MavenSession session ): execution( public MavenSession.new(..) ) && this( session );
+    private pointcut sessionCreation( MavenSession session ):
+        execution( public MavenSession.new(..) )
+        && this( session )
+        && notHere();
 
     after( MavenSession session ): sessionCreation( session )
     {
@@ -48,7 +73,8 @@ public privileged aspect Maven20xCompatAspect
 
     private pointcut methodsTakingRequest( MavenExecutionRequest request ):
         execution( MavenExecutionResult *.*( MavenExecutionRequest ) )
-        && args( request );
+        && args( request )
+        && notHere();
 
     before( MavenExecutionRequest request ): methodsTakingRequest( request )
     {
@@ -59,7 +85,8 @@ public privileged aspect Maven20xCompatAspect
     private pointcut verifyPlugin( Plugin plugin, MavenProject project, PluginManager manager ):
         call( public PluginDescriptor PluginManager+.verifyPlugin( Plugin, MavenProject, Settings, ArtifactRepository ) )
         && args( plugin, project, .. )
-        && target( manager );
+        && target( manager )
+        && notHere();
 
     PluginDescriptor around( Plugin plugin,
                              MavenProject project,
@@ -86,7 +113,8 @@ public privileged aspect Maven20xCompatAspect
     private pointcut extDepArtifactsResolved( DefaultExtensionManager mgr ):
         call( public Set ResolutionGroup.getArtifacts() )
         && within( DefaultExtensionManager )
-        && this( mgr );
+        && this( mgr )
+        && notHere();
 
     Set around( DefaultExtensionManager mgr ): extDepArtifactsResolved( mgr )
     {
@@ -101,7 +129,8 @@ public privileged aspect Maven20xCompatAspect
     private pointcut pluginDepArtifactsResolved( DefaultPluginManager mgr ):
         call( public Set ResolutionGroup.getArtifacts() )
         && cflow( execution( Set DefaultPluginManager.getPluginArtifacts(..) ) )
-        && this( mgr );
+        && this( mgr )
+        && notHere();
 
     Set around( DefaultPluginManager mgr ): pluginDepArtifactsResolved( mgr )
     {
@@ -115,7 +144,8 @@ public privileged aspect Maven20xCompatAspect
     // USE Request to compensate for old buildSettings() API.
     private pointcut buildSettings( MavenSettingsBuilder builder ):
         execution( public Settings MavenSettingsBuilder+.buildSettings() )
-        && target( builder );
+        && target( builder )
+        && notHere();
 
     Settings around( MavenSettingsBuilder builder )
         throws IOException, XmlPullParserException:
