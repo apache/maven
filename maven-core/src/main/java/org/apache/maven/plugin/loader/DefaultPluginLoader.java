@@ -19,12 +19,12 @@ import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Responsible for loading plugins, reports, and any components contained therein. Will resolve
@@ -47,54 +47,6 @@ public class DefaultPluginLoader
     private BuildContextManager buildContextManager;
 
     private MavenPluginCollector pluginCollector;
-
-    /**
-     * Lookup a component with the specified role + roleHint in the plugin's {@link ClassRealm}.
-     * Load the plugin first.
-     */
-    public Object loadPluginComponent( String role, String roleHint, Plugin plugin, MavenProject project )
-        throws ComponentLookupException, PluginLoaderException
-    {
-        loadPlugin( plugin, project );
-
-        try
-        {
-            return pluginManager.getPluginComponent( plugin, role, roleHint );
-        }
-        catch ( PluginManagerException e )
-        {
-            Throwable cause = e.getCause();
-
-            if ( ( cause != null ) && ( cause instanceof ComponentLookupException ) )
-            {
-                StringBuffer message = new StringBuffer();
-                message.append( "ComponentLookupException in PluginManager while looking up a component in the realm of: " );
-                message.append( plugin.getKey() );
-                message.append( ".\nReason: " );
-                message.append( cause.getMessage() );
-                message.append( "\n\nStack-Trace inside of PluginManager was:\n\n" );
-
-                StackTraceElement[] elements = e.getStackTrace();
-                for ( int i = 0; i < elements.length; i++ )
-                {
-                    if ( elements[i].getClassName().indexOf( "PluginManager" ) < 0 )
-                    {
-                        break;
-                    }
-
-                    message.append( elements[i] );
-                }
-
-                logger.debug( message.toString() + "\n" );
-
-                throw (ComponentLookupException) cause;
-            }
-            else
-            {
-                throw new PluginLoaderException( plugin, "Failed to lookup plugin component. Reason: " + e.getMessage(), e );
-            }
-        }
-    }
 
     /**
      * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
@@ -139,7 +91,21 @@ public class DefaultPluginLoader
     public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project )
         throws PluginLoaderException
     {
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptorForPrefix( prefix );
+        Set descriptors = pluginCollector.getPluginDescriptorsForPrefix( prefix );
+        Map projectPluginMap = project.getBuild().getPluginsAsMap();
+
+        PluginDescriptor pluginDescriptor = null;
+        for ( Iterator it = descriptors.iterator(); it.hasNext(); )
+        {
+            PluginDescriptor pd = (PluginDescriptor) it.next();
+
+            Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
+            if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
+            {
+                pluginDescriptor = pd;
+                break;
+            }
+        }
 
         if ( pluginDescriptor == null )
         {
@@ -207,6 +173,12 @@ public class DefaultPluginLoader
         PluginDescriptor pluginDescriptor = null;
         if ( plugin != null )
         {
+            Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
+            if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) )
+            {
+                plugin.setVersion( projectPlugin.getVersion() );
+            }
+
             pluginDescriptor = loadPlugin( plugin, project );
         }
 

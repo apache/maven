@@ -89,10 +89,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -325,106 +323,6 @@ public class MavenEmbedder
         pluginManager.verifyPlugin( plugin, project, session );
     }
 
-    /** protected for tests only.. */
-    protected Map getPluginExtensionComponents( Plugin plugin )
-        throws PluginManagerException
-    {
-        try
-        {
-            PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
-
-            return pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
-        }
-        catch ( ComponentLookupException e )
-        {
-            getLogger().debug( "Unable to find the lifecycle component in the extension", e );
-
-            return new HashMap();
-        }
-    }
-
-    /**
-     * mkleint: copied from DefaultLifecycleExecutor
-     *
-     * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
-     * lookup directly, or have them passed in
-     * @todo Move this sort of thing to the tail end of the project-building process
-     */
-    private Map findArtifactTypeHandlers( MavenProject project )
-        throws MavenEmbedderException
-    {
-        Map map = new HashMap();
-
-        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
-        {
-            Plugin plugin = (Plugin) i.next();
-
-            if ( plugin.isExtensions() )
-            {
-                try
-                {
-                    verifyPlugin( plugin, project );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( PluginNotFoundException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( InvalidPluginException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-                catch ( PluginVersionNotFoundException e )
-                {
-                    throw new PluginLookupException( plugin, "Error resolving plugin.", e );
-                }
-
-                try
-                {
-                    Map extensionComponents = getPluginExtensionComponents( plugin );
-
-                    map.putAll( extensionComponents );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new PluginLookupException( plugin, "Error looking up plugin components.", e );
-                }
-
-                // shudder...
-                for ( Iterator j = map.values().iterator(); j.hasNext(); )
-                {
-                    ArtifactHandler handler = (ArtifactHandler) j.next();
-
-                    if ( project.getPackaging().equals( handler.getPackaging() ) )
-                    {
-                        project.getArtifact().setArtifactHandler( handler );
-                    }
-                }
-            }
-        }
-
-        return map;
-    }
-
     // ----------------------------------------------------------------------
     // Project
     // ----------------------------------------------------------------------
@@ -434,7 +332,7 @@ public class MavenEmbedder
     {
         getLogger().info( "Scanning for extensions: " + mavenProject );
 
-        extensionScanner.scanForBuildExtensions( mavenProject, request.getLocalRepository(), request.getProfileManager() );
+        extensionScanner.scanForBuildExtensions( mavenProject, request );
 
         getLogger().info( "Building MavenProject instance: " + mavenProject );
 

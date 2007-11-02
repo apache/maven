@@ -20,14 +20,13 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.context.BuildContextManager;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.plugin.loader.PluginLoader;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.CustomActivatorAdvice;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -70,8 +69,7 @@ public class DefaultBuildExtensionScanner
     private PluginLoader pluginLoader;
 
     public void scanForBuildExtensions( List files,
-                                        ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager )
+                                        MavenExecutionRequest request )
         throws ExtensionScanningException
     {
         List visited = new ArrayList();
@@ -80,23 +78,21 @@ public class DefaultBuildExtensionScanner
         {
             File pom = (File) it.next();
 
-            scanInternal( pom, localRepository, globalProfileManager, visited, files );
+            scanInternal( pom, request, visited, files );
         }
     }
 
     public void scanForBuildExtensions( File pom,
-                                        ArtifactRepository localRepository,
-                                        ProfileManager globalProfileManager )
+                                        MavenExecutionRequest request )
         throws ExtensionScanningException
     {
-        scanInternal( pom, localRepository, globalProfileManager, new ArrayList(), Collections.singletonList( pom ) );
+        scanInternal( pom, request, new ArrayList(), Collections.singletonList( pom ) );
     }
 
     // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles,
     //       once we move to just-in-time project scanning.
     private void scanInternal( File pom,
-                               ArtifactRepository localRepository,
-                               ProfileManager globalProfileManager,
+                               MavenExecutionRequest request,
                                List visitedModelIds,
                                List reactorFiles )
         throws ExtensionScanningException
@@ -114,8 +110,7 @@ public class DefaultBuildExtensionScanner
 
             getLogger().debug( "Pre-scanning POM lineage of: " + pom + " for build extensions." );
 
-            ModelLineage lineage = buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                      globalProfileManager );
+            ModelLineage lineage = buildModelLineage( pom, request, originalRemoteRepositories );
 
             Map inheritedInterpolationValues = new HashMap();
 
@@ -155,7 +150,7 @@ public class DefaultBuildExtensionScanner
 
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
-                checkModelBuildForExtensions( model, localRepository, inheritedRemoteRepositories );
+                checkModelBuildForExtensions( model, request, inheritedRemoteRepositories );
 
                 if ( !reactorFiles.contains( modelPom ) )
                 {
@@ -167,9 +162,8 @@ public class DefaultBuildExtensionScanner
                 {
                     checkModulesForExtensions( modelPom,
                                                model,
-                                               localRepository,
+                                               request,
                                                originalRemoteRepositories,
-                                               globalProfileManager,
                                                visitedModelIds,
                                                reactorFiles );
                 }
@@ -214,9 +208,8 @@ public class DefaultBuildExtensionScanner
 
     private void checkModulesForExtensions( File containingPom,
                                             Model model,
-                                            ArtifactRepository localRepository,
+                                            MavenExecutionRequest request,
                                             List originalRemoteRepositories,
-                                            ProfileManager globalProfileManager,
                                             List visitedModelIds,
                                             List reactorFiles )
         throws ExtensionScanningException
@@ -284,12 +277,12 @@ public class DefaultBuildExtensionScanner
                     continue;
                 }
 
-                scanInternal( modulePomDirectory, localRepository, globalProfileManager, visitedModelIds, reactorFiles );
+                scanInternal( modulePomDirectory, request, visitedModelIds, reactorFiles );
             }
         }
     }
 
-    private void checkModelBuildForExtensions( Model model, ArtifactRepository localRepository, List remoteRepositories )
+    private void checkModelBuildForExtensions( Model model, MavenExecutionRequest request, List remoteRepositories )
         throws ExtensionScanningException
     {
         Build build = model.getBuild();
@@ -313,7 +306,7 @@ public class DefaultBuildExtensionScanner
 
                     try
                     {
-                        extensionManager.addExtension( extension, model, remoteRepositories, localRepository );
+                        extensionManager.addExtension( extension, model, remoteRepositories, request );
                     }
                     catch ( ExtensionManagerException e )
                     {
@@ -325,8 +318,8 @@ public class DefaultBuildExtensionScanner
         }
     }
 
-    private ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository,
-                                            List originalRemoteRepositories, ProfileManager globalProfileManager )
+    private ModelLineage buildModelLineage( File pom, MavenExecutionRequest request,
+                                            List originalRemoteRepositories )
         throws ExtensionScanningException
     {
         ModelLineage lineage;
@@ -338,8 +331,8 @@ public class DefaultBuildExtensionScanner
             // not for POMs from the repository...otherwise, we would need to be more careful with
             // the last parameter here and determine whether it's appropriate for the POM to have
             // an accompanying profiles.xml file.
-            lineage = modelLineageBuilder.buildModelLineage( pom, localRepository, originalRemoteRepositories,
-                                                             globalProfileManager, false, true );
+            lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories,
+                                                             request.getProfileManager(), false, true );
         }
         catch ( ProjectBuildingException e )
         {

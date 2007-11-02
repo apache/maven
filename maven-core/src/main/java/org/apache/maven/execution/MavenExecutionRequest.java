@@ -202,4 +202,7 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
     List getRemoteRepositories();
+
+    MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
+    MavenRealmManager getRealmManager();
 }

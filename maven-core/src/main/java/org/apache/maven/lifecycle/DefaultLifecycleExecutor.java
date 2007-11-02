@@ -23,7 +23,6 @@ import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectBuildFailureException;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -35,29 +34,23 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.plan.BuildPlan;
 import org.apache.maven.lifecycle.plan.BuildPlanUtils;
 import org.apache.maven.lifecycle.plan.BuildPlanner;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
-import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -66,10 +59,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -765,130 +756,6 @@ public class DefaultLifecycleExecutor
         }
 
         return segments;
-    }
-
-    /**
-     * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
-     * lookup directly, or have them passed in
-     * @todo Move this sort of thing to the tail end of the project-building process
-     */
-    private Map findArtifactTypeHandlers( final MavenSession session )
-        throws LifecycleExecutionException, PluginNotFoundException
-    {
-        Map map = new HashMap();
-        for ( Iterator projectIterator = session.getSortedProjects().iterator(); projectIterator.hasNext(); )
-        {
-            MavenProject project = (MavenProject) projectIterator.next();
-
-            for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
-            {
-                Plugin plugin = (Plugin) i.next();
-
-                if ( plugin.isExtensions() )
-                {
-                    verifyPlugin(
-                        plugin,
-                        project,
-                        session );
-
-                    // TODO: if moved to the plugin manager we already have the descriptor from above and so do can
-                    // lookup the container directly
-                    try
-                    {
-                        Map components = pluginManager.getPluginComponents(
-                            plugin,
-                            ArtifactHandler.ROLE );
-                        map.putAll( components );
-                    }
-                    catch ( ComponentLookupException e )
-                    {
-                        getLogger().debug(
-                            "Unable to find the lifecycle component in the extension",
-                            e );
-                    }
-                    catch ( PluginManagerException e )
-                    {
-                        throw new LifecycleExecutionException(
-                            "Error looking up available components from plugin '"
-                                + plugin.getKey() + "': " + e.getMessage(),
-                                project,
-                            e );
-                    }
-
-                    // shudder...
-                    for ( Iterator j = map.values().iterator(); j.hasNext(); )
-                    {
-                        ArtifactHandler handler = (ArtifactHandler) j.next();
-                        if ( project.getPackaging().equals( handler.getPackaging() ) )
-                        {
-                            project.getArtifact().setArtifactHandler( handler );
-                        }
-                    }
-                }
-            }
-        }
-        return map;
-    }
-
-    private PluginDescriptor verifyPlugin( final Plugin plugin,
-                                           final MavenProject project,
-                                           final MavenSession session )
-        throws LifecycleExecutionException, PluginNotFoundException
-    {
-        getLogger().debug( "Verifying plugin: " + plugin.getKey() );
-
-        PluginDescriptor pluginDescriptor;
-        try
-        {
-            pluginDescriptor = pluginManager.verifyPlugin(
-                plugin,
-                project,
-                session );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new LifecycleExecutionException(
-                "Internal error in the plugin manager getting plugin '"
-                    + plugin.getKey() + "': " + e.getMessage(),
-                    project,
-                e );
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                project,
-                e );
-        }
-        catch ( InvalidPluginException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                project,
-                e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                project,
-                e );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                project,
-                e );
-        }
-        catch ( PluginVersionNotFoundException e )
-        {
-            throw new LifecycleExecutionException(
-                e.getMessage(),
-                project,
-                e );
-        }
-        return pluginDescriptor;
     }
 
     private MojoDescriptor getMojoDescriptorForDirectInvocation( final String task,

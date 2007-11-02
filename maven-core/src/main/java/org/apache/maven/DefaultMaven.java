@@ -279,7 +279,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request.getLocalRepository(), request.getProfileManager() );
+            buildExtensionScanner.scanForBuildExtensions( files, request );
         }
         catch ( ExtensionScanningException e )
         {

@@ -6,25 +6,16 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Responsible for loading plugins, reports, and any components contained therein. Will resolve
  * plugin versions and plugin prefixes as necessary for plugin resolution.
- * 
+ *
  * @author jdcasey
  *
  */
 public interface PluginLoader
 {
-
-    /**
-     * Lookup a component with the specified role + roleHint in the plugin's {@link ClassRealm}.
-     * Load the plugin first.
-     */
-    Object loadPluginComponent( String role, String roleHint, Plugin plugin, MavenProject project )
-        throws ComponentLookupException, PluginLoaderException;
 
     /**
      * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
@@ -34,8 +25,8 @@ public interface PluginLoader
         throws PluginLoaderException;
 
     /**
-     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding, 
-     * using the project for {@link ArtifactRepository} and other supplemental plugin information as 
+     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
+     * using the project for {@link ArtifactRepository} and other supplemental plugin information as
      * necessary.
      */
     PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project )
@@ -49,8 +40,8 @@ public interface PluginLoader
         throws PluginLoaderException;
 
     /**
-     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding, 
-     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as 
+     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding,
+     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
      * necessary.
      */
     PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project )
@@ -70,5 +61,5 @@ public interface PluginLoader
      */
     PluginDescriptor findPluginForPrefix( String prefix, MavenProject project )
         throws PluginLoaderException;
-    
+
 }

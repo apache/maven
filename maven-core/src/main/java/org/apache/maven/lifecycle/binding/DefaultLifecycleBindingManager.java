@@ -20,7 +20,6 @@ import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -89,11 +88,7 @@ public class DefaultLifecycleBindingManager
             }
         }
 
-        if ( bindings == null )
-        {
-            bindings = searchPluginsWithExtensions( project );
-        }
-        else
+        if ( bindings != null )
         {
             BindingUtils.injectProjectConfiguration( bindings, project );
         }
@@ -101,93 +96,6 @@ public class DefaultLifecycleBindingManager
         if ( bindings == null )
         {
             bindings = getDefaultBindings( project );
-        }
-
-        return bindings;
-    }
-
-    /**
-     * Search all plugins configured in the POM that have extensions == true, looking for either a
-     * {@link LifecycleBindingLoader} instance, or a {@link LifecycleMapping} instance that matches the project's
-     * packaging. For the first match found, construct the corresponding LifecycleBindings instance and return it after
-     * POM configurations have been injected into any appropriate MojoBinding instances contained within.
-     */
-    private LifecycleBindings searchPluginsWithExtensions( final MavenProject project )
-        throws LifecycleLoaderException, LifecycleSpecificationException
-    {
-        List plugins = project.getBuildPlugins();
-        String packaging = project.getPackaging();
-
-        LifecycleBindings bindings = null;
-
-        for ( Iterator it = plugins.iterator(); it.hasNext(); )
-        {
-            Plugin plugin = (Plugin) it.next();
-            if ( plugin.isExtensions() )
-            {
-                LifecycleBindingLoader loader = null;
-
-                try
-                {
-                    loader =
-                        (LifecycleBindingLoader) pluginLoader.loadPluginComponent( LifecycleBindingLoader.ROLE,
-                                                                                   packaging, plugin, project );
-                }
-                catch ( ComponentLookupException e )
-                {
-                    logger.debug( LifecycleBindingLoader.ROLE + " for packaging: " + packaging
-                                    + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: "
-                                    + e.getMessage(), e );
-                }
-                catch ( PluginLoaderException e )
-                {
-                    throw new LifecycleLoaderException( "Failed to load plugin: " + plugin.getKey() + ". Reason: "
-                                    + e.getMessage(), e );
-                }
-
-                if ( loader != null )
-                {
-                    bindings = loader.getBindings();
-                }
-
-                // TODO: Remove this once we no longer have to support legacy-style lifecycle mappings
-                if ( bindings == null )
-                {
-                    LifecycleMapping mapping = null;
-                    try
-                    {
-                        mapping =
-                            (LifecycleMapping) pluginLoader.loadPluginComponent( LifecycleMapping.ROLE, packaging,
-                                                                                 plugin, project );
-                    }
-                    catch ( ComponentLookupException e )
-                    {
-                        logger.debug( LifecycleMapping.ROLE + " for packaging: " + packaging
-                                        + " could not be retrieved from plugin: " + plugin.getKey() + ".\nReason: "
-                                        + e.getMessage(), e );
-                    }
-                    catch ( PluginLoaderException e )
-                    {
-                        throw new LifecycleLoaderException( "Failed to load plugin: " + plugin.getKey() + ". Reason: "
-                                        + e.getMessage(), e );
-                    }
-
-                    if ( mapping != null )
-                    {
-                        bindings = legacyLifecycleMappingParser.parseMappings( mapping, packaging );
-                    }
-                }
-
-                if ( bindings != null )
-                {
-                    break;
-                }
-            }
-        }
-
-        if ( bindings != null )
-        {
-            BindingUtils.injectProjectConfiguration( bindings, project );
         }
 
         return bindings;
@@ -217,8 +125,6 @@ public class DefaultLifecycleBindingManager
     public LifecycleBindings getProjectCustomBindings( final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
-        String projectId = project.getId();
-
         LifecycleBindings bindings = new LifecycleBindings();
         bindings.setPackaging( project.getPackaging() );
 

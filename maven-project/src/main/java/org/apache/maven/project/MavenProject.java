@@ -83,11 +83,11 @@ import java.util.Stack;
 public class MavenProject
 {
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
-    
+
     public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
-    
+
     public static final String EMPTY_PROJECT_VERSION = "0";
-    
+
     private Model model;
 
     private MavenProject parent;
@@ -140,7 +140,7 @@ public class MavenProject
     private Set extensionArtifacts;
 
     private Map extensionArtifactMap;
-    
+
     private Map managedVersionMap;
 
     private Map projectReferences = new HashMap();
@@ -148,7 +148,7 @@ public class MavenProject
     private Build buildOverlay;
 
     private boolean executionRoot;
-    
+
     private Map moduleAdjustments;
 
     private Stack previousExecutionProjects = new Stack();
@@ -156,11 +156,11 @@ public class MavenProject
     public MavenProject()
     {
         Model model = new Model();
-        
+
         model.setGroupId( EMPTY_PROJECT_GROUP_ID );
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
-        
+
         this.model = model;
     }
 
@@ -174,108 +174,108 @@ public class MavenProject
         // disown the parent
 
         // copy fields
-        this.file = project.file;
+        file = project.file;
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be sure!
         if ( project.dependencyArtifacts != null )
         {
-            this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
+            dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
         }
-        
+
         if ( project.artifacts != null )
         {
-            this.artifacts = Collections.unmodifiableSet( project.artifacts );
+            artifacts = Collections.unmodifiableSet( project.artifacts );
         }
-        
+
         if ( project.pluginArtifacts != null )
         {
-            this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
+            pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
         }
-        
+
         if ( project.reportArtifacts != null )
         {
-            this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
-        }        
-        
+            reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
+        }
+
         if ( project.extensionArtifacts != null )
         {
-            this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
-        }        
-        
-        this.parentArtifact = project.parentArtifact;
+            extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
+        }
+
+        parentArtifact = project.parentArtifact;
 
         if ( project.remoteArtifactRepositories != null )
         {
-            this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
-        }        
-        
+            remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
+        }
+
         if ( project.pluginArtifactRepositories != null )
         {
-            this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
-        }        
-        
+            pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
+        }
+
         if ( project.collectedProjects != null )
         {
-            this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
-        }        
-        
+            collectedProjects = Collections.unmodifiableList( project.collectedProjects );
+        }
+
         if ( project.activeProfiles != null )
         {
-            this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
-        }        
-        
+            activeProfiles = Collections.unmodifiableList( project.activeProfiles );
+        }
+
         if ( project.getAttachedArtifacts() != null )
         {
             // clone properties modifyable by plugins in a forked lifecycle
-            this.attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
-        }        
-        
+            attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
+        }
+
         if ( project.compileSourceRoots != null )
         {
             // clone source roots
-            this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
-        }        
-        
+            compileSourceRoots = new ArrayList( project.compileSourceRoots );
+        }
+
         if ( project.testCompileSourceRoots != null )
         {
-            this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
-        }        
-        
+            testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
+        }
+
         if ( project.scriptSourceRoots != null )
         {
-            this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
-        }        
-        
-        this.model = ModelUtils.cloneModel( project.model );
+            scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
+        }
+
+        model = ModelUtils.cloneModel( project.model );
 
         if ( project.originalModel != null )
         {
-            this.originalModel = ModelUtils.cloneModel( project.originalModel );
+            originalModel = ModelUtils.cloneModel( project.originalModel );
         }
 
-        this.executionRoot = project.executionRoot;
+        executionRoot = project.executionRoot;
 
         if ( project.artifact != null )
         {
-            this.artifact = ArtifactUtils.copyArtifact( project.artifact );
+            artifact = ArtifactUtils.copyArtifact( project.artifact );
         }
-        
+
         if ( project.getManagedVersionMap() != null )
         {
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
-        
+
         if ( project.releaseArtifactRepository != null )
         {
             releaseArtifactRepository = project.releaseArtifactRepository;
         }
-        
+
         if ( project.snapshotArtifactRepository != null )
         {
             snapshotArtifactRepository = project.snapshotArtifactRepository;
         }
     }
-    
+
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
     // usually doesn't have a file associated with it yet.
     public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
@@ -283,20 +283,20 @@ public class MavenProject
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
         // is coming from the repository??
         String module = moduleProject.getArtifactId();
-        
+
         File moduleFile = moduleProject.getFile();
-        
+
         if ( moduleFile != null )
         {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
-            
+
             module = moduleDir.getName();
         }
-        
+
         if ( moduleAdjustments == null )
         {
             moduleAdjustments = new HashMap();
-            
+
             List modules = getModules();
             if ( modules != null )
             {
@@ -304,21 +304,21 @@ public class MavenProject
                 {
                     String modulePath = (String) it.next();
                     String moduleName = modulePath;
-                    
+
                     if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
                     {
                         moduleName = moduleName.substring( 0, moduleName.length() - 1 );
                     }
-                    
+
                     int lastSlash = moduleName.lastIndexOf( '/' );
-                    
+
                     if ( lastSlash < 0 )
                     {
                         lastSlash = moduleName.lastIndexOf( '\\' );
                     }
-                    
+
                     String adjustment = null;
-                    
+
                     if ( lastSlash > -1 )
                     {
                         moduleName = moduleName.substring( lastSlash + 1 );
@@ -329,7 +329,7 @@ public class MavenProject
                 }
             }
         }
-        
+
         return (String) moduleAdjustments.get( module );
     }
 
@@ -530,7 +530,7 @@ public class MavenProject
     {
         Set artifacts = getArtifacts();
 
-        if ( artifacts == null || artifacts.isEmpty() )
+        if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
             return Collections.EMPTY_LIST;
         }
@@ -568,7 +568,7 @@ public class MavenProject
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
-        
+
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
@@ -623,7 +623,7 @@ public class MavenProject
     {
         Set artifacts = getArtifacts();
 
-        if ( artifacts == null || artifacts.isEmpty() )
+        if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
             return Collections.EMPTY_LIST;
         }
@@ -709,7 +709,7 @@ public class MavenProject
     {
         Set artifacts = getArtifacts();
 
-        if ( artifacts == null || artifacts.isEmpty() )
+        if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
             return Collections.EMPTY_LIST;
         }
@@ -786,7 +786,7 @@ public class MavenProject
     {
         Set artifacts = getArtifacts();
 
-        if ( artifacts == null || artifacts.isEmpty() )
+        if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
             return Collections.EMPTY_LIST;
         }
@@ -842,12 +842,12 @@ public class MavenProject
     public String getGroupId()
     {
         String groupId = model.getGroupId();
-        
-        if ( groupId == null && model.getParent() != null )
+
+        if ( ( groupId == null ) && ( model.getParent() != null ) )
         {
             groupId = model.getParent().getGroupId();
         }
-        
+
         return groupId;
     }
 
@@ -887,12 +887,12 @@ public class MavenProject
     public String getVersion()
     {
         String version = model.getVersion();
-        
-        if ( version == null && model.getParent() != null )
+
+        if ( ( version == null ) && ( model.getParent() != null ) )
         {
             version = model.getParent().getVersion();
         }
-        
+
         return version;
     }
 
@@ -1038,7 +1038,7 @@ public class MavenProject
 
     public void setBuild( Build build )
     {
-        this.buildOverlay = new BuildOverlay( build );
+        buildOverlay = new BuildOverlay( build );
 
         model.setBuild( build );
     }
@@ -1103,13 +1103,13 @@ public class MavenProject
         this.artifacts = artifacts;
 
         // flush the calculated artifactMap
-        this.artifactMap = null;
+        artifactMap = null;
     }
 
     /**
      * All dependencies that this project has, including transitive ones.
      * Contents are lazily populated, so depending on what phases have run dependencies in some scopes won't be included.
-     * eg. if only compile phase has run, dependencies with scope test won't be included. 
+     * eg. if only compile phase has run, dependencies with scope test won't be included.
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
@@ -1132,7 +1132,7 @@ public class MavenProject
     {
         this.pluginArtifacts = pluginArtifacts;
 
-        this.pluginArtifactMap = null;
+        pluginArtifactMap = null;
     }
 
     public Set getPluginArtifacts()
@@ -1154,7 +1154,7 @@ public class MavenProject
     {
         this.reportArtifacts = reportArtifacts;
 
-        this.reportArtifactMap = null;
+        reportArtifactMap = null;
     }
 
     public Set getReportArtifacts()
@@ -1176,12 +1176,12 @@ public class MavenProject
     {
         this.extensionArtifacts = extensionArtifacts;
 
-        this.extensionArtifactMap = null;
+        extensionArtifactMap = null;
     }
 
     public Set getExtensionArtifacts()
     {
-        return this.extensionArtifacts;
+        return extensionArtifacts;
     }
 
     public Map getExtensionArtifactMap()
@@ -1249,7 +1249,7 @@ public class MavenProject
 
         return pluginMgmt;
     }
-    
+
     private Build getModelBuild()
     {
         Build build = model.getBuild();
@@ -1260,7 +1260,7 @@ public class MavenProject
 
             model.setBuild( build );
         }
-        
+
         return build;
     }
 
@@ -1277,7 +1277,7 @@ public class MavenProject
             build.flushPluginMap();
         }
     }
-    
+
     public void injectPluginManagementInfo( Plugin plugin )
     {
         PluginManagement pm = getModelBuild().getPluginManagement();
@@ -1288,7 +1288,7 @@ public class MavenProject
 
             String pluginKey = plugin.getKey();
 
-            if ( pmByKey != null && pmByKey.containsKey( pluginKey ) )
+            if ( ( pmByKey != null ) && pmByKey.containsKey( pluginKey ) )
             {
                 Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
 
@@ -1323,7 +1323,7 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() && snapshotArtifactRepository != null ? snapshotArtifactRepository
+        return getArtifact().isSnapshot() && ( snapshotArtifactRepository != null ) ? snapshotArtifactRepository
             : releaseArtifactRepository;
     }
 
@@ -1462,7 +1462,7 @@ public class MavenProject
         {
             previousExecutionProjects.push( this.executionProject );
         }
-        
+
         this.executionProject = executionProject;
     }
 
@@ -1516,15 +1516,15 @@ public class MavenProject
     {
         return originalModel;
     }
-    
+
     public void setManagedVersionMap( Map map )
     {
-        this.managedVersionMap = map;
+        managedVersionMap = map;
     }
-    
+
     public Map getManagedVersionMap()
     {
-        return this.managedVersionMap;
+        return managedVersionMap;
     }
 
     public boolean equals( Object other )
@@ -1553,7 +1553,7 @@ public class MavenProject
     public List getBuildExtensions()
     {
         Build build = getBuild();
-        if ( build == null || build.getExtensions() == null )
+        if ( ( build == null ) || ( build.getExtensions() == null ) )
         {
             return Collections.EMPTY_LIST;
         }
@@ -1624,17 +1624,17 @@ public class MavenProject
 
     public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
     {
-        if ( getProjectReferences() != null && !getProjectReferences().isEmpty() )
+        if ( ( getProjectReferences() != null ) && !getProjectReferences().isEmpty() )
         {
             String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
             MavenProject ref = (MavenProject) getProjectReferences().get( refId );
-            if ( ref != null && ref.getArtifact() != null )
+            if ( ( ref != null ) && ( ref.getArtifact() != null ) )
             {
                 // TODO: if not matching, we should get the correct artifact from that project (attached)
                 if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
                 {
                     // if the project artifact doesn't exist, don't use it. We haven't built that far.
-                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
+                    if ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() )
                     {
                         pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
                         return pluginArtifact;
@@ -1695,7 +1695,7 @@ public class MavenProject
                     ( ref.getGroupId().equals( pluginArtifact.getGroupId() ) ) &&
                     ( ref.getArtifact().getType().equals( "ejb" ) ) &&
                     ( pluginArtifact.getType().equals( "ejb-client" ) ) &&
-                    ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() ) )
+                    ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() ) )
                 {
                     pluginArtifact = new ActiveProjectArtifact(
                         ref,
@@ -1706,12 +1706,12 @@ public class MavenProject
         }
         return pluginArtifact;
     }
-    
+
 	private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
     {
         String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
         MavenProject project = (MavenProject) projectReferences.get( refId );
-        
+
         boolean projectDirFound = false;
         if ( project != null )
         {
@@ -1740,7 +1740,7 @@ public class MavenProject
             list.add( file.getPath() );
         }
     }
-	
+
     public void clearExecutionProject()
     {
         if ( !previousExecutionProjects.isEmpty() )
@@ -1751,5 +1751,10 @@ public class MavenProject
         {
             executionProject = null;
         }
+    }
+
+    public Plugin getPlugin( String pluginKey )
+    {
+        return (Plugin) getBuild().getPluginsAsMap().get( pluginKey );
     }
 }

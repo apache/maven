@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import org.apache.maven.execution.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -57,6 +58,8 @@ public class DefaultConfiguration
     private PlexusContainer parentContainer;
 
     private File localRepository;
+
+    private MavenRealmManager realmManager;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -187,7 +190,7 @@ public class DefaultConfiguration
 
     public Configuration setClassLoader( ClassLoader loader )
     {
-        this.classWorld = new ClassWorld( "plexus.core", loader );
+        classWorld = new ClassWorld( "plexus.core", loader );
 
         return this;
     }
@@ -217,5 +220,16 @@ public class DefaultConfiguration
     public File getLocalRepository()
     {
         return localRepository;
+    }
+
+    public MavenRealmManager getRealmManager()
+    {
+        return realmManager;
+    }
+
+    public Configuration setRealmManager( MavenRealmManager realmManager )
+    {
+        this.realmManager = realmManager;
+        return this;
     }
 }

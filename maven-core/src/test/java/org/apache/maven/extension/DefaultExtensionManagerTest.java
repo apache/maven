@@ -1,6 +1,7 @@
 package org.apache.maven.extension;
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.DefaultArtifactFilterManager;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -9,13 +10,19 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenRealmManager;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenRealmManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -56,7 +63,7 @@ public class DefaultExtensionManagerTest
 
 //        container.getLoggerManager().setThreshold( Logger.LEVEL_DEBUG );
 
-        filterManager = (ArtifactFilterManager) lookup( ArtifactFilterManager.class.getName() );
+        filterManager = new DefaultArtifactFilterManager();
 
         repoFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
 
@@ -110,7 +117,19 @@ public class DefaultExtensionManagerTest
 
         ExtensionManager mgr = newDefaultExtensionManager();
 
-        mgr.addExtension( ext, model, remoteRepositories, localRepository );
+        MavenRealmManager realmManager = new DefaultMavenRealmManager(
+                                                                      container,
+                                                                      new ConsoleLogger(
+                                                                                         Logger.LEVEL_DEBUG,
+                                                                                         "test" ) );
+
+       MavenExecutionRequest request = new DefaultMavenExecutionRequest().setLocalRepository( localRepository )
+                                                                         .setRealmManager( realmManager );
+
+        mgr.addExtension( ext, model, remoteRepositories, request );
+
+        ClassRealm projectRealm = realmManager.getProjectRealm( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        ClassRealm oldRealm = getContainer().setLookupRealm( projectRealm );
 
         List compList = getContainer().getComponentDescriptorList( ArtifactFactory.ROLE );
 
@@ -118,6 +137,8 @@ public class DefaultExtensionManagerTest
 
         ArtifactFactory result = (ArtifactFactory) lookup( ArtifactFactory.ROLE, "test" );
         assertNotNull( result );
+
+        getContainer().setLookupRealm( oldRealm );
     }
 
     public void test_addExtension_usingModel_ShouldLoadCustomLifecycleMappingAndArtifactHandler()
@@ -146,7 +167,16 @@ public class DefaultExtensionManagerTest
 
         ExtensionManager mgr = newDefaultExtensionManager();
 
-        mgr.addExtension( ext, model, remoteRepositories, localRepository );
+        MavenRealmManager realmManager = new DefaultMavenRealmManager(
+                                                                       container,
+                                                                       new ConsoleLogger(
+                                                                                          Logger.LEVEL_DEBUG,
+                                                                                          "test" ) );
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setLocalRepository( localRepository )
+                                                                          .setRealmManager( realmManager );
+
+        mgr.addExtension( ext, model, remoteRepositories, request );
 
         List lcCompList = getContainer().getComponentDescriptorList( LifecycleMapping.ROLE );
 
@@ -156,11 +186,16 @@ public class DefaultExtensionManagerTest
 
         System.out.println( "Got artifact handlers: " + ahCompList );
 
+        ClassRealm projectRealm = realmManager.getProjectRealm( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        ClassRealm oldRealm = getContainer().setLookupRealm( projectRealm );
+
         LifecycleMapping lcResult = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "test" );
         assertNotNull( lcResult );
 
         ArtifactHandler ahResult = (ArtifactHandler) lookup( ArtifactHandler.ROLE, "test" );
         assertNotNull( ahResult );
+
+        getContainer().setLookupRealm( oldRealm );
     }
 
     private ExtensionManager newDefaultExtensionManager()

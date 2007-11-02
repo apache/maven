@@ -19,7 +19,7 @@ package org.apache.maven.extension;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
@@ -34,12 +34,12 @@ import java.util.List;
  */
 public interface ExtensionManager
 {
-    void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
+    void addExtension( Extension extension, MavenProject project, MavenExecutionRequest request )
         throws ExtensionManagerException;
 
     void registerWagons();
 
     void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
-                       ArtifactRepository localRepository )
+                       MavenExecutionRequest request )
         throws ExtensionManagerException;
 }

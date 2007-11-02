@@ -1,6 +1,7 @@
 package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -175,6 +176,17 @@ public class PluginManagerException
     public PluginManagerException( Plugin plugin,
                                    String message,
                                    PlexusContainerException cause )
+    {
+        super( message, cause );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+    }
+
+    public PluginManagerException( Plugin plugin,
+                                   String message,
+                                   RealmManagementException cause )
     {
         super( message, cause );
 

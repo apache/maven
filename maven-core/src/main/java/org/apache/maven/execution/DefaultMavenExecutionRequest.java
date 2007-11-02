@@ -116,6 +116,8 @@ public class DefaultMavenExecutionRequest
      */
     private boolean noSnapshotUpdates;
 
+    private MavenRealmManager realmManager;
+
     public String getBaseDirectory()
     {
         if ( basedir == null )
@@ -602,5 +604,16 @@ public class DefaultMavenExecutionRequest
     public List getRemoteRepositories()
     {
         return remoteRepositories;
+    }
+
+    public MavenExecutionRequest setRealmManager( MavenRealmManager realmManager )
+    {
+        this.realmManager = realmManager;
+        return this;
+    }
+
+    public MavenRealmManager getRealmManager()
+    {
+        return realmManager;
     }
 }

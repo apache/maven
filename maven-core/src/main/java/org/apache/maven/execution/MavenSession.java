@@ -65,6 +65,11 @@ public class MavenSession
         this.reactorManager = reactorManager;
     }
 
+    public MavenRealmManager getRealmManager()
+    {
+        return request.getRealmManager();
+    }
+
     public Map getPluginContext( PluginDescriptor pluginDescriptor,
                                  MavenProject project )
     {

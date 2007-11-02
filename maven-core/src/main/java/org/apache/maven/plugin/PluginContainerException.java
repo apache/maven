@@ -1,5 +1,6 @@
 package org.apache.maven.plugin;
 
+import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.PlexusContainerException;
@@ -26,7 +27,7 @@ public class PluginContainerException
     extends PluginManagerException
 {
 
-    private final ClassRealm pluginRealm;
+    private ClassRealm pluginRealm;
 
     public PluginContainerException( MojoDescriptor mojoDescriptor,
                                      ClassRealm pluginRealm,
@@ -96,6 +97,13 @@ public class PluginContainerException
         super( plugin, message, e );
 
         this.pluginRealm = pluginRealm;
+    }
+
+    public PluginContainerException( Plugin plugin,
+                                     String message,
+                                     RealmManagementException e )
+    {
+        super( plugin, message, e );
     }
 
     public ClassRealm getPluginRealm()

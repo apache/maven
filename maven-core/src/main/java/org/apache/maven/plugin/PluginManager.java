@@ -30,9 +30,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -54,8 +51,6 @@ public interface PluginManager
         throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
         ArtifactResolutionException;
 
-    PluginDescriptor getPluginDescriptorForPrefix( String prefix );
-
     Plugin getPluginDefinitionForPrefix( String prefix,
                                          MavenSession session,
                                          MavenProject project );
@@ -73,14 +68,5 @@ public interface PluginManager
         throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
         InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;
-
-    Object getPluginComponent( Plugin plugin,
-                               String role,
-                               String roleHint )
-        throws PluginManagerException, ComponentLookupException;
-
-    Map getPluginComponents( Plugin plugin,
-                             String role )
-        throws ComponentLookupException, PluginManagerException;
 
 }

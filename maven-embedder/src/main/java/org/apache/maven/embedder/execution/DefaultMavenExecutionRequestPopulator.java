@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
+import org.apache.maven.execution.DefaultMavenRealmManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
@@ -113,7 +114,25 @@ public class DefaultMavenExecutionRequestPopulator
 
         processSettings( request, configuration );
 
+        realmManager( request, configuration );
+
         return request;
+    }
+
+    private void realmManager( MavenExecutionRequest request,
+                               Configuration configuration )
+    {
+        if ( request.getRealmManager() == null )
+        {
+            if ( configuration.getRealmManager() == null )
+            {
+                request.setRealmManager( new DefaultMavenRealmManager( container, getLogger() ) );
+            }
+            else
+            {
+                request.setRealmManager( configuration.getRealmManager() );
+            }
+        }
     }
 
     private void processSettings( MavenExecutionRequest request,
@@ -125,7 +144,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         List settingsProfiles = settings.getProfiles();
 
-        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
+        if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
             List settingsActiveProfileIds = settings.getActiveProfiles();
 
@@ -386,7 +405,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     // ------------------------------------------------------------------------
-    // Snapshot Policy 
+    // Snapshot Policy
     // ------------------------------------------------------------------------
 
     private void snapshotPolicy( MavenExecutionRequest request,
@@ -575,7 +594,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     // ------------------------------------------------------------------------
-    // Profile Manager 
+    // Profile Manager
     // ------------------------------------------------------------------------
 
     private void profileManager( MavenExecutionRequest request,
