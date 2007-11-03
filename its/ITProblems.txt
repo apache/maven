@@ -49,6 +49,9 @@ The top things that could be done:
 6) It's not obvious how to run them from and IDE and that's where I've found it to be most convenient to run them.
    In particular, the resources directory is treated as test sources, which is not the case as each are projects
 
+7) it0119 places artifacts in the o.a.m.plugins and o.c.mojo group IDs to test plugin prefix order instead of using a
+   replacement settings file and subgroups of o.a.m.its as it should
+
 Other issues:
 
     - [ ] An IT should be completely self-contained so that the problem
@@ -130,7 +133,8 @@ Other issues:
     - [ ] it0086 uses production dependency of bsh to test classloading
     - [ ] it0087 uses prodcution dependency of commons-logging to test
           classloading
-    - [ ] it0089 is an integration test for the checkstyle plugin
+    - [ ] it0089 is an integration test for the checkstyle plugin,
+          and places an artifact in the wrong group ID
     - [x] it0094 has a test that attempts to access a protected field
           in a ClassRealm
     - [ ] it0095 uses the help and verifier plugins to test URL
