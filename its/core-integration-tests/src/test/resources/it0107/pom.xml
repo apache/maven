@@ -12,21 +12,20 @@
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-parameter-implementation</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <goals>
-          <goal>param-implementation</goal>
-        </goals>
-        <configuration>
-          <bla><field>foobar</field></bla>
-          <expected>class org.apache.maven.plugin.coreit.sub.MyBla-foobar</expected>
-        </configuration>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>param-implementation</goal>
+            </goals>
+            <configuration>
+              <bla><field>foobar</field></bla>
+              <expected>class org.apache.maven.plugin.coreit.sub.MyBla-foobar</expected>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-  <pluginsRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <url>http://people.apache.org/maven-snapshot-repository</url>
-    </pluginRepository>
-  </pluginsRepositories>
 </project>
