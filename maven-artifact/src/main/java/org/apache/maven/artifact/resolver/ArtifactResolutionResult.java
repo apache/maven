@@ -19,8 +19,8 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -42,7 +42,7 @@ public class ArtifactResolutionResult
     {
         if ( artifacts == null )
         {
-            artifacts = new HashSet();
+            artifacts = new LinkedHashSet();
             
             for ( Iterator it = resolutionNodes.iterator(); it.hasNext(); )
             {

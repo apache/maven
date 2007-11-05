@@ -36,6 +36,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,7 +65,7 @@ public class DefaultArtifactCollector
                                              ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
         throws ArtifactResolutionException
     {
-        Map resolvedArtifacts = new HashMap();
+        Map resolvedArtifacts = new LinkedHashMap();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
 
@@ -74,7 +76,7 @@ public class DefaultArtifactCollector
         recurse( root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
                  listeners );
 
-        Set set = new HashSet();
+        Set set = new LinkedHashSet();
 
         for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
         {

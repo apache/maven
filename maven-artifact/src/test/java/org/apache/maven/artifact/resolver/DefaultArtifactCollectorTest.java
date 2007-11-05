@@ -667,6 +667,23 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
     }
 
+    public void testResolveOrder()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec m = createArtifactSpec( "m", "1.0" );
+        ArtifactSpec n = createArtifactSpec( "n", "1.0" );
+    
+        ArtifactResolutionResult res = collect( createSet( new Object[]{m.artifact, n.artifact} ) );
+        Iterator i = res.getArtifacts().iterator();
+        assertEquals( "m should be first", m.artifact, i.next() );
+        assertEquals( "n should be second", n.artifact, i.next() );
+
+        res = collect( createSet( new Object[]{n.artifact, m.artifact} ) );
+        i = res.getArtifacts().iterator();
+        assertEquals( "n should be first", n.artifact, i.next() );
+        assertEquals( "m should be second", m.artifact, i.next() );
+    }
+
     private Artifact getArtifact( String id, Set artifacts )
     {
         for ( Iterator i = artifacts.iterator(); i.hasNext(); )
