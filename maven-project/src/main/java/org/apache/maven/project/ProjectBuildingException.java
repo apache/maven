@@ -276,13 +276,20 @@ public class ProjectBuildingException
     /**
      * @deprecated use {@link #getPomUri()}
      */
-    public String getPomLocation()
+    public String getPomLocation ()
     {
-        if ( "file".equals( getPomUri().getScheme() ) )
+        if ( getPomUri() != null )
         {
-            return new File( getPomUri() ).getAbsolutePath();
+            if ( "file".equals( getPomUri().getScheme() ) )
+            {
+                return new File( getPomUri() ).getAbsolutePath();
+            }
+            return getPomUri().toString();
         }
-        return getPomUri().toString();
+        else
+        {
+            return "null";
+        }
     }
 
     public String getProjectId()
