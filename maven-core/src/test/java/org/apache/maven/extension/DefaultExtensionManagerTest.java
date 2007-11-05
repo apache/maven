@@ -86,7 +86,15 @@ public class DefaultExtensionManagerTest
 
             if ( f.exists() )
             {
-                FileUtils.forceDelete( f );
+			    try 
+				{
+                    FileUtils.forceDelete( f );
+				}
+				catch (IOException e)
+				{
+				    //the files on windows can still be locked. They were creaed in a temp directory anyway and will get removed in a subsequent clean.
+					//we can safely ignore this error.
+				}
             }
         }
     }
