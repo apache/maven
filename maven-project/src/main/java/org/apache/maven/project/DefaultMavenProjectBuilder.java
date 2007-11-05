@@ -1059,7 +1059,7 @@ public class DefaultMavenProjectBuilder
         URI uri = null;
         try
         {
-            uri = new URI( url.toString() );
+            uri = new URI( url.toString().replaceAll( " ", "%20" ) );
             reader = ReaderFactory.newXmlReader( url.openStream() );
             return readModel( projectId, uri, reader, strict );
         }
