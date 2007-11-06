@@ -88,6 +88,9 @@ public class MavenMetadataSource
 
     private PlexusContainer container;
 
+    /** Unfortunately we have projects that are still sending us JARs without the accompanying POMs. */
+    private boolean strictlyEnforceThePresenceOfAValidMavenPOM = false;
+
     /**
      * Retrieve the metadata for the project from the repository.
      * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
@@ -110,6 +113,7 @@ public class MavenMetadataSource
         MavenProject project = null;
 
         Artifact pomArtifact;
+        
         boolean done = false;
         do
         {
@@ -157,11 +161,13 @@ public class MavenMetadataSource
                     }
                     catch ( ProjectBuildingException e )
                     {
-                        throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
-                            artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
+                        if ( strictlyEnforceThePresenceOfAValidMavenPOM )
+                        {
+                            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
+                                artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
+                        }
                     }
                 }
-
 
                 if ( project != null )
                 {
