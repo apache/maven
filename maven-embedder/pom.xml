@@ -170,7 +170,7 @@ under the License.
        -->
       <id>tycho</id>
       <properties>
-        <bundleVersion>2.1.0.v20070901-1427</bundleVersion>
+        <bundleVersion>2.1.0.v20071105-1933</bundleVersion>
       </properties>
       <build>
         <resources>

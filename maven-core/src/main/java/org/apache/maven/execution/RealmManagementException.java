@@ -56,6 +56,12 @@ public class RealmManagementException
         this.realmId = realmId;
     }
 
+    public RealmManagementException( String realmId, String message )
+    {
+        super( message );
+        this.realmId = realmId;
+    }
+
     public String getRealmId()
     {
         return realmId;

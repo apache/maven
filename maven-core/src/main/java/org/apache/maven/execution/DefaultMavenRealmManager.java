@@ -22,16 +22,18 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultMavenRealmManager
     implements MavenRealmManager
 {
 
-    private Map extensionComponents = new HashMap();
     private Map pluginArtifacts = new HashMap();
+    private Set managedRealmIds = new HashSet();
 
     private final ClassWorld world;
     private final PlexusContainer container;
@@ -47,8 +49,27 @@ public class DefaultMavenRealmManager
 
     public void clear()
     {
-        extensionComponents.clear();
-        pluginArtifacts.clear();
+        Collection realms = new HashSet( world.getRealms() );
+        for ( Iterator it = realms.iterator(); it.hasNext(); )
+        {
+            ClassRealm realm = (ClassRealm) it.next();
+            String id = realm.getId();
+
+            if ( managedRealmIds.contains( id ) )
+            {
+                try
+                {
+                    world.disposeRealm( id );
+                }
+                catch ( NoSuchRealmException e )
+                {
+                    // cannot happen.
+                }
+            }
+        }
+
+        managedRealmIds.clear();
+//        pluginArtifacts.clear();
     }
 
     public boolean hasExtensionRealm( Artifact extensionArtifact )
@@ -73,6 +94,7 @@ public class DefaultMavenRealmManager
         try
         {
             realm = container.getContainerRealm().createChildRealm( id );
+            managedRealmIds.add( id );
         }
         catch ( DuplicateRealmException e )
         {
@@ -92,101 +114,112 @@ public class DefaultMavenRealmManager
         throws RealmManagementException
     {
         String extensionRealmId = RealmUtils.createExtensionRealmId( extensionArtifact );
-        List componentSetDescriptors = (List) extensionComponents.get( extensionRealmId );
 
-        // don't re-discover components once this is done once.
-        if ( componentSetDescriptors == null )
+        if ( extensionArtifact.getFile() == null )
         {
-            ClassWorld discoveryWorld = new ClassWorld();
+            throw new RealmManagementException( extensionRealmId, "Cannot import project extensions; extension artifact has no associated file that can be scanned for extension components (extension: " + extensionArtifact.getId() + ")" );
+        }
+
+        ClassWorld discoveryWorld = new ClassWorld();
+
+        List componentSetDescriptors;
+        try
+        {
+            // Create an entire new ClassWorld, ClassRealm for discovering
+            // the immediate components of the extension artifact, so we don't pollute the
+            // container with component descriptors or realms that don't have any meaning beyond discovery.
+            ClassRealm discoveryRealm;
             try
             {
-                // Create an entire new ClassWorld, ClassRealm for discovering
-                // the immediate components of the extension artifact, so we don't pollute the
-                // container with component descriptors or realms that don't have any meaning beyond discovery.
-                ClassRealm discoveryRealm = new ClassRealm( discoveryWorld, "discovery" );
-                try
-                {
-                    discoveryRealm.addURL( extensionArtifact.getFile().toURL() );
-                }
-                catch ( MalformedURLException e )
-                {
-                    throw new RealmManagementException( extensionRealmId, extensionArtifact, "Unable to generate URL from extension artifact file: " + extensionArtifact.getFile() + " for local-component discovery.", e );
-                }
-
-                ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
-                discoverer.setManager( new DummyDiscovererManager() );
-
-                try
-                {
-                    // Find the extension component descriptors that exist ONLY in the immediate extension
-                    // artifact...this prevents us from adding plexus-archiver components to the mix, for instance,
-                    // when the extension uses that dependency.
-                    componentSetDescriptors = discoverer.findComponents( container.getContext(), discoveryRealm );
-                    extensionComponents.put( extensionRealmId, componentSetDescriptors );
-                }
-                catch ( PlexusConfigurationException e )
-                {
-                    throw new RealmManagementException( extensionRealmId, "Unable to discover components in extension artifact: " + extensionArtifact.getId(), e );
-                }
+                discoveryRealm = discoveryWorld.newRealm( "discovery: " + extensionRealmId );
             }
-            finally
+            catch ( DuplicateRealmException e )
             {
-                Collection realms = discoveryWorld.getRealms();
-                for ( Iterator it = realms.iterator(); it.hasNext(); )
+                throw new RealmManagementException( extensionRealmId, "Unable to create temporary ClassRealm for local-component discovery.", e );
+            }
+
+            try
+            {
+                discoveryRealm.addURL( extensionArtifact.getFile().toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new RealmManagementException( extensionRealmId, extensionArtifact, "Unable to generate URL from extension artifact file: " + extensionArtifact.getFile() + " for local-component discovery.", e );
+            }
+
+            ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
+            discoverer.setManager( new DummyDiscovererManager() );
+
+            try
+            {
+                // Find the extension component descriptors that exist ONLY in the immediate extension
+                // artifact...this prevents us from adding plexus-archiver components to the mix, for instance,
+                // when the extension uses that dependency.
+                componentSetDescriptors = discoverer.findComponents( container.getContext(), discoveryRealm );
+            }
+            catch ( PlexusConfigurationException e )
+            {
+                throw new RealmManagementException( extensionRealmId, "Unable to discover components in extension artifact: " + extensionArtifact.getId(), e );
+            }
+
+            ClassRealm realm = getProjectRealm( projectGroupId, projectArtifactId, projectVersion, true );
+
+            for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
+            {
+                ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
+                for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
                 {
-                    ClassRealm realm = (ClassRealm) it.next();
+                    // For each component in the extension artifact:
+                    ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
+                    String implementation = comp.getImplementation();
+
                     try
                     {
-                        discoveryWorld.disposeRealm( realm.getId() );
+                        logger.debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealmId + "\nto project realm: " + realm.getId() );
+
+                        // Import the extension component's implementation class into the project-level
+                        // realm.
+                        realm.importFrom( extensionRealmId, implementation );
+
+                        // Set the realmId to be used in looking up this extension component to the
+                        // project-level realm, since we now have a restricted import
+                        // that allows most of the extension to stay hidden, and the
+                        // specific local extension components are still accessible
+                        // from the project-level realm.
+                        comp.setRealmId( realm.getId() );
+
+                        // Finally, add the extension component's descriptor (with projectRealm
+                        // set as the lookup realm) to the container.
+                        container.addComponentDescriptor( comp );
                     }
                     catch ( NoSuchRealmException e )
                     {
+                        throw new RealmManagementException( extensionRealmId, "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealmId + " to project realm: " + realm.getId(), e );
+                    }
+                    catch ( ComponentRepositoryException e )
+                    {
+                        String projectId = RealmUtils.createProjectId( projectGroupId, projectArtifactId, projectVersion );
+                        throw new RealmManagementException( extensionRealmId, "Unable to discover components from imports to project: " + projectId + " from extension artifact: " + extensionArtifact.getId(), e );
                     }
                 }
             }
         }
-
-        ClassRealm realm = getProjectRealm( projectGroupId, projectArtifactId, projectVersion, true );
-
-        for ( Iterator it = componentSetDescriptors.iterator(); it.hasNext(); )
+        finally
         {
-            ComponentSetDescriptor compSet = (ComponentSetDescriptor) it.next();
-            for ( Iterator compIt = compSet.getComponents().iterator(); compIt.hasNext(); )
+            Collection realms = discoveryWorld.getRealms();
+            for ( Iterator it = realms.iterator(); it.hasNext(); )
             {
-                // For each component in the extension artifact:
-                ComponentDescriptor comp = (ComponentDescriptor) compIt.next();
-                String implementation = comp.getImplementation();
-
+                ClassRealm realm = (ClassRealm) it.next();
                 try
                 {
-                    logger.debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealmId + "\nto project realm: " + realm.getId() );
-
-                    // Import the extension component's implementation class into the project-level
-                    // realm.
-                    realm.importFrom( extensionRealmId, implementation );
-
-                    // Set the realmId to be used in looking up this extension component to the
-                    // project-level realm, since we now have a restricted import
-                    // that allows most of the extension to stay hidden, and the
-                    // specific local extension components are still accessible
-                    // from the project-level realm.
-                    comp.setRealmId( realm.getId() );
-
-                    // Finally, add the extension component's descriptor (with projectRealm
-                    // set as the lookup realm) to the container.
-                    container.addComponentDescriptor( comp );
+                    discoveryWorld.disposeRealm( realm.getId() );
                 }
                 catch ( NoSuchRealmException e )
                 {
-                    throw new RealmManagementException( extensionRealmId, "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealmId + " to project realm: " + realm.getId(), e );
-                }
-                catch ( ComponentRepositoryException e )
-                {
-                    String projectId = RealmUtils.createProjectId( projectGroupId, projectArtifactId, projectVersion );
-                    throw new RealmManagementException( extensionRealmId, "Unable to discover components from imports to project: " + projectId + " from extension artifact: " + extensionArtifact.getId(), e );
                 }
             }
         }
+
     }
 
     public ClassRealm getProjectRealm( String projectGroupId, String projectArtifactId, String projectVersion )
@@ -210,6 +243,7 @@ public class DefaultMavenRealmManager
                 try
                 {
                     realm = container.getContainerRealm().createChildRealm( id );
+                    managedRealmIds.add( id );
                 }
                 catch ( DuplicateRealmException duplicateError )
                 {
@@ -286,6 +320,7 @@ public class DefaultMavenRealmManager
         try
         {
             realm = world.newRealm( id );
+//            managedRealmIds.add( id );
         }
         catch ( DuplicateRealmException e )
         {

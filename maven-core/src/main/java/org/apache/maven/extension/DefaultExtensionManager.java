@@ -194,47 +194,47 @@ public class DefaultExtensionManager
         if ( ( pluginArtifact != null )
              && coreFilter.include( pluginArtifact ) )
         {
+            MavenProject dummyProject = new MavenProject( originatingModel );
+            EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
+            MavenSession session = new MavenSession( container, request, dispatcher, null );
+
+            PluginDescriptor pd;
+            try
+            {
+                pd = pluginManager.verifyPlugin( plugin, dummyProject, session );
+                pluginArtifact = pd.getPluginArtifact();
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( PluginNotFoundException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( PluginVersionResolutionException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( InvalidPluginException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+            catch ( PluginVersionNotFoundException e )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
+            }
+
             if ( !realmManager.hasExtensionRealm( pluginArtifact ) )
             {
-                MavenProject dummyProject = new MavenProject( originatingModel );
-                EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
-                MavenSession session = new MavenSession( container, request, dispatcher, null );
-
-                PluginDescriptor pd;
-                try
-                {
-                    pd = pluginManager.verifyPlugin( plugin, dummyProject, session );
-                    pluginArtifact = pd.getPluginArtifact();
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( PluginNotFoundException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( InvalidPluginException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-                catch ( PluginVersionNotFoundException e )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension plugin: " + pluginArtifact, pluginArtifact, groupId, artifactId, version, e );
-                }
-
                 try
                 {
                     realmManager.createExtensionRealm( pluginArtifact, pd.getArtifacts() );
@@ -300,71 +300,67 @@ public class DefaultExtensionManager
         if ( ( extensionArtifact != null )
              && coreFilter.include( extensionArtifact ) )
         {
+            ArtifactFilter filter =
+                new ProjectArtifactExceptionFilter( coreFilter, projectArtifact );
+
+            ResolutionGroup resolutionGroup;
+
+            ArtifactRepository localRepository = request.getLocalRepository();
+
+            try
+            {
+                resolutionGroup = artifactMetadataSource.retrieve( extensionArtifact, localRepository, remoteRepositories );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ExtensionManagerException( "Unable to download metadata from repository for extension artifact '" +
+                    extensionArtifact.getId() + "': " + e.getMessage(), extensionArtifact, projectGroupId, projectArtifactId, projectVersion, e );
+            }
+
+            Set dependencies = new LinkedHashSet();
+
+            dependencies.add( extensionArtifact );
+            dependencies.addAll( resolutionGroup.getArtifacts() );
+
+            ArtifactResolutionRequest dependencyReq = new ArtifactResolutionRequest().setArtifact( projectArtifact )
+                                                                           .setArtifactDependencies( dependencies )
+                                                                           .setFilter( filter )
+                                                                           .setLocalRepository( localRepository )
+                                                                           .setRemoteRepostories( remoteRepositories )
+                                                                           .setMetadataSource( artifactMetadataSource );
+
+            // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
+            ArtifactResolutionResult result = artifactResolver.resolve( dependencyReq );
+
+            if ( result.hasCircularDependencyExceptions() || result.hasErrorArtifactExceptions()
+                 || result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations() )
+            {
+                throw new ExtensionManagerException( "Failed to resolve extension: " + extensionArtifact, extensionArtifact, projectGroupId, projectArtifactId, projectVersion, result );
+            }
+
+            Set resultArtifacts = new LinkedHashSet();
+            for ( Iterator iterator = result.getArtifacts().iterator(); iterator.hasNext(); )
+            {
+                Artifact a = (Artifact) iterator.next();
+
+
+                if ( activeArtifactResolver != null )
+                {
+                    a = activeArtifactResolver.replaceWithActiveArtifact( a );
+                }
+
+                getLogger().debug( "Adding: " + a.getFile() + " to classpath for extension: " + extensionArtifact.getId() );
+                resultArtifacts.add( a );
+            }
+
+            // TODO: This shouldn't be required, now that we're checking the core filter before getting here.
+            if ( !extensionArtifact.isResolved() || ( extensionArtifact.getFile() == null ) )
+            {
+                throw new ExtensionManagerException( "Extension artifact was not resolved, or has no file associated with it.", extensionArtifact, projectGroupId, projectArtifactId, projectVersion );
+            }
+
             if ( !realmManager.hasExtensionRealm( extensionArtifact ) )
             {
-                ArtifactFilter filter =
-                    new ProjectArtifactExceptionFilter( coreFilter, projectArtifact );
-
-                ResolutionGroup resolutionGroup;
-
-                ArtifactRepository localRepository = request.getLocalRepository();
-
-                try
-                {
-                    resolutionGroup = artifactMetadataSource.retrieve( extensionArtifact, localRepository, remoteRepositories );
-                }
-                catch ( ArtifactMetadataRetrievalException e )
-                {
-                    throw new ExtensionManagerException( "Unable to download metadata from repository for extension artifact '" +
-                        extensionArtifact.getId() + "': " + e.getMessage(), extensionArtifact, projectGroupId, projectArtifactId, projectVersion, e );
-                }
-
-                // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
-                // not declare plexus-utils but need it. MNG-2900
-//                DefaultPluginManager.checkPlexusUtils( resolutionGroup, artifactFactory );
-
-                Set dependencies = new LinkedHashSet();
-
-                dependencies.add( extensionArtifact );
-                dependencies.addAll( resolutionGroup.getArtifacts() );
-
-                ArtifactResolutionRequest dependencyReq = new ArtifactResolutionRequest().setArtifact( projectArtifact )
-                                                                               .setArtifactDependencies( dependencies )
-                                                                               .setFilter( filter )
-                                                                               .setLocalRepository( localRepository )
-                                                                               .setRemoteRepostories( remoteRepositories )
-                                                                               .setMetadataSource( artifactMetadataSource );
-
-                // TODO: Make this work with managed dependencies, or an analogous management section in the POM.
-                ArtifactResolutionResult result = artifactResolver.resolve( dependencyReq );
-
-                if ( result.hasCircularDependencyExceptions() || result.hasErrorArtifactExceptions()
-                     || result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations() )
-                {
-                    throw new ExtensionManagerException( "Failed to resolve extension: " + extensionArtifact, extensionArtifact, projectGroupId, projectArtifactId, projectVersion, result );
-                }
-
-                Set resultArtifacts = new LinkedHashSet();
-                for ( Iterator iterator = result.getArtifacts().iterator(); iterator.hasNext(); )
-                {
-                    Artifact a = (Artifact) iterator.next();
-
-
-                    if ( activeArtifactResolver != null )
-                    {
-                        a = activeArtifactResolver.replaceWithActiveArtifact( a );
-                    }
-
-                    getLogger().debug( "Adding: " + a.getFile() + " to classpath for extension: " + extensionArtifact.getId() );
-                    resultArtifacts.add( a );
-                }
-
-                // TODO: This shouldn't be required, now that we're checking the core filter before getting here.
-                if ( !extensionArtifact.isResolved() || ( extensionArtifact.getFile() == null ) )
-                {
-                    throw new ExtensionManagerException( "Extension artifact was not resolved, or has no file associated with it.", extensionArtifact, projectGroupId, projectArtifactId, projectVersion );
-                }
-
                 try
                 {
                     realmManager.createExtensionRealm( extensionArtifact, resultArtifacts );

@@ -328,6 +328,19 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
+    throws ProjectBuildingException, ExtensionScanningException
+    {
+        try
+        {
+            return readProject( mavenProject, request );
+        }
+        finally
+        {
+            request.getRealmManager().clear();
+        }
+    }
+
+    private MavenProject readProject( File mavenProject, MavenExecutionRequest request )
         throws ProjectBuildingException, ExtensionScanningException
     {
         getLogger().info( "Scanning for extensions: " + mavenProject );
@@ -350,89 +363,96 @@ public class MavenEmbedder
 
         try
         {
-            request = populator.populateDefaults( request, configuration );
+            try
+            {
+                request = populator.populateDefaults( request, configuration );
 
-            // This is necessary to make the MavenEmbedderProjectWithExtensionReadingTest work which uses
-            // a custom type for a dependency like this:
+                // This is necessary to make the MavenEmbedderProjectWithExtensionReadingTest work which uses
+                // a custom type for a dependency like this:
+                //
+                // <dependency>
+                //   <groupId>junit</groupId>
+                //   <artifactId>junit</artifactId>
+                //   <version>3.8.1</version>
+                //   <scope>test</scope>
+                //   <type>mkleint</type>
+                // </dependency>
+                //
+                // If the artifact handlers are not loaded up-front then this dependency element is not
+                // registered as an artifact and is not added to the classpath elements.
+
+                MavenProject project = readProject( request.getPom(), request );
+
+//                Map handlers = findArtifactTypeHandlers( project );
+
+                //TODO: ok this is crappy, now there are active collections so when new artifact handlers
+                // enter the system they should be available.
+
+//                artifactHandlerManager.addHandlers( handlers );
+            }
+            catch ( MavenEmbedderException e )
+            {
+                return result.addUnknownException( e );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                return result.addProjectBuildingException( e );
+            }
+            catch ( ExtensionScanningException e )
+            {
+                return result.addExtensionScanningException( e );
+            }
+
+            ReactorManager reactorManager = maven.createReactorManager( request, result );
+
+            if ( result.hasExceptions() )
+            {
+                return result;
+            }
+
+            MavenProjectBuildingResult projectBuildingResult;
+
+            try
+            {
+                projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
+                    request.getPom(),
+                    request.getLocalRepository(),
+                    request.getProfileManager() );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                return result.addProjectBuildingException( e );
+            }
+
+            if ( reactorManager.hasMultipleProjects() )
+            {
+                result.setProject( projectBuildingResult.getProject() );
+
+                result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+            }
+            else
+            {
+                result.setProject( projectBuildingResult.getProject() );
+
+                result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
+            }
+
+            result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
+
+            // From this I could produce something that would help IDE integrators create importers:
+            // - topo sorted list of projects
+            // - binary dependencies
+            // - source dependencies (projects in the reactor)
             //
-            // <dependency>
-            //   <groupId>junit</groupId>
-            //   <artifactId>junit</artifactId>
-            //   <version>3.8.1</version>
-            //   <scope>test</scope>
-            //   <type>mkleint</type>
-            // </dependency>
-            //
-            // If the artifact handlers are not loaded up-front then this dependency element is not
-            // registered as an artifact and is not added to the classpath elements.
+            // We could create a layer approach here. As to do anything you must resolve a projects artifacts,
+            // and with that set you could then subsequently execute goals for each of those project.
 
-            MavenProject project = readProject( request.getPom() );
-
-//            Map handlers = findArtifactTypeHandlers( project );
-
-            //TODO: ok this is crappy, now there are active collections so when new artifact handlers
-            // enter the system they should be available.
-
-//            artifactHandlerManager.addHandlers( handlers );
-        }
-        catch ( MavenEmbedderException e )
-        {
-            return result.addUnknownException( e );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            return result.addProjectBuildingException( e );
-        }
-        catch ( ExtensionScanningException e )
-        {
-            return result.addExtensionScanningException( e );
-        }
-
-        ReactorManager reactorManager = maven.createReactorManager( request, result );
-
-        if ( result.hasExceptions() )
-        {
             return result;
         }
-
-        MavenProjectBuildingResult projectBuildingResult;
-
-        try
+        finally
         {
-            projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
-                request.getPom(),
-                request.getLocalRepository(),
-                request.getProfileManager() );
+            request.getRealmManager().clear();
         }
-        catch ( ProjectBuildingException e )
-        {
-            return result.addProjectBuildingException( e );
-        }
-
-        if ( reactorManager.hasMultipleProjects() )
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-        }
-        else
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
-        }
-
-        result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
-
-        // From this I could produce something that would help IDE integrators create importers:
-        // - topo sorted list of projects
-        // - binary dependencies
-        // - source dependencies (projects in the reactor)
-        //
-        // We could create a layer approach here. As to do anything you must resolve a projects artifacts,
-        // and with that set you could then subsequently execute goals for each of those project.
-
-        return result;
     }
 
     // ----------------------------------------------------------------------
@@ -786,6 +806,7 @@ public class MavenEmbedder
         finally
         {
             loggerManager.setThresholds( oldThreshold );
+            request.getRealmManager().clear();
         }
     }
 

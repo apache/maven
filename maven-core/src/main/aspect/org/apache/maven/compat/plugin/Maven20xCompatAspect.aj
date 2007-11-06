@@ -37,7 +37,6 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Set;
@@ -129,6 +128,8 @@ public privileged aspect Maven20xCompatAspect
         && this( mgr )
         && notHere();
 
+    // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
+    // not declare plexus-utils but need it. MNG-2900
     Set around( DefaultExtensionManager mgr ): extDepArtifactsResolved( mgr )
     {
         Set result = proceed( mgr );
