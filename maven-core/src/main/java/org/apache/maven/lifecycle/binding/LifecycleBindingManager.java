@@ -45,7 +45,7 @@ public interface LifecycleBindingManager
      * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
      */
     LifecycleBindings getPluginLifecycleOverlay( PluginDescriptor pluginDescriptor, String lifecycleId,
-                                                 MavenProject project, boolean includeReportConfig )
+                                                 MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException;
 
     /**

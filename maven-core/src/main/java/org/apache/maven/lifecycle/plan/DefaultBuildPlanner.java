@@ -78,9 +78,7 @@ public class DefaultBuildPlanner
 
             if ( !LifecycleUtils.isValidPhaseName( task ) )
             {
-                logger.warn( "Assuming that mojo: \'" + task + "\' does NOT need configuration from the <reporting /> section of the POM." );
-
-                MojoBinding binding = mojoBindingFactory.parseMojoBinding( task, project, true, false );
+                MojoBinding binding = mojoBindingFactory.parseMojoBinding( task, project, true );
                 plan.addDirectInvocationBinding( task, binding );
             }
         }
@@ -290,7 +288,7 @@ public class DefaultBuildPlanner
                 try
                 {
                     overlayBindings =
-                        lifecycleBindingManager.getPluginLifecycleOverlay( pluginDescriptor, executeLifecycle, project, includeReportConfig );
+                        lifecycleBindingManager.getPluginLifecycleOverlay( pluginDescriptor, executeLifecycle, project );
                 }
                 catch ( LifecycleLoaderException e )
                 {
@@ -343,7 +341,7 @@ public class DefaultBuildPlanner
 
         MojoBinding binding =
             mojoBindingFactory.createMojoBinding( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(),
-                                                  pluginDescriptor.getVersion(), executeGoal, project, includeReportConfig );
+                                                  pluginDescriptor.getVersion(), executeGoal, project );
 
         binding.setOrigin( "Forked from " + referencingGoal );
 

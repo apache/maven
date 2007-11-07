@@ -28,7 +28,7 @@ public class DefaultMojoBindingFactory
      * If a plugin-prefix is allowed and used, resolve the prefix and use the resulting PluginDescriptor
      * to set groupId and artifactId on the MojoBinding instance.
      */
-    public MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, boolean allowPrefixReference, boolean includeReportConfig )
+    public MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, boolean allowPrefixReference )
         throws LifecycleSpecificationException, LifecycleLoaderException
     {
         StringTokenizer tok = new StringTokenizer( bindingSpec, ":" );
@@ -61,7 +61,7 @@ public class DefaultMojoBindingFactory
             }
 
             binding = createMojoBinding( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(),
-                                         pluginDescriptor.getVersion(), tok.nextToken(), project, includeReportConfig );
+                                         pluginDescriptor.getVersion(), tok.nextToken(), project );
         }
         else if ( ( numTokens == 3 ) || ( numTokens == 4 ) )
         {
@@ -78,7 +78,7 @@ public class DefaultMojoBindingFactory
 
             String goal = tok.nextToken();
 
-            binding = createMojoBinding( groupId, artifactId, version, goal, project, includeReportConfig );
+            binding = createMojoBinding( groupId, artifactId, version, goal, project );
         }
         else
         {
@@ -95,7 +95,7 @@ public class DefaultMojoBindingFactory
      * Create a new MojoBinding instance with the specified information, and inject POM configurations
      * appropriate to that mojo before returning it.
      */
-    public MojoBinding createMojoBinding( String groupId, String artifactId, String version, String goal, MavenProject project, boolean includeReportConfig )
+    public MojoBinding createMojoBinding( String groupId, String artifactId, String version, String goal, MavenProject project )
     {
         MojoBinding binding = new MojoBinding();
 
@@ -104,7 +104,7 @@ public class DefaultMojoBindingFactory
         binding.setVersion( version );
         binding.setGoal( goal );
 
-        BindingUtils.injectProjectConfiguration( binding, project, includeReportConfig );
+        BindingUtils.injectProjectConfiguration( binding, project );
 
         return binding;
     }
@@ -119,7 +119,7 @@ public class DefaultMojoBindingFactory
     {
         try
         {
-            return parseMojoBinding( bindingSpec, null, false, false );
+            return parseMojoBinding( bindingSpec, null, false );
         }
         catch ( LifecycleLoaderException e )
         {

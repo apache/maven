@@ -23,7 +23,6 @@ import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectBuildFailureException;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.context.BuildContextManager;
@@ -83,8 +82,6 @@ public class DefaultLifecycleExecutor
     private PluginLoader pluginLoader;
 
     private BuildPlanner buildPlanner;
-
-    private ArtifactHandlerManager artifactHandlerManager;
 
     private MojoBindingFactory mojoBindingFactory;
 
@@ -768,8 +765,7 @@ public class DefaultLifecycleExecutor
         MojoBinding binding = mojoBindingFactory.parseMojoBinding(
             task,
             project,
-            true,
-            false );
+            true );
 
         PluginDescriptor descriptor = pluginLoader.loadPlugin(
             binding,

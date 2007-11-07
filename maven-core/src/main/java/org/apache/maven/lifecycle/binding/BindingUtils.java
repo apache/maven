@@ -199,7 +199,7 @@ final class BindingUtils
      * Inject any plugin configuration available from the specified POM into the MojoBinding, after
      * first merging in the applicable configuration from the POM's pluginManagement section.
      */
-    static void injectProjectConfiguration( MojoBinding binding, MavenProject project, boolean includeReportConfig )
+    static void injectProjectConfiguration( MojoBinding binding, MavenProject project )
     {
         Map pluginMap = buildPluginMap( project );
 
@@ -219,26 +219,23 @@ final class BindingUtils
 
         Object configuration = mergeConfigurations( plugin, exec );
 
-        if ( includeReportConfig )
+        ReportPlugin reportPlugin = (ReportPlugin) BindingUtils.buildReportPluginMap( project ).get( key );
+        if ( reportPlugin != null )
         {
-            ReportPlugin reportPlugin = (ReportPlugin) BindingUtils.buildReportPluginMap( project ).get( key );
-            if ( reportPlugin != null )
+            Map reportSets = reportPlugin.getReportSetsAsMap();
+
+            ReportSet reportSet = null;
+            if ( ( reportSets != null ) && ( exec != null ) )
             {
-                Map reportSets = reportPlugin.getReportSetsAsMap();
-
-                ReportSet reportSet = null;
-                if ( ( reportSets != null ) && ( exec != null ) )
-                {
-                    reportSet = (ReportSet) reportSets.get( exec.getId() );
-                }
-
-                Object reportConfig = BindingUtils.mergeConfigurations( reportPlugin, reportSet );
-
-                // NOTE: This looks weird, but we must retain some consistency with
-                // dominance of plugin configs, regardless of whether they're report
-                // mojos or not.
-                configuration = mergeRawConfigurations( reportConfig, configuration );
+                reportSet = (ReportSet) reportSets.get( exec.getId() );
             }
+
+            Object reportConfig = BindingUtils.mergeConfigurations( reportPlugin, reportSet );
+
+            // NOTE: This looks weird, but we must retain some consistency with
+            // dominance of plugin configs, regardless of whether they're report
+            // mojos or not.
+            configuration = mergeRawConfigurations( reportConfig, configuration );
         }
 
         binding.setConfiguration( configuration );

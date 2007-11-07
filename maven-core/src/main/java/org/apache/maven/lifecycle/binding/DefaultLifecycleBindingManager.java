@@ -276,8 +276,7 @@ public class DefaultLifecycleBindingManager
      * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
      */
     public LifecycleBindings getPluginLifecycleOverlay( final PluginDescriptor pluginDescriptor,
-                                                        final String lifecycleId, final MavenProject project,
-                                                        final boolean includeReportConfig )
+                                                        final String lifecycleId, final MavenProject project )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         Lifecycle lifecycleOverlay = null;
@@ -344,7 +343,7 @@ public class DefaultLifecycleBindingManager
                     MojoBinding binding;
                     if ( goal.indexOf( ":" ) > 0 )
                     {
-                        binding = mojoBindingFactory.parseMojoBinding( goal, project, false, includeReportConfig );
+                        binding = mojoBindingFactory.parseMojoBinding( goal, project, false );
                     }
                     else
                     {
@@ -553,7 +552,7 @@ public class DefaultLifecycleBindingManager
                 binding.setExecutionId( id );
                 binding.setOrigin( "POM" );
 
-                BindingUtils.injectProjectConfiguration( binding, project, true );
+                BindingUtils.injectProjectConfiguration( binding, project );
 
                 reports.add( binding );
             }

@@ -23,14 +23,14 @@ public interface MojoBindingFactory
      * If a plugin-prefix is allowed and used, resolve the prefix and use the resulting PluginDescriptor
      * to set groupId and artifactId on the MojoBinding instance.
      */
-    MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, boolean allowPrefixReference, boolean includeReportConfig )
+    MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, boolean allowPrefixReference )
         throws LifecycleSpecificationException, LifecycleLoaderException;
 
     /**
      * Create a new MojoBinding instance with the specified information, and inject POM configurations
      * appropriate to that mojo before returning it.
      */
-    MojoBinding createMojoBinding( String groupId, String artifactId, String version, String goal, MavenProject project, boolean includeReportConfig );
+    MojoBinding createMojoBinding( String groupId, String artifactId, String version, String goal, MavenProject project );
 
     /**
      * Simplified version of {@link MojoBindingFactory#parseMojoBinding(String, MavenProject, boolean)}
