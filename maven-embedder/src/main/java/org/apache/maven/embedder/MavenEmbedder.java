@@ -343,11 +343,11 @@ public class MavenEmbedder
     private MavenProject readProject( File mavenProject, MavenExecutionRequest request )
         throws ProjectBuildingException, ExtensionScanningException
     {
-        getLogger().info( "Scanning for extensions: " + mavenProject );
+        getLogger().debug( "Scanning for extensions: " + mavenProject );
 
         extensionScanner.scanForBuildExtensions( mavenProject, request );
 
-        getLogger().info( "Building MavenProject instance: " + mavenProject );
+        getLogger().debug( "Building MavenProject instance: " + mavenProject );
 
         return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager() );
     }
