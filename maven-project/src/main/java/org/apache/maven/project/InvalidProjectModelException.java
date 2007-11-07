@@ -19,29 +19,17 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.net.URI;
-
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
+
 public class InvalidProjectModelException
     extends ProjectBuildingException
 {
     private ModelValidationResult validationResult;
-
-    /**
-     * 
-     * @param projectId
-     * @param message
-     * @param pomLocation pom location
-     */
-    public InvalidProjectModelException( String projectId, String message, URI pomLocation )
-    {
-        super( projectId, message, pomLocation );
-    }
 
     public InvalidProjectModelException( String projectId, String message, File pomLocation )
     {
@@ -49,7 +37,7 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @deprecated use {@link File} constructor for pomLocation
      * @param projectId
      * @param pomLocation absolute path of the pom file
      * @param message
@@ -70,7 +58,7 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @deprecated use {@link File} constructor for pomLocation
      * @param projectId
      * @param pomLocation absolute path of the pom file
      * @param message
@@ -81,7 +69,7 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @deprecated use {@link File} constructor for pomLocation
      */
     public InvalidProjectModelException( String projectId, String pomLocation, String message,
                                          ModelInterpolationException cause )
@@ -96,7 +84,7 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @deprecated use {@link File} constructor for pomLocation
      */
     public InvalidProjectModelException( String projectId, String pomLocation, String message,
                                          InvalidRepositoryException cause )
@@ -111,17 +99,23 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} or {@link URI} constructors for pomLocation
+     * @deprecated use {@link File} constructor for pomLocation
      */
     public InvalidProjectModelException( String projectId, String pomLocation, String message,
                                          XmlPullParserException cause )
     {
-        this( projectId, message, new File( pomLocation ).toURI(), cause );
+        this( projectId, message, new File( pomLocation ), cause );
     }
 
-    public InvalidProjectModelException( String projectId, String message, URI pomLocation, XmlPullParserException cause )
+    public InvalidProjectModelException( String projectId, String message, File pomFile, XmlPullParserException cause )
     {
-        super( projectId, message, pomLocation, cause );
+        super( projectId, message, pomFile, cause );
+    }
+
+    // for super-POM building.
+    public InvalidProjectModelException( String projectId, String message, XmlPullParserException cause )
+    {
+        super( projectId, message, cause );
     }
 
     public final ModelValidationResult getValidationResult()

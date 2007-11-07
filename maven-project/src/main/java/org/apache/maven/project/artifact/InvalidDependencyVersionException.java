@@ -1,6 +1,11 @@
 package org.apache.maven.project.artifact;
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.InvalidProjectVersionException;
+
+import java.io.File;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,18 +33,23 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
  * @version $Id$
  */
 public class InvalidDependencyVersionException
-    extends Exception
+    extends InvalidProjectVersionException
 {
-    public InvalidDependencyVersionException( String message, InvalidVersionSpecificationException cause )
+    private Dependency dependency;
+
+    public InvalidDependencyVersionException( String projectId, Dependency dependency, File pomFile, InvalidVersionSpecificationException cause )
     {
-        super( message, cause );
+        super( projectId, formatLocationInPom( dependency ), dependency.getVersion(), pomFile, cause );
+        this.dependency = dependency;
     }
 
-    /**
-     * @deprecated use {@link #InvalidDependencyVersionException(String, InvalidVersionSpecificationException)}
-     */
-    public InvalidDependencyVersionException( String message, Exception cause )
+    private static String formatLocationInPom( Dependency dependency )
     {
-        super( message, cause );
+        return "dependency: " + ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
+    }
+
+    public Dependency getDependency()
+    {
+        return dependency;
     }
 }

@@ -1,6 +1,9 @@
 package org.apache.maven;
 
+import org.apache.maven.lifecycle.LifecycleLoaderException;
+import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.TaskValidationResult;
+import org.apache.maven.plugin.loader.PluginLoaderException;
 
 /**
  * Exception which occurs when a task or goal is specified on the command line
@@ -17,9 +20,24 @@ public class InvalidTaskException
 
     private final String task;
 
-    public InvalidTaskException( TaskValidationResult result )
+    public InvalidTaskException( TaskValidationResult result,
+                                 LifecycleLoaderException cause )
     {
-        super( result.getMessage(), result.getCause() );
+        super( result.getMessage(), cause );
+        task = result.getInvalidTask();
+    }
+
+    public InvalidTaskException( TaskValidationResult result,
+                                 LifecycleSpecificationException cause )
+    {
+        super( result.getMessage(), cause );
+        task = result.getInvalidTask();
+    }
+
+    public InvalidTaskException( TaskValidationResult result,
+                                 PluginLoaderException cause )
+    {
+        super( result.getMessage(), cause );
         task = result.getInvalidTask();
     }
 

@@ -69,8 +69,8 @@ import org.apache.maven.project.validation.ModelValidator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -78,8 +78,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -378,8 +376,7 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
-                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), pomFile, e );
+                    throw new InvalidDependencyVersionException( projectId, d, pomFile, e );
                 }
             }
         }
@@ -1006,7 +1003,22 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = ReaderFactory.newXmlReader( file );
-            return readModel( projectId, file.toURI(), reader, strict );
+
+            String modelSource = IOUtil.toString( reader );
+
+            checkModelVersion( modelSource, projectId, file );
+
+            StringReader sReader = new StringReader( modelSource );
+
+            try
+            {
+                return modelReader.read( sReader, strict );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(),
+                                                        file, e );
+            }
         }
         catch ( FileNotFoundException e )
         {
@@ -1024,58 +1036,14 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId,
-                             URI pomLocation,
-                             Reader reader,
-                             boolean strict )
-        throws IOException, InvalidProjectModelException
+    private void checkModelVersion( String modelSource,
+                                    String projectId,
+                                    File file )
+        throws InvalidProjectModelException
     {
-        String modelSource = IOUtil.toString( reader );
-
         if ( modelSource.indexOf( "<modelVersion>" + MAVEN_MODEL_VERSION ) < 0 )
         {
-            throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", pomLocation );
-        }
-
-        StringReader sReader = new StringReader( modelSource );
-
-        try
-        {
-            return modelReader.read( sReader, strict );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(),
-                                                    pomLocation, e );
-        }
-    }
-
-    private Model readModel( String projectId,
-                             URL url,
-                             boolean strict )
-        throws ProjectBuildingException
-    {
-        Reader reader = null;
-        URI uri = null;
-        try
-        {
-            uri = new URI( url.toString().replaceAll( " ", "%20" ) );
-            reader = ReaderFactory.newXmlReader( url.openStream() );
-            return readModel( projectId, uri, reader, strict );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
-                "\'\nError: \'" + e.getLocalizedMessage() + "\'", uri, e );
-        }
-        catch ( URISyntaxException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm()
-                + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
+            throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", file );
         }
     }
 
@@ -1222,7 +1190,7 @@ public class DefaultMavenProjectBuilder
 
     // TODO: share with createPluginArtifacts?
     protected Set createExtensionArtifacts( String projectId,
-                                            List extensions, File pomLocation )
+                                            List extensions, File pomFile )
         throws ProjectBuildingException
     {
         Set extensionArtifacts = new HashSet();
@@ -1252,9 +1220,9 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                        "' for extension '" + ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() ) +
-                        "': " + e.getMessage(), pomLocation, e );
+                    String key = ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() );
+                    throw new InvalidProjectVersionException( projectId, "extension '" + key,
+                                                              version, pomFile, e );
                 }
 
                 if ( artifact != null )
@@ -1278,6 +1246,30 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
-        return readModel( projectId, url, STRICT_MODEL_PARSING );
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( url.openStream() );
+            String modelSource = IOUtil.toString( reader );
+
+            checkModelVersion( modelSource, projectId, null );
+
+            StringReader sReader = new StringReader( modelSource );
+
+            return modelReader.read( sReader, STRICT_MODEL_PARSING );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(), e );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
+                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
     }
 }

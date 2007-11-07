@@ -323,7 +323,7 @@ public class DefaultModelLineageBuilder
             {
                 try
                 {
-                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, model.getId() );
+                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, model.getId(), modelPomFile );
                     isResolved = true;
                 }
                 catch( ProjectBuildingException e )
@@ -396,15 +396,11 @@ public class DefaultModelLineageBuilder
     }
 
     private File resolveParentFromRepositories( Parent modelParent, ArtifactRepository localRepository,
-                                                List remoteRepositories, String childId )
+                                                List remoteRepositories, String childId, File childPomFile )
         throws ProjectBuildingException
     {
         Artifact parentPomArtifact = artifactFactory.createBuildArtifact( modelParent.getGroupId(), modelParent
             .getArtifactId(), modelParent.getVersion(), "pom" );
-
-//        getLogger().debug( "Looking for parent: " + modelParent.getId() + " using artifact: " + parentPomArtifact );
-//        getLogger().debug( "\tLocal repository: " + localRepository.getBasedir() + "\n" );
-//        getLogger().debug( "\tRemote repositories:\n" + remoteRepositories.toString().replace( ',', '\n' ) + "\n" );
 
         try
         {
@@ -412,13 +408,11 @@ public class DefaultModelLineageBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( "Parent: " + modelParent.getId(),
-                                                "Failed to resolve POM for parent of: " + childId, e );
+            throw new ProjectBuildingException( childId, "Failed to resolve parent POM: " + modelParent.getId(), childPomFile, e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new ProjectBuildingException( "Parent: " + modelParent.getId(), "Cannot find parent: "
-                + parentPomArtifact.getId() + " of: " + childId, e );
+            throw new ProjectBuildingException( childId, "Cannot find artifact for parent POM: " + modelParent.getId(), childPomFile, e );
         }
 
         if ( parentPomArtifact.isResolved() )

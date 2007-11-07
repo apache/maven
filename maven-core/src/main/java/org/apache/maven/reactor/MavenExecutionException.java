@@ -4,6 +4,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.project.ProjectBuildingException;
 
+import java.io.File;
 import java.io.IOException;
 
 /*
@@ -51,26 +52,21 @@ import java.io.IOException;
 public class MavenExecutionException
     extends Exception
 {
-    public MavenExecutionException()
-    {
-    }
+    private File pomFile;
 
-    public MavenExecutionException( String message )
+    public MavenExecutionException( String message, File pomFile )
     {
         super( message );
+        this.pomFile = pomFile;
     }
 
-    public MavenExecutionException( Throwable cause )
+    public MavenExecutionException( String message, File pomFile, ProjectBuildingException cause )
     {
-        super( cause );
+        super( message, cause );
+        this.pomFile = pomFile;
     }
 
     public MavenExecutionException( String message, IOException cause )
-    {
-        super( message, cause );
-    }
-
-    public MavenExecutionException( String message, ProjectBuildingException cause )
     {
         super( message, cause );
     }
@@ -83,5 +79,10 @@ public class MavenExecutionException
     public MavenExecutionException( String message, ExtensionScanningException cause )
     {
         super( message, cause );
+    }
+
+    public File getPomFile()
+    {
+        return pomFile;
     }
 }

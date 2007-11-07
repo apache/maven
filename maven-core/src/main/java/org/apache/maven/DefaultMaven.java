@@ -193,7 +193,7 @@ public class DefaultMaven
 
             if ( !tvr.isTaskValid() )
             {
-                result.addBuildFailureException( new InvalidTaskException( tvr ) );
+                result.addBuildFailureException( tvr.generateInvalidTaskException() );
 
                 return result;
             }
@@ -295,10 +295,7 @@ public class DefaultMaven
         {
             throw new MavenExecutionException( e.getMessage(), e );
         }
-        catch ( ProjectBuildingException e )
-        {
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
+
         return projects;
     }
 
@@ -307,7 +304,7 @@ public class DefaultMaven
                                   boolean recursive,
                                   ProfileManager globalProfileManager,
                                   boolean isRoot )
-        throws ArtifactResolutionException, ProjectBuildingException, MavenExecutionException
+        throws ArtifactResolutionException, MavenExecutionException
     {
         List projects = new ArrayList( files.size() );
 
@@ -324,7 +321,15 @@ public class DefaultMaven
                 usingReleasePom = true;
             }
 
-            MavenProject project = projectBuilder.build( file, localRepository, globalProfileManager );
+            MavenProject project;
+            try
+            {
+                project = projectBuilder.build( file, localRepository, globalProfileManager );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
+            }
 
             if ( isRoot )
             {
@@ -338,8 +343,8 @@ public class DefaultMaven
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
                     throw new MavenExecutionException(
-                        "Unable to build project '" + project.getFile() +
-                            "; it requires Maven version " + version.toString() );
+                        "Unable to build project '" + file +
+                            "; it requires Maven version " + version.toString(), file );
                 }
             }
 

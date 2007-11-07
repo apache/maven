@@ -630,7 +630,7 @@ public class DefaultLifecycleExecutor
                     return new TaskValidationResult(
                         task,
                         "Cannot find mojo descriptor for: \'" + task
-                            + "\' - Treating as non-aggregator." );
+                            + "\' - Treating as non-aggregator.", e );
                 }
                 catch ( LifecycleSpecificationException e )
                 {
@@ -642,16 +642,16 @@ public class DefaultLifecycleExecutor
 
                     return new TaskValidationResult(
                         task,
-                        message );
+                        message, e );
 
                 }
                 catch ( LifecycleLoaderException e )
                 {
-                    String message = "Cannot find plugin to match task '" + task + "'.";
+                    String message = "Failed to load one or more lifecycle definitions which may contain task: '" + task + "'.";
 
                     return new TaskValidationResult(
                         task,
-                        message );
+                        message, e );
                 }
             }
         }

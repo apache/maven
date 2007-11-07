@@ -371,8 +371,7 @@ public class MavenMetadataSource
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new InvalidDependencyVersionException( "Unable to parse version '" + d.getVersion() +
-                    "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
+                throw new InvalidDependencyVersionException( project.getId(), d, project.getFile(), e );
             }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
