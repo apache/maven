@@ -168,6 +168,11 @@ public class MavenCli
             mavenEmbedder = new MavenEmbedder( configuration );
 
             logger = mavenEmbedder.getLogger();
+
+            if ( mavenEmbedder.isOffline( request ) )
+            {
+                logger.info( "You are working in offline mode." );
+            }
         }
         catch ( MavenEmbedderException e )
         {

@@ -778,6 +778,15 @@ public class MavenEmbedder
     // Start of new embedder API
     // ----------------------------------------------------------------------
 
+    public boolean isOffline( MavenExecutionRequest request )
+        throws MavenEmbedderException
+    {
+        // first, grab defaults including settings, in case <offline>true</offline> is set.
+        request = populator.populateDefaults( request, configuration );
+
+        return request.isOffline();
+    }
+
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         LoggerManager loggerManager = container.getLoggerManager();

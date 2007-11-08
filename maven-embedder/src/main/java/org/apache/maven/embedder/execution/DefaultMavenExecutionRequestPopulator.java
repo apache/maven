@@ -470,8 +470,6 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.isOffline() )
         {
-            getLogger().info( "You are working in offline mode." );
-
             wagonManager.setOnline( false );
         }
         else
