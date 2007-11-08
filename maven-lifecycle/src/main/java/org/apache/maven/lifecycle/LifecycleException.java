@@ -1,15 +1,15 @@
 package org.apache.maven.lifecycle;
 
-public class LifecycleException
+public abstract class LifecycleException
     extends Exception
 {
 
-    public LifecycleException( String message, Throwable cause )
+    protected LifecycleException( String message, Throwable cause )
     {
         super( message, cause );
     }
 
-    public LifecycleException( String message )
+    protected LifecycleException( String message )
     {
         super( message );
     }

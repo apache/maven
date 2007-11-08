@@ -36,7 +36,6 @@ import org.apache.maven.lifecycle.plan.BuildPlanner;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManager;
@@ -533,13 +532,6 @@ public class DefaultLifecycleExecutor
                         e );
                 }
                 catch ( ArtifactResolutionException e )
-                {
-                    throw new LifecycleExecutionException(
-                        e.getMessage(),
-                        project,
-                        e );
-                }
-                catch ( MojoExecutionException e )
                 {
                     throw new LifecycleExecutionException(
                         e.getMessage(),

@@ -7,13 +7,9 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
-import java.net.MalformedURLException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -55,9 +51,9 @@ public class PluginManagerException
     private MavenProject project;
 
     protected PluginManagerException( Plugin plugin,
-                                   String message,
-                                   MavenProject project,
-                                   PlexusContainerException cause )
+                                      String message,
+                                      MavenProject project,
+                                      Throwable cause )
     {
         super( message, cause );
 
@@ -67,8 +63,9 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    protected PluginManagerException( Plugin plugin, String message,
-                                   NoSuchRealmException cause )
+    protected PluginManagerException( Plugin plugin,
+                                      String message,
+                                      Throwable cause )
     {
         super( message, cause );
 
@@ -78,10 +75,35 @@ public class PluginManagerException
     }
 
     protected PluginManagerException( MojoDescriptor mojoDescriptor,
-                                   String message,
-                                   ComponentLookupException cause )
+                                      String message,
+                                      Throwable cause )
     {
         super( message, cause );
+        pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
+        pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
+        pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
+        goal = mojoDescriptor.getGoal();
+    }
+
+    protected PluginManagerException( MojoDescriptor mojoDescriptor,
+                                      MavenProject project,
+                                      String message )
+    {
+        super( message );
+        this.project = project;
+        pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
+        pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
+        pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
+        goal = mojoDescriptor.getGoal();
+    }
+
+    protected PluginManagerException( MojoDescriptor mojoDescriptor,
+                                      MavenProject project,
+                                      String message,
+                                      Throwable cause )
+    {
+        super( message, cause );
+        this.project = project;
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
         pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
         pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
@@ -92,28 +114,6 @@ public class PluginManagerException
                                    InvalidVersionSpecificationException cause )
     {
         super( cause );
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
-    }
-
-    protected PluginManagerException( Plugin plugin,
-                                   String message,
-                                   DuplicateRealmException cause )
-    {
-        super( message, cause );
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
-    }
-
-    protected PluginManagerException( Plugin plugin,
-                                   String message,
-                                   MalformedURLException cause )
-    {
-        super( message, cause );
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();

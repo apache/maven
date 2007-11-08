@@ -4,7 +4,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -13,7 +12,6 @@ import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.codehaus.plexus.PlexusContainerException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -120,13 +118,6 @@ public class LifecycleExecutionException
     }
 
     public LifecycleExecutionException( String message, MavenProject project,
-                                        MojoExecutionException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
                                         PluginConfigurationException cause )
     {
         super( message, cause );
@@ -135,14 +126,6 @@ public class LifecycleExecutionException
 
     public LifecycleExecutionException( String message, MavenProject project,
                                         PluginVersionNotFoundException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message,
-                                        MavenProject project,
-                                        PlexusContainerException cause )
     {
         super( message, cause );
         this.project = project;

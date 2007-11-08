@@ -485,7 +485,7 @@ public class DefaultPluginManager
     public void executeMojo( MavenProject project,
                              MojoExecution mojoExecution,
                              MavenSession session )
-        throws ArtifactResolutionException, MojoExecutionException, MojoFailureException,
+        throws ArtifactResolutionException, MojoFailureException,
         ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException,
         PluginConfigurationException
     {
@@ -495,7 +495,7 @@ public class DefaultPluginManager
         // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new MojoExecutionException(
+            throw new PluginExecutionException( mojoExecution, project,
                                               "Cannot execute mojo: "
                                                               + mojoDescriptor.getGoal()
                                                               + ". It requires a project with an existing pom.xml, but the build is not using one." );
@@ -504,7 +504,7 @@ public class DefaultPluginManager
         if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
-            throw new MojoExecutionException(
+            throw new PluginExecutionException( mojoExecution, project,
                                               "Mojo: "
                                                               + mojoDescriptor.getGoal()
                                                               + " requires online mode for execution. Maven is currently offline." );
@@ -537,7 +537,7 @@ public class DefaultPluginManager
 
         String goalName = mojoDescriptor.getFullGoalName();
 
-        Mojo mojo;
+        Mojo mojo = null;
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
@@ -597,7 +597,7 @@ public class DefaultPluginManager
         {
             session.getEventDispatcher().dispatchError( event, goalExecId, e );
 
-            throw e;
+            throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( MojoFailureException e )
         {
@@ -607,6 +607,18 @@ public class DefaultPluginManager
         }
         finally
         {
+            if ( mojo != null )
+            {
+                try
+                {
+                    container.release( mojo );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().debug( "Error releasing mojo for: " + goalExecId, e );
+                }
+            }
+
             pluginDescriptor.setClassRealm( null );
             pluginDescriptor.setArtifacts( null );
 
@@ -686,8 +698,7 @@ public class DefaultPluginManager
                                     MavenProject project,
                                     boolean report,
                                     MojoExecution mojoExecution )
-        throws PluginConfigurationException, ArtifactNotFoundException, PluginManagerException,
-        ArtifactResolutionException
+        throws PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 

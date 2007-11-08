@@ -42,7 +42,7 @@ public interface PluginManager
     void executeMojo( MavenProject project,
                       MojoExecution execution,
                       MavenSession session )
-        throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
+        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
         InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
 
     MavenReport getReport( MavenProject project,
