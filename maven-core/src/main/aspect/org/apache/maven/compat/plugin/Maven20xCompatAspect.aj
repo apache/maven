@@ -1,5 +1,8 @@
 package org.apache.maven.compat.plugin;
 
+import org.apache.maven.lifecycle.MojoBindingUtils;
+import org.apache.maven.lifecycle.LifecycleUtils;
+import org.apache.maven.lifecycle.NoSuchPhaseException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -14,6 +17,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.InvalidPluginException;
@@ -31,6 +35,8 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
@@ -156,6 +162,7 @@ public privileged aspect Maven20xCompatAspect
     }
 
     // GRAB the request when it's passed into a method that returns a corresponding result.
+    // NOTE: We'll use this in multiple places below...
     private MavenExecutionRequest request;
 
     private pointcut methodsTakingRequest( MavenExecutionRequest request ):
@@ -243,6 +250,39 @@ public privileged aspect Maven20xCompatAspect
         }
 
         return pluginRealm;
+    }
+
+    // Grab this so we have a voice!
+    private Logger logger;
+
+    private pointcut enableLoggingCall( Logger logger ):
+        execution( void LogEnabled+.enableLogging( Logger ) )
+        && args( logger );
+
+    after( Logger logger ): enableLoggingCall( logger )
+    {
+        if ( this.logger == null )
+        {
+            this.logger = logger;
+        }
+    }
+
+    private pointcut addMojoBindingCall( String phase, MojoBinding binding ):
+        call( void LifecycleUtils.addMojoBinding( String, MojoBinding, .. ) )
+        && args( phase, binding, .. );
+
+    void around( String phase, MojoBinding binding ): addMojoBindingCall( phase, binding )
+    {
+        try
+        {
+            proceed( phase, binding );
+        }
+        catch ( NoSuchPhaseException e )
+        {
+            logger.debug( "Mojo execution: " + MojoBindingUtils.toString( binding )
+                          + " cannot be attached to lifecycle phase: " + phase
+                          + "; it does not exist. Ignoring this binding." );
+        }
     }
 
     // --------------------------
