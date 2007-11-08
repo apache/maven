@@ -19,22 +19,13 @@ package org.apache.maven.project.inheritance.t07;
  * under the License.
  */
 
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-import java.util.Iterator;
-
-import org.apache.maven.model.Build;
-import org.apache.maven.model.MailingList;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.logging.Logger;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A test which demonstrates maven's dependency management
@@ -70,14 +61,14 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
         System.out.println("Project " + project1.getId() + " " + project1);
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
         assertTrue("No Artifacts", set.size() > 0);
         Iterator iter = set.iterator();
         assertTrue("Set size should be 3, is " + set.size(), set.size() == 3);
-        
+
         while (iter.hasNext())
         {
             Artifact artifact = (Artifact)iter.next();

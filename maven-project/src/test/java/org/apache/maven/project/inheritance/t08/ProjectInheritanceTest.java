@@ -61,14 +61,14 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
         System.out.println("Project " + project1.getId() + " " + project1);
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
         assertTrue("No Artifacts", set.size() > 0);
         Iterator iter = set.iterator();
         assertTrue("Set size should be 4, is " + set.size(), set.size() == 4);
-        
+
         while (iter.hasNext())
         {
             Artifact artifact = (Artifact)iter.next();

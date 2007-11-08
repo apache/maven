@@ -18,23 +18,11 @@ package org.apache.maven.project.inheritance.t09;
  * specific language governing permissions and limitations
  * under the License.
  */
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
-
-import org.apache.maven.model.Build;
-import org.apache.maven.model.MailingList;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.logging.Logger;
+
+import java.io.File;
+import java.util.Map;
 
 /**
  * Verifies exclusions listed in dependencyManagement are valid for
@@ -59,7 +47,7 @@ public class ProjectInheritanceTest
 
     /**
      * How the test project is set up:
-     * 
+     *
      * 1. dependencyManagement lists dependencies on a & b,
      *    with an exclusion on c in b.
      * 2. the child project lists a dependency on project a only
@@ -82,13 +70,13 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
         Map map = project1.getArtifactMap();
 
         assertNotNull("No artifacts", map);
         assertTrue("No Artifacts", map.size() > 0);
         assertTrue("Set size should be 2, is " + map.size(), map.size() == 2);
-        
+
         assertTrue("maven-test:t09-a is not in the project", map.containsKey( "maven-test:t09-a" ));
         assertTrue("maven-test:t09-b is not in the project", map.containsKey( "maven-test:t09-b" ));
 
@@ -101,7 +89,7 @@ public class ProjectInheritanceTest
      * project b.  We will pick up project c in this case because no
      * restrictions were placed on d.  This demonstrates that a, b, c, & d will
      * all be collected.
-     * 
+     *
      * @throws Exception
      */
     public void testDependencyManagementExclusionDoesNotOverrideGloballyForTransitives()
@@ -117,7 +105,7 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project2 = getProjectWithDependencies( pom2 );
 
-        assertEquals( pom0Basedir, project2.getParent().getBasedir() );
+        assertEquals( pom0Basedir, project2.getParent().getBasedir().getCanonicalFile() );
         Map map = project2.getArtifactMap();
         assertNotNull( "No artifacts", map );
         assertTrue( "No Artifacts", map.size() > 0 );

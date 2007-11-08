@@ -30,7 +30,7 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Verifies the version of a dependency listed in a parent's
  * dependencyManagement section is chosen over another version of the same
- * dependency, listed transitively.	
+ * dependency, listed transitively.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @version $Id$
@@ -65,12 +65,12 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
         assertTrue("No Artifacts", set.size() > 0);
         assertTrue("Set size should be 3, is " + set.size(), set.size() == 3);
-        
+
         Iterator iter = set.iterator();
         while (iter.hasNext()) {
             Artifact artifact = (Artifact)iter.next();
