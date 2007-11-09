@@ -533,7 +533,14 @@ public class DefaultModelLineageBuilderTest
         writeModel( current, currentPOM );
 
         // 7. build the lineage.
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, null,
+        File localRepoRootDirectory = createTempDir( "localRepoRootDir" );
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                           "local",
+                                                                           localRepoRootDirectory.toURL()
+                                                                                               .toExternalForm(),
+                                                                           defaultLayout );
+
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
                                                                       Collections.EMPTY_LIST, null,
                                                                       false, true );
 
