@@ -140,6 +140,7 @@ under the License.
   <target name="classpath-pre" depends="init,pull"
           description="constructs a classpath reference containing our dependencies, and verifies that all files are present">
     <path id="pre.classpath">
+      <pathelement location="${maven.repo.local}/aspectj/aspectjrt/${aspectj.version}/aspectjrt-${aspectj.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
