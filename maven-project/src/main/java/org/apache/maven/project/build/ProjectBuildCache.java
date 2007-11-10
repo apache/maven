@@ -30,7 +30,6 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * This cache is meant to provide a reference of the project instances that are in the current build
@@ -71,8 +70,11 @@ public class ProjectBuildCache
     {
         if ( liveInstance )
         {
-            projectCache = new WeakHashMap();
-            pomFileCache = new WeakHashMap();
+//            projectCache = new WeakHashMap();
+//            pomFileCache = new WeakHashMap();
+
+            projectCache = new HashMap();
+            pomFileCache = new HashMap();
         }
     }
 
