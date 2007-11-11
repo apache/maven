@@ -69,9 +69,6 @@ under the License.
       </requirements>
     </component>
     
-    
-    
-    
     <component>
       <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
       <role-hint>default</role-hint>
@@ -338,6 +335,21 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.context.BuildContextManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.resolver.metadata.MetadataSource</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.project.artifact.PomMetadataSource</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.context.BuildContextManager</role>
