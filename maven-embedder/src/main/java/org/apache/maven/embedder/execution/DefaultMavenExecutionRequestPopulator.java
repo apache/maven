@@ -60,6 +60,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
@@ -94,6 +95,8 @@ public class DefaultMavenExecutionRequestPopulator
                                                    Configuration configuration )
         throws MavenEmbedderException
     {
+        executionProperties( request, configuration );
+
         pom( request, configuration );
 
         settings( request, configuration );
@@ -117,6 +120,21 @@ public class DefaultMavenExecutionRequestPopulator
         realmManager( request, configuration );
 
         return request;
+    }
+
+    private void executionProperties( MavenExecutionRequest request,
+                                      Configuration configuration )
+    {
+        if ( request.getProperties() == null )
+        {
+            Properties props = configuration.getSystemProperties();
+            if ( props == null )
+            {
+                props = System.getProperties();
+            }
+
+            request.setProperties( props );
+        }
     }
 
     private void realmManager( MavenExecutionRequest request,
