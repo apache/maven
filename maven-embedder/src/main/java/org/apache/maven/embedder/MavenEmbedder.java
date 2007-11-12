@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -144,6 +145,8 @@ public class MavenEmbedder
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
     private ArtifactHandlerManager artifactHandlerManager;
+
+    private BuildContextManager buildContextManager;
 
     private Maven maven;
 
@@ -336,6 +339,7 @@ public class MavenEmbedder
         }
         finally
         {
+            buildContextManager.clearBuildContext();
             request.getRealmManager().clear();
         }
     }
@@ -451,6 +455,7 @@ public class MavenEmbedder
         }
         finally
         {
+            buildContextManager.clearBuildContext();
             request.getRealmManager().clear();
         }
     }
@@ -482,7 +487,14 @@ public class MavenEmbedder
                          ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+        try
+        {
+            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+        }
+        finally
+        {
+            buildContextManager.clearBuildContext();
+        }
     }
 
     public ArtifactHandler getArtifactHandler( Artifact artifact )
@@ -630,6 +642,8 @@ public class MavenEmbedder
 
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
+            buildContextManager = (BuildContextManager) container.lookup( BuildContextManager.ROLE );
+
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.
             request = new DefaultMavenExecutionRequest();
@@ -688,6 +702,8 @@ public class MavenEmbedder
     public void stop()
         throws MavenEmbedderException
     {
+        buildContextManager.clearBuildContext();
+
         container.dispose();
     }
 
@@ -815,6 +831,8 @@ public class MavenEmbedder
         finally
         {
             loggerManager.setThresholds( oldThreshold );
+
+            buildContextManager.clearBuildContext();
             request.getRealmManager().clear();
         }
     }
