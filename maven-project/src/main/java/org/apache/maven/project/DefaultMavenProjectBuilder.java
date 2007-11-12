@@ -275,7 +275,6 @@ public class DefaultMavenProjectBuilder
         // this snippet of code here.
         // ----------------------------------------------------------------------
 
-        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact projectArtifact = project.getArtifact();
 
         String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
@@ -852,6 +851,7 @@ public class DefaultMavenProjectBuilder
 
         project.setActiveProfiles( activeProfiles );
 
+        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
             project.getVersion(), project.getPackaging() );
