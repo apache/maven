@@ -1559,7 +1559,7 @@ public class DefaultLifecycleExecutor
 
     protected void line()
     {
-        getLogger().info( "----------------------------------------------------------------------------" );
+        getLogger().info( "------------------------------------------------------------------------" );
     }
 
     public Map getPhaseToLifecycleMap()
