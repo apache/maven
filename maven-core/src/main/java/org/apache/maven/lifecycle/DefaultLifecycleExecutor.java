@@ -769,7 +769,7 @@ public class DefaultLifecycleExecutor
 
     protected void line()
     {
-        getLogger().info( "----------------------------------------------------------------------------" );
+        getLogger().info( "------------------------------------------------------------------------" );
     }
 
     private static class TaskSegment
