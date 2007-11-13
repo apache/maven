@@ -41,11 +41,11 @@ public class AttachedArtifact
     {
         super( parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), type,
                classifier, artifactHandler, parent.isOptional() );
-        
+
         setDependencyTrail( Collections.singletonList( parent.getId() ) );
-        
+
         this.parent = parent;
-        
+
         if ( getId().equals( parent.getId() ) )
         {
             throw new InvalidArtifactRTException( parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), parent.getType(), "An attached artifact must have a different ID than its corresponding main artifact." );
@@ -56,102 +56,102 @@ public class AttachedArtifact
     {
         this( parent, type, null, artifactHandler );
     }
-    
+
     public void setArtifactId( String artifactId )
     {
-        throw new UnsupportedOperationException( "Cannot change the artifactId for an attached artifact.  It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public List getAvailableVersions()
     {
         return parent.getAvailableVersions();
     }
-    
+
     public void setAvailableVersions( List availableVersions )
     {
-        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public String getBaseVersion()
     {
         return parent.getBaseVersion();
     }
-    
+
     public void setBaseVersion( String baseVersion )
     {
-        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public String getDownloadUrl()
     {
         return parent.getDownloadUrl();
     }
-    
+
     public void setDownloadUrl( String downloadUrl )
     {
-        throw new UnsupportedOperationException( "Cannot change the download information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public void setGroupId( String groupId )
     {
-        throw new UnsupportedOperationException( "Cannot change the groupId on attached artifacts. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public ArtifactRepository getRepository()
     {
         return parent.getRepository();
     }
-    
+
     public void setRepository( ArtifactRepository repository )
     {
-        throw new UnsupportedOperationException( "Cannot change the repository information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public String getScope()
     {
         return parent.getScope();
     }
-    
+
     public void setScope( String scope )
     {
-        throw new UnsupportedOperationException( "Cannot change the scoping information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public String getVersion()
     {
         return parent.getVersion();
     }
-    
+
     public void setVersion( String version )
     {
-        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public VersionRange getVersionRange()
     {
         return parent.getVersionRange();
     }
-    
+
     public void setVersionRange( VersionRange range )
     {
-        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public boolean isRelease()
     {
         return parent.isRelease();
     }
-    
+
     public void setRelease( boolean release )
     {
-        throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact. It is derived from the main artifact." );
+        // ignore this. We should ALWAYS use the information from the parent artifact.
     }
 
     public boolean isSnapshot()
     {
         return parent.isSnapshot();
     }
-    
+
     public void addMetadata( ArtifactMetadata metadata )
     {
         // ignore. The parent artifact will handle metadata.
