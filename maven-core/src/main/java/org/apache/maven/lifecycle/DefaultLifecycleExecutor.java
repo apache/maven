@@ -25,7 +25,6 @@ import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
@@ -83,8 +82,6 @@ public class DefaultLifecycleExecutor
     private BuildPlanner buildPlanner;
 
     private MojoBindingFactory mojoBindingFactory;
-
-    private BuildContextManager buildContextManager;
 
     // this is needed for setting the lookup realm before we start building a project.
     private PlexusContainer container;
@@ -196,16 +193,13 @@ public class DefaultLifecycleExecutor
 
                     try
                     {
-                        // NEW: To support forked execution under the new lifecycle architecture, the current project
-                        // is stored in a build-context managed data type. This context type holds the current project
-                        // for the fork being executed, plus a stack of projects used in the ancestor execution contexts.
-                        LifecycleExecutionContext ctx = new LifecycleExecutionContext( rootProject );
-                        ctx.store( buildContextManager );
+                        session.setCurrentProject( rootProject );
 
                         // NEW: Build up the execution plan, including configuration.
                         List mojoBindings = getLifecycleBindings(
                             segment.getTasks(),
                             rootProject,
+                            session,
                             target );
 
                         // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
@@ -243,9 +237,7 @@ public class DefaultLifecycleExecutor
                     }
                     finally
                     {
-                        // clean up the execution context, so we don't pollute for future project-executions.
-                        LifecycleExecutionContext.delete( buildContextManager );
-
+                        session.setCurrentProject( null );
                         restoreLookupRealm( oldLookupRealm );
                     }
 
@@ -306,12 +298,12 @@ public class DefaultLifecycleExecutor
 
                         try
                         {
-                            LifecycleExecutionContext ctx = new LifecycleExecutionContext( currentProject );
-                            ctx.store( buildContextManager );
+                            session.setCurrentProject( currentProject );
 
                             List mojoBindings = getLifecycleBindings(
                                 segment.getTasks(),
                                 currentProject,
+                                session,
                                 target );
 
                             for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
@@ -346,8 +338,7 @@ public class DefaultLifecycleExecutor
                         }
                         finally
                         {
-                            LifecycleExecutionContext.delete( buildContextManager );
-
+                            session.setCurrentProject( null );
                             restoreLookupRealm( oldLookupRealm );
                         }
 
@@ -421,6 +412,7 @@ public class DefaultLifecycleExecutor
      */
     private List getLifecycleBindings( final List tasks,
                                        final MavenProject project,
+                                       final MavenSession session,
                                        final String targetDescription )
         throws LifecycleExecutionException
     {
@@ -429,7 +421,8 @@ public class DefaultLifecycleExecutor
         {
             BuildPlan plan = buildPlanner.constructBuildPlan(
                 tasks,
-                project );
+                project,
+                session );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -461,9 +454,7 @@ public class DefaultLifecycleExecutor
                                                final String target )
         throws LifecycleExecutionException, MojoFailureException
     {
-        // NEW: Retrieve/use the current project stored in the execution context, for consistency.
-        LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
-        MavenProject project = ctx.getCurrentProject();
+        MavenProject project = session.getCurrentProject();
 
         // NEW: Since the MojoBinding instances are configured when the build plan is constructed,
         // all that remains to be done here is to load the PluginDescriptor, construct a MojoExecution
@@ -476,7 +467,8 @@ public class DefaultLifecycleExecutor
             {
                 pluginDescriptor = pluginLoader.loadPlugin(
                     mojoBinding,
-                    project );
+                    project,
+                    session );
             }
             catch ( PluginLoaderException e )
             {
@@ -757,11 +749,13 @@ public class DefaultLifecycleExecutor
         MojoBinding binding = mojoBindingFactory.parseMojoBinding(
             task,
             project,
+            session,
             true );
 
         PluginDescriptor descriptor = pluginLoader.loadPlugin(
             binding,
-            project );
+            project,
+            session );
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
 
         return mojoDescriptor;

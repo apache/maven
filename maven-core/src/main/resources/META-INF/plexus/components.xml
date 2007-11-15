@@ -196,10 +196,6 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
       </requirements>
@@ -213,9 +209,6 @@ under the License.
       <role>org.apache.maven.plugin.PluginManager</role>
       <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
       <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-        </requirement>
         <requirement>
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
@@ -234,7 +227,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>project-cache-aware</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
@@ -264,7 +256,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>project-cache-aware</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
@@ -293,10 +284,6 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.extension.BuildExtensionScanner</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
@@ -415,9 +402,6 @@ under the License.
       <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
       <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-        </requirement>
         <requirement>
           <role>org.apache.maven.plugin.loader.PluginLoader</role>
         </requirement>
@@ -710,9 +694,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.PluginMappingManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
         </requirement>
       </requirements>
     </component>

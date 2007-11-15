@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.plan.testutils;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
@@ -9,7 +10,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +100,7 @@ public class TestPluginLoader
         return pd;
     }
 
-    public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project )
+    public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
 //        System.out.println( "Find plugin for prefix: " + prefix + " in project: " + project.getId() );
@@ -108,7 +108,7 @@ public class TestPluginLoader
         return (PluginDescriptor) pluginPrefixes.get( prefix );
     }
 
-    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project )
+    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
 //        System.out.println( "Load plugin from model definition: " + plugin.getKey() + " in project: " + project.getId() );
@@ -116,7 +116,7 @@ public class TestPluginLoader
         return (PluginDescriptor) pluginDescriptors.get( plugin.getKey() );
     }
 
-    public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project )
+    public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
 //        System.out.println( "Load plugin for mojo binding: " + MojoBindingUtils.toString( mojoBinding )
@@ -125,22 +125,7 @@ public class TestPluginLoader
         return (PluginDescriptor) pluginDescriptors.get( MojoBindingUtils.createPluginKey( mojoBinding ) );
     }
 
-    public Object loadPluginComponent( String role, String roleHint, Plugin plugin, MavenProject project )
-        throws ComponentLookupException, PluginLoaderException
-    {
-//        System.out.println( "Load plugin component: " + role + "/" + roleHint + " from plugin: " + plugin.getKey()
-//                            + " in project: " + project.getId() );
-
-        String key = createKey( role, roleHint, plugin.getGroupId(), plugin.getArtifactId() );
-        return components.get( key );
-    }
-
-    private String createKey( String role, String roleHint, String groupId, String artifactId )
-    {
-        return groupId + ":" + artifactId + ":" + role + ":" + roleHint;
-    }
-
-    public PluginDescriptor loadReportPlugin( ReportPlugin plugin, MavenProject project )
+    public PluginDescriptor loadReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         System.out.println( "Load report plugin from model definition: " + plugin.getKey() + " in project: "
@@ -149,7 +134,7 @@ public class TestPluginLoader
         return (PluginDescriptor) pluginDescriptors.get( plugin.getKey() );
     }
 
-    public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project )
+    public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         System.out.println( "Load report plugin for mojo binding: " + MojoBindingUtils.toString( mojoBinding )
@@ -162,11 +147,6 @@ public class TestPluginLoader
     {
         pluginDescriptors.put( pd.getId(), pd );
         pluginPrefixes.put( pd.getGoalPrefix(), pd );
-    }
-
-    public void addPluginComponent( String groupId, String artifactId, String role, String roleHint, Object component )
-    {
-        components.put( createKey( role, roleHint, groupId, artifactId ), component );
     }
 
 }

@@ -205,4 +205,6 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
     MavenRealmManager getRealmManager();
+
+    MavenExecutionRequest clearAccumulatedBuildState();
 }

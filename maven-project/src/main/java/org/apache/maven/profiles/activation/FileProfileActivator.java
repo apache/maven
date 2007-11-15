@@ -27,13 +27,13 @@ import org.codehaus.plexus.util.FileUtils;
 public class FileProfileActivator
     implements ProfileActivator
 {
-    
-    public boolean canDetermineActivation( Profile profile )
+
+    public boolean canDetermineActivation( Profile profile, ProfileActivationContext context )
     {
-        return profile.getActivation() != null && profile.getActivation().getFile() != null;
+        return ( profile.getActivation() != null ) && ( profile.getActivation().getFile() != null );
     }
-    
-    public boolean isActive( Profile profile )
+
+    public boolean isActive( Profile profile, ProfileActivationContext context )
     {
         Activation activation = profile.getActivation();
 
@@ -44,7 +44,7 @@ public class FileProfileActivator
             // check if the file exists, if it does then the profile will be active
             String fileString = actFile.getExists();
 
-            if ( fileString != null && !"".equals( fileString ) )
+            if ( ( fileString != null ) && !"".equals( fileString ) )
             {
                 return FileUtils.fileExists( fileString );
             }
@@ -52,7 +52,7 @@ public class FileProfileActivator
             // check if the file is missing, if it is then the profile will be active
             fileString = actFile.getMissing();
 
-            if ( fileString != null && !"".equals( fileString ) )
+            if ( ( fileString != null ) && !"".equals( fileString ) )
             {
                 return !FileUtils.fileExists( fileString );
             }

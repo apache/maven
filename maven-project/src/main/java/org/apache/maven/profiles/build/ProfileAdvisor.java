@@ -21,6 +21,7 @@ package org.apache.maven.profiles.build;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;
@@ -46,14 +47,16 @@ public interface ProfileAdvisor
                                                              File pomFile,
                                                              List explicitlyActiveIds,
                                                              List explicitlyInactiveIds,
-                                                             boolean useProfilesXml )
+                                                             boolean useProfilesXml,
+                                                             ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException;
 
     List applyActivatedProfiles( Model model,
                                  File pomFile,
                                  List explicitlyActiveIds,
                                  List explicitlyInactiveIds,
-                                 boolean useProfilesXml )
+                                 boolean useProfilesXml,
+                                 ProfileActivationContext activationContext )
         throws ProjectBuildingException;
 
     List applyActivatedExternalProfiles( Model model,

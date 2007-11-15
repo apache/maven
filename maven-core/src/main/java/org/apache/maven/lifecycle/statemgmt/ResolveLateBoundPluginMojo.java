@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.statemgmt;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -30,6 +31,8 @@ public class ResolveLateBoundPluginMojo extends AbstractMojo
 
     private MavenProject project;
 
+    private MavenSession session;
+
     private MojoBindingFactory bindingFactory;
 
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -37,7 +40,7 @@ public class ResolveLateBoundPluginMojo extends AbstractMojo
         MojoBinding binding = bindingFactory.createMojoBinding( groupId, artifactId, version, artifactId, project );
         try
         {
-            PluginDescriptor descriptor = pluginLoader.loadPlugin( binding, project );
+            PluginDescriptor descriptor = pluginLoader.loadPlugin( binding, project, session );
 
             MojoDescriptor mojoDescriptor = descriptor.getMojo( goal );
 

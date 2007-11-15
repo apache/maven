@@ -37,7 +37,6 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -50,11 +49,11 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.build.ProjectBuildCache;
-import org.apache.maven.project.build.ProjectBuildContext;
 import org.apache.maven.project.build.model.DefaultModelLineage;
 import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
@@ -66,7 +65,8 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -129,9 +129,8 @@ Notes
  * @version $Id$
  */
 public class DefaultMavenProjectBuilder
-    extends AbstractLogEnabled
     implements MavenProjectBuilder,
-    Initializable
+    Initializable, LogEnabled
 {
     protected MavenProfilesBuilder profilesBuilder;
 
@@ -158,8 +157,6 @@ public class DefaultMavenProjectBuilder
 
     private ProfileAdvisor profileAdvisor;
 
-    private BuildContextManager buildContextManager;
-
     private MavenTools mavenTools;
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
@@ -182,6 +179,7 @@ public class DefaultMavenProjectBuilder
     }
 
     /** @deprecated  */
+    @Deprecated
     public MavenProject buildFromRepository( Artifact artifact,
                                              List remoteArtifactRepositories,
                                              ArtifactRepository localRepository,
@@ -198,22 +196,15 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-
-        MavenProject project = projectBuildCache.getCachedProject( artifact );
-
-        if ( project != null )
-        {
-            return project;
-        }
-
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return buildInternal( artifact.getFile(), model, localRepository, remoteArtifactRepositories, null, null,
-                              false, false );
+        return buildInternal( model, localRepository, remoteArtifactRepositories, artifact.getFile(), null,
+                              false, false, false );
     }
 
     private MavenProject superProject;
+
+    private Logger logger;
 
     public MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException
@@ -391,23 +382,15 @@ public class DefaultMavenProjectBuilder
                                                       ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        /*
-        // TODO: Remove this once we have build-context stuff working...
-        if ( !container.getContext().contains( "SystemProperties" ) )
-        {
-            container.addContextValue( "SystemProperties", System.getProperties() );
-        }
-        */
-
         Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
-        MavenProject project = buildInternal( projectDescriptor,
-            model,
+        MavenProject project = buildInternal( model,
             localRepository,
             buildArtifactRepositories( getSuperModel() ),
             projectDescriptor,
             profileManager,
             STRICT_MODEL_PARSING,
+            true,
             true );
 
         return project;
@@ -530,13 +513,13 @@ public class DefaultMavenProjectBuilder
     // jvz:note
     // We've got a mixture of things going in the USD and from the repository, sometimes the descriptor
     // is a real file and sometimes null which makes things confusing.
-    private MavenProject buildInternal( File pomLocation,
-                                        Model model,
+    private MavenProject buildInternal( Model model,
                                         ArtifactRepository localRepository,
                                         List parentSearchRepositories,
                                         File projectDescriptor,
                                         ProfileManager externalProfileManager,
-                                        boolean strict, boolean validProfilesXmlLocation )
+                                        boolean strict, boolean validProfilesXmlLocation,
+                                        boolean fromSourceTree )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -548,6 +531,9 @@ public class DefaultMavenProjectBuilder
         List explicitlyActive;
 
         List explicitlyInactive;
+
+        // FIXME: Find a way to pass in this context, so it's never null!
+        ProfileActivationContext profileActivationContext;
 
         if ( externalProfileManager != null )
         {
@@ -564,15 +550,19 @@ public class DefaultMavenProjectBuilder
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
 
             explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
+
+            profileActivationContext = externalProfileManager.getProfileActivationContext();
         }
         else
         {
             explicitlyActive = Collections.EMPTY_LIST;
 
             explicitlyInactive = Collections.EMPTY_LIST;
+
+            profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
-        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation ) );
+        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext ) );
 
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
@@ -581,7 +571,8 @@ public class DefaultMavenProjectBuilder
             parentSearchRepositories,
             projectDescriptor, explicitlyActive,
             explicitlyInactive,
-            validProfilesXmlLocation );
+            validProfilesXmlLocation,
+            profileActivationContext );
 
         Model originalModel = ModelUtils.cloneModel( model );
 
@@ -645,25 +636,20 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, projectDescriptor, strict );
+            project = processProjectLogic( project, projectDescriptor, strict );
         }
         catch ( ModelInterpolationException e )
         {
-            throw new InvalidProjectModelException( projectId, e.getMessage(), pomLocation, e );
+            throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new InvalidProjectModelException( projectId, e.getMessage(), pomLocation, e );
+            throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
 
-        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-
-        projectBuildCache.cacheProject( project );
-
-        projectBuildCache.store( buildContextManager );
-
-        if ( projectDescriptor != null )
+        if ( fromSourceTree )
         {
+            getLogger().debug( "Aligning project: " + project.getId() + " to base directory: " + projectDescriptor.getParentFile() );
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor.getParentFile() );
 
             Build build = project.getBuild();
@@ -676,19 +662,6 @@ public class DefaultMavenProjectBuilder
 
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
-        }
-
-        MavenProject rawParent = project.getParent();
-
-        if ( rawParent != null )
-        {
-            MavenProject processedParent = projectBuildCache.getCachedProject( rawParent );
-
-            // yeah, this null check might be a bit paranoid, but better safe than sorry...
-            if ( processedParent != null )
-            {
-                project.setParent( processedParent );
-            }
         }
 
         project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement(), projectDescriptor ) );
@@ -711,14 +684,15 @@ public class DefaultMavenProjectBuilder
                                                       File pomFile,
                                                       List explicitlyActive,
                                                       List explicitlyInactive,
-                                                      boolean validProfilesXmlLocation )
+                                                      boolean validProfilesXmlLocation,
+                                                      ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
         LinkedHashSet collected = new LinkedHashSet();
 
-        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
+        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
 
-        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
+        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
 
         if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
         {
@@ -733,10 +707,11 @@ public class DefaultMavenProjectBuilder
                                                       File pomFile,
                                                       List explicitlyActive,
                                                       List explicitlyInactive,
-                                                      boolean validProfilesXmlLocation )
+                                                      boolean validProfilesXmlLocation,
+                                                      ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation );
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
 
         if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
@@ -802,8 +777,7 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( File pomLocation,
-                                              MavenProject project,
+    private MavenProject processProjectLogic( MavenProject project,
                                               File pomFile,
                                               boolean strict )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
@@ -887,7 +861,7 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomLocation,
+            throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile,
                 validationResult );
         }
 
@@ -895,11 +869,11 @@ public class DefaultMavenProjectBuilder
             mavenTools.buildArtifactRepositories( model.getRepositories() ) );
 
         // TODO: these aren't taking active project artifacts into consideration in the reactor
-        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins(), pomLocation ) );
+        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins(), pomFile ) );
 
-        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins(), pomLocation ) );
+        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins(), pomFile ) );
 
-        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions(), pomLocation ) );
+        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions(), pomFile ) );
 
         return project;
     }
@@ -925,26 +899,26 @@ public class DefaultMavenProjectBuilder
 
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
-        ProjectBuildContext projectContext = ProjectBuildContext.getProjectBuildContext( buildContextManager, true );
-
-        projectContext.setModelLineage( modelLineage );
-
-        projectContext.store( buildContextManager );
-
         List explicitlyActive;
 
         List explicitlyInactive;
+
+        // FIXME: Find a way to pass in this context, so it's never null!
+        ProfileActivationContext profileActivationContext;
 
         if ( externalProfileManager != null )
         {
             explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
 
             explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
+
+            profileActivationContext = externalProfileManager.getProfileActivationContext();
         }
         else
         {
             explicitlyActive = Collections.EMPTY_LIST;
             explicitlyInactive = Collections.EMPTY_LIST;
+            profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
         MavenProject lastProject = null;
@@ -957,19 +931,19 @@ public class DefaultMavenProjectBuilder
             MavenProject project = new MavenProject( currentModel );
             project.setFile( currentPom );
 
-            projectContext.setCurrentProject( project );
-            projectContext.store( buildContextManager );
-
-            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( currentModel, currentPom, explicitlyActive,
-                explicitlyInactive, validProfilesXmlLocation ) );
-
             if ( lastProject != null )
             {
                 lastProject.setParent( project );
+                project = lastProject.getParent();
 
                 lastProject.setParentArtifact( artifactFactory.createParentArtifact( project.getGroupId(), project
                     .getArtifactId(), project.getVersion() ) );
             }
+
+            // NOTE: the caching aspect may replace the parent project instance, so we apply profiles here.
+            // TODO: Review this...is that a good idea, to allow application of profiles when other profiles could have been applied already?
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), explicitlyActive,
+                                                                              explicitlyInactive, validProfilesXmlLocation, profileActivationContext ) );
 
             lineage.addFirst( project );
 
@@ -1055,6 +1029,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createPluginArtifacts( String projectId,
                                          List plugins, String pomLocation )
         throws ProjectBuildingException
@@ -1120,6 +1095,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createReportArtifacts( String projectId,
                                          List reports, String pomLocation )
         throws ProjectBuildingException
@@ -1181,6 +1157,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createExtensionArtifacts( String projectId,
                                             List extensions, String pomLocation )
         throws ProjectBuildingException
@@ -1271,5 +1248,15 @@ public class DefaultMavenProjectBuilder
         {
             IOUtil.close( reader );
         }
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 }

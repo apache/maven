@@ -29,6 +29,13 @@
           <description>The current MavenProject instance, which will have a new executionProject set after execution.</description>
         </parameter>
         <parameter>
+          <name>session</name>
+          <type>org.apache.maven.execution.MavenSession</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenSession instance, which will handle the fork context.</description>
+        </parameter>
+        <parameter>
           <name>forkId</name>
           <type>int</type>
           <required>true</required>
@@ -38,14 +45,9 @@
       </parameters>
       <configuration>
         <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
         <forkId implementation="int" default-value="-1">${forkId}</forkId>
       </configuration>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <field-name>buildContextManager</field-name>
-        </requirement>
-      </requirements>
     </mojo>
     <mojo>
       <goal>end-fork</goal>
@@ -62,6 +64,13 @@
       <executionStrategy>once-per-session</executionStrategy>
       <parameters>
         <parameter>
+          <name>session</name>
+          <type>org.apache.maven.execution.MavenSession</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenSession instance, which will handle the fork context.</description>
+        </parameter>
+        <parameter>
           <name>forkId</name>
           <type>int</type>
           <required>true</required>
@@ -70,14 +79,9 @@
         </parameter>
       </parameters>
       <configuration>
+        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
         <forkId implementation="int" default-value="-1">${forkId}</forkId>
       </configuration>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <field-name>buildContextManager</field-name>
-        </requirement>
-      </requirements>
     </mojo>
     <mojo>
       <goal>clear-fork-context</goal>
@@ -135,6 +139,13 @@
           <description>The current MavenProject instance, for building a new MojoBinding instance.</description>
         </parameter>
         <parameter>
+          <name>session</name>
+          <type>org.apache.maven.execution.MavenSession</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current MavenSession instance, which will handle the fork context.</description>
+        </parameter>
+        <parameter>
           <name>groupId</name>
           <type>java.lang.String</type>
           <required>true</required>
@@ -165,6 +176,7 @@
       </parameters>
       <configuration>
         <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
         <groupId implementation="java.lang.String">${groupId}</groupId>
         <artifactId implementation="java.lang.String">${artifactId}</artifactId>
         <version implementation="java.lang.String">${version}</version>

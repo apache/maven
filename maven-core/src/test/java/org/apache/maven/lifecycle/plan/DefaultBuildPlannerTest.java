@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.plan;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
@@ -67,7 +68,9 @@ public class DefaultBuildPlannerTest
 
         MavenProject project = new MavenProject( model );
 
-        BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "package" ), project );
+        MavenSession session = new MavenSession( getContainer(), null, null, null );
+
+        BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "package" ), project, session );
 
         List rendered = plan.renderExecutionPlan( new Stack() );
 

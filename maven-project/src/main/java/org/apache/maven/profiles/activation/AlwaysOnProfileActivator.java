@@ -25,12 +25,12 @@ import org.apache.maven.profiles.AlwaysOnActivation;
 public class AlwaysOnProfileActivator
     implements ProfileActivator
 {
-    public boolean canDetermineActivation( Profile profile )
+    public boolean canDetermineActivation( Profile profile, ProfileActivationContext context )
     {
-        return profile.getActivation() != null && profile.getActivation() instanceof AlwaysOnActivation;
+        return ( profile.getActivation() != null ) && ( profile.getActivation() instanceof AlwaysOnActivation );
     }
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( Profile profile, ProfileActivationContext context )
     {
         return true;
     }

@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.binding;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
@@ -37,7 +38,7 @@ public interface LifecycleBindingManager
     /**
      * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within the POM itself.
      */
-    LifecycleBindings getProjectCustomBindings( MavenProject project )
+    LifecycleBindings getProjectCustomBindings( MavenProject project, MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException;
 
     /**
@@ -59,6 +60,6 @@ public interface LifecycleBindingManager
      * <li>plugin-level configuration</li>
      * </ol>
      */
-    List getReportBindings( MavenProject project ) throws LifecycleLoaderException, LifecycleSpecificationException;
+    List getReportBindings( MavenProject project, MavenSession session ) throws LifecycleLoaderException, LifecycleSpecificationException;
 
 }

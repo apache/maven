@@ -19,7 +19,6 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationCustom;
 import org.apache.maven.model.Profile;
@@ -40,7 +39,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * Profile activator that allows the use of custom third-party activators, by specifying a type - 
+ * Profile activator that allows the use of custom third-party activators, by specifying a type -
  * or role-hint - for the activator, along with a configuration (in the form of a DOM) to be used
  * in configuring the activator. This activator will lookup/configure custom activators on-the-fly,
  * without caching any of the lookups from the container.
@@ -53,9 +52,7 @@ public class CustomActivator
 
     private Logger logger;
 
-    private BuildContextManager buildContextManager;
-
-    public boolean canDetermineActivation( Profile profile )
+    public boolean canDetermineActivation( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
         Activation activation = profile.getActivation();
@@ -66,11 +63,11 @@ public class CustomActivator
 
             if ( custom != null )
             {
-                ProfileActivator activator = loadProfileActivator( custom );
-                
+                ProfileActivator activator = loadProfileActivator( custom, context );
+
                 if ( activator != null )
                 {
-                    return activator.canDetermineActivation( profile );
+                    return activator.canDetermineActivation( profile, context );
                 }
             }
         }
@@ -78,11 +75,9 @@ public class CustomActivator
         return false;
     }
 
-    private ProfileActivator loadProfileActivator( ActivationCustom custom )
+    private ProfileActivator loadProfileActivator( ActivationCustom custom, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        CustomActivatorAdvice advice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
-
         String type = custom.getType();
 
         ProfileActivator activator = null;
@@ -93,7 +88,7 @@ public class CustomActivator
         }
         catch ( ComponentLookupException e )
         {
-            if ( !advice.failQuietly() )
+            if ( !context.isCustomActivatorFailureSuppressed() )
             {
                 throw new ProfileActivationException( "Cannot find custom ProfileActivator: " + type
                     + ". \nPerhaps you're missing a build extension?", e );
@@ -110,7 +105,7 @@ public class CustomActivator
         }
         catch ( ComponentConfigurationException e )
         {
-            if ( !advice.failQuietly() )
+            if ( !context.isCustomActivatorFailureSuppressed() )
             {
                 throw new ProfileActivationException( "Failed to configure custom ProfileActivator: " + type
                     + ".", e );
@@ -120,23 +115,23 @@ public class CustomActivator
         return activator;
     }
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
         ActivationCustom custom = profile.getActivation().getCustom();
 
-        ProfileActivator activator = loadProfileActivator( custom );
+        ProfileActivator activator = loadProfileActivator( custom, context );
 
-        return activator.isActive( profile );
+        return activator.isActive( profile, context );
     }
 
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    private Logger getLogger()
+    protected Logger getLogger()
     {
         if ( logger == null )
         {

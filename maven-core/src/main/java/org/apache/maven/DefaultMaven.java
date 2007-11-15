@@ -23,16 +23,12 @@ package org.apache.maven;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.ExecutionBuildContext;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.execution.SessionContext;
 import org.apache.maven.extension.BuildExtensionScanner;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -79,8 +75,6 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
-
-    protected BuildContextManager buildContextManager;
 
     protected MavenProjectBuilder projectBuilder;
 
@@ -213,8 +207,6 @@ public class DefaultMaven
             }
         }
 
-        initializeBuildContext( request );
-
         try
         {
             lifecycleExecutor.execute(
@@ -238,24 +230,6 @@ public class DefaultMaven
         result.setProject( reactorManager.getTopLevelProject() );
 
         return result;
-    }
-
-    /**
-     * Initialize some context objects to be stored in the container's context map for reference by
-     * other Maven components (including custom components that need more information about the
-     * build than is supplied to them by the APIs).
-     */
-    private void initializeBuildContext( MavenExecutionRequest request )
-    {
-        new ExecutionBuildContext( request ).store( buildContextManager );
-
-        SystemBuildContext systemContext = SystemBuildContext.getSystemBuildContext(
-            buildContextManager,
-            true );
-
-        systemContext.setSystemProperties( request.getProperties() );
-
-        systemContext.store( buildContextManager );
     }
 
     private List getProjects( MavenExecutionRequest request )
@@ -427,9 +401,6 @@ public class DefaultMaven
             request,
             dispatcher,
             reactorManager );
-
-        SessionContext ctx = new SessionContext( session );
-        ctx.store( buildContextManager );
 
         return session;
     }

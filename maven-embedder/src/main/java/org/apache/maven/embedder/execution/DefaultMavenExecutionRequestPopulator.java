@@ -36,6 +36,8 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -236,11 +238,11 @@ public class DefaultMavenExecutionRequestPopulator
         // look for the standard POM.
         // ------------------------------------------------------------------------
 
-        if ( request.getPom() != null )
+        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
-            request.setBaseDirectory( request.getPom() );
+            request.setBaseDirectory( request.getPom().getParentFile() );
         }
-        else if ( request.getBaseDirectory() != null )
+        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
         {
             // Look for a release POM
             File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
@@ -251,6 +253,11 @@ public class DefaultMavenExecutionRequestPopulator
             }
 
             request.setPom( pom );
+        }
+        // TODO: Is this correct?
+        else if ( request.getBaseDirectory() == null )
+        {
+            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
         }
     }
 
@@ -622,7 +629,8 @@ public class DefaultMavenExecutionRequestPopulator
         //
         // ------------------------------------------------------------------------
 
-        ProfileManager globalProfileManager = new DefaultProfileManager( container );
+        ProfileActivationContext activationContext = new DefaultProfileActivationContext( request.getProperties(), false );
+        ProfileManager globalProfileManager = new DefaultProfileManager( container, activationContext );
 
         globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
 

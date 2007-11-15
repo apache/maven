@@ -19,39 +19,6 @@ under the License.
 
 <component-set>
   <components>
-    <!--
-     |
-     | Resolver
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-      <implementation>org.apache.maven.project.artifact.CacheAwareArtifactResolver</implementation>
-      <role-hint>project-cache-aware</role-hint>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
-    </component>
-
     <component>
       <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
       <role-hint>default</role-hint>
@@ -86,11 +53,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>project-cache-aware</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>
@@ -182,10 +144,6 @@ under the License.
           <role-hint>default</role-hint>
         </requirement>
         <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.MavenTools</role>
         </requirement>
       </requirements>
@@ -209,12 +167,6 @@ under the License.
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>jdk-prefix</role-hint>
       <implementation>org.apache.maven.profiles.activation.JdkPrefixProfileActivator</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
     </component>
 <!--
      |
@@ -225,12 +177,6 @@ under the License.
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>system-property</role-hint>
       <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
     </component>
     <!--
      |
@@ -261,12 +207,6 @@ under the License.
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>custom</role-hint>
       <implementation>org.apache.maven.profiles.activation.CustomActivator</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
     </component>
 <!--
      |
@@ -318,10 +258,6 @@ under the License.
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
       </requirements>
     </component>
 
@@ -336,10 +272,6 @@ under the License.
         <requirement>
           <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
       </requirements>
     </component>
 
@@ -350,10 +282,6 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.context.BuildContextManager</role>
-          <role-hint>default</role-hint>
         </requirement>
       </requirements>
     </component>

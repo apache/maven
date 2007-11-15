@@ -22,7 +22,6 @@ package org.apache.maven.project.build.model;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
@@ -30,8 +29,9 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.ProjectBuildCache;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
@@ -44,6 +44,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 
 public class DefaultModelLineageBuilderTest
@@ -72,9 +73,6 @@ public class DefaultModelLineageBuilderTest
     public void tearDown()
         throws Exception
     {
-        BuildContextManager ctxMgr = (BuildContextManager) lookup( BuildContextManager.ROLE );
-        ctxMgr.clearBuildContext();
-
         super.tearDown();
 
         for ( Iterator it = toDelete.iterator(); it.hasNext(); )
@@ -439,7 +437,11 @@ public class DefaultModelLineageBuilderTest
 
         profile.addRepository( repository );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer() );
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile( profile );
         profileManager.explicitlyActivate( profile.getId() );
 
@@ -495,62 +497,63 @@ public class DefaultModelLineageBuilderTest
                             + file.exists() );
     }
 
-    public void testReadPOMWithParentInOtherLocalFileWithBadRelativePath()
-        throws Exception
-    {
-        // 1. create the parent model in a "local" POM file.
-        File parentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
-        parentPOM.deleteOnExit();
-
-        Model parent = createModel( "group", "parent", "1" );
-
-        // 4. write the parent model to the local repo directory
-        writeModel( parent, parentPOM );
-
-        BuildContextManager buildContextManager = (BuildContextManager) lookup(
-                                                                                BuildContextManager.ROLE,
-                                                                                "default" );
-
-        ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
-        cache.cacheModelFileForModel( parentPOM, parent );
-        cache.store( buildContextManager );
-
-        // 5. create the current pom with a parent-ref on the parent model
-        Model current = createModel( "group", "current", "1" );
-
-        Parent currentParent = new Parent();
-        currentParent.setGroupId( "group" );
-        currentParent.setArtifactId( "parent" );
-        currentParent.setVersion( "1" );
-        currentParent.setRelativePath( "../parent/pom.xml" );
-
-        current.setParent( currentParent );
-
-        // 6. write the current pom somewhere
-        File currentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
-        currentPOM.deleteOnExit();
-
-        writeModel( current, currentPOM );
-
-        // 7. build the lineage.
-        File localRepoRootDirectory = createTempDir( "localRepoRootDir" );
-        ArtifactRepository localRepository = new DefaultArtifactRepository(
-                                                                           "local",
-                                                                           localRepoRootDirectory.toURL()
-                                                                                               .toExternalForm(),
-                                                                           defaultLayout );
-
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null,
-                                                                      false, true );
-
-        assertEquals( 2, lineage.size() );
-
-        Iterator modelIterator = lineage.modelIterator();
-
-        assertEquals( current.getId(), ( (Model) modelIterator.next() ).getId() );
-        assertEquals( parent.getId(), ( (Model) modelIterator.next() ).getId() );
-    }
+    // TODO: Should this even work reliably? Isn't it a fluke if this is cached, which is what we're testing here??
+//    public void testReadPOMWithParentInOtherLocalFileWithBadRelativePath()
+//        throws Exception
+//    {
+//        // 1. create the parent model in a "local" POM file.
+//        File parentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+//        parentPOM.deleteOnExit();
+//
+//        Model parent = createModel( "group", "parent", "1" );
+//
+//        // 4. write the parent model to the local repo directory
+//        writeModel( parent, parentPOM );
+//
+//        BuildContextManager buildContextManager = (BuildContextManager) lookup(
+//                                                                                BuildContextManager.ROLE,
+//                                                                                "default" );
+//
+//        ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
+//        cache.cacheModelFileForModel( parentPOM, parent );
+//        cache.store( buildContextManager );
+//
+//        // 5. create the current pom with a parent-ref on the parent model
+//        Model current = createModel( "group", "current", "1" );
+//
+//        Parent currentParent = new Parent();
+//        currentParent.setGroupId( "group" );
+//        currentParent.setArtifactId( "parent" );
+//        currentParent.setVersion( "1" );
+//        currentParent.setRelativePath( "../parent/pom.xml" );
+//
+//        current.setParent( currentParent );
+//
+//        // 6. write the current pom somewhere
+//        File currentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+//        currentPOM.deleteOnExit();
+//
+//        writeModel( current, currentPOM );
+//
+//        // 7. build the lineage.
+//        File localRepoRootDirectory = createTempDir( "localRepoRootDir" );
+//        ArtifactRepository localRepository = new DefaultArtifactRepository(
+//                                                                           "local",
+//                                                                           localRepoRootDirectory.toURL()
+//                                                                                               .toExternalForm(),
+//                                                                           defaultLayout );
+//
+//        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
+//                                                                      Collections.EMPTY_LIST, null,
+//                                                                      false, true );
+//
+//        assertEquals( 2, lineage.size() );
+//
+//        Iterator modelIterator = lineage.modelIterator();
+//
+//        assertEquals( current.getId(), ( (Model) modelIterator.next() ).getId() );
+//        assertEquals( parent.getId(), ( (Model) modelIterator.next() ).getId() );
+//    }
 
     private Model createModel( String groupId,
                                String artifactId,

@@ -3,8 +3,7 @@ package org.apache.maven.plugin.loader;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.execution.SessionContext;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -44,8 +43,6 @@ public class DefaultPluginLoader
 
     private PluginMappingManager pluginMappingManager;
 
-    private BuildContextManager buildContextManager;
-
     private MavenPluginCollector pluginCollector;
 
     /**
@@ -53,7 +50,7 @@ public class DefaultPluginLoader
      * using the project for {@link ArtifactRepository} and other supplemental plugin information as
      * necessary.
      */
-    public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project )
+    public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         PluginDescriptor pluginDescriptor = null;
@@ -63,7 +60,7 @@ public class DefaultPluginLoader
         plugin.setArtifactId( mojoBinding.getArtifactId() );
         plugin.setVersion( mojoBinding.getVersion() );
 
-        pluginDescriptor = loadPlugin( plugin, project );
+        pluginDescriptor = loadPlugin( plugin, project, session );
 
         // fill in any blanks once we know more about this plugin.
         if ( pluginDescriptor != null )
@@ -88,7 +85,7 @@ public class DefaultPluginLoader
      *         and try to resolve based on that.</li>
      * </ol>
      */
-    public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project )
+    public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         Set descriptors = pluginCollector.getPluginDescriptorsForPrefix( prefix );
@@ -109,12 +106,12 @@ public class DefaultPluginLoader
 
         if ( pluginDescriptor == null )
         {
-            pluginDescriptor = loadFromProject( prefix, project );
+            pluginDescriptor = loadFromProject( prefix, project, session );
         }
 
         if ( pluginDescriptor == null )
         {
-            pluginDescriptor = loadByPrefix( prefix, project );
+            pluginDescriptor = loadByPrefix( prefix, project, session );
         }
 
         if ( pluginDescriptor == null )
@@ -122,7 +119,7 @@ public class DefaultPluginLoader
             Plugin plugin = new Plugin();
             plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
 
-            pluginDescriptor = loadPlugin( plugin, project );
+            pluginDescriptor = loadPlugin( plugin, project, session );
         }
 
         if ( pluginDescriptor == null )
@@ -137,7 +134,7 @@ public class DefaultPluginLoader
      * Look for a plugin configured in the current project that has a prefix matching the one
      * specified. Return the {@link PluginDescriptor} if a match is found.
      */
-    private PluginDescriptor loadFromProject( String prefix, MavenProject project )
+    private PluginDescriptor loadFromProject( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         PluginDescriptor result = null;
@@ -146,7 +143,7 @@ public class DefaultPluginLoader
         {
             Plugin plugin = (Plugin) it.next();
 
-            PluginDescriptor pluginDescriptor = loadPlugin( plugin, project );
+            PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
             if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
             {
                 result = pluginDescriptor;
@@ -161,14 +158,13 @@ public class DefaultPluginLoader
      * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix
      * matching the one specified. Return the {@link PluginDescriptor} if a match is found.
      */
-    private PluginDescriptor loadByPrefix( String prefix, MavenProject project )
+    private PluginDescriptor loadByPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
-        SessionContext ctx = SessionContext.read( buildContextManager );
-        Settings settings = ctx.getSettings();
+        Settings settings = session.getSettings();
 
         Plugin plugin = pluginMappingManager.getByPrefix( prefix, settings.getPluginGroups(),
-                                                          project.getPluginArtifactRepositories(), ctx.getLocalRepository() );
+                                                          project.getPluginArtifactRepositories(), session.getLocalRepository() );
 
         PluginDescriptor pluginDescriptor = null;
         if ( plugin != null )
@@ -179,7 +175,7 @@ public class DefaultPluginLoader
                 plugin.setVersion( projectPlugin.getVersion() );
             }
 
-            pluginDescriptor = loadPlugin( plugin, project );
+            pluginDescriptor = loadPlugin( plugin, project, session );
         }
 
         return pluginDescriptor;
@@ -189,7 +185,7 @@ public class DefaultPluginLoader
      * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
      * the {@link ArtifactRepository} and other supplemental plugin information as necessary.
      */
-    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project )
+    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         if ( plugin.getGroupId() == null )
@@ -197,11 +193,9 @@ public class DefaultPluginLoader
             plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
         }
 
-        SessionContext ctx = SessionContext.read( buildContextManager );
-
         try
         {
-            PluginDescriptor result = pluginManager.verifyPlugin( plugin, project, ctx.getSession() );
+            PluginDescriptor result = pluginManager.verifyPlugin( plugin, project, session );
 
             // this has been simplified from the old code that injected the plugin management stuff, since
             // pluginManagement injection is now handled by the project method.
@@ -249,7 +243,7 @@ public class DefaultPluginLoader
      * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
      * necessary.
      */
-    public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project )
+    public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         ReportPlugin plugin = new ReportPlugin();
@@ -257,7 +251,7 @@ public class DefaultPluginLoader
         plugin.setArtifactId( mojoBinding.getArtifactId() );
         plugin.setVersion( mojoBinding.getVersion() );
 
-        PluginDescriptor pluginDescriptor = loadReportPlugin( plugin, project );
+        PluginDescriptor pluginDescriptor = loadReportPlugin( plugin, project, session );
 
         mojoBinding.setVersion( pluginDescriptor.getVersion() );
 
@@ -268,16 +262,14 @@ public class DefaultPluginLoader
      * Load the {@link PluginDescriptor} instance for the specified report plugin, using the project for
      * the {@link ArtifactRepository} and other supplemental report/plugin information as necessary.
      */
-    public PluginDescriptor loadReportPlugin( ReportPlugin plugin, MavenProject project )
+    public PluginDescriptor loadReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         // TODO: Shouldn't we be injecting pluginManagement info here??
 
-        SessionContext ctx = SessionContext.read( buildContextManager );
-
         try
         {
-            return pluginManager.verifyReportPlugin( plugin, project, ctx.getSession() );
+            return pluginManager.verifyReportPlugin( plugin, project, session );
         }
         catch ( ArtifactResolutionException e )
         {

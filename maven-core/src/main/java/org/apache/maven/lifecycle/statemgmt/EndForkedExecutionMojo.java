@@ -1,7 +1,6 @@
 package org.apache.maven.lifecycle.statemgmt;
 
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.lifecycle.LifecycleExecutionContext;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -20,23 +19,20 @@ public class EndForkedExecutionMojo
 
     private int forkId = -1;
 
-    private BuildContextManager buildContextManager;
+    private MavenSession session;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
         getLog().info( "Ending forked execution [fork id: " + forkId + "]" );
 
-        LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
-        MavenProject executionProject = ctx.removeForkedProject();
+        MavenProject executionProject = session.removeForkedProject();
 
-        MavenProject project = ctx.getCurrentProject();
+        MavenProject project = session.getCurrentProject();
         if ( ( project != null ) && ( executionProject != null ) )
         {
             project.setExecutionProject( executionProject );
         }
-
-        ctx.store( buildContextManager );
     }
 
 }

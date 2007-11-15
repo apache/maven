@@ -1,9 +1,11 @@
 package org.apache.maven.lifecycle.binding;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleBindingLoader;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.LifecycleUtils;
+import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -121,8 +123,9 @@ public class DefaultLifecycleBindingManager
 
     /**
      * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within the POM itself.
+     * @param session
      */
-    public LifecycleBindings getProjectCustomBindings( final MavenProject project )
+    public LifecycleBindings getProjectCustomBindings( final MavenProject project, final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         LifecycleBindings bindings = new LifecycleBindings();
@@ -169,7 +172,12 @@ public class DefaultLifecycleBindingManager
                                 mojoBinding.setExecutionId( execution.getId() );
                                 mojoBinding.setOrigin( "POM" );
 
+                                logger.debug( "Mojo: " + MojoBindingUtils.toString( mojoBinding ) + ": determining binding phase." );
+
                                 String phase = execution.getPhase();
+
+                                logger.debug( "Phase from <execution/> section (merged with outer <plugin/> section) is: " + phase );
+
                                 boolean pluginResolved = false;
 
                                 if ( phase == null )
@@ -178,7 +186,7 @@ public class DefaultLifecycleBindingManager
                                     {
                                         try
                                         {
-                                            pluginDescriptor = pluginLoader.loadPlugin( plugin, project );
+                                            pluginDescriptor = pluginLoader.loadPlugin( plugin, project, session );
                                             pluginResolved = true;
                                         }
                                         catch ( PluginLoaderException e )
@@ -214,6 +222,8 @@ public class DefaultLifecycleBindingManager
 
                                         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
                                         phase = mojoDescriptor.getPhase();
+
+                                        logger.debug( "Phase from plugin descriptor: " + mojoDescriptor.getFullGoalName() + " is: " + phase );
                                     }
 
                                     if ( phase == null )
@@ -343,7 +353,7 @@ public class DefaultLifecycleBindingManager
                     MojoBinding binding;
                     if ( goal.indexOf( ":" ) > 0 )
                     {
-                        binding = mojoBindingFactory.parseMojoBinding( goal, project, false );
+                        binding = mojoBindingFactory.parseMojoBinding( goal, project );
                     }
                     else
                     {
@@ -404,7 +414,7 @@ public class DefaultLifecycleBindingManager
      * <li>plugin-level configuration</li>
      * </ol>
      */
-    public List getReportBindings( final MavenProject project )
+    public List getReportBindings( final MavenProject project, final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         if ( project.getModel().getReports() != null )
@@ -425,7 +435,7 @@ public class DefaultLifecycleBindingManager
 
                 if ( ( reportSets == null ) || reportSets.isEmpty() )
                 {
-                    reports.addAll( getReportsForPlugin( reportPlugin, null, project ) );
+                    reports.addAll( getReportsForPlugin( reportPlugin, null, project, session ) );
                 }
                 else
                 {
@@ -433,7 +443,7 @@ public class DefaultLifecycleBindingManager
                     {
                         ReportSet reportSet = (ReportSet) j.next();
 
-                        reports.addAll( getReportsForPlugin( reportPlugin, reportSet, project ) );
+                        reports.addAll( getReportsForPlugin( reportPlugin, reportSet, project, session ) );
                     }
                 }
             }
@@ -502,12 +512,12 @@ public class DefaultLifecycleBindingManager
      * Retrieve any reports from the specified ReportPlugin which are referenced in the specified POM.
      */
     private List getReportsForPlugin( final ReportPlugin reportPlugin, final ReportSet reportSet,
-                                      final MavenProject project ) throws LifecycleLoaderException
+                                      final MavenProject project, final MavenSession session ) throws LifecycleLoaderException
     {
         PluginDescriptor pluginDescriptor;
         try
         {
-            pluginDescriptor = pluginLoader.loadReportPlugin( reportPlugin, project );
+            pluginDescriptor = pluginLoader.loadReportPlugin( reportPlugin, project, session );
         }
         catch ( PluginLoaderException e )
         {

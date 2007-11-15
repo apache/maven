@@ -82,6 +82,32 @@ under the License.
       <url>scp://people.apache.org/www/maven.apache.org/embedder/${project.version}/</url>
     </site>
   </distributionManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        
+        <executions>
+          <execution>
+            <id>compile-aspects</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <aspectLibraries>
+                <aspectLibrary>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-core</artifactId>
+                </aspectLibrary>
+              </aspectLibraries>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <!--
@@ -94,27 +120,6 @@ under the License.
       <id>idea</id>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>aspectj-maven-plugin</artifactId>
-            
-            <executions>
-              <execution>
-                <id>weave-compat</id>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <aspectLibraries>
-                    <aspectLibrary>
-                      <groupId>org.apache.maven</groupId>
-                      <artifactId>maven-core</artifactId>
-                    </aspectLibrary>
-                  </aspectLibraries>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <artifactId>shade-maven-plugin</artifactId>
             <groupId>org.codehaus.mojo</groupId>

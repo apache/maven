@@ -37,11 +37,6 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-build-context</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-reporting-api</artifactId>
       <version>2.1-SNAPSHOT</version>
     </dependency>

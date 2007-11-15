@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.binding;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -28,7 +29,7 @@ public class DefaultMojoBindingFactory
      * If a plugin-prefix is allowed and used, resolve the prefix and use the resulting PluginDescriptor
      * to set groupId and artifactId on the MojoBinding instance.
      */
-    public MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, boolean allowPrefixReference )
+    public MojoBinding parseMojoBinding( String bindingSpec, MavenProject project, MavenSession session, boolean allowPrefixReference )
         throws LifecycleSpecificationException, LifecycleLoaderException
     {
         StringTokenizer tok = new StringTokenizer( bindingSpec, ":" );
@@ -51,7 +52,7 @@ public class DefaultMojoBindingFactory
             PluginDescriptor pluginDescriptor;
             try
             {
-                pluginDescriptor = pluginLoader.findPluginForPrefix( prefix, project );
+                pluginDescriptor = pluginLoader.findPluginForPrefix( prefix, project, session );
             }
             catch ( PluginLoaderException e )
             {
@@ -119,7 +120,26 @@ public class DefaultMojoBindingFactory
     {
         try
         {
-            return parseMojoBinding( bindingSpec, null, false );
+            return parseMojoBinding( bindingSpec, null, null, false );
+        }
+        catch ( LifecycleLoaderException e )
+        {
+            IllegalStateException error = new IllegalStateException( e.getMessage()
+                + "\n\nTHIS SHOULD BE IMPOSSIBLE DUE TO THE USAGE OF THE PLUGIN-LOADER." );
+
+            error.initCause( e );
+
+            throw error;
+        }
+    }
+
+    public MojoBinding parseMojoBinding( String bindingSpec,
+                                         MavenProject project )
+        throws LifecycleSpecificationException
+    {
+        try
+        {
+            return parseMojoBinding( bindingSpec, project, null, false );
         }
         catch ( LifecycleLoaderException e )
         {

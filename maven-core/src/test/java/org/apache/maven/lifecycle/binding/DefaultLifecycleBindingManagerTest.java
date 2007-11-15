@@ -163,7 +163,7 @@ public class DefaultLifecycleBindingManagerTest extends PlexusTestCase
 
         MavenProject project = new MavenProject( model );
 
-        LifecycleBindings lifecycleBindings = mgr.getProjectCustomBindings( project );
+        LifecycleBindings lifecycleBindings = mgr.getProjectCustomBindings( project, null );
 
         List bindings = lifecycleBindings.getBuildBinding().getValidate().getBindings();
 

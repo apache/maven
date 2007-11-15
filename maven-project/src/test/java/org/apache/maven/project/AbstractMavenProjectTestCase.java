@@ -23,6 +23,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -30,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -109,7 +112,10 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProject( File pom )
         throws Exception
     {
-        return projectBuilder.build( pom, getLocalRepository(), new DefaultProfileManager( getContainer() ) );
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        return projectBuilder.build( pom, getLocalRepository(), new DefaultProfileManager( getContainer(), ctx ) );
     }
 
 }

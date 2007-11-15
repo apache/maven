@@ -41,9 +41,6 @@ public interface ModelLineageBuilder
     /**
      * Construct a lineage of the current POM plus all of its ancestors.
      *
-     * COMING: Also, set ProjectBuildContext.currentModelLineage build-context to the result of this
-     * method before returning.
-     *
      * @param pom The current POM, whose Model will terminate the constructed lineage
      * @param localRepository The local repository against which parent POMs should be resolved
      * @param remoteRepositories List of ArtifactRepository instances against which parent POMs

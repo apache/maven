@@ -3,6 +3,7 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -59,17 +60,25 @@ public class DefaultMavenRealmManager
             {
                 try
                 {
+                    logger.debug( "disposing managed ClassRealm with id: " + id );
                     world.disposeRealm( id );
+
+                    logger.debug( "dissociating all components from managed ClassRealm with id: " + id );
+                    container.removeComponentRealm( realm );
                 }
                 catch ( NoSuchRealmException e )
                 {
                     // cannot happen.
                 }
+                catch ( PlexusContainerException e )
+                {
+                    logger.debug( "Error while dissociating: " + e.getMessage(), e );
+                }
             }
         }
 
         managedRealmIds.clear();
-//        pluginArtifacts.clear();
+        pluginArtifacts.clear();
     }
 
     public boolean hasExtensionRealm( Artifact extensionArtifact )
@@ -320,7 +329,7 @@ public class DefaultMavenRealmManager
         try
         {
             realm = world.newRealm( id );
-//            managedRealmIds.add( id );
+            managedRealmIds.add( id );
         }
         catch ( DuplicateRealmException e )
         {
@@ -329,6 +338,8 @@ public class DefaultMavenRealmManager
         }
 
         populateRealm( id, realm, pluginArtifact, artifacts );
+
+        logger.debug( "Saving artifacts:\n\n" + artifacts + "\n\nfor plugin: " + id );
         pluginArtifacts.put( id, artifacts );
 
         return realm;
@@ -382,9 +393,21 @@ public class DefaultMavenRealmManager
 
         if ( artifacts != null )
         {
+            logger.debug( "Returning artifacts:\n\n" + artifacts + "\n\nfor plugin: " + id );
             return new ArrayList( artifacts );
         }
 
+        logger.debug( "Found no artifacts for plugin: " + id );
         return null;
+    }
+
+    public void setPluginArtifacts( Plugin plugin,
+                                    Collection artifacts )
+    {
+        String id = RealmUtils.createPluginRealmId( plugin );
+
+        logger.debug( "Setting artifact collection for plugin with id: " + id + " to:\n\n" + artifacts );
+
+        pluginArtifacts.put( id, artifacts );
     }
 }

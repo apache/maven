@@ -20,6 +20,7 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 
 import java.util.List;
@@ -39,6 +40,10 @@ public interface ProfileManager
 
     void activateAsDefault( String profileId );
 
+    ProfileActivationContext getProfileActivationContext();
+
+    void setProfileActivationContext( ProfileActivationContext profileActivationContext );
+
     List getActiveProfiles()
         throws ProfileActivationException;
 
@@ -50,5 +55,5 @@ public interface ProfileManager
 
     List getExplicitlyDeactivatedIds();
 
-    List getIdsActivatedByDefault();    
+    List getIdsActivatedByDefault();
 }

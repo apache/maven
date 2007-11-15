@@ -37,10 +37,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LogEnabled;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -50,11 +46,37 @@ import java.util.Set;
 public privileged aspect Maven20xCompatAspect
 {
 
-    // pointcut to avoid recursive matching on behavior injected by this aspect.
-    private pointcut notHere(): !within( Maven20xCompatAspect );
-
     // GRAB Session as soon as it's constructed.
     private MavenSession session;
+
+    // GRAB the request when it's passed into a method that returns a corresponding result.
+    // NOTE: We'll use this in multiple places below...
+    private MavenExecutionRequest request;
+
+    // Grab this so we have a voice!
+    private Logger logger;
+
+    // used for injecting plexus-utils into extension and plugin artifact sets.
+    private VersionRange vr = null;
+    private Artifact plexusUtilsArtifact = null;
+
+
+    private pointcut mavenEmbedderStop():
+        execution( * org.apache.maven.embedder.MavenEmbedder.stop( .. ) );
+
+    // TODO: There must be a more elegant way to release these resources than depending on MavenEmbedder.stop().
+    after(): mavenEmbedderStop()
+    {
+        session = null;
+        request = null;
+        logger = null;
+        vr = null;
+        plexusUtilsArtifact = null;
+    }
+
+
+    // pointcut to avoid recursive matching on behavior injected by this aspect.
+    private pointcut notHere(): !within( Maven20xCompatAspect );
 
     private pointcut sessionCreation( MavenSession session ):
         execution( public MavenSession+.new(..) )
@@ -114,15 +136,10 @@ public privileged aspect Maven20xCompatAspect
     PluginDescriptor around( String prefix, PluginManager manager ): getPluginDescriptorForPrefix( prefix, manager )
     {
         // TODO: Implement Me!
-        return null;
+        throw new UnsupportedOperationException( "This method has not yet been implemented in Maven's backward-compatibility library." );
     }
 
     public PluginDescriptor PluginManager.getPluginDescriptorForPrefix( String prefix )
-    {
-        return null;
-    }
-
-    public PluginDescriptor DefaultPluginManager.getPluginDescriptorForPrefix( String prefix )
     {
         return null;
     }
@@ -161,19 +178,25 @@ public privileged aspect Maven20xCompatAspect
         return result;
     }
 
-    // GRAB the request when it's passed into a method that returns a corresponding result.
-    // NOTE: We'll use this in multiple places below...
-    private MavenExecutionRequest request;
-
     private pointcut methodsTakingRequest( MavenExecutionRequest request ):
         execution( MavenExecutionResult *.*( MavenExecutionRequest ) )
+        && !withincode( * *.*( MavenExecutionRequest ) )
         && args( request )
         && notHere();
 
     // capture the request instance before it's passed into any method that returns a corresponding MavenExecutionResult.
-    before( MavenExecutionRequest request ): methodsTakingRequest( request )
+    Object around( MavenExecutionRequest request ): methodsTakingRequest( request )
     {
         this.request = request;
+
+        try
+        {
+            return proceed( request );
+        }
+        finally
+        {
+            this.request = null;
+        }
     }
 
     // USE Request to compensate for old buildSettings() API.
@@ -203,33 +226,23 @@ public privileged aspect Maven20xCompatAspect
         return null;
     }
 
-    // container used in the plugin manager.
-    private PlexusContainer container;
+    private pointcut pluginManager( DefaultPluginManager manager ):
+        execution( * DefaultPluginManager.*( .. ) )
+        && this( manager );
 
-    private pointcut pluginManagerContextualized( Context context ):
-        execution( void DefaultPluginManager+.contextualize( Context ) )
-        && args( context );
-
-    // capture the container when the DefaultPluginManager is contextualized.
-    void around( Context context ) throws ContextException: pluginManagerContextualized( context )
-    {
-        proceed( context );
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    private pointcut pluginRealmCreation( Plugin plugin ):
+    private pointcut pluginRealmCreation( Plugin plugin, DefaultPluginManager manager ):
         call( ClassRealm MavenRealmManager+.createPluginRealm( Plugin, Artifact, Collection ) )
-        && withincode( void DefaultPluginManager.addPlugin(..) )
+        && cflow( pluginManager( manager ) )
         && args( plugin, .. );
 
     // Add various imports for Xpp3 stuff back into the core realm every time a plugin realm is created.
-    ClassRealm around( Plugin plugin ): pluginRealmCreation( plugin )
+    ClassRealm around( Plugin plugin, DefaultPluginManager manager ): pluginRealmCreation( plugin, manager )
     {
-        ClassRealm pluginRealm = proceed( plugin );
+        ClassRealm pluginRealm = proceed( plugin, manager );
 
         try
         {
-            String parentRealmId = container.getContainerRealm().getId();
+            String parentRealmId = manager.container.getContainerRealm().getId();
 
             // adding for MNG-3012 to try to work around problems with Xpp3Dom (from plexus-utils)
             // spawning a ClassCastException when a mojo calls plugin.getConfiguration() from maven-model...
@@ -251,9 +264,6 @@ public privileged aspect Maven20xCompatAspect
 
         return pluginRealm;
     }
-
-    // Grab this so we have a voice!
-    private Logger logger;
 
     private pointcut enableLoggingCall( Logger logger ):
         execution( void LogEnabled+.enableLogging( Logger ) )
@@ -288,9 +298,6 @@ public privileged aspect Maven20xCompatAspect
     // --------------------------
     // UTILITIES
     // --------------------------
-
-    private VersionRange vr = null;
-    private Artifact plexusUtilsArtifact = null;
 
     private void checkPlexusUtils( Set dependencyArtifacts, ArtifactFactory artifactFactory )
     {

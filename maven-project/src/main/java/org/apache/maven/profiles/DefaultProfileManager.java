@@ -21,6 +21,7 @@ package org.apache.maven.profiles;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
 import org.codehaus.plexus.PlexusContainer;
@@ -47,16 +48,29 @@ public class DefaultProfileManager
 
     private Map profilesById = new LinkedHashMap();
 
+    private ProfileActivationContext profileActivationContext;
+
     /**
      * the properties passed to the profile manager are the props that
      * are passed to maven, possibly containing profile activator properties
      *
      */
-    public DefaultProfileManager( PlexusContainer container )
+    public DefaultProfileManager( PlexusContainer container, ProfileActivationContext profileActivationContext )
     {
         this.container = container;
+        this.profileActivationContext = profileActivationContext;
     }
-    
+
+    public ProfileActivationContext getProfileActivationContext()
+    {
+        return profileActivationContext;
+    }
+
+    public void setProfileActivationContext( ProfileActivationContext profileActivationContext )
+    {
+        this.profileActivationContext = profileActivationContext;
+    }
+
     public Map getProfilesById()
     {
         return profilesById;
@@ -80,7 +94,7 @@ public class DefaultProfileManager
 
         Activation activation = profile.getActivation();
 
-        if ( activation != null && activation.isActiveByDefault() )
+        if ( ( activation != null ) && activation.isActiveByDefault() )
         {
             activateAsDefault( profileId );
         }
@@ -159,11 +173,11 @@ public class DefaultProfileManager
             {
                 shouldAdd = true;
             }
-            else if ( !deactivatedIds.contains( profileId ) && isActive( profile ) )
+            else if ( !deactivatedIds.contains( profileId ) && isActive( profile, profileActivationContext ) )
             {
                 shouldAdd = true;
             }
-            
+
             if ( shouldAdd )
             {
                 if ( "pom".equals( profile.getSource() ) )
@@ -188,20 +202,20 @@ public class DefaultProfileManager
                 activeFromPom.add( profile );
             }
         }
-        
+
         List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
-        
+
         allActive.addAll( activeExternal );
         allActive.addAll( activeFromPom );
 
         return allActive;
     }
 
-    private boolean isActive( Profile profile )
+    private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
         List activators = null;
-        
+
         try
         {
             activators = container.lookupList( ProfileActivator.ROLE );
@@ -210,15 +224,15 @@ public class DefaultProfileManager
             {
                 ProfileActivator activator = (ProfileActivator) activatorIterator.next();
 
-                if ( activator.canDetermineActivation( profile ) )
+                if ( activator.canDetermineActivation( profile, context ) )
                 {
-                    boolean result = activator.isActive( profile );
-                    
+                    boolean result = activator.isActive( profile, context );
+
                     if ( result )
                     {
                         container.getLogger().debug( "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
                     }
-                    
+
                     return result;
                 }
             }

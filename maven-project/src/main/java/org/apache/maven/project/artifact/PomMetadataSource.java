@@ -23,18 +23,15 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataResolution;
 import org.apache.maven.artifact.resolver.metadata.MetadataRetrievalException;
 import org.apache.maven.artifact.resolver.metadata.MetadataSource;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.ProjectBuildCache;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -63,8 +60,6 @@ public class PomMetadataSource
 
     private ArtifactFactory artifactFactory;
 
-    private BuildContextManager buildContextManager;
-
     // lazily instantiated and cached.
     private MavenProject superProject;
 
@@ -88,33 +83,26 @@ public class PomMetadataSource
                 "Cannot lookup MavenProjectBuilder component instance: " + e.getMessage(), e );
         }
 
-        ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
-
-        MavenProject project;
+        MavenProject project = null;
 
         Artifact pomArtifact = artifactFactory.createProjectArtifact( artifactMetadata.getGroupId(), artifactMetadata.getArtifactId(),
             artifactMetadata.getVersion(), artifactMetadata.getScope() );
 
-        project = cache.getCachedProject( artifactMetadata.getGroupId(), artifactMetadata.getArtifactId(), artifactMetadata.getVersion() );
-
-        if ( project == null )
+        try
         {
-            try
+            project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+        }
+        catch ( InvalidProjectModelException e )
+        {
+            // We want to capture this in the graph so that we can display the error to the user
+        }
+        catch ( ProjectBuildingException e )
+        {
+            if ( strictlyEnforceThePresenceOfAValidMavenPOM )
             {
-                project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
-            }
-            catch ( InvalidProjectModelException e )
-            {
-                // We want to capture this in the graph so that we can display the error to the user
-            }
-            catch ( ProjectBuildingException e )
-            {
-                if ( strictlyEnforceThePresenceOfAValidMavenPOM )
-                {
-                    throw new MetadataRetrievalException(
-                        "Unable to read the metadata file for artifactMetadata '" +
-                            artifactMetadata.getDependencyConflictId() + "': " + e.getMessage(), e, artifactMetadata );
-                }
+                throw new MetadataRetrievalException(
+                    "Unable to read the metadata file for artifactMetadata '" +
+                        artifactMetadata.getDependencyConflictId() + "': " + e.getMessage(), e, artifactMetadata );
             }
         }
 

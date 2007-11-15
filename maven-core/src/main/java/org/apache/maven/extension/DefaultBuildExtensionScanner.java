@@ -20,14 +20,15 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.plugin.loader.PluginLoader;
-import org.apache.maven.profiles.activation.CustomActivatorAdvice;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -55,8 +56,6 @@ public class DefaultBuildExtensionScanner
 {
 
     private Logger logger;
-
-    private BuildContextManager buildContextManager;
 
     private ExtensionManager extensionManager;
 
@@ -97,12 +96,6 @@ public class DefaultBuildExtensionScanner
                                List reactorFiles )
         throws ExtensionScanningException
     {
-
-        // setup the CustomActivatorAdvice to fail quietly while we discover extensions...then, we'll
-        // reset it.
-        CustomActivatorAdvice activatorAdvice = CustomActivatorAdvice.getCustomActivatorAdvice( buildContextManager );
-        activatorAdvice.setFailQuietly( true );
-        activatorAdvice.store( buildContextManager );
 
         try
         {
@@ -183,11 +176,6 @@ public class DefaultBuildExtensionScanner
         {
             throw new ExtensionScanningException( "Failed to interpolate model from: " + pom
                 + " prior to scanning for extensions.", pom, e );
-        }
-        finally
-        {
-            activatorAdvice.reset();
-            activatorAdvice.store( buildContextManager );
         }
     }
 
@@ -322,6 +310,14 @@ public class DefaultBuildExtensionScanner
                                             List originalRemoteRepositories )
         throws ExtensionScanningException
     {
+        ProfileManager profileManager = request.getProfileManager();
+
+        ProfileActivationContext profileActivationContext = profileManager == null
+                        ? new DefaultProfileActivationContext( System.getProperties(), false )
+                        : profileManager.getProfileActivationContext();
+
+        boolean suppressActivatorFailure = profileActivationContext.isCustomActivatorFailureSuppressed();
+
         ModelLineage lineage;
         try
         {
@@ -331,6 +327,7 @@ public class DefaultBuildExtensionScanner
             // not for POMs from the repository...otherwise, we would need to be more careful with
             // the last parameter here and determine whether it's appropriate for the POM to have
             // an accompanying profiles.xml file.
+            profileActivationContext.setCustomActivatorFailureSuppressed( true );
             lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories,
                                                              request.getProfileManager(), false, true );
         }
@@ -338,6 +335,10 @@ public class DefaultBuildExtensionScanner
         {
             throw new ExtensionScanningException( "Error building model lineage in order to pre-scan for extensions: "
                 + e.getMessage(), pom, e );
+        }
+        finally
+        {
+            profileActivationContext.setCustomActivatorFailureSuppressed( suppressActivatorFailure );
         }
 
         return lineage;

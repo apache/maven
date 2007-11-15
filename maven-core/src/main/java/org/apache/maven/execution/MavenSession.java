@@ -21,17 +21,21 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Stack;
 
 /**
  * @author Jason van Zyl
@@ -48,6 +52,9 @@ public class MavenSession
     private boolean usingPOMsFromFilesystem = true;
 
     private MavenExecutionRequest request;
+
+    private MavenProject currentProject;
+    private Stack forkedProjectStack = new Stack();
 
     private Map reports = new LinkedHashMap();
 
@@ -158,6 +165,72 @@ public class MavenSession
     public MavenExecutionRequest getRequest()
     {
         return request;
+    }
+
+    /**
+     * Push the existing currentProject onto the forked-project stack, and set the specified project
+     * as the new current project. This signifies the beginning of a new forked-execution context.
+     */
+    public void addForkedProject( MavenProject project )
+    {
+        forkedProjectStack.push( currentProject );
+        currentProject = project;
+    }
+
+    /**
+     * Peel off the last forked project from the stack, and restore it as the currentProject. This
+     * signifies the cleanup of a completed forked-execution context.
+     */
+    public MavenProject removeForkedProject()
+    {
+        if ( !forkedProjectStack.isEmpty() )
+        {
+            MavenProject lastCurrent = currentProject;
+            currentProject = (MavenProject) forkedProjectStack.pop();
+
+            return lastCurrent;
+        }
+
+        return null;
+    }
+
+    public void setCurrentProject( MavenProject currentProject )
+    {
+        this.currentProject = currentProject;
+    }
+
+    /**
+     * Return the current project for use in a mojo execution.
+     */
+    public MavenProject getCurrentProject()
+    {
+        return currentProject;
+    }
+
+    /**
+     * Retrieve the list of reports ({@link MavenReport} instances) that have been executed against
+     * this project, for use in another mojo's execution.
+     */
+    public List getReports()
+    {
+        return new ArrayList( reports.values() );
+    }
+
+    /**
+     * Clear the reports for this project
+     */
+    public void clearReports()
+    {
+        reports.clear();
+    }
+
+    /**
+     * Add a newly-executed report ({@link MavenReport} instance) to the reports collection, for
+     * future reference.
+     */
+    public void addReport( MojoDescriptor mojoDescriptor, MavenReport report )
+    {
+        reports.put( mojoDescriptor.getId(), report );
     }
 
 }

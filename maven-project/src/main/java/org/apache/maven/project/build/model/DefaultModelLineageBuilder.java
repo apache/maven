@@ -27,14 +27,14 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.ProjectBuildCache;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.build.ProfileAdvisor;
+import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -69,67 +69,82 @@ public class DefaultModelLineageBuilder
 
     private ProfileAdvisor profileAdvisor;
 
-    private BuildContextManager buildContextManager;
-
     private Logger logger;
 
     public DefaultModelLineageBuilder()
     {
     }
 
-    public DefaultModelLineageBuilder( ArtifactResolver resolver, ArtifactFactory artifactFactory, BuildContextManager buildContextManager )
+    public DefaultModelLineageBuilder( ArtifactResolver resolver,
+                                       ArtifactFactory artifactFactory )
     {
         artifactResolver = resolver;
         this.artifactFactory = artifactFactory;
-        this.buildContextManager = buildContextManager;
     }
 
     /**
      * @see org.apache.maven.project.build.model.ModelLineageBuilder#buildModelLineage(java.io.File, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List)
      */
-    public ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository, List remoteRepositories,
-                                           ProfileManager profileManager, boolean allowStubs, boolean validProfilesXmlLocation )
+    public ModelLineage buildModelLineage( File pom,
+                                           ArtifactRepository localRepository,
+                                           List remoteRepositories,
+                                           ProfileManager profileManager,
+                                           boolean allowStubs,
+                                           boolean validProfilesXmlLocation )
         throws ProjectBuildingException
     {
-        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
-
         ModelLineage lineage = new DefaultModelLineage();
 
         List currentRemoteRepositories = remoteRepositories == null ? new ArrayList()
-                                                                   : new ArrayList( remoteRepositories );
+                        : new ArrayList( remoteRepositories );
 
-        ModelAndFile current = new ModelAndFile( readModel( pom, projectBuildCache ), pom, validProfilesXmlLocation );
+        // TODO: Cache the result of this readModel(..) call.
+        ModelAndFile current = new ModelAndFile( readModel( pom ), pom, validProfilesXmlLocation );
 
         do
         {
             if ( lineage.size() == 0 )
             {
-                lineage.setOrigin( current.model, current.file, currentRemoteRepositories, current.validProfilesXmlLocation );
+                lineage.setOrigin( current.getModel(),
+                                   current.getFile(),
+                                   currentRemoteRepositories,
+                                   current.isValidProfilesXmlLocation() );
             }
             else
             {
-                lineage.addParent( current.model, current.file, currentRemoteRepositories, current.validProfilesXmlLocation );
+                lineage.addParent( current.getModel(),
+                                   current.getFile(),
+                                   currentRemoteRepositories,
+                                   current.isValidProfilesXmlLocation() );
             }
 
-            currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager, current.validProfilesXmlLocation );
+            currentRemoteRepositories = updateRepositorySet( current.getModel(),
+                                                             currentRemoteRepositories,
+                                                             current.getFile(),
+                                                             profileManager,
+                                                             current.isValidProfilesXmlLocation() );
 
-            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
+            current = resolveParentPom( current,
+                                        currentRemoteRepositories,
+                                        localRepository,
+                                        allowStubs );
         }
         while ( current != null );
 
         return lineage;
     }
 
-    public void resumeBuildingModelLineage( ModelLineage lineage, ArtifactRepository localRepository,
-                                            ProfileManager profileManager, boolean allowStubs )
+    public void resumeBuildingModelLineage( ModelLineage lineage,
+                                            ArtifactRepository localRepository,
+                                            ProfileManager profileManager,
+                                            boolean allowStubs )
         throws ProjectBuildingException
     {
         if ( lineage.size() == 0 )
         {
-            throw new ProjectBuildingException( "unknown", "Cannot resume a ModelLineage that doesn't contain at least one Model instance." );
+            throw new ProjectBuildingException( "unknown",
+                                                "Cannot resume a ModelLineage that doesn't contain at least one Model instance." );
         }
-
-        ProjectBuildCache projectBuildCache = ProjectBuildCache.read( buildContextManager );
 
         List currentRemoteRepositories = lineage.getDeepestAncestorArtifactRepositoryList();
 
@@ -138,18 +153,33 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = new ArrayList();
         }
 
-        ModelAndFile current = new ModelAndFile( lineage.getDeepestAncestorModel(), lineage.getDeepestAncestorFile(), lineage.isDeepestAncestorUsingProfilesXml() );
+        ModelAndFile current = new ModelAndFile( lineage.getDeepestAncestorModel(),
+                                                 lineage.getDeepestAncestorFile(),
+                                                 lineage.isDeepestAncestorUsingProfilesXml() );
 
         // use the above information to re-bootstrap the resolution chain...
-        current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
+        current = resolveParentPom( current,
+                                    currentRemoteRepositories,
+                                    localRepository,
+                                    allowStubs );
 
         while ( current != null )
         {
-            lineage.addParent( current.model, current.file, currentRemoteRepositories, current.validProfilesXmlLocation );
+            lineage.addParent( current.getModel(),
+                               current.getFile(),
+                               currentRemoteRepositories,
+                               current.isValidProfilesXmlLocation() );
 
-            currentRemoteRepositories = updateRepositorySet( current.model, currentRemoteRepositories, current.file, profileManager, current.validProfilesXmlLocation );
+            currentRemoteRepositories = updateRepositorySet( current.getModel(),
+                                                             currentRemoteRepositories,
+                                                             current.getFile(),
+                                                             profileManager,
+                                                             current.isValidProfilesXmlLocation() );
 
-            current = resolveParentPom( current, currentRemoteRepositories, localRepository, projectBuildCache, allowStubs );
+            current = resolveParentPom( current,
+                                        currentRemoteRepositories,
+                                        localRepository,
+                                        allowStubs );
         }
     }
 
@@ -160,32 +190,9 @@ public class DefaultModelLineageBuilder
     private Model readModel( File pomFile )
         throws ProjectBuildingException
     {
-        return readModel( pomFile, null, true );
-    }
-
-    /**
-     * Read the Model instance from the given POM file, and cache it in the given Map before
-     * returning it.
-     */
-    private Model readModel( File pomFile, ProjectBuildCache projectBuildCache )
-        throws ProjectBuildingException
-    {
-        return readModel( pomFile, projectBuildCache, false );
-    }
-
-    /**
-     * Read the Model instance from the given POM file. Optionally (in normal cases) cache the
-     * Model instance in the given Map before returning it. The skipCache flag controls whether the
-     * Model instance is actually cached.
-     */
-    private Model readModel( File pom, ProjectBuildCache projectBuildCache, boolean skipCache )
-        throws ProjectBuildingException
-    {
-        File pomFile = pom;
-        if ( pom.isDirectory() )
+        if ( pomFile.isDirectory() )
         {
-            pomFile = new File( pom, "pom.xml" );
-//            getLogger().debug( "readModel(..): POM: " + pom + " is a directory. Trying: " + pomFile + " instead." );
+            pomFile = new File( pomFile, "pom.xml" );
         }
 
         Model model;
@@ -198,21 +205,18 @@ public class DefaultModelLineageBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile, pomFile, e );
+            throw new ProjectBuildingException( "unknown", "Failed to read model from: " + pomFile,
+                                                pomFile, e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "unknown", "Failed to parse model from: " + pomFile, pomFile, e );
+            throw new ProjectBuildingException( "unknown",
+                                                "Failed to parse model from: " + pomFile, pomFile,
+                                                e );
         }
         finally
         {
             IOUtil.close( reader );
-        }
-
-        if ( !skipCache )
-        {
-            projectBuildCache.cacheModelFileForModel( pomFile, model );
-            projectBuildCache.store( buildContextManager );
         }
 
         return model;
@@ -224,8 +228,11 @@ public class DefaultModelLineageBuilder
      * The specified pomFile is used for error reporting.
      * @param profileManager
      */
-    private List updateRepositorySet( Model model, List oldArtifactRepositories, File pomFile,
-                                      ProfileManager externalProfileManager, boolean useProfilesXml )
+    private List updateRepositorySet( Model model,
+                                      List oldArtifactRepositories,
+                                      File pomFile,
+                                      ProfileManager externalProfileManager,
+                                      boolean useProfilesXml )
         throws ProjectBuildingException
     {
         List repositories = model.getRepositories();
@@ -241,47 +248,65 @@ public class DefaultModelLineageBuilder
                 List lastRemoteRepos = oldArtifactRepositories;
                 List remoteRepos = mavenTools.buildArtifactRepositories( repositories );
 
-                loadActiveProfileRepositories( remoteRepos, model, externalProfileManager, projectDir, useProfilesXml );
+                loadActiveProfileRepositories( remoteRepos,
+                                               model,
+                                               externalProfileManager,
+                                               projectDir,
+                                               useProfilesXml );
 
-                artifactRepositories = new LinkedHashSet( remoteRepos.size() + oldArtifactRepositories.size() );
+                artifactRepositories = new LinkedHashSet( remoteRepos.size()
+                                                          + oldArtifactRepositories.size() );
 
                 artifactRepositories.addAll( remoteRepos );
                 artifactRepositories.addAll( lastRemoteRepos );
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new ProjectBuildingException( model.getId(), "Failed to create ArtifactRepository list for: "
-                    + pomFile, pomFile, e );
+                throw new ProjectBuildingException( model.getId(),
+                                                    "Failed to create ArtifactRepository list for: "
+                                                                    + pomFile, pomFile, e );
             }
         }
 
         return new ArrayList( artifactRepositories );
     }
 
-    private void loadActiveProfileRepositories( List repositories, Model model, ProfileManager profileManager,
-                                                File pomFile, boolean useProfilesXml )
+    private void loadActiveProfileRepositories( List repositories,
+                                                Model model,
+                                                ProfileManager profileManager,
+                                                File pomFile,
+                                                boolean useProfilesXml )
         throws ProjectBuildingException
     {
         List explicitlyActive;
         List explicitlyInactive;
 
+        // FIXME: Find a way to pass in this context, so it's never null!
+        ProfileActivationContext context;
+
         if ( profileManager != null )
         {
             explicitlyActive = profileManager.getExplicitlyActivatedIds();
             explicitlyInactive = profileManager.getExplicitlyDeactivatedIds();
+            context = profileManager.getProfileActivationContext();
         }
         else
         {
             explicitlyActive = Collections.EMPTY_LIST;
             explicitlyInactive = Collections.EMPTY_LIST;
+            context = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
-        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager, pomFile, model.getId() );
+        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager,
+                                                                                               pomFile,
+                                                                                               model.getId() );
 
-        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile,
-                                                                                               explicitlyActive,
-                                                                                               explicitlyInactive,
-                                                                                               useProfilesXml ) );
+        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
+                                                                                       pomFile,
+                                                                                       explicitlyActive,
+                                                                                       explicitlyInactive,
+                                                                                       useProfilesXml,
+                                                                                       context ) );
 
         if ( !profileRepos.isEmpty() )
         {
@@ -295,12 +320,14 @@ public class DefaultModelLineageBuilder
      * @param projectBuildCache
      * @param allowStubs
      */
-    private ModelAndFile resolveParentPom( ModelAndFile child, List remoteRepositories, ArtifactRepository localRepository,
-                                   ProjectBuildCache projectBuildCache, boolean allowStubs )
+    private ModelAndFile resolveParentPom( ModelAndFile child,
+                                           List remoteRepositories,
+                                           ArtifactRepository localRepository,
+                                           boolean allowStubs )
         throws ProjectBuildingException
     {
-        Model model = child.model;
-        File modelPomFile = child.file;
+        Model model = child.getModel();
+        File modelPomFile = child.getFile();
 
         Parent modelParent = model.getParent();
 
@@ -308,11 +335,11 @@ public class DefaultModelLineageBuilder
 
         if ( modelParent != null )
         {
-              validateParentDeclaration( modelParent, model );
+            validateParentDeclaration( modelParent, model );
 
-            File parentPomFile = projectBuildCache.getCachedModelFile( modelParent );
+            File parentPomFile = null;
 
-            if ( ( parentPomFile == null ) && ( modelPomFile != null ) )
+            if ( ( modelPomFile != null ) )
             {
                 parentPomFile = resolveParentWithRelativePath( modelParent, modelPomFile );
             }
@@ -323,14 +350,21 @@ public class DefaultModelLineageBuilder
             {
                 try
                 {
-                    parentPomFile = resolveParentFromRepositories( modelParent, localRepository, remoteRepositories, model.getId(), modelPomFile );
+                    parentPomFile = resolveParentFromRepositories( modelParent,
+                                                                   localRepository,
+                                                                   remoteRepositories,
+                                                                   model.getId(),
+                                                                   modelPomFile );
                     isResolved = true;
                 }
-                catch( ProjectBuildingException e )
+                catch ( ProjectBuildingException e )
                 {
                     if ( allowStubs )
                     {
-                        getLogger().debug( "DISREGARDING the error encountered while resolving artifact for: " + modelParent.getId() + ", building a stub model in its place.", e );
+                        getLogger().debug( "DISREGARDING the error encountered while resolving artifact for: "
+                                                           + modelParent.getId()
+                                                           + ", building a stub model in its place.",
+                                           e );
                         parentPomFile = null;
                     }
                     else
@@ -344,7 +378,9 @@ public class DefaultModelLineageBuilder
             {
                 if ( allowStubs )
                 {
-                    getLogger().warn( "Cannot find parent POM: " + modelParent.getId() + " for child: " + model.getId() + ". Using stub model instead." );
+                    getLogger().warn( "Cannot find parent POM: " + modelParent.getId()
+                                      + " for child: " + model.getId()
+                                      + ". Using stub model instead." );
 
                     Model parent = new Model();
 
@@ -372,35 +408,44 @@ public class DefaultModelLineageBuilder
         return result;
     }
 
-    private void validateParentDeclaration( Parent modelParent, Model model )
+    private void validateParentDeclaration( Parent modelParent,
+                                            Model model )
         throws ProjectBuildingException
     {
         if ( StringUtils.isEmpty( modelParent.getGroupId() ) )
         {
-            throw new ProjectBuildingException( model.getId(), "Missing groupId element from parent element" );
+            throw new ProjectBuildingException( model.getId(),
+                                                "Missing groupId element from parent element" );
         }
         else if ( StringUtils.isEmpty( modelParent.getArtifactId() ) )
         {
-            throw new ProjectBuildingException( model.getId(), "Missing artifactId element from parent element" );
+            throw new ProjectBuildingException( model.getId(),
+                                                "Missing artifactId element from parent element" );
         }
         else if ( modelParent.getGroupId().equals( model.getGroupId() )
-            && modelParent.getArtifactId().equals( model.getArtifactId() ) )
+                  && modelParent.getArtifactId().equals( model.getArtifactId() ) )
         {
             throw new ProjectBuildingException( model.getId(), "Parent element is a duplicate of "
-                + "the current project " );
+                                                               + "the current project " );
         }
         else if ( StringUtils.isEmpty( modelParent.getVersion() ) )
         {
-            throw new ProjectBuildingException( model.getId(), "Missing version element from parent element" );
+            throw new ProjectBuildingException( model.getId(),
+                                                "Missing version element from parent element" );
         }
     }
 
-    private File resolveParentFromRepositories( Parent modelParent, ArtifactRepository localRepository,
-                                                List remoteRepositories, String childId, File childPomFile )
+    private File resolveParentFromRepositories( Parent modelParent,
+                                                ArtifactRepository localRepository,
+                                                List remoteRepositories,
+                                                String childId,
+                                                File childPomFile )
         throws ProjectBuildingException
     {
-        Artifact parentPomArtifact = artifactFactory.createBuildArtifact( modelParent.getGroupId(), modelParent
-            .getArtifactId(), modelParent.getVersion(), "pom" );
+        Artifact parentPomArtifact = artifactFactory.createBuildArtifact( modelParent.getGroupId(),
+                                                                          modelParent.getArtifactId(),
+                                                                          modelParent.getVersion(),
+                                                                          "pom" );
 
         try
         {
@@ -408,11 +453,13 @@ public class DefaultModelLineageBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( childId, "Failed to resolve parent POM: " + modelParent.getId(), childPomFile, e );
+            throw new ProjectBuildingException( childId, "Failed to resolve parent POM: "
+                                                         + modelParent.getId(), childPomFile, e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new ProjectBuildingException( childId, "Cannot find artifact for parent POM: " + modelParent.getId(), childPomFile, e );
+            throw new ProjectBuildingException( childId, "Cannot find artifact for parent POM: "
+                                                         + modelParent.getId(), childPomFile, e );
         }
 
         if ( parentPomArtifact.isResolved() )
@@ -425,7 +472,8 @@ public class DefaultModelLineageBuilder
         }
     }
 
-    private File resolveParentWithRelativePath( Parent modelParent, File modelPomFile )
+    private File resolveParentWithRelativePath( Parent modelParent,
+                                                File modelPomFile )
         throws ProjectBuildingException
     {
         String relativePath = modelParent.getRelativePath();
@@ -446,11 +494,12 @@ public class DefaultModelLineageBuilder
             Model parentModel = readModel( parentPomFile );
 
             boolean groupsMatch = ( parentModel.getGroupId() == null )
-                || parentModel.getGroupId().equals( modelParent.getGroupId() );
+                                  || parentModel.getGroupId().equals( modelParent.getGroupId() );
             boolean versionsMatch = ( parentModel.getVersion() == null )
-                || parentModel.getVersion().equals( modelParent.getVersion() );
+                                    || parentModel.getVersion().equals( modelParent.getVersion() );
 
-            if ( groupsMatch && versionsMatch && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
+            if ( groupsMatch && versionsMatch
+                 && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
             {
                 return parentPomFile;
             }
@@ -472,20 +521,6 @@ public class DefaultModelLineageBuilder
     public void enableLogging( Logger logger )
     {
         this.logger = logger;
-    }
-
-    private static final class ModelAndFile
-    {
-        private final Model model;
-        private final File file;
-        private final boolean validProfilesXmlLocation;
-
-        ModelAndFile( Model model, File file, boolean validProfilesXmlLocation )
-        {
-            this.model = model;
-            this.file = file;
-            this.validProfilesXmlLocation = validProfilesXmlLocation;
-        }
     }
 
 }

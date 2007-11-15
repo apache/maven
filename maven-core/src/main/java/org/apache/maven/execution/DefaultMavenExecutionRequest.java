@@ -616,4 +616,11 @@ public class DefaultMavenExecutionRequest
     {
         return realmManager;
     }
+
+    public MavenExecutionRequest clearAccumulatedBuildState()
+    {
+        realmManager.clear();
+
+        return this;
+    }
 }

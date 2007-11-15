@@ -36,7 +36,6 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
@@ -45,7 +44,6 @@ import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.build.ProjectBuildCache;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -81,8 +79,6 @@ public class MavenMetadataSource
 
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    private BuildContextManager buildContextManager;
-
     // lazily instantiated and cached.
     private MavenProject superProject;
 
@@ -108,12 +104,10 @@ public class MavenMetadataSource
             throw new ArtifactMetadataRetrievalException( "Cannot lookup MavenProjectBuilder component instance: " + e.getMessage(), e );
         }
 
-        ProjectBuildCache cache = ProjectBuildCache.read( buildContextManager );
-
         MavenProject project = null;
 
         Artifact pomArtifact;
-        
+
         boolean done = false;
         do
         {
@@ -127,45 +121,40 @@ public class MavenMetadataSource
             }
             else
             {
-                project = cache.getCachedProject( artifact );
-
-                if ( project == null )
+                try
                 {
-                    try
-                    {
-                        project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
-                    }
-                    catch ( InvalidProjectModelException e )
-                    {
-                        getLogger().warn( "POM for \'" + pomArtifact +
-                            "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                }
+                catch ( InvalidProjectModelException e )
+                {
+                    getLogger().warn( "POM for \'" + pomArtifact +
+                        "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
 
-                        if ( getLogger().isDebugEnabled() )
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Reason: " + e.getMessage() );
+
+                        ModelValidationResult validationResult = e.getValidationResult();
+
+                        if ( validationResult != null )
                         {
-                            getLogger().debug( "Reason: " + e.getMessage() );
-
-                            ModelValidationResult validationResult = e.getValidationResult();
-
-                            if ( validationResult != null )
+                            getLogger().debug( "\nValidation Errors:" );
+                            for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
                             {
-                                getLogger().debug( "\nValidation Errors:" );
-                                for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
-                                {
-                                    getLogger().debug( i.next().toString() );
-                                }
-                                getLogger().debug( "\n" );
+                                getLogger().debug( i.next().toString() );
                             }
+                            getLogger().debug( "\n" );
                         }
-
-                        project = null;
                     }
-                    catch ( ProjectBuildingException e )
+
+                    project = null;
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    if ( strictlyEnforceThePresenceOfAValidMavenPOM )
                     {
-                        if ( strictlyEnforceThePresenceOfAValidMavenPOM )
-                        {
-                            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
-                                artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
-                        }
+                        throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
+                            artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
                     }
                 }
 

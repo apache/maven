@@ -35,12 +35,10 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.execution.MavenRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.LifecycleExecutionContext;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -134,8 +132,6 @@ public class DefaultPluginManager
     protected MavenProjectBuilder mavenProjectBuilder;
 
     protected PluginMappingManager pluginMappingManager;
-
-    private BuildContextManager buildContextManager;
 
     // END component requirements
 
@@ -337,8 +333,10 @@ public class DefaultPluginManager
         Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
                                             session.getLocalRepository() );
 
+        getLogger().debug( "Got plugin artifacts:\n\n" + artifacts );
+
         MavenRealmManager realmManager = session.getRealmManager();
-        ClassRealm pluginRealm = realmManager.getPluginRealm( projectPlugin );;
+        ClassRealm pluginRealm = realmManager.getPluginRealm( projectPlugin );
         if ( pluginRealm == null )
         {
             try
@@ -388,6 +386,15 @@ public class DefaultPluginManager
             pluginDescriptor.setPluginArtifact( pluginArtifact );
 
             getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + pluginRealm );
+        }
+        else
+        {
+            List managedPluginArtifacts = realmManager.getPluginArtifacts( projectPlugin );
+
+            if ( ( managedPluginArtifacts == null ) || ( managedPluginArtifacts.isEmpty() && !artifacts.isEmpty() ) )
+            {
+                realmManager.setPluginArtifacts( projectPlugin, artifacts );
+            }
         }
     }
 
@@ -581,14 +588,7 @@ public class DefaultPluginManager
             // for reference by future mojos.
             if ( mojo instanceof MavenReport )
             {
-                LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
-                if ( ctx == null )
-                {
-                    ctx = new LifecycleExecutionContext( project );
-                }
-
-                ctx.addReport( mojoDescriptor, (MavenReport) mojo );
-                ctx.store( buildContextManager );
+                session.addReport( mojoDescriptor, (MavenReport) mojo );
             }
 
             dispatcher.dispatchEnd( event, goalExecId );
@@ -783,19 +783,10 @@ public class DefaultPluginManager
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
-        // NEW: Pass in the LifecycleExecutionContext so we have access to the current project,
-        // forked project stack (future), and reports.
-        LifecycleExecutionContext ctx = LifecycleExecutionContext.read( buildContextManager );
-        if ( ctx == null )
-        {
-            ctx = new LifecycleExecutionContext( project );
-        }
-
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(
                                                                                           session,
                                                                                           mojoExecution,
                                                                                           pathTranslator,
-                                                                                          ctx,
                                                                                           getLogger(),
                                                                                           session.getExecutionProperties() );
 

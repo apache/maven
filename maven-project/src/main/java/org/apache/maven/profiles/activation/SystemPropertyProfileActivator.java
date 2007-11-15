@@ -19,27 +19,23 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
-import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.codehaus.plexus.logging.LogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.Properties;
+
 public class SystemPropertyProfileActivator
-    extends DetectedProfileActivator 
-    implements LogEnabled
+    extends DetectedProfileActivator
 {
-    private Logger logger;
-    
-    protected boolean canDetectActivation( Profile profile )
+
+    protected boolean canDetectActivation( Profile profile, ProfileActivationContext context )
     {
-        return profile.getActivation() != null && profile.getActivation().getProperty() != null;
+        return ( profile.getActivation() != null ) && ( profile.getActivation().getProperty() != null );
     }
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( Profile profile, ProfileActivationContext context )
     {
         Activation activation = profile.getActivation();
 
@@ -47,18 +43,17 @@ public class SystemPropertyProfileActivator
 
         if ( property != null )
         {
-            SystemBuildContext systemBuildContext = SystemBuildContext.getSystemBuildContext( getBuildContextManager(), true );
-            
             String name = property.getName();
             boolean reverseName = false;
-            
+
             if ( name.startsWith("!") )
             {
                 reverseName = true;
                 name = name.substring( 1 );
             }
-            
-            String sysValue = systemBuildContext.getSystemProperty( name );
+
+            Properties execProperties = context.getExecutionProperties();
+            String sysValue = execProperties.getProperty( name );
 
             String propValue = property.getValue();
             if ( StringUtils.isNotEmpty( propValue ) )
@@ -69,10 +64,10 @@ public class SystemPropertyProfileActivator
                     reverseValue = true;
                     propValue = propValue.substring( 1 );
                 }
-                
+
                 // we have a value, so it has to match the system value...
                 boolean result = propValue.equals( sysValue );
-                
+
                 if ( reverseValue )
                 {
                     return !result;
@@ -85,7 +80,7 @@ public class SystemPropertyProfileActivator
             else
             {
                 boolean result = StringUtils.isNotEmpty( sysValue );
-                
+
                 if ( reverseName )
                 {
                     return !result;
@@ -98,21 +93,6 @@ public class SystemPropertyProfileActivator
         }
 
         return false;
-    }
-    
-    protected Logger getLogger()
-    {
-        if ( logger == null )
-        {
-            logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "SystemPropertyProfileActivator:internal" );
-        }
-
-        return logger;
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
     }
 
 }

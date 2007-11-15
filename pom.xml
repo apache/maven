@@ -91,6 +91,23 @@ under the License.
           <version>2.1</version>
         </plugin>
         <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.0.2</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <version>1.0-beta-2</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
@@ -124,11 +141,6 @@ under the License.
           <artifactId>maven-bundle-plugin</artifactId>
           <version>1.0.0</version>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>aspectj-maven-plugin</artifactId>
-          <version>1.0-beta-2</version>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -142,7 +154,6 @@ under the License.
     </plugins>
   </build>
   <modules>
-    <module>maven-build-context</module>
     <module>maven-core</module>
     <module>maven-lifecycle</module>
     <module>maven-model</module>
@@ -153,7 +164,7 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-39</plexusVersion>
+    <plexusVersion>1.0-alpha-40</plexusVersion>
     <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
   <dependencies>

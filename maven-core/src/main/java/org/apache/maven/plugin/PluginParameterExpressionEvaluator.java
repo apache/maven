@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutionContext;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -75,38 +74,33 @@ public class PluginParameterExpressionEvaluator
 
     private final Properties properties;
 
-    private final LifecycleExecutionContext lifecycleExecutionContext;
-
     public PluginParameterExpressionEvaluator( MavenSession context,
                                                MojoExecution mojoExecution,
                                                PathTranslator pathTranslator,
-                                               LifecycleExecutionContext lifecycleExecutionContext,
                                                Logger logger,
                                                Properties properties )
     {
         this.context = context;
         this.mojoExecution = mojoExecution;
         this.pathTranslator = pathTranslator;
-        this.lifecycleExecutionContext = lifecycleExecutionContext;
         this.logger = logger;
         this.properties = properties;
-        
-        this.project = lifecycleExecutionContext.getCurrentProject();
+        project = context.getCurrentProject();
 
         String basedir = null;
 
         if ( project != null )
         {
-            File projectFile = project.getFile();
+            File projectFile = project.getBasedir();
 
             // this should always be the case for non-super POM instances...
             if ( projectFile != null )
             {
-                basedir = projectFile.getParentFile().getAbsolutePath();
+                basedir = projectFile.getAbsolutePath();
             }
         }
 
-        if ( basedir == null && context != null )
+        if ( ( basedir == null ) && ( context != null ) )
         {
             basedir = context.getExecutionRootDirectory();
         }
@@ -133,10 +127,9 @@ public class PluginParameterExpressionEvaluator
         this.context = context;
         this.mojoExecution = mojoExecution;
         this.pathTranslator = pathTranslator;
-        this.lifecycleExecutionContext = new LifecycleExecutionContext( project );
         this.logger = logger;
         this.properties = properties;
-        
+
         this.project = project;
 
         String basedir = null;
@@ -169,7 +162,7 @@ public class PluginParameterExpressionEvaluator
         {
             return null;
         }
-        
+
         String expression = stripTokens( expr );
         if ( expression.equals( expr ) )
         {
@@ -180,15 +173,15 @@ public class PluginParameterExpressionEvaluator
                 if ( lastIndex >= 0 )
                 {
                     String retVal = expr.substring( 0, index );
-                    
-                    if ( index > 0 && expr.charAt( index - 1 ) == '$' )
+
+                    if ( ( index > 0 ) && ( expr.charAt( index - 1 ) == '$' ) )
                     {
                         retVal += expr.substring( index + 1, lastIndex + 1 );
                     }
                     else
                     {
                         Object subResult = evaluate( expr.substring( index, lastIndex + 1 ) );
-                        
+
                         if ( subResult != null )
                         {
                             retVal += subResult;
@@ -198,7 +191,7 @@ public class PluginParameterExpressionEvaluator
                             retVal += "$" + expr.substring( index + 1, lastIndex + 1 );
                         }
                     }
-                    
+
                     retVal += evaluate( expr.substring( lastIndex + 1 ) );
                     return retVal;
                 }
@@ -243,9 +236,9 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "reports".equals( expression ) )
         {
-            value = lifecycleExecutionContext.getReports();
+            value = context.getReports();
         }
-        else if ("mojoExecution".equals(expression)) 
+        else if ("mojoExecution".equals(expression))
         {
         	value = mojoExecution;
         }
@@ -357,7 +350,7 @@ public class PluginParameterExpressionEvaluator
         {
             // The CLI should win for defining properties
 
-            if ( value == null && properties != null )
+            if ( ( value == null ) && ( properties != null ) )
             {
                 // We will attempt to get nab a system property as a way to specify a
                 // parameter to a plugins. My particular case here is allowing the surefire
@@ -367,7 +360,7 @@ public class PluginParameterExpressionEvaluator
                 value = properties.getProperty( expression );
             }
 
-            if ( value == null && ( project != null && project.getProperties() != null ) )
+            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
             {
                 value = project.getProperties().getProperty( expression );
             }
@@ -400,7 +393,7 @@ public class PluginParameterExpressionEvaluator
 
     private String stripTokens( String expr )
     {
-        if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
+        if ( expr.startsWith( "${" ) && ( expr.indexOf( "}" ) == expr.length() - 1 ) )
         {
             expr = expr.substring( 2, expr.length() - 1 );
         }
@@ -411,11 +404,11 @@ public class PluginParameterExpressionEvaluator
     {
         File basedir;
 
-        if ( project != null && project.getFile() != null )
+        if ( ( project != null ) && ( project.getFile() != null ) )
         {
             basedir = project.getFile().getParentFile();
         }
-        else if ( context != null && context.getExecutionRootDirectory() != null )
+        else if ( ( context != null ) && ( context.getExecutionRootDirectory() != null ) )
         {
             basedir = new File( context.getExecutionRootDirectory() ).getAbsoluteFile();
         }

@@ -1,5 +1,6 @@
 package org.apache.maven.lifecycle.plan;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.project.MavenProject;
@@ -21,6 +22,6 @@ public interface BuildPlanner
     /**
      * Orchestrates construction of the build plan which will be used by the user of LifecycleExecutor.
      */
-    BuildPlan constructBuildPlan( List tasks, MavenProject project )
+    BuildPlan constructBuildPlan( List tasks, MavenProject project, MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException;
 }

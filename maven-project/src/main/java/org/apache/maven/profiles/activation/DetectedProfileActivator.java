@@ -38,24 +38,36 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
-import org.apache.maven.context.BuildContextManager;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 public abstract class DetectedProfileActivator
-    implements ProfileActivator
+    implements ProfileActivator, LogEnabled
 {
-    private BuildContextManager buildContextManager;
+    private Logger logger;
 
-    public boolean canDetermineActivation( Profile profile )
+    public boolean canDetermineActivation( Profile profile, ProfileActivationContext context )
     {
-        return canDetectActivation( profile );
+        return canDetectActivation( profile, context );
     }
 
-    protected abstract boolean canDetectActivation( Profile profile );
-    
-    protected BuildContextManager getBuildContextManager()
+    protected Logger getLogger()
     {
-        return buildContextManager;
+        if ( logger == null )
+        {
+            logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "DetectedProfileActivator:internal" );
+        }
+
+        return logger;
     }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
+    }
+
+    protected abstract boolean canDetectActivation( Profile profile, ProfileActivationContext context );
 
 }

@@ -19,63 +19,59 @@ package org.apache.maven.profiles.manager;
  * under the License.
  */
 
-import org.apache.maven.context.BuildContextManager;
-import org.apache.maven.context.DefaultBuildContextManager;
-import org.apache.maven.context.SystemBuildContext;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.List;
+import java.util.Properties;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
-    
-    private BuildContextManager buildContextManager;
-    
+
     public void setUp() throws Exception
     {
         super.setUp();
-        
-        buildContextManager = (BuildContextManager) lookup( BuildContextManager.ROLE, DefaultBuildContextManager.ROLE_HINT );
     }
-    
+
     public void testShouldActivateDefaultProfile() throws ProfileActivationException
     {
-        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
-        sysContext.store( buildContextManager );
-        
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
-        
+
         Activation nonActivation = new Activation();
-        
+
         nonActivation.setJdk("19.2");
-        
+
         notActivated.setActivation( nonActivation );
-        
+
         Profile defaultActivated = new Profile();
         defaultActivated.setId("defaultActivated");
-        
+
         Activation defaultActivation = new Activation();
-        
+
         defaultActivation.setActiveByDefault(true);
-        
+
         defaultActivated.setActivation( defaultActivation );
-        
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
-        
+
+        Properties props = new Properties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile(notActivated);
         profileManager.addProfile(defaultActivated);
-        
+
         List active = profileManager.getActiveProfiles();
-        
+
         assertNotNull( active );
         assertEquals( 1, active.size() );
         assertEquals("defaultActivated", ((Profile)active.get(0)).getId());
@@ -83,37 +79,37 @@ public class DefaultProfileManagerTest
 
     public void testShouldNotActivateDefaultProfile() throws ProfileActivationException
     {
-        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
-        sysContext.store( buildContextManager );
-        
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
-        
+
         Activation syspropActivation = new Activation();
-        
+
         ActivationProperty syspropProperty = new ActivationProperty();
         syspropProperty.setName("java.version");
-        
+
         syspropActivation.setProperty(syspropProperty);
-        
+
         syspropActivated.setActivation( syspropActivation );
-        
+
         Profile defaultActivated = new Profile();
         defaultActivated.setId("defaultActivated");
-        
+
         Activation defaultActivation = new Activation();
-        
+
         defaultActivation.setActiveByDefault(true);
-        
+
         defaultActivated.setActivation( defaultActivation );
-        
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
-        
+
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile(syspropActivated);
         profileManager.addProfile(defaultActivated);
-        
+
         List active = profileManager.getActiveProfiles();
-        
+
         assertNotNull( active );
         assertEquals( 1, active.size() );
         assertEquals("syspropActivated", ((Profile)active.get(0)).getId());
@@ -121,27 +117,27 @@ public class DefaultProfileManagerTest
 
     public void testShouldNotActivateReversalOfPresentSystemProperty() throws ProfileActivationException
     {
-        SystemBuildContext sysContext = SystemBuildContext.getSystemBuildContext( buildContextManager, true );
-        sysContext.store( buildContextManager );
-        
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
-        
+
         Activation syspropActivation = new Activation();
-        
+
         ActivationProperty syspropProperty = new ActivationProperty();
         syspropProperty.setName("!java.version");
-        
+
         syspropActivation.setProperty(syspropProperty);
-        
+
         syspropActivated.setActivation( syspropActivation );
-        
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
-        
+
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile(syspropActivated);
-        
+
         List active = profileManager.getActiveProfiles();
-        
+
         assertNotNull( active );
         assertEquals( 0, active.size() );
     }
@@ -150,24 +146,27 @@ public class DefaultProfileManagerTest
     {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
-        
+
         Activation syspropActivation = new Activation();
-        
+
         ActivationProperty syspropProperty = new ActivationProperty();
         syspropProperty.setName("!java.version");
-        
+
         syspropActivation.setProperty(syspropProperty);
-        
+
         syspropActivated.setActivation( syspropActivation );
-        
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
-        
+
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile(syspropActivated);
-        
+
         profileManager.explicitlyActivate("syspropActivated");
-        
+
         List active = profileManager.getActiveProfiles();
-        
+
         assertNotNull( active );
         assertEquals( 1, active.size() );
         assertEquals( "syspropActivated", ((Profile)active.get(0)).getId());
@@ -177,24 +176,27 @@ public class DefaultProfileManagerTest
     {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
-        
+
         Activation syspropActivation = new Activation();
-        
+
         ActivationProperty syspropProperty = new ActivationProperty();
         syspropProperty.setName("java.version");
-        
+
         syspropActivation.setProperty(syspropProperty);
-        
+
         syspropActivated.setActivation( syspropActivation );
-        
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
-        
+
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+
         profileManager.addProfile(syspropActivated);
-        
+
         profileManager.explicitlyDeactivate("syspropActivated");
-        
+
         List active = profileManager.getActiveProfiles();
-        
+
         assertNotNull( active );
         assertEquals( 0, active.size() );
     }
@@ -214,7 +216,10 @@ public class DefaultProfileManagerTest
 
         osActivated.setActivation(osActivation);
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer());
+        Properties props = System.getProperties();
+        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
 
         profileManager.addProfile(osActivated);
 

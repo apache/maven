@@ -215,6 +215,7 @@ public final class CLIRequestUtils
         if ( alternatePomFile != null )
         {
             request.setPom( new File( alternatePomFile ) );
+            System.out.println( "Request pom set to: " + request.getPom() );
         }
 
         return request;
