@@ -42,6 +42,7 @@ under the License.
               <goal>shade</goal>
             </goals>
             <configuration>
+              <finalName>maven-${pom.version}-uber</finalName>
               <artifactSet>
                 <excludes>
                   <exclude>classworlds:classworlds</exclude>
