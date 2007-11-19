@@ -143,7 +143,7 @@ under the License.
     </dependency>
   </dependencies>
   <properties>
-    <mavenVersion>2.0.8</mavenVersion>
+    <mavenVersion>2.0.9-SNAPSHOT</mavenVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
