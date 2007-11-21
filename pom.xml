@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>5</version>
+    <version>6</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <artifactId>maven</artifactId>
@@ -62,6 +62,11 @@ under the License.
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.1</version>
         </plugin>
+		<plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.0.2</version>
+        </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2-beta-1</version>
@@ -81,6 +86,18 @@ under the License.
 		<plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>2.0-beta-5</version>
+        </plugin>
+		<plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>	
+		<plugin>
+          <artifactId>maven-remote-resources-plugin</artifactId>
+          <version>1.0-alpha-15</version>
+        </plugin>			
+		<plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.1.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
