@@ -62,11 +62,16 @@ public interface MavenProjectBuilder
                         ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-
-    MavenProjectBuildingResult buildWithDependencies( File project,
-                                                      ArtifactRepository localRepository,
-                                                      ProfileManager globalProfileManager )
+    MavenProject buildWithDependencies( File project,
+                                        ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager )
         throws ProjectBuildingException;
+
+    MavenProjectBuildingResult buildProjectWithDependencies( File project,
+                                                             ArtifactRepository localRepository,
+                                                             ProfileManager globalProfileManager )
+        throws ProjectBuildingException;
+
 
     MavenProject buildFromRepository( Artifact artifact,
                                       List remoteArtifactRepositories,
@@ -81,7 +86,6 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     /**
-     *
      * @return
      * @throws ProjectBuildingException
      */

@@ -106,7 +106,7 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), null ).getProject();
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), null );
     }
 
     protected MavenProject getProject( File pom )

@@ -247,7 +247,17 @@ public class DefaultMavenProjectBuilder
         return superProject;
     }
 
-    public MavenProjectBuildingResult buildWithDependencies( File projectDescriptor,
+    /** @since 2.0.x */
+    public MavenProject buildWithDependencies( File projectDescriptor,
+                                               ArtifactRepository localRepository,
+                                               ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
+        return buildProjectWithDependencies( projectDescriptor, localRepository, profileManager ).getProject();
+    }
+
+    /** @since 2.1 */
+    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor,
                                                              ArtifactRepository localRepository,
                                                              ProfileManager profileManager )
         throws ProjectBuildingException

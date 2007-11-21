@@ -405,7 +405,7 @@ public class MavenEmbedder
 
         try
         {
-            projectBuildingResult = mavenProjectBuilder.buildWithDependencies(
+            projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies(
                 request.getPom(),
                 request.getLocalRepository(),
                 request.getProfileManager() );
