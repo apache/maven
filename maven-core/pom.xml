@@ -34,7 +34,8 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
+	    <groupId>org.codehaus.mojo</groupId>
+        <artifactId>shade-maven-plugin</artifactId>
         <version>1.0-alpha-13</version>
         <executions>
           <execution>
@@ -52,7 +53,7 @@
               </keepDependenciesWithProvidedScope>
               <transformers>
                 <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                  implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
               </transformers>
               <artifactSet>
                 <excludes>
