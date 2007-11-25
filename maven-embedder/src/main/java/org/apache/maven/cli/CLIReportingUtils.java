@@ -112,7 +112,13 @@ public final class CLIReportingUtils
         }
     }
 
-    static void logResult( MavenExecutionRequest request,
+    /**
+     * Logs result of the executed build.
+     * @param request - build parameters
+     * @param result - result of build
+     * @param logger - the logger to use
+     */
+    public static void logResult( MavenExecutionRequest request,
                            MavenExecutionResult result,
                            MavenEmbedderLogger logger )
     {
@@ -206,7 +212,14 @@ public final class CLIReportingUtils
         showError( null, e, show, logger );
     }
 
-    static void showError( String message,
+    /**
+     * Format the exception and output it through the logger.
+     * @param message - error message
+     * @param e - exception that was thrown
+     * @param showStackTraces
+     * @param logger
+     */
+    public static void showError( String message,
                            Exception e,
                            boolean showStackTraces,
                            MavenEmbedderLogger logger )
