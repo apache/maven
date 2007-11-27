@@ -1,0 +1,560 @@
+package org.apache.maven.project.error;
+
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.project.InvalidProjectModelException;
+import org.apache.maven.project.InvalidProjectVersionException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class DefaultProjectErrorReporter
+    implements ProjectErrorReporter
+{
+
+    private Map<Throwable, String> formattedMessages = new HashMap<Throwable, String>();
+
+    private Map<Throwable, Throwable> realCauses = new HashMap<Throwable, Throwable>();
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#clearErrors()
+     */
+    public void clearErrors()
+    {
+        formattedMessages.clear();
+        realCauses.clear();
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#hasInformationFor(java.lang.Throwable)
+     */
+    public Throwable findReportedException( Throwable error )
+    {
+        if ( formattedMessages.containsKey( error ) )
+        {
+            return error;
+        }
+        else if ( error.getCause() != null )
+        {
+            return findReportedException( error.getCause() );
+        }
+
+        return null;
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#getFormattedMessage(java.lang.Throwable)
+     */
+    public String getFormattedMessage( Throwable error )
+    {
+        return formattedMessages.get( error );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#getRealCause(java.lang.Throwable)
+     */
+    public Throwable getRealCause( Throwable error )
+    {
+        return realCauses.get( error );
+    }
+
+    private void registerProjectBuildError( Throwable error,
+                                            String formattedMessage,
+                                            Throwable realCause )
+    {
+        formattedMessages.put( error, formattedMessage );
+        realCauses.put( error, realCause );
+    }
+
+    private void registerProjectBuildError( Throwable error,
+                                            String formattedMessage )
+    {
+        formattedMessages.put( error, formattedMessage );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorErrorWhileApplyingProfiles(org.apache.maven.profiles.activation.ProfileActivator, org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
+     */
+    public void reportActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
+                                                           Model model,
+                                                           File pomFile,
+                                                           Profile profile,
+                                                           ProfileActivationContext context,
+                                                           ProfileActivationException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Profile activator: " );
+        writer.write( activator.getClass().getName() );
+        writer.write( " experienced an error while processing profile:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( profile.getId() );
+        writer.write( " (source: " );
+        writer.write( profile.getSource() );
+        writer.write( ")" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForActivatorErrorWhileApplyingProfiles( activator,
+                                                                                 model,
+                                                                                 pomFile,
+                                                                                 profile,
+                                                                                 context,
+                                                                                 cause ), writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorErrorWhileGettingRepositoriesFromProfiles(org.apache.maven.profiles.activation.ProfileActivator, java.lang.String, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
+     */
+    public void reportActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
+                                                                          String projectId,
+                                                                          File pomFile,
+                                                                          Profile profile,
+                                                                          ProfileActivationContext context,
+                                                                          ProfileActivationException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Profile activator: " );
+        writer.write( activator.getClass().getName() );
+        writer.write( " experienced an error while processing profile:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( profile.getId() );
+        writer.write( " (source: " );
+        writer.write( profile.getSource() );
+        writer.write( ")" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForActivatorErrorWhileGettingRepositoriesFromProfiles( activator,
+                                                                                                projectId,
+                                                                                                pomFile,
+                                                                                                profile,
+                                                                                                context,
+                                                                                                cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupErrorWhileApplyingProfiles(org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
+     */
+    public void reportActivatorLookupErrorWhileApplyingProfiles( Model model,
+                                                                 File pomFile,
+                                                                 Profile profile,
+                                                                 ComponentLookupException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Error retrieving profile-activator component while processing profile:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( profile.getId() );
+        writer.write( " (source: " );
+        writer.write( profile.getSource() );
+        writer.write( ")" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForActivatorLookupErrorWhileApplyingProfiles( model,
+                                                                                       pomFile,
+                                                                                       profile,
+                                                                                       cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles(java.lang.String, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
+     */
+    public void reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
+                                                                                File pomFile,
+                                                                                Profile profile,
+                                                                                ComponentLookupException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Error retrieving profile-activator component while processing profile:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( profile.getId() );
+        writer.write( " (source: " );
+        writer.write( profile.getSource() );
+        writer.write( ")" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForActivatorLookupErrorWhileGettingRepositoriesFromProfiles( projectId,
+                                                                                                      pomFile,
+                                                                                                      profile,
+                                                                                                      cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportErrorLoadingExternalProfilesFromFile(org.apache.maven.model.Model, java.io.File, java.io.File, java.io.IOException)
+     */
+    public void reportErrorLoadingExternalProfilesFromFile( Model model,
+                                                            File pomFile,
+                                                            File projectDir,
+                                                            IOException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Failed to load external profiles from project directory: " );
+        writer.write( NEWLINE );
+        writer.write( String.valueOf( projectDir ) );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForErrorLoadingExternalProfilesFromFile( model,
+                                                                                  pomFile,
+                                                                                  projectDir,
+                                                                                  cause ), writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportErrorLoadingExternalProfilesFromFile(org.apache.maven.model.Model, java.io.File, java.io.File, org.codehaus.plexus.util.xml.pull.XmlPullParserException)
+     */
+    public void reportErrorLoadingExternalProfilesFromFile( Model model,
+                                                            File pomFile,
+                                                            File projectDir,
+                                                            XmlPullParserException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Failed to load external profiles from project directory: " );
+        writer.write( NEWLINE );
+        writer.write( String.valueOf( projectDir ) );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Line: " );
+        writer.write( cause.getLineNumber() );
+        writer.write( NEWLINE );
+        writer.write( "Column: " );
+        writer.write( cause.getColumnNumber() );
+
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForErrorLoadingExternalProfilesFromFile( model,
+                                                                                  pomFile,
+                                                                                  projectDir,
+                                                                                  cause ), writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    /**
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportInvalidRepositoryWhileGettingRepositoriesFromProfiles(org.apache.maven.model.Repository, java.lang.String, java.io.File, org.apache.maven.artifact.InvalidRepositoryException)
+     */
+    public void reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( Repository repo,
+                                                                             String projectId,
+                                                                             File pomFile,
+                                                                             InvalidRepositoryException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Invalid repository declaration: " );
+        writer.write( repo.getId() );
+        writer.write( NEWLINE );
+        writer.write( "(URL: " );
+        writer.write( repo.getUrl() );
+        writer.write( ")" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, projectId, pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    private void addStandardInfo( String projectId,
+                                  File pomFile,
+                                  StringWriter writer )
+    {
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "While applying profile to: " );
+        writer.write( projectId );
+        writer.write( NEWLINE );
+        writer.write( "From file: " );
+        writer.write( String.valueOf( pomFile ) );
+    }
+
+    private void addTips( List<String> tips,
+                          StringWriter writer )
+    {
+        if ( ( tips != null ) && !tips.isEmpty() )
+        {
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Some tips:" );
+            for ( String tip : tips )
+            {
+                writer.write( NEWLINE );
+                writer.write( "\t- " );
+                writer.write( tip );
+            }
+        }
+    }
+
+    public void reportErrorCreatingArtifactRepository( MavenProject project,
+                                                       File pomFile,
+                                                       Repository repo,
+                                                       UnknownRepositoryLayoutException cause,
+                                                       boolean isPluginRepo )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "You have an invalid repository/pluginRepository declaration in your POM:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Repository-Id: " );
+        writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, project.getId(), pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorCreatingDeploymentArtifactRepository( MavenProject project,
+                                                                 File pomFile,
+                                                                 DeploymentRepository repo,
+                                                                 UnknownRepositoryLayoutException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "You have an invalid repository/snapshotRepository declaration in the <distributionManagement/> section of your POM:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Repository-Id: " );
+        writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, project.getId(), pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportBadNonDependencyProjectArtifactVersion( MavenProject project,
+                                                              File pomFile,
+                                                              InvalidProjectVersionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "You have an invalid version in your POM:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Location: " );
+        writer.write( cause.getLocationInPom() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForBadNonDependencyArtifactSpec( project, pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorInterpolatingModel( MavenProject project,
+                                               File pomFile,
+                                               ModelInterpolationException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "You have an invalid expression in your POM (interpolation failed):" );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForProjectInterpolationError( project, pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportProjectValidationFailure( MavenProject project,
+                                                File pomFile,
+                                                InvalidProjectModelException error )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "The following POM validation errors were detected:" );
+        writer.write( NEWLINE );
+
+        for ( Iterator it = error.getValidationResult().getMessages().iterator(); it.hasNext(); )
+        {
+            String message = (String) it.next();
+            writer.write( NEWLINE );
+            writer.write( " - " );
+            writer.write( message );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForProjectValidationFailure( project, pomFile, error.getValidationResult() ),
+                 writer );
+
+        registerProjectBuildError( error, writer.toString() );
+    }
+
+    public void reportBadManagedDependencyVersion( MavenProject project,
+                                            File pomFile,
+                                            InvalidDependencyVersionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Your project declares a dependency with an invalid version inside its <dependencyManagement/> section." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        Dependency dep = cause.getDependency();
+        writer.write( "Dependency:" );
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( dep.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( dep.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( dep.getVersion() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForBadDependencySpec( project, pomFile, dep ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportBadDependencyVersion( MavenProject project,
+                                            File pomFile,
+                                            InvalidDependencyVersionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Your project declares a dependency with an invalid version." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        Dependency dep = cause.getDependency();
+        writer.write( "Dependency:" );
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( dep.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( dep.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( dep.getVersion() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( project.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForBadDependencySpec( project, pomFile, dep ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+}

@@ -45,7 +45,7 @@ public class InvalidDependencyVersionException
 
     private static String formatLocationInPom( Dependency dependency )
     {
-        return "dependency: " + ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
+        return "Dependency: " + ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
     }
 
     public Dependency getDependency()

@@ -6,7 +6,6 @@ import org.apache.maven.InvalidTaskException;
 import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.ProjectCycleException;
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
@@ -18,20 +17,15 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
-import org.apache.maven.project.InvalidProjectModelException;
-import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -610,73 +604,76 @@ public final class CLIReportingUtils
         Throwable cause = e.getCause();
 
         // Start by looking at whether we can handle the PBE as a specific sub-class of ProjectBuildingException...
-        if ( e instanceof InvalidProjectModelException )
+//        if ( e instanceof InvalidProjectModelException )
+//        {
+//            InvalidProjectModelException error = (InvalidProjectModelException) e;
+//
+//            writer.write( error.getMessage() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "The following POM validation errors were detected:" );
+//            writer.write( NEWLINE );
+//
+//            for ( Iterator it = error.getValidationResult().getMessages().iterator(); it.hasNext(); )
+//            {
+//                String message = (String) it.next();
+//                writer.write( NEWLINE );
+//                writer.write( " - " );
+//                writer.write( message );
+//            }
+//
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
+        if ( false )
         {
-            InvalidProjectModelException error = (InvalidProjectModelException) e;
-
-            writer.write( error.getMessage() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "The following POM validation errors were detected:" );
-            writer.write( NEWLINE );
-
-            for ( Iterator it = error.getValidationResult().getMessages().iterator(); it.hasNext(); )
-            {
-                String message = (String) it.next();
-                writer.write( NEWLINE );
-                writer.write( " - " );
-                writer.write( message );
-            }
-
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-
-            result = true;
         }
-        else if ( e instanceof InvalidDependencyVersionException )
-        {
-            writer.write( NEWLINE );
-            writer.write( "Your project declares a dependency with an invalid version." );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-
-            Dependency dep = ((InvalidDependencyVersionException)e).getDependency();
-            writer.write( "Dependency:" );
-            writer.write( NEWLINE );
-            writer.write( "Group-Id: " );
-            writer.write( dep.getGroupId() );
-            writer.write( NEWLINE );
-            writer.write( "Artifact-Id: " );
-            writer.write( dep.getArtifactId() );
-            writer.write( NEWLINE );
-            writer.write( "Version: " );
-            writer.write( dep.getVersion() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-
-            writer.write( "Reason: " );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+//        else if ( e instanceof InvalidDependencyVersionException )
+//        {
+//            writer.write( NEWLINE );
+//            writer.write( "Your project declares a dependency with an invalid version." );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//
+//            Dependency dep = ((InvalidDependencyVersionException)e).getDependency();
+//            writer.write( "Dependency:" );
+//            writer.write( NEWLINE );
+//            writer.write( "Group-Id: " );
+//            writer.write( dep.getGroupId() );
+//            writer.write( NEWLINE );
+//            writer.write( "Artifact-Id: " );
+//            writer.write( dep.getArtifactId() );
+//            writer.write( NEWLINE );
+//            writer.write( "Version: " );
+//            writer.write( dep.getVersion() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//
+//            writer.write( "Reason: " );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
         // InvalidDependencyVersionException extends from InvalidProjectVersionException, so it comes first.
-        else if ( e instanceof InvalidProjectVersionException )
-        {
-            writer.write( NEWLINE );
-            writer.write( "You have an invalid version in your POM:" );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Location: " );
-            writer.write( ((InvalidProjectVersionException)e).getLocationInPom() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Reason: " );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+//        else if ( e instanceof InvalidProjectVersionException )
+//        {
+//            writer.write( NEWLINE );
+//            writer.write( "You have an invalid version in your POM:" );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Location: " );
+//            writer.write( ((InvalidProjectVersionException)e).getLocationInPom() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Reason: " );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
         // now that we've sorted through all the sub-classes of ProjectBuildingException,
         // let's look at causes of a basic PBE instance.
         else if ( ( cause instanceof ArtifactNotFoundException )
@@ -692,18 +689,19 @@ public final class CLIReportingUtils
 
             result = true;
         }
-        else if ( cause instanceof ProfileActivationException )
-        {
-            writer.write( NEWLINE );
-            writer.write( "Profile activation failed. One or more named profile activators may be missing." );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Reason: " );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+        // handled by aspect binding to ProjectErrorReporter now.
+//        else if ( cause instanceof ProfileActivationException )
+//        {
+//            writer.write( NEWLINE );
+//            writer.write( "Profile activation failed. One or more named profile activators may be missing." );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Reason: " );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
         else if ( cause instanceof IOException )
         {
             writer.write( NEWLINE );
@@ -745,22 +743,22 @@ public final class CLIReportingUtils
 
             result = true;
         }
-        else if ( cause instanceof InvalidRepositoryException )
-        {
-            writer.write( NEWLINE );
-            writer.write( "You have an invalid repository/pluginRepository declaration in your POM:" );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Repository-Id: " );
-            writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Reason: " );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+//        else if ( cause instanceof InvalidRepositoryException )
+//        {
+//            writer.write( NEWLINE );
+//            writer.write( "You have an invalid repository/pluginRepository declaration in your POM:" );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Repository-Id: " );
+//            writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Reason: " );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
 
         writer.write( NEWLINE );
         writer.write( "Failing project's id: " );

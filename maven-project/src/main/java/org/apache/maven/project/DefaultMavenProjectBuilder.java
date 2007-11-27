@@ -864,6 +864,27 @@ public class DefaultMavenProjectBuilder
             project.setParentArtifact( parentArtifact );
         }
 
+        validateModel( model, pomFile );
+
+        project.setRemoteArtifactRepositories(
+            mavenTools.buildArtifactRepositories( model.getRepositories() ) );
+
+        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+
+        // TODO: these aren't taking active project artifacts into consideration in the reactor
+        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins(), pomFile ) );
+
+        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins(), pomFile ) );
+
+        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions(), pomFile ) );
+
+        return project;
+    }
+
+    private void validateModel( Model model,
+                                File pomFile )
+        throws InvalidProjectModelException
+    {
         // Must validate before artifact construction to make sure dependencies are good
         ModelValidationResult validationResult = validator.validate( model );
 
@@ -874,18 +895,6 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile,
                 validationResult );
         }
-
-        project.setRemoteArtifactRepositories(
-            mavenTools.buildArtifactRepositories( model.getRepositories() ) );
-
-        // TODO: these aren't taking active project artifacts into consideration in the reactor
-        project.setPluginArtifacts( createPluginArtifacts( projectId, project.getBuildPlugins(), pomFile ) );
-
-        project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins(), pomFile ) );
-
-        project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions(), pomFile ) );
-
-        return project;
     }
 
     /**
@@ -1083,9 +1092,7 @@ public class DefaultMavenProjectBuilder
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                    "' for plugin '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                    e.getMessage(), pomLocation, e );
+                throw new InvalidProjectVersionException( projectId, "Plugin: " + p.getKey(), version, pomLocation, e );
             }
 
             if ( artifact != null )
@@ -1144,9 +1151,7 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                        "' for report '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                        e.getMessage(), pomLocation, e );
+                    throw new InvalidProjectVersionException( projectId, "Report plugin: " + p.getKey(), version, pomLocation, e );
                 }
 
                 if ( artifact != null )
@@ -1208,7 +1213,7 @@ public class DefaultMavenProjectBuilder
                 catch ( InvalidVersionSpecificationException e )
                 {
                     String key = ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() );
-                    throw new InvalidProjectVersionException( projectId, "extension '" + key,
+                    throw new InvalidProjectVersionException( projectId, "Extension: " + key,
                                                               version, pomFile, e );
                 }
 

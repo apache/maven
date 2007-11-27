@@ -33,6 +33,11 @@ under the License.
       <version>2.1-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
@@ -69,7 +74,7 @@ under the License.
       <artifactId>wagon-file</artifactId>
     </dependency>
     
-    <!-- Needed for backward compat aspect. -->
+    <!-- Needed for compat and cache-control aspects. -->
     <dependency>
       <groupId>aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
@@ -175,7 +180,7 @@ under the License.
        -->
       <id>tycho</id>
       <properties>
-        <bundleVersion>2.1.0.v20071105-1933</bundleVersion>
+        <bundleVersion>2.1.0.v20071120-1632</bundleVersion>
       </properties>
       <build>
         <resources>
