@@ -249,6 +249,9 @@ under the License.
       <implementation>org.apache.maven.extension.DefaultExtensionManager</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>

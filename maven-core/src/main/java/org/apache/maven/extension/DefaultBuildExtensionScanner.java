@@ -25,6 +25,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -273,6 +274,9 @@ public class DefaultBuildExtensionScanner
     private void checkModelBuildForExtensions( Model model, MavenExecutionRequest request, List remoteRepositories )
         throws ExtensionScanningException
     {
+        // FIXME: Fix the log level here.
+        getLogger().info( "Checking " + model.getId() + " for extensions." );
+
         Build build = model.getBuild();
 
         if ( build != null )
@@ -300,6 +304,31 @@ public class DefaultBuildExtensionScanner
                     {
                         throw new ExtensionScanningException( "Cannot resolve pre-scanned extension artifact: "
                             + extension.getGroupId() + ":" + extension.getArtifactId() + ": " + e.getMessage(), model, extension, e );
+                    }
+                }
+            }
+
+            List plugins = build.getPlugins();
+
+            if ( ( plugins != null ) && !plugins.isEmpty() )
+            {
+                for ( Iterator extensionIterator = plugins.iterator(); extensionIterator.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) extensionIterator.next();
+
+                    if ( plugin.isExtensions() )
+                    {
+                        getLogger().debug( "Adding plugin: " + plugin.getKey() + " as an extension(from model: " + model.getId() + ")" );
+
+                        try
+                        {
+                            extensionManager.addPluginAsExtension( plugin, model, remoteRepositories, request );
+                        }
+                        catch ( ExtensionManagerException e )
+                        {
+                            throw new ExtensionScanningException( "Cannot resolve pre-scanned plugin artifact (for use as an extension): "
+                                + plugin.getKey() + ": " + e.getMessage(), model, plugin, e );
+                        }
                     }
                 }
             }

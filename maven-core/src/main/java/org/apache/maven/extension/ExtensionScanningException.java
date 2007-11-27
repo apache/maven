@@ -2,6 +2,7 @@ package org.apache.maven.extension;
 
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 
@@ -76,6 +77,16 @@ public class ExtensionScanningException
     {
         super( message, cause );
         this.pomFile = pomFile;
+    }
+
+    public ExtensionScanningException( String message,
+                                       Model model,
+                                       Plugin plugin,
+                                       ExtensionManagerException cause )
+    {
+        super( message, cause );
+        modelId = model.getId();
+        extensionId = plugin.getGroupId() + ":" + plugin.getArtifactId();
     }
 
     public File getPomFile()

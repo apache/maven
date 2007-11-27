@@ -63,6 +63,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -160,6 +161,8 @@ public class DefaultExtensionManager
                               MavenExecutionRequest request )
         throws ExtensionManagerException
     {
+        getLogger().debug( "Adding plugin: " + plugin.getKey() + " as an extension." );
+
         Parent originatingParent = originatingModel.getParent();
 
         String groupId = originatingModel.getGroupId();
@@ -178,9 +181,17 @@ public class DefaultExtensionManager
             version = originatingParent.getVersion();
         }
 
+        String pluginVersion = plugin.getVersion();
+
+        // TODO: Forbid this?
+        if ( pluginVersion == null )
+        {
+            pluginVersion = Artifact.RELEASE_VERSION;
+        }
+
         Artifact pluginArtifact = artifactFactory.createBuildArtifact( plugin.getGroupId(),
                                                                        plugin.getArtifactId(),
-                                                                       plugin.getVersion(), "maven-plugin" );
+                                                                       pluginVersion, "maven-plugin" );
 
         getLogger().debug( "Starting extension-addition process for: " + pluginArtifact );
 
@@ -195,6 +206,10 @@ public class DefaultExtensionManager
              && coreFilter.include( pluginArtifact ) )
         {
             MavenProject dummyProject = new MavenProject( originatingModel );
+
+            dummyProject.setPluginArtifactRepositories( remoteRepositories );
+            dummyProject.setRemoteArtifactRepositories( Collections.EMPTY_LIST );
+
             EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
             MavenSession session = new MavenSession( container, request, dispatcher, null );
 

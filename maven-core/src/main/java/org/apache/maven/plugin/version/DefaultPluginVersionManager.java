@@ -41,10 +41,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class DefaultPluginVersionManager
     extends AbstractLogEnabled
@@ -85,6 +83,7 @@ public class DefaultPluginVersionManager
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
+
         getLogger().debug( "Version from POM: " + version );
 
         // NOTE: We CANNOT check the current project version here, so delay it until later.
@@ -107,7 +106,7 @@ public class DefaultPluginVersionManager
 
         // third pass...we're always checking for latest install/deploy, so retrieve the version for LATEST metadata and
         // also set that resolved version as the <useVersion/> in settings.xml.
-        if ( StringUtils.isEmpty( version ) )
+        if ( StringUtils.isEmpty( version ) || Artifact.LATEST_VERSION.equals( version ) )
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
@@ -116,7 +115,7 @@ public class DefaultPluginVersionManager
 
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
         // in settings.xml.
-        if ( StringUtils.isEmpty( version ) )
+        if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
@@ -143,7 +142,7 @@ public class DefaultPluginVersionManager
         {
             if ( project.getReportPlugins() != null )
             {
-                for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && version == null; )
+                for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && ( version == null ); )
                 {
                     ReportPlugin plugin = (ReportPlugin) it.next();
 
@@ -158,7 +157,7 @@ public class DefaultPluginVersionManager
         {
             if ( project.getBuildPlugins() != null )
             {
-                for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && version == null; )
+                for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && ( version == null ); )
                 {
                     Plugin plugin = (Plugin) it.next();
 
@@ -208,14 +207,14 @@ public class DefaultPluginVersionManager
         {
             boolean pluginValid = false;
 
-            while ( !pluginValid && artifactVersion != null )
+            while ( !pluginValid && ( artifactVersion != null ) )
             {
                 pluginValid = true;
                 MavenProject pluginProject;
                 try
                 {
                     artifact = artifactFactory.createProjectArtifact( groupId, artifactId, artifactVersion );
-                    
+
                     pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getPluginArtifactRepositories(), localRepository );
                 }
                 catch ( ProjectBuildingException e )
@@ -225,7 +224,7 @@ public class DefaultPluginVersionManager
                 }
 
                 // if we don't have the required Maven version, then ignore an update
-                if ( pluginProject.getPrerequisites() != null && pluginProject.getPrerequisites().getMaven() != null )
+                if ( ( pluginProject.getPrerequisites() != null ) && ( pluginProject.getPrerequisites().getMaven() != null ) )
                 {
                     DefaultArtifactVersion requiredVersion =
                         new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );

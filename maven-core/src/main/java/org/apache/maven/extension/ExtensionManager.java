@@ -22,6 +22,7 @@ package org.apache.maven.extension;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -34,12 +35,22 @@ import java.util.List;
  */
 public interface ExtensionManager
 {
-    void addExtension( Extension extension, MavenProject project, MavenExecutionRequest request )
+    void addExtension( Extension extension,
+                       MavenProject project,
+                       MavenExecutionRequest request )
         throws ExtensionManagerException;
 
     void registerWagons();
 
-    void addExtension( Extension extension, Model originatingModel, List remoteRepositories,
+    void addExtension( Extension extension,
+                       Model originatingModel,
+                       List remoteRepositories,
                        MavenExecutionRequest request )
+        throws ExtensionManagerException;
+
+    void addPluginAsExtension( Plugin plugin,
+                               Model originatingModel,
+                               List remoteRepositories,
+                               MavenExecutionRequest request )
         throws ExtensionManagerException;
 }

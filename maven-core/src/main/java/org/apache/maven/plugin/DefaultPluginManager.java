@@ -162,15 +162,20 @@ public class DefaultPluginManager
         ArtifactNotFoundException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
+        String pluginVersion = plugin.getVersion();
+
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
-        if ( plugin.getVersion() == null )
+        getLogger().debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
+        if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
         {
             getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
-            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
+            pluginVersion = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
                                                                         plugin.getArtifactId(),
                                                                         project, session );
-            plugin.setVersion( version );
+            plugin.setVersion( pluginVersion );
+
+            getLogger().debug( "Resolved to version: " + pluginVersion );
         }
 
         return verifyVersionedPlugin( plugin, project, session );
@@ -379,8 +384,14 @@ public class DefaultPluginManager
 
             if ( pluginDescriptor == null )
             {
+                if ( ( pluginRealm != null ) && getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Plugin Realm: " );
+                    pluginRealm.display();
+                }
+
                 throw new IllegalStateException( "The PluginDescriptor for the plugin "
-                                                 + projectPlugin.getKey() + " was not found" );
+                                                 + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm );
             }
 
             pluginDescriptor.setPluginArtifact( pluginArtifact );
