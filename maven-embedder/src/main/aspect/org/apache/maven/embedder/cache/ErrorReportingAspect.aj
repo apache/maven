@@ -26,7 +26,7 @@ public privileged aspect ErrorReportingAspect
     {
         projectErrorReporter = new DefaultProjectErrorReporter();
 
-        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = Aspects.aspectOf( PBEDerivativeReporterAspect.class );
+        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = (PBEDerivativeReporterAspect) Aspects.aspectOf( PBEDerivativeReporterAspect.class );
         pbeDerivativeReporterAspect.setProjectErrorReporter( projectErrorReporter );
     }
 
@@ -40,7 +40,7 @@ public privileged aspect ErrorReportingAspect
     {
         projectErrorReporter = new DefaultProjectErrorReporter();
 
-        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = Aspects.aspectOf( PBEDerivativeReporterAspect.class );
+        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = (PBEDerivativeReporterAspect) Aspects.aspectOf( PBEDerivativeReporterAspect.class );
         pbeDerivativeReporterAspect.setProjectErrorReporter( projectErrorReporter );
     }
 

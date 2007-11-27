@@ -93,19 +93,23 @@ under the License.
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>2.0.2</version>
+          <!-- Maybe someday...
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
           </configuration>
+          -->
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>aspectj-maven-plugin</artifactId>
           <version>1.0-beta-2</version>
+          <!-- Maybe someday...
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
           </configuration>
+          -->
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>

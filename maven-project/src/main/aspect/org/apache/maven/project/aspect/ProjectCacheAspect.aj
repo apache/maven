@@ -19,7 +19,7 @@ import java.util.Map;
 public privileged aspect ProjectCacheAspect
 {
 
-    private Map<Object, MavenProject> DefaultMavenProjectBuilder.projectCache = new HashMap<Object, MavenProject>();
+    private Map DefaultMavenProjectBuilder.projectCache = new HashMap();
 
     public void DefaultMavenProjectBuilder.clearProjectCache()
     {
@@ -159,7 +159,7 @@ public privileged aspect ProjectCacheAspect
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    private Map<Object, ModelAndFile> DefaultModelLineageBuilder.modelAndFileCache = new HashMap<Object, ModelAndFile>();
+    private Map DefaultModelLineageBuilder.modelAndFileCache = new HashMap();
 
     public void DefaultModelLineageBuilder.clearModelAndFileCache()
     {

@@ -30,9 +30,9 @@ public class DefaultProjectErrorReporter
     implements ProjectErrorReporter
 {
 
-    private Map<Throwable, String> formattedMessages = new HashMap<Throwable, String>();
+    private Map formattedMessages = new HashMap();
 
-    private Map<Throwable, Throwable> realCauses = new HashMap<Throwable, Throwable>();
+    private Map realCauses = new HashMap();
 
     /**
      * @see org.apache.maven.project.error.ProjectErrorReporter#clearErrors()
@@ -65,7 +65,7 @@ public class DefaultProjectErrorReporter
      */
     public String getFormattedMessage( Throwable error )
     {
-        return formattedMessages.get( error );
+        return (String) formattedMessages.get( error );
     }
 
     /**
@@ -73,7 +73,7 @@ public class DefaultProjectErrorReporter
      */
     public Throwable getRealCause( Throwable error )
     {
-        return realCauses.get( error );
+        return (Throwable) realCauses.get( error );
     }
 
     private void registerProjectBuildError( Throwable error,
@@ -345,7 +345,7 @@ public class DefaultProjectErrorReporter
         writer.write( String.valueOf( pomFile ) );
     }
 
-    private void addTips( List<String> tips,
+    private void addTips( List tips,
                           StringWriter writer )
     {
         if ( ( tips != null ) && !tips.isEmpty() )
@@ -353,8 +353,10 @@ public class DefaultProjectErrorReporter
             writer.write( NEWLINE );
             writer.write( NEWLINE );
             writer.write( "Some tips:" );
-            for ( String tip : tips )
+            for ( Iterator it = tips.iterator(); it.hasNext(); )
             {
+                String tip = (String) it.next();
+
                 writer.write( NEWLINE );
                 writer.write( "\t- " );
                 writer.write( tip );

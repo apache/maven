@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// NOTE: The strange String[] syntax is a backward adaptation from java5 stuff, where
+// I was using varargs in listOf(..). I'm not moving them to constants because I'd like
+// to go back to this someday...
+
+// TODO: Optimize the String[] instances in here to List constants, and remove listOf(..)
 public final class ProjectErrorTips
 {
 
@@ -27,103 +32,103 @@ public final class ProjectErrorTips
     {
     }
 
-    public static List<String> getTipsForActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
+    public static List getTipsForActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
                                                                               Model model,
                                                                               File pomFile,
                                                                               Profile profile,
                                                                               ProfileActivationContext context,
                                                                               ProfileActivationException cause )
     {
-        return listOf( "If this is a standard profile activator, see "
+        return listOf( new String[]{  "If this is a standard profile activator, see "
                                        + "http://maven.apache.org/pom.html#Activation for help configuring profile activation.",
                        "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
                        "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List<String> getTipsForActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
+    public static List getTipsForActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
                                                                                              String projectId,
                                                                                              File pomFile,
                                                                                              Profile profile,
                                                                                              ProfileActivationContext context,
                                                                                              ProfileActivationException cause )
     {
-        return listOf( "If this is a standard profile activator, see "
+        return listOf( new String[]{  "If this is a standard profile activator, see "
                                        + "http://maven.apache.org/pom.html#Activation for help configuring profile activation.",
                        "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
                        "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List<String> getTipsForActivatorLookupErrorWhileApplyingProfiles( Model model,
+    public static List getTipsForActivatorLookupErrorWhileApplyingProfiles( Model model,
                                                                                     File pomFile,
                                                                                     Profile profile,
                                                                                     ComponentLookupException cause )
     {
-        return listOf( "If this is a custom profile activator, please ensure the activator's "
+        return listOf( new String[]{  "If this is a custom profile activator, please ensure the activator's "
                                        + "artifact is present in the POM's build/extensions list.",
                        "See http://maven.apache.org/pom.html#Extensions for more on build extensions.",
                        "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
                        "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List<String> getTipsForActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
+    public static List getTipsForActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
                                                                                                    File pomFile,
                                                                                                    Profile profile,
                                                                                                    ComponentLookupException cause )
     {
-        return listOf( "If this is a custom profile activator, please ensure the activator's "
+        return listOf( new String[]{  "If this is a custom profile activator, please ensure the activator's "
                                        + "artifact is present in the POM's build/extensions list.",
                        "See http://maven.apache.org/pom.html#Extensions for more on build extensions.",
                        "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
                        "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List<String> getTipsForErrorLoadingExternalProfilesFromFile( Model model,
+    public static List getTipsForErrorLoadingExternalProfilesFromFile( Model model,
                                                                                File pomFile,
                                                                                File projectDir,
                                                                                IOException cause )
     {
         String profilesXmlPath = new File( projectDir, "profiles.xml" ).getAbsolutePath();
 
-        return listOf( "Please ensure the " + profilesXmlPath + " file exists and is readable." );
+        return listOf( new String[]{  "Please ensure the " + profilesXmlPath + " file exists and is readable." } );
     }
 
-    public static List<String> getTipsForErrorLoadingExternalProfilesFromFile( Model model,
+    public static List getTipsForErrorLoadingExternalProfilesFromFile( Model model,
                                                                                File pomFile,
                                                                                File projectDir,
                                                                                XmlPullParserException cause )
     {
-        return listOf( "XSD location: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+        return listOf( new String[]{  "XSD location: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List<String> getTipsForInvalidRepositorySpec( RepositoryBase repo,
+    public static List getTipsForInvalidRepositorySpec( RepositoryBase repo,
                                                                 String projectId,
                                                                 File pomFile,
                                                                 InvalidRepositoryException cause )
     {
-        return listOf( "See http://maven.apache.org/pom.html#Repositories for more on custom artifact repositories.",
+        return listOf( new String[]{  "See http://maven.apache.org/pom.html#Repositories for more on custom artifact repositories.",
                        "See http://maven.apache.org/pom.html#PluginRepositories for more on custom plugin repositories.",
                        "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
                        "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" );
+                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    private static List<String> listOf( String... tips )
+    private static List listOf( String[] tips )
     {
-        List<String> list = new ArrayList<String>();
+        List list = new ArrayList();
 
-        for ( String tip : tips )
+        for ( int i = 0; i < tips.length; i++ )
         {
-            list.add( tip );
+            list.add( tips[i] );
         }
 
         return list;
     }
 
-    public static List<String> getTipsForProjectValidationFailure( MavenProject project,
+    public static List getTipsForProjectValidationFailure( MavenProject project,
                                                                    File pomFile,
                                                                    ModelValidationResult validationResult )
     {
@@ -131,7 +136,7 @@ public final class ProjectErrorTips
         return null;
     }
 
-    public static List<String> getTipsForBadDependencySpec( MavenProject project,
+    public static List getTipsForBadDependencySpec( MavenProject project,
                                                             File pomFile,
                                                             Dependency dep )
     {
@@ -139,7 +144,7 @@ public final class ProjectErrorTips
         return null;
     }
 
-    public static List<String> getTipsForBadNonDependencyArtifactSpec( MavenProject project,
+    public static List getTipsForBadNonDependencyArtifactSpec( MavenProject project,
                                                                        File pomFile,
                                                                        InvalidProjectVersionException cause )
     {
@@ -147,7 +152,7 @@ public final class ProjectErrorTips
         return null;
     }
 
-    public static List<String> getTipsForProjectInterpolationError( MavenProject project,
+    public static List getTipsForProjectInterpolationError( MavenProject project,
                                                                     File pomFile,
                                                                     ModelInterpolationException cause )
     {
