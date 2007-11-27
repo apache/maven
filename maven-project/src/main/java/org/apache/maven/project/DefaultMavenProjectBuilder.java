@@ -179,7 +179,6 @@ public class DefaultMavenProjectBuilder
     }
 
     /** @deprecated  */
-    @Deprecated
     public MavenProject buildFromRepository( Artifact artifact,
                                              List remoteArtifactRepositories,
                                              ArtifactRepository localRepository,
@@ -1048,7 +1047,6 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
-    @Deprecated
     protected Set createPluginArtifacts( String projectId,
                                          List plugins, String pomLocation )
         throws ProjectBuildingException
@@ -1112,7 +1110,6 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
-    @Deprecated
     protected Set createReportArtifacts( String projectId,
                                          List reports, String pomLocation )
         throws ProjectBuildingException
@@ -1172,7 +1169,6 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
-    @Deprecated
     protected Set createExtensionArtifacts( String projectId,
                                             List extensions, String pomLocation )
         throws ProjectBuildingException
