@@ -20,7 +20,7 @@ import java.io.File;
 import java.util.Set;
 
 public privileged aspect PBEDerivativeReporterAspect
-    extends ProjectErrorReporterAspect
+    extends AbstractProjectErrorReporterAspect
 {
 
     // UnknownRepositoryLayoutException

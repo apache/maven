@@ -1,8 +1,6 @@
 package org.apache.maven.project.aspect;
 
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.error.DefaultProjectErrorReporter;
-import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.model.Model;
@@ -31,7 +29,7 @@ import java.io.IOException;
  * coming from {@link DefaultProfileAdvisor}.
  */
 public privileged aspect ProfileErrorReporterAspect
-    extends ProjectErrorReporterAspect
+    extends AbstractProjectErrorReporterAspect
 {
 
     protected pointcut componentLookupException( ComponentLookupException cause ):

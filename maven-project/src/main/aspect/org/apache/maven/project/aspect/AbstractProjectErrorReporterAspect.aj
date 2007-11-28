@@ -3,7 +3,7 @@ package org.apache.maven.project.aspect;
 import org.apache.maven.project.error.DefaultProjectErrorReporter;
 import org.apache.maven.project.error.ProjectErrorReporter;
 
-public abstract aspect ProjectErrorReporterAspect
+public abstract aspect AbstractProjectErrorReporterAspect
 {
 
     private ProjectErrorReporter reporter;

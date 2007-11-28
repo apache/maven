@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public privileged aspect ProjectIOErrorReporterAspect
-    extends ProjectErrorReporterAspect
+    extends AbstractProjectErrorReporterAspect
 {
 
     private pointcut pbldr_readProject( String projectId, File pomFile ):

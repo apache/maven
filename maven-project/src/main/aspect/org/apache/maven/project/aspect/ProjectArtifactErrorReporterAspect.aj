@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.List;
 
 public privileged aspect ProjectArtifactErrorReporterAspect
-    extends ProjectErrorReporterAspect
+    extends AbstractProjectErrorReporterAspect
 {
 
     private pointcut mlbldr_resolveParentFromRepositories( Parent parentRef, ArtifactRepository localRepo,
