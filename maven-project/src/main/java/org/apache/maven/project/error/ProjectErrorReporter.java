@@ -2,8 +2,12 @@ package org.apache.maven.project.error;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -13,12 +17,14 @@ import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface ProjectErrorReporter
 {
@@ -286,8 +292,8 @@ public interface ProjectErrorReporter
      * </pre>
      */
     void reportBadManagedDependencyVersion( MavenProject projectBeingBuilt,
-                                     File pomFile,
-                                     InvalidDependencyVersionException cause );
+                                            File pomFile,
+                                            InvalidDependencyVersionException cause );
 
     /**
      * <b>Call Stack:</b>
@@ -304,4 +310,107 @@ public interface ProjectErrorReporter
                                      File pomFile,
                                      InvalidDependencyVersionException cause );
 
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
+     *     --&gt; DefaultMavenProjectBuilder.findModelFromRepository(..) (private)
+     * DefaultMavenProjectBuilder.build(..)
+     * --&gt; DefaultMavenProjectBuilder.buildFromSourceFileInternal(..) (private)
+     *     --&gt; DefaultMavenProjectBuilder.readModel(..) (private)
+     *         --&gt; thrown XmlPullParserException
+     * &lt;------ InvalidProjectModelException
+     * </pre>
+     */
+    void reportErrorParsingProjectModel( String projectId,
+                                         File pomFile,
+                                         XmlPullParserException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
+     *     --&gt; DefaultModelLineageBuilder.readModel(..) (private)
+     *         --&gt; thrown XmlPullParserException
+     * &lt;------ ProjectBuildingException
+     * </pre>
+     */
+    void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
+                                               File parentPomFile,
+                                               XmlPullParserException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
+     *     --&gt; DefaultMavenProjectBuilder.findModelFromRepository(..) (private)
+     * DefaultMavenProjectBuilder.build(..)
+     * --&gt; DefaultMavenProjectBuilder.buildFromSourceFileInternal(..) (private)
+     *     --&gt; DefaultMavenProjectBuilder.readModel(..) (private)
+     *         --&gt; thrown IOException
+     * &lt;------ InvalidProjectModelException
+     * </pre>
+     */
+    void reportErrorParsingProjectModel( String projectId,
+                                         File pomFile,
+                                         IOException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
+     *     --&gt; DefaultModelLineageBuilder.readModel(..) (private)
+     *         --&gt; thrown IOException
+     * &lt;------ ProjectBuildingException
+     * </pre>
+     */
+    void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
+                                               File parentPomFile,
+                                               IOException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
+     *     --&gt; DefaultModelLineageBuilder.resolveParentPom(..) (private)
+     *         --&gt; DefaultModelLineageBuilder.resolveParentFromRepository(..) (private)
+     *             --&gt; thrown ArtifactNotFoundException
+     * &lt;---------- ProjectBuildingException
+     * </pre>
+     */
+    void reportParentPomArtifactNotFound( Parent parentRef,
+                                          ArtifactRepository localRepo,
+                                          List remoteRepos,
+                                          String childId,
+                                          File childPomFile,
+                                          ArtifactNotFoundException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * ...
+     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
+     *     --&gt; DefaultModelLineageBuilder.resolveParentPom(..) (private)
+     *         --&gt; DefaultModelLineageBuilder.resolveParentFromRepository(..) (private)
+     *             --&gt; thrown ArtifactResolutionException
+     * &lt;---------- ProjectBuildingException
+     * </pre>
+     */
+    void reportParentPomArtifactUnresolvable( Parent parentRef,
+                                              ArtifactRepository localRepo,
+                                              List remoteRepos,
+                                              String childId,
+                                              File childPomFile,
+                                              ArtifactResolutionException cause );
 }

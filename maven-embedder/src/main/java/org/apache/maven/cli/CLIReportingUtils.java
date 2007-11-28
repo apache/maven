@@ -27,7 +27,6 @@ import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -599,10 +598,6 @@ public final class CLIReportingUtils
         // InvalidProjectVersionException(all)
         // InvalidDependencyVersionException(all)
 
-        boolean result = false;
-
-        Throwable cause = e.getCause();
-
         // Start by looking at whether we can handle the PBE as a specific sub-class of ProjectBuildingException...
 //        if ( e instanceof InvalidProjectModelException )
 //        {
@@ -627,9 +622,6 @@ public final class CLIReportingUtils
 //
 //            result = true;
 //        }
-        if ( false )
-        {
-        }
 //        else if ( e instanceof InvalidDependencyVersionException )
 //        {
 //            writer.write( NEWLINE );
@@ -676,19 +668,19 @@ public final class CLIReportingUtils
 //        }
         // now that we've sorted through all the sub-classes of ProjectBuildingException,
         // let's look at causes of a basic PBE instance.
-        else if ( ( cause instanceof ArtifactNotFoundException )
-                  || ( cause instanceof ArtifactResolutionException ) )
-        {
-            writer.write( NEWLINE );
-            writer.write( e.getMessage() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Reason: " );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+//        else if ( ( cause instanceof ArtifactNotFoundException )
+//                  || ( cause instanceof ArtifactResolutionException ) )
+//        {
+//            writer.write( NEWLINE );
+//            writer.write( e.getMessage() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Reason: " );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
         // handled by aspect binding to ProjectErrorReporter now.
 //        else if ( cause instanceof ProfileActivationException )
 //        {
@@ -702,47 +694,47 @@ public final class CLIReportingUtils
 //
 //            result = true;
 //        }
-        else if ( cause instanceof IOException )
-        {
-            writer.write( NEWLINE );
-            if ( e.getPomFile() == null )
-            {
-                writer.write( "Error reading built-in super POM!" );
-            }
-            else
-            {
-                writer.write( "Error reading POM." );
-            }
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-        }
-        else if ( cause instanceof XmlPullParserException )
-        {
-            writer.write( NEWLINE );
-            if ( e.getPomFile() == null )
-            {
-                writer.write( "Error parsing built-in super POM!" );
-            }
-            else
-            {
-                writer.write( "Error parsing POM." );
-            }
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( cause.getMessage() );
-            writer.write( NEWLINE );
-            writer.write( NEWLINE );
-            writer.write( "Line: " );
-            writer.write( "" + ( (XmlPullParserException) cause ).getLineNumber() );
-            writer.write( NEWLINE );
-            writer.write( "Column: " );
-            writer.write( "" + ( (XmlPullParserException) cause ).getColumnNumber() );
-            writer.write( NEWLINE );
-
-            result = true;
-        }
+//        else if ( cause instanceof IOException )
+//        {
+//            writer.write( NEWLINE );
+//            if ( e.getPomFile() == null )
+//            {
+//                writer.write( "Error reading built-in super POM!" );
+//            }
+//            else
+//            {
+//                writer.write( "Error reading POM." );
+//            }
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//        }
+//        else if ( cause instanceof XmlPullParserException )
+//        {
+//            writer.write( NEWLINE );
+//            if ( e.getPomFile() == null )
+//            {
+//                writer.write( "Error parsing built-in super POM!" );
+//            }
+//            else
+//            {
+//                writer.write( "Error parsing POM." );
+//            }
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( cause.getMessage() );
+//            writer.write( NEWLINE );
+//            writer.write( NEWLINE );
+//            writer.write( "Line: " );
+//            writer.write( "" + ( (XmlPullParserException) cause ).getLineNumber() );
+//            writer.write( NEWLINE );
+//            writer.write( "Column: " );
+//            writer.write( "" + ( (XmlPullParserException) cause ).getColumnNumber() );
+//            writer.write( NEWLINE );
+//
+//            result = true;
+//        }
 //        else if ( cause instanceof InvalidRepositoryException )
 //        {
 //            writer.write( NEWLINE );
@@ -760,6 +752,8 @@ public final class CLIReportingUtils
 //            result = true;
 //        }
 
+        handleGenericException( e, showStackTraces, writer );
+
         writer.write( NEWLINE );
         writer.write( "Failing project's id: " );
         writer.write( e.getProjectId() );
@@ -775,7 +769,7 @@ public final class CLIReportingUtils
         }
         writer.write( NEWLINE );
 
-        return result;
+        return true;
     }
 
     private static boolean handleBuildFailureException( BuildFailureException e,

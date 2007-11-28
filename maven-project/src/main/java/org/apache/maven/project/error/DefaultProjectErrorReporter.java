@@ -2,9 +2,14 @@ package org.apache.maven.project.error;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -14,6 +19,7 @@ import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -338,7 +344,7 @@ public class DefaultProjectErrorReporter
     {
         writer.write( NEWLINE );
         writer.write( NEWLINE );
-        writer.write( "While applying profile to: " );
+        writer.write( "Project Id: " );
         writer.write( projectId );
         writer.write( NEWLINE );
         writer.write( "From file: " );
@@ -555,6 +561,232 @@ public class DefaultProjectErrorReporter
 
         addStandardInfo( project.getId(), pomFile, writer );
         addTips( ProjectErrorTips.getTipsForBadDependencySpec( project, pomFile, dep ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorParsingProjectModel( String projectId,
+                                                File pomFile,
+                                                XmlPullParserException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        if ( pomFile == null )
+        {
+            writer.write( "Error parsing built-in super POM!" );
+        }
+        else
+        {
+            writer.write( "Error parsing POM." );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Line: " );
+        writer.write( "" + ( cause ).getLineNumber() );
+        writer.write( NEWLINE );
+        writer.write( "Column: " );
+        writer.write( "" + ( cause ).getColumnNumber() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
+                                                      File parentPomFile,
+                                                      XmlPullParserException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        if ( parentPomFile == null )
+        {
+            writer.write( "Error parsing built-in super POM!" );
+        }
+        else
+        {
+            writer.write( "Error parsing parent-POM." );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Line: " );
+        writer.write( "" + cause.getLineNumber() );
+        writer.write( NEWLINE );
+        writer.write( "Column: " );
+        writer.write( "" + cause.getColumnNumber() );
+        writer.write( NEWLINE );
+
+        String projectId = childInfo.getModel().getParent().getId();
+        String childId = childInfo.getModel().getId();
+
+        addStandardInfo( projectId, parentPomFile, writer );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Child-Project Id: " );
+        writer.write( childId );
+
+        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorParsingProjectModel( String projectId,
+                                                File pomFile,
+                                                IOException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        if ( pomFile == null )
+        {
+            writer.write( "Error parsing built-in super POM!" );
+        }
+        else
+        {
+            writer.write( "Error parsing POM." );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, pomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
+                                                      File parentPomFile,
+                                                      IOException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        if ( parentPomFile == null )
+        {
+            writer.write( "Error parsing built-in super POM!" );
+        }
+        else
+        {
+            writer.write( "Error parsing parent-POM." );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        String projectId = childInfo.getModel().getParent().getId();
+        String childId = childInfo.getModel().getId();
+
+        addStandardInfo( projectId, parentPomFile, writer );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Child-Project Id: " );
+        writer.write( childId );
+
+        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
+                 writer );
+
+        registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportParentPomArtifactNotFound( Parent parentRef,
+                                                 ArtifactRepository localRepo,
+                                                 List remoteRepos,
+                                                 String childId,
+                                                 File childPomFile,
+                                                 ArtifactNotFoundException cause )
+    {
+        reportArtifactError( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
+    }
+
+    public void reportParentPomArtifactUnresolvable( Parent parentRef,
+                                                     ArtifactRepository localRepo,
+                                                     List remoteRepos,
+                                                     String childId,
+                                                     File childPomFile,
+                                                     ArtifactResolutionException cause )
+    {
+        reportArtifactError( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
+    }
+
+    private void reportArtifactError( Parent parentRef,
+                                      ArtifactRepository localRepo,
+                                      List remoteRepos,
+                                      String childId,
+                                      File childPomFile,
+                                      AbstractArtifactResolutionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Failed to resolve parent-POM from repository." );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Parent POM Information: " );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( parentRef.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( parentRef.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( parentRef.getVersion() );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Local Repository: " );
+        writer.write( localRepo.getBasedir() );
+
+        if ( ( remoteRepos != null ) && !remoteRepos.isEmpty() )
+        {
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Remote Repositories: " );
+
+            for ( Iterator it = remoteRepos.iterator(); it.hasNext(); )
+            {
+                ArtifactRepository remoteRepo = (ArtifactRepository) it.next();
+                writer.write( NEWLINE );
+                writer.write( remoteRepo.getId() );
+                writer.write( " -> " );
+                writer.write( remoteRepo.getUrl() );
+                // TODO: Get mirrors!!
+            }
+        }
+
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Reason: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+
+        addStandardInfo( childId, childPomFile, writer );
+        addTips( ProjectErrorTips.getTipsForPomParsingError( childId, childPomFile, cause ),
                  writer );
 
         registerProjectBuildError( cause, writer.toString() );

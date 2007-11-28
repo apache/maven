@@ -15,31 +15,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.DefaultMavenProjectBuilder;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.error.DefaultProjectErrorReporter;
-import org.apache.maven.project.error.ProjectErrorReporter;
 
 import java.io.File;
 import java.util.Set;
 
 public privileged aspect PBEDerivativeReporterAspect
+    extends ProjectErrorReporterAspect
 {
-
-    private ProjectErrorReporter reporter;
-
-    public void setProjectErrorReporter( ProjectErrorReporter reporter )
-    {
-        this.reporter = reporter;
-    }
-
-    private ProjectErrorReporter getReporter()
-    {
-        if ( reporter == null )
-        {
-            reporter = new DefaultProjectErrorReporter();
-        }
-
-        return reporter;
-    }
 
     // UnknownRepositoryLayoutException
 

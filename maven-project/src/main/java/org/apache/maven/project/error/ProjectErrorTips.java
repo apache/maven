@@ -159,4 +159,13 @@ public final class ProjectErrorTips
         // TODO Auto-generated method stub
         return null;
     }
+
+    public static List getTipsForPomParsingError( String projectId,
+                                                  File pomFile,
+                                                  Exception cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

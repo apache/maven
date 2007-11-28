@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.project.aspect.PBEDerivativeReporterAspect;
+import org.apache.maven.project.aspect.ProjectReporterManagerAspect;
 import org.apache.maven.project.error.DefaultProjectErrorReporter;
 import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.ProjectBuildingException;
@@ -26,8 +26,8 @@ public privileged aspect ErrorReportingAspect
     {
         projectErrorReporter = new DefaultProjectErrorReporter();
 
-        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = (PBEDerivativeReporterAspect) Aspects.aspectOf( PBEDerivativeReporterAspect.class );
-        pbeDerivativeReporterAspect.setProjectErrorReporter( projectErrorReporter );
+        ProjectReporterManagerAspect prma = (ProjectReporterManagerAspect) Aspects.aspectOf( ProjectReporterManagerAspect.class );
+        prma.setReporter( projectErrorReporter );
     }
 
     private pointcut cliReportingUtilsCalls():
@@ -40,8 +40,8 @@ public privileged aspect ErrorReportingAspect
     {
         projectErrorReporter = new DefaultProjectErrorReporter();
 
-        PBEDerivativeReporterAspect pbeDerivativeReporterAspect = (PBEDerivativeReporterAspect) Aspects.aspectOf( PBEDerivativeReporterAspect.class );
-        pbeDerivativeReporterAspect.setProjectErrorReporter( projectErrorReporter );
+        ProjectReporterManagerAspect prma = (ProjectReporterManagerAspect) Aspects.aspectOf( ProjectReporterManagerAspect.class );
+        prma.setReporter( projectErrorReporter );
     }
 
     boolean around( ProjectBuildingException e, boolean showStackTraces, StringWriter writer ):

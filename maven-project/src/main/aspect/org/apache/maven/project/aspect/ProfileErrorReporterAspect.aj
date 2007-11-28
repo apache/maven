@@ -31,23 +31,8 @@ import java.io.IOException;
  * coming from {@link DefaultProfileAdvisor}.
  */
 public privileged aspect ProfileErrorReporterAspect
+    extends ProjectErrorReporterAspect
 {
-    private ProjectErrorReporter reporter;
-
-    public void setProjectErrorReporter( ProjectErrorReporter reporter )
-    {
-        this.reporter = reporter;
-    }
-
-    private ProjectErrorReporter getReporter()
-    {
-        if ( reporter == null )
-        {
-            reporter = new DefaultProjectErrorReporter();
-        }
-
-        return reporter;
-    }
 
     protected pointcut componentLookupException( ComponentLookupException cause ):
         handler( ComponentLookupException )
