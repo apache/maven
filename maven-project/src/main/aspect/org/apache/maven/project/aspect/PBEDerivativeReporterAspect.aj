@@ -27,11 +27,13 @@ public privileged aspect PBEDerivativeReporterAspect
 
     private pointcut mavenTools_buildDeploymentArtifactRepository( DeploymentRepository repo ):
         call( ArtifactRepository MavenTools+.buildDeploymentArtifactRepository( DeploymentRepository ) )
-        && args( repo );
+        && args( repo )
+        && notWithinAspect();
 
     private pointcut pbldr_processProjectLogic( MavenProject project, File pomFile ):
         execution( private MavenProject DefaultMavenProjectBuilder.processProjectLogic( MavenProject, File, .. ) )
-        && args( project, pomFile, .. );
+        && args( project, pomFile, .. )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -55,7 +57,8 @@ public privileged aspect PBEDerivativeReporterAspect
 
     private pointcut mavenTools_buildArtifactRepository( Repository repo ):
         call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
-        && args( repo );
+        && args( repo )
+        && notWithinAspect();
 
     private boolean processingPluginRepositories = false;
 
@@ -120,9 +123,10 @@ public privileged aspect PBEDerivativeReporterAspect
     // InvalidProjectVersionException
 
     private pointcut pbldr_createNonDependencyArtifacts():
-        call( protected * DefaultMavenProjectBuilder.createPluginArtifacts( .. ) )
+        ( call( protected * DefaultMavenProjectBuilder.createPluginArtifacts( .. ) )
         || call( protected * DefaultMavenProjectBuilder.createReportArtifacts( .. ) )
-        || call( protected * DefaultMavenProjectBuilder.createExtensionArtifacts( .. ) );
+        || call( protected * DefaultMavenProjectBuilder.createExtensionArtifacts( .. ) ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -173,7 +177,8 @@ public privileged aspect PBEDerivativeReporterAspect
     // InvalidDependencyVersionException
 
     private pointcut pbldr_buildInternal():
-        execution( * DefaultMavenProjectBuilder.buildInternal( .. ) );
+        execution( * DefaultMavenProjectBuilder.buildInternal( .. ) )
+        && notWithinAspect();
 
     private MavenProject projectBeingBuilt;
 
@@ -216,7 +221,8 @@ public privileged aspect PBEDerivativeReporterAspect
 
     protected pointcut mms_createArtifacts( MavenProject project ):
         call( public static Set MavenMetadataSource.createArtifacts( .., MavenProject ) )
-        && args( .., project );
+        && args( .., project )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:

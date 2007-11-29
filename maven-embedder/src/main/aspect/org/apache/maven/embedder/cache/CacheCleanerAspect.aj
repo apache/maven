@@ -12,14 +12,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public privileged aspect CacheCleanerAspect
 {
 
-    private pointcut executeMethod():
-        execution( * MavenEmbedder.execute( .. ) );
-
-    before(): executeMethod()
-    {
-        System.out.println( "Executing with cache-cleanup enabled." );
-    }
-
     private ModelLineageBuilder MavenEmbedder.modelLineageBuilder;
 
     private pointcut embedderStarted( MavenEmbedder embedder ):

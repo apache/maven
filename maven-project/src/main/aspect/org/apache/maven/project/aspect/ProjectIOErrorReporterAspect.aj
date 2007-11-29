@@ -1,5 +1,7 @@
 package org.apache.maven.project.aspect;
 
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.DefaultMavenProjectBuilder;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.build.model.DefaultModelLineageBuilder;
@@ -12,17 +14,15 @@ public privileged aspect ProjectIOErrorReporterAspect
     extends AbstractProjectErrorReporterAspect
 {
 
-    private pointcut pbldr_readProject( String projectId, File pomFile ):
-        execution( * DefaultMavenProjectBuilder.readModel( String, File, .. ) )
-        && args( projectId, pomFile, .. );
+    private pointcut pbldr_readModel( String projectId, File pomFile ):
+        execution( Model DefaultMavenProjectBuilder.readModel( String, File, boolean ) )
+        && args( projectId, pomFile, * );
 
-    private pointcut xppEx_handler( XmlPullParserException cause ):
-        handler( XmlPullParserException )
-        && args( cause );
-
-    private pointcut ioEx_handler( IOException cause ):
-        handler( IOException )
-        && args( cause );
+    private pointcut within_pbldr_readModel( String projectId, File pomFile ):
+        within( DefaultMavenProjectBuilder )
+        && cflow( pbldr_readModel( projectId, pomFile ) )
+        && !cflowbelow( pbldr_readModel( String, File ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -37,8 +37,9 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <------ InvalidProjectModelException
     // =========================================================================
     before( String projectId, File pomFile, XmlPullParserException cause ):
-        cflow( pbldr_readProject( projectId, pomFile ) )
-        && xppEx_handler( cause )
+        within_pbldr_readModel( projectId, pomFile )
+        && call( ProjectBuildingException.new( .., XmlPullParserException ))
+        && args( .., cause )
     {
         getReporter().reportErrorParsingProjectModel( projectId, pomFile, cause );
     }
@@ -56,8 +57,9 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <------ InvalidProjectModelException
     // =========================================================================
     before( String projectId, File pomFile, IOException cause ):
-        cflow( pbldr_readProject( projectId, pomFile ) )
-        && ioEx_handler( cause )
+        within_pbldr_readModel( projectId, pomFile )
+        && call( ProjectBuildingException.new( .., IOException ))
+        && args( .., cause )
     {
         getReporter().reportErrorParsingProjectModel( projectId, pomFile, cause );
     }
@@ -69,6 +71,17 @@ public privileged aspect ProjectIOErrorReporterAspect
     private pointcut mlbldr_readModel( File pomFile ):
         execution( * DefaultModelLineageBuilder.readModel( File ) )
         && args( pomFile );
+
+    private pointcut within_mlbldr_readModel( File pomFile ):
+        cflow( mlbldr_readModel( pomFile ) )
+        && within( DefaultModelLineageBuilder )
+        && notWithinAspect();
+
+    private pointcut mlbldr_errorParsingParentPom( ModelAndFile childInfo, File parentPomFile, XmlPullParserException cause ):
+        cflowbelow( mlbldr_resolveParentPom( childInfo ) )
+        && within_mlbldr_readModel( parentPomFile )
+        && call( ProjectBuildingException.new( .., XmlPullParserException ) )
+        && args( .., cause );
 
     // =========================================================================
     // Call Stack:
@@ -83,12 +96,16 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <---------- ProjectBuildingException
     // =========================================================================
     before( ModelAndFile childInfo, File parentPomFile, XmlPullParserException cause ):
-        cflow( mlbldr_resolveParentPom( childInfo ) )
-        && cflow( mlbldr_readModel( parentPomFile ) )
-        && xppEx_handler( cause )
+        mlbldr_errorParsingParentPom( childInfo, parentPomFile, cause )
     {
         getReporter().reportErrorParsingParentProjectModel( childInfo, parentPomFile, cause );
     }
+
+    private pointcut mlbldr_errorReadingParentPom( ModelAndFile childInfo, File parentPomFile, IOException cause ):
+        cflow( mlbldr_resolveParentPom( childInfo ) )
+        && within_mlbldr_readModel( parentPomFile )
+        && call( ProjectBuildingException.new( .., IOException ))
+        && args( .., cause );
 
     // =========================================================================
     // Call Stack:
@@ -103,15 +120,17 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <---------- ProjectBuildingException
     // =========================================================================
     before( ModelAndFile childInfo, File parentPomFile, IOException cause ):
-        cflow( mlbldr_resolveParentPom( childInfo ) )
-        && cflow( mlbldr_readModel( parentPomFile ) )
-        && ioEx_handler( cause )
+        mlbldr_errorReadingParentPom( childInfo, parentPomFile, cause )
     {
         getReporter().reportErrorParsingParentProjectModel( childInfo, parentPomFile, cause );
     }
 
-    private pointcut mlbldr_buildModelLineage():
-        execution( * DefaultModelLineageBuilder.buildModelLineage( .. ) );
+    private pointcut mlbldr_errorParsingNonParentPom( File pomFile, XmlPullParserException cause ):
+        !cflow( mlbldr_resolveParentPom( ModelAndFile ) )
+        && cflow( mlbldr_readModel( pomFile ) )
+        && call( ProjectBuildingException.new( .., XmlPullParserException ))
+        && args( .., cause )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -123,13 +142,17 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <------ ProjectBuildingException
     // =========================================================================
     before( File pomFile, XmlPullParserException cause ):
-        cflow( mlbldr_buildModelLineage() )
-        && !cflowbelow( mlbldr_buildModelLineage() )
-        && cflow( mlbldr_readModel( pomFile ) )
-        && xppEx_handler( cause )
+        mlbldr_errorParsingNonParentPom( pomFile, cause )
     {
         getReporter().reportErrorParsingProjectModel( "unknown", pomFile, cause );
     }
+
+    private pointcut mlbldr_errorReadingNonParentPom( File pomFile, IOException cause ):
+        !cflow( mlbldr_resolveParentPom( ModelAndFile ) )
+        && cflow( mlbldr_readModel( pomFile ) )
+        && call( ProjectBuildingException.new( .., IOException ))
+        && args( .., cause )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -141,10 +164,7 @@ public privileged aspect ProjectIOErrorReporterAspect
     // <------ ProjectBuildingException
     // =========================================================================
     before( File pomFile, IOException cause ):
-        cflow( mlbldr_buildModelLineage() )
-        && !cflowbelow( mlbldr_buildModelLineage() )
-        && cflow( mlbldr_readModel( pomFile ) )
-        && ioEx_handler( cause )
+        mlbldr_errorReadingNonParentPom( pomFile, cause )
     {
         getReporter().reportErrorParsingProjectModel( "unknown", pomFile, cause );
     }

@@ -1,26 +1,17 @@
 package org.apache.maven.project.aspect;
 
-import org.apache.maven.project.error.DefaultProjectErrorReporter;
 import org.apache.maven.project.error.ProjectErrorReporter;
+import org.apache.maven.project.error.ProjectReporterManager;
 
-public abstract aspect AbstractProjectErrorReporterAspect
+public abstract aspect AbstractProjectErrorReporterAspect issingleton()
 {
 
-    private ProjectErrorReporter reporter;
-
-    public void setProjectErrorReporter( ProjectErrorReporter reporter )
-    {
-        this.reporter = reporter;
-    }
+    protected pointcut notWithinAspect():
+        !within( org.apache.maven.project.aspect.*+ );
 
     protected ProjectErrorReporter getReporter()
     {
-        if ( reporter == null )
-        {
-            reporter = new DefaultProjectErrorReporter();
-        }
-
-        return reporter;
+        return ProjectReporterManager.getReporter();
     }
 
 }

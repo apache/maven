@@ -16,15 +16,18 @@ public privileged aspect ProjectArtifactErrorReporterAspect
     private pointcut mlbldr_resolveParentFromRepositories( Parent parentRef, ArtifactRepository localRepo,
                                                            List remoteRepos, String childId, File childPomFile ):
         execution( File DefaultModelLineageBuilder.resolveParentFromRepository( Parent, ArtifactRepository, List, String, File ) )
-        && args( parentRef, localRepo, remoteRepos, childId, childPomFile );
+        && args( parentRef, localRepo, remoteRepos, childId, childPomFile )
+        && notWithinAspect();
 
     private pointcut anfe_handler( ArtifactNotFoundException cause ):
         handler( ArtifactNotFoundException )
-        && args( cause );
+        && args( cause )
+        && notWithinAspect();
 
     private pointcut are_handler( ArtifactResolutionException cause ):
         handler( ArtifactResolutionException )
-        && args( cause );
+        && args( cause )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:

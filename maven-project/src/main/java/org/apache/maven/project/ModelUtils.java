@@ -60,77 +60,77 @@ import java.util.TreeMap;
 
 public final class ModelUtils
 {
-    
+
     /**
      * This should be the resulting ordering of plugins after merging:
-     * 
+     *
      * Given:
-     * 
+     *
      *   parent: X -> A -> B -> D -> E
      *   child: Y -> A -> C -> D -> F
-     *  
-     * Result: 
-     * 
+     *
+     * Result:
+     *
      *   X -> Y -> A -> B -> C -> D -> E -> F
      */
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
                                          boolean handleAsInheritance )
     {
-        if ( childContainer == null || parentContainer == null )
+        if ( ( childContainer == null ) || ( parentContainer == null ) )
         {
             // nothing to do.
             return;
         }
 
         List parentPlugins = parentContainer.getPlugins();
-        
-        if ( parentPlugins != null && !parentPlugins.isEmpty() )
+
+        if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
             parentPlugins = new ArrayList( parentPlugins );
-            
-            // If we're processing this merge as an inheritance, we have to build up a list of 
+
+            // If we're processing this merge as an inheritance, we have to build up a list of
             // plugins that were considered for inheritance.
             if ( handleAsInheritance )
             {
                 for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
-                    
+
                     String inherited = plugin.getInherited();
-                    
-                    if ( inherited != null && !Boolean.valueOf( inherited ).booleanValue() )
+
+                    if ( ( inherited != null ) && !Boolean.valueOf( inherited ).booleanValue() )
                     {
                         it.remove();
                     }
                 }
             }
-            
+
             List assembledPlugins = new ArrayList();
 
             Map childPlugins = childContainer.getPluginsAsMap();
-            
+
             for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
             {
                 Plugin parentPlugin = (Plugin) it.next();
 
                 String parentInherited = parentPlugin.getInherited();
 
-                // only merge plugin definition from the parent if at least one 
+                // only merge plugin definition from the parent if at least one
                 // of these is true:
                 // 1. we're not processing the plugins in an inheritance-based merge
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
-                if ( !handleAsInheritance || parentInherited == null ||
+                if ( !handleAsInheritance || ( parentInherited == null ) ||
                     Boolean.valueOf( parentInherited ).booleanValue() )
                 {
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
 
-                    if ( childPlugin != null && !assembledPlugins.contains( childPlugin ) )
+                    if ( ( childPlugin != null ) && !assembledPlugins.contains( childPlugin ) )
                     {
                         Plugin assembledPlugin = childPlugin;
 
                         mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
-                        
+
                         // fix for MNG-2221 (assembly cache was not being populated for later reference):
                         assembledPlugins.add( assembledPlugin );
                     }
@@ -138,18 +138,18 @@ public final class ModelUtils
                     // if we're processing this as an inheritance-based merge, and
                     // the parent's <inherited/> flag is not set, then we need to
                     // clear the inherited flag in the merge result.
-                    if ( handleAsInheritance && parentInherited == null )
+                    if ( handleAsInheritance && ( parentInherited == null ) )
                     {
                         parentPlugin.unsetInheritanceApplied();
                     }
                 }
-                
+
                 // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
                 // since this list is a local one, and may have been modified during processing.
                 List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
                                                                         childContainer.getPlugins() );
-                
-                
+
+
                 childContainer.setPlugins( results );
 
                 childContainer.flushPluginMap();
@@ -160,40 +160,40 @@ public final class ModelUtils
     public static List orderAfterMerge( List merged, List highPrioritySource, List lowPrioritySource )
     {
         List results = new ArrayList();
-        
+
         if ( !merged.isEmpty() )
         {
             results.addAll( merged );
         }
-        
+
         List missingFromResults = new ArrayList();
-        
+
         List sources = new ArrayList();
-        
+
         sources.add( highPrioritySource );
         sources.add( lowPrioritySource );
-        
+
         for ( Iterator sourceIterator = sources.iterator(); sourceIterator.hasNext(); )
         {
             List source = (List) sourceIterator.next();
-            
+
             for ( Iterator it = source.iterator(); it.hasNext(); )
             {
                 Object item = it.next();
-                
+
                 if ( results.contains( item ) )
                 {
                     if ( !missingFromResults.isEmpty() )
                     {
                         int idx = results.indexOf( item );
-                        
+
                         if ( idx < 0 )
                         {
                             idx = 0;
                         }
-                        
+
                         results.addAll( idx, missingFromResults );
-                        
+
                         missingFromResults.clear();
                     }
                 }
@@ -202,21 +202,21 @@ public final class ModelUtils
                     missingFromResults.add( item );
                 }
             }
-            
+
             if ( !missingFromResults.isEmpty() )
             {
                 results.addAll( missingFromResults );
-                
+
                 missingFromResults.clear();
             }
         }
-        
+
         return results;
     }
 
     public static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
     {
-        if ( child == null || parent == null )
+        if ( ( child == null ) || ( parent == null ) )
         {
             // nothing to do.
             return;
@@ -224,7 +224,7 @@ public final class ModelUtils
 
         List parentPlugins = parent.getPlugins();
 
-        if ( parentPlugins != null && !parentPlugins.isEmpty() )
+        if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
             Map assembledPlugins = new TreeMap();
 
@@ -236,7 +236,7 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null ||
+                if ( !handleAsInheritance || ( parentInherited == null ) ||
                     Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
@@ -251,7 +251,7 @@ public final class ModelUtils
                         mergeReportPluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
                     }
 
-                    if ( handleAsInheritance && parentInherited == null )
+                    if ( handleAsInheritance && ( parentInherited == null ) )
                     {
                         assembledPlugin.unsetInheritanceApplied();
                     }
@@ -278,7 +278,7 @@ public final class ModelUtils
 
     public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
     {
-        if ( child == null || parent == null )
+        if ( ( child == null ) || ( parent == null ) )
         {
             // nothing to do.
             return;
@@ -289,7 +289,7 @@ public final class ModelUtils
             child.setExtensions( true );
         }
 
-        if ( child.getVersion() == null && parent.getVersion() != null )
+        if ( ( child.getVersion() == null ) && ( parent.getVersion() != null ) )
         {
             child.setVersion( parent.getVersion() );
         }
@@ -306,14 +306,14 @@ public final class ModelUtils
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = parentInherited == null || Boolean.valueOf( parentInherited ).booleanValue();
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
         List parentExecutions = parent.getExecutions();
 
-        if ( parentExecutions != null && !parentExecutions.isEmpty() )
+        if ( ( parentExecutions != null ) && !parentExecutions.isEmpty() )
         {
             List mergedExecutions = new ArrayList();
-            
+
             Map assembledExecutions = new TreeMap();
 
             Map childExecutions = child.getExecutionsAsMap();
@@ -334,7 +334,7 @@ public final class ModelUtils
 
                         assembled = childExecution;
                     }
-                    else if ( handleAsInheritance && parentInherited == null )
+                    else if ( handleAsInheritance && ( parentInherited == null ) )
                     {
                         parentExecution.unsetInheritanceApplied();
                     }
@@ -364,13 +364,13 @@ public final class ModelUtils
     public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
                                                      boolean handleAsInheritance )
     {
-        if ( child == null || parent == null )
+        if ( ( child == null ) || ( parent == null ) )
         {
             // nothing to do.
             return;
         }
 
-        if ( child.getVersion() == null && parent.getVersion() != null )
+        if ( ( child.getVersion() == null ) && ( parent.getVersion() != null ) )
         {
             child.setVersion( parent.getVersion() );
         }
@@ -378,11 +378,11 @@ public final class ModelUtils
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = parentInherited == null || Boolean.valueOf( parentInherited ).booleanValue();
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
         List parentReportSets = parent.getReportSets();
 
-        if ( parentReportSets != null && !parentReportSets.isEmpty() )
+        if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
         {
             Map assembledReportSets = new TreeMap();
 
@@ -404,7 +404,7 @@ public final class ModelUtils
 
                         assembledReportSet = childReportSet;
                     }
-                    else if ( handleAsInheritance && parentInherited == null )
+                    else if ( handleAsInheritance && ( parentInherited == null ) )
                     {
                         parentReportSet.unsetInheritanceApplied();
                     }
@@ -444,7 +444,7 @@ public final class ModelUtils
 
         List goals = new ArrayList();
 
-        if ( childGoals != null && !childGoals.isEmpty() )
+        if ( ( childGoals != null ) && !childGoals.isEmpty() )
         {
             goals.addAll( childGoals );
         }
@@ -479,7 +479,7 @@ public final class ModelUtils
 
         List reports = new ArrayList();
 
-        if ( childReports != null && !childReports.isEmpty() )
+        if ( ( childReports != null ) && !childReports.isEmpty() )
         {
             reports.addAll( childReports );
         }
@@ -568,7 +568,7 @@ public final class ModelUtils
 
             List modules = profile.getModules();
 
-            if ( modules != null && !modules.isEmpty() )
+            if ( ( modules != null ) && !modules.isEmpty() )
             {
                 newProfile.setModules( new ArrayList( modules ) );
             }
@@ -962,7 +962,7 @@ public final class ModelUtils
 
                 List goals = exec.getGoals();
 
-                if ( goals != null && !goals.isEmpty() )
+                if ( ( goals != null ) && !goals.isEmpty() )
                 {
                     newExec.setGoals( new ArrayList( goals ) );
                 }

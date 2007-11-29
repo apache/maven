@@ -9,43 +9,39 @@ import org.apache.maven.BuildFailureException;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.errors.CoreReporterManagerAspect;
+import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.errors.DefaultCoreErrorReporter;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.project.aspect.ProjectReporterManagerAspect;
-import org.apache.maven.project.error.DefaultProjectErrorReporter;
+import org.apache.maven.project.error.ProjectReporterManager;
 import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.ProjectBuildingException;
 
 public privileged aspect ErrorReportingAspect
 {
 
-    private ProjectErrorReporter projectErrorReporter;
-
-    private CoreErrorReporter coreErrorReporter;
-
     private pointcut embedderCalls():
-        execution( public MavenExecutionResult MavenEmbedder.*( .. ) );
+        execution( public * MavenEmbedder.*( .. ) );
 
     // TODO: Use MavenExecutionRequest to allow configuration of the reporters to be used.
-    before():
+    Object around():
         embedderCalls() && !cflow( embedderCalls() )
     {
-        projectErrorReporter = new DefaultProjectErrorReporter();
-
-        ProjectReporterManagerAspect prma = (ProjectReporterManagerAspect) Aspects.aspectOf( ProjectReporterManagerAspect.class );
-        prma.setReporter( projectErrorReporter );
-
-        coreErrorReporter = new DefaultCoreErrorReporter();
-
-        CoreReporterManagerAspect crma = (CoreReporterManagerAspect) Aspects.aspectOf( CoreReporterManagerAspect.class );
-        crma.setReporter( coreErrorReporter );
+        try
+        {
+            return proceed();
+        }
+        finally
+        {
+            ProjectReporterManager.clearReporter();
+            CoreReporterManager.clearReporter();
+        }
     }
 
     boolean around( ProjectBuildingException e, boolean showStackTraces, StringWriter writer ):
         execution( private static boolean CLIReportingUtils.handleProjectBuildingException( ProjectBuildingException, boolean, StringWriter ) )
         && args( e, showStackTraces, writer )
     {
+        ProjectErrorReporter projectErrorReporter = ProjectReporterManager.getReporter();
+
         if ( projectErrorReporter == null )
         {
             return proceed( e, showStackTraces, writer );
@@ -65,7 +61,10 @@ public privileged aspect ErrorReportingAspect
                     writer.write( CLIReportingUtils.NEWLINE );
                     writer.write( CLIReportingUtils.NEWLINE );
                     Throwable cause = projectErrorReporter.getRealCause( reportingError );
-                    cause.printStackTrace( new PrintWriter( writer ) );
+                    if ( cause != null )
+                    {
+                        cause.printStackTrace( new PrintWriter( writer ) );
+                    }
                 }
 
                 writer.write( CLIReportingUtils.NEWLINE );
@@ -86,12 +85,16 @@ public privileged aspect ErrorReportingAspect
         execution( private static boolean CLIReportingUtils.handleBuildFailureException( BuildFailureException, boolean, StringWriter ) )
         && args( e, showStackTraces, writer )
     {
+        CoreErrorReporter coreErrorReporter = CoreReporterManager.getReporter();
+
         if ( coreErrorReporter == null )
         {
             return proceed( e, showStackTraces, writer );
         }
         else
         {
+            System.out.println( "Checking core error reporter for help." );
+
             Throwable reportingError = coreErrorReporter.findReportedException( e );
 
             boolean result = false;
@@ -105,7 +108,10 @@ public privileged aspect ErrorReportingAspect
                     writer.write( CLIReportingUtils.NEWLINE );
                     writer.write( CLIReportingUtils.NEWLINE );
                     Throwable cause = coreErrorReporter.getRealCause( reportingError );
-                    cause.printStackTrace( new PrintWriter( writer ) );
+                    if ( cause != null )
+                    {
+                        cause.printStackTrace( new PrintWriter( writer ) );
+                    }
                 }
 
                 writer.write( CLIReportingUtils.NEWLINE );

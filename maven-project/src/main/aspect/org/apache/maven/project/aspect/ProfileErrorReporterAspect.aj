@@ -34,22 +34,26 @@ public privileged aspect ProfileErrorReporterAspect
 
     protected pointcut componentLookupException( ComponentLookupException cause ):
         handler( ComponentLookupException )
-        && args( cause );
+        && args( cause )
+        && notWithinAspect();
 
     private pointcut pMgr_isActiveExec( Profile profile, ProfileActivationContext context ):
         execution( boolean DefaultProfileManager.isActive( Profile, ProfileActivationContext ) )
-        && args( profile, context );
+        && args( profile, context )
+        && notWithinAspect();
 
     private pointcut pAdv_applyActivatedProfiles( Model model, File pomFile ):
         execution( private List DefaultProfileAdvisor.applyActivatedProfiles( Model, File, .. ) )
-        && args( model, pomFile, .. );
+        && args( model, pomFile, .. )
+        && notWithinAspect();
 
     private pointcut applyActivatedProfiles_ComponentLookupException( Model model,
                                                                       File pomFile,
                                                                       Profile profile ):
         call( List PlexusContainer+.lookupList( .. ) )
         && cflow( pAdv_applyActivatedProfiles( model, pomFile ) )
-        && cflow( pMgr_isActiveExec( profile, ProfileActivationContext ) );
+        && cflow( pMgr_isActiveExec( profile, ProfileActivationContext ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -73,7 +77,8 @@ public privileged aspect ProfileErrorReporterAspect
 
     protected pointcut profileActivatorCall( ProfileActivator activator ):
         call( * ProfileActivator+.*( .. ) )
-        && target( activator );
+        && target( activator )
+        && notWithinAspect();
 
     private pointcut applyActivatedProfiles_ActivatorThrown( ProfileActivator activator,
                                                                       Model model,
@@ -82,7 +87,8 @@ public privileged aspect ProfileErrorReporterAspect
                                                                       ProfileActivationContext context ):
         profileActivatorCall( activator )
         && cflow( pAdv_applyActivatedProfiles( model, pomFile ) )
-        && cflow( pMgr_isActiveExec( profile, context ) );
+        && cflow( pMgr_isActiveExec( profile, context ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -106,14 +112,16 @@ public privileged aspect ProfileErrorReporterAspect
 
     private pointcut pAdv_loadExternalProjectProfiles( Model model, File pomFile ):
         execution( private void DefaultProfileAdvisor.loadExternalProjectProfiles( *, Model, File ) )
-        && args( *, model, pomFile );
+        && args( *, model, pomFile )
+        && notWithinAspect();
 
     private pointcut loadExternalProfiles_profileBuilding( Model model,
                                                        File pomFile,
                                                        File projectDir ):
         call( ProfilesRoot MavenProfilesBuilder+.buildProfiles( File ) )
         && cflow( pAdv_loadExternalProjectProfiles( model, pomFile ) )
-        && args( projectDir );
+        && args( projectDir )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -153,14 +161,16 @@ public privileged aspect ProfileErrorReporterAspect
 
     private pointcut pAdv_getArtifactRepositoriesFromActiveProfiles( String projectId, File pomFile ):
         execution( LinkedHashSet DefaultProfileAdvisor.getArtifactRepositoriesFromActiveProfiles( *, File, String ) )
-        && args( *, pomFile, projectId );
+        && args( *, pomFile, projectId )
+        && notWithinAspect();
 
     private pointcut getArtifactRepositoriesFromActiveProfiles_ComponentLookupException( String projectId,
                                                                                           File pomFile,
                                                                                           Profile profile ):
         call( List PlexusContainer+.lookupList( .. ) )
         && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) )
-        && cflow( pMgr_isActiveExec( profile, ProfileActivationContext ) );
+        && cflow( pMgr_isActiveExec( profile, ProfileActivationContext ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -189,7 +199,8 @@ public privileged aspect ProfileErrorReporterAspect
                                                                       ProfileActivationContext context ):
         profileActivatorCall( activator )
         && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) )
-        && cflow( pMgr_isActiveExec( profile, context ) );
+        && cflow( pMgr_isActiveExec( profile, context ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
@@ -216,7 +227,8 @@ public privileged aspect ProfileErrorReporterAspect
                                                                                 File pomFile ):
         call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
         && args( repo )
-        && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) );
+        && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) )
+        && notWithinAspect();
 
     // =========================================================================
     // Call Stack:
