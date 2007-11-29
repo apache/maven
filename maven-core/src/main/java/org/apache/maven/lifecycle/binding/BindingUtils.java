@@ -211,6 +211,7 @@ final class BindingUtils
             plugin = new Plugin();
             plugin.setGroupId( binding.getGroupId() );
             plugin.setArtifactId( binding.getArtifactId() );
+            plugin.setVersion( binding.getVersion() );
         }
 
         injectPluginManagementInfo( plugin, project );
@@ -238,6 +239,7 @@ final class BindingUtils
             configuration = mergeRawConfigurations( reportConfig, configuration );
         }
 
+        binding.setVersion( plugin.getVersion() );
         binding.setConfiguration( configuration );
     }
 
@@ -308,6 +310,7 @@ final class BindingUtils
         Map plugMgmtMap = buildPluginMap( plugMgmt );
 
         String key = createPluginKey( plugin );
+
         Plugin mgmtPlugin = (Plugin) plugMgmtMap.get( key );
 
         if ( mgmtPlugin != null )
