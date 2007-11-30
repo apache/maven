@@ -654,11 +654,11 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         if ( pomFile == null )
         {
-            writer.write( "Error parsing built-in super POM!" );
+            writer.write( "Error reading built-in super POM!" );
         }
         else
         {
-            writer.write( "Error parsing POM." );
+            writer.write( "Error reading POM." );
         }
 
         writer.write( NEWLINE );
@@ -682,11 +682,11 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         if ( parentPomFile == null )
         {
-            writer.write( "Error parsing built-in super POM!" );
+            writer.write( "Error reading built-in super POM!" );
         }
         else
         {
-            writer.write( "Error parsing parent-POM." );
+            writer.write( "Error reading parent-POM." );
         }
 
         writer.write( NEWLINE );

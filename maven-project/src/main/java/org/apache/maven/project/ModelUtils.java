@@ -573,7 +573,7 @@ public final class ModelUtils
                 newProfile.setModules( new ArrayList( modules ) );
             }
 
-            newProfile.setPluginRepositories( cloneProfileRepositories( profile.getPluginRepositories() ) );
+//            newProfile.setPluginRepositories( cloneProfileRepositories( profile.getPluginRepositories() ) );
 
             Properties props = profile.getProperties();
 

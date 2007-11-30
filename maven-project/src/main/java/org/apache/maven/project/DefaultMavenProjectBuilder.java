@@ -201,18 +201,19 @@ public class DefaultMavenProjectBuilder
                               false, false, false );
     }
 
-    private MavenProject superProject;
-
     private Logger logger;
 
+    // what is using this externally? jvz.
     public MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException
     {
-        if ( superProject != null )
-        {
-            return superProject;
-        }
+        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
+        return buildStandaloneSuperProject( null );
+    }
 
+    public MavenProject buildStandaloneSuperProject( ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
         Model superModel = getSuperModel();
 
         superModel.setGroupId( STANDALONE_SUPERPOM_GROUPID );
@@ -221,13 +222,30 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
-        superProject = new MavenProject( superModel );
+        List activeProfiles;
+        if ( profileManager != null )
+        {
+            activeProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
+        }
+        else
+        {
+            activeProfiles = Collections.EMPTY_LIST;
+        }
+
+        MavenProject project = new MavenProject( superModel );
+
+        String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
+
+        project.setManagedVersionMap(
+            createManagedVersionMap( projectId, superModel.getDependencyManagement(), null ) );
+
+        project.setActiveProfiles( activeProfiles );
 
         try
         {
-            superProject.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
 
-            superProject.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -239,11 +257,11 @@ public class DefaultMavenProjectBuilder
                                                 e );
         }
 
-        superProject.setOriginalModel( superModel );
+        project.setOriginalModel( superModel );
 
-        superProject.setExecutionRoot( true );
+        project.setExecutionRoot( true );
 
-        return superProject;
+        return project;
     }
 
     /** @since 2.0.x */
@@ -840,7 +858,7 @@ public class DefaultMavenProjectBuilder
             project.getVersion(), project.getPackaging() );
         project.setArtifact( projectArtifact );
 
-        project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( model.getPluginRepositories() ) );
+//        project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( model.getPluginRepositories() ) );
 
         DistributionManagement dm = model.getDistributionManagement();
 
@@ -1227,9 +1245,16 @@ public class DefaultMavenProjectBuilder
     //
     // ----------------------------------------------------------------------
 
+    private Model superModel;
+
     private Model getSuperModel()
         throws ProjectBuildingException
     {
+        if ( superModel != null )
+        {
+            return superModel;
+        }
+
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );

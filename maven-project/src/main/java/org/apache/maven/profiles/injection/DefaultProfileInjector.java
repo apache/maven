@@ -71,8 +71,8 @@ public class DefaultProfileInjector
         injectModules( profile, model );
 
         model.setRepositories( ModelUtils.mergeRepositoryLists( profile.getRepositories(), model.getRepositories() ) );
-        model.setPluginRepositories( ModelUtils.mergeRepositoryLists( profile.getPluginRepositories(), model
-            .getPluginRepositories() ) );
+//        model.setPluginRepositories( ModelUtils.mergeRepositoryLists( profile.getPluginRepositories(), model
+//            .getPluginRepositories() ) );
 
         injectReporting( profile, model );
 
@@ -291,7 +291,7 @@ public class DefaultProfileInjector
         }
 
     }
-    
+
     /**
      * Merge two DOMs. Copy the dominant DOM so the original one is left unchanged.
      * <p>
@@ -299,7 +299,7 @@ public class DefaultProfileInjector
      * Profiles are dominant, thus they are merge targets, but they may be merged in several times
      * (e.g. if they are inherited). So with the second merge, you don't get the profile's original
      * DOM, but an already merged one.
-     * 
+     *
      * @param dominant Dominant DOM
      * @param recessive Recessive DOM
      * @return Merged DOM

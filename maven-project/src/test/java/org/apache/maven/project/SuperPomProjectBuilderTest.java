@@ -19,15 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class SuperPomProjectBuilderTest
     extends AbstractMavenProjectTestCase
@@ -45,7 +36,7 @@ public class SuperPomProjectBuilderTest
         MavenProject project = projectBuilder.buildStandaloneSuperProject();
 
         assertNotNull( project.getRemoteArtifactRepositories() );
-
-        assertNotNull( project.getPluginArtifactRepositories() );
+//
+//        assertNotNull( project.getPluginArtifactRepositories() );
     }
 }

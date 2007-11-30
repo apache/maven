@@ -91,4 +91,7 @@ public interface MavenProjectBuilder
      */
     MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException;
+
+    MavenProject buildStandaloneSuperProject( ProfileManager profileManager )
+        throws ProjectBuildingException;
 }

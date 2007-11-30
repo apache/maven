@@ -170,8 +170,8 @@ public class DefaultModelInheritanceAssembler
         assembleDependencyInheritance( child, parent );
 
         child.setRepositories( ModelUtils.mergeRepositoryLists( child.getRepositories(), parent.getRepositories() ) );
-        child.setPluginRepositories(
-            ModelUtils.mergeRepositoryLists( child.getPluginRepositories(), parent.getPluginRepositories() ) );
+//        child.setPluginRepositories(
+//            ModelUtils.mergeRepositoryLists( child.getPluginRepositories(), parent.getPluginRepositories() ) );
 
         assembleReportingInheritance( child, parent );
 
@@ -335,13 +335,13 @@ public class DefaultModelInheritanceAssembler
             ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
 
             List resources = childBuild.getResources();
-            if ( resources == null || resources.isEmpty() )
+            if ( ( resources == null ) || resources.isEmpty() )
             {
                 childBuild.setResources( parentBuild.getResources() );
             }
 
             resources = childBuild.getTestResources();
-            if ( resources == null || resources.isEmpty() )
+            if ( ( resources == null ) || resources.isEmpty() )
             {
                 childBuild.setTestResources( parentBuild.getTestResources() );
             }
@@ -353,7 +353,7 @@ public class DefaultModelInheritanceAssembler
             PluginManagement dominantPM = childBuild.getPluginManagement();
             PluginManagement recessivePM = parentBuild.getPluginManagement();
 
-            if ( dominantPM == null && recessivePM != null )
+            if ( ( dominantPM == null ) && ( recessivePM != null ) )
             {
                 childBuild.setPluginManagement( recessivePM );
             }
@@ -493,10 +493,14 @@ public class DefaultModelInheritanceAssembler
         if ( appendPaths )
         {
             if ( pathAdjustment != null )
+            {
                 uncleanPath += "/" + pathAdjustment;
+            }
 
             if ( childPath != null )
+            {
                 uncleanPath += "/" + childPath;
+            }
         }
 
         String cleanedPath = "";
@@ -510,7 +514,9 @@ public class DefaultModelInheritanceAssembler
         }
 
         if ( uncleanPath.startsWith( "/" ) )
+        {
             cleanedPath += "/";
+        }
 
         return cleanedPath + resolvePath( uncleanPath );
     }
@@ -524,7 +530,7 @@ public class DefaultModelInheritanceAssembler
 
         while ( tokenizer.hasMoreTokens() )
         {
-            String token = (String) tokenizer.nextToken();
+            String token = tokenizer.nextToken();
 
             if ( token.equals( "" ) )
             {
@@ -556,7 +562,9 @@ public class DefaultModelInheritanceAssembler
         {
             cleanedPath.append( pathElements.removeFirst() );
             if ( !pathElements.isEmpty() )
+            {
                 cleanedPath.append( '/' );
+            }
         }
 
         return cleanedPath.toString();

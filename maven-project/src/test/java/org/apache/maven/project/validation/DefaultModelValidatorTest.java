@@ -99,14 +99,14 @@ public class DefaultModelValidatorTest
 
         assertEquals( "'version' is missing.", result.getMessage( 0 ) );
     }
-    
+
     public void testInvalidAggregatorPackaging()
         throws Exception
     {
         ModelValidationResult result = validate( "invalid-aggregator-packaging-pom.xml" );
-        
+
         assertEquals( 1, result.getMessageCount() );
-        
+
         assertTrue( result.getMessage( 0 ).indexOf( "Aggregator projects require 'pom' as packaging." ) > -1 );
     }
 
@@ -193,15 +193,15 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-repository-id-pom.xml" );
 
-        assertEquals( 4, result.getMessageCount() );
+        assertEquals( 2, result.getMessageCount() );
 
         assertEquals( "'repositories.repository.id' is missing.", result.getMessage( 0 ) );
 
         assertEquals( "'repositories.repository.url' is missing.", result.getMessage( 1 ) );
-
-        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
-
-        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
+//
+//        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
+//
+//        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
     }
 
     public void testMissingResourceDirectory()

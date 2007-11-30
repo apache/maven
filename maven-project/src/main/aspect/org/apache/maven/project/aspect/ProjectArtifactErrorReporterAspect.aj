@@ -4,6 +4,7 @@ import org.apache.maven.project.build.model.DefaultModelLineageBuilder;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.model.Parent;
 
 import java.io.File;
@@ -16,18 +17,21 @@ public privileged aspect ProjectArtifactErrorReporterAspect
     private pointcut mlbldr_resolveParentFromRepositories( Parent parentRef, ArtifactRepository localRepo,
                                                            List remoteRepos, String childId, File childPomFile ):
         execution( File DefaultModelLineageBuilder.resolveParentFromRepository( Parent, ArtifactRepository, List, String, File ) )
+        && within( DefaultModelLineageBuilder )
         && args( parentRef, localRepo, remoteRepos, childId, childPomFile )
         && notWithinAspect();
 
-    private pointcut anfe_handler( ArtifactNotFoundException cause ):
-        handler( ArtifactNotFoundException )
-        && args( cause )
-        && notWithinAspect();
+    private pointcut mlbldr_parentArtifactNotFound( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactNotFoundException cause ):
+        cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
+        && !cflowbelow( mlbldr_resolveParentFromRepositories( Parent, ArtifactRepository, List, String, File ) )
+        && call( ProjectBuildingException.new( .., ArtifactNotFoundException ) )
+        && args( .., cause );
 
-    private pointcut are_handler( ArtifactResolutionException cause ):
-        handler( ArtifactResolutionException )
-        && args( cause )
-        && notWithinAspect();
+    private pointcut mlbldr_parentArtifactUnresolvable( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactResolutionException cause ):
+        cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
+        && !cflowbelow( mlbldr_resolveParentFromRepositories( Parent, ArtifactRepository, List, String, File ) )
+        && call( ProjectBuildingException.new( .., ArtifactResolutionException ) )
+        && args( .., cause );
 
     // =========================================================================
     // Call Stack:
@@ -40,8 +44,7 @@ public privileged aspect ProjectArtifactErrorReporterAspect
     // <---------- ProjectBuildingException
     // =========================================================================
     before( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactNotFoundException cause ):
-        cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
-        && anfe_handler( cause )
+        mlbldr_parentArtifactNotFound( parentRef, localRepo, remoteRepos, childId, childPomFile, cause )
     {
         getReporter().reportParentPomArtifactNotFound( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
     }
@@ -57,8 +60,7 @@ public privileged aspect ProjectArtifactErrorReporterAspect
     // <---------- ProjectBuildingException
     // =========================================================================
     before( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactResolutionException cause ):
-        cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
-        && are_handler( cause )
+        mlbldr_parentArtifactUnresolvable( parentRef, localRepo, remoteRepos, childId, childPomFile, cause )
     {
         getReporter().reportParentPomArtifactUnresolvable( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
     }
