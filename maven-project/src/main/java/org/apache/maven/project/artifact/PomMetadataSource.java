@@ -95,6 +95,7 @@ public class PomMetadataSource
         catch ( InvalidProjectModelException e )
         {
             // We want to capture this in the graph so that we can display the error to the user
+        	artifactMetadata.setError( e.getMessage() );
         }
         catch ( ProjectBuildingException e )
         {
@@ -111,7 +112,6 @@ public class PomMetadataSource
         for ( Iterator i = project.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-
             artifacts.add( new ArtifactMetadata( d.getGroupId(), d.getArtifactId(), d.getVersion() ) );
         }
 
@@ -119,7 +119,8 @@ public class PomMetadataSource
         // and making sure repositories added for a POM are scope only for a particular POM. We don't want
         // repositories lingering around or being aggregated after they are used. jvz
 
-        return new MetadataResolution( artifacts, null );
+        artifactMetadata.setDependencies( artifacts );
+        return new MetadataResolution( artifactMetadata );
     }
 
     private void loadProjectBuilder()
