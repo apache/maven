@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +36,7 @@ import java.util.Map;
 
 /**
  * Manage plugin prefix to artifact ID mapping associations.
- * 
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: DefaultPluginMappingManager.java 495147 2007-01-11 07:47:53Z
  *          jvanzyl $
@@ -61,7 +60,14 @@ public class DefaultPluginMappingManager
             loadPluginMappings( groupIds, pluginRepositories, localRepository );
         }
 
-        return (org.apache.maven.model.Plugin) pluginDefinitionsByPrefix.get( pluginPrefix );
+        org.apache.maven.model.Plugin result = (org.apache.maven.model.Plugin) pluginDefinitionsByPrefix.get( pluginPrefix );
+
+        if ( result == null )
+        {
+            getLogger().debug( "Failed to resolve plugin from prefix: " + pluginPrefix, new Throwable() );
+        }
+
+        return result;
     }
 
     private void loadPluginMappings( List groupIds, List pluginRepositories, ArtifactRepository localRepository )
@@ -100,6 +106,7 @@ public class DefaultPluginMappingManager
     {
         RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
+        getLogger().debug( "Checking repositories:\n" + pluginRepositories + "\n\nfor plugin prefix metadata: " + groupId );
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
         Metadata repoMetadata = metadata.getMetadata();
@@ -108,9 +115,10 @@ public class DefaultPluginMappingManager
             for ( Iterator pluginIterator = repoMetadata.getPlugins().iterator(); pluginIterator.hasNext(); )
             {
                 Plugin mapping = (Plugin) pluginIterator.next();
+                getLogger().debug( "Found plugin: " + mapping.getName() + " with prefix: " + mapping.getPrefix() );
 
                 String prefix = mapping.getPrefix();
-                
+
                 //if the prefix has already been found, don't add it again.
                 //this is to preserve the correct ordering of prefix searching (MNG-2926)
                 if ( !pluginDefinitionsByPrefix.containsKey( prefix ) )

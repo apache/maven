@@ -26,7 +26,7 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.loader.PluginLoader;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -47,10 +47,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public class DefaultBuildExtensionScanner
     implements BuildExtensionScanner, LogEnabled
@@ -65,8 +67,6 @@ public class DefaultBuildExtensionScanner
     private ModelLineageBuilder modelLineageBuilder;
 
     private ModelInterpolator modelInterpolator;
-
-    private PluginLoader pluginLoader;
 
     public void scanForBuildExtensions( List files,
                                         MavenExecutionRequest request )
@@ -112,6 +112,8 @@ public class DefaultBuildExtensionScanner
 
             inheritedRemoteRepositories.addAll( originalRemoteRepositories );
 
+            Set managedPluginsWithExtensionsFlag = new HashSet();
+
             for ( ModelLineageIterator lineageIterator = lineage.reversedLineageIterator(); lineageIterator.hasNext(); )
             {
                 Model model = (Model) lineageIterator.next();
@@ -144,7 +146,9 @@ public class DefaultBuildExtensionScanner
 
                 model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
 
-                checkModelBuildForExtensions( model, request, inheritedRemoteRepositories );
+                grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
+
+                checkModelBuildForExtensions( model, request, inheritedRemoteRepositories, managedPluginsWithExtensionsFlag );
 
                 if ( !reactorFiles.contains( modelPom ) )
                 {
@@ -177,6 +181,31 @@ public class DefaultBuildExtensionScanner
         {
             throw new ExtensionScanningException( "Failed to interpolate model from: " + pom
                 + " prior to scanning for extensions.", pom, e );
+        }
+    }
+
+    private void grabManagedPluginsWithExtensionsFlagTurnedOn( Model model,
+                                                               Set managedPluginsWithExtensionsFlag )
+    {
+        Build build = model.getBuild();
+        if ( build != null )
+        {
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if ( pluginManagement != null )
+            {
+                List plugins = pluginManagement.getPlugins();
+                if ( ( plugins != null ) && !plugins.isEmpty() )
+                {
+                    for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                    {
+                        Plugin plugin = (Plugin) it.next();
+                        if ( plugin.isExtensions() )
+                        {
+                            managedPluginsWithExtensionsFlag.add( plugin.getKey() );
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -271,7 +300,10 @@ public class DefaultBuildExtensionScanner
         }
     }
 
-    private void checkModelBuildForExtensions( Model model, MavenExecutionRequest request, List remoteRepositories )
+    private void checkModelBuildForExtensions( Model model,
+                                               MavenExecutionRequest request,
+                                               List remoteRepositories,
+                                               Set managedPluginsWithExtensionsFlag )
         throws ExtensionScanningException
     {
         // FIXME: Fix the log level here.
@@ -316,7 +348,7 @@ public class DefaultBuildExtensionScanner
                 {
                     Plugin plugin = (Plugin) extensionIterator.next();
 
-                    if ( plugin.isExtensions() )
+                    if ( plugin.isExtensions() || managedPluginsWithExtensionsFlag.contains( plugin.getKey() ) )
                     {
                         getLogger().debug( "Adding plugin: " + plugin.getKey() + " as an extension(from model: " + model.getId() + ")" );
 

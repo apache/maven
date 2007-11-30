@@ -1,5 +1,16 @@
 package org.apache.maven.project;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,7 +30,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-
 public class SuperPomProjectBuilderTest
     extends AbstractMavenProjectTestCase
 {
@@ -31,12 +41,82 @@ public class SuperPomProjectBuilderTest
         projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
     }
 
-    public void testBuildFromMiddlePom() throws Exception
+    public void testStandaloneSuperPomContainsInjectedExternalProfileRepositories()
+        throws ProjectBuildingException
+    {
+        Profile profile = new Profile();
+        profile.setId( "test-profile" );
+
+        Repository repo = new Repository();
+        repo.setId( "test" );
+        repo.setUrl( "http://www.nowhere.com" );
+
+        profile.addRepository( repo );
+
+        ProfileManager pm = new DefaultProfileManager( getContainer(), new DefaultProfileActivationContext( new Properties(), true ) );
+
+        pm.addProfile( profile );
+        pm.explicitlyActivate( profile.getId() );
+
+        MavenProject project = projectBuilder.buildStandaloneSuperProject( pm );
+
+        assertRepository( repo.getId(), project.getRepositories() );
+        assertRepository( repo.getId(), project.getPluginRepositories() );
+        assertArtifactRepository( repo.getId(), project.getRemoteArtifactRepositories() );
+        assertArtifactRepository( repo.getId(), project.getPluginArtifactRepositories() );
+    }
+
+    public void testStandaloneSuperPomContainsCentralRepo()
+        throws ProjectBuildingException
     {
         MavenProject project = projectBuilder.buildStandaloneSuperProject();
 
-        assertNotNull( project.getRemoteArtifactRepositories() );
-//
-//        assertNotNull( project.getPluginArtifactRepositories() );
+        assertRepository( "central", project.getRepositories() );
+        assertRepository( "central", project.getPluginRepositories() );
+        assertArtifactRepository( "central", project.getRemoteArtifactRepositories() );
+        assertArtifactRepository( "central", project.getPluginArtifactRepositories() );
     }
+
+    private void assertArtifactRepository( String id,
+                                           List repos )
+    {
+        assertNotNull( repos );
+        assertFalse( repos.isEmpty() );
+
+        boolean found = false;
+        for ( Iterator it = repos.iterator(); it.hasNext(); )
+        {
+            ArtifactRepository repo = (ArtifactRepository) it.next();
+
+            found = id.equals( repo.getId() );
+            if ( found )
+            {
+                break;
+            }
+        }
+
+        assertTrue( found );
+    }
+
+    private void assertRepository( String id,
+                                   List repos )
+    {
+        assertNotNull( repos );
+        assertFalse( repos.isEmpty() );
+
+        boolean found = false;
+        for ( Iterator it = repos.iterator(); it.hasNext(); )
+        {
+            Repository repo = (Repository) it.next();
+
+            found = id.equals( repo.getId() );
+            if ( found )
+            {
+                break;
+            }
+        }
+
+        assertTrue( found );
+    }
+
 }

@@ -164,7 +164,7 @@ public class DefaultPluginLoader
         Settings settings = session.getSettings();
 
         Plugin plugin = pluginMappingManager.getByPrefix( prefix, settings.getPluginGroups(),
-                                                          project.getPluginArtifactRepositories(), session.getLocalRepository() );
+                                                          project.getRemoteArtifactRepositories(), session.getLocalRepository() );
 
         PluginDescriptor pluginDescriptor = null;
         if ( plugin != null )

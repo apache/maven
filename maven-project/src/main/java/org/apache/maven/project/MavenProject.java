@@ -1318,7 +1318,7 @@ public class MavenProject
      */
     public List getPluginArtifactRepositories()
     {
-        return pluginArtifactRepositories;
+        return getRemoteArtifactRepositories();
     }
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
@@ -1330,7 +1330,7 @@ public class MavenProject
     public List getPluginRepositories()
     {
 //        return model.getPluginRepositories();
-        return Collections.EMPTY_LIST;
+        return model.getRepositories();
     }
 
     public void setActiveProfiles( List activeProfiles )

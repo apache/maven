@@ -115,6 +115,12 @@ under the License.
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-test-tools</artifactId>
+      <version>1.0-alpha-1</version>
+      <scope>test</scope>
+    </dependency>
     
     <!-- Needed for backward compat aspect. -->
     <dependency>

@@ -9,6 +9,7 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.util.Map;
@@ -21,7 +22,9 @@ public class MavenEmbedderProjectWithExtensionReadingTest
         throws Exception
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPom( new File( basedir, "src/test/resources/pom2.xml" ) );
+            .setPom( new File( basedir, "src/test/resources/pom2.xml" ) )
+            // TODO: Remove this!
+            .setLoggingLevel( Logger.LEVEL_DEBUG );
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
@@ -39,11 +42,13 @@ public class MavenEmbedderProjectWithExtensionReadingTest
 
         embedder.getPlexusContainer().addComponentDescriptor( cd );
 
-        // At this point the artifact handler will be inside the container and 
+        // At this point the artifact handler will be inside the container and
         // Maven internally will pick up the artifact handler and use it accordingly to
         // create the classpath appropriately.
 
         MavenExecutionResult result = embedder.readProjectWithDependencies( request );
+
+        System.out.println( "Got exceptions: " + result.getExceptions() );
 
         assertNoExceptions( result );
 

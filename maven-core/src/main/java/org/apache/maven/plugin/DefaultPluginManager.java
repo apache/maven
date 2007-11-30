@@ -151,7 +151,7 @@ public class DefaultPluginManager
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
         return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
-                                                 project.getPluginArtifactRepositories(),
+                                                 project.getRemoteArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
 
@@ -213,7 +213,7 @@ public class DefaultPluginManager
 
                 List remoteRepositories = new ArrayList();
 
-                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
+//                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
 
                 remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
 
@@ -226,7 +226,7 @@ public class DefaultPluginManager
 
                 pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-                artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(),
+                artifactResolver.resolve( pluginArtifact, project.getRemoteArtifactRepositories(),
                                           localRepository );
 
                 addPlugin( plugin, pluginArtifact, project, session );
@@ -440,7 +440,7 @@ public class DefaultPluginManager
             resolutionGroup = artifactMetadataSource.retrieve(
                                                                pluginArtifact,
                                                                localRepository,
-                                                               project.getPluginArtifactRepositories() );
+                                                               project.getRemoteArtifactRepositories() );
         }
         catch ( ArtifactMetadataRetrievalException e )
         {

@@ -282,102 +282,116 @@ public class DefaultMaven
     {
         List projects = new ArrayList( files.size() );
 
-        for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
+        if ( files.isEmpty() )
         {
-            File file = (File) iterator.next();
-
-            boolean usingReleasePom = false;
-
-            if ( RELEASE_POMv4.equals( file.getName() ) )
-            {
-                getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
-
-                usingReleasePom = true;
-            }
-
-            MavenProject project;
             try
             {
-                project = projectBuilder.build( file, localRepository, globalProfileManager );
+                projects.add( projectBuilder.buildStandaloneSuperProject( globalProfileManager ) );
             }
             catch ( ProjectBuildingException e )
             {
-                throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
+                throw new MavenExecutionException( "Failed to build super-project instance.", e );
             }
-
-            if ( isRoot )
+        }
+        else
+        {
+            for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
             {
-                project.setExecutionRoot( true );
-            }
+                File file = (File) iterator.next();
 
-            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
-            {
-                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
+                boolean usingReleasePom = false;
 
-                if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
+                if ( RELEASE_POMv4.equals( file.getName() ) )
                 {
-                    throw new MavenExecutionException(
-                        "Unable to build project '" + file +
-                            "; it requires Maven version " + version.toString(), file );
-                }
-            }
+                    getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
 
-            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
-            {
-                // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
-                project.setPackaging( "pom" );
-
-                File basedir = file.getParentFile();
-
-                // Initial ordering is as declared in the modules section
-                List moduleFiles = new ArrayList( project.getModules().size() );
-
-                for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
-                {
-                    String name = (String) i.next();
-
-                    if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
-                    {
-                        getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
-
-                        continue;
-                    }
-
-                    File moduleFile;
-
-                    if ( usingReleasePom )
-                    {
-                        moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
-                    }
-                    else
-                    {
-                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
-                    }
-
-                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                    {
-                        // we don't canonicalize on unix to avoid interfering with symlinks
-
-                        try
-                        {
-                            moduleFile = moduleFile.getCanonicalFile();
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
-                        }
-                    }
-
-                    moduleFiles.add( moduleFile );
+                    usingReleasePom = true;
                 }
 
-                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,
-                                                          globalProfileManager, false );
+                MavenProject project;
+                try
+                {
+                    project = projectBuilder.build( file, localRepository, globalProfileManager );
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
+                }
 
-                projects.addAll( collectedProjects );
-                project.setCollectedProjects( collectedProjects );
+                if ( isRoot )
+                {
+                    project.setExecutionRoot( true );
+                }
+
+                if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
+                {
+                    DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
+
+                    if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
+                    {
+                        throw new MavenExecutionException(
+                            "Unable to build project '" + file +
+                                "; it requires Maven version " + version.toString(), file );
+                    }
+                }
+
+                if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
+                {
+                    // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
+                    project.setPackaging( "pom" );
+
+                    File basedir = file.getParentFile();
+
+                    // Initial ordering is as declared in the modules section
+                    List moduleFiles = new ArrayList( project.getModules().size() );
+
+                    for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
+                    {
+                        String name = (String) i.next();
+
+                        if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
+                        {
+                            getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+
+                            continue;
+                        }
+
+                        File moduleFile;
+
+                        if ( usingReleasePom )
+                        {
+                            moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                        }
+                        else
+                        {
+                            moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                        }
+
+                        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                        {
+                            // we don't canonicalize on unix to avoid interfering with symlinks
+
+                            try
+                            {
+                                moduleFile = moduleFile.getCanonicalFile();
+                            }
+                            catch ( IOException e )
+                            {
+                                throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                            }
+                        }
+
+                        moduleFiles.add( moduleFile );
+                    }
+
+                    List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,
+                                                              globalProfileManager, false );
+
+                    projects.addAll( collectedProjects );
+                    project.setCollectedProjects( collectedProjects );
+                }
+                projects.add( project );
             }
-            projects.add( project );
         }
 
         return projects;

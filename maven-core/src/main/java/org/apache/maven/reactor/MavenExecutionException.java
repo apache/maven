@@ -81,6 +81,12 @@ public class MavenExecutionException
         super( message, cause );
     }
 
+    public MavenExecutionException( String message,
+                                    ProjectBuildingException cause )
+    {
+        super( message, cause );
+    }
+
     public File getPomFile()
     {
         return pomFile;

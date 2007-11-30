@@ -272,6 +272,14 @@ public class ProjectBuildingException
         pomFile = new File ( pomLocation );
     }
 
+    public ProjectBuildingException( String projectId,
+                                     String message,
+                                     ModelInterpolationException cause )
+    {
+        super( message, cause );
+        this.projectId = projectId;
+    }
+
     public File getPomFile()
     {
         return pomFile;

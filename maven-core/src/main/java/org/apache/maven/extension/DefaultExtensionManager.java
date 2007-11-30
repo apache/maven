@@ -63,7 +63,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -207,8 +206,7 @@ public class DefaultExtensionManager
         {
             MavenProject dummyProject = new MavenProject( originatingModel );
 
-            dummyProject.setPluginArtifactRepositories( remoteRepositories );
-            dummyProject.setRemoteArtifactRepositories( Collections.EMPTY_LIST );
+            dummyProject.setRemoteArtifactRepositories( remoteRepositories );
 
             EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
             MavenSession session = new MavenSession( container, request, dispatcher, null );

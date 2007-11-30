@@ -189,7 +189,7 @@ public class DefaultPluginVersionManager
         try
         {
             ResolutionGroup resolutionGroup =
-                artifactMetadataSource.retrieve( artifact, localRepository, project.getPluginArtifactRepositories() );
+                artifactMetadataSource.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
 
             // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
             // artifact.
@@ -215,7 +215,7 @@ public class DefaultPluginVersionManager
                 {
                     artifact = artifactFactory.createProjectArtifact( groupId, artifactId, artifactVersion );
 
-                    pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getPluginArtifactRepositories(), localRepository );
+                    pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getRemoteArtifactRepositories(), localRepository );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -250,7 +250,7 @@ public class DefaultPluginVersionManager
                         try
                         {
                             List versions = artifactMetadataSource.retrieveAvailableVersions( artifact, localRepository,
-                                                                                              project.getPluginArtifactRepositories() );
+                                                                                              project.getRemoteArtifactRepositories() );
                             ArtifactVersion v = vr.matchVersion( versions );
                             artifactVersion = v != null ? v.toString() : null;
                         }

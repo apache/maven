@@ -45,7 +45,7 @@ public class DefaultMavenProjectBuilderTest
         super.setUp();
 
         projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        
+
         localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
         localRepoDir.mkdirs();
 
@@ -80,7 +80,7 @@ public class DefaultMavenProjectBuilderTest
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) heirarchy
-     * @throws Exception 
+     * @throws Exception
      */
     public void testBuildFromMiddlePom() throws Exception
     {
@@ -88,12 +88,12 @@ public class DefaultMavenProjectBuilderTest
         File f2 = getTestFile( "src/test/resources/projects/grandchild-check/child/grandchild/pom.xml");
 
         getProject( f1 );
-        
+
         // it's the building of the grandchild project, having already cached the child project
         // (but not the parent project), which causes the problem.
         getProject( f2 );
     }
-    
+
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {

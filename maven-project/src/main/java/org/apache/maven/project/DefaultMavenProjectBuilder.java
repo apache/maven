@@ -222,6 +222,8 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
+        superModel = ModelUtils.cloneModel( superModel );
+
         List activeProfiles;
         if ( profileManager != null )
         {
@@ -239,12 +241,15 @@ public class DefaultMavenProjectBuilder
         project.setManagedVersionMap(
             createManagedVersionMap( projectId, superModel.getDependencyManagement(), null ) );
 
+        getLogger().debug( "Activated the following profiles for standalone super-pom: " + activeProfiles );
         project.setActiveProfiles( activeProfiles );
+
 
         try
         {
-            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            processProjectLogic( project, null, true );
 
+            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
             project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
@@ -254,6 +259,15 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":"
                                                 + STANDALONE_SUPERPOM_ARTIFACTID,
                                                 "Maven super-POM contains an invalid repository!",
+                                                e );
+        }
+        catch ( ModelInterpolationException e )
+        {
+            // we shouldn't be swallowing exceptions, no matter how unlikely.
+            // or, if we do, we should pay attention to the one coming from getSuperModel()...
+            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":"
+                                                + STANDALONE_SUPERPOM_ARTIFACTID,
+                                                "Maven super-POM contains an invalid expressions!",
                                                 e );
         }
 
