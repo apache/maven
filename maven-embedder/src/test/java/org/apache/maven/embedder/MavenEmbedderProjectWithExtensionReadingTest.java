@@ -48,8 +48,6 @@ public class MavenEmbedderProjectWithExtensionReadingTest
 
         MavenExecutionResult result = embedder.readProjectWithDependencies( request );
 
-        System.out.println( "Got exceptions: " + result.getExceptions() );
-
         assertNoExceptions( result );
 
         // sources, test sources, and the junit jar..

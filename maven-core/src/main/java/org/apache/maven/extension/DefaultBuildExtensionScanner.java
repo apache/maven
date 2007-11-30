@@ -68,6 +68,23 @@ public class DefaultBuildExtensionScanner
 
     private ModelInterpolator modelInterpolator;
 
+    public DefaultBuildExtensionScanner()
+    {
+    }
+
+    protected DefaultBuildExtensionScanner( ExtensionManager extensionManager,
+                                            MavenProjectBuilder projectBuilder,
+                                            ModelLineageBuilder modelLineageBuilder,
+                                            ModelInterpolator modelInterpolator,
+                                            Logger logger )
+    {
+        this.extensionManager = extensionManager;
+        this.projectBuilder = projectBuilder;
+        this.modelLineageBuilder = modelLineageBuilder;
+        this.modelInterpolator = modelInterpolator;
+        this.logger = logger;
+    }
+
     public void scanForBuildExtensions( List files,
                                         MavenExecutionRequest request )
         throws ExtensionScanningException
@@ -172,10 +189,6 @@ public class DefaultBuildExtensionScanner
                     inheritedInterpolationValues.putAll( modelProps );
                 }
             }
-
-            getLogger().debug( "Finished pre-scanning: " + pom + " for build extensions." );
-
-            extensionManager.registerWagons();
         }
         catch ( ModelInterpolationException e )
         {
