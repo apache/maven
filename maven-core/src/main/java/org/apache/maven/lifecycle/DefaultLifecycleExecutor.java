@@ -216,17 +216,27 @@ public class DefaultLifecycleExecutor
 
                     dispatcher.dispatchStart( event, target );
 
-                    // only call once, with the top-level project (assumed to be provided as a parameter)...
-                    for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                    try
                     {
-                        String task = (String) goalIterator.next();
+                        session.setCurrentProject( rootProject );
 
-                        executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,
-                                                      target );
+                        // only call once, with the top-level project (assumed to be provided as a parameter)...
+                        for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                        {
+                            String task = (String) goalIterator.next();
+
+                            executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime,
+                                                          target );
+                        }
+
+                        rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
+
                     }
-
-                    rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
-
+                    finally
+                    {
+                        session.setCurrentProject( null );
+                    }
+                    
                     dispatcher.dispatchEnd( event, target );
                 }
                 else
@@ -270,15 +280,25 @@ public class DefaultLifecycleExecutor
 
                         String target = currentProject.getId() + " ( " + segment + " )";
                         dispatcher.dispatchStart( event, target );
-
-                        for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                        
+                        try
                         {
-                            String task = (String) goalIterator.next();
+                            session.setCurrentProject( currentProject );
+                        
+                            for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                            {
+                                String task = (String) goalIterator.next();
 
-                            executeGoalAndHandleFailures( task, session, currentProject, dispatcher, event, rm,
-                                                          buildStartTime, target );
+                                executeGoalAndHandleFailures( task, session, currentProject, dispatcher, event, rm,
+                                                              buildStartTime, target );
+                            }
+
                         }
-
+                        finally
+                        {
+                            session.setCurrentProject( null );
+                        }
+                        
                         rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
 
                         dispatcher.dispatchEnd( event, target );

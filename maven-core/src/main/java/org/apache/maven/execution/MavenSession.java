@@ -58,6 +58,8 @@ public class MavenSession
     private final Properties executionProperties;
 
     private final Date startTime;
+    
+    private MavenProject currentProject;
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
@@ -169,4 +171,18 @@ public class MavenSession
     {
         return startTime;
     }
+    
+    public void setCurrentProject( MavenProject currentProject )
+    {
+        this.currentProject = currentProject;
+    }
+
+    /**
+     * Return the current project for use in a mojo execution.
+     */
+    public MavenProject getCurrentProject()
+    {
+        return currentProject;
+    }
+    
 }
