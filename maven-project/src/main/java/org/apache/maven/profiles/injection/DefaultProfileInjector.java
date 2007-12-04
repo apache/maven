@@ -592,7 +592,7 @@ public class DefaultProfileInjector
 
     private void injectDependencies( Profile profile, Model model )
     {
-        Map depsMap = new HashMap();
+        Map depsMap = new LinkedHashMap();
 
         List deps = model.getDependencies();
 
