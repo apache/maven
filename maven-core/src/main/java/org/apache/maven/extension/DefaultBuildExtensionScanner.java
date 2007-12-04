@@ -144,6 +144,21 @@ public class DefaultBuildExtensionScanner
 
                 String key = createKey( model );
 
+                if ( inheritedInterpolationValues == null )
+                {
+                    inheritedInterpolationValues = new HashMap();
+                }
+
+                model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
+
+                grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
+
+                Properties modelProps = model.getProperties();
+                if ( modelProps != null )
+                {
+                    inheritedInterpolationValues.putAll( modelProps );
+                }
+
                 if ( visitedModelIds.contains( key ) )
                 {
                     getLogger().debug( "Already visited: " + key + "; continuing." );
@@ -155,15 +170,6 @@ public class DefaultBuildExtensionScanner
                 getLogger().debug(
                                    "Checking: " + model.getId() + " for extensions. (It has "
                                        + model.getModules().size() + " modules.)" );
-
-                if ( inheritedInterpolationValues == null )
-                {
-                    inheritedInterpolationValues = new HashMap();
-                }
-
-                model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
-
-                grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
 
                 checkModelBuildForExtensions( model, request, inheritedRemoteRepositories, managedPluginsWithExtensionsFlag );
 
@@ -181,12 +187,6 @@ public class DefaultBuildExtensionScanner
                                                originalRemoteRepositories,
                                                visitedModelIds,
                                                reactorFiles );
-                }
-
-                Properties modelProps = model.getProperties();
-                if ( modelProps != null )
-                {
-                    inheritedInterpolationValues.putAll( modelProps );
                 }
             }
         }
