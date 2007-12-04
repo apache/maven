@@ -86,7 +86,7 @@ public class DefaultExtensionManagerTest
 
             if ( f.exists() )
             {
-			    try 
+			    try
 				{
                     FileUtils.forceDelete( f );
 				}
@@ -207,6 +207,7 @@ public class DefaultExtensionManagerTest
     }
 
     private ExtensionManager newDefaultExtensionManager()
+        throws Exception
     {
         DefaultExtensionManager mgr = new DefaultExtensionManager( factory, resolver,
                                                                    metadataSource, container,

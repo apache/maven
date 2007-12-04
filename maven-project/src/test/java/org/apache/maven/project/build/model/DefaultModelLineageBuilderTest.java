@@ -388,7 +388,7 @@ public class DefaultModelLineageBuilderTest
     }
 
     public void testReadPOMWithParentInRepoBroughtInViaSettingsProfile()
-        throws IOException, ProjectBuildingException
+        throws Exception
     {
         // 1. create project-root directory.
         File projectRootDirectory = createTempDir( "projectRootDir" );

@@ -42,7 +42,7 @@ public class SuperPomProjectBuilderTest
     }
 
     public void testStandaloneSuperPomContainsInjectedExternalProfileRepositories()
-        throws ProjectBuildingException
+        throws Exception
     {
         Profile profile = new Profile();
         profile.setId( "test-profile" );

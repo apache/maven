@@ -51,7 +51,7 @@ public class DefaultBuildPlanner
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException
     {
         LifecycleBindings defaultBindings = lifecycleBindingManager.getDefaultBindings( project );
-        LifecycleBindings packagingBindings = lifecycleBindingManager.getBindingsForPackaging( project );
+        LifecycleBindings packagingBindings = lifecycleBindingManager.getBindingsForPackaging( project, session );
         LifecycleBindings projectBindings = lifecycleBindingManager.getProjectCustomBindings( project, session );
 
         BuildPlan plan = new BuildPlan( packagingBindings, projectBindings, defaultBindings, tasks );

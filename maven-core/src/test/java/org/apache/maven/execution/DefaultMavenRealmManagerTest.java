@@ -3,7 +3,6 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
@@ -25,7 +24,7 @@ public class DefaultMavenRealmManagerTest
     }
 
     public void test_ReuseSingleExtensionRealmFromMultipleProjectRealms_UsingTwoManagerInstances()
-        throws RealmManagementException, ComponentLookupException
+        throws Exception
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         URL jarResource = cloader.getResource( "org/apache/maven/execution/test-extension-1.jar" );

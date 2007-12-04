@@ -31,8 +31,9 @@ public interface LifecycleBindingManager
     /**
      * Retrieve the LifecycleBindings given by the lifecycle mapping component/file for the project's packaging. Any
      * applicable mojo configuration will be injected into the LifecycleBindings from the POM.
+     * @param session
      */
-    LifecycleBindings getBindingsForPackaging( MavenProject project )
+    LifecycleBindings getBindingsForPackaging( MavenProject project, MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException;
 
     /**

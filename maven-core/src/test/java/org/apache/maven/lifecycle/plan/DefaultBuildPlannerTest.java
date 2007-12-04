@@ -1,8 +1,11 @@
 package org.apache.maven.lifecycle.plan;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenRealmManager;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenRealmManager;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleLoaderException;
-import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.plan.testutils.TestPluginLoader;
@@ -14,8 +17,14 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.tools.easymock.MockManager;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.easymock.MockControl;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +38,8 @@ public class DefaultBuildPlannerTest
 
     private TestPluginLoader pluginLoader;
 
+    private MockManager mockManager = new MockManager();
+
     protected void setUp()
         throws Exception
     {
@@ -38,7 +49,7 @@ public class DefaultBuildPlannerTest
     }
 
     public void test_constructBuildPlan_ForkedPhaseFromMojoBoundInThatPhase()
-        throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException
+        throws Exception
     {
         Model model = new Model();
 
@@ -59,8 +70,10 @@ public class DefaultBuildPlannerTest
 
         plugin.addExecution( exec );
 
-        PluginDescriptor pd = TestPluginLoader.createPluginDescriptor( plugin.getArtifactId(), "assembly",
-                                                                       plugin.getGroupId(), plugin.getVersion() );
+        PluginDescriptor pd = TestPluginLoader.createPluginDescriptor( plugin.getArtifactId(),
+                                                                       "assembly",
+                                                                       plugin.getGroupId(),
+                                                                       plugin.getVersion() );
         MojoDescriptor md = TestPluginLoader.createMojoDescriptor( pd, "assembly" );
         md.setExecutePhase( "package" );
 
@@ -68,9 +81,14 @@ public class DefaultBuildPlannerTest
 
         MavenProject project = new MavenProject( model );
 
-        MavenSession session = new MavenSession( getContainer(), null, null, null );
+        MavenRealmManager realmManager = new DefaultMavenRealmManager( getContainer(), new ConsoleLogger( Logger.LEVEL_DEBUG, "test" ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setRealmManager( realmManager );
 
-        BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "package" ), project, session );
+        MavenSession session = new MavenSession( getContainer(), request, null, null );
+
+        BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "package" ),
+                                                          project,
+                                                          session );
 
         List rendered = plan.renderExecutionPlan( new Stack() );
 
@@ -96,7 +114,75 @@ public class DefaultBuildPlannerTest
         assertBindingIds( rendered, checkIds );
     }
 
-    private void assertBindingIds( List bindings, List checkIds )
+    public void test_constructBuildPlan_CustomLifecycleIsUsedFromRealmManager()
+        throws Exception
+    {
+        Model model = new Model();
+
+        model.setPackaging( "test" );
+
+        MavenProject project = new MavenProject( model );
+
+        MavenRealmManager realmManager = new DefaultMavenRealmManager( getContainer(), new ConsoleLogger( Logger.LEVEL_DEBUG, "test" ) );
+
+        MockControl extArtifactCtl = MockControl.createControl( Artifact.class );
+        mockManager.add( extArtifactCtl );
+
+        Artifact extensionArtifact = (Artifact) extArtifactCtl.getMock();
+
+        extensionArtifact.getGroupId();
+        extArtifactCtl.setReturnValue( "group", MockControl.ZERO_OR_MORE );
+
+        extensionArtifact.getArtifactId();
+        extArtifactCtl.setReturnValue( "artifact", MockControl.ZERO_OR_MORE );
+
+        extensionArtifact.getVersion();
+        extArtifactCtl.setReturnValue( "1", MockControl.ZERO_OR_MORE );
+
+        extensionArtifact.getFile();
+        extArtifactCtl.setReturnValue( getResourceFile( "org/apache/maven/lifecycle/plan/test-custom-lifecycle-buildPlan-1.jar" ),
+                                       MockControl.ZERO_OR_MORE );
+
+        mockManager.replayAll();
+
+        realmManager.createExtensionRealm( extensionArtifact, Collections.EMPTY_SET );
+        realmManager.importExtensionsIntoProjectRealm( "group", "project", "1", extensionArtifact );
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setRealmManager( realmManager );
+
+        MavenSession session = new MavenSession( getContainer(), request, null, null );
+
+        BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "deploy" ),
+                                                          project,
+                                                          session );
+
+        List rendered = plan.renderExecutionPlan( new Stack() );
+
+        List checkIds = new ArrayList();
+
+        checkIds.add( "org.apache.maven.plugins:maven-deploy-plugin:deploy" );
+        checkIds.add( "org.apache.maven.plugins:maven-install-plugin:install" );
+
+        assertBindingIds( rendered, checkIds );
+
+        mockManager.verifyAll();
+    }
+
+    private File getResourceFile( String path )
+    {
+        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+        URL resource = cloader.getResource( path );
+
+        if ( resource == null )
+        {
+            fail( "Cannot find test resource: " + path );
+        }
+
+        return new File( resource.getPath() );
+    }
+
+    private void assertBindingIds( List bindings,
+                                   List checkIds )
     {
         assertEquals( checkIds.size(), bindings.size() );
 

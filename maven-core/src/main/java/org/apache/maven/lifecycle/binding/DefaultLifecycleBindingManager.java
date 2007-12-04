@@ -21,9 +21,14 @@ import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -43,7 +48,7 @@ import java.util.StringTokenizer;
  *
  */
 public class DefaultLifecycleBindingManager
-    implements LifecycleBindingManager, LogEnabled
+    implements LifecycleBindingManager, LogEnabled, Contextualizable
 {
     private Map bindingsByPackaging;
 
@@ -63,31 +68,45 @@ public class DefaultLifecycleBindingManager
     // configured. Moved out of DefaultLifecycleExecutor...
     private List defaultReports;
 
+    // contextualized, used for setting lookup realm before retrieving lifecycle bindings for packaging.
+    private PlexusContainer container;
+
     /**
      * Retrieve the LifecycleBindings given by the lifecycle mapping component/file for the project's packaging. Any
      * applicable mojo configuration will be injected into the LifecycleBindings from the POM.
      */
-    public LifecycleBindings getBindingsForPackaging( final MavenProject project )
+    public LifecycleBindings getBindingsForPackaging( final MavenProject project, final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         String packaging = project.getPackaging();
 
         LifecycleBindings bindings = null;
 
-        LifecycleBindingLoader loader = (LifecycleBindingLoader) bindingsByPackaging.get( packaging );
-        if ( loader != null )
-        {
-            bindings = loader.getBindings();
-        }
+        ClassRealm projectRealm = session.getRealmManager().getProjectRealm( project.getGroupId(), project.getArtifactId(), project.getVersion() );
 
-        // TODO: Remove this once we no longer have to support legacy-style lifecycle mappings
-        if ( bindings == null )
+        ClassRealm oldRealm = container.setLookupRealm( projectRealm );
+
+        try
         {
-            LifecycleMapping mapping = (LifecycleMapping) legacyMappingsByPackaging.get( packaging );
-            if ( mapping != null )
+            LifecycleBindingLoader loader = (LifecycleBindingLoader) bindingsByPackaging.get( packaging );
+            if ( loader != null )
             {
-                bindings = legacyLifecycleMappingParser.parseMappings( mapping, packaging );
+                bindings = loader.getBindings();
             }
+
+            // TODO: Remove this once we no longer have to support legacy-style lifecycle mappings
+            if ( bindings == null )
+            {
+                LifecycleMapping mapping = (LifecycleMapping) legacyMappingsByPackaging.get( packaging );
+                if ( mapping != null )
+                {
+                    bindings = legacyLifecycleMappingParser.parseMappings( mapping, packaging );
+                }
+            }
+        }
+        finally
+        {
+            container.setLookupRealm( oldRealm );
         }
 
         if ( bindings != null )
@@ -580,6 +599,12 @@ public class DefaultLifecycleBindingManager
         Class reportClass = classRealm.loadClass( MavenReport.class.getName() );
 
         return reportClass.isAssignableFrom( mojoClass );
+    }
+
+    public void contextualize( Context ctx )
+        throws ContextException
+    {
+        container = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }
