@@ -278,6 +278,8 @@ public class DefaultModelLineageBuilder
                                                 boolean useProfilesXml )
         throws ProjectBuildingException
     {
+        getLogger().debug( "Grabbing profile-injected repositories for: " + model.getId() );
+
         List explicitlyActive;
         List explicitlyInactive;
 
@@ -301,12 +303,18 @@ public class DefaultModelLineageBuilder
                                                                                                pomFile,
                                                                                                model.getId() );
 
-        profileRepos.addAll( profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
+        getLogger().debug( "Got external-profile repositories: " + profileRepos );
+
+        LinkedHashSet pomProfileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
                                                                                        pomFile,
                                                                                        explicitlyActive,
                                                                                        explicitlyInactive,
                                                                                        useProfilesXml,
-                                                                                       context ) );
+                                                                                       context );
+
+        getLogger().debug( "Got pom-profile repositories: " + pomProfileRepos );
+
+        profileRepos.addAll( pomProfileRepos );
 
         if ( !profileRepos.isEmpty() )
         {
@@ -350,6 +358,8 @@ public class DefaultModelLineageBuilder
             {
                 try
                 {
+                    getLogger().debug( "Attempting to resolve parent POM: " + modelParent.getId() + " using repositories:\n" + StringUtils.join( remoteRepositories.iterator(), "\n" ) );
+
                     parentPomFile = resolveParentFromRepositories( modelParent,
                                                                    localRepository,
                                                                    remoteRepositories,

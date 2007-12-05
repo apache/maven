@@ -387,7 +387,7 @@ public class DefaultModelLineageBuilderTest
         assertEquals( parent.getId(), ( (Model) modelIterator.next() ).getId() );
     }
 
-    public void testReadPOMWithParentInRepoBroughtInViaSettingsProfile()
+    public void testReadPOMWithParentInRepoBroughtInViaExternalProfile()
         throws Exception
     {
         // 1. create project-root directory.

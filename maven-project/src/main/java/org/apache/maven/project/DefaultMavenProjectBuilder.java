@@ -603,7 +603,20 @@ public class DefaultMavenProjectBuilder
             profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
-        superProject.setActiveProfiles( profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext ) );
+        LinkedHashSet activeInSuperPom = new LinkedHashSet();
+        List activated = profileAdvisor.applyActivatedExternalProfiles( superModel, projectDescriptor, externalProfileManager );
+        if ( !activated.isEmpty() )
+        {
+            activeInSuperPom.addAll( activated );
+        }
+
+        activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
+        if ( !activated.isEmpty() )
+        {
+            activeInSuperPom.addAll( activated );
+        }
+
+        superProject.setActiveProfiles( activated );
 
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();

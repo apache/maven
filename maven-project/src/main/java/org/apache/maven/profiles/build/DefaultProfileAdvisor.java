@@ -92,6 +92,11 @@ public class DefaultProfileAdvisor
                                                 ProfileManager externalProfileManager )
         throws ProjectBuildingException
     {
+        if ( externalProfileManager == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
         logger.debug( "Building profile manager for model: " + model.getId()
                       + " with external profile manager including profiles: "
                       + externalProfileManager.getProfilesById() );
