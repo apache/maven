@@ -200,6 +200,7 @@ public privileged aspect ProfileErrorReporterAspect
         profileActivatorCall( activator )
         && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) )
         && cflow( pMgr_isActiveExec( profile, context ) )
+        && within( DefaultProfileManager )
         && notWithinAspect();
 
     // =========================================================================
@@ -228,6 +229,7 @@ public privileged aspect ProfileErrorReporterAspect
         call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
         && args( repo )
         && cflow( pAdv_getArtifactRepositoriesFromActiveProfiles( projectId, pomFile ) )
+        && within( DefaultProfileAdvisor )
         && notWithinAspect();
 
     // =========================================================================

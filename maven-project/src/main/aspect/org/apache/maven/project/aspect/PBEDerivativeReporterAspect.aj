@@ -1,6 +1,7 @@
 package org.apache.maven.project.aspect;
 
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.profiles.build.DefaultProfileAdvisor;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.InvalidProjectVersionException;
@@ -27,12 +28,14 @@ public privileged aspect PBEDerivativeReporterAspect
 
     private pointcut mavenTools_buildDeploymentArtifactRepository( DeploymentRepository repo ):
         call( ArtifactRepository MavenTools+.buildDeploymentArtifactRepository( DeploymentRepository ) )
-        && args( repo )
-        && notWithinAspect();
+        && args( repo );
 
     private pointcut pbldr_processProjectLogic( MavenProject project, File pomFile ):
         execution( private MavenProject DefaultMavenProjectBuilder.processProjectLogic( MavenProject, File, .. ) )
-        && args( project, pomFile, .. )
+        && args( project, pomFile, .. );
+
+    private pointcut within_DefaultMavenProjectBuilder():
+        !withincode( * DefaultProfileAdvisor.*( .. ) )
         && notWithinAspect();
 
     // =========================================================================
@@ -51,14 +54,14 @@ public privileged aspect PBEDerivativeReporterAspect
     after( MavenProject project, File pomFile, DeploymentRepository repo ) throwing( UnknownRepositoryLayoutException cause ):
         mavenTools_buildDeploymentArtifactRepository( repo ) &&
         cflow( pbldr_processProjectLogic( project, pomFile ) )
+        && within_DefaultMavenProjectBuilder()
     {
         getReporter().reportErrorCreatingDeploymentArtifactRepository( project, pomFile, repo, cause );
     }
 
     private pointcut mavenTools_buildArtifactRepository( Repository repo ):
         call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
-        && args( repo )
-        && notWithinAspect();
+        && args( repo );
 
     private boolean processingPluginRepositories = false;
 
@@ -77,24 +80,31 @@ public privileged aspect PBEDerivativeReporterAspect
     // <---------- ProjectBuildingException
     // =========================================================================
     after( MavenProject project, File pomFile, Repository repo ) throwing( UnknownRepositoryLayoutException cause ):
-        mavenTools_buildArtifactRepository( repo ) && cflow( pbldr_processProjectLogic( project, pomFile ) )
+        mavenTools_buildArtifactRepository( repo )
+        && cflow( pbldr_processProjectLogic( project, pomFile ) )
+        && within_DefaultMavenProjectBuilder()
     {
         getReporter().reportErrorCreatingArtifactRepository( project, pomFile, repo, cause, processingPluginRepositories );
     }
 
     after():
         call( * Model+.getPluginRepositories() )
+        && cflow( pbldr_processProjectLogic( MavenProject, File ) )
+        && within_DefaultMavenProjectBuilder()
     {
         processingPluginRepositories = true;
     }
 
     after():
         call( * Model+.getRepositories() )
+        && cflow( pbldr_processProjectLogic( MavenProject, File ) )
+        && within_DefaultMavenProjectBuilder()
     {
         processingPluginRepositories = false;
     }
 
-    after( MavenProject project, File pomFile ): pbldr_processProjectLogic( project, pomFile )
+    after( MavenProject project, File pomFile ):
+        pbldr_processProjectLogic( project, pomFile )
     {
         processingPluginRepositories = false;
     }
@@ -146,6 +156,7 @@ public privileged aspect PBEDerivativeReporterAspect
     after( MavenProject project, File pomFile ) throwing( ProjectBuildingException cause ):
         cflow( pbldr_processProjectLogic( project, pomFile ) )
         && pbldr_createNonDependencyArtifacts()
+        && within_DefaultMavenProjectBuilder()
     {
         if ( cause instanceof InvalidProjectVersionException )
         {
@@ -168,6 +179,7 @@ public privileged aspect PBEDerivativeReporterAspect
     // =========================================================================
     after( MavenProject project, File pomFile ) throwing( InvalidProjectModelException cause ):
         cflow( pbldr_processProjectLogic( project, pomFile ) )
+        && within_DefaultMavenProjectBuilder()
         && execution( void DefaultMavenProjectBuilder.validateModel( .. ) )
     {
         getReporter().reportProjectValidationFailure( project, pomFile, cause );
@@ -177,14 +189,14 @@ public privileged aspect PBEDerivativeReporterAspect
     // InvalidDependencyVersionException
 
     private pointcut pbldr_buildInternal():
-        execution( * DefaultMavenProjectBuilder.buildInternal( .. ) )
-        && notWithinAspect();
+        execution( * DefaultMavenProjectBuilder.buildInternal( .. ) );
 
     private MavenProject projectBeingBuilt;
 
     after( MavenProject project ):
         cflow( pbldr_buildInternal() )
         && !cflowbelow( pbldr_buildInternal() )
+        && within_DefaultMavenProjectBuilder()
         && call( DependencyManagement MavenProject.getDependencyManagement() )
         && target( project )
     {
@@ -210,6 +222,7 @@ public privileged aspect PBEDerivativeReporterAspect
     // =========================================================================
     after( File pomFile ) throwing( ProjectBuildingException cause ):
         cflow( pbldr_buildInternal() )
+        && within_DefaultMavenProjectBuilder()
         && execution( * DefaultMavenProjectBuilder.createManagedVersionMap( .., File ) )
         && args( .., pomFile )
     {

@@ -130,6 +130,7 @@ public privileged aspect ProjectIOErrorReporterAspect
         && cflow( mlbldr_readModel( pomFile ) )
         && call( ProjectBuildingException.new( .., XmlPullParserException ))
         && args( .., cause )
+        && within( DefaultModelLineageBuilder )
         && notWithinAspect();
 
     // =========================================================================
@@ -152,6 +153,7 @@ public privileged aspect ProjectIOErrorReporterAspect
         && cflow( mlbldr_readModel( pomFile ) )
         && call( ProjectBuildingException.new( .., IOException ))
         && args( .., cause )
+        && within( DefaultModelLineageBuilder )
         && notWithinAspect();
 
     // =========================================================================
