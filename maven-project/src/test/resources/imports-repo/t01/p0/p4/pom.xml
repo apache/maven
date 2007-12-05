@@ -20,14 +20,12 @@
         <artifactId>p2</artifactId>
         <version>1.0</version>
         <type>pom</type>
-        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>maven</groupId>
         <artifactId>p3</artifactId>
         <version>1.0</version>
         <type>pom</type>
-        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>maven-test</groupId>
