@@ -81,9 +81,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,6 +99,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /*:apt
 
@@ -794,6 +798,8 @@ public class DefaultMavenProjectBuilder
             }
         }
 
+        mergeManagedDependencies(project.getModel(), localRepository, parentSearchRepositories);
+
         try
         {
             project = processProjectLogic( pomLocation, project, externalProfileManager, projectDir, strict );
@@ -1287,6 +1293,66 @@ public class DefaultMavenProjectBuilder
         rawProjectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), new MavenProject( project ) );
 
         return project;
+    }
+
+    private void mergeManagedDependencies(Model model, ArtifactRepository localRepository, List parentSearchRepositories)
+        throws ProjectBuildingException
+    {
+        DependencyManagement modelDepMgmt = model.getDependencyManagement();
+
+        if (modelDepMgmt != null)
+        {
+            Map depsMap = new TreeMap();
+            Iterator iter = modelDepMgmt.getDependencies().iterator();
+            boolean doInclude = false;
+            while (iter.hasNext())
+            {
+                Dependency dep = (Dependency) iter.next();
+                depsMap.put( dep.getManagementKey(), dep );
+                if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals(dep.getScope()))
+                {
+                    doInclude = true;
+                }
+            }
+            Map newDeps = new TreeMap(depsMap);
+            iter = modelDepMgmt.getDependencies().iterator();
+            if (doInclude)
+            {
+                while (iter.hasNext())
+                {
+                    Dependency dep = (Dependency)iter.next();
+                    if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals(dep.getScope()))
+                    {
+                        Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
+                                                                                  dep.getVersion(), dep.getScope() );
+                        MavenProject project = buildFromRepository(artifact, parentSearchRepositories, localRepository, false);
+
+                        DependencyManagement depMgmt = project.getDependencyManagement();
+
+                        if (depMgmt != null)
+                        {
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "Importing managed dependencies for " + dep.toString() );
+                            }
+
+                            for ( Iterator it = depMgmt.getDependencies().iterator(); it.hasNext(); )
+                            {
+                                Dependency includedDep = (Dependency) it.next();
+                                String key = includedDep.getManagementKey();
+                                if (!newDeps.containsKey(key))
+                                {
+                                    newDeps.put( includedDep.getManagementKey(), includedDep );
+                                }
+                            }
+                            newDeps.remove(dep.getManagementKey());
+                        }
+                    }
+                }
+                List deps = new ArrayList(newDeps.values());
+                modelDepMgmt.setDependencies(deps);
+            }
+        }
     }
 
     private List injectActiveProfiles( ProfileManager profileManager,
