@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 public privileged aspect Maven20xCompatAspect
 {
@@ -157,7 +158,7 @@ public privileged aspect Maven20xCompatAspect
     {
         Set result = proceed( mgr );
 
-        checkPlexusUtils( result, mgr.artifactFactory );
+        result = checkPlexusUtils( result, mgr.artifactFactory );
 
         return result;
     }
@@ -173,7 +174,7 @@ public privileged aspect Maven20xCompatAspect
     {
         Set result = proceed( mgr );
 
-        checkPlexusUtils( result, mgr.artifactFactory );
+        result = checkPlexusUtils( result, mgr.artifactFactory );
 
         return result;
     }
@@ -299,7 +300,7 @@ public privileged aspect Maven20xCompatAspect
     // UTILITIES
     // --------------------------
 
-    private void checkPlexusUtils( Set dependencyArtifacts, ArtifactFactory artifactFactory )
+    private Set checkPlexusUtils( Set dependencyArtifacts, ArtifactFactory artifactFactory )
     {
         // ----------------------------------------------------------------------------
         // If the plugin already declares a dependency on plexus-utils then we're all
@@ -323,8 +324,6 @@ public privileged aspect Maven20xCompatAspect
             }
         }
 
-        boolean plexusUtilsPresent = false;
-
         for ( Iterator i = dependencyArtifacts.iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
@@ -332,29 +331,27 @@ public privileged aspect Maven20xCompatAspect
             if ( a.getArtifactId().equals( "plexus-utils" )
                  && vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
             {
-                plexusUtilsPresent = true;
-
-                break;
+                return dependencyArtifacts;
             }
         }
 
-        if ( !plexusUtilsPresent )
+        // We will add plexus-utils as every plugin was getting this anyway from Maven itself. We will set the
+        // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
+        // as this is what's implicitly happening in 2.0.6.
+
+        if ( plexusUtilsArtifact == null )
         {
-            // We will add plexus-utils as every plugin was getting this anyway from Maven itself. We will set the
-            // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
-            // as this is what's implicitly happening in 2.0.6.
-
-            if ( plexusUtilsArtifact == null )
-            {
-                plexusUtilsArtifact = artifactFactory.createArtifact( "org.codehaus.plexus",
-                                                                      "plexus-utils",
-                                                                      "1.1",
-                                                                      Artifact.SCOPE_RUNTIME,
-                                                                      "jar" );
-            }
-
-            dependencyArtifacts.add( plexusUtilsArtifact );
+            plexusUtilsArtifact = artifactFactory.createArtifact( "org.codehaus.plexus",
+                                                                  "plexus-utils",
+                                                                  "1.1",
+                                                                  Artifact.SCOPE_RUNTIME,
+                                                                  "jar" );
         }
+
+        Set result = new LinkedHashSet( dependencyArtifacts );
+        result.add( plexusUtilsArtifact );
+
+        return result;
     }
 
 }
