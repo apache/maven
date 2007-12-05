@@ -90,6 +90,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /*:apt
 
@@ -688,6 +689,8 @@ public class DefaultMavenProjectBuilder
             }
         }
 
+        mergeManagedDependencies(project.getModel(), localRepository, parentSearchRepositories);
+
         try
         {
             project = processProjectLogic( project, projectDescriptor, strict );
@@ -1029,6 +1032,66 @@ public class DefaultMavenProjectBuilder
         }
 
         return result;
+    }
+
+    private void mergeManagedDependencies(Model model, ArtifactRepository localRepository, List parentSearchRepositories)
+        throws ProjectBuildingException
+    {
+        DependencyManagement modelDepMgmt = model.getDependencyManagement();
+
+        if (modelDepMgmt != null)
+        {
+            Map depsMap = new TreeMap();
+            Iterator iter = modelDepMgmt.getDependencies().iterator();
+            boolean doInclude = false;
+            while (iter.hasNext())
+            {
+                Dependency dep = (Dependency) iter.next();
+                depsMap.put( dep.getManagementKey(), dep );
+                if (dep.getType().equals("pom"))
+                {
+                    doInclude = true;
+                }
+            }
+            Map newDeps = new TreeMap(depsMap);
+            iter = modelDepMgmt.getDependencies().iterator();
+            if (doInclude)
+            {
+                while (iter.hasNext())
+                {
+                    Dependency dep = (Dependency)iter.next();
+                    if (dep.getType().equals("pom"))
+                    {
+                        Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
+                                                                                  dep.getVersion(), dep.getScope() );
+                        MavenProject project = buildFromRepository(artifact, parentSearchRepositories, localRepository, false);
+
+                        DependencyManagement depMgmt = project.getDependencyManagement();
+
+                        if (depMgmt != null)
+                        {
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "Importing managed dependencies for " + dep.toString() );
+                            }
+
+                            for ( Iterator it = depMgmt.getDependencies().iterator(); it.hasNext(); )
+                            {
+                                Dependency includedDep = (Dependency) it.next();
+                                String key = includedDep.getManagementKey();
+                                if (!newDeps.containsKey(key))
+                                {
+                                    newDeps.put( includedDep.getManagementKey(), includedDep );
+                                }
+                            }
+                            newDeps.remove(dep.getManagementKey());
+                        }
+                    }
+                }
+                List deps = new ArrayList(newDeps.values());
+                modelDepMgmt.setDependencies(deps);
+            }
+        }
     }
 
     private Model readModel( String projectId,
