@@ -22,6 +22,7 @@ package org.apache.maven.project.build.model;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
@@ -32,6 +33,8 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.error.ProjectErrorReporter;
+import org.apache.maven.project.error.ProjectReporterManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
@@ -63,8 +66,7 @@ public class DefaultModelLineageBuilderTest
         super.setUp();
         getContainer().getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
 
-        modelLineageBuilder = (DefaultModelLineageBuilder) lookup(
-                                                                   ModelLineageBuilder.ROLE,
+        modelLineageBuilder = (DefaultModelLineageBuilder) lookup( ModelLineageBuilder.ROLE,
                                                                    DefaultModelLineageBuilder.ROLE_HINT );
 
         defaultLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
@@ -114,8 +116,12 @@ public class DefaultModelLineageBuilderTest
             IOUtil.close( writer );
         }
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile, null, null, null,
-                                                                      false, true );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile,
+                                                                      null,
+                                                                      null,
+                                                                      null,
+                                                                      false,
+                                                                      true );
 
         assertEquals( 1, lineage.size() );
 
@@ -126,8 +132,7 @@ public class DefaultModelLineageBuilderTest
         throws IOException, ProjectBuildingException
     {
         // 1. create local repository directory
-        File localRepoDirectory = File.createTempFile(
-                                                       "DefaultModelLineageBuilder.localRepository.",
+        File localRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.localRepository.",
                                                        "" );
 
         localRepoDirectory.delete();
@@ -177,9 +182,12 @@ public class DefaultModelLineageBuilderTest
                                                                                               .toExternalForm(),
                                                                             defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null,
-                                                                      false, true );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
+                                                                      localRepository,
+                                                                      Collections.EMPTY_LIST,
+                                                                      null,
+                                                                      false,
+                                                                      true );
 
         assertEquals( 3, lineage.size() );
 
@@ -194,8 +202,7 @@ public class DefaultModelLineageBuilderTest
         throws IOException, ProjectBuildingException
     {
         // 1. create local repository directory
-        File localRepoDirectory = File.createTempFile(
-                                                       "DefaultModelLineageBuilder.localRepository.",
+        File localRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.localRepository.",
                                                        "" );
 
         localRepoDirectory.delete();
@@ -226,9 +233,12 @@ public class DefaultModelLineageBuilderTest
                                                                                               .toExternalForm(),
                                                                             defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null,
-                                                                      true, true );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
+                                                                      localRepository,
+                                                                      Collections.EMPTY_LIST,
+                                                                      null,
+                                                                      true,
+                                                                      true );
 
         assertEquals( 2, lineage.size() );
 
@@ -246,8 +256,7 @@ public class DefaultModelLineageBuilderTest
         throws IOException, ProjectBuildingException
     {
         // 1. create local and remote repository directories
-        File localRepoDirectory = File.createTempFile(
-                                                       "DefaultModelLineageBuilder.localRepository.",
+        File localRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.localRepository.",
                                                        "" );
 
         localRepoDirectory.delete();
@@ -255,8 +264,7 @@ public class DefaultModelLineageBuilderTest
 
         deleteDirOnExit( localRepoDirectory );
 
-        File remoteRepoDirectory = File.createTempFile(
-                                                        "DefaultModelLineageBuilder.remoteRepository.",
+        File remoteRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.remoteRepository.",
                                                         "" );
 
         remoteRepoDirectory.delete();
@@ -312,11 +320,12 @@ public class DefaultModelLineageBuilderTest
                                                                                                 .toExternalForm(),
                                                                              defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage(
-                                                                      currentPOM,
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
                                                                       localRepository,
                                                                       Collections.singletonList( remoteRepository ),
-                                                                      null, false, true );
+                                                                      null,
+                                                                      false,
+                                                                      true );
 
         assertEquals( 3, lineage.size() );
 
@@ -331,8 +340,7 @@ public class DefaultModelLineageBuilderTest
         throws IOException, ProjectBuildingException
     {
         // 1. create project-root directory.
-        File projectRootDirectory = File.createTempFile(
-                                                         "DefaultModelLineageBuilder.projectRootDir.",
+        File projectRootDirectory = File.createTempFile( "DefaultModelLineageBuilder.projectRootDir.",
                                                          "" );
 
         projectRootDirectory.delete();
@@ -375,9 +383,12 @@ public class DefaultModelLineageBuilderTest
                                                                                                 .toExternalForm(),
                                                                             defaultLayout );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, null,
-                                                                      false, true );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
+                                                                      localRepository,
+                                                                      Collections.EMPTY_LIST,
+                                                                      null,
+                                                                      false,
+                                                                      true );
 
         assertEquals( 2, lineage.size() );
 
@@ -425,7 +436,7 @@ public class DefaultModelLineageBuilderTest
         ArtifactRepository localRepository = new DefaultArtifactRepository(
                                                                             "local",
                                                                             localRepoRootDirectory.toURL()
-                                                                                                .toExternalForm(),
+                                                                                                  .toExternalForm(),
                                                                             defaultLayout );
 
         Profile profile = new Profile();
@@ -445,9 +456,12 @@ public class DefaultModelLineageBuilderTest
         profileManager.addProfile( profile );
         profileManager.explicitlyActivate( profile.getId() );
 
-        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM, localRepository,
-                                                                      Collections.EMPTY_LIST, profileManager,
-                                                                      false, true );
+        ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
+                                                                      localRepository,
+                                                                      Collections.EMPTY_LIST,
+                                                                      profileManager,
+                                                                      false,
+                                                                      true );
 
         assertEquals( 2, lineage.size() );
 
@@ -565,6 +579,95 @@ public class DefaultModelLineageBuilderTest
         model.setVersion( version );
 
         return model;
+    }
+
+    public void testReadPOMWithParentMissingFromRepository()
+        throws IOException
+    {
+        File localRepoDirectory = File.createTempFile( "DefaultModelLineageBuilder.localRepository.",
+                                                       "" );
+
+        localRepoDirectory.delete();
+        localRepoDirectory.mkdirs();
+
+        deleteDirOnExit( localRepoDirectory );
+
+        Model current = createModel( "group", "current", "1" );
+
+        Parent currentParent = new Parent();
+        currentParent.setGroupId( "group" );
+        currentParent.setArtifactId( "parent" );
+        currentParent.setVersion( "1" );
+
+        current.setParent( currentParent );
+
+        File currentPOM = File.createTempFile( "DefaultModelLineageBuilder.test.", ".pom" );
+        currentPOM.deleteOnExit();
+
+        writeModel( current, currentPOM );
+
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                            "local",
+                                                                            localRepoDirectory.toURL()
+                                                                                              .toExternalForm(),
+                                                                            defaultLayout );
+
+        try
+        {
+            modelLineageBuilder.buildModelLineage( currentPOM,
+                                                   localRepository,
+                                                   Collections.EMPTY_LIST,
+                                                   null,
+                                                   false,
+                                                   true );
+
+            fail( "should have thrown an ArtifactNotFoundException" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            assertTrue( ( e.getCause() instanceof ArtifactNotFoundException ) );
+
+            ProjectErrorReporter reporter = ProjectReporterManager.getReporter();
+            Throwable reportedCause = reporter.findReportedException( e );
+            assertNotNull( reportedCause );
+            System.out.println( reporter.getFormattedMessage( reportedCause ) );
+        }
+
+    }
+
+    public void testReadPOM_HandleErrorWhenFileDoesntExist()
+        throws IOException
+    {
+        File localRepoDirectory = new File( "localRepo" ).getAbsoluteFile();
+        File currentPOM = new File( "pom/pom/pom/pom.xml" );
+
+        ArtifactRepository localRepository = new DefaultArtifactRepository(
+                                                                            "local",
+                                                                            localRepoDirectory.toURL()
+                                                                                              .toExternalForm(),
+                                                                            defaultLayout );
+
+        try
+        {
+            modelLineageBuilder.buildModelLineage( currentPOM,
+                                                   localRepository,
+                                                   Collections.EMPTY_LIST,
+                                                   null,
+                                                   false,
+                                                   true );
+
+            fail( "should have thrown an IOException" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            assertTrue( ( e.getCause() instanceof IOException ) );
+
+            ProjectErrorReporter reporter = ProjectReporterManager.getReporter();
+            Throwable reportedCause = reporter.findReportedException( e );
+            assertNotNull( reportedCause );
+            System.out.println( reporter.getFormattedMessage( reportedCause ) );
+        }
+
     }
 
 }

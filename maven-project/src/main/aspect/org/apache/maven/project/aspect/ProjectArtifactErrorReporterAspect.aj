@@ -16,12 +16,11 @@ public privileged aspect ProjectArtifactErrorReporterAspect
 
     private pointcut mlbldr_resolveParentFromRepositories( Parent parentRef, ArtifactRepository localRepo,
                                                            List remoteRepos, String childId, File childPomFile ):
-        execution( File DefaultModelLineageBuilder.resolveParentFromRepository( Parent, ArtifactRepository, List, String, File ) )
+        execution( private File DefaultModelLineageBuilder.resolveParentFromRepositories( Parent, ArtifactRepository, List, String, File ) )
         && args( parentRef, localRepo, remoteRepos, childId, childPomFile );
 
     private pointcut mlbldr_parentArtifactNotFound( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactNotFoundException cause ):
         cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
-        && !cflowbelow( mlbldr_resolveParentFromRepositories( Parent, ArtifactRepository, List, String, File ) )
         && call( ProjectBuildingException.new( .., ArtifactNotFoundException ) )
         && within( DefaultModelLineageBuilder )
         && args( .., cause )
@@ -29,7 +28,6 @@ public privileged aspect ProjectArtifactErrorReporterAspect
 
     private pointcut mlbldr_parentArtifactUnresolvable( Parent parentRef, ArtifactRepository localRepo, List remoteRepos, String childId, File childPomFile, ArtifactResolutionException cause ):
         cflow( mlbldr_resolveParentFromRepositories( parentRef, localRepo, remoteRepos, childId, childPomFile ) )
-        && !cflowbelow( mlbldr_resolveParentFromRepositories( Parent, ArtifactRepository, List, String, File ) )
         && call( ProjectBuildingException.new( .., ArtifactResolutionException ) )
         && within( DefaultModelLineageBuilder )
         && args( .., cause )
