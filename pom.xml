@@ -189,7 +189,7 @@ under the License.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
-        <version>1.2-alpha-10</version>
+        <version>1.2-alpha-11</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
