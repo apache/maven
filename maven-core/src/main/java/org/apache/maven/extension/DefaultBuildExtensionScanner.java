@@ -106,8 +106,6 @@ public class DefaultBuildExtensionScanner
         scanInternal( pom, request, new ArrayList(), Collections.singletonList( pom ) );
     }
 
-    // TODO: Use a build-context cache object for visitedModelIdx and reactorFiles,
-    //       once we move to just-in-time project scanning.
     private void scanInternal( File pom,
                                MavenExecutionRequest request,
                                List visitedModelIds,
@@ -319,8 +317,7 @@ public class DefaultBuildExtensionScanner
                                                Set managedPluginsWithExtensionsFlag )
         throws ExtensionScanningException
     {
-        // FIXME: Fix the log level here.
-        getLogger().info( "Checking " + model.getId() + " for extensions." );
+        getLogger().debug( "Checking " + model.getId() + " for extensions." );
 
         Build build = model.getBuild();
 
