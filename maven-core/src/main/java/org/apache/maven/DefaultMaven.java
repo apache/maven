@@ -47,7 +47,8 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
@@ -68,9 +69,8 @@ import java.util.List;
  * @todo EventDispatcher should be a component as it is internal to maven.
  */
 public class DefaultMaven
-    extends AbstractLogEnabled
     implements Maven,
-    Contextualizable
+    Contextualizable, LogEnabled
 {
     // ----------------------------------------------------------------------
     // Components
@@ -85,6 +85,8 @@ public class DefaultMaven
     protected RuntimeInformation runtimeInformation;
 
     private BuildExtensionScanner buildExtensionScanner;
+
+    private Logger logger;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -500,5 +502,15 @@ public class DefaultMaven
                 it.remove();
             }
         }
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 }

@@ -1,5 +1,6 @@
 package org.apache.maven.compat.plugin;
 
+import org.apache.maven.DefaultMaven;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.NoSuchPhaseException;
@@ -36,7 +37,6 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LogEnabled;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -87,15 +87,19 @@ public privileged aspect Maven20xCompatAspect
     // capture the session instance.
     after( MavenSession session ): sessionCreation( session )
     {
+        if ( logger != null && logger.isDebugEnabled() )
+        {
+            logger.debug( "Capturing session for backward compatibility aspect: " + session );
+        }
+
         this.session = session;
     }
 
     // USE Session to compensate for old verifyPlugin(..) API.
     private pointcut verifyPlugin( Plugin plugin, MavenProject project, PluginManager manager ):
-        execution( public PluginDescriptor PluginManager+.verifyPlugin( Plugin, MavenProject, Settings, ArtifactRepository ) )
+        execution( PluginDescriptor PluginManager+.verifyPlugin( Plugin, MavenProject, Settings, ArtifactRepository+ ) )
         && args( plugin, project, .. )
-        && target( manager )
-        && notHere();
+        && target( manager );
 
     // redirect the old verifyPlugin(..) call to the new one, using the captured session instance above.
     PluginDescriptor around( Plugin plugin,
@@ -106,6 +110,11 @@ public privileged aspect Maven20xCompatAspect
         PluginVersionNotFoundException:
             verifyPlugin( plugin, project, manager )
     {
+        if ( logger != null && logger.isDebugEnabled() )
+        {
+            logger.debug( "Diverting legacy PluginManager.verifyPlugin(..) call to replacement method using session: " + session );
+        }
+
         return manager.verifyPlugin( plugin, project, session );
     }
 
@@ -114,18 +123,12 @@ public privileged aspect Maven20xCompatAspect
                                                         MavenProject project,
                                                         Settings settings,
                                                         ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException, PluginNotFoundException,
+        PluginVersionResolutionException, InvalidPluginException, PluginManagerException,
+        PluginVersionNotFoundException
     {
         // this will always be diverted, so no need to do anything.
-        return null;
-    }
-
-    public PluginDescriptor DefaultPluginManager.verifyPlugin( Plugin plugin,
-                                                        MavenProject project,
-                                                        Settings settings,
-                                                        ArtifactRepository localRepository )
-    {
-        // this will always be diverted, so no need to do anything.
-        return null;
+        throw new IllegalStateException( "This introduced method should ALWAYS be intercepted by backward compatibility aspect." );
     }
 
     private pointcut getPluginDescriptorForPrefix( String prefix, PluginManager manager ):
@@ -266,15 +269,13 @@ public privileged aspect Maven20xCompatAspect
         return pluginRealm;
     }
 
-    private pointcut enableLoggingCall( Logger logger ):
-        execution( void LogEnabled+.enableLogging( Logger ) )
-        && args( logger );
-
-    after( Logger logger ): enableLoggingCall( logger )
+    before( DefaultMaven maven ):
+        execution( MavenExecutionResult DefaultMaven.execute( MavenExecutionRequest ) )
+        && this( maven )
     {
         if ( this.logger == null )
         {
-            this.logger = logger;
+            this.logger = maven.getLogger();
         }
     }
 
