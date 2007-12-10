@@ -483,7 +483,7 @@ public class MavenEmbedder
     // Execution of phases/goals
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
-    // LegacyLifecycle information
+    // Lifecycle information
     // ----------------------------------------------------------------------
 
     public List getLifecyclePhases()
@@ -517,7 +517,7 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    //  LegacyLifecycle
+    //  Lifecycle
     // ----------------------------------------------------------------------
 
     private MavenExecutionRequest request;
@@ -629,7 +629,7 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    // LegacyLifecycle
+    // Lifecycle
     // ----------------------------------------------------------------------
 
     private void handleExtensions( List extensions )

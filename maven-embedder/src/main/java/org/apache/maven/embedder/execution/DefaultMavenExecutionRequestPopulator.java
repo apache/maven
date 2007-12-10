@@ -640,7 +640,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     // ----------------------------------------------------------------------------
-    // LegacyLifecycle
+    // Lifecycle
     // ----------------------------------------------------------------------------
 
     public void contextualize( Context context )

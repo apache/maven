@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * LegacyLifecycle mapping for a POM.
+ * Lifecycle mapping for a POM.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$

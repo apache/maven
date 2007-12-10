@@ -1262,7 +1262,7 @@ public class DefaultPluginManager
     }
 
     // ----------------------------------------------------------------------
-    // LegacyLifecycle
+    // Lifecycle
     // ----------------------------------------------------------------------
 
     public void contextualize( Context context )

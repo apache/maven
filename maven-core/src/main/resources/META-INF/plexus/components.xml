@@ -725,8 +725,8 @@ under the License.
         </requirement>
       </requirements>
       <configuration>
-        <legacyLifecycles>
-          <legacyLifecycle>
+        <lifecycles>
+          <lifecycle>
             <id>default</id>
             <!-- START SNIPPET: lifecycle -->
             <phases>
@@ -755,8 +755,8 @@ under the License.
               <phase>deploy</phase>
             </phases>
             <!-- END SNIPPET: lifecycle -->
-          </legacyLifecycle>
-          <legacyLifecycle>
+          </lifecycle>
+          <lifecycle>
             <id>clean</id>
             <phases>
               <phase>pre-clean</phase>
@@ -766,8 +766,8 @@ under the License.
             <default-phases>
               <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
             </default-phases>
-          </legacyLifecycle>
-          <legacyLifecycle>
+          </lifecycle>
+          <lifecycle>
             <id>site</id>
             <phases>
               <phase>pre-site</phase>
@@ -779,8 +779,8 @@ under the License.
               <site>org.apache.maven.plugins:maven-site-plugin:site</site>
               <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
             </default-phases>
-          </legacyLifecycle>
-        </legacyLifecycles>
+          </lifecycle>
+        </lifecycles>
         <!-- START SNIPPET: default-reports -->
         <defaultReports>
           <report>org.apache.maven.plugins:maven-project-info-reports-plugin</report>

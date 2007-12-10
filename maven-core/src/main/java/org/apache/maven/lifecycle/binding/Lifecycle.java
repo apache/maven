@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class LegacyLifecycle.
+ * Class Lifecycle.
  */
-public class LegacyLifecycle
+public class Lifecycle
 {
     /**
      * Field id
@@ -58,21 +58,21 @@ public class LegacyLifecycle
      */
     public String getId()
     {
-        return this.id;
-    } //-- String getId() 
+        return id;
+    } //-- String getId()
 
     /**
      * Method getPhases
      */
     public List getPhases()
     {
-        if ( this.phases == null )
+        if ( phases == null )
         {
-            this.phases = new ArrayList();
+            phases = new ArrayList();
         }
 
-        return this.phases;
-    } //-- java.util.List getPhases() 
+        return phases;
+    } //-- java.util.List getPhases()
 
     /**
      * Method setId
@@ -82,7 +82,7 @@ public class LegacyLifecycle
     public void setId( String id )
     {
         this.id = id;
-    } //-- void setId(String) 
+    } //-- void setId(String)
 
     /**
      * Method setPhases
@@ -92,7 +92,7 @@ public class LegacyLifecycle
     public void setPhases( List phases )
     {
         this.phases = phases;
-    } //-- void setPhases(java.util.List) 
+    } //-- void setPhases(java.util.List)
 
     public Map getDefaultPhases()
     {

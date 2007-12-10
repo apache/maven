@@ -1,6 +1,10 @@
-package org.apache.maven.compat.plugin;
+package org.apache.maven.compat;
 
+import org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager;
+import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
+import org.codehaus.plexus.PlexusContainer;
 import org.apache.maven.DefaultMaven;
+import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.NoSuchPhaseException;
@@ -34,10 +38,12 @@ import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.logging.Logger;
 
+import java.util.List;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Collection;
@@ -353,6 +359,32 @@ public privileged aspect Maven20xCompatAspect
         result.add( plexusUtilsArtifact );
 
         return result;
+    }
+
+    // This is to support the maven-enforcer-plugin.
+    private List DefaultLifecycleExecutor.lifecycles;
+
+    private pointcut lifecycleExecutorExecute( DefaultLifecycleExecutor executor ):
+        execution( * DefaultLifecycleExecutor.execute( .. ) )
+        && this( executor );
+
+    before( DefaultLifecycleExecutor executor ): lifecycleExecutorExecute( executor )
+    {
+        PlexusContainer container = executor.container;
+        DefaultLifecycleBindingManager bindingMgr;
+        try
+        {
+            bindingMgr = (DefaultLifecycleBindingManager) container.lookup( LifecycleBindingManager.ROLE, "default" );
+        }
+        catch ( ComponentLookupException e )
+        {
+            IllegalStateException err = new IllegalStateException( "Cannot lookup default role-hint for: " + LifecycleBindingManager.ROLE );
+            err.initCause( e );
+
+            throw err;
+        }
+
+        executor.lifecycles = bindingMgr.lifecycles;
     }
 
 }

@@ -39,7 +39,7 @@ public class LegacyLifecycleMappingParser
 
         for ( Iterator it = lifecycles.iterator(); it.hasNext(); )
         {
-            LegacyLifecycle lifecycle = (LegacyLifecycle) it.next();
+            Lifecycle lifecycle = (Lifecycle) it.next();
 
             if ( "clean".equals( lifecycle.getId() ) )
             {

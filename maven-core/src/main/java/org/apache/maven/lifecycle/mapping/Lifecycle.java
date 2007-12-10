@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class LegacyLifecycle.
+ * Class Lifecycle.
  */
 public class Lifecycle
 {

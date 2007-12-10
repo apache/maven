@@ -63,7 +63,7 @@ public class DefaultLifecycleBindingManager
     private Logger logger;
 
     // configured. Moved out of DefaultLifecycleExecutor...
-    private List legacyLifecycles;
+    private List lifecycles;
 
     // configured. Moved out of DefaultLifecycleExecutor...
     private List defaultReports;
@@ -128,7 +128,7 @@ public class DefaultLifecycleBindingManager
      */
     public LifecycleBindings getDefaultBindings( final MavenProject project ) throws LifecycleSpecificationException
     {
-        LifecycleBindings bindings = legacyLifecycleMappingParser.parseDefaultMappings( legacyLifecycles );
+        LifecycleBindings bindings = legacyLifecycleMappingParser.parseDefaultMappings( lifecycles );
 
         BindingUtils.injectProjectConfiguration( bindings, project );
 
@@ -325,7 +325,7 @@ public class DefaultLifecycleBindingManager
 
         if ( lifecycleOverlay == null )
         {
-            throw new LifecycleLoaderException( "LegacyLifecycle '" + lifecycleId + "' not found in plugin" );
+            throw new LifecycleLoaderException( "Lifecycle '" + lifecycleId + "' not found in plugin" );
         }
 
         LifecycleBindings bindings = new LifecycleBindings();

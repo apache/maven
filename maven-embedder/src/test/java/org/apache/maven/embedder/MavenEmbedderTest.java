@@ -266,7 +266,7 @@ public class MavenEmbedderTest
     }
 
     // ----------------------------------------------------------------------
-    // LegacyLifecycle phases
+    // Lifecycle phases
     // ----------------------------------------------------------------------
 
     public void testRetrievingLifecyclePhases()
