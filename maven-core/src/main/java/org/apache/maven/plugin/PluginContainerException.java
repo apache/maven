@@ -3,15 +3,10 @@ package org.apache.maven.plugin;
 import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
-import java.net.MalformedURLException;
 
 /**
  * Exception which occurs to indicate that the plugin cannot be initialized due
@@ -42,36 +37,6 @@ public class PluginContainerException
     public PluginContainerException( Plugin plugin,
                                      ClassRealm pluginRealm,
                                      String message,
-                                     NoSuchRealmException e )
-    {
-        super( plugin, message, e );
-
-        this.pluginRealm = pluginRealm;
-    }
-
-    public PluginContainerException( Plugin plugin,
-                                     ClassRealm pluginRealm,
-                                     String message,
-                                     DuplicateRealmException e )
-    {
-        super( plugin, message, e );
-
-        this.pluginRealm = pluginRealm;
-    }
-
-    public PluginContainerException( Plugin plugin,
-                                     ClassRealm pluginRealm,
-                                     String message,
-                                     MalformedURLException e )
-    {
-        super( plugin, message, e );
-
-        this.pluginRealm = pluginRealm;
-    }
-
-    public PluginContainerException( Plugin plugin,
-                                     ClassRealm pluginRealm,
-                                     String message,
                                      PlexusConfigurationException e )
     {
         super( plugin, message, e );
@@ -83,16 +48,6 @@ public class PluginContainerException
                                      ClassRealm pluginRealm,
                                      String message,
                                      ComponentRepositoryException e )
-    {
-        super( plugin, message, e );
-
-        this.pluginRealm = pluginRealm;
-    }
-
-    public PluginContainerException( Plugin plugin,
-                                     ClassRealm pluginRealm,
-                                     String message,
-                                     PlexusContainerException e )
     {
         super( plugin, message, e );
 

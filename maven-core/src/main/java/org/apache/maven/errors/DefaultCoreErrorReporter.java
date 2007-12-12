@@ -4,13 +4,19 @@ import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.RealmManagementException;
+import org.apache.maven.extension.ExtensionManagerException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
@@ -18,19 +24,28 @@ import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.error.ProjectErrorReporter;
+import org.apache.maven.project.error.ProjectReporterManager;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
@@ -46,6 +61,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -734,6 +750,64 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( "Maven could not resolve one of your project dependencies from the repository:" );
 
+        writeArtifactInfo( depArtifact, cause, writer, true );
+
+        writeProjectCoordinate( project, writer );
+        addTips( CoreErrorTips.getDependencyArtifactResolutionTips( project, depArtifact, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    private void writeArtifactError( AbstractArtifactResolutionException cause,
+                                    StringWriter writer )
+    {
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( cause.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( cause.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( cause.getVersion() );
+        writer.write( NEWLINE );
+        writer.write( "Type: " );
+        writer.write( cause.getType() );
+        writer.write( NEWLINE );
+
+        if ( cause.getClassifier() != null )
+        {
+            writer.write( NEWLINE );
+            writer.write( "Classifier: " );
+            writer.write( cause.getClassifier() );
+        }
+
+        if ( cause != null )
+        {
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Error message: " );
+            writer.write( cause.getMessage() );
+            writer.write( NEWLINE );
+            writer.write( "Root error message: " );
+            writer.write( getRootCause( cause ).getMessage() );
+        }
+    }
+
+    private void writeArtifactInfo( Artifact depArtifact,
+                                    StringWriter writer,
+                                    boolean includeScope )
+    {
+        writeArtifactInfo( depArtifact, null, writer, includeScope );
+    }
+
+    private void writeArtifactInfo( Artifact depArtifact,
+                                    AbstractArtifactResolutionException cause,
+                                    StringWriter writer,
+                                    boolean includeScope )
+    {
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Group-Id: " );
@@ -758,19 +832,16 @@ public class DefaultCoreErrorReporter
             writer.write( depArtifact.getClassifier() );
         }
 
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( cause.getMessage() );
-        writer.write( NEWLINE );
-        writer.write( "Root error message: " );
-        writer.write( getRootCause( cause ).getMessage() );
-
-        writeProjectCoordinate( project, writer );
-        addTips( CoreErrorTips.getDependencyArtifactResolutionTips( project, depArtifact, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
+        if ( cause != null )
+        {
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "Error message: " );
+            writer.write( cause.getMessage() );
+            writer.write( NEWLINE );
+            writer.write( "Root error message: " );
+            writer.write( getRootCause( cause ).getMessage() );
+        }
     }
 
     public void reportErrorLoadingPlugin( MojoBinding binding,
@@ -844,6 +915,788 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
+    public void handleProjectBuildingError( MavenExecutionRequest request,
+                                            File pomFile,
+                                            ProjectBuildingException exception )
+    {
+        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
+        Throwable reportedException = projectReporter.findReportedException( exception );
+        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
+
+        registerBuildError( exception, formattedMessage, reportedException );
+    }
+
+    public void reportInvalidMavenVersion( MavenProject project,
+                                           ArtifactVersion mavenVersion,
+                                           MavenExecutionException err )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "The version of Maven currently in use is incompatible with your project's <maven/> prerequisite:" );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Current Maven Version: " );
+        writer.write( mavenVersion.toString() );
+        writer.write( NEWLINE );
+        writer.write( "Version required:" );
+        writer.write( project.getPrerequisites().getMaven() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project Information:" );
+        writer.write( NEWLINE );
+        writeProjectCoordinate( project, writer );
+
+        addTips( CoreErrorTips.getIncompatibleProjectMavenVersionPrereqTips( project, mavenVersion ), writer );
+
+        registerBuildError( err, writer.toString() );
+    }
+
+    public void reportPomFileScanningError( File basedir,
+                                            String includes,
+                                            String excludes,
+                                            IOException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while scanning for POM files to build." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "In base directory: " );
+        writer.write( String.valueOf( basedir ) );
+        writer.write( NEWLINE );
+        writer.write( "with include pattern(s):" );
+        writer.write( includes );
+        writer.write( NEWLINE );
+        writer.write( "and exclude pattern(s):" );
+        writer.write( excludes );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+
+        addTips( CoreErrorTips.getPomFileScanningErrorTips( basedir, includes, excludes ), writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportPomFileCanonicalizationError( File pomFile,
+                                                    IOException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while standardizing your POM's File instance." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "POM file: " );
+        writer.write( String.valueOf( pomFile ) );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void handleSuperPomBuildingError( MavenExecutionRequest request,
+                                             ArtifactRepository localRepository,
+                                             ProfileManager globalProfileManager,
+                                             ProjectBuildingException exception )
+    {
+        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
+        Throwable reportedException = projectReporter.findReportedException( exception );
+        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
+
+        registerBuildError( exception, formattedMessage, reportedException );
+    }
+
+    public void handleSuperPomBuildingError( ProfileManager globalProfileManager,
+                                             ProjectBuildingException exception )
+    {
+        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
+        Throwable reportedException = projectReporter.findReportedException( exception );
+        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
+
+        registerBuildError( exception, formattedMessage, reportedException );
+    }
+
+    public void handleSuperPomBuildingError( ProjectBuildingException exception )
+    {
+        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
+        Throwable reportedException = projectReporter.findReportedException( exception );
+        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
+
+        registerBuildError( exception, formattedMessage, reportedException );
+    }
+
+    public void reportErrorInterpolatingModel( Model model,
+                                               Map inheritedValues,
+                                               File pomFile,
+                                               MavenExecutionRequest request,
+                                               ModelInterpolationException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "You have an invalid expression in your POM (interpolation failed):" );
+        writer.write( NEWLINE );
+        writer.write( cause.getMessage() );
+
+        writeProjectCoordinate( model, pomFile, writer );
+        addTips( CoreErrorTips.getTipsForModelInterpolationError( model, pomFile, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportErrorResolvingExtensionDirectDependencies( Artifact extensionArtifact,
+                                                                 Artifact projectArtifact,
+                                                                 List remoteRepos,
+                                                                 MavenExecutionRequest request,
+                                                                 ArtifactMetadataRetrievalException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while trying to resolve an the direct dependencies for a build extension used in your project." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeArtifactInfo( projectArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Extension:" );
+        writeArtifactInfo( extensionArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Failed Artifact:" );
+        writeArtifactInfo( cause.getArtifact(), writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionDirectDepsTips( extensionArtifact, projectArtifact, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportErrorResolvingExtensionDependencies( Artifact extensionArtifact,
+                                                           Artifact projectArtifact,
+                                                           List remoteRepos,
+                                                           MavenExecutionRequest request,
+                                                           ArtifactResolutionResult resolutionResult,
+                                                           ExtensionManagerException err )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while trying to resolve the artifacts for a build extension used in your project." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeArtifactInfo( projectArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Extension:" );
+        writeArtifactInfo( extensionArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        List missingArtifacts = resolutionResult.getMissingArtifacts();
+        if ( ( missingArtifacts != null ) && !missingArtifacts.isEmpty() )
+        {
+            writer.write( "The following artifacts were not found." );
+            writer.write( NEWLINE );
+            writer.write( "(Format is: groupId:artifactId:version:type[:classifier])" );
+            writer.write( NEWLINE );
+
+            for ( Iterator it = missingArtifacts.iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
+                writer.write( NEWLINE );
+                writeCompactArtifactCoordinate( "- ", artifact, writer );
+            }
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+        }
+
+        List circularDependencyExceptions = resolutionResult.getCircularDependencyExceptions();
+        if ( ( circularDependencyExceptions != null ) && !circularDependencyExceptions.isEmpty() )
+        {
+            writer.write( "The following dependency cycles were found." );
+            writer.write( NEWLINE );
+            writer.write( "(Format is: groupId:artifactId:version:type[:classifier]), followed by the dependency trail that included the offending artifact.)" );
+            writer.write( NEWLINE );
+
+            int i = 1;
+            for ( Iterator it = circularDependencyExceptions.iterator(); it.hasNext(); )
+            {
+                CyclicDependencyException cde = (CyclicDependencyException) it.next();
+                Artifact artifact = cde.getArtifact();
+                writer.write( NEWLINE );
+                writeCompactArtifactCoordinate( i + ". ", artifact, writer );
+
+                List trail = artifact.getDependencyTrail();
+                for ( Iterator trailIt = trail.iterator(); trailIt.hasNext(); )
+                {
+                    String id = (String) trailIt.next();
+                    writer.write( NEWLINE );
+                    writer.write( "  - " );
+                    writer.write( id );
+                }
+
+                writer.write( NEWLINE );
+                i++;
+            }
+
+            writer.write( NEWLINE );
+        }
+
+        Map mapOfLists = new LinkedHashMap();
+
+        List metadataExceptions = resolutionResult.getMetadataResolutionExceptions();
+        if ( ( metadataExceptions != null ) && !metadataExceptions.isEmpty() )
+        {
+            mapOfLists.put( "The following metadata-resolution errors were found.", metadataExceptions );
+        }
+
+        List errorArtifactExceptions = resolutionResult.getErrorArtifactExceptions();
+        if ( ( errorArtifactExceptions != null ) && !errorArtifactExceptions.isEmpty() )
+        {
+            mapOfLists.put( "The following artifact-resolution errors were found.", errorArtifactExceptions );
+        }
+
+        List versionRangeViolations = resolutionResult.getVersionRangeViolations();
+        if ( ( versionRangeViolations != null ) && !versionRangeViolations.isEmpty() )
+        {
+            mapOfLists.put( "The following artifact version-range violations were found.", versionRangeViolations );
+        }
+
+        for ( Iterator entryIt = mapOfLists.entrySet().iterator(); entryIt.hasNext(); )
+        {
+            Map.Entry entry = (Map.Entry) entryIt.next();
+            String key = (String) entry.getKey();
+            List exceptions = (List) entry.getValue();
+
+            writer.write( key );
+            writer.write( NEWLINE );
+
+            int i = 1;
+            for ( Iterator it = exceptions.iterator(); it.hasNext(); )
+            {
+                Exception e = (Exception) it.next();
+                writer.write( NEWLINE );
+                writer.write( i );
+                writer.write( ". " );
+                writer.write( e.getMessage() );
+
+                Throwable t = getRootCause( e );
+                if ( ( t != null ) && ( t != e ) )
+                {
+                    writer.write( NEWLINE );
+                    writer.write( NEWLINE );
+                    writer.write( "Root error: " );
+                    writer.write( NEWLINE );
+                    writer.write( NEWLINE );
+                    writer.write( t.getMessage() );
+                }
+
+                writer.write( NEWLINE );
+                i++;
+            }
+
+            writer.write( NEWLINE );
+        }
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionArtifactsTips( extensionArtifact, projectArtifact, resolutionResult ),
+                 writer );
+
+        registerBuildError( err, writer.toString() );
+    }
+
+    private void writeCompactArtifactCoordinate( String linePrefix,
+                                                 Artifact artifact,
+                                                 StringWriter writer )
+    {
+        writer.write( linePrefix );
+        writer.write( artifact.getGroupId() );
+        writer.write( ":" );
+        writer.write( artifact.getArtifactId() );
+        writer.write( ":" );
+        writer.write( artifact.getVersion() );
+        writer.write( ":" );
+        writer.write( artifact.getType() );
+        if ( artifact.getClassifier() != null )
+        {
+            writer.write( ":" );
+            writer.write( artifact.getClassifier() );
+        }
+    }
+
+    public void reportErrorManagingRealmForExtension( Artifact extensionArtifact,
+                                                      Artifact projectArtifact,
+                                                      List remoteRepos,
+                                                      MavenExecutionRequest request,
+                                                      RealmManagementException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while trying to construct the classloader for a build extension used in your project." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeArtifactInfo( projectArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Extension:" );
+        writeArtifactInfo( extensionArtifact, writer, false );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getErrorManagingExtensionRealmTips( extensionArtifact, projectArtifact, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportErrorManagingRealmForExtensionPlugin( Plugin plugin,
+                                                            Model originModel,
+                                                            List remoteRepos,
+                                                            MavenExecutionRequest request,
+                                                            RealmManagementException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while trying to construct the classloader for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getErrorManagingExtensionPluginRealmTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    private void writePluginInfo( Plugin plugin,
+                                  StringWriter writer )
+    {
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( plugin.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( plugin.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( plugin.getVersion() );
+        writer.write( NEWLINE );
+    }
+
+    public void reportMissingArtifactWhileAddingExtensionPlugin( Plugin plugin,
+                                                                 Model originModel,
+                                                                 List remoteRepos,
+                                                                 MavenExecutionRequest request,
+                                                                 ArtifactNotFoundException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "One or more dependency artifacts are missing for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writeArtifactError( cause, writer );
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionPluginArtifactsTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportUnresolvableArtifactWhileAddingExtensionPlugin( Plugin plugin,
+                                                                      Model originModel,
+                                                                      List remoteRepos,
+                                                                      MavenExecutionRequest request,
+                                                                      ArtifactResolutionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven failed to resolve one or more dependency artifacts for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writeArtifactError( cause, writer );
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionPluginArtifactsTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportExtensionPluginArtifactNotFound( Plugin plugin,
+                                                       Model originModel,
+                                                       List remoteRepos,
+                                                       MavenExecutionRequest request,
+                                                       PluginNotFoundException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "The artifact for a plugin used by your project as a build extension was not found." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writeArtifactError( cause, writer );
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionPluginArtifactsTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportUnresolvableExtensionPluginVersion( Plugin plugin,
+                                                          Model originModel,
+                                                          List remoteRepos,
+                                                          MavenExecutionRequest request,
+                                                          PluginVersionResolutionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven could not resolve a valid version for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getErrorResolvingExtensionPluginVersionTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void handleErrorBuildingExtensionPluginPOM( Plugin plugin,
+                                                       Model originModel,
+                                                       List remoteRepos,
+                                                       MavenExecutionRequest request,
+                                                       ProjectBuildingException cause )
+    {
+        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
+        Throwable reportedException = projectReporter.findReportedException( cause );
+        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
+
+        registerBuildError( cause, formattedMessage, reportedException );
+    }
+
+    public void reportInvalidDependencyVersionInExtensionPluginPOM( Plugin plugin,
+                                                             Model originModel,
+                                                             List remoteRepos,
+                                                             MavenExecutionRequest request,
+                                                             InvalidDependencyVersionException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an invalid version among the dependencies of a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Dependency:" );
+        Dependency dep = cause.getDependency();
+        writer.write( NEWLINE );
+        writer.write( "Group-Id: " );
+        writer.write( dep.getGroupId() );
+        writer.write( NEWLINE );
+        writer.write( "Artifact-Id: " );
+        writer.write( dep.getArtifactId() );
+        writer.write( NEWLINE );
+        writer.write( "Version: " );
+        writer.write( dep.getVersion() );
+        writer.write( NEWLINE );
+        writer.write( "Type: " );
+        writer.write( dep.getType() );
+        writer.write( NEWLINE );
+        writer.write( "Scope: " );
+        writer.write( dep.getScope() );
+        if ( dep.getClassifier() != null )
+        {
+            writer.write( NEWLINE );
+            writer.write( "Classifier: " );
+            writer.write( dep.getClassifier() );
+        }
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getInvalidDependencyVersionForExtensionPluginTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportErrorSearchingforCompatibleExtensionPluginVersion( Plugin plugin,
+                                                                         Model originModel,
+                                                                         List remoteRepos,
+                                                                         MavenExecutionRequest request,
+                                                                         String requiredMavenVersion,
+                                                                         String currentMavenVersion,
+                                                                         InvalidVersionSpecificationException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an incompatible version of a plugin used by your project as a build extension." );
+        writer.write( " In attempting to search for an older version of this plugin, Maven failed to construct a valid version range for the search." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Current Maven version: " );
+        writer.write( currentMavenVersion );
+        writer.write( NEWLINE );
+        writer.write( "Plugin requires Maven version: " );
+        writer.write( requiredMavenVersion );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getInvalidPluginVersionRangeForExtensionPluginTips( plugin, originModel, requiredMavenVersion, currentMavenVersion, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString() );
+    }
+
+    public void reportIncompatibleMavenVersionForExtensionPlugin( Plugin plugin,
+                                                                  Model originModel,
+                                                                  List remoteRepos,
+                                                                  MavenExecutionRequest request,
+                                                                  String requiredMavenVersion,
+                                                                  String currentMavenVersion,
+                                                                  PluginVersionResolutionException err )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an incompatible version of a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Current Maven version: " );
+        writer.write( currentMavenVersion );
+        writer.write( NEWLINE );
+        writer.write( "Plugin requires Maven version: " );
+        writer.write( requiredMavenVersion );
+
+        addTips( CoreErrorTips.getInvalidPluginVersionRangeForExtensionPluginTips( plugin, originModel, requiredMavenVersion, currentMavenVersion ),
+                 writer );
+
+        registerBuildError( err, writer.toString() );
+    }
+
+    public void reportUnresolvableExtensionPluginPOM( Plugin plugin,
+                                                      Model originModel,
+                                                      List remoteRepos,
+                                                      MavenExecutionRequest request,
+                                                      ArtifactMetadataRetrievalException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven failed to resolve the POM of a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( "Without the POM, it is impossible to discover or resolve the plugin's dependencies." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getUnresolvableExtensionPluginPOMTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportErrorConfiguringExtensionPluginRealm( Plugin plugin,
+                                                            Model originModel,
+                                                            List remoteRepos,
+                                                            MavenExecutionRequest request,
+                                                            PluginManagerException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven failed to construct the classloader for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getErrorManagingExtensionPluginRealmTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
+    public void reportExtensionPluginVersionNotFound( Plugin plugin,
+                                                      Model originModel,
+                                                      List remoteRepos,
+                                                      MavenExecutionRequest request,
+                                                      PluginVersionNotFoundException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven failed to resolve a valid version for a plugin used by your project as a build extension." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getExtensionPluginVersionNotFoundTips( plugin, originModel, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString(), cause.getCause() );
+    }
+
     private void writeParameter( Parameter currentParameter,
                                  StringWriter writer )
     {
@@ -898,7 +1751,7 @@ public class DefaultCoreErrorReporter
         writer.write( model.getVersion() );
         writer.write( NEWLINE );
         writer.write( "From file: " );
-        writer.write( String.valueOf( pomFile ) );
+        writer.write( pomFile == null ? "Not captured for this error report." : pomFile.getAbsolutePath() );
         writer.write( NEWLINE );
     }
 
@@ -992,80 +1845,5 @@ public class DefaultCoreErrorReporter
             writer.write( "  " );
         }
     }
-
-    public void handleProjectBuildingError( MavenExecutionRequest request,
-                                            File pomFile,
-                                            ProjectBuildingException exception )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void reportInvalidMavenVersion( MavenProject project,
-                                           ArtifactVersion mavenVersion,
-                                           MavenExecutionException err )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void reportPomFileScanningError( File basedir,
-                                            String includes,
-                                            String excludes,
-                                            IOException cause )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void reportPomFileCanonicalizationError( File pomFile,
-                                                    IOException cause )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void handleSuperPomBuildingError( MavenExecutionRequest request,
-                                             ArtifactRepository localRepository,
-                                             ProfileManager globalProfileManager,
-                                             ProjectBuildingException exception )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void handleSuperPomBuildingError( ProfileManager globalProfileManager,
-                                             ProjectBuildingException exception )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void handleSuperPomBuildingError( ProjectBuildingException exception )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void reportErrorInterpolatingModel( Model model,
-                                               Map inheritedValues,
-                                               File pomFile,
-                                               MavenExecutionRequest request,
-                                               ModelInterpolationException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "You have an invalid expression in your POM (interpolation failed):" );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-
-        writeProjectCoordinate( model, pomFile, writer );
-        addTips( CoreErrorTips.getTipsForModelInterpolationError( model, pomFile, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
 
 }

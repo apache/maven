@@ -15,6 +15,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
@@ -790,5 +791,35 @@ public class DefaultProjectErrorReporter
                  writer );
 
         registerProjectBuildError( cause, writer.toString() );
+    }
+
+    public void reportProjectCollision( List allProjectInstances,
+                                        DuplicateProjectException err )
+    {
+
+        File existing = err.getExistingProjectFile();
+        File conflicting = err.getConflictingProjectFile();
+        String projectId = err.getProjectId();
+
+        StringWriter writer = new StringWriter();
+
+        writer.write( "Duplicated project detected." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project: " + projectId );
+        writer.write( NEWLINE );
+        writer.write( "File: " );
+        writer.write( String.valueOf( existing ) );
+        writer.write( NEWLINE );
+        writer.write( "File: " );
+        writer.write( String.valueOf( conflicting ) );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "NOTE: Each project in a Maven build must have a unique combination of groupId and artifactId." );
+
+        addTips( ProjectErrorTips.getTipsForDuplicateProjectError( allProjectInstances, err ),
+                 writer );
+
+        registerProjectBuildError( err, writer.toString() );
     }
 }

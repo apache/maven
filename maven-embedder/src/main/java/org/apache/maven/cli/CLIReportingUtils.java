@@ -1,21 +1,18 @@
 package org.apache.maven.cli;
 
 import org.apache.maven.BuildFailureException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -279,69 +276,7 @@ public final class CLIReportingUtils
                                                           boolean showStackTraces,
                                                           StringWriter writer )
     {
-
-        // =====================================================================
-        // Cases covered:
-        // =====================================================================
-        //
-        // MavenExecutionException(String, File, ProjectBuildingException)
-        // MavenExecutionException(String, ExtensionScanningException)
-        // MavenExecutionException(String, IOException)
-        //
-        // =====================================================================
-        // Cases left to cover:
-        // =====================================================================
-        //
-        // MavenExecutionException(String, ArtifactResolutionException)
-        // MavenExecutionException(String, File)
-
-        Throwable cause = e.getCause();
-        if ( cause != null )
-        {
-            if ( cause instanceof IOException )
-            {
-                writer.write( e.getMessage() );
-                writer.write( NEWLINE );
-
-                handleGenericException( cause, showStackTraces, writer );
-
-                return true;
-            }
-            else if ( cause instanceof ExtensionScanningException )
-            {
-                writer.write( "While scanning for build extensions:" );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-
-                Throwable nestedCause = cause.getCause();
-                if ( ( nestedCause != null ) && ( nestedCause instanceof ProjectBuildingException ) )
-                {
-                    return handleProjectBuildingException( (ProjectBuildingException) nestedCause,
-                                                           showStackTraces,
-                                                           writer );
-                }
-                else
-                {
-                    handleGenericException( cause, showStackTraces, writer );
-
-                    return true;
-                }
-            }
-            else if ( cause instanceof ProjectBuildingException )
-            {
-                return handleProjectBuildingException( (ProjectBuildingException) cause,
-                                                       showStackTraces,
-                                                       writer );
-            }
-            else if ( cause instanceof ArtifactResolutionException )
-            {
-
-            }
-        }
-        else
-        {
-
-        }
+        handleGenericException( e, showStackTraces, writer );
 
         if ( e.getPomFile() != null )
         {
@@ -360,26 +295,7 @@ public final class CLIReportingUtils
                                                             boolean showStackTraces,
                                                             StringWriter writer )
     {
-        // =====================================================================
-        // Cases covered:
-        // =====================================================================
-        //
-        // DuplicateProjectException(String, File, File, String)
-
-        File existing = e.getExistingProjectFile();
-        File conflicting = e.getConflictingProjectFile();
-        String projectId = e.getProjectId();
-
-        writer.write( "Duplicated project detected." );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Project: " + projectId );
-        writer.write( NEWLINE );
-        writer.write( "File: " );
-        writer.write( existing.getAbsolutePath() );
-        writer.write( NEWLINE );
-        writer.write( "File: " );
-        writer.write( conflicting.getAbsolutePath() );
+        handleGenericException( e, showStackTraces, writer );
 
         return true;
     }
@@ -445,6 +361,7 @@ public final class CLIReportingUtils
                                                         StringWriter writer )
     {
         handleGenericException( e, showStackTraces, writer );
+
         return true;
     }
 

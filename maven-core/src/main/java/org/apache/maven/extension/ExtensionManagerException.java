@@ -11,13 +11,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
-import java.net.MalformedURLException;
 
 public class ExtensionManagerException
     extends Exception
@@ -39,86 +32,6 @@ public class ExtensionManagerException
                                       String projectArtifactId,
                                       String projectVersion,
                                       ArtifactMetadataRetrievalException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      MalformedURLException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      PlexusConfigurationException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      DuplicateRealmException cause )
-    {
-        super( message, cause );
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      NoSuchRealmException cause )
-    {
-        super( message, cause );
-        this.extensionArtifact = extensionArtifact;
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      PlexusContainerException cause )
-    {
-        super( message, cause );
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectGroupId,
-                                      String projectArtifactId,
-                                      String projectVersion,
-                                      ComponentRepositoryException cause )
     {
         super( message, cause );
         this.extensionArtifact = extensionArtifact;

@@ -2,17 +2,27 @@ package org.apache.maven.errors;
 
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -172,6 +182,120 @@ public final class CoreErrorTips
     public static List getTipsForModelInterpolationError( Model model,
                                                           File pomFile,
                                                           ModelInterpolationException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getIncompatibleProjectMavenVersionPrereqTips( MavenProject project,
+                                                                     ArtifactVersion mavenVersion )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getPomFileScanningErrorTips( File basedir,
+                                                    String includes,
+                                                    String excludes )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorResolvingExtensionDirectDepsTips( Artifact extensionArtifact,
+                                                                 Artifact projectArtifact,
+                                                                 ArtifactMetadataRetrievalException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorResolvingExtensionArtifactsTips( Artifact extensionArtifact,
+                                                                Artifact projectArtifact,
+                                                                ArtifactResolutionResult resolutionResult )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorManagingExtensionRealmTips( Artifact extensionArtifact,
+                                                           Artifact projectArtifact,
+                                                           RealmManagementException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorManagingExtensionPluginRealmTips( Plugin plugin,
+                                                                 Model originModel,
+                                                                 RealmManagementException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorResolvingExtensionPluginArtifactsTips( Plugin plugin,
+                                                             Model originModel,
+                                                             AbstractArtifactResolutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorResolvingExtensionPluginVersionTips( Plugin plugin,
+                                                                    Model originModel,
+                                                                    PluginVersionResolutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getInvalidDependencyVersionForExtensionPluginTips( Plugin plugin,
+                                                                          Model originModel,
+                                                                          InvalidDependencyVersionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getInvalidPluginVersionRangeForExtensionPluginTips( Plugin plugin,
+                                                                           Model originModel,
+                                                                           String requiredMavenVersion,
+                                                                           String currentMavenVersion )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getInvalidPluginVersionRangeForExtensionPluginTips( Plugin plugin,
+                                                                           Model originModel,
+                                                                           String requiredMavenVersion,
+                                                                           String currentMavenVersion,
+                                                                           InvalidVersionSpecificationException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getUnresolvableExtensionPluginPOMTips( Plugin plugin,
+                                                              Model originModel,
+                                                              ArtifactMetadataRetrievalException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getExtensionPluginVersionNotFoundTips( Plugin plugin,
+                                                              Model originModel,
+                                                              PluginVersionNotFoundException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorManagingExtensionPluginRealmTips( Plugin plugin,
+                                                                 Model originModel,
+                                                                 PluginManagerException cause )
     {
         // TODO Auto-generated method stub
         return null;

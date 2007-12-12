@@ -13,6 +13,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
@@ -413,4 +414,20 @@ public interface ProjectErrorReporter
                                               String childId,
                                               File childPomFile,
                                               ArtifactResolutionException cause );
+
+    /**
+     * <b>Call Stack:</b>
+     * <br/>
+     * <pre>
+     * MavenEmbedder.execute(MavenExecutionRequest)
+     * MavenEmbedder.readProjectWithDependencies(MavenExecutionRequest)
+     * --&gt; DefaultMaven.execute(MavenExecutionRequest)
+     *        --&gt; DefaultMaven.createReactorManager(MavenExecutionRequest, MavenExecutionResult)
+     *               --&gt; new ReactorManager(List, String)
+     *                      --&gt; new ProjectSorter(List)
+     * &lt;----------------------- DuplicateProjectException
+     * </pre>
+     */
+    void reportProjectCollision( List allProjectInstances,
+                                 DuplicateProjectException err );
 }

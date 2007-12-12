@@ -8,6 +8,7 @@ import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -163,6 +164,13 @@ public final class ProjectErrorTips
     public static List getTipsForPomParsingError( String projectId,
                                                   File pomFile,
                                                   Exception cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getTipsForDuplicateProjectError( List allProjectInstances,
+                                                        DuplicateProjectException err )
     {
         // TODO Auto-generated method stub
         return null;

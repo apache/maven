@@ -11,7 +11,9 @@ import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.error.ProjectReporterManager;
 import org.apache.maven.project.error.ProjectErrorReporter;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
 
 public privileged aspect ErrorReportingAspect
 {
@@ -36,6 +38,51 @@ public privileged aspect ErrorReportingAspect
 
     boolean around( ProjectBuildingException e, boolean showStackTraces, StringWriter writer ):
         execution( private static boolean CLIReportingUtils.handleProjectBuildingException( ProjectBuildingException, boolean, StringWriter ) )
+        && args( e, showStackTraces, writer )
+    {
+        ProjectErrorReporter projectErrorReporter = ProjectReporterManager.getReporter();
+
+        if ( projectErrorReporter == null )
+        {
+            return proceed( e, showStackTraces, writer );
+        }
+        else
+        {
+            Throwable reportingError = projectErrorReporter.findReportedException( e );
+
+            boolean result = false;
+
+            if ( reportingError != null )
+            {
+                writer.write( projectErrorReporter.getFormattedMessage( reportingError ) );
+
+                if ( showStackTraces )
+                {
+                    writer.write( CLIReportingUtils.NEWLINE );
+                    writer.write( CLIReportingUtils.NEWLINE );
+                    Throwable cause = projectErrorReporter.getRealCause( reportingError );
+                    if ( cause != null )
+                    {
+                        cause.printStackTrace( new PrintWriter( writer ) );
+                    }
+                }
+
+                writer.write( CLIReportingUtils.NEWLINE );
+                writer.write( CLIReportingUtils.NEWLINE );
+
+                result = true;
+            }
+            else
+            {
+                result = proceed( e, showStackTraces, writer );
+            }
+
+            return result;
+        }
+    }
+
+    boolean around( DuplicateProjectException e, boolean showStackTraces, StringWriter writer ):
+        execution( private static boolean CLIReportingUtils.handleDuplicateProjectException( DuplicateProjectException, boolean, StringWriter ) )
         && args( e, showStackTraces, writer )
     {
         ProjectErrorReporter projectErrorReporter = ProjectReporterManager.getReporter();
@@ -169,4 +216,48 @@ public privileged aspect ErrorReportingAspect
         }
     }
 
+    boolean around( MavenExecutionException e, boolean showStackTraces, StringWriter writer ):
+        execution( private static boolean CLIReportingUtils.handleMavenExecutionException( MavenExecutionException, boolean, StringWriter ) )
+        && args( e, showStackTraces, writer )
+    {
+        CoreErrorReporter coreErrorReporter = CoreReporterManager.getReporter();
+
+        if ( coreErrorReporter == null )
+        {
+            return proceed( e, showStackTraces, writer );
+        }
+        else
+        {
+            Throwable reportingError = coreErrorReporter.findReportedException( e );
+
+            boolean result = false;
+
+            if ( reportingError != null )
+            {
+                writer.write( coreErrorReporter.getFormattedMessage( reportingError ) );
+
+                if ( showStackTraces )
+                {
+                    writer.write( CLIReportingUtils.NEWLINE );
+                    writer.write( CLIReportingUtils.NEWLINE );
+                    Throwable cause = coreErrorReporter.getRealCause( reportingError );
+                    if ( cause != null )
+                    {
+                        cause.printStackTrace( new PrintWriter( writer ) );
+                    }
+                }
+
+                writer.write( CLIReportingUtils.NEWLINE );
+                writer.write( CLIReportingUtils.NEWLINE );
+
+                result = true;
+            }
+            else
+            {
+                result = proceed( e, showStackTraces, writer );
+            }
+
+            return result;
+        }
+    }
 }
