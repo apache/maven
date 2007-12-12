@@ -1,9 +1,23 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.model.Model;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +25,7 @@ import java.util.List;
 // I was using varargs in listOf(..). I'm not moving them to constants because I'd like
 // to go back to this someday...
 
-// TODO: Optimize the String[] instances in here to List constants, and remove listOf(..)
+// TODO: Fill these out!!
 public final class CoreErrorTips
 {
 
@@ -44,6 +58,120 @@ public final class CoreErrorTips
     }
 
     public static List getTaskValidationTips( TaskValidationResult result, Exception cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getMissingPluginDescriptorTips( MojoBinding binding,
+                                                       MavenProject project )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getInvalidExecutionEnvironmentTips( MojoBinding binding,
+                                                           MavenProject project,
+                                                           PluginExecutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getMojoExecutionExceptionTips( MojoBinding binding,
+                                                      MavenProject project,
+                                                      MojoExecutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getMojoLookupErrorTips( MojoBinding binding,
+                                               MavenProject project,
+                                               ComponentLookupException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getUneditableMojoParameterTips( Parameter currentParameter,
+                                                       MojoBinding binding,
+                                                       MavenProject project,
+                                                       PluginConfigurationException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getBannedParameterExpressionTips( Parameter currentParameter,
+                                                         MojoBinding binding,
+                                                         MavenProject project )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getReflectionErrorInParameterExpressionTips( String expression,
+                                                                    Parameter currentParameter,
+                                                                    MojoBinding binding,
+                                                                    MavenProject project )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getMissingRequiredParameterTips( List invalidParameters,
+                                                        MojoBinding binding,
+                                                        MavenProject project )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getMojoConfigurationErrorTips( MojoBinding binding,
+                                                      MavenProject project,
+                                                      PlexusConfiguration config,
+                                                      PluginConfigurationException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getBuildPlanningErrorTips( List tasks,
+                                                  MavenProject configuringProject,
+                                                  LifecycleException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getErrorLoadingPluginTips( MojoBinding binding,
+                                                  MavenProject project,
+                                                  PluginLoaderException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getDependencyArtifactResolutionTips( MavenProject project,
+                                                            Artifact depArtifact,
+                                                            AbstractArtifactResolutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getDependencyArtifactResolutionTips( MavenProject project,
+                                                            String scope,
+                                                            AbstractArtifactResolutionException cause )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getTipsForModelInterpolationError( Model model,
+                                                          File pomFile,
+                                                          ModelInterpolationException cause )
     {
         // TODO Auto-generated method stub
         return null;

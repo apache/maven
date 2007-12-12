@@ -2,14 +2,9 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.loader.PluginLoaderException;
-import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 
@@ -55,34 +50,6 @@ public class LifecycleExecutionException
     }
 
     public LifecycleExecutionException( String message, MavenProject project,
-                                        PluginNotFoundException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        PluginVersionResolutionException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        InvalidVersionSpecificationException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        InvalidPluginException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
                                         ArtifactNotFoundException cause )
     {
         super( message, cause );
@@ -119,13 +86,6 @@ public class LifecycleExecutionException
 
     public LifecycleExecutionException( String message, MavenProject project,
                                         PluginConfigurationException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        PluginVersionNotFoundException cause )
     {
         super( message, cause );
         this.project = project;

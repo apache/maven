@@ -366,12 +366,6 @@ public class DefaultExtensionManager
                 resultArtifacts.add( a );
             }
 
-            // TODO: This shouldn't be required, now that we're checking the core filter before getting here.
-            if ( !extensionArtifact.isResolved() || ( extensionArtifact.getFile() == null ) )
-            {
-                throw new ExtensionManagerException( "Extension artifact was not resolved, or has no file associated with it.", extensionArtifact, projectGroupId, projectArtifactId, projectVersion );
-            }
-
             if ( !realmManager.hasExtensionRealm( extensionArtifact ) )
             {
                 try

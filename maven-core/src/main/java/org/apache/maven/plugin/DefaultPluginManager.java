@@ -1298,6 +1298,7 @@ public class DefaultPluginManager
         // Don't recreate if already created - for effeciency, and because clover plugin adds to it
         if ( project.getDependencyArtifacts() == null )
         {
+            // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively(

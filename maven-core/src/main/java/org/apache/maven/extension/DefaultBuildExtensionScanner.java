@@ -68,6 +68,9 @@ public class DefaultBuildExtensionScanner
 
     private ModelInterpolator modelInterpolator;
 
+    // cached.
+    private MavenProject basicSuperProject;
+
     public DefaultBuildExtensionScanner()
     {
     }
@@ -418,20 +421,21 @@ public class DefaultBuildExtensionScanner
     private List getInitialRemoteRepositories()
         throws ExtensionScanningException
     {
-        MavenProject superProject;
-
-        try
+        if ( basicSuperProject == null )
         {
-            superProject = projectBuilder.buildStandaloneSuperProject();
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ExtensionScanningException(
-                                                  "Error building super-POM for retrieving the default remote repository list: "
-                                                      + e.getMessage(), e );
+            try
+            {
+                basicSuperProject = projectBuilder.buildStandaloneSuperProject();
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ExtensionScanningException(
+                                                      "Error building super-POM for retrieving the default remote repository list: "
+                                                          + e.getMessage(), e );
+            }
         }
 
-        return superProject.getRemoteArtifactRepositories();
+        return basicSuperProject.getRemoteArtifactRepositories();
     }
 
     protected Logger getLogger()

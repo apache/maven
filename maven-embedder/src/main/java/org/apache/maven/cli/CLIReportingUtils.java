@@ -1,7 +1,6 @@
 package org.apache.maven.cli;
 
 import org.apache.maven.BuildFailureException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
@@ -11,10 +10,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -401,145 +396,7 @@ public final class CLIReportingUtils
                                                               boolean showStackTraces,
                                                               StringWriter writer )
     {
-
-        // =====================================================================
-        // Cases covered:
-        // =====================================================================
-        //
-        // LifecycleExecutionException(String, MavenProject, PluginNotFoundException)
-        // LifecycleExecutionException(String, MavenProject, InvalidDependencyVersionException)
-        // LifecycleExecutionException(String, MavenProject, InvalidVersionSpecificationException)
-        // LifecycleExecutionException(String, MavenProject, ArtifactNotFoundException)
-        // LifecycleExecutionException(String, MavenProject, ArtifactResolutionException)
-        // LifecycleExecutionException(String, MavenProject, PluginVersionNotFoundException)
-        // LifecycleExecutionException(String, MavenProject, PluginVersionResolutionException)
-        //
-        // =====================================================================
-        // Cases left to cover:
-        // =====================================================================
-        //
-        // LifecycleExecutionException(String, MavenProject, InvalidPluginException)
-        // LifecycleExecutionException(String, MavenProject, LifecycleException)
-        // LifecycleExecutionException(String, MavenProject, PluginConfigurationException)
-        // LifecycleExecutionException(String, MavenProject, PluginLoaderException)
-        // LifecycleExecutionException(String, MavenProject, PluginManagerException)
-        //    ...this includes PluginExecutionException, which wraps MojoExecutionException
-        //    with MojoExecution and MavenProject context info.
-
-        boolean result = false;
-
-        Throwable cause = e.getCause();
-        if ( cause != null )
-        {
-            if ( cause instanceof PluginNotFoundException )
-            {
-                Plugin plugin = ( (PluginNotFoundException) cause ).getPlugin();
-                ArtifactNotFoundException artifactException = (ArtifactNotFoundException) ( (PluginNotFoundException) cause ).getCause();
-
-                writer.write( NEWLINE );
-                writer.write( "Maven cannot find a plugin required by your build:" );
-                writer.write( NEWLINE );
-                writer.write( "Group-Id: " );
-                writer.write( plugin.getGroupId() );
-                writer.write( NEWLINE );
-                writer.write( "Artifact-Id: " );
-                writer.write( plugin.getArtifactId() );
-                writer.write( NEWLINE );
-                writer.write( "Version: " );
-                writer.write( plugin.getVersion() );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-
-                handleGenericException( artifactException, showStackTraces, writer );
-
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "NOTE: If the above Group-Id or Artifact-Id are incorrect," );
-                writer.write( NEWLINE );
-                writer.write( "check that the corresponding <plugin/> section in your POM is correct." );
-                writer.write( NEWLINE );
-                writer.write( "If you specified this plugin directly using something like 'javadoc:javadoc'," );
-                writer.write( NEWLINE );
-                writer.write( "check that the <pluginGroups/> section in your $HOME/.m2/settings.xml contains the" );
-                writer.write( NEWLINE );
-                writer.write( "proper groupId for the plugin you are trying to use (each groupId goes in a separate" );
-                writer.write( NEWLINE );
-                writer.write( "<pluginGroup/> element within the <pluginGroups/> section." );
-                writer.write( NEWLINE );
-
-                result = true;
-            }
-            else if ( cause instanceof ProjectBuildingException )
-            {
-                result = handleProjectBuildingException( (ProjectBuildingException) cause, showStackTraces, writer );
-            }
-            else if ( cause instanceof ArtifactNotFoundException )
-            {
-                writer.write( NEWLINE );
-                writer.write( "One or more project dependency artifacts are missing." );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Reason: " );
-                writer.write( cause.getMessage() );
-                writer.write( NEWLINE );
-
-                result = true;
-            }
-            else if ( cause instanceof ArtifactNotFoundException )
-            {
-                writer.write( NEWLINE );
-                writer.write( "Maven encountered an error while resolving one or more project dependency artifacts." );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Reason: " );
-                writer.write( cause.getMessage() );
-                writer.write( NEWLINE );
-
-                result = true;
-            }
-            else if ( cause instanceof PluginVersionNotFoundException )
-            {
-                writer.write( NEWLINE );
-                writer.write( "Cannot find a valid version for plugin: " );
-                writer.write( NEWLINE );
-                writer.write( "Group-Id: " );
-                writer.write( ((PluginVersionNotFoundException)cause).getGroupId() );
-                writer.write( NEWLINE );
-                writer.write( "Artifact-Id: " );
-                writer.write( ((PluginVersionNotFoundException)cause).getArtifactId() );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Reason: " );
-                writer.write( cause.getMessage() );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Please ensure that your proxy information is specified correctly in $HOME/.m2/settings.xml." );
-                writer.write( NEWLINE );
-
-                result = true;
-            }
-            else if ( cause instanceof PluginVersionResolutionException )
-            {
-                writer.write( NEWLINE );
-                writer.write( "Maven encountered an error while trying to resolve a valid version for plugin: " );
-                writer.write( NEWLINE );
-                writer.write( "Group-Id: " );
-                writer.write( ((PluginVersionNotFoundException)cause).getGroupId() );
-                writer.write( NEWLINE );
-                writer.write( "Artifact-Id: " );
-                writer.write( ((PluginVersionNotFoundException)cause).getArtifactId() );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Reason: " );
-                writer.write( cause.getMessage() );
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-                writer.write( "Please ensure that your proxy information is specified correctly in $HOME/.m2/settings.xml." );
-                writer.write( NEWLINE );
-
-                result = true;
-            }
-        }
+        handleGenericException( e, showStackTraces, writer );
 
         MavenProject project = e.getProject();
 
@@ -554,7 +411,7 @@ public final class CLIReportingUtils
         }
         writer.write( NEWLINE );
 
-        return result;
+        return true;
     }
 
     // NOTE: This method is an aspect target.

@@ -17,13 +17,24 @@ import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.Maven;
 
 public aspect BuildFailureReporterAspect
-    extends AbstractCoreReporterManagerAspect
+    extends AbstractCoreReporterAspect
 {
 
     private pointcut le_execute( MavenSession session, ReactorManager reactorManager ):
         execution( void LifecycleExecutor+.execute( MavenSession, ReactorManager, .. ) )
         && args( session, reactorManager, .. );
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.execute(MavenSession, ReactorManager, EventDispatcher)
+     * &lt;-- NoGoalsSpecifiedException
+     * </code>
+     * </pre>
+     */
     after( ReactorManager reactorManager, NoGoalsSpecifiedException err ):
         cflow( le_execute( MavenSession, reactorManager ) )
         && execution( NoGoalsSpecifiedException.new( .. ) )
@@ -33,9 +44,22 @@ public aspect BuildFailureReporterAspect
     }
 
     private pointcut aggregatedBuildFailureException_ctor( MojoBinding binding, MojoFailureException cause ):
-        execution( AggregatedBuildFailureException.new( .., MojoBinding, MojoFailureException ) )
+        call( AggregatedBuildFailureException.new( .., MojoBinding, MojoFailureException ) )
         && args( .., binding, cause );
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.execute(MavenSession, ReactorManager, EventDispatcher)
+     *        --&gt; DefaultLifecycleExecutor.executeTaskSegments(List, ReactorManager, MavenSession, MavenProject, EventDispatcher)
+     *               --&gt; (@aggregator plugin execution)
+     * &lt;---------------- AggregatedBuildFailureException
+     * </code>
+     * </pre>
+     */
     after( MavenSession session, MojoBinding binding, MojoFailureException cause ):
         cflow( le_execute( session, ReactorManager ) )
         && aggregatedBuildFailureException_ctor( binding, cause )
@@ -44,9 +68,22 @@ public aspect BuildFailureReporterAspect
     }
 
     private pointcut projectBuildFailureException_ctor( MojoBinding binding, MojoFailureException cause ):
-        execution( ProjectBuildFailureException.new( .., MojoBinding, MojoFailureException ) )
+        call( ProjectBuildFailureException.new( .., MojoBinding, MojoFailureException ) )
         && args( .., binding, cause );
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.execute(MavenSession, ReactorManager, EventDispatcher)
+     *        --&gt; DefaultLifecycleExecutor.executeTaskSegments(List, ReactorManager, MavenSession, MavenProject, EventDispatcher)
+     *               --&gt; (normal plugin execution)
+     * &lt;---------------- ProjectBuildFailureException
+     * </code>
+     * </pre>
+     */
     after( MavenSession session, MojoBinding binding, MojoFailureException cause ):
         cflow( le_execute( session, ReactorManager ) )
         && projectBuildFailureException_ctor( binding, cause )
@@ -57,6 +94,17 @@ public aspect BuildFailureReporterAspect
     private pointcut mvn_createReactorManager():
         execution( ReactorManager Maven+.createReactorManager( .. ) );
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultMaven.createReactorManager(MavenExecutionRequest, MavenExecutionResult)
+     * &lt;-- ProjectCycleException
+     * </code>
+     * </pre>
+     */
     after( ProjectCycleException err ):
         cflow( mvn_createReactorManager() )
         && execution( ProjectCycleException.new( .. ) )
@@ -69,6 +117,18 @@ public aspect BuildFailureReporterAspect
         execution( TaskValidationResult LifecycleExecutor+.isTaskValid( .., MavenSession, MavenProject ) )
         && args( .., session, rootProject );
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.isTaskValid(String, MavenSession, MavenProject)
+     *        --&gt; catch( PluginLoaderException )
+     * &lt;-- TaskValidationResult
+     * </code>
+     * </pre>
+     */
     before( MavenSession session, MavenProject rootProject, PluginLoaderException cause, TaskValidationResult result ):
         cflow( le_isTaskValid( session, rootProject ) )
         && execution( TaskValidationResult.new( .., PluginLoaderException ) )
@@ -78,6 +138,18 @@ public aspect BuildFailureReporterAspect
         getReporter().reportPluginErrorWhileValidatingTask( session, rootProject, cause, result );
     }
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.isTaskValid(String, MavenSession, MavenProject)
+     *        --&gt; catch( LifecycleSpecificationException )
+     * &lt;-- TaskValidationResult
+     * </code>
+     * </pre>
+     */
     before( MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause, TaskValidationResult result ):
         cflow( le_isTaskValid( session, rootProject ) )
         && execution( TaskValidationResult.new( .., LifecycleSpecificationException ) )
@@ -87,6 +159,18 @@ public aspect BuildFailureReporterAspect
         getReporter().reportLifecycleSpecErrorWhileValidatingTask( session, rootProject, cause, result );
     }
 
+    /**
+     * Call stack is:
+     * <br/>
+     * <pre>
+     * <code>
+     * DefaultMaven.execute(MavenExecutionRequest)
+     * --&gt; DefaultLifecycleExecutor.isTaskValid(String, MavenSession, MavenProject)
+     *        --&gt; catch( LifecycleLoaderException )
+     * &lt;-- TaskValidationResult
+     * </code>
+     * </pre>
+     */
     before( MavenSession session, MavenProject rootProject, LifecycleLoaderException cause, TaskValidationResult result ):
         cflow( le_isTaskValid( session, rootProject ) )
         && execution( TaskValidationResult.new( .., LifecycleLoaderException ) )

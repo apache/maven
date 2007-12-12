@@ -1,6 +1,5 @@
 package org.apache.maven.reactor;
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.project.ProjectBuildingException;
 
@@ -67,11 +66,6 @@ public class MavenExecutionException
     }
 
     public MavenExecutionException( String message, IOException cause )
-    {
-        super( message, cause );
-    }
-
-    public MavenExecutionException( String message, ArtifactResolutionException cause )
     {
         super( message, cause );
     }

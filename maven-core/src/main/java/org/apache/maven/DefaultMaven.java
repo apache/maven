@@ -21,7 +21,6 @@ package org.apache.maven;
 
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -185,6 +184,12 @@ public class DefaultMaven
         {
             String goal = (String) i.next();
 
+            if ( goal == null )
+            {
+                i.remove();
+                continue;
+            }
+
             TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
 
             if ( !tvr.isTaskValid() )
@@ -262,15 +267,7 @@ public class DefaultMaven
             throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
 
-        try
-        {
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(), request.getProfileManager(), !request.useReactor() );
-
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new MavenExecutionException( e.getMessage(), e );
-        }
+        projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(), request.getProfileManager(), !request.useReactor() );
 
         return projects;
     }
@@ -280,7 +277,7 @@ public class DefaultMaven
                                   boolean recursive,
                                   ProfileManager globalProfileManager,
                                   boolean isRoot )
-        throws ArtifactResolutionException, MavenExecutionException
+        throws MavenExecutionException
     {
         List projects = new ArrayList( files.size() );
 

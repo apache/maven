@@ -131,19 +131,6 @@ public class ExtensionManagerException
                                       Artifact extensionArtifact,
                                       String projectGroupId,
                                       String projectArtifactId,
-                                      String projectVersion )
-    {
-        super( message );
-        this.extensionArtifact = extensionArtifact;
-        this.projectGroupId = projectGroupId;
-        this.projectArtifactId = projectArtifactId;
-        this.projectVersion = projectVersion;
-    }
-
-    public ExtensionManagerException( String message,
-                                      Artifact extensionArtifact,
-                                      String projectGroupId,
-                                      String projectArtifactId,
                                       String projectVersion,
                                       ArtifactResolutionResult result )
     {
