@@ -4,13 +4,13 @@ import java.util.List;
 
 public class LegacyLifecycleParsingTestComponent
 {
-    
+
     public static final String ROLE = LegacyLifecycleParsingTestComponent.class.getName();
-    private List legacyLifecycles;
-    
+    private List lifecycles;
+
     public List getLifecycles()
     {
-        return legacyLifecycles;
+        return lifecycles;
     }
 
 }
