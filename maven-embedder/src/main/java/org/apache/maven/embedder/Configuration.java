@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.execution.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -131,4 +132,13 @@ public interface Configuration
     Configuration setRealmManager( MavenRealmManager realmManager );
 
     MavenRealmManager getRealmManager();
+
+    // ----------------------------------------------------------------------------
+    // Error Reporter
+    // ----------------------------------------------------------------------------
+
+    Configuration setErrorReporter( CoreErrorReporter errorReporter );
+
+    CoreErrorReporter getErrorReporter();
+
 }

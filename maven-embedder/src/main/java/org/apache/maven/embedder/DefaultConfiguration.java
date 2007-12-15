@@ -18,6 +18,7 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.execution.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -60,6 +61,8 @@ public class DefaultConfiguration
     private File localRepository;
 
     private MavenRealmManager realmManager;
+
+    private CoreErrorReporter errorReporter;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -230,6 +233,17 @@ public class DefaultConfiguration
     public Configuration setRealmManager( MavenRealmManager realmManager )
     {
         this.realmManager = realmManager;
+        return this;
+    }
+
+    public CoreErrorReporter getErrorReporter()
+    {
+        return errorReporter;
+    }
+
+    public Configuration setErrorReporter( CoreErrorReporter errorReporter )
+    {
+        this.errorReporter = errorReporter;
         return this;
     }
 }

@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
+import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.DefaultMavenRealmManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
@@ -97,6 +98,8 @@ public class DefaultMavenExecutionRequestPopulator
                                                    Configuration configuration )
         throws MavenEmbedderException
     {
+        reporter( request, configuration );
+
         executionProperties( request, configuration );
 
         pom( request, configuration );
@@ -122,6 +125,22 @@ public class DefaultMavenExecutionRequestPopulator
         realmManager( request, configuration );
 
         return request;
+    }
+
+    private void reporter( MavenExecutionRequest request,
+                           Configuration configuration )
+    {
+        if ( request.getErrorReporter() == null )
+        {
+            if ( configuration.getErrorReporter() != null )
+            {
+                request.setErrorReporter( configuration.getErrorReporter() );
+            }
+            else
+            {
+                request.setErrorReporter( new DefaultCoreErrorReporter() );
+            }
+        }
     }
 
     private void executionProperties( MavenExecutionRequest request,

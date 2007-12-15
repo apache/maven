@@ -37,6 +37,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
@@ -51,17 +52,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface CoreErrorReporter
+    extends ProjectErrorReporter
 {
-
-    String NEWLINE = "\n";
-
-    void clearErrors();
-
-    String getFormattedMessage( Throwable error );
-
-    Throwable getRealCause( Throwable error );
-
-    Throwable findReportedException( Throwable error );
 
     void reportNoGoalsSpecifiedException( MavenProject rootProject, NoGoalsSpecifiedException error );
 

@@ -30,8 +30,6 @@ import java.util.List;
 public interface ProjectErrorReporter
 {
 
-    String NEWLINE = "\n";
-
     void clearErrors();
 
     String getFormattedMessage( Throwable error );

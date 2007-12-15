@@ -44,6 +44,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.error.DefaultProjectErrorReporter;
 import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.error.ProjectReporterManager;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -66,70 +67,20 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultCoreErrorReporter
+    extends DefaultProjectErrorReporter
     implements CoreErrorReporter
 {
 
-    private Map formattedMessages = new HashMap();
+    private static final String NEWLINE = "\n";
 
-    private Map realCauses = new HashMap();
-
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#clearErrors()
-     */
-    public void clearErrors()
+    public DefaultCoreErrorReporter( Map formattedMessageStore, Map realCauseStore )
     {
-        formattedMessages.clear();
-        realCauses.clear();
+        super( formattedMessageStore, realCauseStore );
     }
 
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#hasInformationFor(java.lang.Throwable)
-     */
-    public Throwable findReportedException( Throwable error )
+    public DefaultCoreErrorReporter()
     {
-        if ( formattedMessages.containsKey( error ) )
-        {
-            return error;
-        }
-        else if ( error.getCause() != null )
-        {
-            return findReportedException( error.getCause() );
-        }
 
-        return null;
-    }
-
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#getFormattedMessage(java.lang.Throwable)
-     */
-    public String getFormattedMessage( Throwable error )
-    {
-        return (String) formattedMessages.get( error );
-    }
-
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#getRealCause(java.lang.Throwable)
-     */
-    public Throwable getRealCause( Throwable error )
-    {
-        return (Throwable) realCauses.get( error );
-    }
-
-    private void registerBuildError( Throwable error,
-                                     String formattedMessage,
-                                     Throwable realCause )
-    {
-        formattedMessages.put( error, formattedMessage );
-        if ( realCause != null )
-        {
-            realCauses.put( error, realCause );
-        }
-    }
-
-    private void registerBuildError( Throwable error,
-                                     String formattedMessage )
-    {
-        formattedMessages.put( error, formattedMessage );
     }
 
     public void reportNoGoalsSpecifiedException( MavenProject rootProject, NoGoalsSpecifiedException error )

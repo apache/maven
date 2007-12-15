@@ -37,9 +37,23 @@ public class DefaultProjectErrorReporter
     implements ProjectErrorReporter
 {
 
-    private Map formattedMessages = new HashMap();
+    private static final String NEWLINE = "\n";
 
-    private Map realCauses = new HashMap();
+    private Map formattedMessages;
+
+    private Map realCauses;
+
+    public DefaultProjectErrorReporter( Map formattedMessageStore, Map realCauseStore )
+    {
+        formattedMessages = formattedMessageStore;
+        realCauses = realCauseStore;
+    }
+
+    public DefaultProjectErrorReporter()
+    {
+        formattedMessages = new HashMap();
+        realCauses = new HashMap();
+    }
 
     /**
      * @see org.apache.maven.project.error.ProjectErrorReporter#clearErrors()
@@ -83,7 +97,7 @@ public class DefaultProjectErrorReporter
         return (Throwable) realCauses.get( error );
     }
 
-    private void registerProjectBuildError( Throwable error,
+    protected void registerBuildError( Throwable error,
                                             String formattedMessage,
                                             Throwable realCause )
     {
@@ -91,7 +105,7 @@ public class DefaultProjectErrorReporter
         realCauses.put( error, realCause );
     }
 
-    private void registerProjectBuildError( Throwable error,
+    protected void registerBuildError( Throwable error,
                                             String formattedMessage )
     {
         formattedMessages.put( error, formattedMessage );
@@ -133,7 +147,7 @@ public class DefaultProjectErrorReporter
                                                                                  context,
                                                                                  cause ), writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -173,7 +187,7 @@ public class DefaultProjectErrorReporter
                                                                                                 cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -207,7 +221,7 @@ public class DefaultProjectErrorReporter
                                                                                        cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -241,7 +255,7 @@ public class DefaultProjectErrorReporter
                                                                                                       cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -270,7 +284,7 @@ public class DefaultProjectErrorReporter
                                                                                   projectDir,
                                                                                   cause ), writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -306,7 +320,7 @@ public class DefaultProjectErrorReporter
                                                                                   projectDir,
                                                                                   cause ), writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
@@ -336,7 +350,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, projectId, pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString(), cause.getCause() );
+        registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     private void addStandardInfo( String projectId,
@@ -395,7 +409,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, project.getId(), pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorCreatingDeploymentArtifactRepository( MavenProject project,
@@ -421,7 +435,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, project.getId(), pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportBadNonDependencyProjectArtifactVersion( MavenProject project,
@@ -446,7 +460,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForBadNonDependencyArtifactSpec( project, pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorInterpolatingModel( MavenProject project,
@@ -464,7 +478,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForProjectInterpolationError( project, pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportProjectValidationFailure( MavenProject project,
@@ -492,7 +506,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForProjectValidationFailure( project, pomFile, error.getValidationResult() ),
                  writer );
 
-        registerProjectBuildError( error, writer.toString() );
+        registerBuildError( error, writer.toString() );
     }
 
     public void reportBadManagedDependencyVersion( MavenProject project,
@@ -528,7 +542,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForBadDependencySpec( project, pomFile, dep ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportBadDependencyVersion( MavenProject project,
@@ -564,7 +578,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForBadDependencySpec( project, pomFile, dep ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorParsingProjectModel( String projectId,
@@ -599,7 +613,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
@@ -643,7 +657,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorParsingProjectModel( String projectId,
@@ -671,7 +685,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, pomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
@@ -708,7 +722,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportParentPomArtifactNotFound( Parent parentRef,
@@ -790,7 +804,7 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForPomParsingError( childId, childPomFile, cause ),
                  writer );
 
-        registerProjectBuildError( cause, writer.toString() );
+        registerBuildError( cause, writer.toString() );
     }
 
     public void reportProjectCollision( List allProjectInstances,
@@ -820,6 +834,6 @@ public class DefaultProjectErrorReporter
         addTips( ProjectErrorTips.getTipsForDuplicateProjectError( allProjectInstances, err ),
                  writer );
 
-        registerProjectBuildError( err, writer.toString() );
+        registerBuildError( err, writer.toString() );
     }
 }

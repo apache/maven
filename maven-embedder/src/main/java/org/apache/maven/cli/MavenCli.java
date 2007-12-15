@@ -29,6 +29,7 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -145,6 +146,8 @@ public class MavenCli
 
         Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );
 
+        System.out.println( "Using error reporter: " + configuration.getErrorReporter() );
+
         ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
@@ -209,6 +212,7 @@ public class MavenCli
         }
 
         Configuration configuration = new DefaultConfiguration()
+            .setErrorReporter( new DefaultCoreErrorReporter() )
             .setUserSettingsFile( userSettingsFile )
             .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
             .setClassWorld( classWorld );

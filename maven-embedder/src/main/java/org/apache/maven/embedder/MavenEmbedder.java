@@ -31,6 +31,8 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
+import org.apache.maven.errors.CoreErrorReporter;
+import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -330,6 +332,11 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
     throws ProjectBuildingException, ExtensionScanningException
     {
+        CoreErrorReporter errorReporter = request.getErrorReporter();
+        errorReporter.clearErrors();
+
+        CoreReporterManager.setReporter( errorReporter );
+
         return readProject( mavenProject, request );
     }
 
@@ -357,6 +364,11 @@ public class MavenEmbedder
         try
         {
             request = populator.populateDefaults( request, configuration );
+
+            CoreErrorReporter errorReporter = request.getErrorReporter();
+            errorReporter.clearErrors();
+
+            CoreReporterManager.setReporter( errorReporter );
 
             // This is necessary to make the MavenEmbedderProjectWithExtensionReadingTest work which uses
             // a custom type for a dependency like this:
@@ -795,6 +807,11 @@ public class MavenEmbedder
 
                 return result;
             }
+
+            CoreErrorReporter errorReporter = request.getErrorReporter();
+            errorReporter.clearErrors();
+
+            CoreReporterManager.setReporter( errorReporter );
 
             return maven.execute( request );
         }

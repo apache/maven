@@ -1,14 +1,14 @@
 package org.apache.maven.cli;
 
-import org.apache.maven.BuildFailureException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.errors.CoreErrorReporter;
+import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
@@ -128,7 +128,7 @@ public final class CLIReportingUtils
             {
                 Exception e = (Exception) i.next();
 
-                showError( e, request.isShowErrors(), logger );
+                showError( e, request.isShowErrors(), request.getErrorReporter(), logger );
             }
         }
         else
@@ -178,14 +178,15 @@ public final class CLIReportingUtils
                            Exception e,
                            boolean showErrors )
     {
-        showError( message, e, showErrors, new MavenEmbedderConsoleLogger() );
+        showError( message, e, showErrors, new DefaultCoreErrorReporter(), new MavenEmbedderConsoleLogger() );
     }
 
     static void showError( Exception e,
                            boolean show,
+                           CoreErrorReporter reporter,
                            MavenEmbedderLogger logger )
     {
-        showError( null, e, show, logger );
+        showError( null, e, show, reporter, logger );
     }
 
     /**
@@ -198,6 +199,7 @@ public final class CLIReportingUtils
     public static void showError( String message,
                            Exception e,
                            boolean showStackTraces,
+                           CoreErrorReporter reporter,
                            MavenEmbedderLogger logger )
     {
         StringWriter writer = new StringWriter();
@@ -210,7 +212,7 @@ public final class CLIReportingUtils
             writer.write( NEWLINE );
         }
 
-        buildErrorMessage( e, showStackTraces, writer );
+        buildErrorMessage( e, showStackTraces, reporter, writer );
 
         writer.write( NEWLINE );
 
@@ -231,17 +233,38 @@ public final class CLIReportingUtils
 
     public static void buildErrorMessage( Exception e,
                                            boolean showStackTraces,
+                                           CoreErrorReporter reporter,
                                            StringWriter writer )
     {
+        if ( reporter != null )
+        {
+            Throwable reported = reporter.findReportedException( e );
+
+            if ( reported != null )
+            {
+                writer.write( reporter.getFormattedMessage( reported ) );
+
+                if ( showStackTraces )
+                {
+                    writer.write( NEWLINE );
+                    writer.write( NEWLINE );
+                    Throwable cause = reporter.getRealCause( reported );
+                    if ( cause != null )
+                    {
+                        cause.printStackTrace( new PrintWriter( writer ) );
+                    }
+                }
+
+                writer.write( NEWLINE );
+                writer.write( NEWLINE );
+
+                return;
+            }
+        }
+
         boolean handled = false;
 
-        if ( e instanceof BuildFailureException )
-        {
-            handled = handleBuildFailureException( (BuildFailureException) e,
-                                                   showStackTraces,
-                                                   writer );
-        }
-        else if ( e instanceof ProjectBuildingException )
+        if ( e instanceof ProjectBuildingException )
         {
             handled = handleProjectBuildingException( (ProjectBuildingException) e,
                                                       showStackTraces,
@@ -252,12 +275,6 @@ public final class CLIReportingUtils
             handled = handleLifecycleExecutionException( (LifecycleExecutionException) e,
                                                          showStackTraces,
                                                          writer );
-        }
-        else if ( e instanceof DuplicateProjectException )
-        {
-            handled = handleDuplicateProjectException( (DuplicateProjectException) e,
-                                                       showStackTraces,
-                                                       writer );
         }
         else if ( e instanceof MavenExecutionException )
         {
@@ -287,15 +304,6 @@ public final class CLIReportingUtils
             writer.write( NEWLINE );
             writer.write( NEWLINE );
         }
-
-        return true;
-    }
-
-    private static boolean handleDuplicateProjectException( DuplicateProjectException e,
-                                                            boolean showStackTraces,
-                                                            StringWriter writer )
-    {
-        handleGenericException( e, showStackTraces, writer );
 
         return true;
     }
@@ -330,7 +338,6 @@ public final class CLIReportingUtils
         return true;
     }
 
-    // NOTE: This method is an aspect target.
     private static boolean handleProjectBuildingException( ProjectBuildingException e,
                                                            boolean showStackTraces,
                                                            StringWriter writer )
@@ -351,16 +358,6 @@ public final class CLIReportingUtils
             writer.write( e.getPomFile().getAbsolutePath() );
         }
         writer.write( NEWLINE );
-
-        return true;
-    }
-
-    // NOTE: This method is an aspect target.
-    private static boolean handleBuildFailureException( BuildFailureException e,
-                                                        boolean showStackTraces,
-                                                        StringWriter writer )
-    {
-        handleGenericException( e, showStackTraces, writer );
 
         return true;
     }
