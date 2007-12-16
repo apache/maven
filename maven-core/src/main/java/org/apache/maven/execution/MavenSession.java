@@ -30,11 +30,13 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -213,6 +215,11 @@ public class MavenSession
      */
     public List getReports()
     {
+        if ( reports == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
         return new ArrayList( reports.values() );
     }
 
@@ -230,7 +237,17 @@ public class MavenSession
      */
     public void addReport( MojoDescriptor mojoDescriptor, MavenReport report )
     {
-        reports.put( mojoDescriptor.getId(), report );
+        reports.put( mojoDescriptor, report );
+    }
+
+    public Set getReportMojoDescriptors()
+    {
+        if ( reports == null )
+        {
+            return Collections.EMPTY_SET;
+        }
+
+        return reports.keySet();
     }
 
 }

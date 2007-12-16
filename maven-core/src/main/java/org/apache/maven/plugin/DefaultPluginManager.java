@@ -265,7 +265,7 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
-        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session );
+        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session, new ArrayList() );
 
         return pluginDescriptor;
     }
@@ -583,13 +583,13 @@ public class DefaultPluginManager
 
         // by this time, the pluginDescriptor has had the correct realm setup from getConfiguredMojo(..)
         ClassRealm pluginRealm = null;
-        ClassRealm projectRealm = session.getRealmManager().getProjectRealm( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
+        List realmActions = new ArrayList();
         try
         {
-            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution );
+            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution, realmActions );
 
             dispatcher.dispatchStart( event, goalExecId );
 
@@ -639,10 +639,10 @@ public class DefaultPluginManager
             pluginDescriptor.setClassRealm( null );
             pluginDescriptor.setArtifacts( null );
 
-            if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() )
-                 && ( pluginRealm != projectRealm ) )
+            for ( Iterator it = realmActions.iterator(); it.hasNext(); )
             {
-                pluginRealm.setParentRealm( null );
+                PluginRealmAction action = (PluginRealmAction) it.next();
+                action.undo();
             }
 
             if ( oldLookupRealm != null )
@@ -680,7 +680,7 @@ public class DefaultPluginManager
             dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
         }
 
-        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
+        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution, new ArrayList() );
     }
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
@@ -715,21 +715,35 @@ public class DefaultPluginManager
                                     Xpp3Dom dom,
                                     MavenProject project,
                                     boolean report,
-                                    MojoExecution mojoExecution )
+                                    MojoExecution mojoExecution,
+                                    List realmActions )
         throws PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session );
+        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session, realmActions );
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
+
+        if ( mojoDescriptor.isRequiresReports() )
+        {
+            Set reportDescriptors = session.getReportMojoDescriptors();
+
+            if ( ( reportDescriptors != null ) && !reportDescriptors.isEmpty() )
+            {
+                for ( Iterator it = reportDescriptors.iterator(); it.hasNext(); )
+                {
+                    MojoDescriptor reportDescriptor = (MojoDescriptor) it.next();
+                    setDescriptorClassAndArtifactInfo( reportDescriptor.getPluginDescriptor(), project, session, realmActions );
+                }
+            }
+        }
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
-
         container.setLookupRealm( pluginRealm );
 
         getLogger().debug(
@@ -869,7 +883,8 @@ public class DefaultPluginManager
 
     private void setDescriptorClassAndArtifactInfo( PluginDescriptor pluginDescriptor,
                                                     MavenProject project,
-                                                    MavenSession session )
+                                                    MavenSession session,
+                                                    List realmActions )
     {
         MavenRealmManager realmManager = session.getRealmManager();
 
@@ -894,10 +909,12 @@ public class DefaultPluginManager
             getLogger().debug( "Realm for plugin: " + pluginDescriptor.getId() + " not found. Using project realm instead." );
 
             pluginRealm = projectRealm;
+            realmActions.add( new PluginRealmAction( pluginDescriptor ) );
         }
         else
         {
             pluginRealm.setParentRealm( projectRealm );
+            realmActions.add( new PluginRealmAction( pluginDescriptor, pluginRealm ) );
         }
 
         getLogger().debug( "Setting realm for plugin descriptor: " + pluginDescriptor.getId() + " to: " + pluginRealm );
@@ -1438,6 +1455,35 @@ public class DefaultPluginManager
                                  artifactFactory.createArtifact( "org.codehaus.plexus",
                                                                  "plexus-utils", "1.1",
                                                                  Artifact.SCOPE_RUNTIME, "jar" ) );
+        }
+    }
+
+    private static final class PluginRealmAction
+    {
+        private final PluginDescriptor pluginDescriptor;
+        private final ClassRealm realmWithTransientParent;
+
+        PluginRealmAction( PluginDescriptor pluginDescriptor )
+        {
+            this.pluginDescriptor = pluginDescriptor;
+            realmWithTransientParent = null;
+        }
+
+        PluginRealmAction( PluginDescriptor pluginDescriptor, ClassRealm realmWithTransientParent )
+        {
+            this.pluginDescriptor = pluginDescriptor;
+            this.realmWithTransientParent = realmWithTransientParent;
+        }
+
+        void undo()
+        {
+            pluginDescriptor.setArtifacts( null );
+            pluginDescriptor.setClassRealm( null );
+
+            if ( realmWithTransientParent != null )
+            {
+                realmWithTransientParent.setParentRealm( null );
+            }
         }
     }
 }
