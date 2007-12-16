@@ -358,10 +358,14 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( "The following plugin cannot function in the current build environment:" );
 
+        writer.write( NEWLINE );
         writeMojoBinding( binding, writer );
-        writer.write( "Referenced from project:" );
+
+        writer.write( "While building project:" );
+        writer.write( NEWLINE );
         writeProjectCoordinate( project, writer );
 
+        writer.write( NEWLINE );
         writer.write( "Reason: " );
         writer.write( cause.getMessage() );
 

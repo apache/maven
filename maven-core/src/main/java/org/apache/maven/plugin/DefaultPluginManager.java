@@ -528,6 +528,11 @@ public class DefaultPluginManager
                                                               + " requires online mode for execution. Maven is currently offline." );
         }
 
+        if ( mojoDescriptor.getDeprecated() != null )
+        {
+            getLogger().warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
+        }
+
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
             Collection projects;
@@ -805,11 +810,59 @@ public class DefaultPluginManager
                                                                                    mergedConfiguration,
                                                                                    mojoDescriptor );
 
+        checkDeprecatedParameters( mojoDescriptor, extractedMojoConfiguration );
+
         checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 
         populatePluginFields( mojo, mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 
         return mojo;
+    }
+
+    private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor,
+                                            PlexusConfiguration extractedMojoConfiguration )
+    {
+        if ( ( extractedMojoConfiguration == null ) || ( extractedMojoConfiguration.getChildCount() < 1 ) )
+        {
+            return;
+        }
+
+        List parameters = mojoDescriptor.getParameters();
+        if ( ( parameters != null ) && !parameters.isEmpty() )
+        {
+            for ( Iterator it = parameters.iterator(); it.hasNext(); )
+            {
+                Parameter param = (Parameter) it.next();
+
+                if ( param.getDeprecated() != null )
+                {
+                    boolean warnOfDeprecation = false;
+                    if ( extractedMojoConfiguration.getChild( param.getName() ) != null )
+                    {
+                        warnOfDeprecation = true;
+                    }
+                    else if ( ( param.getAlias() != null ) && ( extractedMojoConfiguration.getChild( param.getAlias() ) != null ) )
+                    {
+                        warnOfDeprecation = true;
+                    }
+
+                    if ( warnOfDeprecation )
+                    {
+                        StringBuffer buffer = new StringBuffer();
+                        buffer.append( "In mojo: " ).append( mojoDescriptor.getGoal() ).append( ", parameter: " ).append( param.getName() );
+
+                        if ( param.getAlias() != null )
+                        {
+                            buffer.append( " (alias: " ).append( param.getAlias() ).append( ")" );
+                        }
+
+                        buffer.append( " is deprecated:" ).append( "\n\n" ).append( param.getDeprecated() ).append( "\n" );
+
+                        getLogger().warn( buffer.toString() );
+                    }
+                }
+            }
+        }
     }
 
     private void setDescriptorClassAndArtifactInfo( PluginDescriptor pluginDescriptor,

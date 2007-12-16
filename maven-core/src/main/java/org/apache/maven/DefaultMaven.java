@@ -281,18 +281,7 @@ public class DefaultMaven
     {
         List projects = new ArrayList( files.size() );
 
-        if ( files.isEmpty() )
-        {
-            try
-            {
-                projects.add( projectBuilder.buildStandaloneSuperProject( globalProfileManager ) );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new MavenExecutionException( "Failed to build super-project instance.", e );
-            }
-        }
-        else
+        if ( !files.isEmpty() )
         {
             for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
             {

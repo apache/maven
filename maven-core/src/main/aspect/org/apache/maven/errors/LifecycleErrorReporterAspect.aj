@@ -42,6 +42,10 @@ public privileged aspect LifecycleErrorReporterAspect
         execution( void PluginManager+.executeMojo( MavenProject, .. ) )
         && args( project, .. );
 
+    private pointcut within_pm_executeMojo( MavenProject project ):
+        withincode( void PluginManager+.executeMojo( MavenProject, .. ) )
+        && args( project, .. );
+
     before( MojoBinding binding, MavenProject project, LifecycleExecutionException err ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && execution( LifecycleExecutionException.new( String, MavenProject ) )
@@ -68,14 +72,15 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportMojoExecutionException( binding, project, cause );
     }
 
-    before( MojoBinding binding, MavenProject project, PluginExecutionException cause ):
+    PluginExecutionException around( MojoBinding binding, MavenProject project ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
-        && !handler( MojoExecutionException )
-        && execution( PluginExecutionException.new( .., String ) )
-        && this( cause )
+        && call( PluginExecutionException.new( .., String ) )
     {
+        PluginExecutionException cause = proceed( binding, project );
         getReporter().reportInvalidPluginExecutionEnvironment( binding, project, cause );
+
+        return cause;
     }
 
     before( MojoBinding binding, MavenProject project, ComponentLookupException cause ):
