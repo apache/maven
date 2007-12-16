@@ -583,6 +583,7 @@ public class DefaultPluginManager
 
         // by this time, the pluginDescriptor has had the correct realm setup from getConfiguredMojo(..)
         ClassRealm pluginRealm = null;
+        ClassRealm projectRealm = session.getRealmManager().getProjectRealm( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -638,7 +639,8 @@ public class DefaultPluginManager
             pluginDescriptor.setClassRealm( null );
             pluginDescriptor.setArtifacts( null );
 
-            if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() ) )
+            if ( ( pluginRealm != null ) && ( pluginRealm != container.getContainerRealm() )
+                 && ( pluginRealm != projectRealm ) )
             {
                 pluginRealm.setParentRealm( null );
             }
