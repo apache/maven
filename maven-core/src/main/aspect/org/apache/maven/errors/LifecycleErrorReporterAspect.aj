@@ -141,15 +141,18 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportAttemptToOverrideUneditableMojoParameter( currentParameter, binding, project, session, exec, translator, logger, cause );
     }
 
-    before( MojoBinding binding, MavenProject project, List invalidParameters, PluginParameterException err ):
+    PluginParameterException around( MojoBinding binding, MavenProject project, List invalidParameters ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && cflow( pm_checkRequiredParameters() )
-        && execution( PluginParameterException.new( .., List ) )
+        && call( PluginParameterException.new( .., List ) )
         && args( .., invalidParameters )
-        && this( err )
     {
+        PluginParameterException err = proceed( binding, project, invalidParameters );
+
         getReporter().reportMissingRequiredMojoParameter( binding, project, invalidParameters, err );
+
+        return err;
     }
 
     private pointcut ppee_evaluate( String expression ):
