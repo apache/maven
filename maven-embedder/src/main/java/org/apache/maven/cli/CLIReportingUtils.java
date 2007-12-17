@@ -180,7 +180,8 @@ public final class CLIReportingUtils
      * @param showStackTraces
      * @param logger
      */
-    static void showError( String message,
+    //mkleint: public because used in netbeans integration
+    public static void showError( String message,
                            Exception e,
                            boolean showStackTraces,
                            CoreErrorReporter reporter,
