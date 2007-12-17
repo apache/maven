@@ -162,11 +162,6 @@ public class DefaultMavenProjectBuilder
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
-    //DO NOT USE, it is here only for backward compatibility reasons. The existing 
-    // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
-    private Map processedProjectCache = new HashMap();
-    
-
     public void initialize()
     {
         modelReader = new MavenXpp3Reader();
