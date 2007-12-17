@@ -19,14 +19,8 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.extension.ExtensionScanningException;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
 
 import java.util.List;
 
@@ -54,13 +48,7 @@ public interface MavenExecutionResult
     // - xmlpull parser exception
     List getExceptions();
 
-    MavenExecutionResult addLifecycleExecutionException( LifecycleExecutionException e );
-    MavenExecutionResult addDuplicateProjectException( DuplicateProjectException duplicateProjectException );
-    MavenExecutionResult addBuildFailureException( BuildFailureException buildFailureException );
-    MavenExecutionResult addMavenExecutionException( MavenExecutionException e );
-    MavenExecutionResult addProjectBuildingException (ProjectBuildingException e );
-    MavenExecutionResult addExtensionScanningException( ExtensionScanningException e );
-    MavenExecutionResult addUnknownException( Throwable t );
+    MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
 }

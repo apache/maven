@@ -112,12 +112,12 @@ public class DefaultMaven
         }
         catch ( ProjectBuildingException e )
         {
-            result.addProjectBuildingException( e );
+            result.addException( e );
             return null;
         }
         catch ( MavenExecutionException e )
         {
-            result.addMavenExecutionException( e );
+            result.addException( e );
             return null;
         }
 
@@ -138,13 +138,13 @@ public class DefaultMaven
 
             ProjectCycleException error = new ProjectCycleException( projects, message, e );
 
-            result.addBuildFailureException( error );
+            result.addException( error );
 
             return null;
         }
         catch ( DuplicateProjectException e )
         {
-            result.addDuplicateProjectException( e );
+            result.addException( e );
 
             return null;
         }
@@ -194,7 +194,7 @@ public class DefaultMaven
 
             if ( !tvr.isTaskValid() )
             {
-                result.addBuildFailureException( tvr.generateInvalidTaskException() );
+                result.addException( tvr.generateInvalidTaskException() );
 
                 return result;
             }
@@ -223,12 +223,12 @@ public class DefaultMaven
         }
         catch ( LifecycleExecutionException e )
         {
-            result.addLifecycleExecutionException( e );
+            result.addException( e );
             return result;
         }
         catch ( BuildFailureException e )
         {
-            result.addBuildFailureException( e );
+            result.addException( e );
             return result;
         }
 

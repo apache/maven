@@ -4,7 +4,6 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.DefaultCoreErrorReporter;
-import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
@@ -102,9 +101,22 @@ public final class CLIReportingUtils
 
         logReactorSummary( reactorManager, logger );
 
+        boolean printSuccess = true;
         if ( ( reactorManager != null ) && reactorManager.hasBuildFailures() )
         {
-            logErrors( reactorManager, request.isShowErrors(), logger );
+            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
+            {
+                Exception e = (Exception) i.next();
+
+                showError( e, request.isShowErrors(), request.getErrorReporter(), logger );
+            }
+
+            line( logger );
+            if ( !request.isShowErrors() )
+            {
+                logger.info( "For more information, run with the -e flag" );
+                line( logger );
+            }
 
             if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
             {
@@ -115,6 +127,7 @@ public final class CLIReportingUtils
                 stats( request.getStartTime(), logger );
 
                 line( logger );
+                printSuccess = false;
             }
             else
             {
@@ -122,16 +135,7 @@ public final class CLIReportingUtils
             }
         }
 
-        if ( result.hasExceptions() )
-        {
-            for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
-            {
-                Exception e = (Exception) i.next();
-
-                showError( e, request.isShowErrors(), request.getErrorReporter(), logger );
-            }
-        }
-        else
+        if ( printSuccess )
         {
             line( logger );
 
@@ -147,41 +151,21 @@ public final class CLIReportingUtils
         logger.close();
     }
 
-    private static void logErrors( ReactorManager rm,
-                                   boolean showErrors,
-                                   MavenEmbedderLogger logger )
-    {
-        for ( Iterator it = rm.getSortedProjects().iterator(); it.hasNext(); )
-        {
-            MavenProject project = (MavenProject) it.next();
-
-            if ( rm.hasBuildFailure( project ) )
-            {
-                BuildFailure buildFailure = rm.getBuildFailure( project );
-
-                logger.info( "Error for project: " + project.getName() + " (during "
-                             + buildFailure.getTask() + ")" );
-
-                line( logger );
-            }
-        }
-
-        if ( !showErrors )
-        {
-            logger.info( "For more information, run Maven with the -e switch" );
-
-            line( logger );
-        }
-    }
-
     static void showError( String message,
                            Exception e,
                            boolean showErrors )
     {
-        showError( message, e, showErrors, new DefaultCoreErrorReporter(), new MavenEmbedderConsoleLogger() );
+        MavenEmbedderLogger logger = new MavenEmbedderConsoleLogger();
+
+        showError( message, e, showErrors, new DefaultCoreErrorReporter(), logger );
+
+        if ( !showErrors )
+        {
+            logger.info( "For more information, run with the -e flag" );
+        }
     }
 
-    static void showError( Exception e,
+    private static void showError( Exception e,
                            boolean show,
                            CoreErrorReporter reporter,
                            MavenEmbedderLogger logger )
@@ -196,7 +180,7 @@ public final class CLIReportingUtils
      * @param showStackTraces
      * @param logger
      */
-    public static void showError( String message,
+    static void showError( String message,
                            Exception e,
                            boolean showStackTraces,
                            CoreErrorReporter reporter,
@@ -222,10 +206,6 @@ public final class CLIReportingUtils
             writer.write( NEWLINE );
             e.printStackTrace( new PrintWriter( writer ) );
 
-        }
-        else
-        {
-            writer.write( "For more information, run with the -e flag" );
         }
 
         logger.error( writer.toString() );

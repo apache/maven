@@ -395,15 +395,15 @@ public class MavenEmbedder
         }
         catch ( MavenEmbedderException e )
         {
-            return result.addUnknownException( e );
+            return result.addException( e );
         }
         catch ( ProjectBuildingException e )
         {
-            return result.addProjectBuildingException( e );
+            return result.addException( e );
         }
         catch ( ExtensionScanningException e )
         {
-            return result.addExtensionScanningException( e );
+            return result.addException( e );
         }
 
         ReactorManager reactorManager = maven.createReactorManager( request, result );
@@ -424,7 +424,7 @@ public class MavenEmbedder
         }
         catch ( ProjectBuildingException e )
         {
-            return result.addProjectBuildingException( e );
+            return result.addException( e );
         }
 
         if ( reactorManager.hasMultipleProjects() )
@@ -803,7 +803,7 @@ public class MavenEmbedder
             {
                 MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-                result.addUnknownException( e );
+                result.addException( e );
 
                 return result;
             }

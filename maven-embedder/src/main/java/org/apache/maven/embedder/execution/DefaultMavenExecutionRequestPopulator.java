@@ -110,7 +110,8 @@ public class DefaultMavenExecutionRequestPopulator
 
         snapshotPolicy( request, configuration );
 
-        localRepository( request, configuration );
+        // TODO: Can we remove this second call?
+//        localRepository( request, configuration );
 
         checksumPolicy( request, configuration );
 
