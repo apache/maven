@@ -51,7 +51,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.overlay.BuildOverlay;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -1038,19 +1037,12 @@ public class MavenProject
 
     public void setBuild( Build build )
     {
-        buildOverlay = new BuildOverlay( build );
-
         model.setBuild( build );
     }
 
     public Build getBuild()
     {
-        if ( buildOverlay == null )
-        {
-            buildOverlay = new BuildOverlay( getModelBuild() );
-        }
-
-        return buildOverlay;
+        return getModelBuild();
     }
 
     public List getResources()

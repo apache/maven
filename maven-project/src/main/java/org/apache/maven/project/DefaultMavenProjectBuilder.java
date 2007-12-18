@@ -706,14 +706,16 @@ public class DefaultMavenProjectBuilder
 
         if ( fromSourceTree )
         {
+            Build build = project.getBuild();
+
+            // NOTE: setting this script-source root before path translation, because
+            // the plugin tools compose basedir and scriptSourceRoot into a single file.
+            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+
             getLogger().debug( "Aligning project: " + project.getId() + " to base directory: " + projectDescriptor.getParentFile() );
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor.getParentFile() );
 
-            Build build = project.getBuild();
-
             project.addCompileSourceRoot( build.getSourceDirectory() );
-
-            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
 
             project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
 
