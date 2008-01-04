@@ -98,15 +98,20 @@ public class DefaultArtifactResolver
                     "System artifact: " + artifact + " has no file attached", artifact );
             }
 
+            if ( !systemFile.isFile() )
+            {
+                throw new ArtifactNotFoundException( "System artifact: " + artifact
+                    + " is not a file: " + systemFile, artifact );
+            }
+
             if ( !systemFile.exists() )
             {
                 throw new ArtifactNotFoundException(
-                    "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
+                    "System artifact: " + artifact + " not found in path: " + systemFile,
+                    artifact );
             }
-            else
-            {
-                artifact.setResolved( true );
-            }
+
+            artifact.setResolved( true );
         }
         else if ( !artifact.isResolved() )
         {
