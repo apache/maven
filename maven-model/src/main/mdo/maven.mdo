@@ -2406,8 +2406,9 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            Describe the resource target path. For example, if you want that
-            resource to appear in a specific package
+            Describe the resource target path. The path is relative to the target/classes 
+            directory (i.e. <code>${project.build.outputDirectory}</code>).
+            For example, if you want that resource to appear in a specific package
             (<code>org.apache.maven.messages</code>), you must specify this
             element with this value: <code>org/apache/maven/messages</code>.
             This is not required if you simply put the resources in that directory
