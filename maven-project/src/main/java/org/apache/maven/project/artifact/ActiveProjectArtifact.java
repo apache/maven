@@ -296,4 +296,64 @@ public class ActiveProjectArtifact
     {
         artifact.setOptional( optional );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode()
+    {
+        int result = 17;
+
+        result = 37 * result + getGroupId().hashCode();
+        result = 37 * result + getArtifactId().hashCode();
+        result = 37 * result + getType().hashCode();
+        if ( getVersion() != null )
+        {
+            result = 37 * result + getVersion().hashCode();
+        }
+        result = 37 * result + ( getClassifier() != null ? getClassifier().hashCode() : 0 );
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals( Object o )
+    {
+        if ( o == this )
+        {
+            return true;
+        }
+
+        if ( !( o instanceof Artifact ) )
+        {
+            return false;
+        }
+
+        Artifact a = (Artifact) o;
+
+        if ( !a.getGroupId().equals( getGroupId() ) )
+        {
+            return false;
+        }
+        else if ( !a.getArtifactId().equals( getArtifactId() ) )
+        {
+            return false;
+        }
+        else if ( !a.getVersion().equals( getVersion() ) )
+        {
+            return false;
+        }
+        else if ( !a.getType().equals( getType() ) )
+        {
+            return false;
+        }
+        else if ( a.getClassifier() == null ? getClassifier() != null : !a.getClassifier().equals( getClassifier() ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
