@@ -53,4 +53,17 @@ public class MojoFailureException
     {
         super( message );
     }
+
+    /**
+     * Construct a new <code>MojoFailureException</code> exception wrapping an underlying <code>Throwable</code>
+     * and providing a <code>message</code>.
+     *
+     * @param message
+     * @param cause
+     * @since 2.0.9
+     */
+    public MojoFailureException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }
