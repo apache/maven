@@ -58,248 +58,293 @@ public class ActiveProjectArtifact
         artifact.setResolved( true );
     }
 
+    /** {@inheritDoc} */
     public File getFile()
     {
         // we need to get the latest file for the project, not the artifact that was created at one point in time
         return project.getArtifact().getFile();
     }
 
+    /** {@inheritDoc} */
     public String getGroupId()
     {
         return artifact.getGroupId();
     }
 
+    /** {@inheritDoc} */
     public String getArtifactId()
     {
         return artifact.getArtifactId();
     }
 
+    /** {@inheritDoc} */
     public String getVersion()
     {
         return artifact.getVersion();
     }
 
+    /** {@inheritDoc} */
     public void setVersion( String version )
     {
         artifact.setVersion( version );
     }
 
+    /** {@inheritDoc} */
     public String getScope()
     {
         return artifact.getScope();
     }
 
+    /** {@inheritDoc} */
     public String getType()
     {
         return artifact.getType();
     }
 
+    /** {@inheritDoc} */
     public String getClassifier()
     {
         return artifact.getClassifier();
     }
 
+    /** {@inheritDoc} */
     public boolean hasClassifier()
     {
         return artifact.hasClassifier();
     }
 
+    /** {@inheritDoc} */
     public void setFile( File destination )
     {
         artifact.setFile( destination );
         project.getArtifact().setFile( destination );
     }
 
+    /** {@inheritDoc} */
     public String getBaseVersion()
     {
         return artifact.getBaseVersion();
     }
 
+    /** {@inheritDoc} */
     public void setBaseVersion( String baseVersion )
     {
         artifact.setBaseVersion( baseVersion );
     }
 
+    /** {@inheritDoc} */
     public String getId()
     {
         return artifact.getId();
     }
 
+    /** {@inheritDoc} */
     public String getDependencyConflictId()
     {
         return artifact.getDependencyConflictId();
     }
 
+    /** {@inheritDoc} */
     public void addMetadata( ArtifactMetadata metadata )
     {
         artifact.addMetadata( metadata );
     }
 
+    /** {@inheritDoc} */
     public Collection getMetadataList()
     {
         return artifact.getMetadataList();
     }
 
+    /** {@inheritDoc} */
     public void setRepository( ArtifactRepository remoteRepository )
     {
         artifact.setRepository( remoteRepository );
     }
 
+    /** {@inheritDoc} */
     public ArtifactRepository getRepository()
     {
         return artifact.getRepository();
     }
 
+    /** {@inheritDoc} */
     public void updateVersion( String version, ArtifactRepository localRepository )
     {
         artifact.updateVersion( version, localRepository );
     }
 
+    /** {@inheritDoc} */
     public String getDownloadUrl()
     {
         return artifact.getDownloadUrl();
     }
 
+    /** {@inheritDoc} */
     public void setDownloadUrl( String downloadUrl )
     {
         artifact.setDownloadUrl( downloadUrl );
     }
 
+    /** {@inheritDoc} */
     public ArtifactFilter getDependencyFilter()
     {
         return artifact.getDependencyFilter();
     }
 
+    /** {@inheritDoc} */
     public void setDependencyFilter( ArtifactFilter artifactFilter )
     {
         artifact.setDependencyFilter( artifactFilter );
     }
 
+    /** {@inheritDoc} */
     public ArtifactHandler getArtifactHandler()
     {
         return artifact.getArtifactHandler();
     }
 
+    /** {@inheritDoc} */
     public List getDependencyTrail()
     {
         return artifact.getDependencyTrail();
     }
 
+    /** {@inheritDoc} */
     public void setDependencyTrail( List dependencyTrail )
     {
         artifact.setDependencyTrail( dependencyTrail );
     }
 
+    /** {@inheritDoc} */
     public void setScope( String scope )
     {
         artifact.setScope( scope );
     }
 
+    /** {@inheritDoc} */
     public VersionRange getVersionRange()
     {
         return artifact.getVersionRange();
     }
 
+    /** {@inheritDoc} */
     public void setVersionRange( VersionRange newRange )
     {
         artifact.setVersionRange( newRange );
     }
 
+    /** {@inheritDoc} */
     public void selectVersion( String version )
     {
         artifact.selectVersion( version );
     }
 
+    /** {@inheritDoc} */
     public void setGroupId( String groupId )
     {
         artifact.setGroupId( groupId );
     }
 
+    /** {@inheritDoc} */
     public void setArtifactId( String artifactId )
     {
         artifact.setArtifactId( artifactId );
     }
 
+    /** {@inheritDoc} */
     public boolean isSnapshot()
     {
         return artifact.isSnapshot();
     }
 
+    /** {@inheritDoc} */
     public int compareTo( Object o )
     {
         return artifact.compareTo( o );
     }
 
+    /** {@inheritDoc} */
     public void setResolved( boolean resolved )
     {
         artifact.setResolved( resolved );
     }
 
+    /** {@inheritDoc} */
     public boolean isResolved()
     {
         return artifact.isResolved();
     }
 
+    /** {@inheritDoc} */
     public void setResolvedVersion( String version )
     {
         artifact.setResolvedVersion( version );
     }
 
+    /** {@inheritDoc} */
     public void setArtifactHandler( ArtifactHandler handler )
     {
         artifact.setArtifactHandler( handler );
     }
 
+    /** {@inheritDoc} */
     public String toString()
     {
         return "active project artifact:\n\tartifact = " + artifact + ";\n\tproject: " + project;
     }
 
+    /** {@inheritDoc} */
     public boolean isRelease()
     {
         return artifact.isRelease();
     }
 
+    /** {@inheritDoc} */
     public void setRelease( boolean release )
     {
         artifact.setRelease( release );
     }
 
+    /** {@inheritDoc} */
     public List getAvailableVersions()
     {
         return artifact.getAvailableVersions();
     }
 
+    /** {@inheritDoc} */
     public void setAvailableVersions( List versions )
     {
         artifact.setAvailableVersions( versions );
     }
 
+    /** {@inheritDoc} */
     public boolean isOptional()
     {
         return artifact.isOptional();
     }
 
+    /** {@inheritDoc} */
     public ArtifactVersion getSelectedVersion()
         throws OverConstrainedVersionException
     {
         return artifact.getSelectedVersion();
     }
 
+    /** {@inheritDoc} */
     public boolean isSelectedVersionKnown()
         throws OverConstrainedVersionException
     {
         return artifact.isSelectedVersionKnown();
     }
 
+    /** {@inheritDoc} */
     public void setOptional( boolean optional )
     {
         artifact.setOptional( optional );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int hashCode()
     {
         int result = 17;
@@ -316,9 +361,7 @@ public class ActiveProjectArtifact
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean equals( Object o )
     {
         if ( o == this )
