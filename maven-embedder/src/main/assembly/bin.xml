@@ -73,6 +73,7 @@ under the License.
       <includes>
         <include>m2</include>
         <include>mvn</include>
+        <include>mvnDebug</include>
       </includes>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
