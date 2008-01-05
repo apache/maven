@@ -45,15 +45,6 @@ public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
-    /** @deprecated use {@link CLIReportingUtils#OS_NAME} */
-    public static final String OS_NAME = CLIReportingUtils.OS_NAME;
-
-    /** @deprecated use {@link CLIReportingUtils#OS_ARCH} */
-    public static final String OS_ARCH = CLIReportingUtils.OS_ARCH;
-
-    /** @deprecated use {@link CLIReportingUtils#OS_VERSION} */
-    public static final String OS_VERSION = CLIReportingUtils.OS_VERSION;
-
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );

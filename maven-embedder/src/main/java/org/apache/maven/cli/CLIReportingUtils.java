@@ -1,5 +1,16 @@
 package org.apache.maven.cli;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.TimeZone;
+
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.errors.CoreErrorReporter;
@@ -12,17 +23,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.TimeZone;
+import org.codehaus.plexus.util.Os;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -38,13 +39,6 @@ public final class CLIReportingUtils
     public static final int MS_PER_SEC = 1000;
 
     public static final int SEC_PER_MIN = 60;
-
-    public static final String OS_NAME = System.getProperty( "os.name" ).toLowerCase( Locale.US );
-
-    public static final String OS_ARCH = System.getProperty( "os.arch" ).toLowerCase( Locale.US );
-
-    public static final String OS_VERSION = System.getProperty( "os.version" )
-                                                  .toLowerCase( Locale.US );
 
     private static final String NEWLINE = System.getProperty( "line.separator" );
 
@@ -78,8 +72,8 @@ public final class CLIReportingUtils
                                 + System.getProperty( "java.version", "<unknown java version>" ) );
 
             //TODO: when plexus can return the family type, add that here because it will make it easier to know what profile activation settings to use.
-            System.out.println( "OS name: \"" + OS_NAME + "\" version: \"" + OS_VERSION
-                                + "\" arch: \"" + OS_ARCH + "\"" );
+            System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION
+                                + "\" arch: \"" + Os.OS_ARCH + "\"" );
         }
         catch ( IOException e )
         {
