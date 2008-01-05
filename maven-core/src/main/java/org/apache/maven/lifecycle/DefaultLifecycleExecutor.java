@@ -121,7 +121,7 @@ public class DefaultLifecycleExecutor
 
         if ( goals.isEmpty() )
         {
-            throw new NoGoalsSpecifiedException( "You must specify at least one goal. Try 'install'" );
+            throw new NoGoalsSpecifiedException( "\n\nYou must specify at least one goal. Try 'install' to build or mvn -? for other options.\n See http://maven.apache.org for more information.\n\n" );
         }
 
         List taskSegments = segmentTaskListByAggregationNeeds(
