@@ -130,7 +130,7 @@ public class MavenCli
         {
             System.out.println( "+ Error stacktraces are turned on." );
         }
-  
+
         // ----------------------------------------------------------------------
         // Process particular command line options
         // ----------------------------------------------------------------------
@@ -228,7 +228,7 @@ public class MavenCli
                 String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
 
                 StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
-                
+
                 while ( profileTokens.hasMoreTokens() )
                 {
                     String profileAction = profileTokens.nextToken().trim();
@@ -544,12 +544,12 @@ public class MavenCli
             {
                 System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
             }
-            
+
             System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
 
             System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
                                 "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
-                                           
+
         }
         catch ( IOException e )
         {
@@ -575,9 +575,12 @@ public class MavenCli
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
 
-            for ( int i = 0; i < defStrs.length; ++i )
+            if ( defStrs != null )
             {
-                setCliProperty( defStrs[i], executionProperties );
+                for ( int i = 0; i < defStrs.length; ++i )
+                {
+                    setCliProperty( defStrs[i], executionProperties );
+                }
             }
         }
 
