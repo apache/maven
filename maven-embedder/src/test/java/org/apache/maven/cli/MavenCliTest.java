@@ -75,7 +75,7 @@ public class MavenCliTest
         finally
         {
             System.setErr( oldErr );
-            System.setErr( oldOut );
+            System.setOut( oldOut );
         }
     }
 }
