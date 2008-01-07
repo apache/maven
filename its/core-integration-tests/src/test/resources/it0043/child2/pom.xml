@@ -42,7 +42,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-help-plugin</artifactId>
-				<version>2.0.2-SNAPSHOT</version> <!-- Removing this will cause MNG-900 -->
+				<version>2.0.2</version> <!-- Removing this will cause MNG-900 -->
         <executions>
           <execution>
             <phase>generate-test-resources</phase>

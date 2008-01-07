@@ -12,21 +12,22 @@
     <issue>MNG-2539</issue>
   </properties>
 
-  <!--
   <repositories>
     <repository>
       <id>javamail-local</id>
       <url>file://${basedir}/repository</url>
     </repository>
   </repositories>
-  -->
 
+  <!-- pluginRepositories are deprecated in 2.1-SNAPSHOT (trunk), use repositories instead. -->
+  <!--
   <pluginRepositories>
     <pluginRepository>
       <id>javamail-local</id>
       <url>file://${basedir}/repository</url>
     </pluginRepository>
   </pluginRepositories>
+  -->
 
   <build>
     <plugins>
