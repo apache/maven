@@ -60,7 +60,7 @@ public class PluginDescriptor
     private boolean inheritedByDefault = true;
 
     private List artifacts;
-    
+
     private Map lifecycleMappings;
 
     private ClassRealm classRealm;
@@ -258,6 +258,11 @@ public class PluginDescriptor
 
     public MojoDescriptor getMojo( String goal )
     {
+        if ( getMojos() == null )
+        {
+            return null; // no mojo in this POM
+        }
+
         // TODO: could we use a map? Maybe if the parent did that for components too, as this is too vulnerable to
         // changes above not being propogated to the map
 
@@ -329,22 +334,22 @@ public class PluginDescriptor
     {
         return introducedDependencyArtifacts != null ? introducedDependencyArtifacts : Collections.EMPTY_SET;
     }
-    
+
     public void setName( String name )
     {
         this.name = name;
     }
-    
+
     public String getName()
     {
         return name;
     }
-    
+
     public void setDescription( String description )
     {
         this.description = description;
     }
-    
+
     public String getDescription()
     {
         return description;
