@@ -4,12 +4,16 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 public final class CLIRequestUtils
 {
@@ -225,9 +229,26 @@ public final class CLIRequestUtils
     // System properties handling
     // ----------------------------------------------------------------------
 
-    private static Properties getExecutionProperties( CommandLine commandLine )
+    static Properties getExecutionProperties( CommandLine commandLine )
     {
         Properties executionProperties = new Properties();
+
+        // add the env vars to the property set, with the "env." prefix
+        // XXX support for env vars should probably be removed from the ModelInterpolator
+        try
+        {
+            Properties envVars = CommandLineUtils.getSystemEnvVars();
+            Iterator i = envVars.entrySet().iterator();
+            while ( i.hasNext() )
+            {
+                Entry e = (Entry) i.next();
+                executionProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+            }
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error getting environment vars for profile activation: " + e );
+        }
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -276,13 +297,5 @@ public final class CLIRequestUtils
         }
 
         executionProperties.setProperty( name, value );
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-
-        System.setProperty( name, value );
     }
-
 }
