@@ -21,6 +21,7 @@ package org.apache.maven.profiles;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
@@ -59,6 +60,13 @@ public class DefaultProfileManager
     {
         this.container = container;
         this.profileActivationContext = profileActivationContext;
+    }
+
+    // TODO: Remove this, if possible. It uses system properties, which are not safe for IDE and other embedded environments.
+    public DefaultProfileManager( PlexusContainer container )
+    {
+        this.container = container;
+        profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
     }
 
     public ProfileActivationContext getProfileActivationContext()
