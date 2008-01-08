@@ -19,10 +19,16 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
+import java.io.IOException;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.util.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 
 public class FileProfileActivator
     implements ProfileActivator
@@ -44,21 +50,33 @@ public class FileProfileActivator
             // check if the file exists, if it does then the profile will be active
             String fileString = actFile.getExists();
 
-            if ( ( fileString != null ) && !"".equals( fileString ) )
+            RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+            try
             {
+                interpolator.addValueSource( new EnvarBasedValueSource() );
+            }
+            catch ( IOException e )
+            {
+                // ignored
+            }
+            interpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
+
+            if ( StringUtils.isNotEmpty( fileString ) )
+            {
+                fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
                 return FileUtils.fileExists( fileString );
             }
 
             // check if the file is missing, if it is then the profile will be active
             fileString = actFile.getMissing();
 
-            if ( ( fileString != null ) && !"".equals( fileString ) )
+            if ( StringUtils.isNotEmpty( fileString ) )
             {
+                fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
                 return !FileUtils.fileExists( fileString );
             }
         }
 
         return false;
     }
-
 }
