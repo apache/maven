@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Properties;
 
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.util.StringOutputStream;
@@ -78,5 +79,29 @@ public class MavenCliTest
             System.setErr( oldErr );
             System.setOut( oldOut );
         }
+    }
+
+    public void testGetExecutionProperties()
+        throws Exception
+    {
+        System.setProperty( "test.property.1", "1.0" );
+        System.setProperty( "test.property.2", "2.0" );
+        Properties p = MavenCli.getExecutionProperties( ( new MavenCli.CLIManager() ).parse( new String[] {
+            "-Dtest.property.2=2.1",
+            "-Dtest.property.3=3.0" } ) );
+
+        // assume that everybody has a PATH env var
+        String envPath = p.getProperty( "env.PATH" );
+        if ( envPath == null )
+        {
+            envPath = p.getProperty( "env.Path" );
+        }
+        assertNotNull( envPath );
+
+        assertEquals( "1.0", p.getProperty( "test.property.1" ) );
+        assertEquals( "3.0", p.getProperty( "test.property.3" ) );
+
+        // sys props should override cmdline props
+        assertEquals( "2.0", p.getProperty( "test.property.2" ) );
     }
 }

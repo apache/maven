@@ -23,9 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -63,6 +65,7 @@ import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -221,7 +224,7 @@ public class MavenCli
                 // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
             }
 
-            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer(),System.getProperties() );
+            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer(), executionProperties );
 
             if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
             {
@@ -561,9 +564,26 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    private static Properties getExecutionProperties( CommandLine commandLine )
+    static Properties getExecutionProperties( CommandLine commandLine )
     {
         Properties executionProperties = new Properties();
+
+        // add the env vars to the property set, with the "env." prefix
+        // XXX support for env vars should probably be removed from the ModelInterpolator
+        try
+        {
+            Properties envVars = CommandLineUtils.getSystemEnvVars();
+            Iterator i = envVars.entrySet().iterator();
+            while ( i.hasNext() )
+            {
+                Entry e = (Entry) i.next();
+                executionProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+            }
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error getting environment vars for profile activation: " + e );
+        }
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -611,13 +631,6 @@ public class MavenCli
         }
 
         executionProperties.setProperty( name, value );
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-
-        System.setProperty( name, value );
     }
 
     // ----------------------------------------------------------------------
