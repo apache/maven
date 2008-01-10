@@ -121,7 +121,7 @@ under the License.
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
-    <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4-SNAPSHOT" name="maven-plugins" type="pom"/>
+    <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4" name="maven-plugins" type="pom"/>
     <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
     <!-- Wagon Deps (Start) -->
     <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
