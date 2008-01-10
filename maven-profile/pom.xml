@@ -35,7 +35,7 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
-          <model>profiles.mdo</model>
+          <model>src/main/mdo/profiles.mdo</model>
         </configuration>
       </plugin>
     </plugins>
