@@ -49,24 +49,6 @@ public aspect MavenExecErrorReporterAspect
         return currentProject;
     }
 
-    before( MavenExecutionRequest request, File pomFile, ProjectBuildingException exception ):
-        cflow( dm_getProjects( request ) )
-        && cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )
-        && call( MavenExecutionException.new( .., File, ProjectBuildingException ) )
-        && args( .., pomFile, exception )
-    {
-        getReporter().handleProjectBuildingError( request, pomFile, exception );
-    }
-
-    before( ProfileManager globalProfileManager, ProjectBuildingException exception ):
-        cflow( dm_getProjects( MavenExecutionRequest ) )
-        && cflow( dm_collectProjects( ArtifactRepository, globalProfileManager ) )
-        && call( MavenExecutionException.new( String, ProjectBuildingException ) )
-        && args( .., exception )
-    {
-        getReporter().handleSuperPomBuildingError( globalProfileManager, exception );
-    }
-
     before( MavenExecutionException err ):
         cflow( dm_getProjects( MavenExecutionRequest ) )
         && cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )

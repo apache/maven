@@ -21,7 +21,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.extension.DefaultBuildExtensionScanner;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.extension.ExtensionManagerException;
@@ -46,18 +45,6 @@ public privileged aspect ExtensionErrorReporterAspect
         && args( *, cause )
     {
         getReporter().handleSuperPomBuildingError( cause );
-    }
-
-    private pointcut within_dbes_buildModelLineage( MavenExecutionRequest request ):
-        withincode( ModelLineage DefaultBuildExtensionScanner.buildModelLineage( File, MavenExecutionRequest, List ) )
-        && args( *, request, * );
-
-    before( MavenExecutionRequest request, File pomFile, ProjectBuildingException cause ):
-        within_dbes_buildModelLineage( request )
-        && call( ExtensionScanningException.new( String, File, ProjectBuildingException ) )
-        && args( .., pomFile, cause )
-    {
-        getReporter().handleProjectBuildingError( request, pomFile, cause );
     }
 
     private pointcut within_dbes_checkModulesForExtensions():

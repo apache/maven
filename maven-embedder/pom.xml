@@ -80,6 +80,11 @@ under the License.
       <artifactId>aspectjrt</artifactId>
       <version>1.5.3</version>
     </dependency>
+    
+    <dependency>
+      <groupId>easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
   </dependencies>
   <distributionManagement>
     <site>

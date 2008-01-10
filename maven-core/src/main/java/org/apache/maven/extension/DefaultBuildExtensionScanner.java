@@ -407,6 +407,7 @@ public class DefaultBuildExtensionScanner
         }
         catch ( ProjectBuildingException e )
         {
+            System.out.println( "blah" );
             throw new ExtensionScanningException( "Error building model lineage in order to pre-scan for extensions: "
                 + e.getMessage(), pom, e );
         }

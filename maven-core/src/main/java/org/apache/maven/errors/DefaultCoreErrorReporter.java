@@ -870,17 +870,6 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void handleProjectBuildingError( MavenExecutionRequest request,
-                                            File pomFile,
-                                            ProjectBuildingException exception )
-    {
-        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
-        Throwable reportedException = projectReporter.findReportedException( exception );
-        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
-
-        registerBuildError( exception, formattedMessage, reportedException );
-    }
-
     public void reportInvalidMavenVersion( MavenProject project,
                                            ArtifactVersion mavenVersion,
                                            MavenExecutionException err )

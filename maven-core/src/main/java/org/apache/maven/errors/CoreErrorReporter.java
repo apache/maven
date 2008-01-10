@@ -99,8 +99,6 @@ public interface CoreErrorReporter
 
     void reportErrorFormulatingBuildPlan( List tasks, MavenProject configuringProject, String targetDescription, LifecycleException cause );
 
-    void handleProjectBuildingError( MavenExecutionRequest request, File pomFile, ProjectBuildingException exception );
-
     void reportInvalidMavenVersion( MavenProject project, ArtifactVersion mavenVersion, MavenExecutionException err );
 
     void reportPomFileScanningError( File basedir, String includes, String excludes, IOException cause );
