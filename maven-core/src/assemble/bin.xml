@@ -55,7 +55,7 @@ under the License.
       <includes>
         <include>m2</include>
         <include>mvn</include>
-		<include>mvnDebug</include>
+        <include>mvnDebug</include>
       </includes>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -70,6 +70,10 @@ under the License.
       <includes>
         <include>maven-*-uber.jar</include>
       </includes>
+    </fileSet>
+    <fileSet>
+      <directory>target/maven-site/target/site</directory>
+      <outputDirectory>docs</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
