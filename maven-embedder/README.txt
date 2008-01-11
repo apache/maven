@@ -4,13 +4,15 @@
   What is it?
   -----------
 
-  Maven is a software project management and comprehension tool. Based on 
+  Maven is a software project management and comprehension tool. Based on
   the concept of a Project Object Model (POM), Maven can manage a project's
   build, reporting and documentation from a central piece of information.
 
   Documentation
   -------------
 
+  The documentation available as of the date of this release is included in
+  HTML format in the docs/ directory.
   The most up-to-date documentation can be found at http://maven.apache.org/.
 
   Release Notes
@@ -22,7 +24,7 @@
   -------------------
 
   JDK:
-    1.4 or above (this is to execute Maven - it still allows you to build against 1.3 
+    1.4 or above (this is to execute Maven - it still allows you to build against 1.3
     and prior JDK's).
   Memory:
     No minimum requirement.

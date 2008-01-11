@@ -89,5 +89,9 @@ under the License.
         <include>maven-embedder-*.jar</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>target/maven-site/target/site</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>
