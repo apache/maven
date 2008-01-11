@@ -1,5 +1,10 @@
 package org.apache.maven.error;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
@@ -7,6 +12,8 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -14,8 +21,12 @@ import org.easymock.MockControl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 
@@ -30,6 +41,10 @@ public class ErrorReporterPointcutTest
     private MavenEmbedder maven;
 
     private String basedir;
+
+    private static boolean isOffline;
+
+    private static boolean offlineIsSet = false;
 
     public void setUp()
         throws Exception
@@ -57,10 +72,68 @@ public class ErrorReporterPointcutTest
         maven = new MavenEmbedder( configuration );
     }
 
+    private boolean checkOnline()
+    {
+        if ( !offlineIsSet )
+        {
+            HttpClient client = new HttpClient();
+            GetMethod get = new GetMethod(
+                                           "http://repo1.maven.org/maven2/org/apache/maven/maven-core/2.0/maven-core-2.0.pom" );
+
+            HttpConnectionManager mgr = client.getHttpConnectionManager();
+            mgr.getParams().setConnectionTimeout( 1 );
+
+            try
+            {
+                int result = client.executeMethod( get );
+                if ( result == HttpStatus.SC_OK )
+                {
+                    new MavenXpp3Reader().read( get.getResponseBodyAsStream() );
+                    isOffline = false;
+                }
+            }
+            catch ( HttpException e )
+            {
+                System.out.println( "System is offline" );
+                isOffline = true;
+            }
+            catch ( IOException e )
+            {
+                System.out.println( "System is offline" );
+                isOffline = true;
+            }
+            catch ( XmlPullParserException e )
+            {
+                System.out.println( "System is offline" );
+                isOffline = true;
+            }
+            finally
+            {
+                offlineIsSet = true;
+            }
+        }
+
+        if ( isOffline )
+        {
+            String method = getTestMethodName();
+            System.out.println( "Test: " + method
+                                + " requires an access to the Maven central repository. SKIPPING." );
+            return false;
+        }
+
+        return true;
+    }
+
+    private String getTestMethodName()
+    {
+        String method = new Throwable().getStackTrace()[2].getMethodName();
+        return method;
+    }
+
     private File prepareProjectDir()
         throws URISyntaxException, IOException
     {
-        String method = new Throwable().getStackTrace()[1].getMethodName();
+        String method = getTestMethodName();
 
         String resource = "error-reporting-projects/" + method;
 
@@ -74,8 +147,9 @@ public class ErrorReporterPointcutTest
             {
                 FileUtils.deleteDirectory( targetDirectory );
             }
-            catch( IOException e )
-            {}
+            catch ( IOException e )
+            {
+            }
         }
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
@@ -108,10 +182,69 @@ public class ErrorReporterPointcutTest
 
     }
 
+    // FIXME: Fix the offline detection for this one!
     public void testReportAggregatedMojoFailureException()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "plugin" ) );
+
+        File basedir = new File( projectDir, "project" );
+
+        reporter.reportAggregatedMojoFailureException( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( basedir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "org.apache.maven.errortest:testReportAggregatedMojoFailureException-maven-plugin:1:test"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
+    }
+
+    private void buildTestAccessory( File basedir )
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( basedir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "clean",
+                                                                              "install"
+                                                                          } ) );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        if ( result.hasExceptions() )
+        {
+            StringWriter writer = new StringWriter();
+            PrintWriter pWriter = new PrintWriter( writer );
+
+            writer.write( "Failed to build project in: " );
+            writer.write( basedir.getPath() );
+            writer.write( "\nEncountered the following errors:" );
+
+            for ( Iterator it = result.getExceptions().iterator(); it.hasNext(); )
+            {
+                Throwable error = (Throwable) it.next();
+                writer.write( "\n\n" );
+                error.printStackTrace( pWriter );
+            }
+
+            fail( writer.toString() );
+        }
     }
 
     public void testReportAttemptToOverrideUneditableMojoParameter()
@@ -277,8 +410,19 @@ public class ErrorReporterPointcutTest
 
     public void testReportNoGoalsSpecifiedException()
     {
-        // TODO Auto-generated method stub
+        reporter.reportNoGoalsSpecifiedException( null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
 
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Collections.EMPTY_LIST );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportPluginErrorWhileValidatingTask()
@@ -300,9 +444,26 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectCycle()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportProjectCycle( null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportProjectDependenciesNotFound()
@@ -377,82 +538,149 @@ public class ErrorReporterPointcutTest
 
     }
 
-    public void clearErrors()
+    // FIXME: How can I test this when it's masked by reportActivatorErrorWhileGettingRepositoriesFromProfiles?
+    public void testReportActivatorError()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportActivatorError( null, null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
-    public Throwable findReportedException( Throwable error )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getFormattedMessage( Throwable error )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Throwable getRealCause( Throwable error )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void testReportActivatorErrorWhileApplyingProfiles()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void testReportActivatorErrorWhileGettingRepositoriesFromProfiles()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void testReportActivatorLookupErrorWhileApplyingProfiles()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void testReportActivatorLookupErrorWhileGettingRepositoriesFromProfiles()
+    public void testReportActivatorLookupError()
     {
         // TODO Auto-generated method stub
 
     }
 
     public void testReportBadDependencyVersion()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportBadDependencyVersion( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportBadManagedDependencyVersion()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportBadManagedDependencyVersion( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportBadNonDependencyProjectArtifactVersion()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportBadNonDependencyProjectArtifactVersion( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorCreatingArtifactRepository()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportErrorCreatingArtifactRepository( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorCreatingDeploymentArtifactRepository()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportErrorCreatingDeploymentArtifactRepository( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorInterpolatingModel_UsingModelInstance()
@@ -520,7 +748,9 @@ public class ErrorReporterPointcutTest
 
         reporterCtl.replay();
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( new File( projectDir, "pom.xml" ) )
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( new File(
+                                                                                             projectDir,
+                                                                                             "pom.xml" ) )
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
@@ -551,15 +781,49 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectCollision()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportProjectCollision( null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportProjectValidationFailure()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportProjectValidationFailure( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
 }

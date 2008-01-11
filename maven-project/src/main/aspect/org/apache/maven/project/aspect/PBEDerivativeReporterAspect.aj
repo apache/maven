@@ -12,6 +12,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.MavenTools;
+import org.apache.maven.project.build.model.DefaultModelLineageBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.DefaultMavenProjectBuilder;
 import org.apache.maven.project.InvalidProjectModelException;
@@ -19,6 +20,7 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;
 import java.util.Set;
+import java.util.List;
 
 public privileged aspect PBEDerivativeReporterAspect
     extends AbstractProjectErrorReporterAspect
@@ -32,6 +34,10 @@ public privileged aspect PBEDerivativeReporterAspect
 
     private pointcut pbldr_processProjectLogic( MavenProject project, File pomFile ):
         execution( private MavenProject DefaultMavenProjectBuilder.processProjectLogic( MavenProject, File, .. ) )
+        && args( project, pomFile, .. );
+
+    private pointcut within_pbldr_processProjectLogic( MavenProject project, File pomFile ):
+        withincode( private MavenProject DefaultMavenProjectBuilder.processProjectLogic( MavenProject, File, .. ) )
         && args( project, pomFile, .. );
 
     private pointcut within_DefaultMavenProjectBuilder():
@@ -63,8 +69,6 @@ public privileged aspect PBEDerivativeReporterAspect
         call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
         && args( repo );
 
-    private boolean processingPluginRepositories = false;
-
     // =========================================================================
     // Call Stack:
     // =========================================================================
@@ -82,31 +86,31 @@ public privileged aspect PBEDerivativeReporterAspect
     after( MavenProject project, File pomFile, Repository repo ) throwing( UnknownRepositoryLayoutException cause ):
         mavenTools_buildArtifactRepository( repo )
         && cflow( pbldr_processProjectLogic( project, pomFile ) )
-        && within_DefaultMavenProjectBuilder()
     {
-        getReporter().reportErrorCreatingArtifactRepository( project, pomFile, repo, cause, processingPluginRepositories );
+        getReporter().reportErrorCreatingArtifactRepository( project.getId(), pomFile, repo, cause );
     }
 
-    after():
-        call( * Model+.getPluginRepositories() )
-        && cflow( pbldr_processProjectLogic( MavenProject, File ) )
-        && within_DefaultMavenProjectBuilder()
-    {
-        processingPluginRepositories = true;
-    }
+    private pointcut mlbldr_updateRepositorySet( Model model, File pomFile ):
+        execution( List DefaultModelLineageBuilder.updateRepositorySet( Model, *, File, .. ) )
+        && args( model, *, pomFile, .. );
 
-    after():
-        call( * Model+.getRepositories() )
-        && cflow( pbldr_processProjectLogic( MavenProject, File ) )
-        && within_DefaultMavenProjectBuilder()
+    // =========================================================================
+    // Call Stack:
+    // =========================================================================
+    // ...
+    // --> DefaultModelLineageBuilder.buildModelLineage(..)
+    // --> DefaultModelLineageBuilder.resumeBuildingModelLineage(..)
+    //     --> DefaultModelLineageBuilder.updateRepositorySet(..) (private)
+    //         --> DefaultMavenTools.buildArtifactRepositories(..)
+    //             --> DefaultMavenTools.buildArtifactRepository(..)
+    //         <------ UnknownRepositoryLayoutException
+    // <------ ProjectBuildingException
+    // =========================================================================
+    after( Model model, File pomFile, Repository repo ) throwing( UnknownRepositoryLayoutException cause ):
+        mavenTools_buildArtifactRepository( repo )
+        && cflow( mlbldr_updateRepositorySet( model, pomFile ) )
     {
-        processingPluginRepositories = false;
-    }
-
-    after( MavenProject project, File pomFile ):
-        pbldr_processProjectLogic( project, pomFile )
-    {
-        processingPluginRepositories = false;
+        getReporter().reportErrorCreatingArtifactRepository( model.getId(), pomFile, repo, cause );
     }
 
     // ModelInterpolationException

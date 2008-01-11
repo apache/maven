@@ -114,51 +114,12 @@ public class DefaultProjectErrorReporter
     /**
      * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorErrorWhileApplyingProfiles(org.apache.maven.profiles.activation.ProfileActivator, org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
      */
-    public void reportActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
-                                                           Model model,
-                                                           File pomFile,
-                                                           Profile profile,
-                                                           ProfileActivationContext context,
-                                                           ProfileActivationException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Profile activator: " );
-        writer.write( activator.getClass().getName() );
-        writer.write( " experienced an error while processing profile:" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( profile.getId() );
-        writer.write( " (source: " );
-        writer.write( profile.getSource() );
-        writer.write( ")" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-
-        addStandardInfo( model.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorErrorWhileApplyingProfiles( activator,
-                                                                                 model,
-                                                                                 pomFile,
-                                                                                 profile,
-                                                                                 context,
-                                                                                 cause ), writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorErrorWhileGettingRepositoriesFromProfiles(org.apache.maven.profiles.activation.ProfileActivator, java.lang.String, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
-     */
-    public void reportActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
-                                                                          String projectId,
-                                                                          File pomFile,
-                                                                          Profile profile,
-                                                                          ProfileActivationContext context,
-                                                                          ProfileActivationException cause )
+    public void reportActivatorError( ProfileActivator activator,
+                                      String projectId,
+                                      File pomFile,
+                                      Profile profile,
+                                      ProfileActivationContext context,
+                                      ProfileActivationException cause )
     {
         StringWriter writer = new StringWriter();
 
@@ -179,58 +140,23 @@ public class DefaultProjectErrorReporter
         writer.write( cause.getMessage() );
 
         addStandardInfo( projectId, pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorErrorWhileGettingRepositoriesFromProfiles( activator,
-                                                                                                projectId,
-                                                                                                pomFile,
-                                                                                                profile,
-                                                                                                context,
-                                                                                                cause ),
-                 writer );
+        addTips( ProjectErrorTips.getTipsForActivatorError( activator,
+                                                            projectId,
+                                                            pomFile,
+                                                            profile,
+                                                            context,
+                                                            cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
     /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupErrorWhileApplyingProfiles(org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
+     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupError(java.lang.String, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
      */
-    public void reportActivatorLookupErrorWhileApplyingProfiles( Model model,
-                                                                 File pomFile,
-                                                                 Profile profile,
-                                                                 ComponentLookupException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Error retrieving profile-activator component while processing profile:" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( profile.getId() );
-        writer.write( " (source: " );
-        writer.write( profile.getSource() );
-        writer.write( ")" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-
-        addStandardInfo( model.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorLookupErrorWhileApplyingProfiles( model,
-                                                                                       pomFile,
-                                                                                       profile,
-                                                                                       cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    /**
-     * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles(java.lang.String, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
-     */
-    public void reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
-                                                                                File pomFile,
-                                                                                Profile profile,
-                                                                                ComponentLookupException cause )
+    public void reportActivatorLookupError( String projectId,
+                                            File pomFile,
+                                            Profile profile,
+                                            ComponentLookupException cause )
     {
         StringWriter writer = new StringWriter();
 
@@ -249,11 +175,10 @@ public class DefaultProjectErrorReporter
         writer.write( cause.getMessage() );
 
         addStandardInfo( projectId, pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorLookupErrorWhileGettingRepositoriesFromProfiles( projectId,
-                                                                                                      pomFile,
-                                                                                                      profile,
-                                                                                                      cause ),
-                 writer );
+        addTips( ProjectErrorTips.getTipsForActivatorLookupError( projectId,
+                                                                  pomFile,
+                                                                  profile,
+                                                                  cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
@@ -385,11 +310,10 @@ public class DefaultProjectErrorReporter
         }
     }
 
-    public void reportErrorCreatingArtifactRepository( MavenProject project,
+    public void reportErrorCreatingArtifactRepository( String projectId,
                                                        File pomFile,
                                                        Repository repo,
-                                                       UnknownRepositoryLayoutException cause,
-                                                       boolean isPluginRepo )
+                                                       UnknownRepositoryLayoutException cause )
     {
         StringWriter writer = new StringWriter();
 
@@ -405,8 +329,8 @@ public class DefaultProjectErrorReporter
         writer.write( cause.getMessage() );
         writer.write( NEWLINE );
 
-        addStandardInfo( project.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, project.getId(), pomFile, cause ),
+        addStandardInfo( projectId, pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, projectId, pomFile, cause ),
                  writer );
 
         registerBuildError( cause, writer.toString() );

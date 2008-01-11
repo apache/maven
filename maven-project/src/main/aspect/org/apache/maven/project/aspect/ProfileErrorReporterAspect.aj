@@ -72,7 +72,7 @@ public privileged aspect ProfileErrorReporterAspect
         throwing( ComponentLookupException cause ):
             applyActivatedProfiles_ComponentLookupException( model, pomFile, profile )
     {
-        getReporter().reportActivatorLookupErrorWhileApplyingProfiles( model, pomFile, profile, cause );
+        getReporter().reportActivatorLookupError( model.getId(), pomFile, profile, cause );
     }
 
     protected pointcut profileActivatorCall( ProfileActivator activator ):
@@ -107,7 +107,7 @@ public privileged aspect ProfileErrorReporterAspect
         throwing( ProfileActivationException cause ):
             applyActivatedProfiles_ActivatorThrown( activator, model, pomFile, profile, context )
     {
-        getReporter().reportActivatorErrorWhileApplyingProfiles( activator, model, pomFile, profile, context, cause );
+        getReporter().reportActivatorError( activator, model.getId(), pomFile, profile, context, cause );
     }
 
     private pointcut pAdv_loadExternalProjectProfiles( Model model, File pomFile ):
@@ -189,7 +189,7 @@ public privileged aspect ProfileErrorReporterAspect
         throwing( ComponentLookupException cause ):
             getArtifactRepositoriesFromActiveProfiles_ComponentLookupException( projectId, pomFile, profile )
     {
-        getReporter().reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles( projectId, pomFile, profile, cause );
+        getReporter().reportActivatorLookupError( projectId, pomFile, profile, cause );
     }
 
     private pointcut getArtifactRepositoriesFromActiveProfiles_ActivatorThrown( ProfileActivator activator,
@@ -220,7 +220,7 @@ public privileged aspect ProfileErrorReporterAspect
         throwing( ProfileActivationException cause ):
             getArtifactRepositoriesFromActiveProfiles_ActivatorThrown( activator, projectId, pomFile, profile, context )
     {
-        getReporter().reportActivatorErrorWhileGettingRepositoriesFromProfiles( activator, projectId, pomFile, profile, context, cause );
+        getReporter().reportActivatorError( activator, projectId, pomFile, profile, context, cause );
     }
 
     private pointcut getArtifactRepositoriesFromActiveProfiles_InvalidRepository( Repository repo,

@@ -84,13 +84,16 @@ public privileged aspect ExtensionErrorReporterAspect
         getReporter().reportErrorResolvingExtensionDirectDependencies( extensionArtifact, projectArtifact, remoteRepos, request, cause );
     }
 
-    before( Artifact extensionArtifact, Artifact projectArtifact, List remoteRepos, MavenExecutionRequest request, ArtifactResolutionResult resolutionResult, ExtensionManagerException err ):
+    ExtensionManagerException around( Artifact extensionArtifact, Artifact projectArtifact, List remoteRepos, MavenExecutionRequest request, ArtifactResolutionResult resolutionResult ):
         cflow( dem_addExtension( extensionArtifact, projectArtifact, remoteRepos, request ) )
-        && execution( ExtensionManagerException.new( .., ArtifactResolutionResult ) )
+        && call( ExtensionManagerException.new( .., ArtifactResolutionResult ) )
         && args( .., resolutionResult )
-        && this( err )
     {
+        ExtensionManagerException err = proceed( extensionArtifact, projectArtifact, remoteRepos, request, resolutionResult );
+
         getReporter().reportErrorResolvingExtensionDependencies( extensionArtifact, projectArtifact, remoteRepos, request, resolutionResult, err );
+
+        return err;
     }
 
     private pointcut call_eme_ctor_RealmManagementException( RealmManagementException cause ):
@@ -214,27 +217,17 @@ public privileged aspect ExtensionErrorReporterAspect
         cflow( dem_addPluginAsExtension( Plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && cflow( dpm_verifyVersionedPlugin( plugin ) )
-        && execution( PluginVersionResolutionException.new( .., String ) )
+        && call( PluginVersionResolutionException.new( .., String ) )
         && this( err )
     {
         getReporter().reportIncompatibleMavenVersionForExtensionPlugin( plugin, originModel, remoteRepos, request, requiredVersion, currentVersion, err );
-    }
-
-    before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ProjectBuildingException cause ):
-        cflow( dem_addPluginAsExtension( Plugin, originModel, remoteRepos, request ) )
-        && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
-        && cflow( dpm_verifyVersionedPlugin( plugin ) )
-        && execution( InvalidPluginException.new( .., ProjectBuildingException ) )
-        && args( .., cause )
-    {
-        getReporter().handleErrorBuildingExtensionPluginPOM( plugin, originModel, remoteRepos, request, cause );
     }
 
     before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, InvalidDependencyVersionException cause ):
         cflow( dem_addPluginAsExtension( Plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && cflow( dpm_verifyVersionedPlugin( plugin ) )
-        && execution( InvalidPluginException.new( .., InvalidDependencyVersionException ) )
+        && call( InvalidPluginException.new( .., InvalidDependencyVersionException ) )
         && args( .., cause )
     {
         getReporter().reportInvalidDependencyVersionInExtensionPluginPOM( plugin, originModel, remoteRepos, request, cause );

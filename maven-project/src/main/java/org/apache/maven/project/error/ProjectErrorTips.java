@@ -33,12 +33,12 @@ public final class ProjectErrorTips
     {
     }
 
-    public static List getTipsForActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
-                                                                              Model model,
-                                                                              File pomFile,
-                                                                              Profile profile,
-                                                                              ProfileActivationContext context,
-                                                                              ProfileActivationException cause )
+    public static List getTipsForActivatorError( ProfileActivator activator,
+                                                 String projectId,
+                                                 File pomFile,
+                                                 Profile profile,
+                                                 ProfileActivationContext context,
+                                                 ProfileActivationException cause )
     {
         return listOf( new String[]{  "If this is a standard profile activator, see "
                                        + "http://maven.apache.org/pom.html#Activation for help configuring profile activation.",
@@ -47,37 +47,10 @@ public final class ProjectErrorTips
                        "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
     }
 
-    public static List getTipsForActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
-                                                                                             String projectId,
-                                                                                             File pomFile,
-                                                                                             Profile profile,
-                                                                                             ProfileActivationContext context,
-                                                                                             ProfileActivationException cause )
-    {
-        return listOf( new String[]{  "If this is a standard profile activator, see "
-                                       + "http://maven.apache.org/pom.html#Activation for help configuring profile activation.",
-                       "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
-                       "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
-    }
-
-    public static List getTipsForActivatorLookupErrorWhileApplyingProfiles( Model model,
-                                                                                    File pomFile,
-                                                                                    Profile profile,
-                                                                                    ComponentLookupException cause )
-    {
-        return listOf( new String[]{  "If this is a custom profile activator, please ensure the activator's "
-                                       + "artifact is present in the POM's build/extensions list.",
-                       "See http://maven.apache.org/pom.html#Extensions for more on build extensions.",
-                       "XSD location for pom.xml: http://maven.apache.org/xsd/maven-4.0.0.xsd",
-                       "XSD location for settings.xml: http://maven.apache.org/xsd/settings-1.0.0.xsd",
-                       "XSD location for profiles.xml: http://maven.apache.org/xsd/profiles-1.0.0.xsd" } );
-    }
-
-    public static List getTipsForActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
-                                                                                                   File pomFile,
-                                                                                                   Profile profile,
-                                                                                                   ComponentLookupException cause )
+    public static List getTipsForActivatorLookupError( String projectId,
+                                                       File pomFile,
+                                                       Profile profile,
+                                                       ComponentLookupException cause )
     {
         return listOf( new String[]{  "If this is a custom profile activator, please ensure the activator's "
                                        + "artifact is present in the POM's build/extensions list.",

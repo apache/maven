@@ -915,8 +915,15 @@ public class DefaultMavenProjectBuilder
 
         validateModel( model, pomFile );
 
-        project.setRemoteArtifactRepositories(
-            mavenTools.buildArtifactRepositories( model.getRepositories() ) );
+        try
+        {
+            project.setRemoteArtifactRepositories(
+                                                  mavenTools.buildArtifactRepositories( model.getRepositories() ) );
+        }
+        catch( Exception e )
+        {
+            e.printStackTrace();
+        }
 
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 

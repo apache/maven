@@ -45,27 +45,6 @@ public interface ProjectErrorReporter
      * DefaultProfileAdvisor.applyActivatedProfiles(..)
      * DefaultProfileAdvisor.applyActivatedExternalProfiles(..)
      * --&gt; DefaultProfileAdvisor.applyActivatedProfiles(..) (private)
-     *     --&gt; DefaultProfileManager.getActiveProfiles(..)
-     *         --&gt; DefaultProfileManager.isActive(..) (private)
-     *             --&gt; ProfileActivator.canDetermineActivation(..)
-     *             --&gt; ProfileActivator.isActive(..)
-     *         &lt;------ ProfileActivationException
-     * &lt;------ ProjectBuildingException
-     * </pre>
-     */
-    void reportActivatorErrorWhileApplyingProfiles( ProfileActivator activator,
-                                                    Model model,
-                                                    File pomFile,
-                                                    Profile profile,
-                                                    ProfileActivationContext context,
-                                                    ProfileActivationException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * DefaultProfileAdvisor.applyActivatedProfiles(..)
-     * DefaultProfileAdvisor.applyActivatedExternalProfiles(..)
      * --&gt; DefaultProfileAdvisor.getArtifactRepositoriesFromActiveProfiles(..)
      *     --&gt; DefaultProfileManager.getActiveProfiles(..)
      *         --&gt; DefaultProfileManager.isActive(..) (private)
@@ -75,12 +54,12 @@ public interface ProjectErrorReporter
      * &lt;------ ProjectBuildingException
      * </pre>
      */
-    void reportActivatorErrorWhileGettingRepositoriesFromProfiles( ProfileActivator activator,
-                                                                   String projectId,
-                                                                   File pomFile,
-                                                                   Profile profile,
-                                                                   ProfileActivationContext context,
-                                                                   ProfileActivationException cause );
+    void reportActivatorError( ProfileActivator activator,
+                               String projectId,
+                               File pomFile,
+                               Profile profile,
+                               ProfileActivationContext context,
+                               ProfileActivationException cause );
 
     /**
      * <b>Call Stack:</b>
@@ -89,25 +68,6 @@ public interface ProjectErrorReporter
      * DefaultProfileAdvisor.applyActivatedProfiles(..)
      * DefaultProfileAdvisor.applyActivatedExternalProfiles(..)
      * --&gt; DefaultProfileAdvisor.applyActivatedProfiles(..) (private)
-     *     --&gt; DefaultProfileManager.getActiveProfiles(..)
-     *         --&gt; DefaultProfileManager.isActive(..) (private)
-     *             --&gt; PlexusContainer.lookupList(..)
-     *             &lt;-- ComponentLookupException
-     *         &lt;-- ProfileActivationException
-     * &lt;------ ProjectBuildingException
-     * </pre>
-     */
-    void reportActivatorLookupErrorWhileApplyingProfiles( Model model,
-                                                          File pomFile,
-                                                          Profile profile,
-                                                          ComponentLookupException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * DefaultProfileAdvisor.applyActivatedProfiles(..)
-     * DefaultProfileAdvisor.applyActivatedExternalProfiles(..)
      * --&gt; DefaultProfileAdvisor.getArtifactRepositoriesFromActiveProfiles(..)
      *     --&gt; DefaultProfileManager.getActiveProfiles(..)
      *         --&gt; DefaultProfileManager.isActive(..) (private)
@@ -117,10 +77,10 @@ public interface ProjectErrorReporter
      * &lt;------ ProjectBuildingException
      * </pre>
      */
-    void reportActivatorLookupErrorWhileGettingRepositoriesFromProfiles( String projectId,
-                                                                         File pomFile,
-                                                                         Profile profile,
-                                                                         ComponentLookupException cause );
+    void reportActivatorLookupError( String projectId,
+                                     File pomFile,
+                                     Profile profile,
+                                     ComponentLookupException cause );
 
     /**
      * <b>Call Stack:</b>
@@ -211,11 +171,10 @@ public interface ProjectErrorReporter
      * &lt;---------- ProjectBuildingException
      * </pre>
      */
-    void reportErrorCreatingArtifactRepository( MavenProject project,
+    void reportErrorCreatingArtifactRepository( String projectId,
                                                 File pomFile,
                                                 Repository repo,
-                                                UnknownRepositoryLayoutException cause,
-                                                boolean isPluginRepo );
+                                                UnknownRepositoryLayoutException cause );
 
     /**
      * <b>Call Stack:</b>

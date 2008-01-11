@@ -2,11 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.test.error</groupId>
-  <artifactId>test-mojo-failure</artifactId>
+  <artifactId>testReportProjectMojoFailureException</artifactId>
   <packaging>jar</packaging>
   <version>1</version>
-  <name>test-mojo-failure</name>
-  <url>http://maven.apache.org</url>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

@@ -5,7 +5,6 @@ import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -40,7 +39,6 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -947,28 +945,6 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void handleSuperPomBuildingError( MavenExecutionRequest request,
-                                             ArtifactRepository localRepository,
-                                             ProfileManager globalProfileManager,
-                                             ProjectBuildingException exception )
-    {
-        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
-        Throwable reportedException = projectReporter.findReportedException( exception );
-        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
-
-        registerBuildError( exception, formattedMessage, reportedException );
-    }
-
-    public void handleSuperPomBuildingError( ProfileManager globalProfileManager,
-                                             ProjectBuildingException exception )
-    {
-        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
-        Throwable reportedException = projectReporter.findReportedException( exception );
-        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
-
-        registerBuildError( exception, formattedMessage, reportedException );
-    }
-
     public void handleSuperPomBuildingError( ProjectBuildingException exception )
     {
         ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
@@ -1385,19 +1361,6 @@ public class DefaultCoreErrorReporter
                  writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    public void handleErrorBuildingExtensionPluginPOM( Plugin plugin,
-                                                       Model originModel,
-                                                       List remoteRepos,
-                                                       MavenExecutionRequest request,
-                                                       ProjectBuildingException cause )
-    {
-        ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
-        Throwable reportedException = projectReporter.findReportedException( cause );
-        String formattedMessage = projectReporter.getFormattedMessage( reportedException );
-
-        registerBuildError( cause, formattedMessage, reportedException );
     }
 
     public void reportInvalidDependencyVersionInExtensionPluginPOM( Plugin plugin,
