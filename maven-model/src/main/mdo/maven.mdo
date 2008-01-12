@@ -1387,7 +1387,7 @@
       <version>3.0.0+</version>
       <description>
         <![CDATA[
-        The <code>&lt;dependency&gt;</code> element contains informations required to a dependency
+        The <code>&lt;dependency&gt;</code> element contains information about a dependency
         of the project.
         ]]>
       </description>
@@ -2913,7 +2913,7 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The version (or valid range of verisons) of the plugin to be used.
+            The version (or valid range of versions) of the plugin to be used.
             ]]>
           </description>
           <type>String</type>
@@ -2934,7 +2934,7 @@
           <version>4.0.0</version>
           <description>
             Multiple specifications of a set of goals to execute during
-            the build lifecycle, each having (possibly) different
+            the build lifecycle, each having (possibly) a different
             configuration.
           </description>
           <association>
@@ -3079,7 +3079,7 @@
           <defaultValue>default</defaultValue>
           <description>
             The identifier of this execution for labelling the goals
-            during the build, and for matching exections to merge during
+            during the build, and for matching executions to merge during
             inheritance.
           </description>
         </field>
@@ -3090,7 +3090,7 @@
           <description>
             The build lifecycle phase to bind the goals in this
             execution to. If omitted, the goals will be bound to the
-            default specified in their metadata.
+            default phase specified in their metadata.
           </description>
         </field>
         <field>
