@@ -48,6 +48,10 @@ public class DefaultMavenRealmManager
         this.logger = logger;
     }
 
+    //mkleint: the clearing is fine for sequenced operations. Even though the 
+    // MavenRealmManager is associated with request, the paralel execution will
+    // eventualy fail as the ClassWorld and PlexusContainer are not meant for 
+    // multithreaded environment.
     public void clear()
     {
         Collection realms = new HashSet( world.getRealms() );
