@@ -305,6 +305,38 @@ under the License.
       <build>
         <plugins>
           <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-1</version>
+            <executions>
+              <execution>
+                <id>create-distro</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptor>src/main/assembly/bin.xml</descriptor>
+                  <finalName>apache-maven-${pom.version}</finalName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.3</version>
+            <configuration>
+              <forkMode>once</forkMode>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>include-site</id>
+      <build>
+        <plugins>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-scm-plugin</artifactId>
             <configuration>
@@ -340,30 +372,6 @@ under the License.
                 </goals>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-1</version>
-            <executions>
-              <execution>
-                <id>create-distro</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptor>src/main/assembly/bin.xml</descriptor>
-                  <finalName>apache-maven-${pom.version}</finalName>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-              <forkMode>once</forkMode>
-            </configuration>
           </plugin>
         </plugins>
       </build>
