@@ -1,0 +1,25 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.test.ComponentOne</role>
+      <role-hint>default</role-hint>
+      <implementation>org.test.ComponentOne</implementation>
+      <requirements>
+        <requirement>
+          <role>org.test.ComponentTwo</role>
+        </requirement>
+      </requirements>
+    </component>
+      
+    <component>
+      <role>org.test.ComponentTwo</role>
+      <role-hint>default</role-hint>
+      <implementation>org.test.ComponentTwo</implementation>
+      <requirements>
+        <requirement>
+          <role>org.test.ComponentOne</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

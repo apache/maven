@@ -17,7 +17,6 @@ import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
-import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -46,7 +45,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +62,8 @@ public interface CoreErrorReporter
 
     void reportErrorConfiguringExtensionPluginRealm( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginManagerException cause );
 
+    void reportErrorConfiguringExtensionPluginRealm( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, RealmManagementException cause );
+
     void reportErrorFormulatingBuildPlan( List tasks, MavenProject configuringProject, String targetDescription, LifecycleException cause );
 
     void reportErrorInterpolatingModel( Model model, Map inheritedValues, File pomFile, MavenExecutionRequest request, ModelInterpolationException cause );
@@ -71,8 +71,6 @@ public interface CoreErrorReporter
     void reportErrorLoadingPlugin( MojoBinding binding, MavenProject project, PluginLoaderException cause );
 
     void reportErrorManagingRealmForExtension( Artifact extensionArtifact, Artifact projectArtifact, List remoteRepos, MavenExecutionRequest request, RealmManagementException cause );
-
-    void reportErrorManagingRealmForExtensionPlugin( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, RealmManagementException cause );
 
     void reportErrorResolvingExtensionDependencies( Artifact extensionArtifact, Artifact projectArtifact, List remoteRepos, MavenExecutionRequest request, ArtifactResolutionResult resolutionResult, ExtensionManagerException err );
 
@@ -92,9 +90,9 @@ public interface CoreErrorReporter
 
     void reportInvalidPluginExecutionEnvironment( MojoBinding binding, MavenProject project, PluginExecutionException cause );
 
-    void reportLifecycleLoaderErrorWhileValidatingTask( MavenSession session, MavenProject rootProject, LifecycleLoaderException cause, TaskValidationResult result );
+    void reportLifecycleLoaderErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, LifecycleLoaderException cause );
 
-    void reportLifecycleSpecErrorWhileValidatingTask( MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause, TaskValidationResult result );
+    void reportLifecycleSpecErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause );
 
     void reportMissingArtifactWhileAddingExtensionPlugin( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactNotFoundException cause );
 
@@ -108,11 +106,7 @@ public interface CoreErrorReporter
 
     void reportNoGoalsSpecifiedException( MavenProject rootProject, NoGoalsSpecifiedException error );
 
-    void reportPluginErrorWhileValidatingTask( MavenSession session, MavenProject rootProject, PluginLoaderException cause, TaskValidationResult result );
-
-    void reportPomFileCanonicalizationError( File pomFile, IOException cause );
-
-    void reportPomFileScanningError( File basedir, String includes, String excludes, IOException cause );
+    void reportPluginErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, PluginLoaderException cause );
 
     void reportProjectCycle( ProjectCycleException error );
 

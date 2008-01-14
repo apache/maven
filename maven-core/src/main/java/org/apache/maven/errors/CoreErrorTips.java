@@ -9,7 +9,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.lifecycle.LifecycleException;
-import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -67,7 +66,7 @@ public final class CoreErrorTips
         return null;
     }
 
-    public static List getTaskValidationTips( TaskValidationResult result, Exception cause )
+    public static List getTaskValidationTips( String task, Exception cause )
     {
         // TODO Auto-generated method stub
         return null;

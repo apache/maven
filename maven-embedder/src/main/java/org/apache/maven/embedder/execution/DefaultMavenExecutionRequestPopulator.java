@@ -339,18 +339,24 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( createLocalRepository( request.getSettings(), configuration ) );
+            request.setLocalRepository( createLocalRepository( request, request.getSettings(), configuration ) );
         }
     }
 
 
-    public ArtifactRepository createLocalRepository( Settings settings,
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request,
+                                                     Settings settings,
                                                      Configuration configuration )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
 
-        if ( configuration.getLocalRepository() != null )
+        if ( request.getLocalRepositoryPath() != null )
+        {
+            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
+        }
+
+        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
         {
             localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
         }

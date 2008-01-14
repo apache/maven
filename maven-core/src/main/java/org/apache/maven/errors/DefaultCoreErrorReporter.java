@@ -21,7 +21,6 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
-import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -56,7 +55,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -251,58 +249,58 @@ public class DefaultCoreErrorReporter
         registerBuildError( error, writer.toString(), cause );
     }
 
-    public void reportLifecycleLoaderErrorWhileValidatingTask( MavenSession session,
+    public void reportLifecycleLoaderErrorWhileValidatingTask( String task,
+                                                               MavenSession session,
                                                                MavenProject rootProject,
-                                                               LifecycleLoaderException cause,
-                                                               TaskValidationResult result )
+                                                               LifecycleLoaderException cause )
     {
         StringWriter writer = new StringWriter();
 
         writer.write( NEWLINE );
         writer.write( "Invalid mojo or lifecycle phase: " );
-        writer.write( result.getInvalidTask() );
+        writer.write( task );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
 
         writer.write( "Original error message was: " );
         writer.write( cause.getMessage() );
 
-        addTips( CoreErrorTips.getTaskValidationTips( result, cause ), writer );
+        addTips( CoreErrorTips.getTaskValidationTips( task, cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void reportLifecycleSpecErrorWhileValidatingTask( MavenSession session,
+    public void reportLifecycleSpecErrorWhileValidatingTask( String task,
+                                                             MavenSession session,
                                                              MavenProject rootProject,
-                                                             LifecycleSpecificationException cause,
-                                                             TaskValidationResult result )
+                                                             LifecycleSpecificationException cause )
     {
         StringWriter writer = new StringWriter();
 
         writer.write( NEWLINE );
         writer.write( "Invalid mojo or lifecycle phase: " );
-        writer.write( result.getInvalidTask() );
+        writer.write( task );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
 
         writer.write( "Original error message was: " );
         writer.write( cause.getMessage() );
 
-        addTips( CoreErrorTips.getTaskValidationTips( result, cause ), writer );
+        addTips( CoreErrorTips.getTaskValidationTips( task, cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void reportPluginErrorWhileValidatingTask( MavenSession session,
+    public void reportPluginErrorWhileValidatingTask( String task,
+                                                      MavenSession session,
                                                       MavenProject rootProject,
-                                                      PluginLoaderException cause,
-                                                      TaskValidationResult result )
+                                                      PluginLoaderException cause )
     {
         StringWriter writer = new StringWriter();
 
         writer.write( NEWLINE );
         writer.write( "Invalid mojo or lifecycle phase: " );
-        writer.write( result.getInvalidTask() );
+        writer.write( task );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
 
@@ -314,7 +312,7 @@ public class DefaultCoreErrorReporter
         writer.write( "Original error message was: " );
         writer.write( cause.getMessage() );
 
-        addTips( CoreErrorTips.getTaskValidationTips( result, cause ), writer );
+        addTips( CoreErrorTips.getTaskValidationTips( task, cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
@@ -895,56 +893,6 @@ public class DefaultCoreErrorReporter
         registerBuildError( err, writer.toString() );
     }
 
-    public void reportPomFileScanningError( File basedir,
-                                            String includes,
-                                            String excludes,
-                                            IOException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Maven encountered an error while scanning for POM files to build." );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-
-        writer.write( "In base directory: " );
-        writer.write( String.valueOf( basedir ) );
-        writer.write( NEWLINE );
-        writer.write( "with include pattern(s):" );
-        writer.write( includes );
-        writer.write( NEWLINE );
-        writer.write( "and exclude pattern(s):" );
-        writer.write( excludes );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( cause.getMessage() );
-
-        addTips( CoreErrorTips.getPomFileScanningErrorTips( basedir, includes, excludes ), writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    public void reportPomFileCanonicalizationError( File pomFile,
-                                                    IOException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Maven encountered an error while standardizing your POM's File instance." );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-
-        writer.write( "POM file: " );
-        writer.write( String.valueOf( pomFile ) );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( cause.getMessage() );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
     public void handleSuperPomBuildingError( ProjectBuildingException exception )
     {
         ProjectErrorReporter projectReporter = ProjectReporterManager.getReporter();
@@ -1197,7 +1145,7 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void reportErrorManagingRealmForExtensionPlugin( Plugin plugin,
+    public void reportErrorConfiguringExtensionPluginRealm( Plugin plugin,
                                                             Model originModel,
                                                             List remoteRepos,
                                                             MavenExecutionRequest request,

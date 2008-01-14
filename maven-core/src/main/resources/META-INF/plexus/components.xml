@@ -262,7 +262,7 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
-          <role-hint>default</role-hint>
+          <role-hint>maven-strict</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>

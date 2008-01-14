@@ -739,9 +739,9 @@ public class DefaultLifecycleExecutor
         return segments;
     }
 
-    private MojoDescriptor getMojoDescriptorForDirectInvocation( final String task,
-                                                                 final MavenSession session,
-                                                                 final MavenProject project )
+    private MojoDescriptor getMojoDescriptorForDirectInvocation( String task,
+                                                                 MavenSession session,
+                                                                 MavenProject project )
         throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException
     {
         // we don't need to include report configuration here, since we're just looking for
@@ -756,6 +756,7 @@ public class DefaultLifecycleExecutor
             binding,
             project,
             session );
+
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
 
         return mojoDescriptor;

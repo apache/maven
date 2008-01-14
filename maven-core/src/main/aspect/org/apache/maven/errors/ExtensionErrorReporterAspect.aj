@@ -31,7 +31,6 @@ import org.apache.maven.plugin.version.DefaultPluginVersionManager;
 import org.apache.maven.execution.RuntimeInformation;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -45,17 +44,6 @@ public privileged aspect ExtensionErrorReporterAspect
         && args( *, cause )
     {
         getReporter().handleSuperPomBuildingError( cause );
-    }
-
-    private pointcut within_dbes_checkModulesForExtensions():
-        withincode( * DefaultBuildExtensionScanner.checkModulesForExtensions( File, Model, MavenExecutionRequest, List, List, List ) );
-
-    before( File pomFile, IOException cause ):
-        within_dbes_checkModulesForExtensions()
-        && call( ExtensionScanningException.new( String, File, String, IOException ) )
-        && args( *, pomFile, *, cause )
-    {
-        getReporter().reportPomFileCanonicalizationError( pomFile, cause );
     }
 
     private pointcut dbes_scanInternal( File pomFile, MavenExecutionRequest request ):
@@ -123,7 +111,7 @@ public privileged aspect ExtensionErrorReporterAspect
         && within_dem_addPluginAsExtension()
         && call_eme_ctor_RealmManagementException( cause )
     {
-        getReporter().reportErrorManagingRealmForExtensionPlugin( plugin, originModel, remoteRepos, request, cause );
+        getReporter().reportErrorConfiguringExtensionPluginRealm( plugin, originModel, remoteRepos, request, cause );
     }
 
     before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactNotFoundException cause ):

@@ -1,7 +1,6 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.plugin.loader.PluginLoaderException;
@@ -9,16 +8,23 @@ import org.apache.maven.ProjectCycleException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
 import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.Maven;
+import org.apache.maven.plugin.loader.PluginLoader;
+import org.apache.maven.lifecycle.binding.MojoBindingFactory;
 
-public aspect BuildFailureReporterAspect
+public privileged aspect BuildFailureReporterAspect
     extends AbstractCoreReporterAspect
 {
+
+    private pointcut within_le_execute( MavenSession session, ReactorManager reactorManager ):
+        withincode( void LifecycleExecutor+.execute( MavenSession, ReactorManager, .. ) )
+        && args( session, reactorManager, .. );
 
     private pointcut le_execute( MavenSession session, ReactorManager reactorManager ):
         execution( void LifecycleExecutor+.execute( MavenSession, ReactorManager, .. ) )
@@ -35,12 +41,15 @@ public aspect BuildFailureReporterAspect
      * </code>
      * </pre>
      */
-    after( ReactorManager reactorManager, NoGoalsSpecifiedException err ):
+    NoGoalsSpecifiedException around( ReactorManager reactorManager ):
         cflow( le_execute( MavenSession, reactorManager ) )
-        && execution( NoGoalsSpecifiedException.new( .. ) )
-        && this( err )
+        && call( NoGoalsSpecifiedException.new( .. ) )
     {
+        NoGoalsSpecifiedException err = proceed( reactorManager );
+
         getReporter().reportNoGoalsSpecifiedException( reactorManager.getTopLevelProject(), err );
+
+        return err;
     }
 
     private pointcut aggregatedBuildFailureException_ctor( MojoBinding binding, MojoFailureException cause ):
@@ -113,9 +122,8 @@ public aspect BuildFailureReporterAspect
         getReporter().reportProjectCycle( err );
     }
 
-    private pointcut le_isTaskValid( MavenSession session, MavenProject rootProject ):
-        execution( TaskValidationResult LifecycleExecutor+.isTaskValid( .., MavenSession, MavenProject ) )
-        && args( .., session, rootProject );
+    private pointcut within_le_getMojoDescriptorForDirectInvocation():
+        withincode( * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) );
 
     /**
      * Call stack is:
@@ -129,14 +137,19 @@ public aspect BuildFailureReporterAspect
      * </code>
      * </pre>
      */
-    before( MavenSession session, MavenProject rootProject, PluginLoaderException cause, TaskValidationResult result ):
-        cflow( le_isTaskValid( session, rootProject ) )
-        && execution( TaskValidationResult.new( .., PluginLoaderException ) )
-        && args( .., cause )
-        && this( result )
+    after( MojoBinding binding, MavenSession session, MavenProject rootProject ) throwing ( PluginLoaderException cause ):
+        within_le_getMojoDescriptorForDirectInvocation()
+        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, MavenSession ) )
+        && args( binding, rootProject, session )
     {
-        getReporter().reportPluginErrorWhileValidatingTask( session, rootProject, cause, result );
+        getReporter().reportPluginErrorWhileValidatingTask( binding.getGoal(), session, rootProject, cause );
     }
+
+//    before():
+//        call( * MojoBindingFactory+.parseMojoBinding( String, MavenProject, MavenSession, boolean ) )
+//    {
+//        System.out.println( "Boo" );
+//    }
 
     /**
      * Call stack is:
@@ -150,13 +163,12 @@ public aspect BuildFailureReporterAspect
      * </code>
      * </pre>
      */
-    before( MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause, TaskValidationResult result ):
-        cflow( le_isTaskValid( session, rootProject ) )
-        && execution( TaskValidationResult.new( .., LifecycleSpecificationException ) )
-        && args( .., cause )
-        && this( result )
+    after( String task, MavenSession session, MavenProject rootProject ) throwing ( LifecycleSpecificationException cause ):
+        within_le_getMojoDescriptorForDirectInvocation()
+        && call( * MojoBindingFactory+.parseMojoBinding( String, MavenProject, MavenSession, .. ) )
+        && args( task, rootProject, session, .. )
     {
-        getReporter().reportLifecycleSpecErrorWhileValidatingTask( session, rootProject, cause, result );
+        getReporter().reportLifecycleSpecErrorWhileValidatingTask( task, session, rootProject, cause );
     }
 
     /**
@@ -171,13 +183,12 @@ public aspect BuildFailureReporterAspect
      * </code>
      * </pre>
      */
-    before( MavenSession session, MavenProject rootProject, LifecycleLoaderException cause, TaskValidationResult result ):
-        cflow( le_isTaskValid( session, rootProject ) )
-        && execution( TaskValidationResult.new( .., LifecycleLoaderException ) )
-        && args( .., cause )
-        && this( result )
+    after( String task, MavenSession session, MavenProject rootProject ) throwing ( LifecycleLoaderException cause ):
+        within_le_getMojoDescriptorForDirectInvocation()
+        && call( * MojoBindingFactory+.parseMojoBinding( String, MavenProject, MavenSession, .. ) )
+        && args( task, rootProject, session, .. )
     {
-        getReporter().reportLifecycleLoaderErrorWhileValidatingTask( session, rootProject, cause, result );
+        getReporter().reportLifecycleLoaderErrorWhileValidatingTask( task, session, rootProject, cause );
     }
 
 }

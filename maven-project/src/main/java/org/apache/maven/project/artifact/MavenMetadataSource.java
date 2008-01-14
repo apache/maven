@@ -127,6 +127,12 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidProjectModelException e )
                 {
+                    if ( strictlyEnforceThePresenceOfAValidMavenPOM )
+                    {
+                        throw new ArtifactMetadataRetrievalException( "Invalid POM file for artifact: '" +
+                            artifact.getDependencyConflictId() + "' Reason: " + e.getMessage(), e, artifact );
+                    }
+
                     getLogger().warn( "POM for \'" + pomArtifact +
                         "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
 

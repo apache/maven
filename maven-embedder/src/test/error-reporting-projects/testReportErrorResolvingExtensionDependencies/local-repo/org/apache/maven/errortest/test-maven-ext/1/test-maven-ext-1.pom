@@ -19,17 +19,16 @@ under the License.
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>testReportBadNonDependencyProjectArtifactVersion</artifactId>
+  <groupId>org.apache.maven.errortest</groupId>
+  <artifactId>test-maven-ext</artifactId>
   <version>1</version>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>[3.1,</version>
-      </plugin>
-    </plugins>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.errortest</groupId>
+      <artifactId>test-maven-ext-dep</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+  
 </project>

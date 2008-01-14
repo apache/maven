@@ -10,10 +10,8 @@ import org.apache.maven.DefaultMaven;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 public aspect MavenExecErrorReporterAspect
@@ -49,36 +47,21 @@ public aspect MavenExecErrorReporterAspect
         return currentProject;
     }
 
-    before( MavenExecutionException err ):
+    MavenExecutionException around():
         cflow( dm_getProjects( MavenExecutionRequest ) )
         && cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )
-        && execution( MavenExecutionException.new( String, File ) )
-        && this( err )
+        && call( MavenExecutionException.new( String, File ) )
     {
+        MavenExecutionException err = proceed();
+
         getReporter().reportInvalidMavenVersion( currentProject, mavenVersion, err );
+
+        return err;
     }
 
     after(): dm_collectProjects( ArtifactRepository, ProfileManager )
     {
         currentProject = null;
-    }
-
-    after( File basedir, String includes, String excludes ) throwing( IOException cause ):
-        cflow( dm_getProjects( MavenExecutionRequest ) )
-        && cflow( execution( * DefaultMaven.getProjectFiles( MavenExecutionRequest ) ) )
-        && call( * FileUtils.getFiles( File, String, String ) )
-        && args( basedir, includes, excludes )
-    {
-        getReporter().reportPomFileScanningError( basedir, includes, excludes, cause );
-    }
-
-    after( File pomFile ) throwing( IOException cause ):
-        cflow( dm_getProjects( MavenExecutionRequest ) )
-        && cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )
-        && call( File File.getCanonicalFile() )
-        && target( pomFile )
-    {
-        getReporter().reportPomFileCanonicalizationError( pomFile, cause );
     }
 
 }

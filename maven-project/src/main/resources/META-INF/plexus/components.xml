@@ -263,6 +263,23 @@ under the License.
 
     <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+      <role-hint>maven-strict</role-hint>
+      <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
+      <configuration>
+        <strictlyEnforceThePresenceOfAValidMavenPOM>true</strictlyEnforceThePresenceOfAValidMavenPOM>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
       <requirements>
