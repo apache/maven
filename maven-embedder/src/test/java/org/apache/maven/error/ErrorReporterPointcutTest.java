@@ -5,6 +5,7 @@ import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
@@ -216,31 +217,35 @@ public class ErrorReporterPointcutTest
         fail( writer.toString() );
     }
 
-    // FIXME: Figure out how to keep the project-build error report from being the primary report...
     public void testReportErrorResolvingExtensionDirectDependencies()
         throws URISyntaxException, IOException
     {
-//        File projectDir = prepareProjectDir();
-//        File localRepo = new File( projectDir, "local-repo" );
-//        File project = new File( projectDir, "project" );
-//
-//        reporter.reportErrorResolvingExtensionDirectDependencies( null, null, null, null, null );
-//        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-//        reporterCtl.setVoidCallable();
-//
-//        reporterCtl.replay();
-//
-//        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
-//                                                                          .setLocalRepositoryPath( localRepo )
-//                                                                          .setShowErrors( true )
-//                                                                          .setErrorReporter( reporter )
-//                                                                          .setGoals( Arrays.asList( new String[] {
-//                                                                              "initialize"
-//                                                                          } ) );
-//
-//        maven.execute( request );
-//
-//        reporterCtl.verify();
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
+
+        // TODO: Verify that the actual error reported is the one that identified the failing project as an extension POM.
+        reporter.reportBadDependencyVersion( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporter.reportErrorResolvingExtensionDirectDependencies( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setLocalRepositoryPath( localRepo )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportAggregatedMojoFailureException()
@@ -613,27 +618,49 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectDependenciesNotFound()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportProjectDependenciesNotFound( null, null, (MultipleArtifactsNotFoundException) null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportProjectDependenciesUnresolvable()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
-    }
+        reporter.reportProjectDependenciesUnresolvable( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
 
-    public void testReportProjectDependencyArtifactNotFound()
-    {
-        // TODO Auto-generated method stub
+        reporterCtl.replay();
 
-    }
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
 
-    public void testReportProjectDependencyArtifactUnresolvable()
-    {
-        // TODO Auto-generated method stub
+        maven.execute( request );
 
+        reporterCtl.verify();
     }
 
     public void testReportProjectMojoFailureException()

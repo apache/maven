@@ -10,6 +10,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -643,25 +644,18 @@ public class DefaultCoreErrorReporter
         reportTransitiveResolutionError( project, scope, cause );
     }
 
+    public void reportProjectDependenciesNotFound( MavenProject project,
+                                                   String scope,
+                                                   MultipleArtifactsNotFoundException cause )
+    {
+        reportTransitiveResolutionError( project, scope, cause );
+    }
+
     public void reportProjectDependenciesUnresolvable( MavenProject project,
                                                        String scope,
                                                        ArtifactResolutionException cause )
     {
         reportTransitiveResolutionError( project, scope, cause );
-    }
-
-    public void reportProjectDependencyArtifactNotFound( MavenProject project,
-                                                         Artifact artifact,
-                                                         ArtifactNotFoundException cause )
-    {
-        reportArtifactError( project, artifact, cause );
-    }
-
-    public void reportProjectDependencyArtifactUnresolvable( MavenProject project,
-                                                             Artifact artifact,
-                                                             ArtifactResolutionException cause )
-    {
-        reportArtifactError( project, artifact, cause );
     }
 
     private void reportTransitiveResolutionError( MavenProject project,
@@ -687,24 +681,6 @@ public class DefaultCoreErrorReporter
 
         writeProjectCoordinate( project, writer );
         addTips( CoreErrorTips.getDependencyArtifactResolutionTips( project, scope, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    private void reportArtifactError( MavenProject project,
-                                      Artifact depArtifact,
-                                      AbstractArtifactResolutionException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Maven could not resolve one of your project dependencies from the repository:" );
-
-        writeArtifactInfo( depArtifact, cause, writer, true );
-
-        writeProjectCoordinate( project, writer );
-        addTips( CoreErrorTips.getDependencyArtifactResolutionTips( project, depArtifact, cause ),
                  writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );

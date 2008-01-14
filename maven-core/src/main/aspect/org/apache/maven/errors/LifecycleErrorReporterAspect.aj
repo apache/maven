@@ -4,9 +4,8 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.logging.Logger;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
@@ -217,29 +216,14 @@ public privileged aspect LifecycleErrorReporterAspect
     after( MavenProject project, String scope ) throwing( ArtifactResolutionException cause ):
         pm_resolveTransitiveDependencies( project, scope )
     {
-        getReporter().reportProjectDependenciesUnresolvable( project, scope, cause );
-    }
-
-    private pointcut within_pm_downloadDependencies( MavenProject project ):
-        withincode( void DefaultPluginManager.downloadDependencies( MavenProject, .. ) )
-        && args( project, .. );
-
-    private pointcut ar_resolve( Artifact artifact ):
-        call( * ArtifactResolver+.resolve( Artifact, ..) )
-        && args( artifact, .. );
-
-    after( MavenProject project, Artifact artifact ) throwing( ArtifactNotFoundException cause ):
-        within_pm_downloadDependencies( project )
-        && ar_resolve( artifact )
-    {
-        getReporter().reportProjectDependencyArtifactNotFound( project, artifact, cause );
-    }
-
-    after( MavenProject project, Artifact artifact ) throwing( ArtifactResolutionException cause ):
-        within_pm_downloadDependencies( project )
-        && ar_resolve( artifact )
-    {
-        getReporter().reportProjectDependencyArtifactUnresolvable( project, artifact, cause );
+        if ( cause instanceof MultipleArtifactsNotFoundException )
+        {
+            getReporter().reportProjectDependenciesNotFound( project, scope, (MultipleArtifactsNotFoundException) cause );
+        }
+        else
+        {
+            getReporter().reportProjectDependenciesUnresolvable( project, scope, cause );
+        }
     }
 
     private pointcut le_getLifecycleBindings( List tasks, MavenProject configuringProject, String targetDescription ):

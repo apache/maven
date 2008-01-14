@@ -7,6 +7,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -112,11 +113,9 @@ public interface CoreErrorReporter
 
     void reportProjectDependenciesNotFound( MavenProject project, String scope, ArtifactNotFoundException cause );
 
+    void reportProjectDependenciesNotFound( MavenProject project, String scope, MultipleArtifactsNotFoundException cause );
+
     void reportProjectDependenciesUnresolvable( MavenProject project, String scope, ArtifactResolutionException cause );
-
-    void reportProjectDependencyArtifactNotFound( MavenProject project, Artifact artifact, ArtifactNotFoundException cause );
-
-    void reportProjectDependencyArtifactUnresolvable( MavenProject project, Artifact artifact, ArtifactResolutionException cause );
 
     void reportProjectMojoFailureException( MavenSession session, MojoBinding binding, MojoFailureException cause );
 
