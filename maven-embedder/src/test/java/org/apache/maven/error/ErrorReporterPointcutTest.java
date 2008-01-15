@@ -950,15 +950,51 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorParsingParentProjectModel_XmlPullParserException()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File childDir = new File( projectDir, "child" );
 
+        reporter.reportErrorParsingParentProjectModel( null, null, (XmlPullParserException) null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( childDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorParsingParentProjectModel_IOException()
+        throws URISyntaxException, IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File childDir = new File( projectDir, "child" );
 
+        reporter.reportErrorParsingParentProjectModel( null, null, (IOException) null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( childDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorParsingProjectModel_XmlPullParserException()
