@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -146,7 +145,7 @@ public class ErrorReporterPointcutTest
     }
 
     private File prepareProjectDir()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         String method = getTestMethodName();
 
@@ -217,7 +216,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorResolvingExtensionDirectDependencies()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
         File localRepo = new File( projectDir, "local-repo" );
@@ -248,7 +247,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportAggregatedMojoFailureException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         if ( !checkOnline() )
         {
@@ -292,7 +291,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorConfiguringExtensionPluginRealm()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -319,7 +318,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorFormulatingBuildPlan()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         if ( !checkOnline() )
         {
@@ -351,7 +350,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorInterpolatingModel_UsingProjectInstance()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         if ( !checkOnline() )
         {
@@ -388,7 +387,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorManagingRealmForExtension()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -415,7 +414,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorResolvingExtensionDependencies()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
         File localRepo = new File( projectDir, "local-repo" );
@@ -471,7 +470,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportInvalidMavenVersion()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -494,7 +493,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportInvalidPluginExecutionEnvironment()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -517,7 +516,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportLifecycleLoaderErrorWhileValidatingTask()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
         File localRepo = new File( projectDir, "local-repo" );
@@ -618,7 +617,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectCycle()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -641,7 +640,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectDependenciesNotFound()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -665,7 +664,7 @@ public class ErrorReporterPointcutTest
 
     // FIXME: Get the wagon to fail (in a way other than 'not found')
     public void testReportProjectDependenciesUnresolvable()
-        throws URISyntaxException, IOException
+        throws IOException
     {
 //        File projectDir = prepareProjectDir();
 //
@@ -688,7 +687,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectMojoFailureException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -737,7 +736,7 @@ public class ErrorReporterPointcutTest
 
     // FIXME: How can I test this when it's masked by reportActivatorErrorWhileGettingRepositoriesFromProfiles?
     public void testReportActivatorError()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -766,7 +765,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportBadDependencyVersion()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -789,7 +788,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportBadManagedDependencyVersion()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -812,7 +811,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportBadNonDependencyProjectArtifactVersion()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -835,7 +834,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorCreatingArtifactRepository()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -858,7 +857,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorCreatingDeploymentArtifactRepository()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -881,7 +880,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorInterpolatingModel_UsingModelInstance()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -904,7 +903,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorLoadingExternalProfilesFromFile_XmlPullParserException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -927,7 +926,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorLoadingExternalProfilesFromFile_IOException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -950,7 +949,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorParsingParentProjectModel_XmlPullParserException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
         File childDir = new File( projectDir, "child" );
@@ -974,7 +973,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorParsingParentProjectModel_IOException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
         File childDir = new File( projectDir, "child" );
@@ -998,7 +997,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorParsingProjectModel_XmlPullParserException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -1021,7 +1020,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorParsingProjectModel_IOException()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -1046,15 +1045,49 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportInvalidRepositoryWhileGettingRepositoriesFromProfiles()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportParentPomArtifactNotFound()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
 
+        reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportParentPomArtifactUnresolvable()
@@ -1064,7 +1097,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectCollision()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
@@ -1087,7 +1120,7 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportProjectValidationFailure()
-        throws URISyntaxException, IOException
+        throws IOException
     {
         File projectDir = prepareProjectDir();
 
