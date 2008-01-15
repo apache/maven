@@ -142,7 +142,7 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.3</version>
         <configuration>
-          <forkMode>never</forkMode>
+          <forkMode>once</forkMode>
         </configuration>
       </plugin>
     </plugins>
