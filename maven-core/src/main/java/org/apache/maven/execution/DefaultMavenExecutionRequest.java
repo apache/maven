@@ -23,6 +23,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -530,6 +532,8 @@ public class DefaultMavenExecutionRequest
 
     private CoreErrorReporter errorReporter;
 
+    private ProfileActivationContext profileActivationContext;
+
     public MavenExecutionRequest setSettings( Settings settings )
     {
         this.settings = settings;
@@ -635,6 +639,17 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setErrorReporter( CoreErrorReporter reporter )
     {
         errorReporter = reporter;
+        return this;
+    }
+
+    public ProfileActivationContext getProfileActivationContext()
+    {
+        return profileActivationContext;
+    }
+
+    public MavenExecutionRequest setProfileActivationContext( ProfileActivationContext profileActivationContext )
+    {
+        this.profileActivationContext = profileActivationContext;
         return this;
     }
 }

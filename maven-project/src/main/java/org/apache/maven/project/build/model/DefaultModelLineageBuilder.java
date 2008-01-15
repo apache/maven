@@ -47,7 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -280,22 +279,15 @@ public class DefaultModelLineageBuilder
     {
         getLogger().debug( "Grabbing profile-injected repositories for: " + model.getId() );
 
-        List explicitlyActive;
-        List explicitlyInactive;
-
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext context;
 
         if ( profileManager != null )
         {
-            explicitlyActive = profileManager.getExplicitlyActivatedIds();
-            explicitlyInactive = profileManager.getExplicitlyDeactivatedIds();
             context = profileManager.getProfileActivationContext();
         }
         else
         {
-            explicitlyActive = Collections.EMPTY_LIST;
-            explicitlyInactive = Collections.EMPTY_LIST;
             context = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
@@ -307,8 +299,6 @@ public class DefaultModelLineageBuilder
 
         LinkedHashSet pomProfileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
                                                                                        pomFile,
-                                                                                       explicitlyActive,
-                                                                                       explicitlyInactive,
                                                                                        useProfilesXml,
                                                                                        context );
 

@@ -24,6 +24,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;

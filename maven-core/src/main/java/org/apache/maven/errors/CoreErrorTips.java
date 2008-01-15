@@ -7,7 +7,6 @@ import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
@@ -23,6 +22,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 

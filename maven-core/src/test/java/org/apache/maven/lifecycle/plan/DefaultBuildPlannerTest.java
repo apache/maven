@@ -2,9 +2,7 @@ package org.apache.maven.lifecycle.plan;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenRealmManager;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -17,6 +15,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.realm.DefaultMavenRealmManager;
+import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.shared.tools.easymock.MockManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;

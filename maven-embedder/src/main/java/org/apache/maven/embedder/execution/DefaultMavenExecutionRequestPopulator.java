@@ -29,7 +29,6 @@ import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.errors.DefaultCoreErrorReporter;
-import org.apache.maven.execution.DefaultMavenRealmManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
@@ -39,6 +38,7 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -119,11 +119,11 @@ public class DefaultMavenExecutionRequestPopulator
 
         eventing( request, configuration );
 
+        realmManager( request, configuration );
+
         profileManager( request, configuration );
 
         processSettings( request, configuration );
-
-        realmManager( request, configuration );
 
         return request;
     }
@@ -655,14 +655,20 @@ public class DefaultMavenExecutionRequestPopulator
         //
         // ------------------------------------------------------------------------
 
-        ProfileActivationContext activationContext = new DefaultProfileActivationContext( request.getProperties(), false );
+        ProfileActivationContext activationContext = request.getProfileActivationContext();
+        if ( activationContext == null )
+        {
+            activationContext = new DefaultProfileActivationContext( request.getRealmManager(),
+                                                                     request.getProperties(), false );
+        }
+
+        activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );
+        activationContext.setExplicitlyInactiveProfileIds( request.getInactiveProfiles() );
+
         ProfileManager globalProfileManager = new DefaultProfileManager( container, activationContext );
 
-        globalProfileManager.explicitlyActivate( request.getActiveProfiles() );
-
-        globalProfileManager.explicitlyDeactivate( request.getInactiveProfiles() );
-
         request.setProfileManager( globalProfileManager );
+        request.setProfileActivationContext( activationContext );
     }
 
     // ----------------------------------------------------------------------------

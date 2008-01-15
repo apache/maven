@@ -25,9 +25,12 @@ import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.realm.DefaultMavenRealmManager;
+import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,12 +43,6 @@ public class DefaultProfileManager
     implements ProfileManager
 {
     private PlexusContainer container;
-
-    private List activatedIds = new ArrayList();
-
-    private List deactivatedIds = new ArrayList();
-
-    private List defaultIds = new ArrayList();
 
     private Map profilesById = new LinkedHashMap();
 
@@ -63,10 +60,18 @@ public class DefaultProfileManager
     }
 
     // TODO: Remove this, if possible. It uses system properties, which are not safe for IDE and other embedded environments.
+    /**
+     * @deprecated Using this is dangerous when extensions or non-global system properties are in play.
+     */
     public DefaultProfileManager( PlexusContainer container )
     {
         this.container = container;
-        profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
+
+        // create the necessary bits to get a skeletal profile manager running.
+        Logger logger = container.getLoggerManager().getLoggerForComponent( DefaultProfileManager.class.getName() );
+        MavenRealmManager manager = new DefaultMavenRealmManager( container, logger );
+
+        profileActivationContext = new DefaultProfileActivationContext( manager, System.getProperties(), false );
     }
 
     public ProfileActivationContext getProfileActivationContext()
@@ -113,11 +118,12 @@ public class DefaultProfileManager
     */
     public void explicitlyActivate( String profileId )
     {
+        List activatedIds = profileActivationContext.getExplicitlyActiveProfileIds();
         if ( !activatedIds.contains( profileId ) )
         {
             container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly activated." );
 
-            activatedIds.add( profileId );
+            profileActivationContext.setActive( profileId );
         }
     }
 
@@ -139,11 +145,12 @@ public class DefaultProfileManager
     */
     public void explicitlyDeactivate( String profileId )
     {
+        List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
         if ( !deactivatedIds.contains( profileId ) )
         {
             container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly deactivated." );
 
-            deactivatedIds.add( profileId );
+            profileActivationContext.setInactive( profileId );
         }
     }
 
@@ -177,11 +184,11 @@ public class DefaultProfileManager
             Profile profile = (Profile) entry.getValue();
 
             boolean shouldAdd = false;
-            if ( activatedIds.contains( profileId ) )
+            if ( profileActivationContext.isExplicitlyActive( profileId ) )
             {
                 shouldAdd = true;
             }
-            else if ( !deactivatedIds.contains( profileId ) && isActive( profile, profileActivationContext ) )
+            else if ( !profileActivationContext.isExplicitlyInactive( profileId ) && isActive( profile, profileActivationContext ) )
             {
                 shouldAdd = true;
             }
@@ -201,13 +208,18 @@ public class DefaultProfileManager
 
         if ( activeFromPom.isEmpty() )
         {
+            List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+
             for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
             {
                 String profileId = (String) it.next();
 
                 Profile profile = (Profile) profilesById.get( profileId );
 
-                activeFromPom.add( profile );
+                if ( profile != null )
+                {
+                    activeFromPom.add( profile );
+                }
             }
         }
 
@@ -283,24 +295,26 @@ public class DefaultProfileManager
 
     public void activateAsDefault( String profileId )
     {
+        List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+
         if ( !defaultIds.contains( profileId ) )
         {
-            defaultIds.add( profileId );
+            profileActivationContext.setActiveByDefault( profileId );
         }
     }
 
     public List getExplicitlyActivatedIds()
     {
-        return activatedIds;
+        return profileActivationContext.getExplicitlyActiveProfileIds();
     }
 
     public List getExplicitlyDeactivatedIds()
     {
-        return deactivatedIds;
+        return profileActivationContext.getExplicitlyInactiveProfileIds();
     }
 
     public List getIdsActivatedByDefault()
     {
-        return defaultIds;
+        return profileActivationContext.getActiveByDefaultProfileIds();
     }
 }

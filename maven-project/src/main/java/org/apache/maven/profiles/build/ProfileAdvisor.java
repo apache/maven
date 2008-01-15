@@ -45,16 +45,12 @@ public interface ProfileAdvisor
 
     LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
                                                              File pomFile,
-                                                             List explicitlyActiveIds,
-                                                             List explicitlyInactiveIds,
                                                              boolean useProfilesXml,
                                                              ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException;
 
     List applyActivatedProfiles( Model model,
                                  File pomFile,
-                                 List explicitlyActiveIds,
-                                 List explicitlyInactiveIds,
                                  boolean useProfilesXml,
                                  ProfileActivationContext activationContext )
         throws ProjectBuildingException;

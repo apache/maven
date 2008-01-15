@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.realm;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -54,7 +54,7 @@ public class DefaultMavenRealmManager
 
     private Map pluginArtifacts = new HashMap();
     private Set managedRealmIds = new HashSet();
-    
+
     private final ClassWorld world;
     private final PlexusContainer container;
     private final Logger logger;
@@ -66,10 +66,10 @@ public class DefaultMavenRealmManager
         this.container = container;
         this.logger = logger;
     }
-    
-    //mkleint: the clearing is fine for sequenced operations. Even though the 
+
+    //mkleint: the clearing is fine for sequenced operations. Even though the
     // MavenRealmManager is associated with request, the paralel execution will
-    // eventualy fail as the ClassWorld and PlexusContainer are not meant for 
+    // eventualy fail as the ClassWorld and PlexusContainer are not meant for
     // multithreaded environment.
     public void clear()
     {

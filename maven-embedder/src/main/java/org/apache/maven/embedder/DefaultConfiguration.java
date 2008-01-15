@@ -19,7 +19,7 @@ package org.apache.maven.embedder;
  */
 
 import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.execution.MavenRealmManager;
+import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 

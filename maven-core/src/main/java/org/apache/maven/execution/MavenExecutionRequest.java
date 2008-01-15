@@ -24,6 +24,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
@@ -191,6 +193,9 @@ public interface MavenExecutionRequest
 
     ProfileManager getProfileManager();
     MavenExecutionRequest setProfileManager( ProfileManager profileManager );
+
+    ProfileActivationContext getProfileActivationContext();
+    MavenExecutionRequest setProfileActivationContext( ProfileActivationContext profileActivationContext );
 
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );

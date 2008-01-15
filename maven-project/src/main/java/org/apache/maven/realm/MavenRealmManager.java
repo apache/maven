@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.realm;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;

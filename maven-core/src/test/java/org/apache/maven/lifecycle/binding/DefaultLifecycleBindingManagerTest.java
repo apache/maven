@@ -2,9 +2,7 @@ package org.apache.maven.lifecycle.binding;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenRealmManager;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
@@ -18,6 +16,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.realm.DefaultMavenRealmManager;
+import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.shared.tools.easymock.MockManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;

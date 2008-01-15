@@ -1,8 +1,8 @@
 package org.apache.maven.plugin;
 
-import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;

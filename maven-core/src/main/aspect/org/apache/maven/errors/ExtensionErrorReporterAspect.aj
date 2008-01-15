@@ -8,7 +8,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -28,6 +27,7 @@ import org.apache.maven.extension.DefaultExtensionManager;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.version.DefaultPluginVersionManager;
+import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.execution.RuntimeInformation;
 
 import java.io.File;

@@ -15,7 +15,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.extension.ExtensionManagerException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -54,6 +53,7 @@ import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;

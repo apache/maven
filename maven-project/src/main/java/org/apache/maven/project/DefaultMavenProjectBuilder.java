@@ -570,10 +570,6 @@ public class DefaultMavenProjectBuilder
 
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-        List explicitlyActive;
-
-        List explicitlyInactive;
-
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext profileActivationContext;
 
@@ -589,18 +585,10 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor, e );
             }
 
-            explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
-
-            explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
-
             profileActivationContext = externalProfileManager.getProfileActivationContext();
         }
         else
         {
-            explicitlyActive = Collections.EMPTY_LIST;
-
-            explicitlyInactive = Collections.EMPTY_LIST;
-
             profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
@@ -611,7 +599,7 @@ public class DefaultMavenProjectBuilder
             activeInSuperPom.addAll( activated );
         }
 
-        activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
+        activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, validProfilesXmlLocation, profileActivationContext );
         if ( !activated.isEmpty() )
         {
             activeInSuperPom.addAll( activated );
@@ -624,8 +612,7 @@ public class DefaultMavenProjectBuilder
 
         LinkedHashSet aggregatedRemoteWagonRepositories = collectInitialRepositories( model, superModel,
             parentSearchRepositories,
-            projectDescriptor, explicitlyActive,
-            explicitlyInactive,
+            projectDescriptor,
             validProfilesXmlLocation,
             profileActivationContext );
 
@@ -741,17 +728,15 @@ public class DefaultMavenProjectBuilder
                                                       Model superModel,
                                                       List parentSearchRepositories,
                                                       File pomFile,
-                                                      List explicitlyActive,
-                                                      List explicitlyInactive,
                                                       boolean validProfilesXmlLocation,
                                                       ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
         LinkedHashSet collected = new LinkedHashSet();
 
-        collectInitialRepositoriesFromModel( collected, model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
+        collectInitialRepositoriesFromModel( collected, model, pomFile, validProfilesXmlLocation, profileActivationContext );
 
-        collectInitialRepositoriesFromModel( collected, superModel, null, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
+        collectInitialRepositoriesFromModel( collected, superModel, null, validProfilesXmlLocation, profileActivationContext );
 
         if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
         {
@@ -764,13 +749,11 @@ public class DefaultMavenProjectBuilder
     private void collectInitialRepositoriesFromModel( LinkedHashSet collected,
                                                       Model model,
                                                       File pomFile,
-                                                      List explicitlyActive,
-                                                      List explicitlyInactive,
                                                       boolean validProfilesXmlLocation,
                                                       ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, explicitlyActive, explicitlyInactive, validProfilesXmlLocation, profileActivationContext );
+        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile, validProfilesXmlLocation, profileActivationContext );
 
         if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
         {
@@ -974,25 +957,15 @@ public class DefaultMavenProjectBuilder
 
         modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
 
-        List explicitlyActive;
-
-        List explicitlyInactive;
-
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext profileActivationContext;
 
         if ( externalProfileManager != null )
         {
-            explicitlyActive = externalProfileManager.getExplicitlyActivatedIds();
-
-            explicitlyInactive = externalProfileManager.getExplicitlyDeactivatedIds();
-
             profileActivationContext = externalProfileManager.getProfileActivationContext();
         }
         else
         {
-            explicitlyActive = Collections.EMPTY_LIST;
-            explicitlyInactive = Collections.EMPTY_LIST;
             profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
@@ -1017,8 +990,7 @@ public class DefaultMavenProjectBuilder
 
             // NOTE: the caching aspect may replace the parent project instance, so we apply profiles here.
             // TODO: Review this...is that a good idea, to allow application of profiles when other profiles could have been applied already?
-            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), explicitlyActive,
-                                                                              explicitlyInactive, validProfilesXmlLocation, profileActivationContext ) );
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), validProfilesXmlLocation, profileActivationContext ) );
 
             lineage.addFirst( project );
 

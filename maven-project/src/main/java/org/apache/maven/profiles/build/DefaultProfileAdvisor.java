@@ -69,8 +69,6 @@ public class DefaultProfileAdvisor
 
     public List applyActivatedProfiles( Model model,
                                         File pomFile,
-                                        List explicitlyActiveIds,
-                                        List explicitlyInactiveIds,
                                         boolean useProfilesXml,
                                         ProfileActivationContext activationContext )
         throws ProjectBuildingException
@@ -79,8 +77,6 @@ public class DefaultProfileAdvisor
                       + pomFile );
         ProfileManager profileManager = buildProfileManager( model,
                                                              pomFile,
-                                                             explicitlyActiveIds,
-                                                             explicitlyInactiveIds,
                                                              useProfilesXml,
                                                              activationContext );
 
@@ -152,17 +148,11 @@ public class DefaultProfileAdvisor
 
     private ProfileManager buildProfileManager( Model model,
                                                 File pomFile,
-                                                List explicitlyActiveIds,
-                                                List explicitlyInactiveIds,
                                                 boolean useProfilesXml,
                                                 ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
         ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
-
-        profileManager.explicitlyActivate( explicitlyActiveIds );
-
-        profileManager.explicitlyDeactivate( explicitlyInactiveIds );
 
         profileManager.addProfiles( model.getProfiles() );
 
@@ -204,22 +194,24 @@ public class DefaultProfileAdvisor
             for ( Iterator i = activeExternalProfiles.iterator(); i.hasNext(); )
             {
                 Profile externalProfile = (Profile) i.next();
-
-                for ( Iterator repoIterator = externalProfile.getRepositories().iterator(); repoIterator.hasNext(); )
+                if ( externalProfile.getRepositories() != null )
                 {
-                    Repository mavenRepo = (Repository) repoIterator.next();
-
-                    ArtifactRepository artifactRepo;
-                    try
+                    for ( Iterator repoIterator = externalProfile.getRepositories().iterator(); repoIterator.hasNext(); )
                     {
-                        artifactRepo = mavenTools.buildArtifactRepository( mavenRepo );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        throw new ProjectBuildingException( modelId, e.getMessage(), e );
-                    }
+                        Repository mavenRepo = (Repository) repoIterator.next();
 
-                    remoteRepositories.add( artifactRepo );
+                        ArtifactRepository artifactRepo;
+                        try
+                        {
+                            artifactRepo = mavenTools.buildArtifactRepository( mavenRepo );
+                        }
+                        catch ( InvalidRepositoryException e )
+                        {
+                            throw new ProjectBuildingException( modelId, e.getMessage(), e );
+                        }
+
+                        remoteRepositories.add( artifactRepo );
+                    }
                 }
             }
 
@@ -229,16 +221,12 @@ public class DefaultProfileAdvisor
 
     public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
                                                                     File pomFile,
-                                                                    List explicitlyActiveIds,
-                                                                    List explicitlyInactiveIds,
                                                                     boolean useProfilesXml,
                                                                     ProfileActivationContext activationContext )
         throws ProjectBuildingException
     {
         ProfileManager profileManager = buildProfileManager( model,
                                                              pomFile,
-                                                             explicitlyActiveIds,
-                                                             explicitlyInactiveIds,
                                                              useProfilesXml,
                                                              activationContext );
 
@@ -263,7 +251,8 @@ public class DefaultProfileAdvisor
 
                     if ( ( active != null ) && !active.isEmpty() )
                     {
-                        profileManager.explicitlyActivate( root.getActiveProfiles() );
+                        ProfileActivationContext ctx = profileManager.getProfileActivationContext();
+                        ctx.setExplicitlyActiveProfileIds( root.getActiveProfiles() );
                     }
 
                     for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )

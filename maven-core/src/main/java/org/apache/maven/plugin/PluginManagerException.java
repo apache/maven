@@ -1,11 +1,11 @@
 package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.execution.RealmManagementException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
