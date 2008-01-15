@@ -763,7 +763,6 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    // TODO: Finish this test!
     public void testReportActivatorLookupError()
         throws IOException
     {
