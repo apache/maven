@@ -110,7 +110,7 @@ public class DefaultProfileAdvisor
         {
             try
             {
-                activeProfiles = profileManager.getActiveProfiles();
+                activeProfiles = profileManager.getActiveProfiles( model );
             }
             catch ( ProfileActivationException e )
             {
@@ -164,9 +164,9 @@ public class DefaultProfileAdvisor
         return profileManager;
     }
 
-    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager,
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
                                                                     File pomFile,
-                                                                    String modelId )
+                                                                    ProfileManager profileManager )
         throws ProjectBuildingException
     {
 
@@ -179,12 +179,12 @@ public class DefaultProfileAdvisor
         {
             try
             {
-                activeExternalProfiles = profileManager.getActiveProfiles();
+                activeExternalProfiles = profileManager.getActiveProfiles( model );
             }
             catch ( ProfileActivationException e )
             {
                 throw new ProjectBuildingException(
-                                                    modelId,
+                                                    model.getId(),
                                                     "Failed to compute active profiles for repository aggregation.",
                                                     pomFile, e );
             }
@@ -207,7 +207,7 @@ public class DefaultProfileAdvisor
                         }
                         catch ( InvalidRepositoryException e )
                         {
-                            throw new ProjectBuildingException( modelId, e.getMessage(), e );
+                            throw new ProjectBuildingException( model.getId(), e.getMessage(), e );
                         }
 
                         remoteRepositories.add( artifactRepo );
@@ -230,7 +230,7 @@ public class DefaultProfileAdvisor
                                                              useProfilesXml,
                                                              activationContext );
 
-        return getArtifactRepositoriesFromActiveProfiles( profileManager, pomFile, model.getId() );
+        return getArtifactRepositoriesFromActiveProfiles( model, pomFile, profileManager );
     }
 
     private void loadExternalProjectProfiles( ProfileManager profileManager,

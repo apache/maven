@@ -19,6 +19,7 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -59,6 +60,9 @@ public interface ProfileManager
 
     void setProfileActivationContext( ProfileActivationContext profileActivationContext );
 
+    /**
+     * @deprecated Use {@link ProfileManager#getActiveProfiles(Model)} instead.
+     */
     List getActiveProfiles()
         throws ProfileActivationException;
 
@@ -80,4 +84,7 @@ public interface ProfileManager
      * @deprecated Use {@link ProfileActivationContext} methods instead.
      */
     List getIdsActivatedByDefault();
+
+    List getActiveProfiles( Model model )
+        throws ProfileActivationException;
 }

@@ -754,11 +754,17 @@ public class ErrorReporterPointcutTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
+//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
                                                                           .setGoals( Arrays.asList( new String[] {
                                                                               "initialize"
                                                                           } ) );
 
-        maven.execute( request );
+        MavenExecutionResult result = maven.execute( request );
+
+//        if ( result.hasExceptions() )
+//        {
+//            reportExceptions( result, projectDir );
+//        }
 
         reporterCtl.verify();
     }
@@ -766,33 +772,39 @@ public class ErrorReporterPointcutTest
     public void testReportActivatorLookupError()
         throws IOException
     {
-//        if ( !checkOnline() )
+        if ( !checkOnline() )
+        {
+            return;
+        }
+
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "ext" ) );
+
+        File project = new File( projectDir, "project" );
+
+        reporter.reportActivatorLookupError( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        MavenExecutionResult result = maven.execute( request );
+
+//        if ( result.hasExceptions() )
 //        {
-//            return;
+//            reportExceptions( result, project );
 //        }
-//
-//        File projectDir = prepareProjectDir();
-//
-//        buildTestAccessory( new File( projectDir, "ext" ) );
-//
-//        File project = new File( projectDir, "project" );
-//
-//        reporter.reportActivatorLookupError( null, null, null, null );
-//        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-//        reporterCtl.setVoidCallable();
-//
-//        reporterCtl.replay();
-//
-//        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
-//                                                                          .setShowErrors( true )
-//                                                                          .setErrorReporter( reporter )
-//                                                                          .setGoals( Arrays.asList( new String[] {
-//                                                                              "initialize"
-//                                                                          } ) );
-//
-//        maven.execute( request );
-//
-//        reporterCtl.verify();
+
+        reporterCtl.verify();
     }
 
     public void testReportBadDependencyVersion()

@@ -20,14 +20,17 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.project.ModelUtils;
 import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -167,68 +170,92 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#getActiveProfiles()
-    */
     public List getActiveProfiles()
         throws ProfileActivationException
     {
-        List activeFromPom = new ArrayList();
-        List activeExternal = new ArrayList();
+         return getActiveProfiles( null );
+    }
 
-        for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
+    public List getActiveProfiles( Model model )
+        throws ProfileActivationException
+    {
+        MavenRealmManager realmManager = profileActivationContext.getRealmManager();
+
+        ClassRealm projectRealm = null;
+        ClassRealm oldLookupRealm = null;
+
+        if ( ( model != null ) && ( realmManager != null ) )
         {
-            Map.Entry entry = (Entry) it.next();
-
-            String profileId = (String) entry.getKey();
-            Profile profile = (Profile) entry.getValue();
-
-            boolean shouldAdd = false;
-            if ( profileActivationContext.isExplicitlyActive( profileId ) )
-            {
-                shouldAdd = true;
-            }
-            else if ( !profileActivationContext.isExplicitlyInactive( profileId ) && isActive( profile, profileActivationContext ) )
-            {
-                shouldAdd = true;
-            }
-
-            if ( shouldAdd )
-            {
-                if ( "pom".equals( profile.getSource() ) )
-                {
-                    activeFromPom.add( profile );
-                }
-                else
-                {
-                    activeExternal.add( profile );
-                }
-            }
+            projectRealm = realmManager.getProjectRealm( ModelUtils.getGroupId( model ), model.getArtifactId(), ModelUtils.getVersion( model ) );
+            oldLookupRealm = container.setLookupRealm( projectRealm );
         }
 
-        if ( activeFromPom.isEmpty() )
+        try
         {
-            List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+            List activeFromPom = new ArrayList();
+            List activeExternal = new ArrayList();
 
-            for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
+            for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
             {
-                String profileId = (String) it.next();
+                Map.Entry entry = (Entry) it.next();
 
-                Profile profile = (Profile) profilesById.get( profileId );
+                String profileId = (String) entry.getKey();
+                Profile profile = (Profile) entry.getValue();
 
-                if ( profile != null )
+                boolean shouldAdd = false;
+                if ( profileActivationContext.isExplicitlyActive( profileId ) )
                 {
-                    activeFromPom.add( profile );
+                    shouldAdd = true;
+                }
+                else if ( !profileActivationContext.isExplicitlyInactive( profileId ) && isActive( profile, profileActivationContext ) )
+                {
+                    shouldAdd = true;
+                }
+
+                if ( shouldAdd )
+                {
+                    if ( "pom".equals( profile.getSource() ) )
+                    {
+                        activeFromPom.add( profile );
+                    }
+                    else
+                    {
+                        activeExternal.add( profile );
+                    }
                 }
             }
+
+            if ( activeFromPom.isEmpty() )
+            {
+                List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+
+                for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
+                {
+                    String profileId = (String) it.next();
+
+                    Profile profile = (Profile) profilesById.get( profileId );
+
+                    if ( profile != null )
+                    {
+                        activeFromPom.add( profile );
+                    }
+                }
+            }
+
+            List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
+
+            allActive.addAll( activeExternal );
+            allActive.addAll( activeFromPom );
+
+            return allActive;
         }
-
-        List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
-
-        allActive.addAll( activeExternal );
-        allActive.addAll( activeFromPom );
-
-        return allActive;
+        finally
+        {
+            if ( projectRealm != null )
+            {
+                container.setLookupRealm( oldLookupRealm );
+            }
+        }
     }
 
     private boolean isActive( Profile profile, ProfileActivationContext context )

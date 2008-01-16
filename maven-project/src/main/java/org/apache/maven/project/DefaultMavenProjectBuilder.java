@@ -225,14 +225,20 @@ public class DefaultMavenProjectBuilder
 
         superModel = ModelUtils.cloneModel( superModel );
 
-        List activeProfiles;
+        List activeProfiles = new ArrayList();
         if ( profileManager != null )
         {
-            activeProfiles = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
-        }
-        else
-        {
-            activeProfiles = Collections.EMPTY_LIST;
+            List activated = profileAdvisor.applyActivatedProfiles( superModel, null, false, profileManager.getProfileActivationContext() );
+            if ( !activated.isEmpty() )
+            {
+                activeProfiles.addAll( activated );
+            }
+
+            activated = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
+            if ( !activated.isEmpty() )
+            {
+                activeProfiles.addAll( activated );
+            }
         }
 
         MavenProject project = new MavenProject( superModel );
@@ -593,13 +599,13 @@ public class DefaultMavenProjectBuilder
         }
 
         LinkedHashSet activeInSuperPom = new LinkedHashSet();
-        List activated = profileAdvisor.applyActivatedExternalProfiles( superModel, projectDescriptor, externalProfileManager );
+        List activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, validProfilesXmlLocation, profileActivationContext );
         if ( !activated.isEmpty() )
         {
             activeInSuperPom.addAll( activated );
         }
 
-        activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, validProfilesXmlLocation, profileActivationContext );
+        activated = profileAdvisor.applyActivatedExternalProfiles( superModel, projectDescriptor, externalProfileManager );
         if ( !activated.isEmpty() )
         {
             activeInSuperPom.addAll( activated );

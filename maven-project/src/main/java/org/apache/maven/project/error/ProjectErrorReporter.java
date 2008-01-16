@@ -55,7 +55,7 @@ public interface ProjectErrorReporter
      * </pre>
      */
     void reportActivatorError( ProfileActivator activator,
-                               String projectId,
+                               Model model,
                                File pomFile,
                                Profile profile,
                                ProfileActivationContext context,
@@ -77,9 +77,10 @@ public interface ProjectErrorReporter
      * &lt;------ ProjectBuildingException
      * </pre>
      */
-    void reportActivatorLookupError( String projectId,
+    void reportActivatorLookupError( Model model,
                                      File pomFile,
                                      Profile profile,
+                                     ProfileActivationContext context,
                                      ComponentLookupException cause );
 
     /**
@@ -131,7 +132,7 @@ public interface ProjectErrorReporter
      * </pre>
      */
     void reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( Repository repo,
-                                                                      String projectId,
+                                                                      Model model,
                                                                       File pomFile,
                                                                       InvalidRepositoryException cause );
 

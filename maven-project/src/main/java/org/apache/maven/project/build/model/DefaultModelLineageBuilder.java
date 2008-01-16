@@ -291,9 +291,9 @@ public class DefaultModelLineageBuilder
             context = new DefaultProfileActivationContext( System.getProperties(), false );
         }
 
-        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( profileManager,
+        LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
                                                                                                pomFile,
-                                                                                               model.getId() );
+                                                                                               profileManager );
 
         getLogger().debug( "Got external-profile repositories: " + profileRepos );
 

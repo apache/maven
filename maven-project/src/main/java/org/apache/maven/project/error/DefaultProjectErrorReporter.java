@@ -115,7 +115,7 @@ public class DefaultProjectErrorReporter
      * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorErrorWhileApplyingProfiles(org.apache.maven.profiles.activation.ProfileActivator, org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
      */
     public void reportActivatorError( ProfileActivator activator,
-                                      String projectId,
+                                      Model model,
                                       File pomFile,
                                       Profile profile,
                                       ProfileActivationContext context,
@@ -139,9 +139,9 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( cause.getMessage() );
 
-        addStandardInfo( projectId, pomFile, writer );
+        addStandardInfo( model.getId(), pomFile, writer );
         addTips( ProjectErrorTips.getTipsForActivatorError( activator,
-                                                            projectId,
+                                                            model.getId(),
                                                             pomFile,
                                                             profile,
                                                             context,
@@ -153,9 +153,10 @@ public class DefaultProjectErrorReporter
     /**
      * @see org.apache.maven.project.error.ProjectErrorReporter#reportActivatorLookupError(java.lang.String, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
      */
-    public void reportActivatorLookupError( String projectId,
+    public void reportActivatorLookupError( Model model,
                                             File pomFile,
                                             Profile profile,
+                                            ProfileActivationContext context,
                                             ComponentLookupException cause )
     {
         StringWriter writer = new StringWriter();
@@ -174,8 +175,8 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( cause.getMessage() );
 
-        addStandardInfo( projectId, pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorLookupError( projectId,
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForActivatorLookupError( model.getId(),
                                                                   pomFile,
                                                                   profile,
                                                                   cause ), writer );
@@ -252,7 +253,7 @@ public class DefaultProjectErrorReporter
      * @see org.apache.maven.project.error.ProjectErrorReporter#reportInvalidRepositoryWhileGettingRepositoriesFromProfiles(org.apache.maven.model.Repository, java.lang.String, java.io.File, org.apache.maven.artifact.InvalidRepositoryException)
      */
     public void reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( Repository repo,
-                                                                             String projectId,
+                                                                             Model model,
                                                                              File pomFile,
                                                                              InvalidRepositoryException cause )
     {
@@ -271,8 +272,8 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( cause.getMessage() );
 
-        addStandardInfo( projectId, pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, projectId, pomFile, cause ),
+        addStandardInfo( model.getId(), pomFile, writer );
+        addTips( ProjectErrorTips.getTipsForInvalidRepositorySpec( repo, model.getId(), pomFile, cause ),
                  writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );

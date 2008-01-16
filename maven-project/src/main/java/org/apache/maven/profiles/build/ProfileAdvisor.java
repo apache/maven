@@ -38,9 +38,9 @@ public interface ProfileAdvisor
 
     String ROLE = ProfileAdvisor.class.getName();
 
-    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( ProfileManager profileManager,
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
                                                              File pomFile,
-                                                             String modelId )
+                                                             ProfileManager profileManager )
         throws ProjectBuildingException;
 
     LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,

@@ -1121,4 +1121,30 @@ public final class ModelUtils
         return new ArrayList( depsMap.values() );
     }
 
+    public static String getGroupId( Model model )
+    {
+        Parent parent = model.getParent();
+
+        String groupId = model.getGroupId();
+        if ( ( parent != null ) && ( groupId == null ) )
+        {
+            groupId = parent.getGroupId();
+        }
+
+        return groupId;
+    }
+
+    public static String getVersion( Model model )
+    {
+        Parent parent = model.getParent();
+
+        String version = model.getVersion();
+        if ( ( parent != null ) && ( version == null ) )
+        {
+            version = parent.getVersion();
+        }
+
+        return version;
+    }
+
 }
