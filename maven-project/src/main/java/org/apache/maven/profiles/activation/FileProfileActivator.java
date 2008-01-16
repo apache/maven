@@ -69,7 +69,7 @@ public class FileProfileActivator
             {
                 fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
 
-                System.out.println( "FileProfileActivator: Checking file existence for: " + fileString );
+                System.out.println( "FileProfileActivator: Checking file existence for: " + fileString + ". Result: " + FileUtils.fileExists( fileString ) );
                 if ( logger != null )
                 {
                     logger.info( "FileProfileActivator: Checking file existence for: " + fileString );
@@ -85,7 +85,7 @@ public class FileProfileActivator
             {
                 fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
 
-                System.out.println( "FileProfileActivator: Checking file is missing for: " + fileString );
+                System.out.println( "FileProfileActivator: Checking file is missing for: " + fileString + ". Result: " + (!FileUtils.fileExists( fileString )) );
                 if ( logger != null )
                 {
                     logger.info( "FileProfileActivator: Checking file is missing for: " + fileString );
