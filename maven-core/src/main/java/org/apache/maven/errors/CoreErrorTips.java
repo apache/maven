@@ -6,7 +6,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
@@ -270,7 +269,7 @@ public final class CoreErrorTips
                                                                            Model originModel,
                                                                            String requiredMavenVersion,
                                                                            String currentMavenVersion,
-                                                                           InvalidVersionSpecificationException cause )
+                                                                           Exception cause )
     {
         // TODO Auto-generated method stub
         return null;

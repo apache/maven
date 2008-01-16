@@ -202,8 +202,8 @@ public class DefaultPluginVersionManager
 
         String artifactVersion = artifact.getVersion();
 
-        // make sure this artifact was actually resolved to a file in the repo...
-        if ( artifact.getFile() != null )
+        // make sure this artifact was transformed to a real version, and actually resolved to a file in the repo...
+        if ( !metaVersionId.equals( artifactVersion ) && ( artifact.getFile() != null ) )
         {
             boolean pluginValid = false;
 
@@ -229,10 +229,10 @@ public class DefaultPluginVersionManager
                     DefaultArtifactVersion requiredVersion =
                         new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
 
-                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) != 0 )
                     {
-                        getLogger().info( "Ignoring available plugin update: " + artifactVersion +
-                            " as it requires Maven version " + requiredVersion );
+                        getLogger().info( "Ignoring available plugin version: " + artifactVersion +
+                            " for: " + groupId + ":" + artifactId + " as it requires Maven version " + requiredVersion );
 
                         VersionRange vr;
                         try
@@ -264,15 +264,15 @@ public class DefaultPluginVersionManager
                         if ( artifactVersion != null )
                         {
                             getLogger().debug( "Found " + artifactVersion );
+                        }
+                        else
+                        {
                             pluginValid = false;
                         }
                     }
                 }
             }
-        }
 
-        if ( !metaVersionId.equals( artifactVersion ) )
-        {
             version = artifactVersion;
         }
 

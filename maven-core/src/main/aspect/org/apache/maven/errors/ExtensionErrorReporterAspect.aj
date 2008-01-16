@@ -5,6 +5,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -29,6 +30,8 @@ import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.version.DefaultPluginVersionManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.io.File;
 import java.util.List;
@@ -144,12 +147,11 @@ public privileged aspect ExtensionErrorReporterAspect
     private pointcut within_dpvm_resolveMetaVersion():
         withincode( * DefaultPluginVersionManager.resolveMetaVersion( .. ) );
 
-    before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactMetadataRetrievalException cause ):
+    after( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request ) throwing ( ArtifactMetadataRetrievalException cause ):
         cflow( dem_addPluginAsExtension( plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && within_dpvm_resolveMetaVersion()
-        && call( PluginVersionResolutionException.new( .., ArtifactMetadataRetrievalException ) )
-        && args( .., cause )
+        && call( * ArtifactMetadataSource+.retrieve( .. ) )
     {
         getReporter().reportUnresolvableExtensionPluginPOM( plugin, originModel, remoteRepos, request, cause );
     }
@@ -174,7 +176,7 @@ public privileged aspect ExtensionErrorReporterAspect
     }
 
     after():
-        execution( * DefaultPluginManager.checkRequiredMavenVersion( .. ) )
+        execution( * DefaultPluginManager.verifyVersionedPlugin( .. ) )
     {
         requiredVersion = null;
         currentVersion = null;
@@ -187,12 +189,20 @@ public privileged aspect ExtensionErrorReporterAspect
         currentVersion = null;
     }
 
-    before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, InvalidVersionSpecificationException cause ):
+    after( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request ) throwing ( InvalidVersionSpecificationException cause ):
         cflow( dem_addPluginAsExtension( plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && withincode( * DefaultPluginVersionManager.resolveMetaVersion( .. ) )
-        && call( PluginVersionResolutionException.new( .., InvalidVersionSpecificationException ) )
-        && args( .., cause )
+        && call( VersionRange VersionRange.createFromVersionSpec( .. ) )
+    {
+        getReporter().reportErrorSearchingforCompatibleExtensionPluginVersion( plugin, originModel, remoteRepos, request, requiredVersion, currentVersion, cause );
+    }
+
+    after( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request ) throwing ( ArtifactMetadataRetrievalException cause ):
+        cflow( dem_addPluginAsExtension( plugin, originModel, remoteRepos, request ) )
+        && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
+        && withincode( * DefaultPluginVersionManager.resolveMetaVersion( .. ) )
+        && call( * ArtifactMetadataSource+.retrieveAvailableVersions( .. ) )
     {
         getReporter().reportErrorSearchingforCompatibleExtensionPluginVersion( plugin, originModel, remoteRepos, request, requiredVersion, currentVersion, cause );
     }
@@ -201,12 +211,11 @@ public privileged aspect ExtensionErrorReporterAspect
         execution( * DefaultPluginManager.verifyVersionedPlugin( Plugin, .. ) )
         && args( plugin, .. );
 
-    after( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginVersionResolutionException err ):
+    after( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request ) throwing ( PluginVersionResolutionException err ):
         cflow( dem_addPluginAsExtension( Plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && cflow( dpm_verifyVersionedPlugin( plugin ) )
-        && call( PluginVersionResolutionException.new( .., String ) )
-        && this( err )
+        && call( private void DefaultPluginManager.checkRequiredMavenVersion( .. ) )
     {
         getReporter().reportIncompatibleMavenVersionForExtensionPlugin( plugin, originModel, remoteRepos, request, requiredVersion, currentVersion, err );
     }

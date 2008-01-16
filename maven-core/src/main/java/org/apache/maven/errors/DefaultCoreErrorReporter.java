@@ -1392,6 +1392,51 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString() );
     }
 
+    public void reportErrorSearchingforCompatibleExtensionPluginVersion( Plugin plugin,
+                                                                         Model originModel,
+                                                                         List remoteRepos,
+                                                                         MavenExecutionRequest request,
+                                                                         String requiredMavenVersion,
+                                                                         String currentMavenVersion,
+                                                                         ArtifactMetadataRetrievalException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an incompatible version of a plugin used by your project as a build extension." );
+        writer.write( " In attempting to search for an older version of this plugin, Maven failed to retrieve the list of available plugin versions." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Project:" );
+        writeProjectCoordinate( originModel, null, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Plugin (used as an extension):" );
+        writePluginInfo( plugin, writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Current Maven version: " );
+        writer.write( currentMavenVersion );
+        writer.write( NEWLINE );
+        writer.write( "Plugin requires Maven version: " );
+        writer.write( requiredMavenVersion );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message: " );
+        writer.write( cause.getMessage() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Root error message: " );
+        writer.write( getRootCause( cause ).getMessage() );
+
+        addTips( CoreErrorTips.getInvalidPluginVersionRangeForExtensionPluginTips( plugin, originModel, requiredMavenVersion, currentMavenVersion, cause ),
+                 writer );
+
+        registerBuildError( cause, writer.toString() );
+    }
+
     public void reportIncompatibleMavenVersionForExtensionPlugin( Plugin plugin,
                                                                   Model originModel,
                                                                   List remoteRepos,

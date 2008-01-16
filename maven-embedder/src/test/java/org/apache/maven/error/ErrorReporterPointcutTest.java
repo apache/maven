@@ -17,6 +17,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.easymock.MockControl;
@@ -279,9 +280,35 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportAttemptToOverrideUneditableMojoParameter()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "plugin" ) );
+
+        File basedir = new File( projectDir, "project" );
+
+        reporter.reportAttemptToOverrideUneditableMojoParameter( null, null, null, null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( basedir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorApplyingMojoConfiguration()
@@ -444,12 +471,6 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    public void testReportErrorSearchingforCompatibleExtensionPluginVersion()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void testReportExtensionPluginArtifactNotFound()
     {
         // TODO Auto-generated method stub
@@ -457,21 +478,91 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportExtensionPluginVersionNotFound()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        Settings settings = new Settings();
+        settings.setOffline( true );
+        settings.setLocalRepository( localRepo.getAbsolutePath() );
+
+        reporter.reportExtensionPluginVersionNotFound( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setLoggingLevel( Logger.LEVEL_DEBUG )
+                                                                          .setSettings( settings )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportIncompatibleMavenVersionForExtensionPlugin()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        reporter.reportIncompatibleMavenVersionForExtensionPlugin( null, null, null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setLocalRepositoryPath( localRepo )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportInvalidDependencyVersionInExtensionPluginPOM()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        // TODO: Verify that the actual error reported is the one that identified the failing project as an extension POM.
+        reporter.reportBadDependencyVersion( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporter.reportInvalidDependencyVersionInExtensionPluginPOM( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setLocalRepositoryPath( localRepo )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportInvalidMavenVersion()
@@ -581,15 +672,67 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportMissingRequiredMojoParameter()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "plugin" ) );
+
+        File basedir = new File( projectDir, "project" );
+
+        reporter.reportMissingRequiredMojoParameter( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( basedir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "org.apache.maven.errortest:testReportMissingRequiredMojoParameter-maven-plugin:1:test"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportMojoExecutionException()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "plugin" ) );
+
+        File basedir = new File( projectDir, "project" );
+
+        reporter.reportMojoExecutionException( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( basedir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "org.apache.maven.errortest:testReportMojoExecutionException-maven-plugin:1:test"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportMojoLookupError()
@@ -729,18 +872,6 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportUnresolvableArtifactWhileAddingExtensionPlugin()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void testReportUnresolvableExtensionPluginPOM()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void testReportUseOfBannedMojoParameter()
     {
         // TODO Auto-generated method stub
 

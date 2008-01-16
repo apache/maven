@@ -79,6 +79,8 @@ public interface CoreErrorReporter
 
     void reportErrorSearchingforCompatibleExtensionPluginVersion( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, String requiredMavenVersion, String currentMavenVersion, InvalidVersionSpecificationException cause );
 
+    void reportErrorSearchingforCompatibleExtensionPluginVersion( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, String requiredMavenVersion, String currentMavenVersion, ArtifactMetadataRetrievalException cause );
+
     void reportExtensionPluginArtifactNotFound( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginNotFoundException cause );
 
     void reportExtensionPluginVersionNotFound( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginVersionNotFoundException cause );

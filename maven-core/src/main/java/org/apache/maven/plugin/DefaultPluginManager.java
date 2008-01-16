@@ -217,7 +217,11 @@ public class DefaultPluginManager
 
                 remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
 
-                checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
+                MavenProject pluginProject = buildPluginProject( plugin, localRepository, remoteRepositories );
+
+                checkRequiredMavenVersion( plugin, pluginProject, localRepository, remoteRepositories );
+
+                checkPluginDependencySpec( plugin, pluginProject );
 
                 Artifact pluginArtifact = artifactFactory.createPluginArtifact(
                                                                                 plugin.getGroupId(),
@@ -270,43 +274,67 @@ public class DefaultPluginManager
         return pluginDescriptor;
     }
 
-    /**
-     * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
-     * manager which executes before the plugin is instantiated
-     */
-    private void checkRequiredMavenVersion( Plugin plugin,
-                                            ArtifactRepository localRepository,
-                                            List remoteRepositories )
-        throws PluginVersionResolutionException, InvalidPluginException
+    private void checkPluginDependencySpec( Plugin plugin,
+                                            MavenProject pluginProject )
+        throws InvalidPluginException
     {
+        ArtifactFilter filter = new ScopeArtifactFilter( "runtime" );
         try
         {
-            Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(),
-                                                                       plugin.getArtifactId(),
-                                                                       plugin.getVersion() );
-            MavenProject project = mavenProjectBuilder.buildFromRepository( artifact,
-                                                                            remoteRepositories,
-                                                                            localRepository );
-            // if we don't have the required Maven version, then ignore an update
-            if ( ( project.getPrerequisites() != null )
-                 && ( project.getPrerequisites().getMaven() != null ) )
-            {
-                DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                                                                                     project.getPrerequisites()
-                                                                                            .getMaven() );
-                if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
-                {
-                    throw new PluginVersionResolutionException( plugin.getGroupId(),
-                                                                plugin.getArtifactId(),
-                                                                "Plugin requires Maven version "
-                                                                                + requiredVersion );
-                }
-            }
+            pluginProject.createArtifacts( artifactFactory, null, filter );
+        }
+        catch ( InvalidDependencyVersionException e )
+        {
+            throw new InvalidPluginException( "Plugin: " + plugin.getKey() + " has a dependency with an invalid version.", e );
+        }
+    }
+
+    private MavenProject buildPluginProject( Plugin plugin,
+                                             ArtifactRepository localRepository,
+                                             List remoteRepositories )
+        throws InvalidPluginException
+    {
+        Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(),
+                                                                   plugin.getArtifactId(),
+                                                                   plugin.getVersion() );
+
+        try
+        {
+            return mavenProjectBuilder.buildFromRepository( artifact,
+                                                            remoteRepositories,
+                                                            localRepository );
         }
         catch ( ProjectBuildingException e )
         {
             throw new InvalidPluginException( "Unable to build project for plugin '"
                                               + plugin.getKey() + "': " + e.getMessage(), e );
+        }
+    }
+
+    /**
+     * @param pluginProject
+     * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
+     * manager which executes before the plugin is instantiated
+     */
+    private void checkRequiredMavenVersion( Plugin plugin,
+                                            MavenProject pluginProject,
+                                            ArtifactRepository localRepository,
+                                            List remoteRepositories )
+        throws PluginVersionResolutionException, InvalidPluginException
+    {
+        // if we don't have the required Maven version, then ignore an update
+        if ( ( pluginProject.getPrerequisites() != null )
+             && ( pluginProject.getPrerequisites().getMaven() != null ) )
+        {
+            DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
+
+            if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+            {
+                throw new PluginVersionResolutionException( plugin.getGroupId(),
+                                                            plugin.getArtifactId(),
+                                                            "Plugin requires Maven version "
+                                                                            + requiredVersion );
+            }
         }
     }
 
