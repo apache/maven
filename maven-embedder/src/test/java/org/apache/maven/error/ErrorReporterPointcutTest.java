@@ -667,28 +667,35 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    // FIXME: Get the wagon to fail (in a way other than 'not found')
     public void testReportProjectDependenciesUnresolvable()
         throws IOException
     {
-//        File projectDir = prepareProjectDir();
-//
-//        reporter.reportProjectDependenciesUnresolvable( null, null, null );
-//        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-//        reporterCtl.setVoidCallable();
-//
-//        reporterCtl.replay();
-//
-//        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
-//                                                                          .setShowErrors( true )
-//                                                                          .setErrorReporter( reporter )
-//                                                                          .setGoals( Arrays.asList( new String[] {
-//                                                                              "compile"
-//                                                                          } ) );
-//
-//        maven.execute( request );
-//
-//        reporterCtl.verify();
+        if ( !checkOnline() )
+        {
+            return;
+        }
+
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
+
+        reporter.reportProjectDependenciesUnresolvable( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setLocalRepositoryPath( localRepo )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "compile"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportProjectMojoFailureException()
@@ -739,7 +746,6 @@ public class ErrorReporterPointcutTest
 
     }
 
-    // FIXME: How can I test this when it's masked by reportActivatorErrorWhileGettingRepositoriesFromProfiles?
     public void testReportActivatorError()
         throws IOException
     {
@@ -754,17 +760,11 @@ public class ErrorReporterPointcutTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
-//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
                                                                           .setGoals( Arrays.asList( new String[] {
                                                                               "initialize"
                                                                           } ) );
 
-        MavenExecutionResult result = maven.execute( request );
-
-//        if ( result.hasExceptions() )
-//        {
-//            reportExceptions( result, projectDir );
-//        }
+        maven.execute( request );
 
         reporterCtl.verify();
     }
@@ -792,17 +792,11 @@ public class ErrorReporterPointcutTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
-//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
                                                                           .setGoals( Arrays.asList( new String[] {
                                                                               "initialize"
                                                                           } ) );
 
-        MavenExecutionResult result = maven.execute( request );
-
-//        if ( result.hasExceptions() )
-//        {
-//            reportExceptions( result, project );
-//        }
+        maven.execute( request );
 
         reporterCtl.verify();
     }
@@ -1110,34 +1104,33 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    // TODO: Finish this test!
     public void testReportParentPomArtifactNotFound()
         throws IOException
     {
-//        File projectDir = prepareProjectDir();
-//
-//        reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null, null, null, null );
-//        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-//        reporterCtl.setVoidCallable();
-//
-//        reporterCtl.replay();
-//
-//        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
-//                                                                          .setShowErrors( true )
-//                                                                          .setErrorReporter( reporter )
-//                                                                          .setGoals( Arrays.asList( new String[] {
-//                                                                              "initialize"
-//                                                                          } ) );
-//
-//        maven.execute( request );
-//
-//        reporterCtl.verify();
-    }
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
 
-    public void testReportParentPomArtifactUnresolvable()
-    {
-        // TODO Auto-generated method stub
+        Settings settings = new Settings();
+        settings.setLocalRepository( localRepo.getAbsolutePath() );
+        settings.setOffline( true );
 
+        reporter.reportParentPomArtifactNotFound( null, null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setSettings( settings )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportProjectCollision()
