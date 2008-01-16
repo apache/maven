@@ -69,13 +69,14 @@ public class FileProfileActivator
             {
                 fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
 
-                System.out.println( "FileProfileActivator: Checking file existence for: " + fileString + ". Result: " + FileUtils.fileExists( fileString ) );
+                boolean result = FileUtils.fileExists( fileString );
+
                 if ( logger != null )
                 {
-                    logger.info( "FileProfileActivator: Checking file existence for: " + fileString );
+                    logger.debug( "FileProfileActivator: Checking file existence for: " + fileString + ". Result: " + result );
                 }
 
-                return FileUtils.fileExists( fileString );
+                return result;
             }
 
             // check if the file is missing, if it is then the profile will be active
@@ -85,21 +86,21 @@ public class FileProfileActivator
             {
                 fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
 
-                System.out.println( "FileProfileActivator: Checking file is missing for: " + fileString + ". Result: " + (!FileUtils.fileExists( fileString )) );
+                boolean result = !FileUtils.fileExists( fileString );
+
                 if ( logger != null )
                 {
-                    logger.info( "FileProfileActivator: Checking file is missing for: " + fileString );
+                    logger.debug( "FileProfileActivator: Checking file is missing for: " + fileString + ". Result: " + result );
                 }
 
-                return !FileUtils.fileExists( fileString );
+                return result;
             }
         }
         else
         {
-            System.out.println( "FileProfileActivator: no file specified. Skipping activation." );
             if ( logger != null )
             {
-                logger.info( "FileProfileActivator: no file specified. Skipping activation." );
+                logger.debug( "FileProfileActivator: no file specified. Skipping activation." );
             }
         }
 

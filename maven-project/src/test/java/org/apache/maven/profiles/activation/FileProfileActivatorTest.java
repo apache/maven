@@ -19,12 +19,12 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.Profile;
+
 import java.util.Properties;
 
 import junit.framework.TestCase;
-
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.Profile;
 
 /**
  * Test case for the {@link FileProfileActivator}.
@@ -41,8 +41,18 @@ public class FileProfileActivatorTest
         throws ProfileActivationException
     {
         org.apache.maven.model.ActivationFile activationFile = new org.apache.maven.model.ActivationFile();
+
+        // make an educated guess at the repository location...
+        String repoLocation = System.getProperty( "maven.repo.local", "${user.home}/.m2/repository" );
+
+        repoLocation = repoLocation.replace( '\\', '/' );
+        if ( repoLocation.endsWith( "/" ) )
+        {
+            repoLocation = repoLocation.substring( 0, repoLocation.length() - 1 );
+        }
+
         // Assume that junit exists
-        activationFile.setExists( "${user.home}/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar" );
+        activationFile.setExists( repoLocation + "/junit/junit/3.8.1/junit-3.8.1.jar" );
 
         Activation fileActivation = new Activation();
         fileActivation.setFile( activationFile );
