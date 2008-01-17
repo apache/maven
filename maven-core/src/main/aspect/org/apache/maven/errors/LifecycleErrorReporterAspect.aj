@@ -9,11 +9,13 @@ import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -23,6 +25,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.lifecycle.statemgmt.ResolveLateBoundPluginMojo;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -54,10 +57,10 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportMissingPluginDescriptor( binding, project, err );
     }
 
-    before( MojoBinding binding, MavenProject project, PluginLoaderException cause ):
-        cflow( le_executeGoalAndHandleFailures( binding ) )
-        && call( LifecycleExecutionException.new( String, MavenProject, PluginLoaderException ) )
-        && args( *, project, cause )
+    after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
+        cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
+        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
+        && args( binding, project, .. )
     {
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
     }
@@ -68,7 +71,11 @@ public privileged aspect LifecycleErrorReporterAspect
         && handler( MojoExecutionException )
         && args( cause )
     {
-        getReporter().reportMojoExecutionException( binding, project, cause );
+        // this will be covered by the reportErrorLoadingPlugin(..) method.
+        if ( !StateManagementUtils.RESOLVE_LATE_BOUND_PLUGIN_GOAL.equals( binding.getGoal() ) )
+        {
+            getReporter().reportMojoExecutionException( binding, project, cause );
+        }
     }
 
     PluginExecutionException around( MojoBinding binding, MavenProject project ):

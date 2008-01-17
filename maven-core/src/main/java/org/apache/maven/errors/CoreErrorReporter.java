@@ -107,8 +107,6 @@ public interface CoreErrorReporter
 
     void reportNoGoalsSpecifiedException( MavenProject rootProject, NoGoalsSpecifiedException error );
 
-    void reportPluginErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, PluginLoaderException cause );
-
     void reportProjectCycle( ProjectCycleException error );
 
     void reportProjectDependenciesNotFound( MavenProject project, String scope, ArtifactNotFoundException cause );

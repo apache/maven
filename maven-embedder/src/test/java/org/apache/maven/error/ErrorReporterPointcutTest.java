@@ -408,9 +408,33 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorLoadingPlugin()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        Settings settings = new Settings();
+        settings.setOffline( true );
+        settings.setLocalRepository( localRepo.getAbsolutePath() );
+
+        reporter.reportErrorLoadingPlugin( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setSettings( settings )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorManagingRealmForExtension()
@@ -772,12 +796,6 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    public void testReportPluginErrorWhileValidatingTask()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void testReportProjectCycle()
         throws IOException
     {
@@ -906,17 +924,11 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setSettings( settings )
                                                                           .setErrorReporter( reporter )
-//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
                                                                           .setGoals( Arrays.asList( new String[] {
                                                                               "initialize"
                                                                           } ) );
 
         maven.execute( request );
-//        MavenExecutionResult result = maven.execute( request );
-//        if ( result.hasExceptions() )
-//        {
-//            reportExceptions( result, project );
-//        }
 
         reporterCtl.verify();
     }

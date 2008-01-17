@@ -291,32 +291,6 @@ public class DefaultCoreErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    public void reportPluginErrorWhileValidatingTask( String task,
-                                                      MavenSession session,
-                                                      MavenProject rootProject,
-                                                      PluginLoaderException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Invalid mojo or lifecycle phase: " );
-        writer.write( task );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-
-        writer.write( "Failed to load plugin: " );
-        writer.write( cause.getPluginKey() );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-
-        writer.write( "Original error message was: " );
-        writer.write( cause.getMessage() );
-
-        addTips( CoreErrorTips.getTaskValidationTips( task, cause ), writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
     public void reportMissingPluginDescriptor( MojoBinding binding,
                                                MavenProject project,
                                                LifecycleExecutionException err )
