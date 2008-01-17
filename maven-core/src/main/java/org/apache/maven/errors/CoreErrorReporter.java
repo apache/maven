@@ -4,6 +4,7 @@ import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -26,7 +27,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
@@ -81,7 +81,7 @@ public interface CoreErrorReporter
 
     void reportErrorSearchingforCompatibleExtensionPluginVersion( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, String requiredMavenVersion, String currentMavenVersion, ArtifactMetadataRetrievalException cause );
 
-    void reportExtensionPluginArtifactNotFound( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginNotFoundException cause );
+    void reportExtensionPluginArtifactNotFound( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, AbstractArtifactResolutionException cause );
 
     void reportExtensionPluginVersionNotFound( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, PluginVersionNotFoundException cause );
 
@@ -96,8 +96,6 @@ public interface CoreErrorReporter
     void reportLifecycleLoaderErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, LifecycleLoaderException cause );
 
     void reportLifecycleSpecErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause );
-
-    void reportMissingArtifactWhileAddingExtensionPlugin( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactNotFoundException cause );
 
     void reportMissingPluginDescriptor( MojoBinding binding, MavenProject project, LifecycleExecutionException err );
 

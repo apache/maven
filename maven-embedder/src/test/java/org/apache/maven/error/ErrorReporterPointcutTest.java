@@ -472,9 +472,29 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportExtensionPluginArtifactNotFound()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        reporter.reportExtensionPluginArtifactNotFound( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setLocalRepositoryPath( localRepo )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportExtensionPluginVersionNotFound()
@@ -657,12 +677,6 @@ public class ErrorReporterPointcutTest
         maven.execute( request );
 
         reporterCtl.verify();
-    }
-
-    public void testReportMissingArtifactWhileAddingExtensionPlugin()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     public void testReportMissingPluginDescriptor()
@@ -872,9 +886,39 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportUnresolvableArtifactWhileAddingExtensionPlugin()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        File projectDir = prepareProjectDir();
+        File localRepo = new File( projectDir, "local-repo" );
+        File project = new File( projectDir, "project" );
 
+        Settings settings = new Settings();
+        settings.setOffline( true );
+        settings.setLocalRepository( localRepo.getAbsolutePath() );
+
+        reporter.reportUnresolvableArtifactWhileAddingExtensionPlugin( null, null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setSettings( settings )
+                                                                          .setErrorReporter( reporter )
+//                                                                          .setErrorReporter( new DummyCoreErrorReporter() )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+//        MavenExecutionResult result = maven.execute( request );
+//        if ( result.hasExceptions() )
+//        {
+//            reportExceptions( result, project );
+//        }
+
+        reporterCtl.verify();
     }
 
     public void testReportActivatorError()

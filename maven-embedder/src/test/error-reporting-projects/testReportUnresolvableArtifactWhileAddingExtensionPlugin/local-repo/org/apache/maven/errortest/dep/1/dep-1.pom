@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.errortest</groupId>
+  <artifactId>dep</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>[4.0,4.1]</version>
+    </dependency>
+  </dependencies>
+</project>

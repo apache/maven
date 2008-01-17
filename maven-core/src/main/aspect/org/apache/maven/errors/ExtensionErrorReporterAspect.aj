@@ -123,7 +123,7 @@ public privileged aspect ExtensionErrorReporterAspect
         && call( ExtensionManagerException.new( .., ArtifactNotFoundException ) )
         && args( .., cause )
     {
-        getReporter().reportMissingArtifactWhileAddingExtensionPlugin( plugin, originModel, remoteRepos, request, cause );
+        getReporter().reportExtensionPluginArtifactNotFound( plugin, originModel, remoteRepos, request, cause );
     }
 
     before( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactResolutionException cause ):

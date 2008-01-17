@@ -31,7 +31,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -1170,34 +1169,6 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
     }
 
-    public void reportMissingArtifactWhileAddingExtensionPlugin( Plugin plugin,
-                                                                 Model originModel,
-                                                                 List remoteRepos,
-                                                                 MavenExecutionRequest request,
-                                                                 ArtifactNotFoundException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "One or more dependency artifacts are missing for a plugin used by your project as a build extension." );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Project:" );
-        writeProjectCoordinate( originModel, null, writer );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Plugin (used as an extension):" );
-        writePluginInfo( plugin, writer );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writeArtifactError( cause, writer );
-
-        addTips( CoreErrorTips.getErrorResolvingExtensionPluginArtifactsTips( plugin, originModel, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
     public void reportUnresolvableArtifactWhileAddingExtensionPlugin( Plugin plugin,
                                                                       Model originModel,
                                                                       List remoteRepos,
@@ -1230,7 +1201,7 @@ public class DefaultCoreErrorReporter
                                                        Model originModel,
                                                        List remoteRepos,
                                                        MavenExecutionRequest request,
-                                                       PluginNotFoundException cause )
+                                                       AbstractArtifactResolutionException cause )
     {
         StringWriter writer = new StringWriter();
 

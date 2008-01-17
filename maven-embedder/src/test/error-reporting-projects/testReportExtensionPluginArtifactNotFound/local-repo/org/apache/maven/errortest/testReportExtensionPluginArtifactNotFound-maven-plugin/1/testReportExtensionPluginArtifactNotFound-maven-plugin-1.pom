@@ -2,7 +2,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.errortest</groupId>
-  <artifactId>testReportInvalidDependencyVersionInExtensionPluginPOM-maven-plugin</artifactId>
+  <artifactId>testReportExtensionPluginArtifactNotFound-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>1</version>
   
@@ -13,9 +13,9 @@
       <version>2.0</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>[3.8.1,</version>
+      <groupId>nothing</groupId>
+      <artifactId>nothing</artifactId>
+      <version>1</version>
     </dependency>
   </dependencies>
   <build>
