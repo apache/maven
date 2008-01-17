@@ -86,6 +86,13 @@ echo.
 goto error
 
 :valMHome
+
+:stripMHome
+if not _%M2_HOME:~-1%==_\ goto checkMBat
+set M2_HOME=%M2_HOME:~0,-1%
+goto stripMHome
+
+:checkMBat
 if exist "%M2_HOME%\bin\mvn.bat" goto init
 
 echo.
