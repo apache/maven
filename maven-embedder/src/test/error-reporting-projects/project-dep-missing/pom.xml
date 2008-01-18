@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.errortest</groupId>
+  <artifactId>project-dep-missing</artifactId>
+  <version>1</version>
+  
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>file://${java.io.tmpdir}</url>
+    </repository>
+  </repositories>
+  
+  <dependencies>
+    <dependency>
+      <groupId>not</groupId>
+      <artifactId>found</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
+  
+</project>

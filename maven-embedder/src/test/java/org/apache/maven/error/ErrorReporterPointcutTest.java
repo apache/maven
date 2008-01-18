@@ -147,9 +147,13 @@ public class ErrorReporterPointcutTest
     private File prepareProjectDir()
         throws IOException
     {
-        String method = getTestMethodName();
+        return prepareProjectDir( "nothing" );
+    }
 
-        String resource = "error-reporting-projects/" + method;
+    private File prepareProjectDir( String basename )
+        throws IOException
+    {
+        String resource = "error-reporting-projects/" + basename;
 
         File testDirectory = new File( basedir, "src/test/" + resource );
 
@@ -219,7 +223,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorResolvingExtensionDirectDependencies()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-ext-direct-deps" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -255,7 +259,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "aggregate-mojo-failure");
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -271,7 +275,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportAggregatedMojoFailureException-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:aggregate-mojo-failure-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -287,7 +291,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "config-rdonly-mojo-param");
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -326,7 +330,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "mojo-config-error");
         File plugin = new File( projectDir, "plugin" );
         File project = new File( projectDir, "project" );
 
@@ -342,7 +346,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportErrorApplyingMojoConfiguration-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:mojo-config-error-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -353,7 +357,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorConfiguringExtensionPluginRealm()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "ext-plugin-realm-error" );
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -389,7 +393,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-build-plan" );
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -405,7 +409,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportErrorFormulatingBuildPlan-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:bad-build-plan-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -421,7 +425,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "interp-from-project");
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -447,7 +451,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorLoadingPlugin()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "err-loading-plugin" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -482,7 +486,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "ext-realm-error" );
 
         buildTestAccessory( new File( projectDir, "ext" ) );
 
@@ -509,7 +513,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorResolvingExtensionDependencies()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "ext-deps-resolve-err" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -535,7 +539,7 @@ public class ErrorReporterPointcutTest
     public void testReportExtensionPluginArtifactNotFound()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "ext-plugin-artifact-missing" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -561,7 +565,7 @@ public class ErrorReporterPointcutTest
     public void testReportExtensionPluginVersionNotFound()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "ext-plugin-version-err" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -591,7 +595,7 @@ public class ErrorReporterPointcutTest
     public void testReportIncompatibleMavenVersionForExtensionPlugin()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-ext-plugin-maven-ver" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -623,7 +627,7 @@ public class ErrorReporterPointcutTest
     public void testReportInvalidDependencyVersionInExtensionPluginPOM()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-ext-plugin-dep-ver" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -654,7 +658,7 @@ public class ErrorReporterPointcutTest
     public void testReportInvalidMavenVersion()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-maven-version" );
 
         reporter.reportInvalidMavenVersion( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -677,7 +681,7 @@ public class ErrorReporterPointcutTest
     public void testReportInvalidPluginExecutionEnvironment()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-plugin-exec-env" );
 
         reporter.reportInvalidPluginExecutionEnvironment( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -700,7 +704,7 @@ public class ErrorReporterPointcutTest
     public void testReportLifecycleLoaderErrorWhileValidatingTask()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "task-lifecycle-loader-err" );
         File localRepo = new File( projectDir, "local-repo" );
 
         Settings settings = new Settings();
@@ -753,7 +757,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "missing-req-mojo-param" );
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -769,7 +773,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportMissingRequiredMojoParameter-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:missing-req-mojo-param-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -785,7 +789,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "mojo-exec-err" );
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -801,7 +805,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportMojoExecutionException-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:mojo-exec-err-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -817,7 +821,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "mojo-lookup-err" );
 
         buildTestAccessory( new File( projectDir, "plugin" ) );
 
@@ -831,7 +835,7 @@ public class ErrorReporterPointcutTest
                                                                           .setShowErrors( true )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {
-                                                                              "org.apache.maven.errortest:testReportMojoLookupError-maven-plugin:1:test"
+                                                                              "org.apache.maven.errortest:mojo-lookup-err-maven-plugin:1:test"
                                                                           } ) );
 
         maven.execute( request );
@@ -859,7 +863,7 @@ public class ErrorReporterPointcutTest
     public void testReportProjectCycle()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-cycle" );
 
         reporter.reportProjectCycle( null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -882,7 +886,7 @@ public class ErrorReporterPointcutTest
     public void testReportProjectDependenciesNotFound()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-dep-missing" );
 
         reporter.reportProjectDependenciesNotFound( null,
                                                     null,
@@ -912,7 +916,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "err-resolving-project-dep" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -938,7 +942,7 @@ public class ErrorReporterPointcutTest
     public void testReportProjectMojoFailureException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-mojo-failure" );
 
         reporter.reportProjectMojoFailureException( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -962,7 +966,7 @@ public class ErrorReporterPointcutTest
     public void testReportUnresolvableArtifactWhileAddingExtensionPlugin()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "err-resolving-ext-plugin" );
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
@@ -992,7 +996,7 @@ public class ErrorReporterPointcutTest
     public void testReportActivatorError()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "profile-activator-err" );
 
         reporter.reportActivatorError( null, null, null, null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1020,7 +1024,7 @@ public class ErrorReporterPointcutTest
             return;
         }
 
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "profile-activator-lookup-err" );
 
         buildTestAccessory( new File( projectDir, "ext" ) );
 
@@ -1047,7 +1051,7 @@ public class ErrorReporterPointcutTest
     public void testReportBadDependencyVersion()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-dep-version" );
 
         reporter.reportBadDependencyVersion( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1070,7 +1074,7 @@ public class ErrorReporterPointcutTest
     public void testReportBadManagedDependencyVersion()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-mg-dep-version" );
 
         reporter.reportBadManagedDependencyVersion( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1093,7 +1097,7 @@ public class ErrorReporterPointcutTest
     public void testReportBadNonDependencyProjectArtifactVersion()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-non-dep-version" );
 
         reporter.reportBadNonDependencyProjectArtifactVersion( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1116,7 +1120,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorCreatingArtifactRepository()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "repo-creation-err" );
 
         reporter.reportErrorCreatingArtifactRepository( null, null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1139,7 +1143,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorCreatingDeploymentArtifactRepository()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "deploy-repo-creation-err" );
 
         reporter.reportErrorCreatingDeploymentArtifactRepository( null, null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1162,7 +1166,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorInterpolatingModel_UsingModelInstance()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "interp-from-model" );
 
         reporter.reportErrorInterpolatingModel( null, null, null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1185,7 +1189,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorLoadingExternalProfilesFromFile_XmlPullParserException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "load-extern-profiles-xex" );
 
         reporter.reportErrorLoadingExternalProfilesFromFile( null,
                                                              null,
@@ -1211,7 +1215,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorLoadingExternalProfilesFromFile_IOException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "load-extern-profiles-ioex" );
 
         reporter.reportErrorLoadingExternalProfilesFromFile( null, null, null, (IOException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1234,7 +1238,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorParsingParentProjectModel_XmlPullParserException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "parent-parse-xex");
         File childDir = new File( projectDir, "child" );
 
         reporter.reportErrorParsingParentProjectModel( null, null, (XmlPullParserException) null );
@@ -1258,7 +1262,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorParsingParentProjectModel_IOException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "parent-parse-ioex" );
         File childDir = new File( projectDir, "child" );
 
         reporter.reportErrorParsingParentProjectModel( null, null, (IOException) null );
@@ -1282,7 +1286,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorParsingProjectModel_XmlPullParserException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-parse-xex" );
 
         reporter.reportErrorParsingProjectModel( null, null, (XmlPullParserException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1305,7 +1309,7 @@ public class ErrorReporterPointcutTest
     public void testReportErrorParsingProjectModel_IOException()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-parse-ioex" );
 
         reporter.reportErrorParsingProjectModel( null, null, (IOException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1330,7 +1334,7 @@ public class ErrorReporterPointcutTest
     public void testReportInvalidRepositoryWhileGettingRepositoriesFromProfiles()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "bad-profile-repo" );
 
         reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null,
                                                                               null,
@@ -1356,7 +1360,7 @@ public class ErrorReporterPointcutTest
     public void testReportParentPomArtifactNotFound()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "missing-parent-pom" );
         File localRepo = new File( projectDir, "local-repo" );
 
         Settings settings = new Settings();
@@ -1385,7 +1389,7 @@ public class ErrorReporterPointcutTest
     public void testReportProjectCollision()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-collision" );
 
         reporter.reportProjectCollision( null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1408,7 +1412,7 @@ public class ErrorReporterPointcutTest
     public void testReportProjectValidationFailure()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "project-validation" );
 
         reporter.reportProjectValidationFailure( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
@@ -1431,7 +1435,7 @@ public class ErrorReporterPointcutTest
     public void testReportMissingModulePom()
         throws IOException
     {
-        File projectDir = prepareProjectDir();
+        File projectDir = prepareProjectDir( "missing-module-pom" );
 
         reporter.reportMissingModulePom( null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );

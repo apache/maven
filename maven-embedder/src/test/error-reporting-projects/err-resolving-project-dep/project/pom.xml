@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.errortest</groupId>
+  <artifactId>err-resolving-project-dep</artifactId>
+  <version>1</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>[3.8.1,3.8.2]</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.errortest</groupId>
+      <artifactId>dep</artifactId>
+      <version>1</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+  
+</project>
