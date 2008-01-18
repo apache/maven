@@ -418,8 +418,11 @@ public class DefaultPluginManager
                     pluginRealm.display();
                 }
 
-                throw new IllegalStateException( "The PluginDescriptor for the plugin "
-                                                 + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm );
+                getLogger().debug( "Removing invalid plugin realm." );
+                realmManager.disposePluginRealm( projectPlugin );
+
+                throw new PluginManagerException( projectPlugin, "The PluginDescriptor for the plugin "
+                                                 + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm, project );
             }
 
             pluginDescriptor.setPluginArtifact( pluginArtifact );
@@ -854,7 +857,7 @@ public class DefaultPluginManager
                                                                                    mergedConfiguration,
                                                                                    mojoDescriptor );
 
-        checkDeprecatedParameters( mojoDescriptor, extractedMojoConfiguration );
+        checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
 
         checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 

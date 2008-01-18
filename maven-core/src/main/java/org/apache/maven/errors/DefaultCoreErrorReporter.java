@@ -17,7 +17,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.ExtensionManagerException;
 import org.apache.maven.lifecycle.LifecycleException;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.MojoBindingUtils;
@@ -46,6 +45,7 @@ import org.apache.maven.project.error.ProjectReporterManager;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -289,34 +289,6 @@ public class DefaultCoreErrorReporter
         addTips( CoreErrorTips.getTaskValidationTips( task, cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    public void reportMissingPluginDescriptor( MojoBinding binding,
-                                               MavenProject project,
-                                               LifecycleExecutionException err )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "Maven cannot find a plugin required by your build:" );
-
-        writeMojoBinding( binding, writer );
-        writer.write( "Referenced from project:" );
-        writeProjectCoordinate( project, writer );
-
-        writer.write( "NOTE: If the above information seems incorrect, check that " +
-        		"the corresponding <plugin/> section in your POM is correct." );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "If you specified this plugin directly using something like " +
-        		"'javadoc:javadoc', check that the <pluginGroups/> section in your " +
-        		"$HOME/.m2/settings.xml contains the proper groupId for the plugin " +
-        		"you are trying to use (each groupId goes in a separate <pluginGroup/> " +
-        		"element within the <pluginGroups/> section." );
-
-        addTips( CoreErrorTips.getMissingPluginDescriptorTips( binding, project ), writer );
-
-        registerBuildError( err, writer.toString() );
     }
 
     public void reportInvalidPluginExecutionEnvironment( MojoBinding binding,
@@ -1665,6 +1637,33 @@ public class DefaultCoreErrorReporter
         {
             writer.write( "  " );
         }
+    }
+
+    public void reportMissingModulePom( MissingModuleException err )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "The module: " );
+        writer.write( err.getModuleName() );
+        writer.write( " cannot be found." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Module's expected path: " );
+        writer.write( NEWLINE );
+        writer.write( err.getModuleFile().getAbsolutePath() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Referenced by POM: " );
+        writer.write( NEWLINE );
+        writer.write( err.getPomFile().getAbsolutePath() );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        addTips( CoreErrorTips.getMissingModuleTips( err.getPomFile(), err.getModuleFile(), err.getModuleName() ), writer );
+
+        registerBuildError( err, writer.toString() );
     }
 
 }

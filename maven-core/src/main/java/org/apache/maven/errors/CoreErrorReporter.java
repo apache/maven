@@ -15,7 +15,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.ExtensionManagerException;
 import org.apache.maven.lifecycle.LifecycleException;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -39,6 +38,7 @@ import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -97,8 +97,6 @@ public interface CoreErrorReporter
 
     void reportLifecycleSpecErrorWhileValidatingTask( String task, MavenSession session, MavenProject rootProject, LifecycleSpecificationException cause );
 
-    void reportMissingPluginDescriptor( MojoBinding binding, MavenProject project, LifecycleExecutionException err );
-
     void reportMissingRequiredMojoParameter( MojoBinding binding, MavenProject project, List invalidParameters, PluginParameterException err );
 
     void reportMojoExecutionException( MojoBinding binding, MavenProject project, MojoExecutionException cause );
@@ -124,5 +122,7 @@ public interface CoreErrorReporter
     void reportUnresolvableExtensionPluginPOM( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, ArtifactMetadataRetrievalException cause );
 
     void reportUseOfBannedMojoParameter( Parameter currentParameter, MojoBinding binding, MavenProject project, String expression, String altExpression, ExpressionEvaluationException err );
+
+    void reportMissingModulePom( MissingModuleException err );
 
 }

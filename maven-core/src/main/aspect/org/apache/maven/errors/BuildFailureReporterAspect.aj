@@ -132,32 +132,6 @@ public privileged aspect BuildFailureReporterAspect
      * <code>
      * DefaultMaven.execute(MavenExecutionRequest)
      * --&gt; DefaultLifecycleExecutor.isTaskValid(String, MavenSession, MavenProject)
-     *        --&gt; catch( PluginLoaderException )
-     * &lt;-- TaskValidationResult
-     * </code>
-     * </pre>
-     */
-    after( MojoBinding binding, MavenSession session, MavenProject rootProject ) throwing ( PluginLoaderException cause ):
-        within_le_getMojoDescriptorForDirectInvocation()
-        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, MavenSession ) )
-        && args( binding, rootProject, session )
-    {
-        getReporter().reportPluginErrorWhileValidatingTask( binding.getGoal(), session, rootProject, cause );
-    }
-
-//    before():
-//        call( * MojoBindingFactory+.parseMojoBinding( String, MavenProject, MavenSession, boolean ) )
-//    {
-//        System.out.println( "Boo" );
-//    }
-
-    /**
-     * Call stack is:
-     * <br/>
-     * <pre>
-     * <code>
-     * DefaultMaven.execute(MavenExecutionRequest)
-     * --&gt; DefaultLifecycleExecutor.isTaskValid(String, MavenSession, MavenProject)
      *        --&gt; catch( LifecycleSpecificationException )
      * &lt;-- TaskValidationResult
      * </code>

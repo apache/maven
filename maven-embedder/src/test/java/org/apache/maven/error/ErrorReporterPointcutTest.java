@@ -197,7 +197,8 @@ public class ErrorReporterPointcutTest
         }
     }
 
-    private void reportExceptions( MavenExecutionResult result, File basedir )
+    private void reportExceptions( MavenExecutionResult result,
+                                   File basedir )
     {
         StringWriter writer = new StringWriter();
         PrintWriter pWriter = new PrintWriter( writer );
@@ -293,7 +294,14 @@ public class ErrorReporterPointcutTest
 
         File basedir = new File( projectDir, "project" );
 
-        reporter.reportAttemptToOverrideUneditableMojoParameter( null, null, null, null, null, null, null, null );
+        reporter.reportAttemptToOverrideUneditableMojoParameter( null,
+                                                                 null,
+                                                                 null,
+                                                                 null,
+                                                                 null,
+                                                                 null,
+                                                                 null,
+                                                                 null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -312,9 +320,35 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportErrorApplyingMojoConfiguration()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+        File plugin = new File( projectDir, "plugin" );
+        File project = new File( projectDir, "project" );
+
+        buildTestAccessory( plugin );
+
+        reporter.reportErrorApplyingMojoConfiguration( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "org.apache.maven.errortest:testReportErrorApplyingMojoConfiguration-maven-plugin:1:test"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportErrorConfiguringExtensionPluginRealm()
@@ -326,7 +360,11 @@ public class ErrorReporterPointcutTest
 
         File project = new File( projectDir, "project" );
 
-        reporter.reportErrorConfiguringExtensionPluginRealm( null, null, null, null, (PluginManagerException) null );
+        reporter.reportErrorConfiguringExtensionPluginRealm( null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             (PluginManagerException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -559,7 +597,13 @@ public class ErrorReporterPointcutTest
         File localRepo = new File( projectDir, "local-repo" );
         File project = new File( projectDir, "project" );
 
-        reporter.reportIncompatibleMavenVersionForExtensionPlugin( null, null, null, null, null, null, null );
+        reporter.reportIncompatibleMavenVersionForExtensionPlugin( null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -703,12 +747,6 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
-    public void testReportMissingPluginDescriptor()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void testReportMissingRequiredMojoParameter()
         throws IOException
     {
@@ -774,9 +812,33 @@ public class ErrorReporterPointcutTest
     }
 
     public void testReportMojoLookupError()
+        throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( !checkOnline() )
+        {
+            return;
+        }
 
+        File projectDir = prepareProjectDir();
+
+        buildTestAccessory( new File( projectDir, "plugin" ) );
+
+        reporter.reportMojoLookupError( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "org.apache.maven.errortest:testReportMojoLookupError-maven-plugin:1:test"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
     }
 
     public void testReportNoGoalsSpecifiedException()
@@ -824,7 +886,9 @@ public class ErrorReporterPointcutTest
     {
         File projectDir = prepareProjectDir();
 
-        reporter.reportProjectDependenciesNotFound( null, null, (MultipleArtifactsNotFoundException) null );
+        reporter.reportProjectDependenciesNotFound( null,
+                                                    null,
+                                                    (MultipleArtifactsNotFoundException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -895,12 +959,6 @@ public class ErrorReporterPointcutTest
         maven.execute( request );
 
         reporterCtl.verify();
-    }
-
-    public void testReportReflectionErrorWhileEvaluatingMojoParameter()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     public void testReportUnresolvableArtifactWhileAddingExtensionPlugin()
@@ -1131,7 +1189,10 @@ public class ErrorReporterPointcutTest
     {
         File projectDir = prepareProjectDir();
 
-        reporter.reportErrorLoadingExternalProfilesFromFile( null, null, null, (XmlPullParserException) null );
+        reporter.reportErrorLoadingExternalProfilesFromFile( null,
+                                                             null,
+                                                             null,
+                                                             (XmlPullParserException) null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -1273,7 +1334,10 @@ public class ErrorReporterPointcutTest
     {
         File projectDir = prepareProjectDir();
 
-        reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null, null, null, null );
+        reporter.reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( null,
+                                                                              null,
+                                                                              null,
+                                                                              null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
@@ -1349,6 +1413,29 @@ public class ErrorReporterPointcutTest
         File projectDir = prepareProjectDir();
 
         reporter.reportProjectValidationFailure( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "initialize"
+                                                                          } ) );
+
+        maven.execute( request );
+
+        reporterCtl.verify();
+    }
+
+    public void testReportMissingModulePom()
+        throws IOException
+    {
+        File projectDir = prepareProjectDir();
+
+        reporter.reportMissingModulePom( null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 

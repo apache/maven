@@ -25,10 +25,10 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.lifecycle.statemgmt.ResolveLateBoundPluginMojo;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.PlexusContainer;
 
 import java.util.List;
 
@@ -40,6 +40,10 @@ public privileged aspect LifecycleErrorReporterAspect
         execution( void DefaultLifecycleExecutor.executeGoalAndHandleFailures( MojoBinding, .. ) )
         && args( binding, .. );
 
+    private pointcut le_executeGoalAndHandleFailures_withSession( MojoBinding binding, MavenSession session ):
+        execution( void DefaultLifecycleExecutor.executeGoalAndHandleFailures( MojoBinding, MavenSession, .. ) )
+        && args( binding, session, .. );
+
     private pointcut pm_executeMojo( MavenProject project ):
         execution( void PluginManager+.executeMojo( MavenProject, .. ) )
         && args( project, .. );
@@ -47,15 +51,6 @@ public privileged aspect LifecycleErrorReporterAspect
     private pointcut within_pm_executeMojo( MavenProject project ):
         withincode( void PluginManager+.executeMojo( MavenProject, .. ) )
         && args( project, .. );
-
-    before( MojoBinding binding, MavenProject project, LifecycleExecutionException err ):
-        cflow( le_executeGoalAndHandleFailures( binding ) )
-        && execution( LifecycleExecutionException.new( String, MavenProject ) )
-        && args( .., project )
-        && this( err )
-    {
-        getReporter().reportMissingPluginDescriptor( binding, project, err );
-    }
 
     after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
         cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
@@ -89,12 +84,11 @@ public privileged aspect LifecycleErrorReporterAspect
         return cause;
     }
 
-    before( MojoBinding binding, MavenProject project, ComponentLookupException cause ):
+    after( MojoBinding binding, MavenProject project ) throwing ( ComponentLookupException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && withincode( Mojo DefaultPluginManager.getConfiguredMojo( .. ) )
-        && handler( ComponentLookupException )
-        && args( cause )
+        && call( Object PlexusContainer+.lookup( .. ) )
     {
         getReporter().reportMojoLookupError( binding, project, cause );
     }

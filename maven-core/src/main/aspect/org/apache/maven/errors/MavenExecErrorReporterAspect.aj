@@ -1,6 +1,7 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -57,6 +58,13 @@ public aspect MavenExecErrorReporterAspect
         getReporter().reportInvalidMavenVersion( currentProject, mavenVersion, err );
 
         return err;
+    }
+
+    after( MissingModuleException err ):
+        execution( MissingModuleException.new( String, File, File ) )
+        && this( err )
+    {
+        getReporter().reportMissingModulePom( err );
     }
 
     after(): dm_collectProjects( ArtifactRepository, ProfileManager )

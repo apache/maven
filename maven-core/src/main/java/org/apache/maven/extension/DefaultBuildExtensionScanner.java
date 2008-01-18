@@ -38,6 +38,7 @@ import org.apache.maven.project.build.model.ModelLineageBuilder;
 import org.apache.maven.project.build.model.ModelLineageIterator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
+import org.apache.maven.reactor.MissingModuleException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -90,7 +91,7 @@ public class DefaultBuildExtensionScanner
 
     public void scanForBuildExtensions( List files,
                                         MavenExecutionRequest request )
-        throws ExtensionScanningException
+        throws ExtensionScanningException, MissingModuleException
     {
         List visited = new ArrayList();
 
@@ -104,7 +105,7 @@ public class DefaultBuildExtensionScanner
 
     public void scanForBuildExtensions( File pom,
                                         MavenExecutionRequest request )
-        throws ExtensionScanningException
+        throws ExtensionScanningException, MissingModuleException
     {
         scanInternal( pom, request, new ArrayList(), Collections.singletonList( pom ) );
     }
@@ -113,7 +114,7 @@ public class DefaultBuildExtensionScanner
                                MavenExecutionRequest request,
                                List visitedModelIds,
                                List reactorFiles )
-        throws ExtensionScanningException
+        throws ExtensionScanningException, MissingModuleException
     {
 
         try
@@ -244,7 +245,7 @@ public class DefaultBuildExtensionScanner
                                             List originalRemoteRepositories,
                                             List visitedModelIds,
                                             List reactorFiles )
-        throws ExtensionScanningException
+        throws ExtensionScanningException, MissingModuleException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
         // an extension in place before they can be activated.
@@ -302,11 +303,7 @@ public class DefaultBuildExtensionScanner
 
                 if ( !modulePomDirectory.exists() )
                 {
-                    getLogger().debug(
-                                       "Cannot find POM for module: " + moduleSubpath
-                                           + "; continuing scan with next module. (Full path was: "
-                                           + modulePomDirectory + ")" );
-                    continue;
+                    throw new MissingModuleException( moduleSubpath, modulePomDirectory, containingPom );
                 }
 
                 scanInternal( modulePomDirectory, request, visitedModelIds, reactorFiles );

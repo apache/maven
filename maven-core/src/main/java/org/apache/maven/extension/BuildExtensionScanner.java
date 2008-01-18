@@ -20,6 +20,7 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.reactor.MissingModuleException;
 
 import java.io.File;
 import java.util.List;
@@ -31,10 +32,10 @@ public interface BuildExtensionScanner
 
     void scanForBuildExtensions( List files,
                                  MavenExecutionRequest request )
-        throws ExtensionScanningException;
+        throws ExtensionScanningException, MissingModuleException;
 
     void scanForBuildExtensions( File pom,
                                  MavenExecutionRequest request )
-        throws ExtensionScanningException;
+        throws ExtensionScanningException, MissingModuleException;
 
 }

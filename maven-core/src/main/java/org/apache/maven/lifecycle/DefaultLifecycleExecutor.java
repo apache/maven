@@ -462,7 +462,7 @@ public class DefaultLifecycleExecutor
         // using both the PluginDescriptor and the MojoBinding.
         try
         {
-            PluginDescriptor pluginDescriptor = null;
+            PluginDescriptor pluginDescriptor;
             try
             {
                 pluginDescriptor = pluginLoader.loadPlugin(
@@ -487,62 +487,53 @@ public class DefaultLifecycleExecutor
                 }
             }
 
-            if ( pluginDescriptor != null )
+            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
+            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+
+            mojoExecution.setConfiguration( (Xpp3Dom) mojoBinding.getConfiguration() );
+
+            try
             {
-                MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-
-                mojoExecution.setConfiguration( (Xpp3Dom) mojoBinding.getConfiguration() );
-
-                try
-                {
-                    pluginManager.executeMojo(
-                        project,
-                        mojoExecution,
-                        session );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new LifecycleExecutionException(
-                        "Internal error in the plugin manager executing goal '"
-                            + mojoDescriptor.getId() + "': " + e.getMessage(),
-                            project,
-                        e );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    throw new LifecycleExecutionException(
-                        e.getMessage(),
-                        project,
-                        e );
-                }
-                catch ( InvalidDependencyVersionException e )
-                {
-                    throw new LifecycleExecutionException(
-                        e.getMessage(),
-                        project,
-                        e );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new LifecycleExecutionException(
-                        e.getMessage(),
-                        project,
-                        e );
-                }
-                catch ( PluginConfigurationException e )
-                {
-                    throw new LifecycleExecutionException(
-                        e.getMessage(),
-                        project,
-                        e );
-                }
+                pluginManager.executeMojo(
+                    project,
+                    mojoExecution,
+                    session );
             }
-            else
+            catch ( PluginManagerException e )
             {
                 throw new LifecycleExecutionException(
-                    "Failed to load plugin for: "
-                        + MojoBindingUtils.toString( mojoBinding ) + ". Reason: unknown", project );
+                    "Internal error in the plugin manager executing goal '"
+                        + mojoDescriptor.getId() + "': " + e.getMessage(),
+                        project,
+                    e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new LifecycleExecutionException(
+                    e.getMessage(),
+                    project,
+                    e );
+            }
+            catch ( InvalidDependencyVersionException e )
+            {
+                throw new LifecycleExecutionException(
+                    e.getMessage(),
+                    project,
+                    e );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new LifecycleExecutionException(
+                    e.getMessage(),
+                    project,
+                    e );
+            }
+            catch ( PluginConfigurationException e )
+            {
+                throw new LifecycleExecutionException(
+                    e.getMessage(),
+                    project,
+                    e );
             }
         }
         catch ( LifecycleExecutionException e )

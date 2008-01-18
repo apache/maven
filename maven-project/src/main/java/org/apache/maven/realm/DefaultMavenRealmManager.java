@@ -339,6 +339,25 @@ public class DefaultMavenRealmManager
         }
     }
 
+    public void disposePluginRealm( Plugin plugin )
+    {
+        String id = RealmUtils.createPluginRealmId( plugin );
+
+        logger.debug( "Disposing realm for plugin with id: " + id );
+
+        try
+        {
+            world.disposeRealm( id );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            logger.debug( "Plugin realm: " + id + " didn't exist in ClassWorld instance." );
+        }
+
+        managedRealmIds.remove( id );
+        pluginArtifacts.remove( id );
+    }
+
     public ClassRealm createPluginRealm( Plugin plugin,
                                           Artifact pluginArtifact,
                                           Collection artifacts )

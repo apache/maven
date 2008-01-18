@@ -299,4 +299,12 @@ public final class CoreErrorTips
         return null;
     }
 
+    public static List getMissingModuleTips( File pomFile,
+                                             File moduleFile,
+                                             String moduleName )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

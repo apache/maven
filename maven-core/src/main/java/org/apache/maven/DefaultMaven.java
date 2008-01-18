@@ -42,6 +42,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -369,7 +370,14 @@ public class DefaultMaven
                             }
                         }
 
-                        moduleFiles.add( moduleFile );
+                        if ( !moduleFile.exists() )
+                        {
+                            throw new MissingModuleException( name, moduleFile, file );
+                        }
+                        else
+                        {
+                            moduleFiles.add( moduleFile );
+                        }
                     }
 
                     List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,

@@ -195,6 +195,18 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
+    public PluginManagerException( Plugin plugin,
+                                   String message,
+                                   MavenProject project )
+    {
+        super( message );
+
+        pluginGroupId = plugin.getGroupId();
+        pluginArtifactId = plugin.getArtifactId();
+        pluginVersion = plugin.getVersion();
+        this.project = project;
+    }
+
     public String getPluginGroupId()
     {
         return pluginGroupId;

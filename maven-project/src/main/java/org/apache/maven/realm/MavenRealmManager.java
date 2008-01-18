@@ -37,6 +37,8 @@ public interface MavenRealmManager
                                   Collection artifacts )
         throws RealmManagementException;
 
+    void disposePluginRealm( Plugin plugin );
+
     void setPluginArtifacts( Plugin plugin,
                              Collection artifacts );
 }
