@@ -15,6 +15,7 @@ import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
+import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.shared.tools.easymock.MockManager;
 import org.apache.maven.shared.tools.easymock.TestFileManager;
 import org.codehaus.plexus.logging.Logger;
@@ -87,7 +88,7 @@ public class DefaultBuildExtensionScannerTest
 
     public void testIncludePluginWhenExtensionsFlagDirectlySet()
         throws ExtensionScanningException, ProjectBuildingException, ModelInterpolationException,
-        ExtensionManagerException
+        ExtensionManagerException, MissingModuleException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         File pomFile = new File( "pom" );
@@ -140,7 +141,7 @@ public class DefaultBuildExtensionScannerTest
 
     public void testIncludePluginWhenExtensionsFlagSetInPluginManagement()
         throws ExtensionScanningException, ProjectBuildingException, ModelInterpolationException,
-        ExtensionManagerException
+        ExtensionManagerException, MissingModuleException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         File pomFile = new File( "pom" );
@@ -219,7 +220,7 @@ public class DefaultBuildExtensionScannerTest
 
     public void testIncludePluginWithExtensionsFlagDeclaredInParentPluginManagementReferencedFromModule()
         throws ModelInterpolationException, ProjectBuildingException, ExtensionManagerException,
-        ExtensionScanningException, IOException
+        ExtensionScanningException, IOException, MissingModuleException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         File projectDir = fileManager.createTempDir();

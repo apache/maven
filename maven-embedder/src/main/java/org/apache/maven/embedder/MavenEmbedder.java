@@ -59,6 +59,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
@@ -330,7 +332,7 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
-    throws ProjectBuildingException, ExtensionScanningException
+    throws ProjectBuildingException, ExtensionScanningException, MavenExecutionException
     {
         CoreErrorReporter errorReporter = request.getErrorReporter();
         errorReporter.clearErrors();
@@ -341,7 +343,7 @@ public class MavenEmbedder
     }
 
     private MavenProject readProject( File mavenProject, MavenExecutionRequest request )
-        throws ProjectBuildingException, ExtensionScanningException
+        throws ProjectBuildingException, ExtensionScanningException, MissingModuleException
     {
         getLogger().debug( "Scanning for extensions: " + mavenProject );
 
@@ -402,6 +404,10 @@ public class MavenEmbedder
             return result.addException( e );
         }
         catch ( ExtensionScanningException e )
+        {
+            return result.addException( e );
+        }
+        catch ( MissingModuleException e )
         {
             return result.addException( e );
         }
