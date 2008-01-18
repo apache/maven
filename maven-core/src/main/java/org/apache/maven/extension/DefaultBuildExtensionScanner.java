@@ -181,7 +181,7 @@ public class DefaultBuildExtensionScanner
                                        "POM: " + modelPom
                                            + " is not in the current reactor. Its modules will not be scanned." );
                 }
-                else
+                else if ( request.isRecursive() )
                 {
                     checkModulesForExtensions( modelPom,
                                                model,
