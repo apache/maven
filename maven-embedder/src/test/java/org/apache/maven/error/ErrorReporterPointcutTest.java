@@ -17,7 +17,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.easymock.MockControl;
@@ -578,7 +577,6 @@ public class ErrorReporterPointcutTest
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
                                                                           .setShowErrors( true )
-                                                                          .setLoggingLevel( Logger.LEVEL_DEBUG )
                                                                           .setSettings( settings )
                                                                           .setErrorReporter( reporter )
                                                                           .setGoals( Arrays.asList( new String[] {

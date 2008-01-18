@@ -1,16 +1,5 @@
 package org.apache.maven.cli;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.TimeZone;
-
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.errors.CoreErrorReporter;
@@ -22,8 +11,18 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
-
 import org.codehaus.plexus.util.Os;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -96,7 +95,7 @@ public final class CLIReportingUtils
         logReactorSummary( reactorManager, logger );
 
         boolean printSuccess = true;
-        if ( ( reactorManager != null ) && reactorManager.hasBuildFailures() )
+        if ( ( reactorManager == null ) || reactorManager.hasBuildFailures() )
         {
             for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
             {
@@ -112,7 +111,7 @@ public final class CLIReportingUtils
                 line( logger );
             }
 
-            if ( !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
+            if ( ( reactorManager != null ) && !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
             {
                 logger.info( "BUILD FAILED" );
 
