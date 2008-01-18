@@ -279,6 +279,9 @@ final class BindingUtils
                     PluginExecution exec = (PluginExecution) plugin.getExecutionsAsMap().get( mojo.getExecutionId() );
 
                     mojo.setConfiguration( mergeConfigurations( plugin, exec ) );
+                    
+                    mojo.setVersion( plugin.getVersion() );
+                    
                 }
             }
         }
