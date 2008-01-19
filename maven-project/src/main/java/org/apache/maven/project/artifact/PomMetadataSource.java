@@ -52,7 +52,8 @@ import java.util.Set;
  */
 public class PomMetadataSource
     extends AbstractLogEnabled
-    implements MetadataSource, Contextualizable
+    implements MetadataSource,
+    Contextualizable
 {
     public static final String ROLE_HINT = "default";
 
@@ -85,17 +86,24 @@ public class PomMetadataSource
 
         MavenProject project = null;
 
-        Artifact pomArtifact = artifactFactory.createProjectArtifact( artifactMetadata.getGroupId(), artifactMetadata.getArtifactId(),
-            artifactMetadata.getVersion(), artifactMetadata.getScope() );
+        Artifact pomArtifact = artifactFactory.createProjectArtifact(
+            artifactMetadata.getGroupId()
+            , artifactMetadata.getArtifactId()
+            , artifactMetadata.getVersion()
+        );
 
         try
         {
             project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+            if ( pomArtifact.getFile() != null )
+            {
+                artifactMetadata.setArtifactUri( pomArtifact.getFile().toURI().toString() );
+            }
         }
         catch ( InvalidProjectModelException e )
         {
             // We want to capture this in the graph so that we can display the error to the user
-        	artifactMetadata.setError( e.getMessage() );
+            artifactMetadata.setError( e.getMessage() );
         }
         catch ( ProjectBuildingException e )
         {
@@ -112,7 +120,9 @@ public class PomMetadataSource
         for ( Iterator i = project.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            artifacts.add( new ArtifactMetadata( d.getGroupId(), d.getArtifactId(), d.getVersion() ) );
+
+            artifacts.add( new ArtifactMetadata( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(),
+                d.getScope(), d.getClassifier(), null, null, false, null ) );
         }
 
         // The remote repositories is intentially null here while working in the graph in the least invasive way
@@ -120,6 +130,7 @@ public class PomMetadataSource
         // repositories lingering around or being aggregated after they are used. jvz
 
         artifactMetadata.setDependencies( artifacts );
+
         return new MetadataResolution( artifactMetadata );
     }
 
