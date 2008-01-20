@@ -46,7 +46,6 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -94,12 +93,16 @@ public class DefaultBuildExtensionScanner
         throws ExtensionScanningException, MissingModuleException
     {
         List visited = new ArrayList();
+        
+        List internalFiles = new ArrayList();
+        
+        internalFiles.addAll(files);
 
         for ( Iterator it = files.iterator(); it.hasNext(); )
         {
             File pom = (File) it.next();
 
-            scanInternal( pom, request, visited, files );
+            scanInternal( pom, request, visited, internalFiles );
         }
     }
 
@@ -107,7 +110,11 @@ public class DefaultBuildExtensionScanner
                                         MavenExecutionRequest request )
         throws ExtensionScanningException, MissingModuleException
     {
-        scanInternal( pom, request, new ArrayList(), Collections.singletonList( pom ) );
+        List internalFiles = new ArrayList();
+        
+        internalFiles.add( pom );
+        
+        scanInternal( pom, request, new ArrayList(), internalFiles );
     }
 
     private void scanInternal( File pom,
@@ -305,7 +312,9 @@ public class DefaultBuildExtensionScanner
                 {
                     throw new MissingModuleException( moduleSubpath, modulePomDirectory, containingPom );
                 }
-
+                
+                reactorFiles.add( modulePomDirectory );
+                
                 scanInternal( modulePomDirectory, request, visitedModelIds, reactorFiles );
             }
         }
