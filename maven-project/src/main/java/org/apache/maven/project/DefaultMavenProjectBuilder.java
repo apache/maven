@@ -159,6 +159,13 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     private MavenTools mavenTools;
+    
+    //DO NOT USE, it is here only for backward compatibility reasons. The existing
+    // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
+
+// the aspect weaving seems not to work for reflection from plugin.
+    private Map processedProjectCache = new HashMap();
+    
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
