@@ -116,7 +116,8 @@ under the License.
       </sequential>
     </macrodef>
     <pull orgpath="aspectj/aspectjrt" version="${aspectj.version}" name="aspectjrt"/>
-    <pull orgpath="net/sf/retrotranslator/retrotranslator-runtime" version="${retrotranslator.version}" name="retrotranslator-runtime"/>    
+    <pull orgpath="net/sf/retrotranslator/retrotranslator-runtime" version="${retrotranslator.version}" name="retrotranslator-runtime"/>
+    <pull orgpath="backport-util-concurrent/backport-util-concurrent" version="${backport.version}" name="backport-util-concurrent"/>        
     <pull orgpath="commons-cli/commons-cli" version="${commons-cli.version}" name="commons-cli"/>
     <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
@@ -144,6 +145,7 @@ under the License.
     <path id="pre.classpath">
       <pathelement location="${maven.repo.local}/aspectj/aspectjrt/${aspectj.version}/aspectjrt-${aspectj.version}.jar"/>
       <pathelement location="${maven.repo.local}/net/sf/retrotranslator/retrotranslator-runtime/${retrotranslator.version}/retrotranslator-runtime-${retrotranslator.version}.jar"/>
+      <pathelement location="${maven.repo.local}/backport-util-concurrent/backport-util-concurrent/${backport.version}/backport-util-concurrent-${backport.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
