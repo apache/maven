@@ -18,6 +18,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -55,7 +56,9 @@ public privileged aspect LifecycleErrorReporterAspect
         && args( project, .. );
 
     after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
-        call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
+        ( cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
+          || cflow( execution( * LifecycleExecutor+.isTaskValid( .. ) ) ) )
+        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
         && args( binding, project, .. )
     {
         getReporter().reportErrorLoadingPlugin( binding, project, cause );

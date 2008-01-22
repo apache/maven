@@ -461,7 +461,7 @@ public class ErrorReporterPointcutTest
 
         reporter.reportErrorLoadingPlugin( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-        reporterCtl.setVoidCallable();
+        reporterCtl.setVoidCallable( MockControl.ONE_OR_MORE );
 
         reporterCtl.replay();
 
