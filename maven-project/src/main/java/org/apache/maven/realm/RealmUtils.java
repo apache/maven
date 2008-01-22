@@ -37,16 +37,16 @@ public final class RealmUtils
     public static String createExtensionRealmId( Artifact extensionArtifact )
     {
         return "/extensions/" + extensionArtifact.getGroupId() + ":"
-               + extensionArtifact.getArtifactId() + ":" + extensionArtifact.getVersion() + 
-               "/thread:" + Thread.currentThread().getId(); //add thread to the mix to prevent clashes in paralel execution
+               + extensionArtifact.getArtifactId() + ":" + extensionArtifact.getVersion() +
+               "/thread:" + Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
     }
 
     public static String createProjectId( String projectGroupId,
                                           String projectArtifactId,
                                           String projectVersion )
     {
-        return "/projects/" + projectGroupId + ":" + projectArtifactId + ":" + projectVersion + 
-               "/thread:" + Thread.currentThread().getId(); //add thread to the mix to prevent clashes in paralel execution
+        return "/projects/" + projectGroupId + ":" + projectArtifactId + ":" + projectVersion +
+               "/thread:" + Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
     }
 
     public static String createPluginRealmId( Plugin plugin )
@@ -87,7 +87,7 @@ public final class RealmUtils
         }
 
         id.append( '@' ).append( depId.toString().hashCode() )
-                .append( "/thread:" ).append( Thread.currentThread().getId() ); //add thread to the mix to prevent clashes in paralel execution
+                .append( "/thread:" ).append( Thread.currentThread().getName() ); //add thread to the mix to prevent clashes in paralel execution
 
         return id.toString();
     }
