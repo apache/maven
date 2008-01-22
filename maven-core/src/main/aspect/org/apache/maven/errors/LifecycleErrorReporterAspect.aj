@@ -55,8 +55,7 @@ public privileged aspect LifecycleErrorReporterAspect
         && args( project, .. );
 
     after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
-        cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
-        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
+        call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
         && args( binding, project, .. )
     {
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
