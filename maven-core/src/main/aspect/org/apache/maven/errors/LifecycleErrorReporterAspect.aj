@@ -2,6 +2,7 @@ package org.apache.maven.errors;
 
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -29,6 +30,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.util.List;
 
@@ -60,11 +62,10 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
     }
 
-    before( MojoBinding binding, MavenProject project, MojoExecutionException cause ):
+    after( MojoBinding binding, MavenProject project ) throwing ( MojoExecutionException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
-        && handler( MojoExecutionException )
-        && args( cause )
+        && call( void Mojo+.execute() )
     {
         // this will be covered by the reportErrorLoadingPlugin(..) method.
         if ( !StateManagementUtils.RESOLVE_LATE_BOUND_PLUGIN_GOAL.equals( binding.getGoal() ) )
@@ -179,14 +180,13 @@ public privileged aspect LifecycleErrorReporterAspect
                                                       err );
     }
 
-    before( MojoBinding binding, MavenProject project, String expression, Exception cause ):
+    after( MojoBinding binding, MavenProject project, String expression ) throwing ( Exception cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && cflow( pm_checkRequiredParameters() )
         && cflow( ppee_evaluate( expression ) )
         && within( PluginParameterExpressionEvaluator )
-        && handler( Exception )
-        && args( cause )
+        && call( Object ReflectionValueExtractor.evaluate( String, Object ) )
     {
         getReporter().reportReflectionErrorWhileEvaluatingMojoParameter( currentParameter,
                                                       binding,
