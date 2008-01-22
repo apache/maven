@@ -34,7 +34,7 @@ public interface MavenProjectBuilder
 
     String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
 
-    String STANDALONE_SUPERPOM_VERSION = "2.0";
+    String STANDALONE_SUPERPOM_VERSION = "2.1";
 
     boolean STRICT_MODEL_PARSING = true;
 
