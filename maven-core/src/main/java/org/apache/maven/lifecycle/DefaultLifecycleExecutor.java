@@ -109,7 +109,7 @@ public class DefaultLifecycleExecutor
 
         List goals = session.getGoals();
 
-        if ( goals.isEmpty() && ( rootProject != null ) )
+        if ( ( ( goals == null ) || goals.isEmpty() ) && ( rootProject != null ) )
         {
             String goal = rootProject.getDefaultGoal();
 
@@ -119,7 +119,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        if ( goals.isEmpty() )
+        if ( ( goals == null ) || goals.isEmpty() )
         {
             throw new NoGoalsSpecifiedException( "\n\nYou must specify at least one goal. Try 'install' to build or mvn -? for other options.\n See http://maven.apache.org for more information.\n\n" );
         }

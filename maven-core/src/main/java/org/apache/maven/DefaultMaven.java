@@ -181,23 +181,26 @@ public class DefaultMaven
             reactorManager,
             dispatcher );
 
-        for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
+        if ( request.getGoals() != null )
         {
-            String goal = (String) i.next();
-
-            if ( goal == null )
+            for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
             {
-                i.remove();
-                continue;
-            }
+                String goal = (String) i.next();
 
-            TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
+                if ( goal == null )
+                {
+                    i.remove();
+                    continue;
+                }
 
-            if ( !tvr.isTaskValid() )
-            {
-                result.addException( tvr.generateInvalidTaskException() );
+                TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
 
-                return result;
+                if ( !tvr.isTaskValid() )
+                {
+                    result.addException( tvr.generateInvalidTaskException() );
+
+                    return result;
+                }
             }
         }
 
