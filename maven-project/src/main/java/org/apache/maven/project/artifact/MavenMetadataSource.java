@@ -151,6 +151,10 @@ public class MavenMetadataSource
                             }
                             getLogger().debug( "\n" );
                         }
+                        else
+                        {
+                            getLogger().debug( "", e );
+                        }
                     }
 
                     project = null;
