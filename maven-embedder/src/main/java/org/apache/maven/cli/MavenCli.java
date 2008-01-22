@@ -137,8 +137,6 @@ public class MavenCli
 
         Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );
 
-        System.out.println( "Using error reporter: " + configuration.getErrorReporter() );
-
         ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
