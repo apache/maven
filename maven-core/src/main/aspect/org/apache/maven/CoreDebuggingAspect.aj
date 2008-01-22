@@ -7,12 +7,23 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.aspectj.lang.JoinPoint;
 
 import java.util.Iterator;
 import java.util.List;
 
 public aspect CoreDebuggingAspect
 {
+
+    after() throwing ( RuntimeException e ):
+//        adviceexecution( )
+//        && args( jp )
+        call( * *..*.*(..))
+        && !within( CoreDebuggingAspect+ )
+        && !handler( * )
+    {
+        System.out.println( "Error: " + e.getClass().getName() + "\nwas in join point: " + thisJoinPoint.toLongString() + "\n(at: " + thisJoinPoint.getSourceLocation() + ")" );
+    }
 
 //    after( MavenExecutionRequest request ) returning( List projects ):
 //        call( List DefaultMaven.getProjects( MavenExecutionRequest ) )
