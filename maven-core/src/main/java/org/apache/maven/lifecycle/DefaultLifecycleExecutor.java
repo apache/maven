@@ -34,6 +34,7 @@ import org.apache.maven.lifecycle.plan.BuildPlanUtils;
 import org.apache.maven.lifecycle.plan.BuildPlanner;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
@@ -625,6 +626,12 @@ public class DefaultLifecycleExecutor
                         task,
                         message, e );
                 }
+                catch ( InvalidPluginException e )
+                {
+                    return new TaskValidationResult(
+                        task,
+                        e.getMessage(), e );
+                }
             }
         }
 
@@ -733,7 +740,8 @@ public class DefaultLifecycleExecutor
     private MojoDescriptor getMojoDescriptorForDirectInvocation( String task,
                                                                  MavenSession session,
                                                                  MavenProject project )
-        throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException
+        throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException,
+        InvalidPluginException
     {
         // we don't need to include report configuration here, since we're just looking for
         // an @aggregator flag...
@@ -749,6 +757,11 @@ public class DefaultLifecycleExecutor
             session );
 
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
+
+        if ( mojoDescriptor == null )
+        {
+            throw new InvalidPluginException( "Plugin: " + descriptor.getId() + " does not contain referenced mojo: " + binding.getGoal() );
+        }
 
         return mojoDescriptor;
     }

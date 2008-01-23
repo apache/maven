@@ -1,6 +1,7 @@
 package org.apache.maven.lifecycle;
 
 import org.apache.maven.InvalidTaskException;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 
 /** @author Jason van Zyl */
@@ -43,6 +44,15 @@ public class TaskValidationResult
         this.cause = cause;
     }
 
+    public TaskValidationResult( String task,
+                                 String message,
+                                 InvalidPluginException e )
+    {
+        invalidTask = task;
+        this.message = message;
+        cause = e;
+    }
+
     public String getInvalidTask()
     {
         return invalidTask;
@@ -65,23 +75,7 @@ public class TaskValidationResult
 
     public InvalidTaskException generateInvalidTaskException()
     {
-        InvalidTaskException e = null;
-        if ( cause instanceof LifecycleLoaderException )
-        {
-            e = new InvalidTaskException( this, (LifecycleLoaderException)cause );
-        }
-        else if ( cause instanceof LifecycleSpecificationException )
-        {
-            e = new InvalidTaskException( this, (LifecycleSpecificationException)cause );
-        }
-        else if ( cause instanceof PluginLoaderException )
-        {
-            e = new InvalidTaskException( this, (PluginLoaderException)cause );
-        }
-        else
-        {
-            throw new IllegalStateException( "No matching constructor in InvalidTaskException for TaskValidationResult cause: " + cause + " ( invalid task: " + invalidTask + ")" );
-        }
+        InvalidTaskException e = new InvalidTaskException( this, cause );
 
         return e;
     }

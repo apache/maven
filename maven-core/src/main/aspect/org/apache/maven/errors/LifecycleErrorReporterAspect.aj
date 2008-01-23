@@ -13,6 +13,7 @@ import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.model.MojoBinding;
@@ -62,6 +63,13 @@ public privileged aspect LifecycleErrorReporterAspect
         && args( binding, project, .. )
     {
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
+    }
+
+    after( String task, MavenSession session, MavenProject project ) throwing ( InvalidPluginException cause ):
+        call( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
+        && args( task, session, project )
+    {
+        getReporter().reportInvalidPluginForDirectInvocation( task, session, project, cause );
     }
 
     after( MojoBinding binding, MavenProject project ) throwing ( MojoExecutionException cause ):

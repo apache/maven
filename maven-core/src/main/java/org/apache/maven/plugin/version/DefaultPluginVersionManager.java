@@ -27,8 +27,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.Restriction;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
@@ -226,13 +226,38 @@ public class DefaultPluginVersionManager
                 // if we don't have the required Maven version, then ignore an update
                 if ( ( pluginProject.getPrerequisites() != null ) && ( pluginProject.getPrerequisites().getMaven() != null ) )
                 {
-                    DefaultArtifactVersion requiredVersion =
-                        new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
+                    String mavenVersion = pluginProject.getPrerequisites().getMaven();
 
-                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) != 0 )
+                    VersionRange mavenRange = null;
+                    try
+                    {
+                        mavenRange = VersionRange.createFromVersionSpec( mavenVersion );
+
+                        List restrictions = mavenRange.getRestrictions();
+                        if ( ( restrictions.size() == 1 ) && Restriction.EVERYTHING.equals( restrictions.get( 0 ) ) )
+                        {
+                            String range = "[" + mavenVersion + ",]";
+
+                            getLogger().debug( "Plugin: "
+                                               + pluginProject.getId()
+                                               + " specifies a simple prerequisite Maven version of: "
+                                               + mavenVersion
+                                               + ". This version has been translated into the range: "
+                                               + range + " for plugin-version resolution purposes." );
+
+                            mavenRange = VersionRange.createFromVersionSpec( range );
+                        }
+                    }
+                    catch ( InvalidVersionSpecificationException e )
+                    {
+                        getLogger().debug( "Invalid prerequisite Maven version: " + mavenVersion + " for plugin: " + pluginProject.getId() +
+                                                                        e.getMessage() );
+                    }
+
+                    if ( ( mavenRange != null ) && !mavenRange.containsVersion( runtimeInformation.getApplicationVersion() ) )
                     {
                         getLogger().info( "Ignoring available plugin version: " + artifactVersion +
-                            " for: " + groupId + ":" + artifactId + " as it requires Maven version " + requiredVersion );
+                            " for: " + groupId + ":" + artifactId + " as it requires Maven version matching: " + mavenVersion );
 
                         VersionRange vr;
                         try

@@ -6,10 +6,12 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -302,6 +304,15 @@ public final class CoreErrorTips
     public static List getMissingModuleTips( File pomFile,
                                              File moduleFile,
                                              String moduleName )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getInvalidPluginForDirectInvocationTips( String task,
+                                                                MavenSession session,
+                                                                MavenProject project,
+                                                                InvalidPluginException err )
     {
         // TODO Auto-generated method stub
         return null;

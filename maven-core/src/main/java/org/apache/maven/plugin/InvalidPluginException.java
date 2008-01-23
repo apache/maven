@@ -41,4 +41,9 @@ public class InvalidPluginException
         super( message, e );
     }
 
+    public InvalidPluginException( String message )
+    {
+        super( message );
+    }
+
 }

@@ -20,6 +20,7 @@ import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -124,5 +125,7 @@ public interface CoreErrorReporter
     void reportUseOfBannedMojoParameter( Parameter currentParameter, MojoBinding binding, MavenProject project, String expression, String altExpression, ExpressionEvaluationException err );
 
     void reportMissingModulePom( MissingModuleException err );
+
+    void reportInvalidPluginForDirectInvocation( String task, MavenSession session, MavenProject project, InvalidPluginException err );
 
 }

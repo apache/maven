@@ -24,6 +24,7 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -1662,6 +1663,35 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
 
         addTips( CoreErrorTips.getMissingModuleTips( err.getPomFile(), err.getModuleFile(), err.getModuleName() ), writer );
+
+        registerBuildError( err, writer.toString() );
+    }
+
+    public void reportInvalidPluginForDirectInvocation( String task,
+                                                        MavenSession session,
+                                                        MavenProject project,
+                                                        InvalidPluginException err )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Maven encountered an error while loading a plugin for use in your build." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Original task invocation:" );
+        writer.write( task );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "While building project:" );
+        writeProjectCoordinate( project, writer );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Error message:" );
+        writer.write( err.getMessage() );
+
+        addTips( CoreErrorTips.getInvalidPluginForDirectInvocationTips( task, session, project, err ), writer );
 
         registerBuildError( err, writer.toString() );
     }
