@@ -15,15 +15,15 @@ import java.util.List;
 public aspect CoreDebuggingAspect
 {
 
-    after() throwing ( RuntimeException e ):
-//        adviceexecution( )
-//        && args( jp )
-        call( * *..*.*(..))
-        && !within( CoreDebuggingAspect+ )
-        && !handler( * )
-    {
-        System.out.println( "Error: " + e.getClass().getName() + "\nwas in join point: " + thisJoinPoint.toLongString() + "\n(at: " + thisJoinPoint.getSourceLocation() + ")" );
-    }
+//    after() throwing ( RuntimeException e ):
+////        adviceexecution( )
+////        && args( jp )
+//        call( * *..*.*(..))
+//        && !within( CoreDebuggingAspect+ )
+//        && !handler( * )
+//    {
+//        System.out.println( "Error: " + e.getClass().getName() + "\nwas in join point: " + thisJoinPoint.toLongString() + "\n(at: " + thisJoinPoint.getSourceLocation() + ")" );
+//    }
 
 //    after( MavenExecutionRequest request ) returning( List projects ):
 //        call( List DefaultMaven.getProjects( MavenExecutionRequest ) )
