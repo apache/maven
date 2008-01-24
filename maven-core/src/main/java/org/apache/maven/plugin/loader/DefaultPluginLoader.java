@@ -92,15 +92,18 @@ public class DefaultPluginLoader
         Map projectPluginMap = project.getBuild().getPluginsAsMap();
 
         PluginDescriptor pluginDescriptor = null;
-        for ( Iterator it = descriptors.iterator(); it.hasNext(); )
+        if ( descriptors != null )
         {
-            PluginDescriptor pd = (PluginDescriptor) it.next();
-
-            Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
-            if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
+            for ( Iterator it = descriptors.iterator(); it.hasNext(); )
             {
-                pluginDescriptor = pd;
-                break;
+                PluginDescriptor pd = (PluginDescriptor) it.next();
+
+                Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
+                if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
+                {
+                    pluginDescriptor = pd;
+                    break;
+                }
             }
         }
 

@@ -181,6 +181,11 @@ public class MavenEmbedder
         start( embedderConfiguration );
     }
 
+    public MavenExecutionRequest getDefaultRequest()
+    {
+        return request;
+    }
+
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------

@@ -19,11 +19,15 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,13 +36,15 @@ import java.util.Map;
 import java.util.Set;
 
 public class MavenPluginCollector
-    implements ComponentDiscoveryListener
+    implements ComponentDiscoveryListener, LogEnabled
 {
     private Set pluginsInProcess = new HashSet();
 
     private Map pluginDescriptors = new HashMap();
 
     private Map pluginIdsByPrefix = new HashMap();
+
+    private Logger logger;
 
     // ----------------------------------------------------------------------
     // Mojo discovery
@@ -75,12 +81,14 @@ public class MavenPluginCollector
 
     private String constructPluginKey( Plugin plugin )
     {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
+        String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
+        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + version;
     }
 
     private String constructPluginKey( PluginDescriptor pluginDescriptor )
     {
-        return pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" + pluginDescriptor.getVersion();
+        String version = ArtifactUtils.toSnapshotVersion( pluginDescriptor.getVersion() );
+        return pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" + version;
     }
 
     public boolean isPluginInstalled( Plugin plugin )
@@ -102,6 +110,21 @@ public class MavenPluginCollector
         }
 
         return result;
+    }
+
+    protected Logger getLogger()
+    {
+        if ( logger == null )
+        {
+            logger = new ConsoleLogger( Logger.LEVEL_INFO, "internal" );
+        }
+
+        return logger;
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 
 }

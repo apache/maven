@@ -179,6 +179,8 @@ public class DefaultPluginVersionManager
                                        String metaVersionId )
         throws PluginVersionResolutionException, InvalidPluginException
     {
+        getLogger().info( "Attempting to resolve a version for plugin: " + groupId + ":" + artifactId + " using meta-version: " + metaVersionId  );
+
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         String key = artifact.getDependencyConflictId();

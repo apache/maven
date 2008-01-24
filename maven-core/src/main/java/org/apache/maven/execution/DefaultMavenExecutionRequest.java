@@ -121,6 +121,48 @@ public class DefaultMavenExecutionRequest
 
     private MavenRealmManager realmManager;
 
+    public DefaultMavenExecutionRequest()
+    {
+        // default constructor.
+    }
+
+    public DefaultMavenExecutionRequest( MavenExecutionRequest original )
+    {
+        localRepository = original.getLocalRepository();
+        localRepositoryPath = original.getLocalRepositoryPath();
+        offline = original.isOffline();
+        interactiveMode = original.isInteractiveMode();
+        proxies = original.getProxies();
+        servers = original.getServers();
+        mirrors = original.getMirrors();
+        profiles = original.getProfiles();
+        pluginGroups = original.getPluginGroups();
+        usePluginUpdateOverride = original.isUsePluginUpdateOverride();
+        isProjectPresent = original.isProjectPresent();
+        userSettingsFile = original.getUserSettingsFile();
+        globalSettingsFile = original.getGlobalSettingsFile();
+        basedir = new File( original.getBaseDirectory() );
+        goals = original.getGoals();
+        useReactor = original.useReactor();
+        recursive = original.isRecursive();
+        pom = original.getPom();
+        reactorFailureBehavior = original.getReactorFailureBehavior();
+        properties = original.getProperties();
+        startTime = original.getStartTime();
+        showErrors = original.isShowErrors();
+        eventMonitors = original.getEventMonitors();
+        activeProfiles = original.getActiveProfiles();
+        inactiveProfiles = original.getInactiveProfiles();
+        transferListener = original.getTransferListener();
+        loggingLevel = original.getLoggingLevel();
+        globalChecksumPolicy = original.getGlobalChecksumPolicy();
+        updateSnapshots = original.isUpdateSnapshots();
+        profileManager = original.getProfileManager();
+        remoteRepositories = original.getRemoteRepositories();
+        noSnapshotUpdates = original.isNoSnapshotUpdates();
+        realmManager = original.getRealmManager();
+    }
+
     public String getBaseDirectory()
     {
         if ( basedir == null )

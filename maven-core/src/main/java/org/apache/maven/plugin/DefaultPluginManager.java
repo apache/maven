@@ -492,7 +492,7 @@ public class DefaultPluginManager
         // followed by the plugin's default artifact set
         dependencies.addAll( resolutionGroup.getArtifacts() );
 
-        List repositories = new ArrayList();
+        LinkedHashSet repositories = new LinkedHashSet();
 
         repositories.addAll( resolutionGroup.getResolutionRepositories() );
 
@@ -503,7 +503,10 @@ public class DefaultPluginManager
                                                                                 pluginArtifact,
                                                                                 Collections.EMPTY_MAP,
                                                                                 localRepository,
-                                                                                repositories,
+                                                                                repositories.isEmpty()
+                                                                                                ? Collections.EMPTY_LIST
+                                                                                                : new ArrayList(
+                                                                                                                 repositories ),
                                                                                 artifactMetadataSource,
                                                                                 coreArtifactFilterManager.getArtifactFilter() );
 
