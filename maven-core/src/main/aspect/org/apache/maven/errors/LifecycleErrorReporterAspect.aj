@@ -59,14 +59,14 @@ public privileged aspect LifecycleErrorReporterAspect
     after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
         ( cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
           || cflow( execution( * LifecycleExecutor+.isTaskValid( .. ) ) ) )
-        && call( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
+        && execution( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
         && args( binding, project, .. )
     {
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
     }
 
     after( String task, MavenSession session, MavenProject project ) throwing ( InvalidPluginException cause ):
-        call( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
+        execution( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
         && args( task, session, project )
     {
         getReporter().reportInvalidPluginForDirectInvocation( task, session, project, cause );
