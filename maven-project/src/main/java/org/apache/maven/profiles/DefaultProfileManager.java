@@ -59,7 +59,14 @@ public class DefaultProfileManager
     public DefaultProfileManager( PlexusContainer container, ProfileActivationContext profileActivationContext )
     {
         this.container = container;
-        this.profileActivationContext = profileActivationContext;
+        if ( profileActivationContext == null )
+        {
+            this.profileActivationContext = createDefaultActivationContext();
+        }
+        else
+        {
+            this.profileActivationContext = profileActivationContext;
+        }
     }
 
     // TODO: Remove this, if possible. It uses system properties, which are not safe for IDE and other embedded environments.
@@ -70,11 +77,16 @@ public class DefaultProfileManager
     {
         this.container = container;
 
+        profileActivationContext = createDefaultActivationContext();
+    }
+
+    private ProfileActivationContext createDefaultActivationContext()
+    {
         // create the necessary bits to get a skeletal profile manager running.
         Logger logger = container.getLoggerManager().getLoggerForComponent( DefaultProfileManager.class.getName() );
         MavenRealmManager manager = new DefaultMavenRealmManager( container, logger );
 
-        profileActivationContext = new DefaultProfileActivationContext( manager, System.getProperties(), false );
+        return new DefaultProfileActivationContext( manager, System.getProperties(), false );
     }
 
     public ProfileActivationContext getProfileActivationContext()
