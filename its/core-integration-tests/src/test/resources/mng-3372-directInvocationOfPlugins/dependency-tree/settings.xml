@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<settings>
+  <profiles>
+    <profile>
+      <id>asf-snapshots</id>
+      <repositories>
+        <repository>
+          <id>asf-snapshots</id>
+          <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>asf-snapshots</activeProfile>
+  </activeProfiles>
+</settings>
