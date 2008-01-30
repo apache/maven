@@ -66,7 +66,7 @@ public privileged aspect PBEDerivativeReporterAspect
     }
 
     private pointcut mavenTools_buildArtifactRepository( Repository repo ):
-        call( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
+        execution( ArtifactRepository MavenTools+.buildArtifactRepository( Repository ) )
         && args( repo );
 
     // =========================================================================
