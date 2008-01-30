@@ -747,8 +747,8 @@ public class DefaultCoreErrorReporter
     }
 
     public void reportErrorFormulatingBuildPlan( List tasks,
-                                                 MavenProject configuringProject,
-                                                 String targetDescription,
+                                                 MavenProject project,
+                                                 MavenSession session,
                                                  LifecycleException cause )
     {
         StringWriter writer = new StringWriter();
@@ -769,12 +769,8 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Current project:" );
-        writeProjectCoordinate( configuringProject, writer );
+        writeProjectCoordinate( project, writer );
 
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Build execution sub-segment:" );
-        writer.write( targetDescription );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Error message: " );
@@ -783,7 +779,7 @@ public class DefaultCoreErrorReporter
         writer.write( "Root error message: " );
         writer.write( getRootCause( cause ).getMessage() );
 
-        addTips( CoreErrorTips.getBuildPlanningErrorTips( tasks, configuringProject, cause ), writer );
+        addTips( CoreErrorTips.getBuildPlanningErrorTips( tasks, project, cause ), writer );
 
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }

@@ -66,7 +66,7 @@ public interface CoreErrorReporter
 
     void reportErrorConfiguringExtensionPluginRealm( Plugin plugin, Model originModel, List remoteRepos, MavenExecutionRequest request, RealmManagementException cause );
 
-    void reportErrorFormulatingBuildPlan( List tasks, MavenProject configuringProject, String targetDescription, LifecycleException cause );
+    void reportErrorFormulatingBuildPlan( List tasks, MavenProject project, MavenSession session, LifecycleException cause );
 
     void reportErrorInterpolatingModel( Model model, Map inheritedValues, File pomFile, MavenExecutionRequest request, ModelInterpolationException cause );
 

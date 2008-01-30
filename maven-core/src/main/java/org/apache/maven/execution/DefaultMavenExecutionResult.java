@@ -20,11 +20,13 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.lifecycle.plan.BuildPlan;
 import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult
@@ -39,6 +41,8 @@ public class DefaultMavenExecutionResult
     private List exceptions;
 
     private ReactorManager reactorManager;
+
+    private Map buildPlans;
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -108,5 +112,20 @@ public class DefaultMavenExecutionResult
         this.reactorManager = reactorManager;
 
         return this;
+    }
+
+    public BuildPlan getBuildPlan( String projectId )
+    {
+        return (BuildPlan) buildPlans.get( projectId );
+    }
+
+    public BuildPlan getBuildPlan( MavenProject project )
+    {
+        return (BuildPlan) buildPlans.get( project.getId() );
+    }
+
+    public void setBuildPlans( Map buildPlans )
+    {
+        this.buildPlans = buildPlans;
     }
 }

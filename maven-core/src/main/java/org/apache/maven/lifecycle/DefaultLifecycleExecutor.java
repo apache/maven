@@ -130,20 +130,18 @@ public class DefaultLifecycleExecutor
             session,
             rootProject );
 
-        // FIXME: This should be handled by the extension scanner.
-//        try
-//        {
-//            Map handlers = findArtifactTypeHandlers( session );
-//
-//            artifactHandlerManager.addHandlers( handlers );
-//        }
-//        catch ( PluginNotFoundException e )
-//        {
-//            throw new LifecycleExecutionException(
-//                "Plugin could not be not found while searching for artifact-type handlers.",
-//                rootProject,
-//                e );
-//        }
+        try
+        {
+            buildPlanner.constructInitialProjectBuildPlans( session );
+        }
+        catch ( LifecycleException e )
+        {
+            e.printStackTrace();
+            throw new LifecycleExecutionException(
+                                                   "Failed to construct one or more initial build plans."
+                                                                   + " Reason: " + e.getMessage(),
+                                                   e );
+        }
 
         executeTaskSegments(
             taskSegments,
@@ -430,7 +428,7 @@ public class DefaultLifecycleExecutor
                 getLogger().debug(
                     "\n\nOur build plan is:\n" + BuildPlanUtils.listBuildPlan(
                         plan,
-                        false ) + "\n\n" );
+                        false ) + "\n\nfor task-segment: " + targetDescription );
             }
 
             mojoBindings = plan.renderExecutionPlan( new Stack() );

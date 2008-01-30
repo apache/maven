@@ -20,9 +20,11 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.lifecycle.plan.BuildPlan;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jason van Zyl
@@ -51,4 +53,10 @@ public interface MavenExecutionResult
     MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
+
+    BuildPlan getBuildPlan( String projectId );
+
+    BuildPlan getBuildPlan( MavenProject project );
+
+    void setBuildPlans( Map buildPlan );
 }

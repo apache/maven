@@ -240,6 +240,8 @@ public class DefaultMaven
 
         result.setProject( reactorManager.getTopLevelProject() );
 
+        result.setBuildPlans( session.getBuildPlans() );
+
         return result;
     }
 

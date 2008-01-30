@@ -16,12 +16,15 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.plan.BuildPlanner;
+import org.apache.maven.lifecycle.plan.BuildPlan;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.LifecycleException;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleLoaderException;
+import org.apache.maven.lifecycle.LifecycleSpecificationException;
+import org.apache.maven.lifecycle.plan.LifecyclePlannerException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.PluginManager;
@@ -32,7 +35,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.util.List;
 
@@ -44,7 +46,8 @@ public privileged aspect LifecycleErrorReporterAspect
         execution( void DefaultLifecycleExecutor.executeGoalAndHandleFailures( MojoBinding, .. ) )
         && args( binding, .. );
 
-    private pointcut le_executeGoalAndHandleFailures_withSession( MojoBinding binding, MavenSession session ):
+    private pointcut le_executeGoalAndHandleFailures_withSession( MojoBinding binding,
+                                                                  MavenSession session ):
         execution( void DefaultLifecycleExecutor.executeGoalAndHandleFailures( MojoBinding, MavenSession, .. ) )
         && args( binding, session, .. );
 
@@ -56,7 +59,8 @@ public privileged aspect LifecycleErrorReporterAspect
         withincode( void PluginManager+.executeMojo( MavenProject, .. ) )
         && args( project, .. );
 
-    after( MojoBinding binding, MavenProject project ) throwing ( PluginLoaderException cause ):
+    after( MojoBinding binding,
+           MavenProject project) throwing ( PluginLoaderException cause ):
         ( cflow( le_executeGoalAndHandleFailures( MojoBinding ) )
           || cflow( execution( * LifecycleExecutor+.isTaskValid( .. ) ) ) )
         && execution( * PluginLoader+.loadPlugin( MojoBinding, MavenProject, .. ) )
@@ -65,14 +69,17 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportErrorLoadingPlugin( binding, project, cause );
     }
 
-    after( String task, MavenSession session, MavenProject project ) throwing ( InvalidPluginException cause ):
+    after( String task,
+           MavenSession session,
+           MavenProject project) throwing ( InvalidPluginException cause ):
         execution( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
         && args( task, session, project )
     {
         getReporter().reportInvalidPluginForDirectInvocation( task, session, project, cause );
     }
 
-    after( MojoBinding binding, MavenProject project ) throwing ( MojoExecutionException cause ):
+    after( MojoBinding binding,
+           MavenProject project) throwing ( MojoExecutionException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && call( void Mojo+.execute() )
@@ -84,7 +91,8 @@ public privileged aspect LifecycleErrorReporterAspect
         }
     }
 
-    PluginExecutionException around( MojoBinding binding, MavenProject project ):
+    PluginExecutionException around( MojoBinding binding,
+                                     MavenProject project ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && call( PluginExecutionException.new( .., String ) )
@@ -95,7 +103,8 @@ public privileged aspect LifecycleErrorReporterAspect
         return cause;
     }
 
-    after( MojoBinding binding, MavenProject project ) throwing ( ComponentLookupException cause ):
+    after( MojoBinding binding,
+           MavenProject project) throwing ( ComponentLookupException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && withincode( Mojo DefaultPluginManager.getConfiguredMojo( .. ) )
@@ -137,22 +146,38 @@ public privileged aspect LifecycleErrorReporterAspect
         currentParameter = null;
     }
 
-    private pointcut pm_executeMojoWithSessionAndExec( MavenProject project, MojoExecution exec, MavenSession session, DefaultPluginManager manager ):
+    private pointcut pm_executeMojoWithSessionAndExec( MavenProject project,
+                                                       MojoExecution exec,
+                                                       MavenSession session,
+                                                       DefaultPluginManager manager ):
         execution( void DefaultPluginManager.executeMojo( MavenProject, MojoExecution, MavenSession ) )
         && args( project, exec, session )
         && this( manager );
 
-    after( MojoBinding binding, MavenProject project, MojoExecution exec, MavenSession session, DefaultPluginManager manager ) throwing( PluginConfigurationException cause ):
+    after( MojoBinding binding,
+           MavenProject project,
+           MojoExecution exec,
+           MavenSession session,
+           DefaultPluginManager manager) throwing( PluginConfigurationException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojoWithSessionAndExec( project, exec, session, manager ) )
         && pm_validatePomConfig()
     {
         PathTranslator translator = manager.pathTranslator;
         Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "error reporting" );
-        getReporter().reportAttemptToOverrideUneditableMojoParameter( currentParameter, binding, project, session, exec, translator, logger, cause );
+        getReporter().reportAttemptToOverrideUneditableMojoParameter( currentParameter,
+                                                                      binding,
+                                                                      project,
+                                                                      session,
+                                                                      exec,
+                                                                      translator,
+                                                                      logger,
+                                                                      cause );
     }
 
-    PluginParameterException around( MojoBinding binding, MavenProject project, List invalidParameters ):
+    PluginParameterException around( MojoBinding binding,
+                                     MavenProject project,
+                                     List invalidParameters ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && cflow( pm_checkRequiredParameters() )
@@ -174,7 +199,10 @@ public privileged aspect LifecycleErrorReporterAspect
         withincode( Object PluginParameterExpressionEvaluator.evaluate( String ) )
         && args( expression );
 
-    before( MojoBinding binding, MavenProject project, String expression, ExpressionEvaluationException err ):
+    before( MojoBinding binding,
+            MavenProject project,
+            String expression,
+            ExpressionEvaluationException err ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && cflow( pm_checkRequiredParameters() )
@@ -190,7 +218,9 @@ public privileged aspect LifecycleErrorReporterAspect
                                                       err );
     }
 
-    after( MojoBinding binding, MavenProject project, String expression ) throwing ( Exception cause ):
+    after( MojoBinding binding,
+           MavenProject project,
+           String expression) throwing ( Exception cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && cflow( pm_checkRequiredParameters() )
@@ -199,13 +229,15 @@ public privileged aspect LifecycleErrorReporterAspect
         && call( Object ReflectionValueExtractor.evaluate( String, Object ) )
     {
         getReporter().reportReflectionErrorWhileEvaluatingMojoParameter( currentParameter,
-                                                      binding,
-                                                      project,
-                                                      expression,
-                                                      cause );
+                                                                         binding,
+                                                                         project,
+                                                                         expression,
+                                                                         cause );
     }
 
-    after( MojoBinding binding, MavenProject project, PlexusConfiguration config ) throwing( PluginConfigurationException cause ):
+    after( MojoBinding binding,
+           MavenProject project,
+           PlexusConfiguration config) throwing( PluginConfigurationException cause ):
         cflow( le_executeGoalAndHandleFailures( binding ) )
         && cflow( pm_executeMojo( project ) )
         && execution( void DefaultPluginManager.populatePluginFields( *, *, PlexusConfiguration, .. ) )
@@ -214,22 +246,27 @@ public privileged aspect LifecycleErrorReporterAspect
         getReporter().reportErrorApplyingMojoConfiguration( binding, project, config, cause );
     }
 
-    private pointcut pm_resolveTransitiveDependencies( MavenProject project, String scope ):
+    private pointcut pm_resolveTransitiveDependencies( MavenProject project,
+                                                       String scope ):
         execution( void DefaultPluginManager.resolveTransitiveDependencies( *, *, String, *, MavenProject ) )
         && args( *, *, scope, *, project );
 
-    after( MavenProject project, String scope ) throwing( ArtifactNotFoundException cause ):
+    after( MavenProject project,
+           String scope) throwing( ArtifactNotFoundException cause ):
         pm_resolveTransitiveDependencies( project, scope )
     {
         getReporter().reportProjectDependenciesNotFound( project, scope, cause );
     }
 
-    after( MavenProject project, String scope ) throwing( ArtifactResolutionException cause ):
+    after( MavenProject project,
+           String scope) throwing( ArtifactResolutionException cause ):
         pm_resolveTransitiveDependencies( project, scope )
     {
         if ( cause instanceof MultipleArtifactsNotFoundException )
         {
-            getReporter().reportProjectDependenciesNotFound( project, scope, (MultipleArtifactsNotFoundException) cause );
+            getReporter().reportProjectDependenciesNotFound( project,
+                                                             scope,
+                                                             (MultipleArtifactsNotFoundException) cause );
         }
         else
         {
@@ -237,16 +274,39 @@ public privileged aspect LifecycleErrorReporterAspect
         }
     }
 
-    private pointcut le_getLifecycleBindings( List tasks, MavenProject configuringProject, String targetDescription ):
+    private pointcut le_getLifecycleBindings( List tasks,
+                                              MavenProject configuringProject,
+                                              String targetDescription ):
         execution( List DefaultLifecycleExecutor.getLifecycleBindings( List, MavenProject, *, String ) )
         && args( tasks, configuringProject, *, targetDescription );
 
-    before( List tasks, MavenProject configuringProject, String targetDescription, LifecycleException cause ):
-        cflow( le_getLifecycleBindings( tasks, configuringProject, targetDescription ) )
-        && call( LifecycleExecutionException.new( .., LifecycleException ) )
-        && args( .., cause )
+    BuildPlan around( List tasks,
+                      MavenProject project,
+                      MavenSession session )
+        throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException:
+            cflow( execution( * DefaultLifecycleExecutor.*( .. ) ) )
+            && execution( BuildPlan BuildPlanner+.constructBuildPlan( List, MavenProject, MavenSession ) )
+            && args( tasks, project, session )
     {
-        getReporter().reportErrorFormulatingBuildPlan( tasks, configuringProject, targetDescription, cause );
+        try
+        {
+            return proceed( tasks, project, session );
+        }
+        catch ( LifecycleLoaderException cause )
+        {
+            getReporter().reportErrorFormulatingBuildPlan( tasks, project, session, cause );
+            throw cause;
+        }
+        catch ( LifecyclePlannerException cause )
+        {
+            getReporter().reportErrorFormulatingBuildPlan( tasks, project, session, cause );
+            throw cause;
+        }
+        catch ( LifecycleSpecificationException cause )
+        {
+            getReporter().reportErrorFormulatingBuildPlan( tasks, project, session, cause );
+            throw cause;
+        }
     }
 
 }

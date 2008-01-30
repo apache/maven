@@ -91,6 +91,13 @@ public class LifecycleExecutionException
         this.project = project;
     }
 
+    public LifecycleExecutionException( String message,
+                                        Throwable cause )
+    {
+        super( message, cause );
+        project = null;
+    }
+
     public MavenProject getProject()
     {
         return project;
