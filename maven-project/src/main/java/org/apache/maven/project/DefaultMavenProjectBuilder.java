@@ -35,8 +35,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -75,18 +75,15 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -404,8 +401,8 @@ public class DefaultMavenProjectBuilder
     {
         Map map = null;
         List deps;
-        if ( dependencyManagement != null && ( deps = dependencyManagement.getDependencies() ) != null &&
-            deps.size() > 0 )
+        if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) &&
+            ( deps.size() > 0 ) )
         {
             map = new ManagedVersionMap( map );
 
@@ -434,7 +431,7 @@ public class DefaultMavenProjectBuilder
                     // If the dependencyManagement section listed exclusions,
                     // add them to the managed artifacts here so that transitive
                     // dependencies will be excluded if necessary.
-                    if ( null != d.getExclusions() && !d.getExclusions().isEmpty() )
+                    if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
                     {
                         List exclusions = new ArrayList();
 
@@ -483,8 +480,8 @@ public class DefaultMavenProjectBuilder
 
         if ( checkDistributionManagementStatus )
         {
-            if ( project.getDistributionManagement() != null &&
-                project.getDistributionManagement().getStatus() != null )
+            if ( ( project.getDistributionManagement() != null ) &&
+                ( project.getDistributionManagement().getStatus() != null ) )
             {
                 String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
@@ -502,6 +499,10 @@ public class DefaultMavenProjectBuilder
                                            boolean allowStubModel )
         throws ProjectBuildingException
     {
+        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
+
+        normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
+
         Artifact projectArtifact;
 
         // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
@@ -520,8 +521,6 @@ public class DefaultMavenProjectBuilder
         }
 
         Model model;
-
-        String projectId = ArtifactUtils.versionlessKey( projectArtifact );
 
         try
         {
@@ -580,6 +579,52 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
+    private List normalizeToArtifactRepositories( List remoteArtifactRepositories,
+                                                  String projectId )
+        throws ProjectBuildingException
+    {
+        List normalized = new ArrayList( remoteArtifactRepositories.size() );
+
+        boolean normalizationNeeded = false;
+        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        {
+            Object item = it.next();
+
+            if ( item instanceof ArtifactRepository )
+            {
+                normalized.add( item );
+            }
+            else if ( item instanceof Repository )
+            {
+                Repository repo = (Repository) item;
+                try
+                {
+                    item = ProjectUtils.buildArtifactRepository( repo, artifactRepositoryFactory, container );
+
+                    normalized.add( item );
+                    normalizationNeeded = true;
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    throw new ProjectBuildingException( projectId, "Error building artifact repository for id: " + repo.getId(), e );
+                }
+            }
+            else
+            {
+                throw new ProjectBuildingException( projectId, "Error building artifact repository from non-repository information item: " + item );
+            }
+        }
+
+        if ( normalizationNeeded )
+        {
+            return normalized;
+        }
+        else
+        {
+            return remoteArtifactRepositories;
+        }
+    }
+
     private void checkStatusAndUpdate( Artifact projectArtifact,
                                        ArtifactStatus status,
                                        File file,
@@ -588,7 +633,7 @@ public class DefaultMavenProjectBuilder
         throws ArtifactNotFoundException
     {
         // TODO: configurable actions dependant on status
-        if ( !projectArtifact.isSnapshot() && status.compareTo( ArtifactStatus.DEPLOYED ) < 0 )
+        if ( !projectArtifact.isSnapshot() && ( status.compareTo( ArtifactStatus.DEPLOYED ) < 0 ) )
         {
             // use default policy (enabled, daily update, warn on bad checksum)
             ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
@@ -1051,7 +1096,7 @@ public class DefaultMavenProjectBuilder
 
         //TODO mkleint - use the (Container, Properties constructor to make system properties embeddable
         ProfileManager profileManager;
-        if ( externalProfileManager != null && externalProfileManager instanceof DefaultProfileManager )
+        if ( ( externalProfileManager != null ) && ( externalProfileManager instanceof DefaultProfileManager ) )
         {
             profileManager = new DefaultProfileManager( container,
                                                         ( (DefaultProfileManager) externalProfileManager ).getSystemProperties() );
@@ -1138,7 +1183,7 @@ public class DefaultMavenProjectBuilder
 
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using
             // <relativePath/>
-            if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
+            if ( ( model == null ) && ( projectDir != null ) && StringUtils.isNotEmpty( parentRelativePath ) )
             {
                 parentDescriptor = new File( projectDir, parentRelativePath );
 
@@ -1184,18 +1229,18 @@ public class DefaultMavenProjectBuilder
                     }
                 }
 
-                if ( parentDescriptor != null && parentDescriptor.exists() )
+                if ( ( parentDescriptor != null ) && parentDescriptor.exists() )
                 {
                     Model candidateParent = readModel( projectId, parentDescriptor, strict );
 
                     String candidateParentGroupId = candidateParent.getGroupId();
-                    if ( candidateParentGroupId == null && candidateParent.getParent() != null )
+                    if ( ( candidateParentGroupId == null ) && ( candidateParent.getParent() != null ) )
                     {
                         candidateParentGroupId = candidateParent.getParent().getGroupId();
                     }
 
                     String candidateParentVersion = candidateParent.getVersion();
-                    if ( candidateParentVersion == null && candidateParent.getParent() != null )
+                    if ( ( candidateParentVersion == null ) && ( candidateParent.getParent() != null ) )
                     {
                         candidateParentVersion = candidateParent.getParent().getVersion();
                     }
@@ -1267,7 +1312,7 @@ public class DefaultMavenProjectBuilder
                 }
             }
 
-            if ( model != null && !"pom".equals( model.getPackaging() ) )
+            if ( ( model != null ) && !"pom".equals( model.getPackaging() ) )
             {
                 throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " +
                     projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
@@ -1403,7 +1448,7 @@ public class DefaultMavenProjectBuilder
                 {
                     List active = root.getActiveProfiles();
 
-                    if ( active != null && !active.isEmpty() )
+                    if ( ( active != null ) && !active.isEmpty() )
                     {
                         profileManager.explicitlyActivate( root.getActiveProfiles() );
                     }
@@ -1665,6 +1710,6 @@ public class DefaultMavenProjectBuilder
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }
