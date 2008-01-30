@@ -24,6 +24,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -46,6 +47,7 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
@@ -159,13 +161,13 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     private MavenTools mavenTools;
-    
+
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
 
 // the aspect weaving seems not to work for reflection from plugin.
     private Map processedProjectCache = new HashMap();
-    
+
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
@@ -456,6 +458,10 @@ public class DefaultMavenProjectBuilder
                                            ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
+
+        remoteArtifactRepositories = normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
+
         Artifact projectArtifact;
 
         // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
@@ -476,8 +482,6 @@ public class DefaultMavenProjectBuilder
         }
 
         Model model;
-
-        String projectId = ArtifactUtils.versionlessKey( projectArtifact );
 
         try
         {
@@ -523,6 +527,52 @@ public class DefaultMavenProjectBuilder
         }
 
         return model;
+    }
+
+    private List normalizeToArtifactRepositories( List remoteArtifactRepositories,
+                                                  String projectId )
+        throws ProjectBuildingException
+    {
+        List normalized = new ArrayList( remoteArtifactRepositories.size() );
+
+        boolean normalizationNeeded = false;
+        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        {
+            Object item = it.next();
+
+            if ( item instanceof ArtifactRepository )
+            {
+                normalized.add( item );
+            }
+            else if ( item instanceof Repository )
+            {
+                Repository repo = (Repository) item;
+                try
+                {
+                    item = mavenTools.buildArtifactRepository( repo );
+
+                    normalized.add( item );
+                    normalizationNeeded = true;
+                }
+                catch ( UnknownRepositoryLayoutException e )
+                {
+                    throw new ProjectBuildingException( projectId, "Error building artifact repository for id: " + repo.getId(), e );
+                }
+            }
+            else
+            {
+                throw new ProjectBuildingException( projectId, "Error building artifact repository from non-repository information item: " + item );
+            }
+        }
+
+        if ( normalizationNeeded )
+        {
+            return normalized;
+        }
+        else
+        {
+            return remoteArtifactRepositories;
+        }
     }
 
     private void checkStatusAndUpdate( Artifact projectArtifact,
