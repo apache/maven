@@ -102,6 +102,8 @@ public class DefaultBuildPlanner
         addForkedLifecycleModifiers( plan, project, session, new LinkedList() );
         addReportingLifecycleModifiers( plan, project, session, new LinkedList() );
 
+        plan.markFullyResolved();
+
         // TODO: Inject relative-ordered project/plugin executions as plan modifiers.
 
         return plan;
@@ -152,7 +154,10 @@ public class DefaultBuildPlanner
         {
             MojoBinding mojoBinding = (MojoBinding) it.next();
 
-            findForkModifiers( mojoBinding, plan, project, session, callStack );
+            if ( !plan.isFullyResolved( mojoBinding ) )
+            {
+                findForkModifiers( mojoBinding, plan, project, session, callStack );
+            }
         }
     }
 
@@ -197,12 +202,22 @@ public class DefaultBuildPlanner
                                                  LinkedList callStack )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
+        if ( plan.isIncludingReports() )
+        {
+            return;
+        }
+
         List planBindings = plan.renderExecutionPlan( new Stack() );
         plan.resetExecutionProgress();
 
         for ( Iterator it = planBindings.iterator(); it.hasNext(); )
         {
             MojoBinding mojoBinding = (MojoBinding) it.next();
+
+            if ( plan.isFullyResolved( mojoBinding ) )
+            {
+                continue;
+            }
 
             PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding,
                                                                       plan,
@@ -234,6 +249,11 @@ public class DefaultBuildPlanner
                     {
                         MojoBinding reportBinding = (MojoBinding) reportBindingIt.next();
 
+                        if ( plan.isFullyResolved( reportBinding ) )
+                        {
+                            continue;
+                        }
+
                         PluginDescriptor pd = loadPluginDescriptor( reportBinding,
                                                                     plan,
                                                                     project,
@@ -251,6 +271,8 @@ public class DefaultBuildPlanner
                         }
                     }
                 }
+
+                plan.markAsIncludingReports();
 
                 // NOTE: the first sighting of a mojo requiring reports should satisfy this condition.
                 // therefore, we can break out as soon as we find one.

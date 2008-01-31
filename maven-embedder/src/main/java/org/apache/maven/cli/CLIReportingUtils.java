@@ -95,7 +95,7 @@ public final class CLIReportingUtils
         logReactorSummary( reactorManager, logger );
 
         boolean printSuccess = true;
-        if ( ( reactorManager == null ) || reactorManager.hasBuildFailures() )
+        if ( result.hasExceptions() )
         {
             for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
             {

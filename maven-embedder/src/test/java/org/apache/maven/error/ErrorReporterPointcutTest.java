@@ -203,6 +203,15 @@ public class ErrorReporterPointcutTest
     private void reportExceptions( MavenExecutionResult result,
                                    File basedir )
     {
+        reportExceptions( result, basedir, false );
+    }
+
+    private void reportExceptions( MavenExecutionResult result,
+                                   File basedir,
+                                   boolean expectExceptions )
+    {
+        assertTrue( !expectExceptions || result.hasExceptions() );
+
         StringWriter writer = new StringWriter();
         PrintWriter pWriter = new PrintWriter( writer );
 
@@ -217,7 +226,14 @@ public class ErrorReporterPointcutTest
             error.printStackTrace( pWriter );
         }
 
-        fail( writer.toString() );
+        if ( expectExceptions )
+        {
+            fail( writer.toString() );
+        }
+        else
+        {
+            System.out.println( writer.toString() );
+        }
     }
 
     public void testReportErrorResolvingExtensionDirectDependencies()
@@ -1451,6 +1467,40 @@ public class ErrorReporterPointcutTest
                                                                           } ) );
 
         maven.execute( request );
+
+        reporterCtl.verify();
+    }
+
+    public void testReportInvalidPluginForDirectInvocation()
+        throws IOException
+    {
+        File projectDir = prepareProjectDir( "missing-direct-invoke-mojo" );
+
+        File plugin = new File( projectDir, "plugin" );
+
+        buildTestAccessory( plugin );
+
+        Settings settings = new Settings();
+        settings.addPluginGroup( "org.apache.maven.errortest" );
+
+        reporter.reportInvalidPluginForDirectInvocation( null, null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( projectDir )
+                                                                          .setSettings( settings )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "missing-direct-invoke-mojo:test"
+                                                                          } ) );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        assertTrue( result.hasExceptions() );
+        reportExceptions( result, projectDir );
 
         reporterCtl.verify();
     }

@@ -8,14 +8,17 @@ import org.apache.maven.lifecycle.NoSuchPhaseException;
 import org.apache.maven.lifecycle.model.LifecycleBinding;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.lifecycle.model.Phase;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 public class BuildPlan
@@ -31,6 +34,10 @@ public class BuildPlan
     private List renderedLifecycleMojos = new ArrayList();
 
     private final Map directInvocationBindings;
+
+    private Set fullyResolvedBindings = new HashSet();
+
+    private boolean includingReports = false;
 
     public BuildPlan( final LifecycleBindings packaging, final LifecycleBindings projectBindings,
                       final LifecycleBindings defaults, final List tasks )
@@ -50,13 +57,64 @@ public class BuildPlan
     }
 
     private BuildPlan( final LifecycleBindings bindings, final Map forkedDirectInvocations, final Map forkedPhases,
-                       final Map directInvocationBindings, final List tasks )
+                       final Map directInvocationBindings, final Set fullyResolvedMojoBindings, final List tasks,
+                       boolean includingReports )
     {
         this.bindings = LifecycleUtils.cloneBindings( bindings );
         this.forkedDirectInvocations = new HashMap( forkedDirectInvocations );
         this.forkedPhases = new HashMap( forkedPhases );
+        fullyResolvedBindings = new HashSet( fullyResolvedMojoBindings );
         this.tasks = tasks;
+        this.includingReports = includingReports;
         this.directInvocationBindings = new HashMap( directInvocationBindings );
+    }
+
+    public void markAsIncludingReports()
+    {
+        includingReports = true;
+    }
+
+    public boolean isIncludingReports()
+    {
+        return includingReports;
+    }
+
+    public boolean isFullyResolved( final MojoBinding mojoBinding )
+    {
+        String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
+
+        return fullyResolvedBindings.contains( key );
+    }
+
+    public void markFullyResolved()
+    {
+        for ( Iterator bindingIterator = bindings.getBindingList().iterator(); bindingIterator.hasNext(); )
+        {
+            LifecycleBinding binding = (LifecycleBinding) bindingIterator.next();
+
+            for ( Iterator phaseIterator = binding.getPhasesInOrder().iterator(); phaseIterator.hasNext(); )
+            {
+                Phase phase = (Phase) phaseIterator.next();
+
+                for ( Iterator mojoBindingIterator = phase.getBindings().iterator(); mojoBindingIterator.hasNext(); )
+                {
+                    MojoBinding mojoBinding = (MojoBinding) mojoBindingIterator.next();
+
+                    String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
+
+                    fullyResolvedBindings.add( key );
+                }
+            }
+        }
+
+        for ( Iterator it = directInvocationBindings.values().iterator(); it.hasNext(); )
+        {
+            MojoBinding mojoBinding = (MojoBinding) it.next();
+
+            String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
+
+            fullyResolvedBindings.add( key );
+        }
     }
 
     public void addLifecycleOverlay( final LifecycleBindings overlay )
@@ -135,7 +193,7 @@ public class BuildPlan
 
     public BuildPlan copy( final List newTasks )
     {
-        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, directInvocationBindings, newTasks );
+        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, directInvocationBindings, fullyResolvedBindings, newTasks, includingReports );
     }
 
     public void resetExecutionProgress()

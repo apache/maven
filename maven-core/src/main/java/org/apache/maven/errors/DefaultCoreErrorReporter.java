@@ -1685,6 +1685,7 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Error message:" );
+        writer.write( NEWLINE );
         writer.write( err.getMessage() );
 
         addTips( CoreErrorTips.getInvalidPluginForDirectInvocationTips( task, session, project, err ), writer );

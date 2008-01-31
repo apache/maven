@@ -75,6 +75,7 @@ public privileged aspect LifecycleErrorReporterAspect
         execution( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
         && args( task, session, project )
     {
+        System.out.println( "BINGO" );
         getReporter().reportInvalidPluginForDirectInvocation( task, session, project, cause );
     }
 
