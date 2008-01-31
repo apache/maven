@@ -36,7 +36,11 @@ public interface ProjectErrorReporter
 
     Throwable getRealCause( Throwable error );
 
+    List getReportedExceptions();
+
     Throwable findReportedException( Throwable error );
+
+    boolean isStackTraceRecommended( Throwable error );
 
     /**
      * <b>Call Stack:</b>

@@ -70,9 +70,9 @@ public class DefaultCoreErrorReporter
 
     private static final String NEWLINE = "\n";
 
-    public DefaultCoreErrorReporter( Map formattedMessageStore, Map realCauseStore )
+    public DefaultCoreErrorReporter( Map formattedMessageStore, Map realCauseStore, Map stackTraceRecommendationStore )
     {
-        super( formattedMessageStore, realCauseStore );
+        super( formattedMessageStore, realCauseStore, stackTraceRecommendationStore );
     }
 
     public DefaultCoreErrorReporter()

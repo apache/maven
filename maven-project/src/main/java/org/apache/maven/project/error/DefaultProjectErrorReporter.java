@@ -28,8 +28,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,16 +45,20 @@ public class DefaultProjectErrorReporter
 
     private Map realCauses;
 
-    public DefaultProjectErrorReporter( Map formattedMessageStore, Map realCauseStore )
+    private Map stackTraceRecommendations;
+
+    public DefaultProjectErrorReporter( Map formattedMessageStore, Map realCauseStore, Map stackTraceRecommendationStore )
     {
         formattedMessages = formattedMessageStore;
         realCauses = realCauseStore;
+        stackTraceRecommendations = stackTraceRecommendationStore;
     }
 
     public DefaultProjectErrorReporter()
     {
-        formattedMessages = new HashMap();
+        formattedMessages = new LinkedHashMap();
         realCauses = new HashMap();
+        stackTraceRecommendations = new HashMap();
     }
 
     /**
@@ -62,6 +68,11 @@ public class DefaultProjectErrorReporter
     {
         formattedMessages.clear();
         realCauses.clear();
+    }
+
+    public List getReportedExceptions()
+    {
+        return new ArrayList( formattedMessages.keySet() );
     }
 
     /**
@@ -95,6 +106,23 @@ public class DefaultProjectErrorReporter
     public Throwable getRealCause( Throwable error )
     {
         return (Throwable) realCauses.get( error );
+    }
+
+    public boolean isStackTraceRecommended( Throwable error )
+    {
+        Boolean rec = (Boolean) stackTraceRecommendations.get( error );
+
+        if ( rec == null )
+        {
+            return false;
+        }
+
+        return rec.booleanValue();
+    }
+
+    protected void setStackTraceRecommendation( Throwable error, boolean recommended )
+    {
+        stackTraceRecommendations.put( error, Boolean.valueOf( recommended ) );
     }
 
     protected void registerBuildError( Throwable error,
