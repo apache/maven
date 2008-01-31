@@ -210,6 +210,9 @@ under the License.
       <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.plugin.PluginManagerSupport</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>
@@ -690,10 +693,21 @@ under the License.
       <implementation>org.apache.maven.plugin.loader.DefaultPluginLoader</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.plugin.MavenPluginCollector</role>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.plugin.loader.PluginPrefixLoader</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.plugin.loader.DefaultPluginPrefixLoader</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManagerSupport</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.plugin.PluginManager</role>
+          <role>org.apache.maven.plugin.MavenPluginCollector</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.PluginMappingManager</role>
@@ -821,7 +835,7 @@ under the License.
       <implementation>org.apache.maven.lifecycle.binding.DefaultMojoBindingFactory</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.plugin.loader.PluginLoader</role>
+          <role>org.apache.maven.plugin.loader.PluginPrefixLoader</role>
         </requirement>
       </requirements>
     </component>
@@ -847,6 +861,29 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.settings.validation.SettingsValidator</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.plugin.PluginManagerSupport</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.plugin.DefaultPluginManagerSupport</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.version.PluginVersionManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.execution.RuntimeInformation</role>
         </requirement>
       </requirements>
     </component>

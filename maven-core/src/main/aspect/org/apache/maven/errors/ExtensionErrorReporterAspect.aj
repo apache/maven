@@ -14,6 +14,7 @@ import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerSupport;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.model.Model;
@@ -215,7 +216,7 @@ public privileged aspect ExtensionErrorReporterAspect
         cflow( dem_addPluginAsExtension( Plugin, originModel, remoteRepos, request ) )
         && cflow( execution( * PluginManager+.verifyPlugin( .. ) ) )
         && cflow( dpm_verifyVersionedPlugin( plugin ) )
-        && call( private void DefaultPluginManager.checkRequiredMavenVersion( .. ) )
+        && call( void PluginManagerSupport+.checkRequiredMavenVersion( .. ) )
     {
         getReporter().reportIncompatibleMavenVersionForExtensionPlugin( plugin, originModel, remoteRepos, request, requiredVersion, currentVersion, err );
     }

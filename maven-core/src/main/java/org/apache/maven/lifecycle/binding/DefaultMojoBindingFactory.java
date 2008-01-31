@@ -4,9 +4,10 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.loader.PluginPrefixLoader;
 import org.apache.maven.project.MavenProject;
 
 import java.util.StringTokenizer;
@@ -22,7 +23,7 @@ public class DefaultMojoBindingFactory
     implements MojoBindingFactory
 {
 
-    PluginLoader pluginLoader;
+    PluginPrefixLoader pluginPrefixLoader;
 
     /**
      * Parse the specified mojo string into a MojoBinding, optionally allowing plugin-prefix references.
@@ -49,10 +50,10 @@ public class DefaultMojoBindingFactory
 
             String prefix = tok.nextToken();
 
-            PluginDescriptor pluginDescriptor;
+            Plugin plugin;
             try
             {
-                pluginDescriptor = pluginLoader.findPluginForPrefix( prefix, project, session );
+                plugin = pluginPrefixLoader.findPluginForPrefix( prefix, project, session );
             }
             catch ( PluginLoaderException e )
             {
@@ -61,8 +62,8 @@ public class DefaultMojoBindingFactory
                                                     e );
             }
 
-            binding = createMojoBinding( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(),
-                                         pluginDescriptor.getVersion(), tok.nextToken(), project );
+            binding = createMojoBinding( plugin.getGroupId(), plugin.getArtifactId(),
+                                         plugin.getVersion(), tok.nextToken(), project );
         }
         else if ( ( numTokens == 3 ) || ( numTokens == 4 ) )
         {

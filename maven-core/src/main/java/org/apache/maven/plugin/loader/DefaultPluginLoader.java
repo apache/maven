@@ -8,22 +8,15 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginMappingManager;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Responsible for loading plugins, reports, and any components contained therein. Will resolve
@@ -40,10 +33,6 @@ public class DefaultPluginLoader
 
     // FIXME: Move the functionality used from this into the PluginLoader when PluginManager refactor is complete.
     private PluginManager pluginManager;
-
-    private PluginMappingManager pluginMappingManager;
-
-    private MavenPluginCollector pluginCollector;
 
     /**
      * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
@@ -68,117 +57,6 @@ public class DefaultPluginLoader
             mojoBinding.setGroupId( pluginDescriptor.getGroupId() );
             mojoBinding.setArtifactId( pluginDescriptor.getArtifactId() );
             mojoBinding.setVersion( pluginDescriptor.getVersion() );
-        }
-
-        return pluginDescriptor;
-    }
-
-    /**
-     * Determine the appropriate {@link PluginDescriptor} instance for use with the specified plugin
-     * prefix, using the following strategies (in order):
-     * <br/>
-     * <ol>
-     *   <li>Search for a plugin that has already been loaded with the specified prefix</li>
-     *   <li>Search for a plugin configured in the POM that has a matching prefix</li>
-     *   <li>Search the pluginGroups specified in the settings.xml for a matching plugin</li>
-     *   <li>Use groupId == org.apache.maven.plugins, and artifactId == maven-&lt;prefix&gt;-plugin,
-     *         and try to resolve based on that.</li>
-     * </ol>
-     */
-    public PluginDescriptor findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        Set descriptors = pluginCollector.getPluginDescriptorsForPrefix( prefix );
-        Map projectPluginMap = project.getBuild().getPluginsAsMap();
-
-        PluginDescriptor pluginDescriptor = null;
-        if ( descriptors != null )
-        {
-            for ( Iterator it = descriptors.iterator(); it.hasNext(); )
-            {
-                PluginDescriptor pd = (PluginDescriptor) it.next();
-
-                Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
-                if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
-                {
-                    pluginDescriptor = pd;
-                    break;
-                }
-            }
-        }
-
-        if ( pluginDescriptor == null )
-        {
-            pluginDescriptor = loadFromProject( prefix, project, session );
-        }
-
-        if ( pluginDescriptor == null )
-        {
-            pluginDescriptor = loadByPrefix( prefix, project, session );
-        }
-
-        if ( pluginDescriptor == null )
-        {
-            Plugin plugin = new Plugin();
-            plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
-
-            pluginDescriptor = loadPlugin( plugin, project, session );
-        }
-
-        if ( pluginDescriptor == null )
-        {
-            throw new PluginLoaderException( "Cannot find plugin with prefix: " + prefix );
-        }
-
-        return pluginDescriptor;
-    }
-
-    /**
-     * Look for a plugin configured in the current project that has a prefix matching the one
-     * specified. Return the {@link PluginDescriptor} if a match is found.
-     */
-    private PluginDescriptor loadFromProject( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        PluginDescriptor result = null;
-
-        for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
-        {
-            Plugin plugin = (Plugin) it.next();
-
-            PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
-            if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
-            {
-                result = pluginDescriptor;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix
-     * matching the one specified. Return the {@link PluginDescriptor} if a match is found.
-     */
-    private PluginDescriptor loadByPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        Settings settings = session.getSettings();
-
-        Plugin plugin = pluginMappingManager.getByPrefix( prefix, settings.getPluginGroups(),
-                                                          project.getRemoteArtifactRepositories(), session.getLocalRepository() );
-
-        PluginDescriptor pluginDescriptor = null;
-        if ( plugin != null )
-        {
-            Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
-            if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) )
-            {
-                plugin.setVersion( projectPlugin.getVersion() );
-            }
-
-            pluginDescriptor = loadPlugin( plugin, project, session );
         }
 
         return pluginDescriptor;

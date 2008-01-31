@@ -48,19 +48,4 @@ public interface PluginLoader
     PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
         throws PluginLoaderException;
 
-    /**
-     * Determine the appropriate {@link PluginDescriptor} instance for use with the specified plugin
-     * prefix, using the following strategies (in order):
-     * <br/>
-     * <ol>
-     *   <li>Search for a plugin that has already been loaded with the specified prefix</li>
-     *   <li>Search for a plugin configured in the POM that has a matching prefix</li>
-     *   <li>Search the pluginGroups specified in the settings.xml for a matching plugin</li>
-     *   <li>Use groupId == org.apache.maven.plugins, and artifactId == maven-&lt;prefix&gt;-plugin,
-     *         and try to resolve based on that.</li>
-     * </ol>
-     */
-    PluginDescriptor findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
 }
