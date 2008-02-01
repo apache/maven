@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -92,6 +93,16 @@ public class DefaultMavenProjectBuilderTest
         // it's the building of the grandchild project, having already cached the child project
         // (but not the parent project), which causes the problem.
         getProject( f2 );
+    }
+
+    public void testDuplicatePluginDefinitionsMerged()
+        throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
+
+        MavenProject project = getProject( f1 );
+
+        assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
     }
 
     protected ArtifactRepository getLocalRepository()
