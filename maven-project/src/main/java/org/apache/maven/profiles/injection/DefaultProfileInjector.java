@@ -66,7 +66,8 @@ public class DefaultProfileInjector
 
     public void inject( Profile profile, Model model )
     {
-        injectDependencies( profile, model );
+
+        model.setDependencies( injectDependencies( profile.getDependencies(), model.getDependencies() ) );
 
         injectModules( profile, model );
 
@@ -212,6 +213,8 @@ public class DefaultProfileInjector
         {
             modelPlugin.setVersion( profilePlugin.getVersion() );
         }
+
+        modelPlugin.setDependencies( injectDependencies( profilePlugin.getDependencies(), modelPlugin.getDependencies() ) );
 
         // merge the lists of goals that are not attached to an <execution/>
         injectConfigurationContainer( profilePlugin, modelPlugin );
@@ -590,33 +593,29 @@ public class DefaultProfileInjector
         recessive.flushReportSetMap();
     }
 
-    private void injectDependencies( Profile profile, Model model )
+    private List injectDependencies( List profileDeps, List modelDeps )
     {
         Map depsMap = new LinkedHashMap();
 
-        List deps = model.getDependencies();
-
-        if ( deps != null )
+        if ( modelDeps != null )
         {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
+            for ( Iterator it = modelDeps.iterator(); it.hasNext(); )
             {
                 Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
-        deps = profile.getDependencies();
-
-        if ( deps != null )
+        if ( profileDeps != null )
         {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
+            for ( Iterator it = profileDeps.iterator(); it.hasNext(); )
             {
                 Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
-        model.setDependencies( new ArrayList( depsMap.values() ) );
+        return new ArrayList( depsMap.values() );
     }
 
 }

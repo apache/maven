@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -36,9 +35,38 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 public class ModelUtilsTest
     extends TestCase
 {
+
+    public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion()
+    {
+        Plugin mgtPlugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency mgtDep = createDependency( "g", "a", "2" );
+        mgtPlugin.addDependency( mgtDep );
+
+        Plugin plugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency dep = createDependency( "g", "a", "1" );
+        plugin.addDependency( dep );
+
+        ModelUtils.mergePluginDefinitions( plugin, mgtPlugin, false );
+
+        assertEquals( dep.getVersion(), ((Dependency) plugin.getDependencies().get( 0 ) ).getVersion() );
+    }
+
+    private Dependency createDependency( String gid,
+                                         String aid,
+                                         String ver )
+    {
+        Dependency dep = new Dependency();
+        dep.setGroupId( gid );
+        dep.setArtifactId( aid );
+        dep.setVersion( ver );
+
+        return dep;
+    }
 
     public void testShouldNotInheritPluginWithInheritanceSetToFalse()
     {

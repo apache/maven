@@ -19,16 +19,15 @@ package org.apache.maven.profiles.injection;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
-import org.apache.maven.profiles.injection.DefaultProfileInjector;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Collections;
@@ -36,9 +35,42 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 public class DefaultProfileInjectorTest
     extends TestCase
 {
+
+    public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion()
+    {
+        PluginContainer profile = new PluginContainer();
+        Plugin profilePlugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency profileDep = createDependency( "g", "a", "2" );
+        profilePlugin.addDependency( profileDep );
+        profile.addPlugin( profilePlugin );
+
+        PluginContainer model = new PluginContainer();
+        Plugin plugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency dep = createDependency( "g", "a", "1" );
+        plugin.addDependency( dep );
+        model.addPlugin( plugin );
+
+        new DefaultProfileInjector().injectPlugins( profile, model );
+
+        assertEquals( profileDep.getVersion(), ((Dependency) plugin.getDependencies().get( 0 ) ).getVersion() );
+    }
+
+    private Dependency createDependency( String gid,
+                                         String aid,
+                                         String ver )
+    {
+        Dependency dep = new Dependency();
+        dep.setGroupId( gid );
+        dep.setArtifactId( aid );
+        dep.setVersion( ver );
+
+        return dep;
+    }
 
     /**
      * Test that this is the resulting ordering of plugins after merging:
