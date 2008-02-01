@@ -62,6 +62,54 @@ public final class ModelUtils
 {
     
     /**
+     * Given this plugin list:
+     *
+     * A1 -> B -> C -> A2 -> D
+     *
+     * Rearrange it to this:
+     *
+     * A(A1 + A2) -> B -> C -> D
+     *
+     * In cases of overlapping definitions, A1 is overridden by A2
+     *
+     */
+    public static void mergeDuplicatePluginDefinitions( PluginContainer pluginContainer )
+    {
+        if ( pluginContainer == null )
+        {
+            return;
+        }
+
+        List originalPlugins = pluginContainer.getPlugins();
+
+        if ( ( originalPlugins == null ) || originalPlugins.isEmpty() )
+        {
+            return;
+        }
+
+        List normalized = new ArrayList( originalPlugins.size() );
+
+        for ( Iterator it = originalPlugins.iterator(); it.hasNext(); )
+        {
+            Plugin currentPlugin = (Plugin) it.next();
+
+            if ( normalized.contains( currentPlugin ) )
+            {
+                int idx = normalized.indexOf( currentPlugin );
+                Plugin firstPlugin = (Plugin) normalized.get( idx );
+
+                mergePluginDefinitions( firstPlugin, currentPlugin, false );
+            }
+            else
+            {
+                normalized.add( currentPlugin );
+            }
+        }
+
+        pluginContainer.setPlugins( normalized );
+    }
+
+    /**
      * This should be the resulting ordering of plugins after merging:
      * 
      * Given:
