@@ -621,9 +621,14 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( "Error message: " );
         writer.write( cause.getMessage() );
-        writer.write( NEWLINE );
-        writer.write( "Root error message: " );
-        writer.write( getRootCause( cause ).getMessage() );
+
+        Throwable root = getRootCause( cause );
+        if ( root != cause )
+        {
+            writer.write( NEWLINE );
+            writer.write( "Root error message: " );
+            writer.write( root.getMessage() );
+        }
 
         writeProjectCoordinate( project, writer );
         addTips( CoreErrorTips.getDependencyArtifactResolutionTips( project, scope, cause ),
