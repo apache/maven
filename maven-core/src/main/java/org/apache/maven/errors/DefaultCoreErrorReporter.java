@@ -613,7 +613,7 @@ public class DefaultCoreErrorReporter
         writer.write( NEWLINE );
         writer.write( "Transitive dependency resolution for scope: " );
         writer.write( scope );
-        writer.write( "has failed for your project." );
+        writer.write( " has failed for your project." );
 
         writer.write( NEWLINE );
         writer.write( NEWLINE );
