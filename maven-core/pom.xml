@@ -32,43 +32,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <configuration>
-          <connectionUrl>scm:svn:http://svn.apache.org/repos/asf/maven/site/trunk</connectionUrl>
-          <checkoutDirectory>${project.build.directory}/maven-site</checkoutDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>checkout</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <configuration>
-          <projectsDirectory>${project.build.directory}/maven-site</projectsDirectory>
-          <pom>${project.build.directory}/maven-site/pom.xml</pom>
-          <goals>
-            <goal>clean</goal>
-            <goal>site</goal>
-          </goals>
-        </configuration>
-        <executions>
-          <execution>
-            <id>initialize</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>1.0-alpha-15</version>
         <executions>
@@ -255,4 +218,51 @@
       <artifactId>classworlds</artifactId>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>include-site</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <configuration>
+              <connectionUrl>scm:svn:http://svn.apache.org/repos/asf/maven/site/trunk</connectionUrl>
+              <checkoutDirectory>${project.build.directory}/maven-site</checkoutDirectory>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>checkout</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <projectsDirectory>${project.build.directory}/maven-site</projectsDirectory>
+              <pom>${project.build.directory}/maven-site/pom.xml</pom>
+              <goals>
+                <goal>clean</goal>
+                <goal>site</goal>
+              </goals>
+            </configuration>
+            <executions>
+              <execution>
+                <id>initialize</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
