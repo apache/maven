@@ -37,6 +37,33 @@ public class ModelUtilsTest
     extends TestCase
 {
     
+    public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion()
+    {
+        Plugin mgtPlugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency mgtDep = createDependency( "g", "a", "2" );
+        mgtPlugin.addDependency( mgtDep );
+
+        Plugin plugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
+        Dependency dep = createDependency( "g", "a", "1" );
+        plugin.addDependency( dep );
+
+        ModelUtils.mergePluginDefinitions( plugin, mgtPlugin, false );
+
+        assertEquals( dep.getVersion(), ((Dependency) plugin.getDependencies().get( 0 ) ).getVersion() );
+    }
+
+    private Dependency createDependency( String gid,
+                                         String aid,
+                                         String ver )
+    {
+        Dependency dep = new Dependency();
+        dep.setGroupId( gid );
+        dep.setArtifactId( aid );
+        dep.setVersion( ver );
+
+        return dep;
+    }
+
     public void testShouldNotInheritPluginWithInheritanceSetToFalse()
     {
         PluginContainer parent = new PluginContainer();
@@ -402,5 +429,30 @@ public class ModelUtilsTest
         assertEquals( 1, child.getDependencies().size() );
         Dependency dep2 = (Dependency) child.getDependencies().get( 0 );
         assertEquals( dep.getManagementKey(), dep2.getManagementKey() );
+    }
+
+    public void testShouldMergeTwoPluginDependenciesOnMergeDupePluginDefs()
+    {
+        PluginContainer first = new PluginContainer();
+        Plugin fPlugin = createPlugin( "g", "a", "1", Collections.EMPTY_MAP );
+        Dependency fDep = new Dependency();
+        fDep.setGroupId( "group" );
+        fDep.setArtifactId( "artifact" );
+        fDep.setVersion( "1" );
+
+        first.addPlugin( fPlugin );
+        fPlugin.addDependency( fDep );
+
+        Plugin sPlugin = createPlugin( "g", "a", "1", Collections.EMPTY_MAP );
+        Dependency sDep = new Dependency();
+        sDep.setGroupId( "group" );
+        sDep.setArtifactId( "artifact2" );
+        sDep.setVersion( "1" );
+        first.addPlugin( sPlugin );
+        sPlugin.addDependency( sDep );
+
+        ModelUtils.mergeDuplicatePluginDefinitions( first );
+
+        assertEquals( 2, ((Plugin)first.getPlugins().get( 0 ) ).getDependencies().size() );
     }
 }

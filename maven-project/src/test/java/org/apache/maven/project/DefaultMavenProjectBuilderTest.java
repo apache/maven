@@ -28,6 +28,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -161,6 +162,17 @@ public class DefaultMavenProjectBuilderTest
         getProject( f2 );
     }
     
+     public void testDuplicatePluginDefinitionsMerged()
+         throws Exception
+     {
+         File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
+ 
+         MavenProject project = getProject( f1 );
+ 
+         assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
+     }
+ 
+	
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
