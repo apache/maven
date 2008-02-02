@@ -631,6 +631,13 @@ public class MavenCli
         }
 
         executionProperties.setProperty( name, value );
+
+        // ----------------------------------------------------------------------
+        // I'm leaving the setting of system properties here as not to break
+        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
+        // ----------------------------------------------------------------------
+
+        System.setProperty( name, value );
     }
 
     // ----------------------------------------------------------------------
