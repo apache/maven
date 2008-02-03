@@ -141,7 +141,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0087Test.class );
         suite.addTestSuite( MavenIT0088Test.class );
         suite.addTestSuite( MavenIT0089Test.class );
-        suite.addTestSuite( MavenIT0090Test.class);
+        suite.addTestSuite( MavenIT0090Test.class );
         suite.addTestSuite( MavenIT0092Test.class );
         suite.addTestSuite( MavenIT0094Test.class );
         suite.addTestSuite( MavenIT0095Test.class );
@@ -159,10 +159,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
-        suite.addTestSuite( MavenITmng2254PomEncodingTest.class);
+        suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
-		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class);
-		suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class);
+		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
+		suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
+        suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
