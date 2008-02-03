@@ -31,26 +31,9 @@ import java.util.List;
 public class DefaultMavenProjectHelper
     implements MavenProjectHelper
 {
-    
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile )
-    {
-        String type = artifactType;
-        
-        ArtifactHandler handler = null;
-        
-        if ( type != null )
-        {
-            handler = artifactHandlerManager.getArtifactHandler( artifactType );
-        }
-        
-        if ( handler == null )
-        {
-            handler = artifactHandlerManager.getArtifactHandler( "jar" );
-        }
-        
-        Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType, artifactClassifier, handler );
+    {                
+        Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType, artifactClassifier );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );
@@ -60,9 +43,7 @@ public class DefaultMavenProjectHelper
 
     public void attachArtifact( MavenProject project, String artifactType, File artifactFile )
     {
-        ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( artifactType );
-        
-        Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType, handler );
+        Artifact artifact = new AttachedArtifact( project.getArtifact(), artifactType );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );
@@ -74,7 +55,7 @@ public class DefaultMavenProjectHelper
     {
         Artifact projectArtifact = project.getArtifact();
         
-        Artifact artifact = new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier, projectArtifact.getArtifactHandler() );
+        Artifact artifact = new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );

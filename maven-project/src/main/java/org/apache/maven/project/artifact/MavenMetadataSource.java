@@ -21,6 +21,7 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -84,6 +85,8 @@ public class MavenMetadataSource
 
     private PlexusContainer container;
 
+    private ArtifactHandlerManager artifactHandlerManager;
+
     /** Unfortunately we have projects that are still sending us JARs without the accompanying POMs. */
     private boolean strictlyEnforceThePresenceOfAValidMavenPOM = false;
 
@@ -127,12 +130,6 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidProjectModelException e )
                 {
-                    if ( strictlyEnforceThePresenceOfAValidMavenPOM )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Invalid POM file for artifact: '" +
-                            artifact.getDependencyConflictId() + "' Reason: " + e.getMessage(), e, artifact );
-                    }
-
                     getLogger().warn( "POM for \'" + pomArtifact +
                         "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
 
@@ -150,10 +147,6 @@ public class MavenMetadataSource
                                 getLogger().debug( i.next().toString() );
                             }
                             getLogger().debug( "\n" );
-                        }
-                        else
-                        {
-                            getLogger().debug( "", e );
                         }
                     }
 
@@ -253,7 +246,7 @@ public class MavenMetadataSource
         else
         {
             Set artifacts = Collections.EMPTY_SET;
-            if ( !artifact.getArtifactHandler().isIncludesDependencies() )
+            if ( !artifactHandlerManager.getArtifactHandler( artifact.getType() ).isIncludesDependencies() )
             {
                 // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
                 // or used the inherited scope (should that be passed to the buildFromRepository method above?)
