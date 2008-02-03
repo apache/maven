@@ -144,6 +144,9 @@ under the License.
         <requirement>
           <role>org.apache.maven.MavenTools</role>
         </requirement>
+       <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
       </requirements>
     </component>
 <!--
@@ -244,7 +247,27 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
+    <component>
+      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+      <role-hint>maven-strict</role-hint>
+      <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
+      <configuration>
+        <strictlyEnforceThePresenceOfAValidMavenPOM>true</strictlyEnforceThePresenceOfAValidMavenPOM>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
     <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
       <role-hint>maven</role-hint>
