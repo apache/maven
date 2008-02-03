@@ -23,7 +23,7 @@ under the License.
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>2.0.8-SNAPSHOT</version>
+    <version>2.0.9-SNAPSHOT</version>
   </parent>
   <artifactId>maven-core-it-runner</artifactId>
   <name>Integration Test Executor</name>
@@ -31,7 +31,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>2.0.8-SNAPSHOT</version>
+      <version>2.0.9-SNAPSHOT</version>
       <classifier>bin</classifier>
       <type>tar.gz</type>
     </dependency>
@@ -52,7 +52,7 @@ under the License.
           <systemProperties>
             <property>
               <name>maven.home</name>
-              <value>${basedir}/target/maven-installation/apache-maven-${project.version}</value>
+              <value>${basedir}/target/maven-installation/apache-maven-${pom.version}</value>
             </property>
           </systemProperties>
           <includes>
@@ -69,7 +69,7 @@ under the License.
                 <artifactItem>
                   <groupId>org.apache.maven</groupId>
                   <artifactId>maven-core</artifactId>
-                  <version>${project.version}</version>
+                  <version>${pom.version}</version>
                   <classifier>bin</classifier>
                   <type>tar.gz</type>
                 </artifactItem>
@@ -88,7 +88,7 @@ under the License.
           <execution>
             <configuration>
               <tasks>
-                <chmod file="${basedir}/target/maven-installation/apache-maven-${project.version}/bin/mvn" perm="755"/>
+                <chmod file="${basedir}/target/maven-installation/apache-maven-${pom.version}/bin/mvn" perm="755"/>
               </tasks>
             </configuration>
             <phase>process-sources</phase>
