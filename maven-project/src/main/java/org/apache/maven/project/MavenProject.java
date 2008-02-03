@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
@@ -153,12 +152,6 @@ public class MavenProject
 
     private Stack previousExecutionProjects = new Stack();
 
-    // This should not be in here and neither should any of artifact listing methods that pick off artifacts
-    // based on their scope as that forces MavenProject to know about all scopes that are available which
-    // makes the addition of new scopes unscalable. Another component should take as input a MavenProject and
-    // spit out the list of artifacts based on scope. jvz.
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public MavenProject()
     {
         Model model = new Model();
@@ -173,12 +166,6 @@ public class MavenProject
     public MavenProject( Model model )
     {
         this.model = model;
-    }
-
-    // This is temporary until we get the scope related elements out of here. jvz.
-    public void setArtifactHandlerManager( ArtifactHandlerManager artifactHandlerManager )
-    {
-        this.artifactHandlerManager = artifactHandlerManager;
     }
 
     public MavenProject( MavenProject project )
@@ -503,7 +490,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
@@ -525,7 +512,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
@@ -585,7 +572,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 // NOTE: [jc] scope == 'test' is the widest possible scope, so we don't really need to perform
@@ -614,7 +601,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 // NOTE: [jc] scope == 'test' is the widest possible scope, so we don't really need to perform
@@ -679,7 +666,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
@@ -705,7 +692,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
@@ -761,7 +748,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
@@ -782,7 +769,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( artifactHandlerManager.getArtifactHandler( a.getType() ).isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
@@ -1763,4 +1750,30 @@ public class MavenProject
     {
         return (Plugin) getBuild().getPluginsAsMap().get( pluginKey );
     }
+    /**
+     * Default toString
+     */
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(30);
+        sb.append( "MavenProject: " );
+        sb.append( this.getGroupId() );
+        sb.append( ":" );
+        sb.append( this.getArtifactId() );
+        sb.append( ":" );
+        sb.append( this.getVersion() );
+        sb.append( " @ " );
+        
+        try 
+        {
+            sb.append( this.getFile().getPath() );
+        }
+        catch (NullPointerException e)
+        {
+            //don't log it.
+        }
+        
+        return sb.toString();        
+    }
+    
 }

@@ -37,10 +37,10 @@ public class AttachedArtifact
 
     private final Artifact parent;
 
-    public AttachedArtifact( Artifact parent, String type, String classifier )
+    public AttachedArtifact( Artifact parent, String type, String classifier, ArtifactHandler artifactHandler )
     {
         super( parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), type,
-               classifier, parent.isOptional() );
+               classifier, artifactHandler, parent.isOptional() );
 
         setDependencyTrail( Collections.singletonList( parent.getId() ) );
 
@@ -52,9 +52,9 @@ public class AttachedArtifact
         }
     }
 
-    public AttachedArtifact( Artifact parent, String type )
+    public AttachedArtifact( Artifact parent, String type, ArtifactHandler artifactHandler )
     {
-        this( parent, type, null );
+        this( parent, type, null, artifactHandler );
     }
 
     public void setArtifactId( String artifactId )
