@@ -31,7 +31,6 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.ProfileManager;
@@ -45,7 +44,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
@@ -341,7 +339,7 @@ public class DefaultMaven
         MavenProject superProject;
         try
         {
-            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
+            superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), request.getGlobalProfileManager() );
 
         }
         catch ( ProjectBuildingException e )
@@ -462,7 +460,7 @@ public class DefaultMaven
                 project.setExecutionRoot( true );
             }
 
-            if ( project.getPrerequisites() != null && project.getPrerequisites().getMaven() != null )
+            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
@@ -472,7 +470,7 @@ public class DefaultMaven
                 }
             }
 
-            if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
+            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
             {
                 // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                 project.setPackaging( "pom" );
