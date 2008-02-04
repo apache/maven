@@ -19,12 +19,13 @@ package org.apache.maven.integrationtests;
  * under the License.
  */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 
 import java.io.PrintStream;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class IntegrationTestSuite
     extends AbstractMavenIntegrationTestCase
@@ -186,6 +187,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
 		suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
+		suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
         // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); -- not passing for 2.0.7 either, looks to be 2.1+ ?
         return suite;
     }
