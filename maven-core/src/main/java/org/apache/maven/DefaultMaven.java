@@ -106,7 +106,7 @@ public class DefaultMaven
 
             if ( projects.isEmpty() )
             {
-                projects.add( projectBuilder.buildStandaloneSuperProject() );
+                projects.add( projectBuilder.buildStandaloneSuperProject( request.getProfileManager() ) );
 
                 request.setProjectPresent( false );
             }
