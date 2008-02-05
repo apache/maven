@@ -350,15 +350,21 @@ public class DefaultMaven
                             continue;
                         }
 
-                        File moduleFile;
-
-                        if ( usingReleasePom )
+                        File moduleFile = new File( basedir, name );
+                        if ( !moduleFile.exists() )
                         {
-                            moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                            throw new MissingModuleException( name, moduleFile, file );
                         }
-                        else
+                        else if ( moduleFile.isDirectory() )
                         {
-                            moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                            if ( usingReleasePom )
+                            {
+                                moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                            }
+                            else
+                            {
+                                moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                            }
                         }
 
                         if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
@@ -379,14 +385,7 @@ public class DefaultMaven
                             moduleFile = new File( moduleFile.toURI().normalize() );
                         }
 
-                        if ( !moduleFile.exists() )
-                        {
-                            throw new MissingModuleException( name, moduleFile, file );
-                        }
-                        else
-                        {
-                            moduleFiles.add( moduleFile );
-                        }
+                        moduleFiles.add( moduleFile );
                     }
 
                     List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,
