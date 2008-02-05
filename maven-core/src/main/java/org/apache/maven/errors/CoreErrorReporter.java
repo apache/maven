@@ -32,6 +32,7 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -127,5 +128,7 @@ public interface CoreErrorReporter
     void reportMissingModulePom( MissingModuleException err );
 
     void reportInvalidPluginForDirectInvocation( String task, MavenSession session, MavenProject project, InvalidPluginException err );
+
+    void reportDuplicateAttachmentException( MojoBinding binding, MavenProject project, DuplicateArtifactAttachmentException cause );
 
 }

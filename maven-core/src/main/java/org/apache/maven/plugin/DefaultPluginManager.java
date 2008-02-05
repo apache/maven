@@ -51,6 +51,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -540,7 +541,19 @@ public class DefaultPluginManager
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
-            mojo.execute();
+            // NOTE: DuplicateArtifactAttachmentException is currently unchecked, so be careful removing this try/catch!
+            // This is necessary to avoid creating compatibility problems for existing plugins that use
+            // MavenProjectHelper.attachArtifact(..).
+            try
+            {
+                mojo.execute();
+            }
+            catch( DuplicateArtifactAttachmentException e )
+            {
+                session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+                throw new PluginExecutionException( mojoExecution, project, e );
+            }
 
             // NEW: If the mojo that just executed is a report, store it in the LifecycleExecutionContext
             // for reference by future mojos.

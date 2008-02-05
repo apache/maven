@@ -37,6 +37,7 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -1696,6 +1697,37 @@ public class DefaultCoreErrorReporter
         addTips( CoreErrorTips.getInvalidPluginForDirectInvocationTips( task, session, project, err ), writer );
 
         registerBuildError( err, writer.toString() );
+    }
+
+    public void reportDuplicateAttachmentException( MojoBinding binding,
+                                                    MavenProject project,
+                                                    DuplicateArtifactAttachmentException cause )
+    {
+        StringWriter writer = new StringWriter();
+
+        writer.write( NEWLINE );
+        writer.write( "Your build attempted to attach multiple artifacts with the same classifier to the main project." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+
+        writer.write( "Mojo responsible for second attachment attempt:" );
+        writer.write( MojoBindingUtils.toString( binding ) );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Reported for project:" );
+        // Note: Using cause.getProject(), since an aggregator mojo (or, really, any sort)
+        // could try to attach to any of the projects in the reactor, and in the case of the aggregator,
+        // the project passed into the mojo execution and passed on here would just be the root project.
+        writeProjectCoordinate( cause.getProject(), writer );
+
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Artifact attachment:" );
+        writeArtifactInfo( cause.getArtifact(), writer, false );
+
+        addTips( CoreErrorTips.getDuplicateAttachmentTips( binding, project, cause ), writer );
+
+        registerBuildError( cause, writer.toString() );
     }
 
 }

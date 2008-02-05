@@ -1505,4 +1505,39 @@ public class ErrorReporterPointcutTest
         reporterCtl.verify();
     }
 
+    public void testReportDuplicateAttachmentException()
+        throws IOException
+    {
+        File projectDir = prepareProjectDir( "duplicated-attachments" );
+
+        File plugin = new File( projectDir, "plugin" );
+        File project = new File( projectDir, "project" );
+
+        buildTestAccessory( plugin );
+
+        Settings settings = new Settings();
+        settings.addPluginGroup( "org.apache.maven.errortest" );
+
+        reporter.reportDuplicateAttachmentException( null, null, null );
+        reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
+        reporterCtl.setVoidCallable();
+
+        reporterCtl.replay();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( project )
+                                                                          .setSettings( settings )
+                                                                          .setShowErrors( true )
+                                                                          .setErrorReporter( reporter )
+                                                                          .setGoals( Arrays.asList( new String[] {
+                                                                              "duplicated-attachments:test"
+                                                                          } ) );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        assertTrue( result.hasExceptions() );
+        reportExceptions( result, project );
+
+        reporterCtl.verify();
+    }
+
 }

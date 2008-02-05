@@ -25,6 +25,7 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.plan.LifecyclePlannerException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.PluginManager;
@@ -75,8 +76,16 @@ public privileged aspect LifecycleErrorReporterAspect
         execution( private * DefaultLifecycleExecutor.getMojoDescriptorForDirectInvocation( String, MavenSession, MavenProject ) )
         && args( task, session, project )
     {
-        System.out.println( "BINGO" );
         getReporter().reportInvalidPluginForDirectInvocation( task, session, project, cause );
+    }
+
+    after( MojoBinding binding,
+           MavenProject project) throwing ( DuplicateArtifactAttachmentException cause ):
+        cflow( le_executeGoalAndHandleFailures( binding ) )
+        && cflow( pm_executeMojo( project ) )
+        && call( void Mojo+.execute() )
+    {
+        getReporter().reportDuplicateAttachmentException( binding, project, cause );
     }
 
     after( MojoBinding binding,

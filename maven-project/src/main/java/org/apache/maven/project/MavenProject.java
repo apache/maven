@@ -1336,7 +1336,15 @@ public class MavenProject
     }
 
     public void addAttachedArtifact( Artifact artifact )
+        throws DuplicateArtifactAttachmentException
     {
+        List attachedArtifacts = getAttachedArtifacts();
+
+        if ( attachedArtifacts.contains( artifact ) )
+        {
+            throw new DuplicateArtifactAttachmentException( this, artifact );
+        }
+
         getAttachedArtifacts().add( artifact );
     }
 
@@ -1757,23 +1765,23 @@ public class MavenProject
     {
         StringBuffer sb = new StringBuffer(30);
         sb.append( "MavenProject: " );
-        sb.append( this.getGroupId() );
+        sb.append( getGroupId() );
         sb.append( ":" );
-        sb.append( this.getArtifactId() );
+        sb.append( getArtifactId() );
         sb.append( ":" );
-        sb.append( this.getVersion() );
+        sb.append( getVersion() );
         sb.append( " @ " );
-        
-        try 
+
+        try
         {
-            sb.append( this.getFile().getPath() );
+            sb.append( getFile().getPath() );
         }
         catch (NullPointerException e)
         {
             //don't log it.
         }
-        
-        return sb.toString();        
+
+        return sb.toString();
     }
-    
+
 }

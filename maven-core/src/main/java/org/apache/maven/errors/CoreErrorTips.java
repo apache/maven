@@ -20,6 +20,7 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -313,6 +314,14 @@ public final class CoreErrorTips
                                                                 MavenSession session,
                                                                 MavenProject project,
                                                                 InvalidPluginException err )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List getDuplicateAttachmentTips( MojoBinding binding,
+                                                   MavenProject project,
+                                                   DuplicateArtifactAttachmentException cause )
     {
         // TODO Auto-generated method stub
         return null;
