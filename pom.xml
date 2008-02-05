@@ -158,7 +158,7 @@ under the License.
     <module>maven-embedder</module>
   </modules>
   <properties>
-    <plexusVersion>1.0-alpha-43</plexusVersion>
+    <plexusVersion>1.0-alpha-44</plexusVersion>
     <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
   <dependencies>
