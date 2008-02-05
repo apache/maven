@@ -516,6 +516,8 @@ public class DefaultMaven
                         }
                     }
 
+                    moduleFile = new File( moduleFile.toURI().normalize() );
+
                     moduleFiles.add( moduleFile );
                 }
 
