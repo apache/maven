@@ -374,8 +374,10 @@ public class DefaultMaven
                                 throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
                             }
                         }
-
-                        moduleFile = new File( moduleFile.toURI().normalize() );
+                        else
+                        {
+                            moduleFile = new File( moduleFile.toURI().normalize() );
+                        }
 
                         if ( !moduleFile.exists() )
                         {
