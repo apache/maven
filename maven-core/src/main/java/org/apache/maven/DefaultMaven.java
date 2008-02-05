@@ -375,6 +375,8 @@ public class DefaultMaven
                             }
                         }
 
+                        moduleFile = new File( moduleFile.toURI().normalize() );
+
                         if ( !moduleFile.exists() )
                         {
                             throw new MissingModuleException( name, moduleFile, file );
