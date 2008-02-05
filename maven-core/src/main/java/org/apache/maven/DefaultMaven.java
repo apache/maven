@@ -491,15 +491,18 @@ public class DefaultMaven
                         continue;
                     }
 
-                    File moduleFile;
+                    File moduleFile = new File( basedir, name );
 
-                    if ( usingReleasePom )
+                    if ( moduleFile.exists() && moduleFile.isDirectory() )
                     {
-                        moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
-                    }
-                    else
-                    {
-                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                        if ( usingReleasePom )
+                        {
+                            moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
+                        }
+                        else
+                        {
+                            moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                        }
                     }
 
                     if ( Os.isFamily( "windows" ) )
