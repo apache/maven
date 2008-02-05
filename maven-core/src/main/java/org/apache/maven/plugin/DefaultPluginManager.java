@@ -51,6 +51,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -59,6 +60,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
+import org.codehaus.classworlds.NoSuchRealmException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -78,7 +80,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.classworlds.NoSuchRealmException;
 
 import java.io.File;
 import java.net.URL;
@@ -447,6 +448,12 @@ public class DefaultPluginManager
             plugin.execute();
 
             dispatcher.dispatchEnd( event, goalExecId );
+        }
+        catch ( DuplicateArtifactAttachmentException e )
+        {
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw new MojoExecutionException( "Error attaching artifact to project: Duplicate attachment.", e );
         }
         catch ( MojoExecutionException e )
         {
@@ -1239,7 +1246,7 @@ public class DefaultPluginManager
         {
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
-        
+
         Set resolvedArtifacts;
         try
         {
@@ -1254,7 +1261,7 @@ public class DefaultPluginManager
         catch (MultipleArtifactsNotFoundException me)
         {
             /*only do this if we are an aggregating plugin: MNG-2277
-            if the dependency doesn't yet exist but is in the reactor, then 
+            if the dependency doesn't yet exist but is in the reactor, then
             all we can do is warn and skip it. A better fix can be inserted into 2.1*/
             if (isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), me.getMissingArtifacts() ))
             {
@@ -1297,19 +1304,19 @@ public class DefaultPluginManager
                     //most likely it would be produced by the project we just found in the reactor since all
                     //the other info matches. Assume it's ok.
                     getLogger().warn( "The dependency: "+ p.getId()+" can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
-                    
+
                     //found it, move on.
                     foundInReactor.add( p );
                     break;
-                }   
+                }
             }
         }
-        
+
         //if all of them have been found, we can continue.
         return foundInReactor.size() == missing.size();
     }
-    
-    
+
+
     // ----------------------------------------------------------------------
     // Artifact downloading
     // ----------------------------------------------------------------------
