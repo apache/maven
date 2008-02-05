@@ -1,0 +1,1 @@
+Checks that non-standard module-pom filenames can be referenced by file within a <modules/> section, rather than depending on using the directory name with the normal 'pom.xml' as an implied POM filename.
