@@ -47,6 +47,7 @@ set ERROR_CODE=0
 
 @REM set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" @setlocal
+if "%OS%"=="WINNT" @setlocal
 
 @REM ==== START VALIDATION ====
 if not "%JAVA_HOME%" == "" goto OkJHome
@@ -73,6 +74,7 @@ goto error
 if not "%M2_HOME%"=="" goto valMHome
 
 if "%OS%"=="Windows_NT" SET M2_HOME=%~dp0\..
+if "%OS%"=="WINNT" SET M2_HOME=%~dp0\..
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
@@ -104,8 +106,13 @@ goto error
 :init
 @REM Decide how to startup depending on the version of windows
 
+@REM -- Windows NT with Novell Login
+if "%OS%"=="WINNT" goto WinNTNovell
+
 @REM -- Win98ME
 if NOT "%OS%"=="Windows_NT" goto Win9xArg
+
+:WinNTNovell
 
 @REM -- 4NT shell
 if "%@eval[2+2]" == "4" goto 4NTArgs
@@ -153,11 +160,13 @@ goto end
 
 :error
 if "%OS%"=="Windows_NT" @endlocal
+if "%OS%"=="WINNT" @endlocal
 set ERROR_CODE=1
 
 :end
 @REM set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" goto endNT
+if "%OS%"=="WINNT" goto endNT
 
 @REM For old DOS remove the set variables from ENV - we assume they were not set
 @REM before we started - at least we don't leave any baggage around
@@ -166,7 +175,7 @@ set MAVEN_CMD_LINE_ARGS=
 goto postExec
 
 :endNT
-@endlocal
+@endlocal & set ERROR_CODE=%ERROR_CODE%
 
 :postExec
 if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
