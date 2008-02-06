@@ -190,6 +190,7 @@ public class IntegrationTestSuite
 		suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
 		suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
 		suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
+		suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
         // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); -- not passing for 2.0.7 either, looks to be 2.1+ ?
         return suite;
     }
