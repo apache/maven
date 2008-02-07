@@ -144,12 +144,12 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 if "%@eval[2+2]" == "4" goto 4NTCWJars
 
 @REM -- Regular WinNT shell
-for %%i in ("%M2_HOME%"\boot\classworlds-*) do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
 goto runm2
 
 @REM The 4NT Shell from jp software
 :4NTCWJars
-for %%i in ("%M2_HOME%\boot\classworlds-*") do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%M2_HOME%\boot\plexus-classworlds-*") do set CLASSWORLDS_JAR="%%i"
 goto runm2
 
 @REM Start MAVEN2
