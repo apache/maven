@@ -473,8 +473,8 @@ public class DefaultPluginManager
             if ( getLogger().isFatalErrorEnabled() )
             {
                 getLogger().fatalError(
-                                        plugin.getClass().getName() + "#execute() caused a linkage error "
-                                            + "and may be out-of-date. Check the realms:" );
+                                        plugin.getClass().getName() + "#execute() caused a linkage error ("
+                                            + e.getClass().getName() + ") and may be out-of-date. Check the realms:" );
 
                 ClassRealm pluginRealm = mojoDescriptor.getPluginDescriptor().getClassRealm();
                 StringBuffer sb = new StringBuffer();
@@ -1209,6 +1209,44 @@ public class DefaultPluginManager
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
                                                     "Unable to retrieve component configurator for plugin configuration",
                                                     e );
+        }
+        catch ( LinkageError e )
+        {
+            if ( getLogger().isFatalErrorEnabled() )
+            {
+                getLogger().fatalError(
+                                        configurator.getClass().getName() + "#configureComponent(...) caused a linkage error ("
+                                            + e.getClass().getName() + ") and may be out-of-date. Check the realms:" );
+
+                ClassRealm pluginRealm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+                StringBuffer sb = new StringBuffer();
+                sb.append( "Plugin realm = " + pluginRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < pluginRealm.getConstituents().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + pluginRealm.getConstituents()[i] );
+                    if ( i != ( pluginRealm.getConstituents().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+
+                ClassRealm containerRealm = container.getContainerRealm();
+                sb = new StringBuffer();
+                sb.append( "Container realm = " + containerRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < containerRealm.getConstituents().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + containerRealm.getConstituents()[i] );
+                    if ( i != ( containerRealm.getConstituents().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+            }
+
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+                                                    e.getClass().getName() + ": " + e.getMessage(), e );
         }
         finally
         {
