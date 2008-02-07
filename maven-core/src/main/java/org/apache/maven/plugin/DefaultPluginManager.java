@@ -576,6 +576,44 @@ public class DefaultPluginManager
 
             throw e;
         }
+        catch ( LinkageError e )
+        {
+            if ( getLogger().isFatalErrorEnabled() )
+            {
+                getLogger().fatalError(
+                                        mojo.getClass().getName() + "#execute() caused a linkage error "
+                                            + "and may be out-of-date. Check the realms:" );
+
+                StringBuffer sb = new StringBuffer();
+                sb.append( "Plugin realm = " + pluginRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < pluginRealm.getURLs().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + pluginRealm.getURLs()[i] );
+                    if ( i != ( pluginRealm.getURLs().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+
+                ClassRealm containerRealm = container.getContainerRealm();
+                sb = new StringBuffer();
+                sb.append( "Container realm = " + containerRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < containerRealm.getURLs().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + containerRealm.getURLs()[i] );
+                    if ( i != ( containerRealm.getURLs().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+            }
+
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw e;
+        }
         finally
         {
             if ( mojo != null )
