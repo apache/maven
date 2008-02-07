@@ -60,6 +60,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
+import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.NoSuchRealmException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -463,6 +464,45 @@ public class DefaultPluginManager
         }
         catch ( MojoFailureException e )
         {
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw e;
+        }
+        catch ( LinkageError e )
+        {
+            if ( getLogger().isFatalErrorEnabled() )
+            {
+                getLogger().fatalError(
+                                        plugin.getClass().getName() + "#execute() caused a linkage error "
+                                            + "and may be out-of-date. Check the realms:" );
+
+                ClassRealm pluginRealm = mojoDescriptor.getPluginDescriptor().getClassRealm();
+                StringBuffer sb = new StringBuffer();
+                sb.append( "Plugin realm = " + pluginRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < pluginRealm.getConstituents().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + pluginRealm.getConstituents()[i] );
+                    if ( i != ( pluginRealm.getConstituents().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+
+                ClassRealm containerRealm = container.getContainerRealm();
+                sb = new StringBuffer();
+                sb.append( "Container realm = " + containerRealm.getId() ).append( '\n' );
+                for ( int i = 0; i < containerRealm.getConstituents().length; i++ )
+                {
+                    sb.append( "urls[" + i + "] = " + containerRealm.getConstituents()[i] );
+                    if ( i != ( containerRealm.getConstituents().length - 1 ) )
+                    {
+                        sb.append( '\n' );
+                    }
+                }
+                getLogger().fatalError( sb.toString() );
+            }
+
             session.getEventDispatcher().dispatchError( event, goalExecId, e );
 
             throw e;
