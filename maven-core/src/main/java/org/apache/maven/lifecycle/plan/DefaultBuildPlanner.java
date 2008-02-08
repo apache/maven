@@ -126,6 +126,10 @@ public class DefaultBuildPlanner
                                                                            project,
                                                                            session,
                                                                            true );
+
+                binding.setOrigin( MojoBinding.DIRECT_INVOCATION_ORIGIN );
+                binding.setOriginDescription( "Original reference from user: " + task );
+
                 plan.addDirectInvocationBinding( task, binding );
             }
         }
@@ -469,7 +473,8 @@ public class DefaultBuildPlanner
                                                                     executeGoal,
                                                                     project );
 
-        binding.setOrigin( "Forked from " + referencingGoal );
+        binding.setOrigin( MojoBinding.FORKED_DIRECT_REFERENCE_ORIGIN );
+        binding.setOriginDescription( "Forked from: " + MojoBindingUtils.toString( mojoBinding ) );
 
         plan.addForkedExecution( mojoBinding, Collections.singletonList( binding ) );
     }

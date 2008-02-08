@@ -25,6 +25,7 @@ import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
@@ -62,8 +63,15 @@ import java.util.List;
 import java.util.Stack;
 
 /**
+ * Responsible for orchestrating the process of building the ordered list of
+ * steps required to achieve the specified set of tasks passed into Maven, then
+ * executing these mojos in order. This class also manages the various error messages
+ * that may occur during this process, and directing the behavior of the build
+ * according to what's specified in {@link MavenExecutionRequest#getReactorFailureBehavior()}.
+ *
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author jdcasey
  * @version $Id$
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
  * much of the event handling)
@@ -92,12 +100,7 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
 
     /**
-     * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
-     *
-     * @param session
-     * @param reactorManager
-     * @param dispatcher
-     * @throws MojoFailureException
+     * {@inheritDoc}
      */
     public void execute( final MavenSession session,
                          final ReactorManager reactorManager,
@@ -151,6 +154,16 @@ public class DefaultLifecycleExecutor
             dispatcher );
     }
 
+    /**
+     * After the list of goals from {@link MavenSession#getGoals()} is segmented into
+     * contiguous sets of aggregated and non-aggregated mojos and lifecycle phases,
+     * this method is used to execute each task-segment. Its logic has a top-level fork
+     * for each segment, which basically varies the project used to run the execution
+     * according to aggregation needs. If the segment is aggregated, the root project
+     * will be used to construct and execute the mojo bindings. Otherwise, this
+     * method will iterate through each project, and execute all the goals implied
+     * by the current task segment.
+     */
     private void executeTaskSegments( final List taskSegments,
                                       final ReactorManager reactorManager,
                                       final MavenSession session,
@@ -216,7 +229,8 @@ public class DefaultLifecycleExecutor
                                     event,
                                     reactorManager,
                                     buildStartTime,
-                                    target );
+                                    target,
+                                    true );
                             }
                             catch ( MojoFailureException e )
                             {
@@ -317,7 +331,8 @@ public class DefaultLifecycleExecutor
                                 {
                                     executeGoalAndHandleFailures( binding, session, dispatcher,
                                                                   event, reactorManager,
-                                                                  buildStartTime, target );
+                                                                  buildStartTime, target,
+                                                                  false);
                                 }
                                 catch ( MojoFailureException e )
                                 {
@@ -367,6 +382,17 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    /**
+     * Since each project can have its own {@link ClassRealm} instance that inherits
+     * from the core Maven realm, and contains the specific build-extension
+     * components referenced in that project, the lookup realms must be managed for
+     * each project that's used to fire off a mojo execution. This helps ensure
+     * that unsafe {@link PlexusContainer#lookup(String)} and related calls will
+     * have access to these build-extension components.
+     * <br />
+     * This method simply restores the original Maven-core lookup realm when a
+     * project-specific realm is in use.
+     */
     private void restoreLookupRealm( ClassRealm oldLookupRealm )
     {
         if ( oldLookupRealm != null )
@@ -375,32 +401,28 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    /**
+     * Since each project can have its own {@link ClassRealm} instance that inherits
+     * from the core Maven realm, and contains the specific build-extension
+     * components referenced in that project, the lookup realms must be managed for
+     * each project that's used to fire off a mojo execution. This helps ensure
+     * that unsafe {@link PlexusContainer#lookup(String)} and related calls will
+     * have access to these build-extension components.
+     * <br />
+     * This method is meant to find a project-specific realm, if one exists, for
+     * use as the lookup realm for unsafe component lookups, using {@link PlexusContainer#setLookupRealm(ClassRealm)}.
+     */
     private ClassRealm setProjectLookupRealm( MavenSession session,
                                               MavenProject rootProject )
         throws LifecycleExecutionException
     {
-//        MavenProjectSession projectSession;
-//        try
-//        {
-//            projectSession = session.getProjectSession( rootProject );
-//        }
-//        catch ( PlexusContainerException e )
-//        {
-//            throw new LifecycleExecutionException(
-//                                                   "Failed to create project-specific session for: "
-//                                                                   + rootProject.getId(),
-//                                                   rootProject, e );
-//        }
-//        if ( projectSession != null )
-//        {
-//            return container.setLookupRealm( projectSession.getProjectRealm() );
-//        }
-//        else
-//        {
-//            return null;
-//        }
+        ClassRealm projectRealm = session.getRealmManager().getProjectRealm( rootProject.getGroupId(), rootProject.getArtifactId(), rootProject.getVersion() );
 
-        // TODO: Fix this to use project-level realm!
+        if ( projectRealm != null )
+        {
+            return container.setLookupRealm( projectRealm );
+        }
+
         return container.getLookupRealm();
     }
 
@@ -444,13 +466,22 @@ public class DefaultLifecycleExecutor
         return mojoBindings;
     }
 
+    /**
+     * Lookup the plugin containing the referenced mojo, validate that it is
+     * allowed to execute in the current environment (according to whether
+     * it's a direct-invocation-only or aggregator mojo, and the allowAggregators
+     * flag), and execute the mojo. If any of these steps fails, this method will
+     * consult with the {@link ReactorManager} to determine whether the build
+     * should be stopped.
+     */
     private void executeGoalAndHandleFailures( final MojoBinding mojoBinding,
                                                final MavenSession session,
                                                final EventDispatcher dispatcher,
                                                final String event,
                                                final ReactorManager rm,
                                                final long buildStartTime,
-                                               final String target )
+                                               final String target,
+                                               boolean allowAggregators )
         throws LifecycleExecutionException, MojoFailureException
     {
         MavenProject project = session.getCurrentProject();
@@ -487,6 +518,9 @@ public class DefaultLifecycleExecutor
             }
 
             MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
+
+            validateMojoExecution( mojoBinding, mojoDescriptor, project, allowAggregators );
+
             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
 
             mojoExecution.setConfiguration( (Xpp3Dom) mojoBinding.getConfiguration() );
@@ -546,6 +580,90 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    /**
+     * Verify that the specified {@link MojoBinding} is legal for execution under
+     * the current circumstances. Currently, this mainly checks that aggregator
+     * mojos and direct-invocation-only mojos are not bound to lifecycle phases.
+     * <br/>
+     * If an invalid mojo is detected, and it is brought in via the user's POM
+     * (this will be checked using {@link MojoBinding#POM_ORIGIN} and {@link MojoBinding#getOrigin()}),
+     * then a {@link LifecycleExecutionException} will be thrown. Otherwise, the mojo
+     * was brought in via a lifecycle mapping or overlay, or as part of a forked execution.
+     * In these cases, the error will be logged to the console, using the ERROR log-level (since the
+     * user cannot fix this sort of problem easily).
+     */
+    private void validateMojoExecution( MojoBinding mojoBinding,
+                                        MojoDescriptor mojoDescriptor,
+                                        MavenProject project,
+                                        boolean allowAggregators )
+        throws LifecycleExecutionException
+    {
+        if ( mojoDescriptor.isAggregator() && !allowAggregators )
+        {
+            if ( MojoBinding.POM_ORIGIN.equals( mojoBinding.getOrigin() ) )
+            {
+                StringBuffer buffer = new StringBuffer();
+                buffer.append( "\n\nDEPRECATED: Binding aggregator mojos to lifecycle phases in the POM is considered dangerous." );
+                buffer.append( "\nThis feature has been deprecated. Please adjust your POM files accordingly." );
+                buffer.append( "\n\nOffending mojo:\n\n" );
+                buffer.append( MojoBindingUtils.toString( mojoBinding ) );
+                buffer.append( "\n\nProject: " ).append( project.getId() );
+                buffer.append( "\nPOM File: " ).append( String.valueOf( project.getFile() ) );
+                buffer.append( "\n" );
+
+                getLogger().warn( buffer.toString() );
+            }
+            else
+            {
+                StringBuffer buffer = new StringBuffer();
+                buffer.append( "\n\nDEPRECATED: An aggregator mojo has been bound to your project's build lifecycle." );
+                buffer.append( "\nThis feature is dangerous, and has been deprecated." );
+                buffer.append( "\n\nOffending mojo:\n\n" );
+                buffer.append( MojoBindingUtils.toString( mojoBinding ) );
+                buffer.append( "\n\nDirect binding of aggregator mojos to the lifecycle is not allowed, but this binding was not configured from within in your POM." );
+                buffer.append( "\n\nIts origin was: " ).append( mojoBinding.getOrigin() );
+                if ( mojoBinding.getOriginDescription() != null )
+                {
+                    buffer.append( " (" ).append( mojoBinding.getOriginDescription() ).append( ")" );
+                }
+
+                buffer.append( "\n" );
+
+                getLogger().warn( buffer.toString() );
+            }
+        }
+        else if ( mojoDescriptor.isDirectInvocationOnly() && !MojoBinding.DIRECT_INVOCATION_ORIGIN.equals( mojoBinding.getOrigin() ) )
+        {
+            if ( MojoBinding.POM_ORIGIN.equals( mojoBinding.getOrigin() ) )
+            {
+                throw new LifecycleExecutionException( "Mojo:\n\n" + MojoBindingUtils.toString( mojoBinding ) + "\n\ncan only be invoked directly by the user. Binding it to lifecycle phases in the POM is not allowed.", project );
+            }
+            else
+            {
+                StringBuffer buffer = new StringBuffer();
+                buffer.append( "\n\nSKIPPING execution of mojo:\n\n" ).append( MojoBindingUtils.toString( mojoBinding ) );
+                buffer.append( "\n\nIt specifies direct-invocation only, but has been bound to the build lifecycle." );
+                buffer.append( "\n\nDirect-invocation mojos can only be called by the user. This binding was not configured from within in your POM." );
+                buffer.append( "\n\nIts origin was: " ).append( mojoBinding.getOrigin() );
+                if ( mojoBinding.getOriginDescription() != null )
+                {
+                    buffer.append( " (" ).append( mojoBinding.getOriginDescription() ).append( ")" );
+                }
+
+                buffer.append( "\n" );
+
+                getLogger().error( buffer.toString() );
+            }
+        }
+    }
+
+    /**
+     * In the event that an error occurs during executeGoalAndHandleFailure(..),
+     * this method is called to handle logging the error in the {@link ReactorManager},
+     * then determining (again, from the reactor-manager) whether to stop the build.
+     *
+     * @return true if the build should stop, false otherwise.
+     */
     private boolean handleExecutionFailure( final ReactorManager rm,
                                             final MavenProject project,
                                             final Exception e,
@@ -571,6 +689,9 @@ public class DefaultLifecycleExecutor
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TaskValidationResult isTaskValid( String task,
                                              MavenSession session,
                                              MavenProject rootProject )
@@ -636,6 +757,15 @@ public class DefaultLifecycleExecutor
         return new TaskValidationResult();
     }
 
+    /**
+     * Split up the list of goals from {@link MavenSession#getGoals()} according
+     * to aggregation needs. Each adjacent goal in the list is included in a single
+     * task segment. When the next goal references a different type of mojo or
+     * lifecycle phase (eg. previous goal wasn't an aggregator, but next one is...or the reverse),
+     * a new task segment is started and the new goal is added to that.
+     *
+     * @return the list of task-segments, each flagged according to aggregation needs.
+     */
     private List segmentTaskListByAggregationNeeds( final List tasks,
                                                     final MavenSession session,
                                                     final MavenProject rootProject )
@@ -735,6 +865,12 @@ public class DefaultLifecycleExecutor
         return segments;
     }
 
+    /**
+     * Retrieve the {@link MojoDescriptor} that corresponds to a given direct mojo
+     * invocation. This is used during the fail-fast method isTaskValid(..), and also
+     * during task-segmentation, to allow the lifecycle executor to determine whether
+     * the mojo is an aggregator.
+     */
     private MojoDescriptor getMojoDescriptorForDirectInvocation( String task,
                                                                  MavenSession session,
                                                                  MavenProject project )

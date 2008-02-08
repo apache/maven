@@ -189,7 +189,7 @@ public class DefaultLifecycleBindingManager
                                 mojoBinding.setGoal( goal );
                                 mojoBinding.setConfiguration( BindingUtils.mergeConfigurations( plugin, execution ) );
                                 mojoBinding.setExecutionId( execution.getId() );
-                                mojoBinding.setOrigin( "POM" );
+                                mojoBinding.setOrigin( MojoBinding.POM_ORIGIN );
 
                                 logger.debug( "Mojo: " + MojoBindingUtils.toString( mojoBinding ) + ": determining binding phase." );
 
@@ -384,7 +384,8 @@ public class DefaultLifecycleBindingManager
                     }
 
                     binding.setConfiguration( configuration );
-                    binding.setOrigin( lifecycleId );
+                    binding.setOrigin( MojoBinding.LIFECYCLE_MAPPING_ORIGIN );
+                    binding.setOriginDescription( "Lifecycle overlay: " + lifecycleId );
 
                     LifecycleUtils.addMojoBinding( phase.getId(), binding, bindings );
                     phaseBindings.add( binding );
@@ -572,7 +573,7 @@ public class DefaultLifecycleBindingManager
                 binding.setVersion( pluginDescriptor.getVersion() );
                 binding.setGoal( mojoDescriptor.getGoal() );
                 binding.setExecutionId( id );
-                binding.setOrigin( "POM" );
+                binding.setOrigin( MojoBinding.POM_ORIGIN );
 
                 BindingUtils.injectProjectConfiguration( binding, project );
 

@@ -845,13 +845,25 @@ public class DefaultPluginManager
                 if ( param.getDeprecated() != null )
                 {
                     boolean warnOfDeprecation = false;
-                    if ( extractedMojoConfiguration.getChild( param.getName() ) != null )
+                    PlexusConfiguration child = extractedMojoConfiguration.getChild( param.getName() );
+                    try
                     {
-                        warnOfDeprecation = true;
+                        if ( ( child != null ) && ( child.getValue() != null ) )
+                        {
+                            warnOfDeprecation = true;
+                        }
+                        else if ( param.getAlias() != null)
+                        {
+                            child = extractedMojoConfiguration.getChild( param.getAlias() );
+                            if ( ( child != null ) && ( child.getValue() != null ) )
+                            {
+                                warnOfDeprecation = true;
+                            }
+                        }
                     }
-                    else if ( ( param.getAlias() != null ) && ( extractedMojoConfiguration.getChild( param.getAlias() ) != null ) )
+                    catch ( PlexusConfigurationException e )
                     {
-                        warnOfDeprecation = true;
+                        // forget it, this is just for deprecation checking, after all...
                     }
 
                     if ( warnOfDeprecation )

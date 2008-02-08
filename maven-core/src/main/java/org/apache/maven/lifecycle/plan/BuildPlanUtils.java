@@ -132,6 +132,7 @@ public final class BuildPlanUtils
         if ( extendedInfo )
         {
             listing.append( "\nOrigin: " ).append( binding.getOrigin() );
+            listing.append( "\nOrigin Description: " ).append( binding.getOriginDescription() );
             listing.append( "\nConfiguration:\n\t" ).append(
                                                              String.valueOf( binding.getConfiguration() ).replaceAll(
                                                                                                                       "\\n",

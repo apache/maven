@@ -5,9 +5,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Constructs and matches MojoBinding instances that refer to the forked-execution context manager mojos.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public final class StateManagementUtils
 {
@@ -15,8 +15,6 @@ public final class StateManagementUtils
     public static final String GROUP_ID = "org.apache.maven.plugins.internal";
 
     public static final String ARTIFACT_ID = "maven-state-management";
-
-    public static final String ORIGIN = "Maven build-state management";
 
     public static final String END_FORKED_EXECUTION_GOAL = "end-fork";
 
@@ -46,7 +44,7 @@ public final class StateManagementUtils
         binding.setArtifactId( ARTIFACT_ID );
         binding.setVersion( VERSION );
         binding.setGoal( START_FORKED_EXECUTION_GOAL );
-        binding.setOrigin( ORIGIN );
+        binding.setOrigin( MojoBinding.INTERNAL_ORIGIN );
 
         CURRENT_FORK_ID = (int) System.currentTimeMillis();
 
@@ -73,7 +71,7 @@ public final class StateManagementUtils
         binding.setArtifactId( ARTIFACT_ID );
         binding.setVersion( VERSION );
         binding.setGoal( END_FORKED_EXECUTION_GOAL );
-        binding.setOrigin( ORIGIN );
+        binding.setOrigin( MojoBinding.INTERNAL_ORIGIN );
 
         Xpp3Dom config = new Xpp3Dom( "configuration" );
         Xpp3Dom forkId = new Xpp3Dom( "forkId" );
@@ -98,7 +96,7 @@ public final class StateManagementUtils
         binding.setArtifactId( ARTIFACT_ID );
         binding.setVersion( VERSION );
         binding.setGoal( CLEAR_FORKED_EXECUTION_GOAL );
-        binding.setOrigin( ORIGIN );
+        binding.setOrigin( MojoBinding.INTERNAL_ORIGIN );
 
         Xpp3Dom config = new Xpp3Dom( "configuration" );
         Xpp3Dom forkId = new Xpp3Dom( "forkId" );
@@ -156,7 +154,7 @@ public final class StateManagementUtils
         binding.setArtifactId( ARTIFACT_ID );
         binding.setVersion( VERSION );
         binding.setGoal( RESOLVE_LATE_BOUND_PLUGIN_GOAL );
-        binding.setOrigin( ORIGIN );
+        binding.setOrigin( MojoBinding.INTERNAL_ORIGIN );
 
         Xpp3Dom config = new Xpp3Dom( "configuration" );
         Xpp3Dom param = new Xpp3Dom( "groupId" );

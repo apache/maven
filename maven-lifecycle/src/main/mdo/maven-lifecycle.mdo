@@ -548,16 +548,7 @@
       </fields>
     </class>
     <class>
-      <name>LifecycleStep</name>
-      <version>1.0.0</version>
-      <description><![CDATA[
-        Some step in the build process. This could be a mojo, or it could be a signal to start/stop 
-        forked-mode of execution, etc.
-      ]]></description>
-    </class>
-    <class>
       <name>MojoBinding</name>
-      <superClass>LifecycleStep</superClass>
       <version>1.0.0</version>
       <description>A binding of one mojo to one lifecycle phase, possibly including configuration.</description>
       <fields>
@@ -601,12 +592,6 @@
           <type>String</type>
         </field>
         <field>
-          <version>1.0.0</version>
-          <name>origin</name>
-          <type>String</type>
-          <description>Specific location from which this set of mojo binding was loaded.</description>
-        </field>
-        <field>
           <name>configuration</name>
           <version>1.0.0</version>
           <description>Mojo binding's configuration.</description>
@@ -623,8 +608,63 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
+    /** origin marker for mojos referenced directly by the user or embedded-mode consumer. */
+    public static final String DIRECT_INVOCATION_ORIGIN = "Direct invocation";
+    
+    /** origin marker for single (non-lifecycle) mojos referenced by a forked-execution annotation in another mojo. */
+    public static final String FORKED_DIRECT_REFERENCE_ORIGIN = "Direct forking reference";
+    
+    /** origin marker for mojos bound to the lifecycle through POM configuration (not packaging defaults). */
+    public static final String POM_ORIGIN = "POM";
+    
+    /** origin marker for mojos bound to the lifecycle by a standard (or default) lifecycle mapping. */
+    public static final String LIFECYCLE_MAPPING_ORIGIN = "Lifecycle mapping";
+    
+    /** origin marker for mojos injected into the lifecycle by Maven, to manage lifecycle state. */
+    public static final String INTERNAL_ORIGIN = "Maven internal state-management";
+    
+    private String origin;
+    
+    /**
+     * Return the origin marker set for this MojoBinding, or null. This will give a general idea of where this
+     * binding came from.
+     */
+    public String getOrigin()
+    {
+        return origin;
+    }
+    
+    public void setOrigin( String origin )
+    {
+        this.origin = origin;
+    }
+    
+    private String originDescription;
+    
+    /**
+     * Return specific information about where exactly this binding came from, if it's available. 
+     * This might be used to record the specific forking mojo or the lifecycle
+     * overlay name that included this mojo, for instance.
+     */
+    public String getOriginDescription()
+    {
+        return originDescription;
+    }
+    
+    public void setOriginDescription( String originDescription )
+    {
+        this.originDescription = originDescription;
+    }
+          
     private boolean lateBound = false;
           
+    /**
+     * Mark this mojo binding as late-bound, meaning the plugin for this mojo
+     * could not be resolved when it was included in a build plan (the class
+     * responsible for calculating the ordered list of mojos to execute for a build).
+     * This flag should result in Maven injecting an internal step into the build
+     * just ahead of this mojo's execution, to resolve the plugin it refers to.
+     */
     public boolean isLateBound()
     {
         return lateBound;
