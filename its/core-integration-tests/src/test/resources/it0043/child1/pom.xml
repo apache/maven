@@ -1,43 +1,13 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.maven.its.it0043</groupId>
+  <parent>
+    <groupId>org.apache.maven.its.it0043</groupId>
+    <artifactId>maven-it-it0043-parent</artifactId>
+  	<version>1.0-SNAPSHOT</version>
+  </parent>
+  
   <artifactId>maven-it-it0043-child1</artifactId>
-	<version>1.0-SNAPSHOT</version>
   <name>Maven Integration Test :: it0043 Child1</name> 
   <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
 
-	<!-- Use 2.0.2-SNAPSHOT because of MPH-21. Remove when it's released. -->
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
-	<!-- ensure help plugin is in the local repo, as child2 overrides
-	     the central repo, but tries to run the help plugin -->
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-help-plugin</artifactId>
-				<!-- use 2.0.2-snap until it's released, due to bug described above -->
-				<version>2.0.2</version>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>effective-pom</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/effective-pom-child1.xml</output>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

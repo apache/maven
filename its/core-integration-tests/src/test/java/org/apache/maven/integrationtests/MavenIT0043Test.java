@@ -16,10 +16,20 @@ public class MavenIT0043Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0043" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "child1/target/maven-it-it0043-child1-1.0-SNAPSHOT.jar" );
-        verifier.assertFilePresent( "child2/target/maven-it-it0043-child2-1.0-SNAPSHOT.jar" );
+
+        File child1 = new File( testDir, "child1" );
+        Verifier verifier = new Verifier( child1.getAbsolutePath() );
+
+        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-help-plugin", "2.0.2", "jar" );
+
+        verifier.executeGoal( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        File child2 = new File( testDir, "child2" );
+        verifier = new Verifier( child2.getAbsolutePath() );
+
+        verifier.executeGoal( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

@@ -10,6 +10,7 @@
   <version>1.0</version>
   <build>
     <plugins>
+      <!--
       <plugin>
         <artifactId>maven-help-plugin</artifactId>
         <executions>
@@ -25,6 +26,7 @@
           </execution>
         </executions>
       </plugin>
+    -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>

@@ -50,6 +50,9 @@ extends TestCase
                 found.append( extensionName );
             }
         }
+
+        System.out.println( "Expected:\n\n" + expected + "\n\nFound:\n\n" + found );
+
         assertEquals( "dependencies order in classpath should match pom.xml", expected, found.toString() );
     }
 }

@@ -10,6 +10,7 @@
   <build>
     <defaultGoal>integration-test</defaultGoal>
     <plugins>
+      <!--
       <plugin>
         <artifactId>maven-help-plugin</artifactId>
         <configuration>
@@ -25,6 +26,7 @@
           </execution>
         </executions>
       </plugin>
+    -->
       <plugin>
         <artifactId>maven-verifier-plugin</artifactId>
         <executions>

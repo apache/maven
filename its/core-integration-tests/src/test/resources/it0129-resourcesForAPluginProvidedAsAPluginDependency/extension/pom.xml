@@ -14,7 +14,7 @@
           <execution>
             <phase>process-resources</phase>
             <goals>
-              <goal>attached</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
               <descriptors>

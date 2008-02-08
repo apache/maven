@@ -1,8 +1,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.it0043</groupId>
+  <parent>
+    <groupId>org.apache.maven.its.it0043</groupId>
+    <artifactId>maven-it-it0043-parent</artifactId>
+  	<version>1.0-SNAPSHOT</version>
+  </parent>
+  
   <artifactId>maven-it-it0043-child2</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>Maven Integration Test :: it0043 Child2</name> 
   <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
 
@@ -37,24 +41,4 @@
       <version>3.8.1</version>
     </dependency>
   </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-help-plugin</artifactId>
-				<version>2.0.2</version> <!-- Removing this will cause MNG-900 -->
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>effective-pom</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/effective-pom.xml</output>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
