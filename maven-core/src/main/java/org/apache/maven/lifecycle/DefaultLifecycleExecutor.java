@@ -473,6 +473,10 @@ public class DefaultLifecycleExecutor
      * flag), and execute the mojo. If any of these steps fails, this method will
      * consult with the {@link ReactorManager} to determine whether the build
      * should be stopped.
+     * <br />
+     * <b>NOTE:</b> If the binding is an aggregator mojo, and the specified project
+     * is not the root project of the reactor (using {@link ReactorManager#getTopLevelProject()},
+     * then print a DEBUG message and skip that execution.
      */
     private void executeGoalAndHandleFailures( final MojoBinding mojoBinding,
                                                final MavenSession session,
@@ -519,13 +523,13 @@ public class DefaultLifecycleExecutor
 
             MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
 
-            validateMojoExecution( mojoBinding, mojoDescriptor, project, allowAggregators );
-
             if ( mojoDescriptor.isAggregator() && ( project != rm.getTopLevelProject() ) )
             {
                 getLogger().debug( "Skipping mojo execution: " + MojoBindingUtils.toString( mojoBinding ) + "\nfor project: " + project.getId() + "\n\nIt is an aggregator mojo, and the current project is not the root project for the reactor." );
                 return;
             }
+
+            validateMojoExecution( mojoBinding, mojoDescriptor, project, allowAggregators );
 
             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
 
