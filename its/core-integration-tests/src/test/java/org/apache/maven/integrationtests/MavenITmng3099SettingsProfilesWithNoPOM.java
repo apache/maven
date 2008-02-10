@@ -24,6 +24,12 @@ import java.util.List;
 public class MavenITmng3099SettingsProfilesWithNoPOM
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng3099SettingsProfilesWithNoPOM()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.8,)" ); // 2.0.9+
+    }
+
     public void testitMNG3099 ()
         throws Exception
     {
