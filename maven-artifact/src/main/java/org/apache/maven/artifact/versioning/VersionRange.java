@@ -19,12 +19,12 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * Construct a version range from a specification.
@@ -504,17 +504,7 @@ public class VersionRange
             {
                 Restriction r = (Restriction) i.next();
 
-                buf.append( r.isLowerBoundInclusive() ? "[" : "(" );
-                if ( r.getLowerBound() != null )
-                {
-                    buf.append( r.getLowerBound().toString() );
-                }
-                buf.append( "," );
-                if ( r.getUpperBound() != null )
-                {
-                    buf.append( r.getUpperBound().toString() );
-                }
-                buf.append( r.isUpperBoundInclusive() ? "]" : ")" );
+                buf.append( r.toString() );
 
                 if ( i.hasNext() )
                 {
@@ -547,16 +537,15 @@ public class VersionRange
 
     public boolean containsVersion( ArtifactVersion version )
     {
-        boolean matched = false;
-        for ( Iterator i = restrictions.iterator(); i.hasNext() && !matched; )
+        for ( Iterator i = restrictions.iterator(); i.hasNext(); )
         {
             Restriction restriction = (Restriction) i.next();
             if ( restriction.containsVersion( version ) )
             {
-                matched = true;
+                return true;
             }
         }
-        return matched;
+        return false;
     }
 
     public boolean hasRestrictions()

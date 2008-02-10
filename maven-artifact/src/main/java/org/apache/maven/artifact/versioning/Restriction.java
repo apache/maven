@@ -1,5 +1,6 @@
 package org.apache.maven.artifact.versioning;
 
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -93,5 +94,24 @@ public class Restriction
             }
         }
         return true;
+    }
+
+    public String toString()
+    {
+        StringBuffer buf = new StringBuffer();
+
+        buf.append( isLowerBoundInclusive() ? "[" : "(" );
+        if ( getLowerBound() != null )
+        {
+            buf.append( getLowerBound().toString() );
+        }
+        buf.append( "," );
+        if ( getUpperBound() != null )
+        {
+            buf.append( getUpperBound().toString() );
+        }
+        buf.append( isUpperBoundInclusive() ? "]" : ")" );
+
+        return buf.toString();
     }
 }
