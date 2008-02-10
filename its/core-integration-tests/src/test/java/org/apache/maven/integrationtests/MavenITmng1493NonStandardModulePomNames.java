@@ -11,6 +11,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng1493NonStandardModulePomNames
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng1493NonStandardModulePomNames()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[2.1-SNAPSHOT,)" ); // 2.1+
+    }
+
     public void testitMNG1493 ()
         throws Exception
     {
