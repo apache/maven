@@ -164,7 +164,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
 		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
 		suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
-        suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
@@ -182,6 +181,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
+        // suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class ); -- MNG-1412 -- this is a poorly formed test - testing the classloader manifests, not the ordering from the POM itself
 
         // 2.0.7 only (TODO: detect what version is used before running them)
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
