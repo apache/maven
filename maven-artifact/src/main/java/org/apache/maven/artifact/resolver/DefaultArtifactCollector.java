@@ -262,6 +262,38 @@ public class DefaultArtifactCollector
                     Artifact artifact = child.getArtifact();
                     try
                     {
+                        Object childKey = child.getKey();
+                        if ( managedVersions.containsKey( childKey ) )
+                        {
+                            // If this child node is a managed dependency, ensure
+                            // we are using the dependency management version
+                            // of this child if applicable b/c we want to use the
+                            // managed version's POM, *not* any other version's POM.
+                            // We retrieve the POM below in the retrieval step.
+                            manageArtifact( child, managedVersions, listeners );
+                            
+                            // Also, we need to ensure that any exclusions it presents are
+                            // added to the artifact before we retrive the metadata
+                            // for the artifact; otherwise we may end up with unwanted
+                            // dependencies.
+                            Artifact ma = (Artifact) managedVersions.get( childKey );
+                            ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
+                            if ( null != managedExclusionFilter )
+                            {
+                                if ( null != artifact.getDependencyFilter() )
+                                {
+                                    AndArtifactFilter aaf = new AndArtifactFilter();
+                                    aaf.add( artifact.getDependencyFilter() );
+                                    aaf.add( managedExclusionFilter );
+                                    artifact.setDependencyFilter( aaf );
+                                }
+                                else
+                                {
+                                    artifact.setDependencyFilter( managedExclusionFilter );
+                                }
+                            }
+                        }
+
                         if ( artifact.getVersion() == null )
                         {
                             // set the recommended version
@@ -304,38 +336,6 @@ public class DefaultArtifactCollector
 
                             artifact.selectVersion( version.toString() );
                             fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
-                        }
-
-                        Object childKey = child.getKey();
-                        if ( managedVersions.containsKey( childKey ) )
-                        {
-                            // If this child node is a managed dependency, ensure
-                            // we are using the dependency management version
-                            // of this child if applicable b/c we want to use the
-                            // managed version's POM, *not* any other version's POM.
-                            // We retrieve the POM below in the retrieval step.
-                            manageArtifact( child, managedVersions, listeners );
-                            
-                            // Also, we need to ensure that any exclusions it presents are
-                            // added to the artifact before we retrive the metadata
-                            // for the artifact; otherwise we may end up with unwanted
-                            // dependencies.
-                            Artifact ma = (Artifact) managedVersions.get( childKey );
-                            ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
-                            if ( null != managedExclusionFilter )
-                            {
-                                if ( null != artifact.getDependencyFilter() )
-                                {
-                                    AndArtifactFilter aaf = new AndArtifactFilter();
-                                    aaf.add( artifact.getDependencyFilter() );
-                                    aaf.add( managedExclusionFilter );
-                                    artifact.setDependencyFilter( aaf );
-                                }
-                                else
-                                {
-                                    artifact.setDependencyFilter( managedExclusionFilter );
-                                }
-                            }
                         }
 
                         artifact.setDependencyTrail( node.getDependencyTrail() );
