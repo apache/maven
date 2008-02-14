@@ -19,17 +19,15 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -90,20 +88,20 @@ public class MavenProjectTest
                         + MavenProject.EMPTY_PROJECT_VERSION, project.getId() );
     }
 
-    public void testCopyConstructor()
+    public void testClone()
         throws Exception
     {
         File f = getFileForClasspathResource( "canonical-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = new MavenProject( projectToClone );
+        MavenProject clonedProject = (MavenProject) projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
         assertTrue( "ManagedVersionMap is not empty", clonedMap.isEmpty() );
     }
 
-    public void testCopyConstructorWithDependencyManagement()
+    public void testCloneWithDependencyManagement()
         throws Exception
     {
         File f = getFileForClasspathResource( "dependencyManagement-pom.xml" );
@@ -118,7 +116,7 @@ public class MavenProjectTest
         assertNotNull( "No ManagedVersionMap", map );
         assertTrue( "ManagedVersionMap is empty", !map.isEmpty() );
 
-        MavenProject clonedProject = new MavenProject( projectToClone );
+        MavenProject clonedProject = (MavenProject) projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
@@ -147,13 +145,13 @@ public class MavenProjectTest
         assertEquals( "..", pathAdjustment );
     }
     
-    public void testCopyConstructorWithDistributionManagement() throws Exception
+    public void testCloneWithDistributionManagement() throws Exception
     {
         
         File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = new MavenProject( projectToClone );
+        MavenProject clonedProject = (MavenProject) projectToClone.clone();
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
 }

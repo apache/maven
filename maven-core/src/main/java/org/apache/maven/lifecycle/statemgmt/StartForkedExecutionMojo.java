@@ -29,7 +29,7 @@ public class StartForkedExecutionMojo
 
         if ( project != null )
         {
-            session.addForkedProject( new MavenProject( project ) );
+            session.addForkedProject( (MavenProject) project.clone() );
         }
     }
 
