@@ -158,103 +158,107 @@ public class MavenProject
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
         
-        this.model = model;
+        this.setModel( model );
     }
 
     public MavenProject( Model model )
     {
-        this.model = model;
+        this.setModel( model );
     }
 
+    /**
+     * @deprecated use {@link #clone()}
+     */
     public MavenProject( MavenProject project )
     {
         // disown the parent
 
         // copy fields
-        this.file = project.file;
+        setFile( project.getFile() );
 
-        // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be sure!
-        if ( project.dependencyArtifacts != null )
+        // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
+        // sure!
+        if ( project.getDependencyArtifacts() != null )
         {
-            this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
+            setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
         }
-        
-        if ( project.artifacts != null )
-        {
-            this.artifacts = Collections.unmodifiableSet( project.artifacts );
-        }
-        
-        if ( project.pluginArtifacts != null )
-        {
-            this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
-        }
-        
-        if ( project.reportArtifacts != null )
-        {
-            this.reportArtifacts = Collections.unmodifiableSet( project.reportArtifacts );
-        }        
-        
-        if ( project.extensionArtifacts != null )
-        {
-            this.extensionArtifacts = Collections.unmodifiableSet( project.extensionArtifacts );
-        }        
-        
-        this.parentArtifact = project.parentArtifact;
 
-        if ( project.remoteArtifactRepositories != null )
+        if ( project.getArtifacts() != null )
         {
-            this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
-        }        
-        
-        if ( project.pluginArtifactRepositories != null )
+            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
+        }
+
+        if ( project.getPluginArtifacts() != null )
         {
-            this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
-        }        
-        
-        if ( project.collectedProjects != null )
+            setPluginArtifacts( Collections.unmodifiableSet( project.getPluginArtifacts() ) );
+        }
+
+        if ( project.getReportArtifacts() != null )
         {
-            this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
-        }        
-        
-        if ( project.activeProfiles != null )
+            setReportArtifacts( Collections.unmodifiableSet( project.getReportArtifacts() ) );
+        }
+
+        if ( project.getExtensionArtifacts() != null )
         {
-            this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
-        }        
-        
+            setExtensionArtifacts( Collections.unmodifiableSet( project.getExtensionArtifacts() ) );
+        }
+
+        setParentArtifact( ( project.getParentArtifact() ) );
+
+        if ( project.getRemoteArtifactRepositories() != null )
+        {
+            setRemoteArtifactRepositories( Collections.unmodifiableList( project.getRemoteArtifactRepositories() ) );
+        }
+
+        if ( project.getPluginArtifactRepositories() != null )
+        {
+            setPluginArtifactRepositories( ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
+        }
+
+        if ( project.getCollectedProjects() != null )
+        {
+            setCollectedProjects( ( Collections.unmodifiableList( project.getCollectedProjects() ) ) );
+        }
+
+        if ( project.getActiveProfiles() != null )
+        {
+            setActiveProfiles( ( Collections.unmodifiableList( project.getActiveProfiles() ) ) );
+        }
+
         if ( project.getAttachedArtifacts() != null )
         {
             // clone properties modifyable by plugins in a forked lifecycle
-            this.attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
-        }        
-        
-        if ( project.compileSourceRoots != null )
-        {
-            // clone source roots
-            this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
-        }        
-        
-        if ( project.testCompileSourceRoots != null )
-        {
-            this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
-        }        
-        
-        if ( project.scriptSourceRoots != null )
-        {
-            this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
-        }        
-        
-        this.model = ModelUtils.cloneModel( project.model );
-
-        if ( project.originalModel != null )
-        {
-            this.originalModel = ModelUtils.cloneModel( project.originalModel );
+            setAttachedArtifacts( new ArrayList( project.getAttachedArtifacts() ) );
         }
 
-        this.executionRoot = project.executionRoot;
-
-        if ( project.artifact != null )
+        if ( project.getCompileSourceRoots() != null )
         {
-            this.artifact = ArtifactUtils.copyArtifact( project.artifact );
+            // clone source roots
+            setCompileSourceRoots( ( new ArrayList( project.getCompileSourceRoots() ) ) );
+        }
+
+        if ( project.getTestCompileSourceRoots() != null )
+        {
+            setTestCompileSourceRoots( ( new ArrayList( project.getTestCompileSourceRoots() ) ) );
+        }
+
+        if ( project.getScriptSourceRoots() != null )
+        {
+            setScriptSourceRoots( ( new ArrayList( project.getScriptSourceRoots() ) ) );
+        }
+
+        setModel( ( ModelUtils.cloneModel( project.getModel() ) ) );
+
+        if ( project.getOriginalModel() != null )
+        {
+            setOriginalModel( ( ModelUtils.cloneModel( project.getOriginalModel() ) ) );
+        }
+
+        setExecutionRoot( project.isExecutionRoot() );
+
+        if ( project.getArtifact() != null )
+        {
+            setArtifact( ArtifactUtils.copyArtifact( project.getArtifact() ) );
         }
 
         if ( project.getManagedVersionMap() != null )
@@ -262,14 +266,14 @@ public class MavenProject
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
         
-        if ( project.releaseArtifactRepository != null )
+        if ( project.getReleaseArtifactRepository() != null )
         {
-            releaseArtifactRepository = project.releaseArtifactRepository;
+            setReleaseArtifactRepository( project.getReleaseArtifactRepository() );
         }
         
-        if ( project.snapshotArtifactRepository != null )
+        if ( project.getSnapshotArtifactRepository() != null )
         {
-            snapshotArtifactRepository = project.snapshotArtifactRepository;
+            setSnapshotArtifactRepository( project.getSnapshotArtifactRepository() );
         }
     }
     
@@ -403,17 +407,17 @@ public class MavenProject
 
     public void setDependencies( List dependencies )
     {
-        model.setDependencies( dependencies );
+        getModel().setDependencies( dependencies );
     }
 
     public List getDependencies()
     {
-        return model.getDependencies();
+        return getModel().getDependencies();
     }
 
     public DependencyManagement getDependencyManagement()
     {
-        return model.getDependencyManagement();
+        return getModel().getDependencyManagement();
     }
 
     // ----------------------------------------------------------------------
@@ -427,9 +431,9 @@ public class MavenProject
             path = path.trim();
             if ( path.length() != 0 )
             {
-                if ( !compileSourceRoots.contains( path ) )
+                if ( !getCompileSourceRoots().contains( path ) )
                 {
-                    compileSourceRoots.add( path );
+                    getCompileSourceRoots().add( path );
                 }
             }
         }
@@ -442,9 +446,9 @@ public class MavenProject
             path = path.trim();
             if ( path.length() != 0 )
             {
-                if ( !scriptSourceRoots.contains( path ) )
+                if ( !getScriptSourceRoots().contains( path ) )
                 {
-                    scriptSourceRoots.add( path );
+                    getScriptSourceRoots().add( path );
                 }
             }
         }
@@ -457,9 +461,9 @@ public class MavenProject
             path = path.trim();
             if ( path.length() != 0 )
             {
-                if ( !testCompileSourceRoots.contains( path ) )
+                if ( !getTestCompileSourceRoots().contains( path ) )
                 {
-                    testCompileSourceRoots.add( path );
+                    getTestCompileSourceRoots().add( path );
                 }
             }
         }
@@ -821,31 +825,31 @@ public class MavenProject
 
     public void setModelVersion( String pomVersion )
     {
-        model.setModelVersion( pomVersion );
+        getModel().setModelVersion( pomVersion );
     }
 
     public String getModelVersion()
     {
-        return model.getModelVersion();
+        return getModel().getModelVersion();
     }
 
     public String getId()
     {
-        return model.getId();
+        return getModel().getId();
     }
 
     public void setGroupId( String groupId )
     {
-        model.setGroupId( groupId );
+        getModel().setGroupId( groupId );
     }
 
     public String getGroupId()
     {
-        String groupId = model.getGroupId();
-        
-        if ( groupId == null && model.getParent() != null )
+        String groupId = getModel().getGroupId();
+
+        if ( ( groupId == null ) && ( getModel().getParent() != null ) )
         {
-            groupId = model.getParent().getGroupId();
+            groupId = getModel().getParent().getGroupId();
         }
         
         return groupId;
@@ -853,25 +857,25 @@ public class MavenProject
 
     public void setArtifactId( String artifactId )
     {
-        model.setArtifactId( artifactId );
+        getModel().setArtifactId( artifactId );
     }
 
     public String getArtifactId()
     {
-        return model.getArtifactId();
+        return getModel().getArtifactId();
     }
 
     public void setName( String name )
     {
-        model.setName( name );
+        getModel().setName( name );
     }
 
     public String getName()
     {
         // TODO: this should not be allowed to be null.
-        if ( model.getName() != null )
+        if ( getModel().getName() != null )
         {
-            return model.getName();
+            return getModel().getName();
         }
         else
         {
@@ -881,16 +885,16 @@ public class MavenProject
 
     public void setVersion( String version )
     {
-        model.setVersion( version );
+        getModel().setVersion( version );
     }
 
     public String getVersion()
     {
-        String version = model.getVersion();
-        
-        if ( version == null && model.getParent() != null )
+        String version = getModel().getVersion();
+
+        if ( ( version == null ) && ( getModel().getParent() != null ) )
         {
-            version = model.getParent().getVersion();
+            version = getModel().getParent().getVersion();
         }
         
         return version;
@@ -898,149 +902,149 @@ public class MavenProject
 
     public String getPackaging()
     {
-        return model.getPackaging();
+        return getModel().getPackaging();
     }
 
     public void setPackaging( String packaging )
     {
-        model.setPackaging( packaging );
+        getModel().setPackaging( packaging );
     }
 
     public void setInceptionYear( String inceptionYear )
     {
-        model.setInceptionYear( inceptionYear );
+        getModel().setInceptionYear( inceptionYear );
     }
 
     public String getInceptionYear()
     {
-        return model.getInceptionYear();
+        return getModel().getInceptionYear();
     }
 
     public void setUrl( String url )
     {
-        model.setUrl( url );
+        getModel().setUrl( url );
     }
 
     public String getUrl()
     {
-        return model.getUrl();
+        return getModel().getUrl();
     }
 
     public Prerequisites getPrerequisites()
     {
-        return model.getPrerequisites();
+        return getModel().getPrerequisites();
     }
 
     public void setIssueManagement( IssueManagement issueManagement )
     {
-        model.setIssueManagement( issueManagement );
+        getModel().setIssueManagement( issueManagement );
     }
 
     public CiManagement getCiManagement()
     {
-        return model.getCiManagement();
+        return getModel().getCiManagement();
     }
 
     public void setCiManagement( CiManagement ciManagement )
     {
-        model.setCiManagement( ciManagement );
+        getModel().setCiManagement( ciManagement );
     }
 
     public IssueManagement getIssueManagement()
     {
-        return model.getIssueManagement();
+        return getModel().getIssueManagement();
     }
 
     public void setDistributionManagement( DistributionManagement distributionManagement )
     {
-        model.setDistributionManagement( distributionManagement );
+        getModel().setDistributionManagement( distributionManagement );
     }
 
     public DistributionManagement getDistributionManagement()
     {
-        return model.getDistributionManagement();
+        return getModel().getDistributionManagement();
     }
 
     public void setDescription( String description )
     {
-        model.setDescription( description );
+        getModel().setDescription( description );
     }
 
     public String getDescription()
     {
-        return model.getDescription();
+        return getModel().getDescription();
     }
 
     public void setOrganization( Organization organization )
     {
-        model.setOrganization( organization );
+        getModel().setOrganization( organization );
     }
 
     public Organization getOrganization()
     {
-        return model.getOrganization();
+        return getModel().getOrganization();
     }
 
     public void setScm( Scm scm )
     {
-        model.setScm( scm );
+        getModel().setScm( scm );
     }
 
     public Scm getScm()
     {
-        return model.getScm();
+        return getModel().getScm();
     }
 
     public void setMailingLists( List mailingLists )
     {
-        model.setMailingLists( mailingLists );
+        getModel().setMailingLists( mailingLists );
     }
 
     public List getMailingLists()
     {
-        return model.getMailingLists();
+        return getModel().getMailingLists();
     }
 
     public void addMailingList( MailingList mailingList )
     {
-        model.addMailingList( mailingList );
+        getModel().addMailingList( mailingList );
     }
 
     public void setDevelopers( List developers )
     {
-        model.setDevelopers( developers );
+        getModel().setDevelopers( developers );
     }
 
     public List getDevelopers()
     {
-        return model.getDevelopers();
+        return getModel().getDevelopers();
     }
 
     public void addDeveloper( Developer developer )
     {
-        model.addDeveloper( developer );
+        getModel().addDeveloper( developer );
     }
 
     public void setContributors( List contributors )
     {
-        model.setContributors( contributors );
+        getModel().setContributors( contributors );
     }
 
     public List getContributors()
     {
-        return model.getContributors();
+        return getModel().getContributors();
     }
 
     public void addContributor( Contributor contributor )
     {
-        model.addContributor( contributor );
+        getModel().addContributor( contributor );
     }
 
     public void setBuild( Build build )
     {
         this.buildOverlay = new BuildOverlay( build );
 
-        model.setBuild( build );
+        getModel().setBuild( build );
     }
 
     public Build getBuild()
@@ -1075,27 +1079,27 @@ public class MavenProject
 
     public void setReporting( Reporting reporting )
     {
-        model.setReporting( reporting );
+        getModel().setReporting( reporting );
     }
 
     public Reporting getReporting()
     {
-        return model.getReporting();
+        return getModel().getReporting();
     }
 
     public void setLicenses( List licenses )
     {
-        model.setLicenses( licenses );
+        getModel().setLicenses( licenses );
     }
 
     public List getLicenses()
     {
-        return model.getLicenses();
+        return getModel().getLicenses();
     }
 
     public void addLicense( License license )
     {
-        model.addLicense( license );
+        getModel().addLicense( license );
     }
 
     public void setArtifacts( Set artifacts )
@@ -1206,7 +1210,7 @@ public class MavenProject
 
     public List getRepositories()
     {
-        return model.getRepositories();
+        return getModel().getRepositories();
     }
 
     // ----------------------------------------------------------------------
@@ -1215,33 +1219,33 @@ public class MavenProject
 
     public List getReportPlugins()
     {
-        if ( model.getReporting() == null )
+        if ( getModel().getReporting() == null )
         {
             return null;
         }
-        return model.getReporting().getPlugins();
+        return getModel().getReporting().getPlugins();
 
     }
 
     public List getBuildPlugins()
     {
-        if ( model.getBuild() == null )
+        if ( getModel().getBuild() == null )
         {
             return null;
         }
-        return model.getBuild().getPlugins();
+        return getModel().getBuild().getPlugins();
     }
 
     public List getModules()
     {
-        return model.getModules();
+        return getModel().getModules();
     }
 
     public PluginManagement getPluginManagement()
     {
         PluginManagement pluginMgmt = null;
 
-        Build build = model.getBuild();
+        Build build = getModel().getBuild();
         if ( build != null )
         {
             pluginMgmt = build.getPluginManagement();
@@ -1252,13 +1256,13 @@ public class MavenProject
     
     private Build getModelBuild()
     {
-        Build build = model.getBuild();
+        Build build = getModel().getBuild();
 
         if ( build == null )
         {
             build = new Build();
 
-            model.setBuild( build );
+            getModel().setBuild( build );
         }
         
         return build;
@@ -1322,13 +1326,13 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() && snapshotArtifactRepository != null ? snapshotArtifactRepository
-            : releaseArtifactRepository;
+        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null ) ? getSnapshotArtifactRepository()
+            : getReleaseArtifactRepository();
     }
 
     public List getPluginRepositories()
     {
-        return model.getPluginRepositories();
+        return getModel().getPluginRepositories();
     }
 
     public void setActiveProfiles( List activeProfiles )
@@ -1624,6 +1628,42 @@ public class MavenProject
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
     }
 
+
+    protected void setModel( Model model )
+    {
+        this.model = model;
+    }
+
+    protected void setAttachedArtifacts( List attachedArtifacts )
+    {
+        this.attachedArtifacts = attachedArtifacts;
+    }
+
+    protected void setCompileSourceRoots( List compileSourceRoots )
+    {
+        this.compileSourceRoots = compileSourceRoots;
+    }
+
+    protected void setTestCompileSourceRoots( List testCompileSourceRoots )
+    {
+        this.testCompileSourceRoots = testCompileSourceRoots;
+    }
+
+    protected void setScriptSourceRoots( List scriptSourceRoots )
+    {
+        this.scriptSourceRoots = scriptSourceRoots;
+    }
+
+    protected ArtifactRepository getReleaseArtifactRepository()
+    {
+        return releaseArtifactRepository;
+    }
+
+    protected ArtifactRepository getSnapshotArtifactRepository()
+    {
+        return snapshotArtifactRepository;
+    }
+
     public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
     {
         if ( getProjectReferences() != null && !getProjectReferences().isEmpty() )
@@ -1743,6 +1783,14 @@ public class MavenProject
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @since 2.0.9
+     */
+    public Object clone()
+    {
+        return new MavenProject( this );
     }
 
 }
