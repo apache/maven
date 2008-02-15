@@ -29,7 +29,15 @@ public class StartForkedExecutionMojo
 
         if ( project != null )
         {
-            session.addForkedProject( (MavenProject) project.clone() );
+            try
+            {
+                session.addForkedProject( (MavenProject) project.clone() );
+            }
+            catch ( CloneNotSupportedException e )
+            {
+                throw new IllegalStateException( "MavenProject instance of class " + project.getClass().getName() +
+                    " does not support clone " );
+            }
         }
     }
 
