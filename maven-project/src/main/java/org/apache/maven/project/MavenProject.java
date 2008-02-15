@@ -80,6 +80,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * </ol>
  */
 public class MavenProject
+    implements Cloneable
 {
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
     
@@ -167,10 +168,14 @@ public class MavenProject
     }
 
     /**
-     * @deprecated use {@link #clone()}
+     * @deprecated use {@link #clone()} so subclasses can provide a copy of the same class
      */
     public MavenProject( MavenProject project )
     {
+        deepCopy( project );
+    }
+
+    private final void deepCopy(MavenProject project){
         // disown the parent
 
         // copy fields
@@ -1786,11 +1791,15 @@ public class MavenProject
     }
 
     /**
+     * @throws CloneNotSupportedException
      * @since 2.0.9
      */
     public Object clone()
+        throws CloneNotSupportedException
     {
-        return new MavenProject( this );
+        MavenProject clone = (MavenProject) super.clone();
+        clone.deepCopy( this );
+        return clone;
     }
 
 }
