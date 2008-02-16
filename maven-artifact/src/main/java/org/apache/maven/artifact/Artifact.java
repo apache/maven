@@ -123,8 +123,14 @@ public interface Artifact
 
     ArtifactHandler getArtifactHandler();
 
+    /**
+     * @return {@link List} &lt; {@link String} > with artifact ids
+     */
     List getDependencyTrail();
 
+    /**
+     * @param dependencyTrail {@link List} &lt; {@link String} > with artifact ids
+     */
     void setDependencyTrail( List dependencyTrail );
 
     void setScope( String scope );
