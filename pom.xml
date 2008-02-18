@@ -84,7 +84,7 @@ under the License.
       <name>Maven Commits List</name>
       <subscribe>commits-subscribe@maven.apache.org</subscribe>
       <unsubscribe>commits-unsubscribe@maven.apache.org</unsubscribe>
-      <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
+      <archive>http://mail-archives.apache.org/mod_mbox/maven-commits</archive>
       <otherArchives>
         <otherArchive>http://www.mail-archive.com/commits@maven.apache.org</otherArchive>
         <otherArchive>http://www.nabble.com/Maven---Commits-f15575.html</otherArchive>
