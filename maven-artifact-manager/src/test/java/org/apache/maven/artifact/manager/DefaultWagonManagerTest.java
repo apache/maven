@@ -43,6 +43,15 @@ public class DefaultWagonManagerTest
         wagonManager = (WagonManager) lookup( WagonManager.ROLE );
     }
 
+	public void testMappedMirror()
+		throws Exception
+	{
+		DefaultWagonManager manager = (DefaultWagonManager) wagonManager;
+		manager.addMirror( "wildcar", "*", "http://archiva/repository/{0}" );
+		assertEquals( "http://archiva/repository/central", manager.getMirror( "central" ).getUrl() );
+		assertEquals( "http://archiva/repository/apache.snapshots", manager.getMirror( "apache.snapshots" ).getUrl() );
+	}
+	
     public void testDefaultWagonManager()
         throws Exception
     {

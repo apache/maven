@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.text.MessageFormat;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -710,6 +711,16 @@ public class DefaultWagonManager
         if ( repository == null )
         {
             repository = (ArtifactRepository) mirrors.get( WILDCARD );
+	        if ( repository != null )
+	        {
+				String url = repository.getUrl();
+				if ( url.indexOf( "{0}" ) >= 0 )
+				{
+				    url = MessageFormat.format( repository.getUrl(), new Object[] { mirrorOf } );
+				    repository = new DefaultArtifactRepository( mirrorOf, url, null );
+					mirrors.put( mirrorOf, repository );
+				}
+			}
         }
         return repository;
     }
