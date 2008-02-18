@@ -10,7 +10,7 @@ or
 export PATH=$PATH:$M2_HOME/bin
 
 In addition, the last part of the M2_HOME path MUST be of the form maven-$version, eg:
-/usr/local/maven-2.1-SNAPSHOT
+/usr/local/apache-maven-2.0.9-SNAPSHOT
 
 You can set the parameters passed to the Java VM when running Maven2 bootstrap,
 setting the environment variable MAVEN_OPTS, e.g.
