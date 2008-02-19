@@ -55,7 +55,7 @@ public class RegexBasedModelInterpolator
     public RegexBasedModelInterpolator()
         throws IOException
     {
-        envars = CommandLineUtils.getSystemEnvVars();                                                                                                        
+        envars = CommandLineUtils.getSystemEnvVars();
     }
 
     public Model interpolate( Model model, Map context )
@@ -153,7 +153,7 @@ public class RegexBasedModelInterpolator
 
             // Check for special expressions that should NOT be interpolated.
             // See DefaultProjectBuilder and MNG-2124/MNG-1927.
-            if ( context.get( realExpr ) == null && context.containsKey( realExpr ) )
+            if ( ( context.get( realExpr ) == null ) && context.containsKey( realExpr ) )
             {
                 continue;
             }
@@ -189,16 +189,16 @@ public class RegexBasedModelInterpolator
                 value = envars.getProperty( realExpr );
             }
 
-            // Any expression, not just artifactId, version etc., but also scm.repository 
+            // Any expression, not just artifactId, version etc., but also scm.repository
             // were evaluated against the model, even if there is no prefix.
             // If the 2.1 strategy fails, try the legacy approach. If it yields a result, warn for it.
-            if ( value == null && prefix.length() == 0 )
+            if ( ( value == null ) && ( prefix.length() == 0 ) )
             {
                 value = getValueFromModel( realExpr, model, wholeExpr, logger );
 
-                if ( isSnapshotModel && value != null && logger != null )
+                if ( isSnapshotModel && ( value != null ) && ( logger != null ) )
                 {
-                    logger.warn( "Deprecated expression: " + wholeExpr + " - missing prefix. Use ${pom."
+                    logger.debug( "Expression: " + wholeExpr + " is missing its prefix. Instead, use ${pom."
                         + realExpr + "} (model: " + model.getId() + ")" );
                 }
             }
@@ -222,7 +222,7 @@ public class RegexBasedModelInterpolator
                 matcher.reset( result );
             }
 
-            
+
 /*
         // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
         // timing of executing the interpolation
