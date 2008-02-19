@@ -164,6 +164,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
 		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
 		suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
+        //suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
