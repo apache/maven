@@ -44,4 +44,11 @@ under the License.
       </properties>
     </profile>
   </profiles>
+  
+  <distributionManagement>
+    <repository>
+      <id>test-deploy-location</id>
+      <url>file:${java.io.tmpdir}/test-deploy-repository</url>
+    </repository>
+  </distributionManagement>
 </project>

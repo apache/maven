@@ -523,6 +523,10 @@ public class DefaultMavenExecutionRequestPopulator
         {
             wagonManager.setOnline( false );
         }
+        else if ( ( request.getSettings() != null ) && request.getSettings().isOffline() )
+        {
+            wagonManager.setOnline( false );
+        }
         else
         {
             wagonManager.findAndRegisterWagons( container );
