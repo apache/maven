@@ -198,6 +198,7 @@ public class RegexBasedModelInterpolator
 
                 if ( isSnapshotModel && ( value != null ) && ( logger != null ) )
                 {
+                    // TODO: Bring this back into the open once we're ready to deal with it.
                     logger.debug( "Expression: " + wholeExpr + " is missing its prefix. Instead, use ${pom."
                         + realExpr + "} (model: " + model.getId() + ")" );
                 }
