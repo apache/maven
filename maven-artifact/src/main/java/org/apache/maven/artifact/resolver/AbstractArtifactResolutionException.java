@@ -45,6 +45,8 @@ public class AbstractArtifactResolutionException
 
     private String classifier;
 
+    private Artifact artifact; 
+
     private List remoteRepositories;
 
     private final String originalMessage;
@@ -56,16 +58,7 @@ public class AbstractArtifactResolutionException
     protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
                                                    String type, String classifier, List remoteRepositories, List path )
     {
-        super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ) );
-
-        this.originalMessage = message;
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.type = type;
-        this.classifier = classifier;
-        this.version = version;
-        this.remoteRepositories = remoteRepositories;
-        this.path = constructArtifactPath( path, "" );
+        this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
     }
 
     protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
@@ -90,8 +83,7 @@ public class AbstractArtifactResolutionException
 
     protected AbstractArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
     {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              artifact.getClassifier(),remoteRepositories, artifact.getDependencyTrail() );
+        this( message, artifact, remoteRepositories, null );
     }
 
     protected AbstractArtifactResolutionException( String message, Artifact artifact, List remoteRepositories,
@@ -99,6 +91,12 @@ public class AbstractArtifactResolutionException
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
               artifact.getClassifier(),remoteRepositories, artifact.getDependencyTrail(), t );
+        this.artifact = artifact;
+    }
+
+    public Artifact getArtifact()
+    {
+        return artifact;
     }
 
     public String getGroupId()
