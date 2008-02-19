@@ -24,6 +24,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -76,12 +77,13 @@ public class EmbedderOfflineTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setSettings( settings )
             .setShowErrors( true )
+            .setLoggingLevel( Logger.LEVEL_DEBUG )
             .setBaseDirectory( targetDirectory )
             .setGoals( Collections.singletonList( "deploy" ) );
 
         MavenExecutionResult result = maven.execute( request );
 
-        assertTrue( result.hasExceptions() );
+        assertTrue( "Deployment should have failed.", result.hasExceptions() );
 
         List exceptions = result.getExceptions();
         assertEquals( 1, exceptions.size() );
@@ -90,8 +92,10 @@ public class EmbedderOfflineTest
 
         LifecycleExecutionException top = (LifecycleExecutionException) exceptions.get( 0 );
 
+        top.printStackTrace();
+
         assertNotNull( top.getCause().getCause() );
-        assertTrue( top.getCause().getCause().getMessage().indexOf( "System is offline" ) > -1 );
+        assertTrue( "Deployment should fail due to offline status.", top.getCause().getCause().getMessage().indexOf( "System is offline" ) > -1 );
 
     }
 }
