@@ -134,7 +134,8 @@ public class DefaultBuildExtensionScannerTest
         new DefaultBuildExtensionScanner( extensionManager, projectBuilder, modelLineageBuilder,
                                           modelInterpolator, new ConsoleLogger( Logger.LEVEL_DEBUG,
                                                                                 "test" ) ).scanForBuildExtensions( pomFile,
-                                                                                                                   request );
+                                                                                                                   request,
+                                                                                                                   false );
 
         mockManager.verifyAll();
     }
@@ -213,7 +214,8 @@ public class DefaultBuildExtensionScannerTest
         new DefaultBuildExtensionScanner( extensionManager, projectBuilder, modelLineageBuilder,
                                           modelInterpolator, new ConsoleLogger( Logger.LEVEL_DEBUG,
                                                                                 "test" ) ).scanForBuildExtensions( pomFile,
-                                                                                                                   request );
+                                                                                                                   request,
+                                                                                                                   false );
 
         mockManager.verifyAll();
     }
@@ -324,7 +326,8 @@ public class DefaultBuildExtensionScannerTest
         new DefaultBuildExtensionScanner( extensionManager, projectBuilder, modelLineageBuilder,
                                           modelInterpolator, new ConsoleLogger( Logger.LEVEL_DEBUG,
                                                                                 "test" ) ).scanForBuildExtensions( pomFile,
-                                                                                                                   request );
+                                                                                                                   request,
+                                                                                                                   false );
 
         mockManager.verifyAll();
     }

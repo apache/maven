@@ -363,7 +363,7 @@ public class MavenEmbedder
     {
         getLogger().debug( "Scanning for extensions: " + mavenProject );
 
-        extensionScanner.scanForBuildExtensions( mavenProject, request );
+        extensionScanner.scanForBuildExtensions( mavenProject, request, true );
 
         getLogger().debug( "Building MavenProject instance: " + mavenProject );
 

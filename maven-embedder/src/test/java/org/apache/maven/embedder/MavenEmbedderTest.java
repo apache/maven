@@ -338,6 +338,15 @@ public class MavenEmbedderTest
         assertEquals( "scm:svn:https://host/trunk/parent/modules/child1", project.getScm().getDeveloperConnection() );
     }
 
+    public void testProjectReading_SkipMissingModuleSilently()
+        throws Exception
+    {
+        File pomFile = new File( basedir,
+                                 "src/test/projects/readProject-missingModuleIgnored/pom.xml" );
+
+        maven.readProject( pomFile );
+    }
+
     /*
     public void testProjectReadingWithDistributionStatus()
         throws Exception

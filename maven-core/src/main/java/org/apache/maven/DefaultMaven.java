@@ -266,7 +266,7 @@ public class DefaultMaven
         // instances just-in-time.
         try
         {
-            buildExtensionScanner.scanForBuildExtensions( files, request );
+            buildExtensionScanner.scanForBuildExtensions( files, request, false );
         }
         catch ( ExtensionScanningException e )
         {

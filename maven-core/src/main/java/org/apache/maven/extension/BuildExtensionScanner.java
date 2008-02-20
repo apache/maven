@@ -31,11 +31,13 @@ public interface BuildExtensionScanner
     String ROLE = BuildExtensionScanner.class.getName();
 
     void scanForBuildExtensions( List files,
-                                 MavenExecutionRequest request )
+                                 MavenExecutionRequest request,
+                                 boolean ignoreMissingModules  )
         throws ExtensionScanningException, MissingModuleException;
 
     void scanForBuildExtensions( File pom,
-                                 MavenExecutionRequest request )
+                                 MavenExecutionRequest request,
+                                 boolean ignoreMissingModules )
         throws ExtensionScanningException, MissingModuleException;
 
 }

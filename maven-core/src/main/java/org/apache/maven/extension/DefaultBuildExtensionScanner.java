@@ -89,38 +89,41 @@ public class DefaultBuildExtensionScanner
     }
 
     public void scanForBuildExtensions( List files,
-                                        MavenExecutionRequest request )
+                                        MavenExecutionRequest request,
+                                        boolean ignoreMissingModules )
         throws ExtensionScanningException, MissingModuleException
     {
         List visited = new ArrayList();
-        
+
         List internalFiles = new ArrayList();
-        
+
         internalFiles.addAll(files);
 
         for ( Iterator it = files.iterator(); it.hasNext(); )
         {
             File pom = (File) it.next();
 
-            scanInternal( pom, request, visited, internalFiles );
+            scanInternal( pom, request, visited, internalFiles, ignoreMissingModules );
         }
     }
 
     public void scanForBuildExtensions( File pom,
-                                        MavenExecutionRequest request )
+                                        MavenExecutionRequest request,
+                                        boolean ignoreMissingModules )
         throws ExtensionScanningException, MissingModuleException
     {
         List internalFiles = new ArrayList();
-        
+
         internalFiles.add( pom );
-        
-        scanInternal( pom, request, new ArrayList(), internalFiles );
+
+        scanInternal( pom, request, new ArrayList(), internalFiles, ignoreMissingModules );
     }
 
     private void scanInternal( File pom,
                                MavenExecutionRequest request,
                                List visitedModelIds,
-                               List reactorFiles )
+                               List reactorFiles,
+                               boolean ignoreMissingModules )
         throws ExtensionScanningException, MissingModuleException
     {
 
@@ -195,7 +198,8 @@ public class DefaultBuildExtensionScanner
                                                request,
                                                originalRemoteRepositories,
                                                visitedModelIds,
-                                               reactorFiles );
+                                               reactorFiles,
+                                               ignoreMissingModules );
                 }
             }
         }
@@ -251,7 +255,8 @@ public class DefaultBuildExtensionScanner
                                             MavenExecutionRequest request,
                                             List originalRemoteRepositories,
                                             List visitedModelIds,
-                                            List reactorFiles )
+                                            List reactorFiles,
+                                            boolean ignoreMissingModules )
         throws ExtensionScanningException, MissingModuleException
     {
         // FIXME: This gets a little sticky, because modules can be added by profiles that require
@@ -310,12 +315,19 @@ public class DefaultBuildExtensionScanner
 
                 if ( !modulePomDirectory.exists() )
                 {
-                    throw new MissingModuleException( moduleSubpath, modulePomDirectory, containingPom );
+                    if ( ignoreMissingModules )
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw new MissingModuleException( moduleSubpath, modulePomDirectory, containingPom );
+                    }
                 }
-                
+
                 reactorFiles.add( modulePomDirectory );
-                
-                scanInternal( modulePomDirectory, request, visitedModelIds, reactorFiles );
+
+                scanInternal( modulePomDirectory, request, visitedModelIds, reactorFiles, ignoreMissingModules );
             }
         }
     }
