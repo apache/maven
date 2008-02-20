@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>scm.inherit</groupId>
+  <artifactId>parent</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  
+  <scm>
+    <connection>scm:svn:http://host/trunk/parent</connection>
+    <developerConnection>scm:svn:https://host/trunk/parent</developerConnection>
+    <url>http://host/viewer?path=/trunk/parent</url>
+  </scm>
+  
+  <modules>
+    <module>modules/child1</module>
+  </modules>
+
+</project>

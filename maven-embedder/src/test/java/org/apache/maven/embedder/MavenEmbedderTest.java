@@ -19,8 +19,6 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -32,6 +30,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.util.FileUtils;
@@ -48,6 +47,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 public class MavenEmbedderTest
     extends TestCase
@@ -206,7 +207,7 @@ public class MavenEmbedderTest
 
     /**
      * Test that two executions of the embedder don't share data that has changed, see MNG-3013
-     * 
+     *
      * @throws Exception
      */
     public void testTwoExecutionsDoNotCacheChangedData()
@@ -323,6 +324,18 @@ public class MavenEmbedderTest
         assertEquals( 1, artifacts.size() );
 
         artifacts.iterator().next();
+    }
+
+    public void testProjectReading_FromChildLevel_ScmInheritanceCalculations()
+        throws Exception
+    {
+        File pomFile = new File( basedir, "src/test/projects/readProject-withScmInheritance/modules/child1/pom.xml" );
+
+        MavenProject project = maven.readProject( pomFile );
+
+        assertEquals( "http://host/viewer?path=/trunk/parent/modules/child1", project.getScm().getUrl() );
+        assertEquals( "scm:svn:http://host/trunk/parent/modules/child1", project.getScm().getConnection() );
+        assertEquals( "scm:svn:https://host/trunk/parent/modules/child1", project.getScm().getDeveloperConnection() );
     }
 
     /*
