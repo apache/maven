@@ -95,6 +95,33 @@ public class ProjectInheritanceTest
 
         assertEquals( project1.getScm().getUrl(), "http://host/viewer?path=/p0/modules/p1" );
         assertEquals( project1.getScm().getConnection(), "scm:svn:http://host/p0/modules/p1" );
-        assertEquals( project1.getScm().getDeveloperConnection(), "scm:svn:https://host/p0/modules/p1" );
+        assertEquals( project1.getScm().getDeveloperConnection(),
+                      "scm:svn:https://host/p0/modules/p1" );
     }
+
+//    public void testScmInfoCalculatedCorrectlyOnChildReadFromLocalRepository()
+//        throws Exception
+//    {
+//        File localRepo = getLocalRepositoryPath();
+//
+//        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.class );
+//        Artifact artifact = factory.createProjectArtifact( "maven", "p1", "1.0" );
+//
+//        ArtifactRepositoryFactory repoFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.class );
+//        ArtifactRepository localArtifactRepo = repoFactory.createLocalRepository( localRepo );
+//
+//        MavenProject project1 = getProjectBuilder().buildFromRepository( artifact, Collections.EMPTY_LIST, localArtifactRepo );
+//
+//        System.out.println( "\n\n" );
+//        System.out.println( "Child SCM URL is: " + project1.getScm().getUrl() );
+//        System.out.println( "Child SCM connection is: " + project1.getScm().getConnection() );
+//        System.out.println( "Child SCM developer connection is: "
+//                            + project1.getScm().getDeveloperConnection() );
+//
+//        assertEquals( project1.getScm().getUrl(), "http://host/viewer?path=/p0/modules/p1" );
+//        assertEquals( project1.getScm().getConnection(), "scm:svn:http://host/p0/modules/p1" );
+//        assertEquals( project1.getScm().getDeveloperConnection(),
+//                      "scm:svn:https://host/p0/modules/p1" );
+//    }
+
 }

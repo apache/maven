@@ -59,6 +59,11 @@ public abstract class AbstractMavenProjectTestCase
         }
     }
 
+    protected MavenProjectBuilder getProjectBuilder()
+    {
+        return projectBuilder;
+    }
+
     // ----------------------------------------------------------------------
     // Local repository
     // ----------------------------------------------------------------------
