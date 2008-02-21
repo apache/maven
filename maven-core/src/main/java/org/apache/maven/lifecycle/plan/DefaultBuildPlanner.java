@@ -208,6 +208,7 @@ public class DefaultBuildPlanner
     {
         if ( plan.isIncludingReports() )
         {
+            logger.debug( "Report modifiers are already present in the build plan." );
             return;
         }
 
@@ -220,6 +221,7 @@ public class DefaultBuildPlanner
 
             if ( plan.isFullyResolved( mojoBinding ) )
             {
+                logger.debug( "Skipping report-discovery for mojo: " + MojoBindingUtils.toString( mojoBinding ) + "; it is already fully resolved in the build plan." );
                 continue;
             }
 
@@ -230,6 +232,7 @@ public class DefaultBuildPlanner
 
             if ( pluginDescriptor == null )
             {
+                logger.debug( "Plugin descriptor not found for mojo: " + MojoBindingUtils.toString( mojoBinding ) + "; skipping for report-discovery." );
                 continue;
             }
 
@@ -243,6 +246,7 @@ public class DefaultBuildPlanner
 
             if ( mojoDescriptor.isRequiresReports() )
             {
+                logger.debug( "Mojo: " + MojoBindingUtils.toString( mojoBinding ) + " requires reports; running report-discovery." );
                 List reportBindings = lifecycleBindingManager.getReportBindings( project, session );
 
                 if ( reportBindings != null )

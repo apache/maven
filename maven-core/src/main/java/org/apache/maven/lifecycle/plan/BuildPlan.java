@@ -8,7 +8,6 @@ import org.apache.maven.lifecycle.NoSuchPhaseException;
 import org.apache.maven.lifecycle.model.LifecycleBinding;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.lifecycle.model.Phase;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 
 import java.util.ArrayList;
@@ -87,27 +86,11 @@ public class BuildPlan
     }
 
     public void markFullyResolved()
+        throws NoSuchPhaseException
     {
-        for ( Iterator bindingIterator = bindings.getBindingList().iterator(); bindingIterator.hasNext(); )
-        {
-            LifecycleBinding binding = (LifecycleBinding) bindingIterator.next();
+        List bindings = renderExecutionPlan( new Stack() );
 
-            for ( Iterator phaseIterator = binding.getPhasesInOrder().iterator(); phaseIterator.hasNext(); )
-            {
-                Phase phase = (Phase) phaseIterator.next();
-
-                for ( Iterator mojoBindingIterator = phase.getBindings().iterator(); mojoBindingIterator.hasNext(); )
-                {
-                    MojoBinding mojoBinding = (MojoBinding) mojoBindingIterator.next();
-
-                    String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
-
-                    fullyResolvedBindings.add( key );
-                }
-            }
-        }
-
-        for ( Iterator it = directInvocationBindings.values().iterator(); it.hasNext(); )
+        for ( Iterator it = bindings.iterator(); it.hasNext(); )
         {
             MojoBinding mojoBinding = (MojoBinding) it.next();
 
