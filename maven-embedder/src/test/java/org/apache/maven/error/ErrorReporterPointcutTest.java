@@ -196,7 +196,7 @@ public class ErrorReporterPointcutTest
 
         if ( result.hasExceptions() )
         {
-            reportExceptions( result, basedir );
+            reportExceptions( result, basedir, true );
         }
     }
 
