@@ -846,7 +846,7 @@ public class DefaultMavenProjectBuilder
         // merge any duplicated plugin definitions together, using the first appearance as the dominant one.
         ModelUtils.mergeDuplicatePluginDefinitions( project.getModel().getBuild() );
 
-        mergeManagedDependencies(project.getModel(), localRepository, parentSearchRepositories);
+        mergeManagedDependencies(project.getModel(), localRepository, repositories);
 
         try
         {
