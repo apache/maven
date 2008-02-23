@@ -4,6 +4,16 @@
   <artifactId>maven-it-MNG1412-DependenciesOrder</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <description>Check that dependencies are available in classpath in same order as declared in POM</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.3.1</version><!-- to avoid problem with SUREFIRE-460 -->
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>commons-net</groupId>
