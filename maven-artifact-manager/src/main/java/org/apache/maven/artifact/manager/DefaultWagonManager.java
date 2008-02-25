@@ -51,6 +51,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -714,9 +715,10 @@ public class DefaultWagonManager
 	        if ( repository != null )
 	        {
 				String url = repository.getUrl();
-				if ( url.indexOf( "{0}" ) >= 0 )
+				if ( url.indexOf( "${mirrorOf}" ) >= 0 )
 				{
-				    url = MessageFormat.format( repository.getUrl(), new Object[] { mirrorOf } );
+				    url = StringUtils.replace( url, "${mirrorOf}", "{0}" );
+				    url = MessageFormat.format( url, new Object[] { mirrorOf } );
 				    repository = new DefaultArtifactRepository( mirrorOf, url, null );
 					mirrors.put( mirrorOf, repository );
 				}

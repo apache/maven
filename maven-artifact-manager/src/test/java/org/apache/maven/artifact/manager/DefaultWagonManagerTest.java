@@ -47,7 +47,7 @@ public class DefaultWagonManagerTest
 		throws Exception
 	{
 		DefaultWagonManager manager = (DefaultWagonManager) wagonManager;
-		manager.addMirror( "wildcar", "*", "http://archiva/repository/{0}" );
+		manager.addMirror( "wildcar", "*", "http://archiva/repository/${mirrorOf}" );
 		assertEquals( "http://archiva/repository/central", manager.getMirror( "central" ).getUrl() );
 		assertEquals( "http://archiva/repository/apache.snapshots", manager.getMirror( "apache.snapshots" ).getUrl() );
 	}
