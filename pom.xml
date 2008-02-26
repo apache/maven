@@ -232,6 +232,7 @@ under the License.
 
   <properties>
     <mavenVersion>2.0.9-SNAPSHOT</mavenVersion>
+    <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
 
   <dependencyManagement>
@@ -326,27 +327,32 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-file</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
