@@ -65,6 +65,7 @@ public class MavenArtifactFilterManager
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
+        artifacts.add( "wagon-webdav" );
         artifacts.add( "wagon-ssh" );
         artifacts.add( "wagon-ssh-external" );
 
