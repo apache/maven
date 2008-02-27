@@ -56,11 +56,11 @@ public class MavenITmng3331ModulePathNormalization
     public void testMNG3331ModuleWithRelativeParentDirRef ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-relative-parentDir-ref/parent" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-relative-parentDir-ref" );
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
 
         verifier.executeGoal( "initialize" );
 
