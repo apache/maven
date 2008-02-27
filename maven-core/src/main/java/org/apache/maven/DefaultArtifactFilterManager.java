@@ -58,6 +58,12 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "maven-reporting-api" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
+        artifacts.add( "wagon-webdav" );
+        artifacts.add( "commons-httpclient" );
+        artifacts.add( "slide-webdavlib" );
+        artifacts.add( "xml-im-exporter" );
+        artifacts.add( "slf4j-api" );
+        artifacts.add( "slf4j-simple" );
         //adding shared/maven-toolchain project here, even though not part of the default
         //distro yet.
         artifacts.add( "maven-toolchain" );
