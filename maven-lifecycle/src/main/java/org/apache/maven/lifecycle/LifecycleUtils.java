@@ -12,14 +12,43 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class LifecycleUtils
 {
 
     private LifecycleUtils()
     {
+    }
+
+    public static void setupTrackingInfo( final LifecycleBindings bindings )
+    {
+        for ( Iterator bindingIt = bindings.getBindingList().iterator(); bindingIt.hasNext(); )
+        {
+            LifecycleBinding binding = (LifecycleBinding) bindingIt.next();
+
+            if ( binding == null )
+            {
+                continue;
+            }
+
+            LinkedHashMap phaseMap = binding.getOrderedPhaseMapping();
+            for ( Iterator phaseIt = phaseMap.entrySet().iterator(); phaseIt.hasNext(); )
+            {
+                Map.Entry entry = (Entry) phaseIt.next();
+                Phase phase = (Phase) entry.getValue();
+
+                String phaseName = (String) entry.getKey();
+
+                if ( phase != null )
+                {
+                    phase.setLifecycleInfo( phaseName, binding );
+                }
+            }
+        }
     }
 
     public static void setOrigin( final LifecycleBindings bindings, final String origin )

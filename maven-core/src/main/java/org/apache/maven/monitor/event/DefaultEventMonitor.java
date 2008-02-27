@@ -28,20 +28,66 @@ public class DefaultEventMonitor
     extends AbstractSelectiveEventMonitor
 {
 
-    private static final String[] START_EVENTS = {MavenEvents.MOJO_EXECUTION};
+    private static final String[] START_EVENTS = {
+        MavenEvents.PROJECT_EXECUTION,
+        MavenEvents.PHASE_EXECUTION,
+        MavenEvents.MOJO_EXECUTION
+    };
+
+    private static final String[] END_EVENTS = {
+        MavenEvents.PHASE_EXECUTION
+    };
 
     private final Logger logger;
 
     public DefaultEventMonitor( Logger logger )
     {
-        super( START_EVENTS, MavenEvents.NO_EVENTS, MavenEvents.NO_EVENTS );
+        super( START_EVENTS, END_EVENTS, MavenEvents.NO_EVENTS );
 
         this.logger = logger;
     }
 
     protected void doStartEvent( String event, String target, long time )
     {
-        logger.info( "[" + target + "]" );
+        if ( MavenEvents.MOJO_EXECUTION.equals( event ) )
+        {
+            logger.info( "[" + target + "]" );
+        }
+        else if ( MavenEvents.PHASE_EXECUTION.equals( event ) )
+        {
+            logger.debug( line() );
+            logger.debug( "Entering lifecycle phase: " + target );
+            logger.debug( line() );
+        }
+        else if ( MavenEvents.PROJECT_EXECUTION.equals( event ) )
+        {
+            logger.info( line() );
+            String[] targetParts = target.split( "\n" );
+            logger.info( "Building " + targetParts[0] );
+            if ( targetParts.length > 0 )
+            {
+                logger.info( "" );
+                for ( int i = 1; i < targetParts.length; i++ )
+                {
+                    logger.info( targetParts[i] );
+                }
+            }
+            logger.info( line() );
+        }
+    }
+
+    protected void doEndEvent( String event,
+                               String target,
+                               long timestamp )
+    {
+        logger.debug( line() );
+        logger.debug( "Completed lifecycle phase: " + target );
+        logger.debug( line() );
+    }
+
+    private String line()
+    {
+        return "------------------------------------------------------------------------";
     }
 
 }

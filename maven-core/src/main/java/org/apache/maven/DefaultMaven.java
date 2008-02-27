@@ -33,7 +33,7 @@ import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.TaskValidationResult;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.ProfileManager;
@@ -168,9 +168,9 @@ public class DefaultMaven
             return result;
         }
 
-        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
+        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );
 
-        String event = MavenEvents.REACTOR_EXECUTION;
+        String event = MavenEvents.MAVEN_EXECUTION;
 
         dispatcher.dispatchStart(
             event,
@@ -197,7 +197,9 @@ public class DefaultMaven
 
                 if ( !tvr.isTaskValid() )
                 {
-                    result.addException( tvr.generateInvalidTaskException() );
+                    Exception e = tvr.generateInvalidTaskException();
+                    result.addException( e );
+                    dispatcher.dispatchError( event, request.getBaseDirectory(), e );
 
                     return result;
                 }
@@ -228,11 +230,15 @@ public class DefaultMaven
         catch ( LifecycleExecutionException e )
         {
             result.addException( e );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
             return result;
         }
         catch ( BuildFailureException e )
         {
             result.addException( e );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
             return result;
         }
 
@@ -241,6 +247,8 @@ public class DefaultMaven
         result.setProject( reactorManager.getTopLevelProject() );
 
         result.setBuildPlans( session.getBuildPlans() );
+
+        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
         return result;
     }

@@ -192,6 +192,8 @@ public class BuildPlan
     public List renderExecutionPlan( final Stack executionStack )
         throws NoSuchPhaseException
     {
+        LifecycleUtils.setupTrackingInfo( bindings );
+
         List plan = new ArrayList();
 
         for ( Iterator it = tasks.iterator(); it.hasNext(); )

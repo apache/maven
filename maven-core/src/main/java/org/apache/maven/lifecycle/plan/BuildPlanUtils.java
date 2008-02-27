@@ -127,7 +127,18 @@ public final class BuildPlanUtils
         StringBuffer listing = new StringBuffer();
 
         listing.append( MojoBindingUtils.toString( binding ) );
-        listing.append( " [executionId: " ).append( binding.getExecutionId() ).append( "]" );
+        listing.append( " [executionId: " ).append( binding.getExecutionId() ).append( ", phase: " );
+
+        if ( ( binding.getPhase() != null ) && ( binding.getPhase().getName() != null ) )
+        {
+            listing.append( binding.getPhase().getName() );
+        }
+        else
+        {
+            listing.append( "None specified" );
+        }
+
+        listing.append( "]" );
 
         if ( extendedInfo )
         {

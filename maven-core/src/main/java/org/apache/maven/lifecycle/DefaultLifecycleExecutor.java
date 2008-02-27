@@ -177,104 +177,7 @@ public class DefaultLifecycleExecutor
 
             if ( segment.aggregate() )
             {
-                if ( !reactorManager.isBlackListed( rootProject ) )
-                {
-                    line();
-
-                    getLogger().info( "Building " + rootProject.getName() );
-
-                    getLogger().info( "  " + segment );
-
-                    line();
-
-                    String target = rootProject.getId() + " ( " + segment + " )";
-
-                    getLogger().debug( "Constructing build plan for " + target );
-
-                    // !! This is ripe for refactoring to an aspect.
-                    // Event monitoring.
-                    String event = MavenEvents.PROJECT_EXECUTION;
-
-                    long buildStartTime = System.currentTimeMillis();
-
-                    dispatcher.dispatchStart(
-                        event,
-                        target );
-
-                    ClassRealm oldLookupRealm = setProjectLookupRealm( session, rootProject );
-
-                    try
-                    {
-                        session.setCurrentProject( rootProject );
-
-                        // NEW: Build up the execution plan, including configuration.
-                        List mojoBindings = getLifecycleBindings(
-                            segment.getTasks(),
-                            rootProject,
-                            session,
-                            target );
-
-                        // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
-                        // only call once, with the top-level project (assumed to be provided as a parameter)...
-                        for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
-                        {
-                            MojoBinding binding = (MojoBinding) mojoIterator.next();
-
-                            try
-                            {
-                                executeGoalAndHandleFailures(
-                                    binding,
-                                    session,
-                                    dispatcher,
-                                    event,
-                                    reactorManager,
-                                    buildStartTime,
-                                    target,
-                                    true );
-                            }
-                            catch ( MojoFailureException e )
-                            {
-                                AggregatedBuildFailureException error = new AggregatedBuildFailureException(
-                                                                                                             session.getExecutionRootDirectory(),
-                                                                                                             binding,
-                                                                                                             e );
-
-                                dispatcher.dispatchError( event, target, error );
-
-                                if ( handleExecutionFailure( reactorManager, rootProject, error, binding, buildStartTime ) )
-                                {
-                                    throw error;
-                                }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        session.setCurrentProject( null );
-                        restoreLookupRealm( oldLookupRealm );
-                    }
-
-
-                    reactorManager.registerBuildSuccess(
-                        rootProject,
-                        System.currentTimeMillis() - buildStartTime );
-
-                    dispatcher.dispatchEnd(
-                        event,
-                        target );
-                }
-                else
-                {
-                    line();
-
-                    getLogger().info( "SKIPPING " + rootProject.getName() );
-
-                    getLogger().info( "  " + segment );
-
-                    getLogger().info( "This project has been banned from further executions due to previous failures." );
-
-                    line();
-                }
+                executeTaskSegmentsForProject( segment, rootProject, reactorManager, dispatcher, session );
             }
             else
             {
@@ -285,100 +188,151 @@ public class DefaultLifecycleExecutor
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
 
-                    if ( !reactorManager.isBlackListed( currentProject ) )
-                    {
-                        line();
-
-                        getLogger().info( "Building " + currentProject.getName() );
-
-                        getLogger().info( "  " + segment );
-
-                        line();
-
-                        String target = currentProject.getId() + " ( " + segment + " )";
-
-                        // !! This is ripe for refactoring to an aspect.
-                        // Event monitoring.
-                        String event = MavenEvents.PROJECT_EXECUTION;
-
-                        long buildStartTime = System.currentTimeMillis();
-
-                        dispatcher.dispatchStart(
-                            event,
-                            target );
-
-                        ClassRealm oldLookupRealm = setProjectLookupRealm( session, currentProject );
-
-                        try
-                        {
-                            session.setCurrentProject( currentProject );
-
-                            List mojoBindings = getLifecycleBindings(
-                                segment.getTasks(),
-                                currentProject,
-                                session,
-                                target );
-
-                            for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
-                            {
-                                MojoBinding binding = (MojoBinding) mojoIterator.next();
-
-                                getLogger().debug(
-                                    "Mojo: " + binding.getGoal() + " has config:\n"
-                                        + binding.getConfiguration() );
-
-                                try
-                                {
-                                    executeGoalAndHandleFailures( binding, session, dispatcher,
-                                                                  event, reactorManager,
-                                                                  buildStartTime, target,
-                                                                  false);
-                                }
-                                catch ( MojoFailureException e )
-                                {
-                                    ProjectBuildFailureException error = new ProjectBuildFailureException(
-                                                                                                           currentProject.getId(),
-                                                                                                           binding,
-                                                                                                           e );
-
-                                    dispatcher.dispatchError( event, target, error );
-
-                                    if ( handleExecutionFailure( reactorManager, currentProject, error, binding, buildStartTime ) )
-                                    {
-                                        throw error;
-                                    }
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            session.setCurrentProject( null );
-                            restoreLookupRealm( oldLookupRealm );
-                        }
-
-                        reactorManager.registerBuildSuccess(
-                            currentProject,
-                            System.currentTimeMillis() - buildStartTime );
-
-                        dispatcher.dispatchEnd(
-                            event,
-                            target );
-                    }
-                    else
-                    {
-                        line();
-
-                        getLogger().info( "SKIPPING " + currentProject.getName() );
-
-                        getLogger().info( "  " + segment );
-
-                        getLogger().info(
-                            "This project has been banned from further executions due to previous failures." );
-
-                        line();
-                    }
+                    executeTaskSegmentsForProject( segment, currentProject, reactorManager, dispatcher, session );
                 }
             }
+        }
+    }
+
+    private void executeTaskSegmentsForProject( TaskSegment segment,
+                                    MavenProject project,
+                                    ReactorManager reactorManager,
+                                    EventDispatcher dispatcher,
+                                    MavenSession session )
+        throws LifecycleExecutionException, BuildFailureException
+    {
+        if ( !reactorManager.isBlackListed( project ) )
+        {
+//            line();
+//
+//            getLogger().info( "Building " + project.getName() );
+//
+//            getLogger().info( "  " + segment );
+//
+//            line();
+
+            String target = project.getName() + "\nId: " + project.getId() + "\n" + segment;
+
+            getLogger().debug( "Constructing build plan for " + target );
+
+            // !! This is ripe for refactoring to an aspect.
+            // Event monitoring.
+            String event = MavenEvents.PROJECT_EXECUTION;
+
+            long buildStartTime = System.currentTimeMillis();
+
+            dispatcher.dispatchStart(
+                event,
+                target );
+
+            ClassRealm oldLookupRealm = setProjectLookupRealm( session, project );
+
+            try
+            {
+                session.setCurrentProject( project );
+
+                // NEW: Build up the execution plan, including configuration.
+                List mojoBindings = getLifecycleBindings(
+                    segment.getTasks(),
+                    project,
+                    session,
+                    target );
+
+                String currentPhase = null;
+
+                // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
+                // only call once, with the top-level project (assumed to be provided as a parameter)...
+                for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
+                {
+                    MojoBinding binding = (MojoBinding) mojoIterator.next();
+
+                    String phase = binding.getPhase() == null ? null : binding.getPhase().getName();
+
+                    if ( ( currentPhase != null ) && !currentPhase.equals( phase ) )
+                    {
+                        dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
+                        currentPhase = null;
+                    }
+
+                    if ( ( currentPhase == null ) && ( phase != null ) )
+                    {
+                        currentPhase = phase;
+                        dispatcher.dispatchStart( MavenEvents.PHASE_EXECUTION, currentPhase );
+                    }
+
+                    try
+                    {
+                        executeGoalAndHandleFailures(
+                            binding,
+                            session,
+                            dispatcher,
+                            event,
+                            reactorManager,
+                            buildStartTime,
+                            target,
+                            segment.aggregate() );
+                    }
+                    catch ( MojoFailureException e )
+                    {
+                        if ( segment.aggregate() )
+                        {
+                            AggregatedBuildFailureException error = new AggregatedBuildFailureException(
+                                                                                                        session.getExecutionRootDirectory(),
+                                                                                                        binding,
+                                                                                                        e );
+
+                           dispatcher.dispatchError( event, target, error );
+
+                           if ( handleExecutionFailure( reactorManager, project, error, binding, buildStartTime ) )
+                           {
+                               throw error;
+                           }
+                        }
+                        else
+                        {
+                            ProjectBuildFailureException error = new ProjectBuildFailureException(
+                                                                                                  project.getId(),
+                                                                                                  binding,
+                                                                                                  e );
+
+                           dispatcher.dispatchError( event, target, error );
+
+                           if ( handleExecutionFailure( reactorManager, project, error, binding, buildStartTime ) )
+                           {
+                               throw error;
+                           }
+                        }
+                    }
+                }
+
+                dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
+            }
+            finally
+            {
+                session.setCurrentProject( null );
+                restoreLookupRealm( oldLookupRealm );
+            }
+
+
+            reactorManager.registerBuildSuccess(
+                project,
+                System.currentTimeMillis() - buildStartTime );
+
+            dispatcher.dispatchEnd(
+                event,
+                target );
+        }
+        else
+        {
+            line();
+
+            getLogger().info( "SKIPPING " + project.getName() );
+
+            getLogger().info( "  " + segment );
+
+            getLogger().info( "This project has been banned from further executions due to previous failures." );
+
+            line();
         }
     }
 
@@ -939,7 +893,7 @@ public class DefaultLifecycleExecutor
         {
             StringBuffer message = new StringBuffer();
 
-            message.append( " task-segment: [" );
+            message.append( "task-segment: [" );
 
             for ( Iterator it = tasks.iterator(); it.hasNext(); )
             {

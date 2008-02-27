@@ -3,6 +3,7 @@ package org.apache.maven.project.error;
 public final class ProjectReporterManager
 {
 
+    // FIXME: This is not threadsafe!
     private static ProjectErrorReporter reporter;
 
     private ProjectReporterManager()

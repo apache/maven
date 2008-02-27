@@ -5,6 +5,7 @@ import org.apache.maven.project.error.ProjectReporterManager;
 public final class CoreReporterManager
 {
 
+    // FIXME: This is not threadsafe!!
     private static CoreErrorReporter reporter;
 
     private CoreReporterManager()

@@ -116,6 +116,11 @@
         throw new UnsupportedOperationException( "Unsupported in base-class." );
     }
           
+    public java.util.LinkedHashMap getOrderedPhaseMapping()
+    {
+        throw new UnsupportedOperationException( "Unsupported in base-class." );
+    }
+    
     public java.util.List getPhasesInOrder()
     {
         throw new UnsupportedOperationException( "Unsupported in base-class." );
@@ -168,26 +173,24 @@
         return "clean";
     }
           
+    public java.util.LinkedHashMap getOrderedPhaseMapping()
+    {
+        java.util.LinkedHashMap phases = new java.util.LinkedHashMap();
+        phases.put( "pre-clean", getPreClean() );
+        phases.put( "clean", getClean() );
+        phases.put( "post-clean", getPostClean() );
+        
+        return phases;
+    }
+    
     public java.util.List getPhasesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( getPreClean() );
-        phases.add( getClean() );
-        phases.add( getPostClean() );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
     
     public java.util.List getPhaseNamesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( "pre-clean" );
-        phases.add( "clean" );
-        phases.add( "post-clean" );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
     }
           ]]></code>
         </codeSegment>
@@ -392,66 +395,44 @@
         return "build";
     }
           
+    public java.util.LinkedHashMap getOrderedPhaseMapping()
+    {
+        java.util.LinkedHashMap phases = new java.util.LinkedHashMap();
+        phases.put( "validate", getValidate() );
+        phases.put( "initialize", getInitialize() );
+        phases.put( "generate-sources", getGenerateSources() );
+        phases.put( "process-sources", getProcessSources() );
+        phases.put( "generate-resources", getGenerateResources() );
+        phases.put( "process-resources", getProcessResources() );
+        phases.put( "compile", getCompile() );
+        phases.put( "process-classes", getProcessClasses() );
+        phases.put( "generate-test-sources", getGenerateTestSources() );
+        phases.put( "process-test-sources", getProcessTestSources() );
+        phases.put( "generate-test-resources", getGenerateTestResources() );
+        phases.put( "process-test-resources", getProcessTestResources() );
+        phases.put( "test-compile", getTestCompile() );
+        phases.put( "process-test-classes", getProcessTestClasses() );
+        phases.put( "test", getTest() );
+        phases.put( "prepare-package", getPreparePackage() );
+        phases.put( "package", getCreatePackage() );
+        phases.put( "pre-integration-test", getPreIntegrationTest() );
+        phases.put( "integration-test", getIntegrationTest() );
+        phases.put( "post-integration-test", getPostIntegrationTest() );
+        phases.put( "verify", getVerify() );
+        phases.put( "install", getInstall() );
+        phases.put( "deploy", getDeploy() );
+        
+        return phases;
+    }
+    
     public java.util.List getPhasesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( getValidate() );
-        phases.add( getInitialize() );
-        phases.add( getGenerateSources() );
-        phases.add( getProcessSources() );
-        phases.add( getGenerateResources() );
-        phases.add( getProcessResources() );
-        phases.add( getCompile() );
-        phases.add( getProcessClasses() );
-        phases.add( getGenerateTestSources() );
-        phases.add( getProcessTestSources() );
-        phases.add( getGenerateTestResources() );
-        phases.add( getProcessTestResources() );
-        phases.add( getTestCompile() );
-        phases.add( getProcessTestClasses() );
-        phases.add( getTest() );
-        phases.add( getPreparePackage() );
-        phases.add( getCreatePackage() );
-        phases.add( getPreIntegrationTest() );
-        phases.add( getIntegrationTest() );
-        phases.add( getPostIntegrationTest() );
-        phases.add( getVerify() );
-        phases.add( getInstall() );
-        phases.add( getDeploy() );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
     
     public java.util.List getPhaseNamesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( "validate" );
-        phases.add( "initialize" );
-        phases.add( "generate-sources" );
-        phases.add( "process-sources" );
-        phases.add( "generate-resources" );
-        phases.add( "process-resources" );
-        phases.add( "compile" );
-        phases.add( "process-classes" );
-        phases.add( "generate-test-sources" );
-        phases.add( "process-test-sources" );
-        phases.add( "generate-test-resources" );
-        phases.add( "process-test-resources" );
-        phases.add( "test-compile" );
-        phases.add( "process-test-classes" );
-        phases.add( "test" );
-        phases.add( "prepare-package" );
-        phases.add( "package" );
-        phases.add( "pre-integration-test" );
-        phases.add( "integration-test" );
-        phases.add( "post-integration-test" );
-        phases.add( "verify" );
-        phases.add( "install" );
-        phases.add( "deploy" );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
     }
           ]]></code>
         </codeSegment>
@@ -503,29 +484,26 @@
     {
         return "site";
     }
-          
+    
+    public java.util.LinkedHashMap getOrderedPhaseMapping()
+    {
+        java.util.LinkedHashMap map = new java.util.LinkedHashMap();
+        map.put( "pre-site", getPreSite() );
+        map.put( "site", getSite() );
+        map.put( "post-site", getPostSite() );
+        map.put( "site-deploy", getSiteDeploy() );
+        
+        return map;
+    }
+    
     public java.util.List getPhasesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( getPreSite() );
-        phases.add( getSite() );
-        phases.add( getPostSite() );
-        phases.add( getSiteDeploy() );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
     
     public java.util.List getPhaseNamesInOrder()
     {
-        java.util.List phases = new java.util.ArrayList();
-        
-        phases.add( "pre-site" );
-        phases.add( "site" );
-        phases.add( "post-site" );
-        phases.add( "site-deploy" );
-        
-        return java.util.Collections.unmodifiableList( phases );
+        return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
     }
           ]]></code>
         </codeSegment>
@@ -546,6 +524,50 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    private String name;
+    private LifecycleBinding lifecycleBinding;
+    
+    /**
+     * Get the name of this phase.
+     */
+    public String getName()
+    {
+        return name;
+    }
+    
+    /**
+     * Get the LifecycleBinding instance to which this Phase belongs.
+     */
+    public LifecycleBinding getLifecycleBinding()
+    {
+        return lifecycleBinding;
+    }
+    
+    /**
+     * Set the name of this phase, and the Lifecycle instance to which is belongs.
+     */
+    public void setLifecycleInfo( String phaseName, LifecycleBinding lifecycleBinding )
+    {
+        this.name = phaseName;
+        this.lifecycleBinding = lifecycleBinding;
+        
+        java.util.List bindings = getBindings();
+        if ( bindings != null )
+        {
+            for( java.util.Iterator it = bindings.iterator(); it.hasNext(); )
+            {
+                MojoBinding binding = (MojoBinding) it.next();
+                binding.setLifecycleInfo( this );
+            }
+        }
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>MojoBinding</name>
@@ -673,6 +695,26 @@
     public void setLateBound( boolean lateBound )
     {
         this.lateBound = lateBound;
+    }
+    
+    private Phase phase;
+    
+    /**
+     * Get the Phase instance to which this MojoBinding is bound. NOTE: In
+     * some cases, the phase name may not be known, or may not exist (as in the
+     * case of a direct mojo invocation from the command line or embedder).
+     */
+    public Phase getPhase()
+    {
+        return phase;
+    }
+    
+    /**
+     * Set the Phase instance to which this MojoBinding is bound.
+     */
+    public void setLifecycleInfo( Phase phase )
+    {
+        this.phase = phase;
     }
           ]]></code>
         </codeSegment>
