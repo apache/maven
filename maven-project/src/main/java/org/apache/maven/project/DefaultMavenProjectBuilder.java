@@ -968,10 +968,8 @@ public class DefaultMavenProjectBuilder
 
         activeProfiles.addAll( injectedProfiles );
 
-        // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
-        //  [BP] - Can this above comment be explained?
         // We don't need all the project methods that are added over those in the model, but we do need basedir
-        Map context = new HashMap( System.getProperties() );
+        Map context = new HashMap();
 
         if ( projectDir != null )
         {
@@ -989,6 +987,9 @@ public class DefaultMavenProjectBuilder
         context.put( "build.testSourceDirectory", null );
 
         model = modelInterpolator.interpolate( model, context, strict );
+
+        // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
+        model = modelInterpolator.interpolate( model, System.getProperties(), strict );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
