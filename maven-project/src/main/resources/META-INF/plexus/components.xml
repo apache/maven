@@ -42,6 +42,9 @@ under the License.
       <implementation>org.apache.maven.project.build.model.DefaultModelLineageBuilder</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
           <role-hint>default</role-hint>
         </requirement>
@@ -107,6 +110,9 @@ under the License.
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
@@ -307,6 +313,17 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.project.workspace.DefaultProjectWorkspace</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.workspace.MavenWorkspaceStore</role>
         </requirement>
       </requirements>
     </component>

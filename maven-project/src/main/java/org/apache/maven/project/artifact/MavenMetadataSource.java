@@ -95,6 +95,11 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = Collections.EMPTY_LIST;
+        }
+
         try
         {
             loadProjectBuilder();
@@ -326,14 +331,17 @@ public class MavenMetadataSource
             }
         }
 
-        // this list should contain the super-POM repositories, so we don't have to explicitly add them back.
-        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        if ( remoteArtifactRepositories != null )
         {
-            ArtifactRepository repository = (ArtifactRepository) it.next();
-
-            if ( !repositories.contains( repository ) )
+            // this list should contain the super-POM repositories, so we don't have to explicitly add them back.
+            for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
             {
-                repositories.add( repository );
+                ArtifactRepository repository = (ArtifactRepository) it.next();
+
+                if ( !repositories.contains( repository ) )
+                {
+                    repositories.add( repository );
+                }
             }
         }
 

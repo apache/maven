@@ -33,6 +33,9 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
+import org.apache.maven.monitor.event.PerCallWorkspaceMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
@@ -47,6 +50,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
+import org.apache.maven.workspace.MavenWorkspaceStore;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -92,12 +96,18 @@ public class DefaultMavenExecutionRequestPopulator
 
     private WagonManager wagonManager;
 
+    private MavenWorkspaceStore workspaceManager;
+
     private MavenSettingsBuilder settingsBuilder;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
                                                    Configuration configuration )
         throws MavenEmbedderException
     {
+        eventMonitors( request, configuration );
+
+        workspaceMonitor( request, configuration );
+
         reporter( request, configuration );
 
         executionProperties( request, configuration );
@@ -126,6 +136,59 @@ public class DefaultMavenExecutionRequestPopulator
         processSettings( request, configuration );
 
         return request;
+    }
+
+    private void workspaceMonitor( MavenExecutionRequest request,
+                                   Configuration configuration )
+    {
+        MavenWorkspaceMonitor workspaceMonitor = request.getWorkspaceMonitor();
+
+        if ( workspaceMonitor == null )
+        {
+            workspaceMonitor = configuration.getWorkspaceMonitor();
+        }
+
+        List requestEventMonitors = request.getEventMonitors();
+        if ( ( requestEventMonitors != null ) && !requestEventMonitors.isEmpty() )
+        {
+            for ( Iterator it = requestEventMonitors.iterator(); it.hasNext(); )
+            {
+                Object monitor = it.next();
+                if ( monitor instanceof MavenWorkspaceMonitor )
+                {
+                    if ( workspaceMonitor == null )
+                    {
+                        workspaceMonitor = (MavenWorkspaceMonitor) monitor;
+                    }
+                    it.remove();
+                    break;
+                }
+            }
+        }
+
+        if ( workspaceMonitor == null )
+        {
+            workspaceMonitor = new PerCallWorkspaceMonitor();
+        }
+
+        workspaceMonitor.setWorkspaceStore( workspaceManager );
+
+        request.addEventMonitor( workspaceMonitor );
+    }
+
+    private void eventMonitors( MavenExecutionRequest request,
+                                Configuration configuration )
+    {
+        List configEventMonitors = configuration.getEventMonitors();
+
+        if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
+        {
+            for ( Iterator it = configEventMonitors.iterator(); it.hasNext(); )
+            {
+                EventMonitor monitor = (EventMonitor) it.next();
+                request.addEventMonitor( monitor );
+            }
+        }
     }
 
     private void reporter( MavenExecutionRequest request,

@@ -305,7 +305,10 @@ public class DefaultLifecycleExecutor
                     }
                 }
 
-                dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
+                if ( currentPhase != null )
+                {
+                    dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
+                }
             }
             finally
             {

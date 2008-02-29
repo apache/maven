@@ -13,20 +13,9 @@ import org.apache.maven.project.build.model.ModelAndFile;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public privileged aspect ProjectCacheAspect
 {
-
-    private Map DefaultMavenProjectBuilder.projectCache = new HashMap();
-
-    public void DefaultMavenProjectBuilder.clearProjectCache()
-    {
-        logger.debug( "Clearing project cache." );
-        projectCache.clear();
-        logger.debug( "After clearing, " + projectCache.size() + " items remain." );
-    }
 
     private pointcut mavenProjectBuilder( DefaultMavenProjectBuilder builder ):
         execution( * DefaultMavenProjectBuilder+.*( .. ) )
@@ -63,19 +52,6 @@ public privileged aspect ProjectCacheAspect
 //        proceed( child, parent, builder );
 //    }
 
-    private pointcut setMavenProjectFile( File pomFile, MavenProject project, DefaultMavenProjectBuilder builder ):
-        execution( void MavenProject.setFile( File ) )
-        && cflow( mavenProjectBuilder( builder ) )
-        && args( pomFile )
-        && target( project );
-
-    after( File pomFile, MavenProject project, DefaultMavenProjectBuilder builder ):
-        setMavenProjectFile( pomFile, project, builder )
-    {
-        builder.logger.debug( "Caching project: " + project.getId() + " by its file: " + pomFile );
-        builder.projectCache.put( pomFile, project );
-    }
-
     private pointcut pbBuildFromRepository( Artifact artifact, DefaultMavenProjectBuilder builder ):
         execution( MavenProject DefaultMavenProjectBuilder+.buildFromRepository( Artifact, .. ) )
         && args( artifact, .. )
@@ -89,15 +65,10 @@ public privileged aspect ProjectCacheAspect
         MavenProject project = null;
 
         boolean skipCache = false;
-        if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) || Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
-        {
-            builder.logger.debug( "Skipping cache for meta-version: " + artifact.getVersion() );
-            skipCache = true;
-        }
-        else
+        if ( !Artifact.LATEST_VERSION.equals( artifact.getVersion() ) && !Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
             builder.logger.debug( "Checking cache for project (in buildFromRepository): " + key );
-            project = (MavenProject) builder.projectCache.get( key );
+            project = (MavenProject) builder.projectWorkspace.getProject( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         }
 
         if ( project == null )
@@ -108,8 +79,8 @@ public privileged aspect ProjectCacheAspect
             if ( !skipCache )
             {
                 builder.logger.debug( "Caching result for: " + key + " (also keyed by file: " + project.getFile() + ")" );
-                builder.projectCache.put( key, project );
-                builder.projectCache.put( project.getFile(), project );
+                builder.projectWorkspace.storeProjectByCoordinate( project );
+                builder.projectWorkspace.storeProjectByFile( project );
             }
         }
         else
@@ -131,7 +102,7 @@ public privileged aspect ProjectCacheAspect
     {
         builder.logger.debug( "Checking cache-hit on project (in build*): " + pomFile );
 
-        MavenProject project = (MavenProject) builder.projectCache.get( pomFile );
+        MavenProject project = (MavenProject) builder.projectWorkspace.getProject( pomFile );
 
         if ( project == null )
         {
@@ -141,8 +112,8 @@ public privileged aspect ProjectCacheAspect
             String key = createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() );
 
             builder.logger.debug( "Caching result for: " + key + " (also keyed by file: " + pomFile + ")" );
-            builder.projectCache.put( key, project );
-            builder.projectCache.put( pomFile, project );
+            builder.projectWorkspace.storeProjectByFile( project );
+            builder.projectWorkspace.storeProjectByCoordinate( project );
         }
         else
         {
@@ -157,17 +128,6 @@ public privileged aspect ProjectCacheAspect
     private String createCacheKey( String groupId, String artifactId, String version )
     {
         return groupId + ":" + artifactId + ":" + version;
-    }
-
-    private Map DefaultModelLineageBuilder.modelAndFileCache = new HashMap();
-
-    public void DefaultModelLineageBuilder.clearModelAndFileCache()
-    {
-        logger.debug( "Clearing model-and-file cache." );
-
-        modelAndFileCache.clear();
-
-        logger.debug( "After clearing, model-and-file cache has " + modelAndFileCache.size() + " entries." );
     }
 
     private pointcut mlbResolveParentPom( ModelAndFile child, DefaultModelLineageBuilder builder ):
@@ -192,7 +152,7 @@ public privileged aspect ProjectCacheAspect
             String key = createCacheKey( parentRef.getGroupId(), parentRef.getArtifactId(), parentRef.getVersion() );
 
             builder.logger.debug( "Checking cache for parent model-and-file instance: " + key );
-            parent = (ModelAndFile) builder.modelAndFileCache.get( key );
+            parent = (ModelAndFile) builder.projectWorkspace.getModelAndFile( parentRef.getGroupId(), parentRef.getArtifactId(), parentRef.getVersion() );
 
             if ( parent == null )
             {
@@ -202,8 +162,7 @@ public privileged aspect ProjectCacheAspect
                 if ( parent != null )
                 {
                     builder.logger.debug( "Caching parent model-and-file under: " + key + " and file: " + parent.getFile() + " (child is: " + childModel.getId() + ")" );
-                    builder.modelAndFileCache.put( key, parent );
-                    builder.modelAndFileCache.put( parent.getFile(), parent );
+                    builder.projectWorkspace.storeModelAndFile( parent );
                 }
             }
             else
@@ -215,11 +174,9 @@ public privileged aspect ProjectCacheAspect
         return parent;
     }
 
-    private pointcut buildModelLineageExec(): execution( ModelLineage DefaultModelLineageBuilder.buildModelLineage( .. ) );
-
     private pointcut mlbReadModelCacheHit( File pomFile, DefaultModelLineageBuilder builder ):
-        execution( Model DefaultModelLineageBuilder.readModel( File ) )
-        && cflowbelow( buildModelLineageExec() )
+        call( Model DefaultModelLineageBuilder.readModel( File ) )
+        && withincode( ModelLineage DefaultModelLineageBuilder.buildModelLineage( .. ) )
         && args( pomFile )
         && this( builder );
 
@@ -227,22 +184,21 @@ public privileged aspect ProjectCacheAspect
         throws ProjectBuildingException:
             mlbReadModelCacheHit( pomFile, builder )
     {
-        builder.logger.debug( "Checking cache for model-and-file instance for parent-pom in file: " + pomFile );
-        ModelAndFile cached = (ModelAndFile) builder.modelAndFileCache.get( pomFile );
+        builder.logger.debug( "Checking cache for model-and-file instance for pom in file: " + pomFile );
+        ModelAndFile cached = (ModelAndFile) builder.projectWorkspace.getModelAndFile( pomFile );
         if ( cached != null )
         {
-            builder.logger.debug( "Returning cached parent-pom instance." );
+            builder.logger.debug( "Returning cached pom instance." );
             return cached.getModel();
         }
 
-        builder.logger.debug( "Allowing readModel(..) to proceed for parent-pom in file: " + pomFile );
+        builder.logger.debug( "Allowing readModel(..) to proceed for pom in file: " + pomFile );
         return proceed( pomFile, builder );
     }
 
     private pointcut mlbCacheableModelAndFileConstruction( Model model, File pomFile, DefaultModelLineageBuilder builder ):
         call( ModelAndFile.new( Model, File, .. ) )
-        && cflow( buildModelLineageExec() )
-        && !cflowbelow( buildModelLineageExec() )
+        && withincode( ModelLineage DefaultModelLineageBuilder.buildModelLineage( .. ) )
         && args( model, pomFile, .. )
         && this( builder );
 
@@ -250,16 +206,14 @@ public privileged aspect ProjectCacheAspect
         mlbCacheableModelAndFileConstruction( model, pomFile, builder )
     {
         builder.logger.debug( "Checking cache for model-and-file instance for file: " + pomFile );
-        ModelAndFile cached = (ModelAndFile) builder.modelAndFileCache.get( pomFile );
+        ModelAndFile cached = (ModelAndFile) builder.projectWorkspace.getModelAndFile( pomFile );
         if ( cached == null )
         {
             builder.logger.debug( "Allowing construction to proceed for model-and-file with model: " + model.getId() + " and file: " + pomFile );
             cached = proceed( model, pomFile, builder );
 
-            String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
-
-            builder.modelAndFileCache.put( key, cached );
-            builder.modelAndFileCache.put( pomFile, cached );
+            builder.logger.debug( "Storing: " + cached );
+            builder.projectWorkspace.storeModelAndFile( cached );
         }
         else
         {

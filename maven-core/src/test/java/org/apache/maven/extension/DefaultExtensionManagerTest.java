@@ -102,6 +102,7 @@ public class DefaultExtensionManagerTest
     public void test_addExtension_usingModel_ShouldLoadExtensionComponent()
         throws Exception
     {
+        System.out.println( "\n\n\n\n\n\n\nSTART\n\n" );
         File remoteRepoDir = findRemoteRepositoryDirectory();
         File localRepo = createTempDir();
 
@@ -147,6 +148,8 @@ public class DefaultExtensionManagerTest
         assertNotNull( result );
 
         getContainer().setLookupRealm( oldRealm );
+
+        System.out.println( "\n\nEND\n\n\n\n\n\n\n" );
     }
 
     public void test_addExtension_usingModel_ShouldLoadCustomLifecycleMappingAndArtifactHandler()

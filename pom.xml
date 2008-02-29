@@ -209,6 +209,7 @@ under the License.
     <module>maven-project</module>
     <module>maven-reporting-api</module>
     <module>maven-embedder</module>
+    <module>maven-workspace</module>
   </modules>
 
   <properties>

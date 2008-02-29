@@ -79,6 +79,9 @@ under the License.
       <implementation>org.apache.maven.project.TestProjectBuilder</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.project.build.model.ModelLineageBuilder</role>
           <role-hint>default</role-hint>
         </requirement>

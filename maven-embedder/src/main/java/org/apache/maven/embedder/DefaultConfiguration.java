@@ -19,6 +19,8 @@ package org.apache.maven.embedder;
  */
 
 import org.apache.maven.errors.CoreErrorReporter;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
 import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -49,7 +51,7 @@ public class DefaultConfiguration
 
     private Properties systemProperties;
 
-    /** List&lt;URL>. */
+    /** List&lt;URL&gt;. */
     private List extensions = new ArrayList();
 
     private MavenEmbedderLogger logger;
@@ -63,6 +65,11 @@ public class DefaultConfiguration
     private MavenRealmManager realmManager;
 
     private CoreErrorReporter errorReporter;
+
+    /** List&lt;EventMonitor&gt;. */
+    private List eventMonitors;
+
+    private MavenWorkspaceMonitor workspaceMonitor;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -244,6 +251,40 @@ public class DefaultConfiguration
     public Configuration setErrorReporter( CoreErrorReporter errorReporter )
     {
         this.errorReporter = errorReporter;
+        return this;
+    }
+
+    public Configuration addEventMonitor( EventMonitor eventMonitor )
+    {
+        if ( eventMonitors == null )
+        {
+            eventMonitors = new ArrayList();
+        }
+
+        eventMonitors.add( eventMonitor );
+
+        return this;
+    }
+
+    public List getEventMonitors()
+    {
+        return eventMonitors;
+    }
+
+    public Configuration setEventMonitors( List eventMonitors )
+    {
+        this.eventMonitors = eventMonitors;
+        return this;
+    }
+
+    public MavenWorkspaceMonitor getWorkspaceMonitor()
+    {
+        return workspaceMonitor;
+    }
+
+    public Configuration setWorkspaceMonitor( MavenWorkspaceMonitor workspaceMonitor )
+    {
+        this.workspaceMonitor = workspaceMonitor;
         return this;
     }
 }

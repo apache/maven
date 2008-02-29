@@ -35,6 +35,7 @@ import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.workspace.ProjectWorkspace;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -68,6 +69,8 @@ public class DefaultModelLineageBuilder
 
     private ProfileAdvisor profileAdvisor;
 
+    private ProjectWorkspace projectWorkspace;
+
     private Logger logger;
 
     public DefaultModelLineageBuilder()
@@ -97,7 +100,6 @@ public class DefaultModelLineageBuilder
         List currentRemoteRepositories = remoteRepositories == null ? new ArrayList()
                         : new ArrayList( remoteRepositories );
 
-        // TODO: Cache the result of this readModel(..) call.
         ModelAndFile current = new ModelAndFile( readModel( pom ), pom, validProfilesXmlLocation );
 
         do

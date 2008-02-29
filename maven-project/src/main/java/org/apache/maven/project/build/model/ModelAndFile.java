@@ -13,7 +13,7 @@ public class ModelAndFile
 
     private final boolean validProfilesXmlLocation;
 
-    ModelAndFile( Model model,
+    public ModelAndFile( Model model,
                   File file,
                   boolean validProfilesXmlLocation )
     {

@@ -1,0 +1,15 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>testing</groupId>
+  <artifactId>read-with-deps</artifactId>
+  <version>1</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>tests</groupId>
+      <artifactId>dep</artifactId>
+      <version>1</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+</project>

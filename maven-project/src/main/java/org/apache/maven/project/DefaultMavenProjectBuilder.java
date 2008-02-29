@@ -67,6 +67,7 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.project.workspace.ProjectWorkspace;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -161,6 +162,8 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     private MavenTools mavenTools;
+
+    private ProjectWorkspace projectWorkspace;
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
@@ -1047,6 +1050,7 @@ public class DefaultMavenProjectBuilder
 
             if ( lastProject != null )
             {
+                // TODO: Use cached parent project here, and stop looping, if possible...
                 lastProject.setParent( project );
                 project = lastProject.getParent();
 

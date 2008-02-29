@@ -74,6 +74,7 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.apache.maven.settings.validation.DefaultSettingsValidator;
 import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
+import org.apache.maven.workspace.MavenWorkspaceStore;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -164,6 +165,9 @@ public class MavenEmbedder
 
     private BuildPlanner buildPlanner;
 
+    // TODO: Remove this once we have better control over cache-cleaning.
+    private MavenWorkspaceStore workspaceStore;
+
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -195,6 +199,11 @@ public class MavenEmbedder
     public MavenExecutionRequest getDefaultRequest()
     {
         return request;
+    }
+
+    protected MavenWorkspaceStore getWorkspaceStore()
+    {
+        return workspaceStore;
     }
 
     // ----------------------------------------------------------------------
@@ -596,6 +605,8 @@ public class MavenEmbedder
 
     private MavenExecutionRequest request;
 
+    private EventDispatcher dispatcher;
+
     private void start( Configuration configuration )
         throws MavenEmbedderException
     {
@@ -690,6 +701,8 @@ public class MavenEmbedder
 
             buildPlanner = (BuildPlanner) container.lookup( BuildPlanner.class );
 
+            workspaceStore = (MavenWorkspaceStore) container.lookup( MavenWorkspaceStore.class );
+
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
             // This is temporary as we can probably cache a single request and use it for default values and
@@ -697,6 +710,8 @@ public class MavenEmbedder
             request = new DefaultMavenExecutionRequest();
 
             populator.populateDefaults( request, configuration );
+
+            dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
         }
         catch ( ComponentLookupException e )
         {

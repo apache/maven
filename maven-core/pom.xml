@@ -33,6 +33,11 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-workspace</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-lifecycle</artifactId>
       <version>2.1-SNAPSHOT</version>
     </dependency>

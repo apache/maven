@@ -1,0 +1,11 @@
+<metadata>
+  <groupId>tests</groupId>
+  <artifactId>project-caching</artifactId>
+  <versioning>
+    <release>1</release>
+    <latest>1</latest>
+    <versions>
+      <version>1</version>
+    </versions>
+  </versioning>
+</metadata>
