@@ -987,9 +987,10 @@ public class DefaultMavenProjectBuilder
         context.put( "build.testSourceDirectory", null );
 
         model = modelInterpolator.interpolate( model, context, strict );
-
+        
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
-        model = modelInterpolator.interpolate( model, System.getProperties(), strict );
+        context.putAll( System.getProperties() );
+        model = modelInterpolator.interpolate( model, context, strict );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
