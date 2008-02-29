@@ -34,6 +34,11 @@
       <artifactId>maven-plugin-api</artifactId>
       <version>2.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0</version>
+    </dependency>
     <!-- Test the resolution of the version -->
     <dependency>
       <groupId>org.apache.maven.its</groupId>

@@ -48,7 +48,7 @@ public class MavenITmng2339BadProjectInterpolationTest
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dversion=foo" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "process-sources" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

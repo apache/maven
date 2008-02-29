@@ -19,20 +19,36 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 /**
- * @goal touch
+ * @goal check
  * 
- * @phase process-sources
+ * @phase validate
  *
  * @description Goal which cleans the build
  */
 public class CoreItMojo
     extends AbstractMojo
 {
+    /** @parameter */
+    private String myDirectory;
+
+    /** @parameter expression="${project}" */
+    private MavenProject project;
+
     public void execute()
         throws MojoExecutionException
     {
-        getLog().info( "Don't touch me!" );
+        if ( !myDirectory.equals( project.getBasedir() + "/target/foo" ) )
+        {
+            throw new MojoExecutionException( "wrong directory: " + myDirectory );
+        }
+
+        String value = project.getProperties().getProperty( "myDirectory" );
+        if ( !value.equals( "${project.build.directory}/foo" ) )
+        {
+            throw new MojoExecutionException( "wrong directory: " + value );
+        }
     }
 }
