@@ -43,7 +43,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id: DefaultModelInheritanceAssembler.java,v 1.4 2004/08/23 20:24:54
  *          jdcasey Exp $
  * @todo generate this with modello to keep it in sync with changes in the model.

@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class MavenExecutionException

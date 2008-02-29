@@ -22,7 +22,7 @@ package org.apache.maven.project.inheritance;
 import org.apache.maven.model.Model;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public interface ModelInheritanceAssembler

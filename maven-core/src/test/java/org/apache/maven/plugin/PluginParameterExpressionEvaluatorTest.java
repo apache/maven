@@ -50,7 +50,7 @@ import java.util.Properties;
 
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id: PluginParameterExpressionEvaluatorTest.java,v 1.5 2005/03/08
  *          06:06:21 jdcasey Exp $
  */

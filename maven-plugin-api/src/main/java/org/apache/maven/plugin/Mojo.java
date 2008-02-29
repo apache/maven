@@ -31,7 +31,7 @@ import org.apache.maven.plugin.logging.Log;
  * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which will
  * allow the Mojo to communicate to the outside world through standard Maven channels.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public interface Mojo

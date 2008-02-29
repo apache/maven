@@ -32,7 +32,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public interface PluginManager

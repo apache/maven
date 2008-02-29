@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  * @todo belong in MavenSession, so it only gets created once?
  */

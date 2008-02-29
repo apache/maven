@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * A test which demonstrates maven's dependency management
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class ProjectInheritanceTest

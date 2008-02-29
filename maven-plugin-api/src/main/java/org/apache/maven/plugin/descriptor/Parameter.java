@@ -20,7 +20,7 @@ package org.apache.maven.plugin.descriptor;
  */
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class Parameter

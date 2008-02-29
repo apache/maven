@@ -27,7 +27,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * we are testing to make sure that elements stated in a model are
  * not clobbered by the same elements elsewhere in the lineage.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class ProjectInheritanceTest

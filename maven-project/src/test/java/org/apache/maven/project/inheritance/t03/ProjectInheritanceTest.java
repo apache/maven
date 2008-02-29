@@ -33,7 +33,7 @@ import java.io.File;
  * anywhere else in the lineage. We are just making sure that values
  * down in the lineage are bubbling up where they should.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public class ProjectInheritanceTest

@@ -24,7 +24,7 @@ import org.apache.maven.model.Model;
 import java.io.File;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public interface PathTranslator

@@ -33,7 +33,7 @@ import org.apache.maven.project.MavenProject;
  * that may occur during this process, and directing the behavior of the build
  * according to what's specified in {@link MavenExecutionRequest#getReactorFailureBehavior()}.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @author jdcasey
  * @version $Id$
  */

@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.Properties;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id$
  */
 public abstract class AbstractMavenProjectTestCase
