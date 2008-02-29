@@ -33,7 +33,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.0-alpha-15</version>
+        <version>1.0-beta-2-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>
