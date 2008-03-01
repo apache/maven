@@ -219,6 +219,7 @@ under the License.
     <module>maven-repository-metadata</module>
     <module>maven-script</module>
     <module>maven-settings</module>
+    <module>maven-toolchain</module>
   </modules>
 
   <dependencies>
