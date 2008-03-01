@@ -220,6 +220,7 @@ under the License.
     <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo"/>
     <modello file="maven-profile/src/main/mdo/profiles.mdo"/>
     <modello file="maven-core/src/main/mdo/settings.mdo"/>
+    <modello file="maven-toolchain/src/main/mdo/toolchains.xml"/>
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">

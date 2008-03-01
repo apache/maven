@@ -3,12 +3,12 @@
     <parent>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven</artifactId>
-        <version>2.0.6</version>
+        <version>2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>maven-toolchain</artifactId>
     <name>Maven Toolchains</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.1-SNAPSHOT</version>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <version>2.0.6</version>
+            <version>2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven</groupId>
+            <groupId>org.apache.maven.artifact</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>2.0.6</version>
+            <version>3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
@@ -49,37 +49,6 @@
                     <model>src/main/mdo/toolchains.xml</model>
                 </configuration>
             </plugin>
-                <plugin>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <version>1.0-alpha-15</version>
-                    <executions>
-                        <execution>
-                            <id>shading</id>                                
-                            <phase>package</phase>
-                            <goals>
-                                <goal>shade</goal>
-                            </goals>
-                            <configuration>
-                                <artifactSet>
-                                    <includes>
-                                        <include>${project.groupId}:${project.artifactId}</include>
-                                    </includes>
-                                </artifactSet>
-                                <relocations>
-                                    <relocation>
-                                        <pattern>org.codehaus.plexus.util</pattern>
-                                        <excludes>
-                                            <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                                            <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                                        </excludes>
-                                    </relocation>
-                                </relocations>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            
         </plugins>
     </build>
     
