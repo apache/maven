@@ -168,7 +168,7 @@ public class IntegrationTestSuite
         suite.addTestSuite(MavenIT0098Test.class);
         suite.addTestSuite(MavenIT0107Test.class);
         suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
-        suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class ); // -- MNG-1412 -- this is a poorly formed test - testing the classloader manifests, not the ordering from the POM itself
+        suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
