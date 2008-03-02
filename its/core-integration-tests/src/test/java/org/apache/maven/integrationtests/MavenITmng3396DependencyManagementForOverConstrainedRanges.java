@@ -47,6 +47,8 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRanges
         testDir = ResourceExtractor.simpleExtractResources( getClass(), baseDir + "/plugin" );
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "pom" );
+        verifier.deleteArtifact( GROUP_ID, "A", "1.0", "jar" );
         verifier.deleteArtifact( GROUP_ID, "A", "3.0", "pom" );
         verifier.deleteArtifact( GROUP_ID, "A", "3.0", "jar" );
         verifier.deleteArtifact( GROUP_ID, "plugin", "1.0", "pom" );
