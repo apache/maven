@@ -54,6 +54,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
@@ -84,6 +85,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -390,6 +392,23 @@ public class DefaultPluginManager
                                                    pluginArtifact, e );
         }
 
+        /* get plugin managed versions */
+        Map pluginManagedDependencies = new HashMap();
+        try
+        {
+            MavenProject pluginProject =
+                mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(),
+                                                         localRepository );
+            if ( pluginProject != null )
+            {
+                pluginManagedDependencies = pluginProject.getManagedVersionMap();
+            }
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // this can't happen, it would have blowed up at artifactMetadataSource.retrieve()
+        }
+
 //        checkPlexusUtils( resolutionGroup, artifactFactory );
 
         Set dependencies = new LinkedHashSet();
@@ -409,7 +428,7 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = artifactResolver.resolveTransitively(
                                                                                 dependencies,
                                                                                 pluginArtifact,
-                                                                                Collections.EMPTY_MAP,
+                                                                                pluginManagedDependencies,
                                                                                 localRepository,
                                                                                 repositories.isEmpty()
                                                                                                 ? Collections.EMPTY_LIST
