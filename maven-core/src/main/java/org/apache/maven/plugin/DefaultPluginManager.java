@@ -1,3 +1,4 @@
+
 package org.apache.maven.plugin;
 
 /*
@@ -702,8 +703,25 @@ public class DefaultPluginManager
             repositories.addAll( resolutionGroup.getResolutionRepositories() );
             repositories.addAll( project.getRemoteArtifactRepositories() );
 
+            /* get plugin managed versions */
+            Map pluginManagedDependencies = new HashMap();
+            try
+            {
+                MavenProject pluginProject =
+                    mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(),
+                                                             localRepository );
+                if ( pluginProject != null )
+                {
+                    pluginManagedDependencies = pluginProject.getManagedVersionMap();
+                }
+            }
+            catch ( ProjectBuildingException e )
+            {
+                // this can't happen, it would have blowed up at artifactMetadataSource.retrieve()
+            }
+
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
-                                                                                    Collections.EMPTY_MAP,
+                                                                                    pluginManagedDependencies,
                                                                                     localRepository, repositories,
                                                                                     artifactMetadataSource,
                                                                                     artifactFilter );
