@@ -162,37 +162,34 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
-		suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
-		suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
+        suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
+        suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
+        suite.addTestSuite(MavenIT0098Test.class);
+        suite.addTestSuite(MavenIT0107Test.class);
+        suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
+        suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class ); // -- MNG-1412 -- this is a poorly formed test - testing the classloader manifests, not the ordering from the POM itself
+        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
+        suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
+        suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
+        suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
+        suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
+        suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
+        suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
         // ----------------------------------------------------------------------------------------------------
 
         // suite.addTestSuite(MavenIT0091Test.class);
-        // suite.addTestSuite(MavenIT0098Test.class);
         // suite.addTestSuite(MavenIT0106Test.class);
-        // suite.addTestSuite(MavenIT0107Test.class);
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3158
-        // Superceded by IT0114 - see readme in resources folder
-        // suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         // suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
-        // suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class ); -- MNG-1412 -- this is a poorly formed test - testing the classloader manifests, not the ordering from the POM itself
-
-        // 2.0.7 only (TODO: detect what version is used before running them)
-        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
-        suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
-		suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
-		suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
-		suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
-		suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
-		suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
-        // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); -- not passing for 2.0.7 either, looks to be 2.1+ ?
+        // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); // -- not passing for 2.0.7 either, looks to be 2.1+ ?
         return suite;
     }
 }
