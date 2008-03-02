@@ -6,7 +6,6 @@
   <groupId>org.apache.maven.its.mng3396</groupId>
   <artifactId>pluginuser</artifactId>
   <version>1.0</version>
-  <packaging>maven-plugin</packaging>
 
   <build>
     <plugins>
