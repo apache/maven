@@ -179,6 +179,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
 
+        suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
         // ----------------------------------------------------------------------------------------------------
