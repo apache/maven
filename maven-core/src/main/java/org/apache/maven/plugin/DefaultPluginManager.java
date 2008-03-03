@@ -284,7 +284,10 @@ public class DefaultPluginManager
         {
             try
             {
-                pluginRealm = realmManager.createPluginRealm( projectPlugin, pluginArtifact, artifacts );
+                pluginRealm = realmManager.createPluginRealm( projectPlugin,
+                                                              pluginArtifact,
+                                                              artifacts,
+                                                              coreArtifactFilterManager.getArtifactFilter() );
 
                 getLogger().debug( "Created realm: " + pluginRealm + " for plugin: " + projectPlugin.getKey() );
             }
@@ -425,6 +428,8 @@ public class DefaultPluginManager
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
+        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
+
         ArtifactResolutionResult result = artifactResolver.resolveTransitively(
                                                                                 dependencies,
                                                                                 pluginArtifact,
@@ -435,7 +440,7 @@ public class DefaultPluginManager
                                                                                                 : new ArrayList(
                                                                                                                  repositories ),
                                                                                 artifactMetadataSource,
-                                                                                coreArtifactFilterManager.getArtifactFilter() );
+                                                                                filter );
 
         Set resolved = new HashSet( result.getArtifacts() );
 

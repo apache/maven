@@ -20,6 +20,7 @@ package org.apache.maven.realm;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -130,7 +131,7 @@ public class DefaultMavenRealmManager
                                                 e );
         }
 
-        populateRealm( id, realm, extensionArtifact, artifacts );
+        populateRealm( id, realm, extensionArtifact, artifacts, null );
 
         return realm;
     }
@@ -267,7 +268,8 @@ public class DefaultMavenRealmManager
 
     public ClassRealm createPluginRealm( Plugin plugin,
                                           Artifact pluginArtifact,
-                                          Collection artifacts )
+                                          Collection artifacts,
+                                          ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
         String id = RealmUtils.createPluginRealmId( plugin );
@@ -286,7 +288,7 @@ public class DefaultMavenRealmManager
                                                 e );
         }
 
-        populateRealm( id, realm, pluginArtifact, artifacts );
+        populateRealm( id, realm, pluginArtifact, artifacts, coreArtifactFilter );
 
         logger.debug( "Saving artifacts:\n\n" + artifacts + "\n\nfor plugin: " + id );
         pluginArtifacts.put( id, artifacts );
@@ -297,7 +299,8 @@ public class DefaultMavenRealmManager
     private void populateRealm( String id,
                                 ClassRealm realm,
                                 Artifact mainArtifact,
-                                Collection artifacts )
+                                Collection artifacts,
+                                ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
         if ( !artifacts.contains( mainArtifact ) )
@@ -318,16 +321,24 @@ public class DefaultMavenRealmManager
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            try
+
+            if ( ( coreArtifactFilter == null ) || coreArtifactFilter.include( artifact ) )
             {
-                realm.addURL( artifact.getFile().toURI().toURL() );
+                try
+                {
+                    realm.addURL( artifact.getFile().toURI().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    throw new RealmManagementException( id, artifact, "Invalid URL for artifact file: "
+                                                                      + artifact.getFile()
+                                                                      + " to be used in realm: " + id
+                                                                      + ".", e );
+                }
             }
-            catch ( MalformedURLException e )
+            else
             {
-                throw new RealmManagementException( id, artifact, "Invalid URL for artifact file: "
-                                                                  + artifact.getFile()
-                                                                  + " to be used in realm: " + id
-                                                                  + ".", e );
+                logger.debug( "Excluding artifact: " + artifact.getArtifactId() + " from plugin realm; it's already included in Maven's core." );
             }
         }
     }

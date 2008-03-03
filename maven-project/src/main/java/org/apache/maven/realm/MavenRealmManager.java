@@ -1,6 +1,7 @@
 package org.apache.maven.realm;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
@@ -34,7 +35,8 @@ public interface MavenRealmManager
 
     ClassRealm createPluginRealm( Plugin plugin,
                                   Artifact pluginArtifact,
-                                  Collection artifacts )
+                                  Collection artifacts,
+                                  ArtifactFilter coreArtifactFilter )
         throws RealmManagementException;
 
     void disposePluginRealm( Plugin plugin );
