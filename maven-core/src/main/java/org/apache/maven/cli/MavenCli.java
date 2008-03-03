@@ -536,16 +536,24 @@ public class MavenCli
             Properties properties = new Properties();
             resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream(
                 "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
-            properties.load( resourceAsStream );
 
-            if( properties.getProperty( "builtOn" ) != null )
+            if ( resourceAsStream != null )
             {
-                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" )
-                    + " built on " + properties.getProperty( "builtOn" ) );
+                properties.load( resourceAsStream );
+
+                if( properties.getProperty( "builtOn" ) != null )
+                {
+                    System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" )
+                        + " built on " + properties.getProperty( "builtOn" ) );
+                }
+                else
+                {
+                    System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
+                }
             }
             else
             {
-                System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
+                System.out.println( "Maven version: unknown" );
             }
 
             System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
