@@ -176,6 +176,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
+        suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
@@ -190,6 +191,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
         // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); // -- not passing for 2.0.7 either, looks to be 2.1+ ?
+
         return suite;
     }
 }

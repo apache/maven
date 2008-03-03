@@ -1,0 +1,14 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="test">
+  <xs:complexType>
+    <xs:attribute name="name" type="xs:string" use ="required"/>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>
+
+  
+  
+  
+
