@@ -177,6 +177,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
+        suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
