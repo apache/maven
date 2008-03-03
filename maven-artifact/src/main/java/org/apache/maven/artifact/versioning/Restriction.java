@@ -96,6 +96,86 @@ public class Restriction
         return true;
     }
 
+
+    public int hashCode()
+    {
+        int result = 13;
+
+        if ( lowerBound == null )
+        {
+            result += 1;
+        }
+        else
+        {
+            result += lowerBound.hashCode();
+        }
+
+        result *= lowerBoundInclusive ? 1 : 2;
+
+        if ( upperBound == null )
+        {
+            result -= 3;
+        }
+        else
+        {
+            result -= upperBound.hashCode();
+        }
+
+        result *= upperBoundInclusive ? 2 : 3;
+
+        return result;
+    }
+
+    public boolean equals( Object other )
+    {
+        if ( this == other )
+        {
+            return true;
+        }
+
+        if ( !(other instanceof Restriction ) )
+        {
+            return false;
+        }
+
+        Restriction restriction = (Restriction) other;
+        if ( lowerBound != null )
+        {
+            if ( !lowerBound.equals( restriction.lowerBound ) )
+            {
+                return false;
+            }
+        }
+        else if ( restriction.lowerBound != null )
+        {
+            return false;
+        }
+
+        if ( lowerBoundInclusive != restriction.lowerBoundInclusive )
+        {
+            return false;
+        }
+
+        if ( upperBound != null )
+        {
+            if ( !upperBound.equals( restriction.upperBound ) )
+            {
+                return false;
+            }
+        }
+        else if ( restriction.upperBound != null )
+        {
+            return false;
+        }
+
+        if ( upperBoundInclusive != restriction.upperBoundInclusive )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
