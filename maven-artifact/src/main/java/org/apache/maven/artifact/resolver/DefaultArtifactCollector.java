@@ -299,8 +299,13 @@ public class DefaultArtifactCollector
                             // set the recommended version
                             // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
                             ArtifactVersion version;
-                            if ( !artifact.isSelectedVersionKnown() )
+                            if ( artifact.isSelectedVersionKnown() )
                             {
+                                version = artifact.getSelectedVersion();
+                            }
+                            else
+                            {
+                                //go find the version
                                 List versions = artifact.getAvailableVersions();
                                 if ( versions == null )
                                 {
@@ -329,11 +334,10 @@ public class DefaultArtifactCollector
                                     }
                                 }
                             }
-                            else
-                            {
-                                version = artifact.getSelectedVersion();
-                            }
 
+                            //this is dangerous because artifact.getSelectedVersion() can
+                            //return null. However it is ok here because we first check if the
+                            //selected version is known. As currently coded we can't get a null here.
                             artifact.selectVersion( version.toString() );
                             fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                         }
