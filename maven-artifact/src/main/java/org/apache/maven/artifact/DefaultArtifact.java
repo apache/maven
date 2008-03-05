@@ -26,6 +26,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -428,7 +429,8 @@ public class DefaultArtifact
                     if ( result == 0 )
                     {
                         // We don't consider the version range in the comparison, just the resolved version
-                        result = version.compareTo( a.getVersion() );
+                        result = new DefaultArtifactVersion( version ).compareTo(
+                            new DefaultArtifactVersion( a.getVersion() ) );
                     }
                 }
             }
