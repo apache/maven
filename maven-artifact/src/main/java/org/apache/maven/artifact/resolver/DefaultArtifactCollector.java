@@ -273,7 +273,7 @@ public class DefaultArtifactCollector
                             manageArtifact( child, managedVersions, listeners );
                             
                             // Also, we need to ensure that any exclusions it presents are
-                            // added to the artifact before we retrive the metadata
+                            // added to the artifact before we retrieve the metadata
                             // for the artifact; otherwise we may end up with unwanted
                             // dependencies.
                             Artifact ma = (Artifact) managedVersions.get( childKey );
@@ -341,7 +341,7 @@ public class DefaultArtifactCollector
                         artifact.setDependencyTrail( node.getDependencyTrail() );
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
 
-                        //TODO might be better to have source.retreive() throw a specific exception for this situation
+                        //TODO might be better to have source.retrieve() throw a specific exception for this situation
                         //and catch here rather than have it return null
                         if ( rGroup == null )
                         {

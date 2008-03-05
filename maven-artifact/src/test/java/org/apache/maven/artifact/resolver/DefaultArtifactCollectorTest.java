@@ -338,6 +338,35 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
     
+    public void testCompatibleRecommendedVersionWithChildren()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+
+        // this test puts two dependencies on C with 3.2 and [1.0,3.0] as the version.
+        // it puts 2.5 in the pretend repo...we should get back c2.5 and d1.0
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec e = a.addDependency( "e", "1.0" );
+        ArtifactSpec c1 = b.addDependency( "c", "3.2" );
+        ArtifactSpec d1 = c1.addDependency( "d","1.1" );
+        e.addDependency( "c", "[1.0,3.0]" );
+
+        // put it in the repo
+        ArtifactSpec c = createArtifactSpec( "c", "2.5" );
+        ArtifactSpec d = c.addDependency( "d","1.0" );
+        
+        source.addArtifact( c );
+        source.addArtifact( d );
+        source.addArtifact( c1 );
+        source.addArtifact( d1 );
+
+        ArtifactResolutionResult res = collect( a );
+
+        assertEquals( "Check artifact list",
+                      createSet( new Object[] { a.artifact, b.artifact, e.artifact, c.artifact,d.artifact } ), res.getArtifacts() );
+        assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+    
     public void testInCompatibleRecommendedVersion()
     throws ArtifactResolutionException, InvalidVersionSpecificationException
 {
@@ -906,8 +935,8 @@ public class DefaultArtifactCollectorTest
 
         private String getKey( Artifact artifact )
         {
-            //return artifact.getDependencyConflictId() + ":" + artifact.getVersionRange();
-            return artifact.getDependencyConflictId();
+            return artifact.getDependencyConflictId() + ":" + artifact.getVersion();
+            //return artifact.getDependencyConflictId();
         }
 
         private Set createArtifacts( ArtifactFactory artifactFactory, Set dependencies, String inheritedScope,
