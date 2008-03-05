@@ -178,9 +178,9 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
+        suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
 
         // Not yet implemented
-//        suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
 //        suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
 
         // ----------------------------------------------------------------------------------------------------
