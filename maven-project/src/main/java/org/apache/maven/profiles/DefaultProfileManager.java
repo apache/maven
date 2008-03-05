@@ -332,12 +332,12 @@ public class DefaultProfileManager
 
         List settingsProfiles = settings.getProfiles();
 
+        List settingsActiveProfileIds = settings.getActiveProfiles();
+
+        explicitlyActivate( settingsActiveProfileIds );
+
         if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
         {
-            List settingsActiveProfileIds = settings.getActiveProfiles();
-
-            explicitlyActivate( settingsActiveProfileIds );
-
             for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
             {
                 org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();

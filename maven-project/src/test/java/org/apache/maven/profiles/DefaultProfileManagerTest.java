@@ -20,10 +20,11 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.ActivationOS;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.List;
@@ -31,6 +32,35 @@ import java.util.List;
 public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
+    public void testShouldActivateNonExistantSettingsProfile()
+        throws ProfileActivationException
+    {
+        // MNG-2234 - we should activate profiles that don't exist yet so that they can be defined by a POM.
+        Settings settings = new Settings();
+        settings.addActiveProfile( "testProfile" );
+
+        ProfileManager profileManager = new DefaultProfileManager( getContainer(), settings );
+
+        List activeIds = profileManager.getExplicitlyActivatedIds();
+
+        assertNotNull( activeIds );
+        assertEquals( 1, activeIds.size() );
+        assertEquals( "testProfile", activeIds.get( 0 ) );
+
+        List activeProfiles = profileManager.getActiveProfiles();
+        assertTrue( activeProfiles.isEmpty() );
+
+        Profile p = new Profile();
+        p.setId( "testProfile" );
+        profileManager.addProfile( p );
+
+        activeProfiles = profileManager.getActiveProfiles();
+
+        assertNotNull( activeProfiles );
+        assertEquals( 1, activeProfiles.size() );
+        assertEquals( "testProfile", ( (Profile) activeProfiles.get( 0 ) ).getId() );
+    }
+
     public void testShouldActivateDefaultProfile()
         throws ProfileActivationException
     {
