@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -24,6 +25,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmngXXXXDescriptionOfProblemTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmngXXXXDescriptionOfProblemTest()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.8,)" ); // only test in 2.0.9+
+    }
+
     public void testitMNGxxxx ()
         throws Exception
     {
@@ -60,6 +67,7 @@ public class MavenITmngXXXXDescriptionOfProblemTest
          */
         List cliOptions = new ArrayList();
         cliOptions.add( "-N" );
+        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "install" );
 
         /*
