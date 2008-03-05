@@ -45,6 +45,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
+        artifacts.add( "maven-build-context" );
         artifacts.add( "maven-core" );
         artifacts.add( "maven-error-diagnoser" );
         artifacts.add( "maven-lifecycle" );
@@ -58,12 +59,6 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
         artifacts.add( "maven-reporting-api" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
-        artifacts.add( "wagon-webdav" );
-        artifacts.add( "commons-httpclient" );
-        artifacts.add( "slide-webdavlib" );
-        artifacts.add( "xml-im-exporter" );
-        artifacts.add( "slf4j-api" );
-        artifacts.add( "slf4j-simple" );
         //adding shared/maven-toolchain project here, even though not part of the default
         //distro yet.
         artifacts.add( "maven-toolchain" );
