@@ -101,11 +101,24 @@ public privileged aspect Maven20xCompatAspect
         this.session = session;
     }
 
+    // Re-Introduce old verifyPlugin(..) API.
+    public PluginDescriptor PluginManager.verifyPlugin( Plugin plugin,
+                                                        MavenProject project,
+                                                        Settings settings,
+                                                        ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException, PluginNotFoundException,
+        PluginVersionResolutionException, InvalidPluginException, PluginManagerException,
+        PluginVersionNotFoundException
+    {
+        // this will always be diverted, so no need to do anything.
+        throw new IllegalStateException( "This introduced method should ALWAYS be intercepted by backward compatibility aspect." );
+    }
+
     // USE Session to compensate for old verifyPlugin(..) API.
     private pointcut verifyPlugin( Plugin plugin, MavenProject project, PluginManager manager ):
         execution( PluginDescriptor PluginManager+.verifyPlugin( Plugin, MavenProject, Settings, ArtifactRepository+ ) )
         && args( plugin, project, .. )
-        && target( manager );
+        && this( manager );
 
     // redirect the old verifyPlugin(..) call to the new one, using the captured session instance above.
     PluginDescriptor around( Plugin plugin,
@@ -124,23 +137,10 @@ public privileged aspect Maven20xCompatAspect
         return manager.verifyPlugin( plugin, project, session );
     }
 
-    // Re-Introduce old verifyPlugin(..) API.
-    public PluginDescriptor PluginManager.verifyPlugin( Plugin plugin,
-                                                        MavenProject project,
-                                                        Settings settings,
-                                                        ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException, PluginNotFoundException,
-        PluginVersionResolutionException, InvalidPluginException, PluginManagerException,
-        PluginVersionNotFoundException
-    {
-        // this will always be diverted, so no need to do anything.
-        throw new IllegalStateException( "This introduced method should ALWAYS be intercepted by backward compatibility aspect." );
-    }
-
     private pointcut getPluginDescriptorForPrefix( String prefix, PluginManager manager ):
         execution( public PluginDescriptor PluginManager+.getPluginDescriptorForPrefix( String ) )
         && args( prefix )
-        && target( manager )
+        && this( manager )
         && notHere();
 
     PluginDescriptor around( String prefix, PluginManager manager ): getPluginDescriptorForPrefix( prefix, manager )
@@ -209,20 +209,6 @@ public privileged aspect Maven20xCompatAspect
         }
     }
 
-    // USE Request to compensate for old buildSettings() API.
-    private pointcut buildSettings( MavenSettingsBuilder builder ):
-        execution( public Settings MavenSettingsBuilder+.buildSettings() )
-        && target( builder )
-        && notHere();
-
-    // redirect old buildSettings() call to the new one, using the request captured above.
-    Settings around( MavenSettingsBuilder builder )
-        throws IOException, XmlPullParserException:
-            buildSettings( builder )
-    {
-        return builder.buildSettings( request );
-    }
-
     // Re-Introduce old buildSettings() API.
     public Settings MavenSettingsBuilder.buildSettings()
         throws IOException, XmlPullParserException
@@ -236,12 +222,25 @@ public privileged aspect Maven20xCompatAspect
         return null;
     }
 
+    // USE Request to compensate for old buildSettings() API.
+    private pointcut buildSettings( MavenSettingsBuilder builder ):
+        execution( public Settings MavenSettingsBuilder+.buildSettings() )
+        && target( builder );
+
+    // redirect old buildSettings() call to the new one, using the request captured above.
+    Settings around( MavenSettingsBuilder builder )
+        throws IOException, XmlPullParserException:
+            buildSettings( builder )
+    {
+        return builder.buildSettings( request );
+    }
+
     private pointcut pluginManager( DefaultPluginManager manager ):
         execution( * DefaultPluginManager.*( .. ) )
         && this( manager );
 
     private pointcut pluginRealmCreation( Plugin plugin, DefaultPluginManager manager ):
-        call( ClassRealm MavenRealmManager+.createPluginRealm( Plugin, Artifact, Collection ) )
+        call( ClassRealm MavenRealmManager+.createPluginRealm( Plugin, Artifact, Collection, .. ) )
         && cflow( pluginManager( manager ) )
         && args( plugin, .. );
 
