@@ -19,7 +19,7 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest
     public MavenITmng2277AggregatorAndResolutionPluginsTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.7,2.1-SNAPSHOT)" ); // 2.0.8+
+        super( "(2.0.7,)" ); // 2.0.8+
     }
 
     public void testitMNG2277 ()
