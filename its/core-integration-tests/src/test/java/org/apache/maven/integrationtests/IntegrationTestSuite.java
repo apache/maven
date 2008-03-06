@@ -163,6 +163,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
         suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
+        suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
         suite.addTestSuite(MavenIT0098Test.class);
@@ -179,9 +180,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
-
-        // Not yet implemented
-//        suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
