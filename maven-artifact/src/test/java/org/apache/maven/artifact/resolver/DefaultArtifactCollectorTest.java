@@ -368,30 +368,56 @@ public class DefaultArtifactCollectorTest
     }
     
     public void testInCompatibleRecommendedVersion()
-    throws ArtifactResolutionException, InvalidVersionSpecificationException
-{
-    
-    //this test puts two dependencies on C with 3.2 and [1.0,3.0] as the version.
-    //it puts 2.5 and 3.0 in the pretend repo...we should get back 3.0
-    ArtifactSpec a = createArtifactSpec( "a", "1.0" );
-    ArtifactSpec b = a.addDependency( "b", "1.0" );
-    ArtifactSpec b1 = a.addDependency( "b1", "1.0" );
-    b.addDependency( "c", "3.2" );
-    b1.addDependency( "c", "[1.0,3.0]" );
-  
-    //put it in the repo
-    ArtifactSpec c = createArtifactSpec( "c", "3.0" );
-    source.addArtifact( createArtifactSpec( "c", "2.5" ));
-    source.addArtifact( createArtifactSpec( "c", "3.0" ));
-    source.addArtifact( createArtifactSpec( "c", "3.2" ));
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
 
-    
-    ArtifactResolutionResult res = collect( a );
+        // this test puts two dependencies on C with 3.2 and [1.0,3.0] as the version.
+        // it puts 2.5 and 3.0 in the pretend repo...we should get back 3.0
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec b1 = a.addDependency( "b1", "1.0" );
+        b.addDependency( "c", "3.2" );
+        b1.addDependency( "c", "[1.0,3.0]" );
 
-    assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact,b1.artifact,c.artifact } ),
-                  res.getArtifacts() );
-    assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
-}
+        // put it in the repo
+        ArtifactSpec c = createArtifactSpec( "c", "3.0" );
+        source.addArtifact( createArtifactSpec( "c", "2.5" ) );
+        source.addArtifact( createArtifactSpec( "c", "3.0" ) );
+        source.addArtifact( createArtifactSpec( "c", "3.2" ) );
+
+        ArtifactResolutionResult res = collect( a );
+
+        assertEquals( "Check artifact list",
+                      createSet( new Object[] { a.artifact, b.artifact, b1.artifact, c.artifact } ), res.getArtifacts() );
+        assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    //MNG-2123: this version of the test caused the crash seen in the IT. It was
+    //only happening if the first dependency was not a range but the second one was.
+    public void testInCompatibleRecommendedVersion2()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+
+        // this test puts two dependencies on C with 3.2 and [1.0,3.0] as the version.
+        // it puts 2.5 and 3.0 in the pretend repo...we should get back 3.0
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec b1 = a.addDependency( "b1", "1.0" );
+        b1.addDependency( "c", "3.2" );
+        b.addDependency( "c", "[1.0,3.0]" );
+
+        // put it in the repo
+        ArtifactSpec c = createArtifactSpec( "c", "3.0" );
+        source.addArtifact( createArtifactSpec( "c", "2.5" ) );
+        source.addArtifact( createArtifactSpec( "c", "3.0" ) );
+        source.addArtifact( createArtifactSpec( "c", "3.2" ) );
+
+        ArtifactResolutionResult res = collect( a );
+
+        assertEquals( "Check artifact list",
+                      createSet( new Object[] { a.artifact, b.artifact, b1.artifact, c.artifact } ), res.getArtifacts() );
+        assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
     
     public void testIncompatibleRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
