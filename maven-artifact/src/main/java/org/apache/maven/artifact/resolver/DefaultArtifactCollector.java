@@ -192,10 +192,33 @@ public class DefaultArtifactCollector
                         for ( int j = 0; j < 2; j++ )
                         {
                             Artifact resetArtifact = resetNodes[j].getArtifact();
-                            if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null &&
-                                resetArtifact.getAvailableVersions() != null )
+                            
+                            //MNG-2123: if the previous node was not a range, then it wouldn't have any available
+                            //versions. We just clobbered the selected version above. (why? i have no idea.)
+                            //So since we are here and this is ranges we must go figure out the version (for a third time...)
+                            if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null)
                             {
 
+                                //go find the version. This is a total hack. See previous comment.
+                                List versions = resetArtifact.getAvailableVersions();
+                                if ( versions == null )
+                                {
+                                    try
+                                    {
+                                        versions =
+                                            source.retrieveAvailableVersions( resetArtifact, localRepository,
+                                                                              remoteRepositories );
+                                        resetArtifact.setAvailableVersions( versions );
+                                    }
+                                    catch ( ArtifactMetadataRetrievalException e )
+                                    {
+                                        resetArtifact.setDependencyTrail( node.getDependencyTrail() );
+                                        throw new ArtifactResolutionException(
+                                                                               "Unable to get dependency information: " +
+                                                                                   e.getMessage(), resetArtifact,
+                                                                               remoteRepositories, e );
+                                    }
+                                }
                                 resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion(
                                     resetArtifact.getAvailableVersions() ).toString() );
                                 fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
