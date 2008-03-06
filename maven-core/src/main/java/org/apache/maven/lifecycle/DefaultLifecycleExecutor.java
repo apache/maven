@@ -1551,17 +1551,6 @@ public class DefaultLifecycleExecutor
                     plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
                     plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
                 }
-
-                for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
-                {
-                    Plugin buildPlugin = (Plugin) i.next();
-
-                    if ( buildPlugin.getKey().equals( plugin.getKey() ) )
-                    {
-                        plugin = buildPlugin;
-                        break;
-                    }
-                }
             }
             else if ( ( numTokens == 3 ) || ( numTokens == 4 ) )
             {
@@ -1584,7 +1573,21 @@ public class DefaultLifecycleExecutor
                 throw new BuildFailureException( message );
             }
 
-//            project.injectPluginManagementInfo( plugin );
+            if ( plugin.getVersion() == null )
+            {
+                for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+                {
+                    Plugin buildPlugin = (Plugin) i.next();
+
+                    if ( buildPlugin.getKey().equals( plugin.getKey() ) )
+                    {
+                        plugin = buildPlugin;
+                        break;
+                    }
+                }
+
+                project.injectPluginManagementInfo( plugin );
+            }
 
             if ( pluginDescriptor == null )
             {
