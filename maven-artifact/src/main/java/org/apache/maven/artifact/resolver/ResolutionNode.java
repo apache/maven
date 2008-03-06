@@ -19,16 +19,17 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 public class ResolutionNode
 {
@@ -137,8 +138,17 @@ public class ResolutionNode
                 if ( artifact.getVersion() == null )
                 {
                     // set the recommended version
-                    String version = artifact.getSelectedVersion().toString();
-                    artifact.selectVersion( version );
+                    ArtifactVersion selected = artifact.getSelectedVersion();
+                    //MNG-2123: null is a valid response to getSelectedVersion, don't
+                    //assume it won't ever be.
+                    if (selected != null)
+                    {  
+                        artifact.selectVersion( selected.toString() );
+                    }
+                    else
+                    {
+                        throw new OverConstrainedVersionException("Unable to get a selected Version for "+ artifact.getArtifactId(),artifact);
+                    }                 
                 }
 
                 ids.add( 0, artifact );
