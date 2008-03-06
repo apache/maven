@@ -332,7 +332,16 @@ public class DefaultRepositoryMetadataManager
                 "System is offline. Cannot resolve required metadata:\n" + metadata.extendedToString() );
         }
 
-        File file = getArtifactMetadataFromDeploymentRepository( metadata, localRepository, remoteRepository );
+        File file;
+        try
+        {
+            file = getArtifactMetadataFromDeploymentRepository( metadata, localRepository, remoteRepository );
+        }
+        catch ( TransferFailedException e )
+        {
+            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: " +
+                remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
+        }
 
         try
         {
@@ -351,6 +360,7 @@ public class DefaultRepositoryMetadataManager
     private File getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata,
                                                               ArtifactRepository localRepository,
                                                               ArtifactRepository remoteRepository )
+        throws TransferFailedException
     {
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
@@ -370,17 +380,6 @@ public class DefaultRepositoryMetadataManager
             {
                 file.delete();
             }
-        }
-        catch ( TransferFailedException e )
-        {
-            getLogger().warn( metadata + " could not be retrieved from repository: " + remoteRepository.getId() +
-                " due to an error: " + e.getMessage() );
-            getLogger().debug( "Exception", e );
-
-            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-            // suppressing logging to avoid logging this error twice.
-            // We don't want to interrupt program flow here. Just allow empty metadata instead.
-            // rethrowing this would change behavior.
         }
         return file;
     }
@@ -405,7 +404,16 @@ public class DefaultRepositoryMetadataManager
         if ( metadata instanceof RepositoryMetadata )
         {
             getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
-            file = getArtifactMetadataFromDeploymentRepository( metadata, localRepository, deploymentRepository );
+            try
+            {
+                file = getArtifactMetadataFromDeploymentRepository( metadata, localRepository, deploymentRepository );
+            }
+            catch ( TransferFailedException e )
+            {
+                throw new RepositoryMetadataDeploymentException( metadata +
+                    " could not be retrieved from repository: " + deploymentRepository.getId() + " due to an error: " +
+                    e.getMessage(), e );
+            }
         }
         else
         {
