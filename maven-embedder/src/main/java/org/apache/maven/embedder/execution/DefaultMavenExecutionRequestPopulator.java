@@ -104,7 +104,7 @@ public class DefaultMavenExecutionRequestPopulator
                                                    Configuration configuration )
         throws MavenEmbedderException
     {
-        eventMonitors( request, configuration );
+        eventing( request, configuration );
 
         workspaceMonitor( request, configuration );
 
@@ -126,8 +126,6 @@ public class DefaultMavenExecutionRequestPopulator
         checksumPolicy( request, configuration );
 
         artifactTransferMechanism( request, configuration );
-
-        eventing( request, configuration );
 
         realmManager( request, configuration );
 
@@ -174,21 +172,6 @@ public class DefaultMavenExecutionRequestPopulator
         workspaceMonitor.setWorkspaceStore( workspaceManager );
 
         request.addEventMonitor( workspaceMonitor );
-    }
-
-    private void eventMonitors( MavenExecutionRequest request,
-                                Configuration configuration )
-    {
-        List configEventMonitors = configuration.getEventMonitors();
-
-        if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
-        {
-            for ( Iterator it = configEventMonitors.iterator(); it.hasNext(); )
-            {
-                EventMonitor monitor = (EventMonitor) it.next();
-                request.addEventMonitor( monitor );
-            }
-        }
     }
 
     private void reporter( MavenExecutionRequest request,
@@ -701,12 +684,24 @@ public class DefaultMavenExecutionRequestPopulator
 
         Logger logger = container.getLoggerManager().getLoggerForComponent( Mojo.ROLE );
 
-        if ( request.getEventMonitors() == null )
+        if ( ( request.getEventMonitors() == null ) || request.getEventMonitors().isEmpty() )
         {
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
         }
 
         container.getLoggerManager().setThreshold( request.getLoggingLevel() );
+
+        // Now, add in any event monitors from the Configuration instance.
+        List configEventMonitors = configuration.getEventMonitors();
+
+        if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
+        {
+            for ( Iterator it = configEventMonitors.iterator(); it.hasNext(); )
+            {
+                EventMonitor monitor = (EventMonitor) it.next();
+                request.addEventMonitor( monitor );
+            }
+        }
     }
 
     // ------------------------------------------------------------------------

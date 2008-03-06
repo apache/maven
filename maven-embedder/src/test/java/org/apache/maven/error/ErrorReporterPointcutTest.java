@@ -76,6 +76,14 @@ public class ErrorReporterPointcutTest
         maven = new MavenEmbedder( configuration );
     }
 
+    public void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        maven.stop();
+    }
+
     private boolean checkOnline()
     {
         if ( !offlineIsSet )
