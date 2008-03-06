@@ -21,6 +21,7 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -214,7 +215,32 @@ public class ArtifactResolverTest
         }
         catch ( ArtifactNotFoundException expected )
         {
-            assertTrue( true );
+            List repos = expected.getRemoteRepositories();
+            assertEquals( 1, repos.size() );
+            assertEquals( "test", ( (ArtifactRepository) repos.get( 0 ) ).getId() );
+        }
+    }
+
+    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepositoryWithMirrors()
+        throws Exception
+    {
+        ArtifactRepository repository = remoteRepository();
+
+        WagonManager wagonManager = (WagonManager) lookup( WagonManager.ROLE );
+        wagonManager.addMirror( "mirror", "test", repository.getUrl() );
+
+        Artifact k = createArtifact( "k", "1.0" );
+
+        try
+        {
+            artifactResolver.resolve( k, Collections.singletonList( repository ), localRepository() );
+            fail( "Resolution succeeded when it should have failed" );
+        }
+        catch ( ArtifactNotFoundException expected )
+        {
+            List repos = expected.getRemoteRepositories();
+            assertEquals( 1, repos.size() );
+            assertEquals( "mirror", ( (ArtifactRepository) repos.get( 0 ) ).getId() );
         }
     }
 
