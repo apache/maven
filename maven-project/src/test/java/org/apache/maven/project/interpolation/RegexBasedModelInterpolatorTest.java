@@ -19,18 +19,22 @@ package org.apache.maven.project.interpolation;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -256,4 +260,40 @@ public class RegexBasedModelInterpolatorTest
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
+
+    public void testShouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly()
+        throws Exception
+    {
+        Model model = new Model();
+
+        Build build = new Build();
+        build.setSourceDirectory( "correct" );
+
+        Resource res = new Resource();
+        res.setDirectory( "${project.build.sourceDirectory}" );
+
+        build.addResource( res );
+
+        Resource res2 = new Resource();
+        res2.setDirectory( "${pom.build.sourceDirectory}" );
+
+        build.addResource( res2 );
+
+        Resource res3 = new Resource();
+        res3.setDirectory( "${build.sourceDirectory}" );
+
+        build.addResource( res3 );
+
+        model.setBuild( build );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        List outResources = out.getBuild().getResources();
+        Iterator resIt = outResources.iterator();
+
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+    }
+
 }

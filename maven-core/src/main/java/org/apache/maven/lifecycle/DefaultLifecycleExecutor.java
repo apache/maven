@@ -1584,7 +1584,7 @@ public class DefaultLifecycleExecutor
                 throw new BuildFailureException( message );
             }
 
-            project.injectPluginManagementInfo( plugin );
+//            project.injectPluginManagementInfo( plugin );
 
             if ( pluginDescriptor == null )
             {

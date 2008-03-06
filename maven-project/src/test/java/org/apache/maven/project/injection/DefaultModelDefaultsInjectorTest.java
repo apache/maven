@@ -19,14 +19,18 @@ package org.apache.maven.project.injection;
  * under the License.
  */
 
-import java.util.List;
-
-import junit.framework.TestCase;
-
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
+
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -39,42 +43,107 @@ public class DefaultModelDefaultsInjectorTest
         new DefaultModelDefaultsInjector();
     }
 
+    public void testShouldMergePluginManagementVersionIntoPlugin()
+    {
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-test-plugin";
+
+        Model model = new Model();
+        Build build = new Build();
+        Plugin targetPlugin = new Plugin();
+        targetPlugin.setGroupId( groupId );
+        targetPlugin.setArtifactId( artifactId );
+
+        build.addPlugin( targetPlugin );
+
+        PluginManagement pMgmt = new PluginManagement();
+        Plugin managedPlugin = new Plugin();
+        managedPlugin.setGroupId( groupId );
+        managedPlugin.setArtifactId( artifactId );
+        managedPlugin.setVersion( "10.0.0" );
+
+        pMgmt.addPlugin( managedPlugin );
+        build.setPluginManagement( pMgmt );
+        model.setBuild( build );
+
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+
+        Map pMap = model.getBuild().getPluginsAsMap();
+        Plugin result = (Plugin) pMap.get( groupId + ":" + artifactId );
+
+        assertNotNull( result );
+        assertEquals( managedPlugin.getVersion(), result.getVersion() );
+    }
+
+    public void testShouldKeepPluginVersionOverPluginManagementVersion()
+    {
+        String groupId = "org.apache.maven.plugins";
+        String artifactId = "maven-test-plugin";
+
+        Model model = new Model();
+        Build build = new Build();
+        Plugin targetPlugin = new Plugin();
+        targetPlugin.setGroupId( groupId );
+        targetPlugin.setArtifactId( artifactId );
+        targetPlugin.setVersion( "9.0.0" );
+
+        build.addPlugin( targetPlugin );
+
+        PluginManagement pMgmt = new PluginManagement();
+        Plugin managedPlugin = new Plugin();
+        managedPlugin.setGroupId( groupId );
+        managedPlugin.setArtifactId( artifactId );
+        managedPlugin.setVersion( "10.0.0" );
+
+        pMgmt.addPlugin( managedPlugin );
+        build.setPluginManagement( pMgmt );
+        model.setBuild( build );
+
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+
+        Map pMap = model.getBuild().getPluginsAsMap();
+        Plugin result = (Plugin) pMap.get( groupId + ":" + artifactId );
+
+        assertNotNull( result );
+        assertEquals( targetPlugin.getVersion(), result.getVersion() );
+    }
+
     public void testShouldMergeManagedDependencyOfTypeEJBToDependencyList()
     {
         Model model = new Model();
-        
+
         Dependency managedDep = new Dependency();
-        
+
         managedDep.setGroupId( "group" );
         managedDep.setArtifactId( "artifact" );
         managedDep.setVersion( "1.0" );
         managedDep.setType( "ejb" );
-        
+
         DependencyManagement depMgmt = new DependencyManagement();
-        
+
         depMgmt.addDependency( managedDep );
-        
+
         model.setDependencyManagement( depMgmt );
-        
+
         Dependency dep = new Dependency();
-        
+
         dep.setGroupId( "group" );
         dep.setArtifactId( "artifact" );
-        
+
         // looks like groupId:artifactId:type is the minimum for identification, where
         // type is defaulted to "jar".
         dep.setType( "ejb" );
-        
+
         model.addDependency( dep );
-        
+
         new DefaultModelDefaultsInjector().injectDefaults( model );
-        
+
         List resultingDeps = model.getDependencies();
-        
+
         assertEquals( 1, resultingDeps.size() );
-        
+
         Dependency result = (Dependency) resultingDeps.get( 0 );
-        
+
         assertEquals( "1.0", result.getVersion() );
     }
 
@@ -124,13 +193,13 @@ public class DefaultModelDefaultsInjectorTest
         def.setArtifactId( dep.getArtifactId() );
         def.setVersion( "1.0.1" );
         def.setScope( "scope" );
-        
+
         Exclusion exc = new Exclusion();
         exc.setArtifactId( "mydep" );
         exc.setGroupId( "mygrp" );
-        
+
         def.addExclusion( exc );
-        
+
         DependencyManagement depMgmt = new DependencyManagement();
 
         depMgmt.addDependency( def );
@@ -144,11 +213,11 @@ public class DefaultModelDefaultsInjectorTest
 
         Dependency result = (Dependency) deps.get( 0 );
         assertEquals( def.getVersion(), result.getVersion() );
-        
+
         List resultExclusions = result.getExclusions();
         assertNotNull( resultExclusions );
         assertEquals( 1, resultExclusions.size() );
-        
+
         Exclusion resultExclusion = (Exclusion) resultExclusions.get( 0 );
         assertEquals( "mydep", resultExclusion.getArtifactId() );
         assertEquals( "mygrp", resultExclusion.getGroupId() );
