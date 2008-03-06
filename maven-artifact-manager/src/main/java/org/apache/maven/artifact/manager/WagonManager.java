@@ -124,4 +124,6 @@ public interface WagonManager
     void registerWagons( Collection wagons, PlexusContainer extensionContainer );
 
     void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
+
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
 }

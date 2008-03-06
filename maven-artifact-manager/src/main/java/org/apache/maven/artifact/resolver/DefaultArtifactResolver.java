@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
@@ -203,16 +204,18 @@ public class DefaultArtifactResolver
                     {
                         throw new ArtifactResolutionException(
                             "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                            artifact, remoteRepositories );
+                            artifact, getMirroredRepositories( remoteRepositories ) );
                     }
                 }
                 catch ( ResourceDoesNotExistException e )
                 {
-                    throw new ArtifactNotFoundException( e.getMessage(), artifact, remoteRepositories, e );
+                    throw new ArtifactNotFoundException( e.getMessage(), artifact,
+                                                         getMirroredRepositories( remoteRepositories ), e );
                 }
                 catch ( TransferFailedException e )
                 {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    throw new ArtifactResolutionException( e.getMessage(), artifact,
+                                                           getMirroredRepositories( remoteRepositories ), e );
                 }
 
                 resolved = true;
@@ -239,7 +242,7 @@ public class DefaultArtifactResolver
                     {
                         throw new ArtifactResolutionException(
                             "Unable to copy resolved artifact for local use: " + e.getMessage(), artifact,
-                            remoteRepositories, e );
+                            getMirroredRepositories( remoteRepositories ), e );
                     }
                 }
                 artifact.setFile( copy );
@@ -319,10 +322,22 @@ public class DefaultArtifactResolver
         if ( missingArtifacts.size() > 0 )
         {
             throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
-                                                          remoteRepositories );
+                                                          getMirroredRepositories( remoteRepositories ) );
         }
 
         return artifactResolutionResult;
+    }
+
+    private List getMirroredRepositories( List remoteRepositories )
+    {
+        Map repos = new HashMap();
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        {
+            ArtifactRepository repository = (ArtifactRepository) i.next();
+            ArtifactRepository repo = wagonManager.getMirrorRepository( repository );
+            repos.put( repo.getId(), repo );
+        }
+        return new ArrayList( repos.values() );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,

@@ -586,7 +586,7 @@ public class DefaultWagonManager
         }
     }
 
-    private ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
     {
         ArtifactRepository mirror = getMirror( repository.getId() );
         if ( mirror != null )
