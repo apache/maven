@@ -36,20 +36,20 @@ public abstract class AbstractMavenIntegrationTestCase
     protected AbstractMavenIntegrationTestCase( String versionRangeStr )
         throws InvalidVersionSpecificationException
     {
-        this.versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+        versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
 
         String v = System.getProperty( "maven.version" );
         if ( v != null )
         {
-            this.version = new DefaultArtifactVersion( v );
-            if ( !versionRange.containsVersion( this.version ) )
+            version = new DefaultArtifactVersion( v );
+            if ( !versionRange.containsVersion( version ) )
             {
                 skip = true;
             }
         }
         else
         {
-            out.print( "WARNING: " + getITName() + ": version range '" + versionRange
+            out.println( "WARNING: " + getITName() + ": version range '" + versionRange
                 + "' supplied but no maven version - not skipping test." );
         }
     }

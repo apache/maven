@@ -181,6 +181,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
+        suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
