@@ -88,6 +88,10 @@ public interface WagonManager
                               String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
 
+    void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
+                                                      File file, String checksumPolicyWarn )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
     void setOnline( boolean online );
 
     boolean isOnline();

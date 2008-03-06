@@ -346,8 +346,8 @@ public class DefaultWagonManager
         else
         {
             getLogger().debug( "Trying repository " + repository.getId() );
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(),
-                           false );
+            getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
+                                   policy.getChecksumPolicy(), false );
             getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
@@ -358,6 +358,15 @@ public class DefaultWagonManager
                                      ArtifactRepository repository,
                                      File destination,
                                      String checksumPolicy )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
+
+        getRemoteFile( getMirrorRepository( repository ), destination, remotePath, null, checksumPolicy, true );
+    }
+
+    public void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository repository,
+                                                             File destination, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
@@ -376,14 +385,6 @@ public class DefaultWagonManager
         // TODO: better excetpions - transfer failed is not enough?
 
         failIfNotOnline();
-
-        ArtifactRepository mirror = getMirror( repository.getId() );
-        if ( mirror != null )
-        {
-            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
-        }
 
         String protocol = repository.getProtocol();
         Wagon wagon;
@@ -583,6 +584,18 @@ public class DefaultWagonManager
                 }
             }
         }
+    }
+
+    private ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    {
+        ArtifactRepository mirror = getMirror( repository.getId() );
+        if ( mirror != null )
+        {
+            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
+        }
+        return repository;
     }
 
     private void failIfNotOnline()
