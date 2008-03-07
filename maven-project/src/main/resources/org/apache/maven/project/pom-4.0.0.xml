@@ -27,10 +27,7 @@ under the License.
       <id>central</id>
       <name>Maven Repository Switchboard</name>
       <layout>default</layout>
-      <!--
-      <url>http://www.ibiblio.org/maven2</url>
-      -->
-            <url>http://repo1.maven.org/maven2</url>
+      <url>http://repo1.maven.org/maven2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -41,10 +38,7 @@ under the License.
     <pluginRepository>
       <id>central</id>
       <name>Maven Plugin Repository</name>
-      <!--
-      <url>http://www.ibiblio.org/maven2</url>
-      -->
-            <url>http://repo1.maven.org/maven2</url>
+      <url>http://repo1.maven.org/maven2</url>
       <layout>default</layout>
       <snapshots>
         <enabled>false</enabled>
@@ -73,6 +67,74 @@ under the License.
         <directory>src/test/resources</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+       <plugins>
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <version>1.1</version>
+         </plugin>       
+         <plugin>
+           <artifactId>maven-assembly-plugin</artifactId>
+           <version>2.2-beta-1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>2.0.2</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-dependency-plugin</artifactId>
+           <version>2.0</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-deploy-plugin</artifactId>
+           <version>2.3</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-ear-plugin</artifactId>
+           <version>2.1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-ejb-plugin</artifactId>
+           <version>2.1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-jar-plugin</artifactId>
+           <version>2.2</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-javadoc-plugin</artifactId>
+           <version>2.3</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-install-plugin</artifactId>
+           <version>2.2</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-rar-plugin</artifactId>
+           <version>2.2</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-site-plugin</artifactId>
+           <version>2.0-beta-6</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-source-plugin</artifactId>
+           <version>2.0.4</version>
+         </plugin>         
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.3</version>
+         </plugin>
+         <plugin>                
+           <artifactId>maven-resources-plugin</artifactId>
+           <version>2.2</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-war-plugin</artifactId>
+           <version>2.1-alpha-1</version>
+         </plugin>
+       </plugins>
+     </pluginManagement>
   </build>
 
   <reporting>
@@ -96,7 +158,6 @@ under the License.
             <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -110,7 +171,6 @@ under the License.
             <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -124,7 +184,6 @@ under the License.
             <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
-
             <configuration>
               <updateReleaseInfo>true</updateReleaseInfo>
             </configuration>
