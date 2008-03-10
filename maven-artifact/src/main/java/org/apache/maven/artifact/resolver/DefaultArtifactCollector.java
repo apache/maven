@@ -220,8 +220,18 @@ public class DefaultArtifactCollector
                                     }
                                 }
                                 //end hack
-                                resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion(
-                                                                                                           resetArtifact.getAvailableVersions() ).toString() );
+                               
+                                //MNG-2861: match version can return null
+                                ArtifactVersion selectedVersion = resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() );
+                                if (selectedVersion != null)
+                                {
+                                  resetArtifact.selectVersion( selectedVersion.toString() );
+                                }
+                                else
+                                {
+                                  throw new OverConstrainedVersionException(" Unable to find a version in "+ resetArtifact.getAvailableVersions()+" to match the range "+ resetArtifact.getVersionRange(), resetArtifact);
+                                }
+                                
                                 fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
                             }
                         }
