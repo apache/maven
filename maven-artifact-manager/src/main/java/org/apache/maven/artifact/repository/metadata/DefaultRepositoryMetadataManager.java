@@ -82,19 +82,21 @@ public class DefaultRepositoryMetadataManager
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
 
-
                     boolean checkForUpdates =
-                        policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
+                        !file.exists() || policy.checkOutOfDate( new Date( file.lastModified() ) );
 
                     if ( checkForUpdates )
                     {
                         if ( wagonManager.isOnline() )
                         {
                             getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
+
+                            boolean storeMetadata = false;
                             try
                             {
                                 wagonManager.getArtifactMetadata( metadata, repository, file,
                                                                   policy.getChecksumPolicy() );
+                                storeMetadata = true;
                             }
                             catch ( ResourceDoesNotExistException e )
                             {
@@ -106,6 +108,7 @@ public class DefaultRepositoryMetadataManager
                                 {
                                     file.delete();
                                 }
+                                storeMetadata = true;
                             }
                             catch ( TransferFailedException e )
                             {
@@ -119,6 +122,30 @@ public class DefaultRepositoryMetadataManager
                                 // TODO: [jc; 08-Nov-2005] revisit this for 2.1
                                 // suppressing logging to avoid logging this error twice.
                             }
+                            if ( storeMetadata )
+                            {
+                                // touch file so that this is not checked again until interval has passed
+                                if ( file.exists() )
+                                {
+                                    file.setLastModified( System.currentTimeMillis() );
+                                }
+                                else
+                                {
+                                    // this ensures that files are not continuously checked when they don't exist remotely
+
+                                    // TODO: [jdcasey] If this happens as a result of ResourceDoesNotExistException, what effect will it have on subsequent runs?
+                                    // Will the updateInterval come into play cleanly, or will this plug up the works??
+                                    try
+                                    {
+                                        metadata.storeInLocalRepository( localRepository, repository );
+                                    }
+                                    catch ( RepositoryMetadataStoreException e )
+                                    {
+                                        throw new RepositoryMetadataResolutionException(
+                                            "Unable to store local copy of metadata: " + e.getMessage(), e );
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -126,28 +153,11 @@ public class DefaultRepositoryMetadataManager
                                 metadata.extendedToString() + "\n\n" );
                         }
                     }
-
-                    // TODO: should this be inside the above check?
-                    // touch file so that this is not checked again until interval has passed
-                    if ( file.exists() )
-                    {
-                        file.setLastModified( System.currentTimeMillis() );
-                    }
-                    else
-                    {
-                        // this ensures that files are not continuously checked when they don't exist remotely
-                        try
-                        {
-                            metadata.storeInLocalRepository( localRepository, repository );
-                        }
-                        catch ( RepositoryMetadataStoreException e )
-                        {
-                            throw new RepositoryMetadataResolutionException(
-                                "Unable to store local copy of metadata: " + e.getMessage(), e );
-                        }
-                    }
                 }
             }
+
+            // TODO: [jdcasey] what happens here when the system is offline, or there is a TransferFailedException
+            // ...and no metadata file is written?
             cachedMetadata.add( metadata.getKey() );
         }
 
@@ -238,7 +248,7 @@ public class DefaultRepositoryMetadataManager
                 }
                 else
                 {
-                    if ( m.getVersioning() != null && m.getVersioning().getSnapshot() != null &&
+                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null ) &&
                         m.getVersioning().getSnapshot().isLocalCopy() )
                     {
                         m.getVersioning().getSnapshot().setLocalCopy( false );
@@ -265,7 +275,7 @@ public class DefaultRepositoryMetadataManager
         {
             Metadata metadata = readMetadata( metadataFile );
 
-            if ( repoMetadata.isSnapshot() && previousMetadata != null )
+            if ( repoMetadata.isSnapshot() && ( previousMetadata != null ) )
             {
                 previousMetadata.put( remoteRepository, metadata );
             }
