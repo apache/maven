@@ -58,7 +58,7 @@ public abstract class DefaultToolchain
 
     public final String getType( )
     {
-        return type;
+        return type != null ? type : model.getType();
     }
 
     
