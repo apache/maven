@@ -54,6 +54,31 @@ public abstract class AbstractMavenIntegrationTestCase
         }
     }
 
+    /**
+     * This allows fine-grained control over execution of individual test methods
+     * by allowing tests to adjust to the current maven version, or else simply avoid
+     * executing altogether if the wrong version is present.
+     */
+    protected boolean matchesVersionRange( String versionRangeStr )
+        throws InvalidVersionSpecificationException
+    {
+        versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+
+        String v = System.getProperty( "maven.version" );
+        if ( v != null )
+        {
+            version = new DefaultArtifactVersion( v );
+            return versionRange.containsVersion( version );
+        }
+        else
+        {
+            out.println( "WARNING: " + getITName() + ": version range '" + versionRange
+                + "' supplied but no maven version found - returning true for match check." );
+
+            return true;
+        }
+    }
+
     protected void runTest()
         throws Throwable
     {

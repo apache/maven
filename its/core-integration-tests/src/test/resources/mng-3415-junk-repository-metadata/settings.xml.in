@@ -1,0 +1,16 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>remote-repository</id>
+      <repositories>
+        <repository>
+          <id>testing-repo</id>
+          <url>@PROTO@://@TESTDIR@/remote-repository</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>remote-repository</activeProfile>
+  </activeProfiles>
+</settings>
