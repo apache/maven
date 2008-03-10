@@ -169,6 +169,16 @@ public class MavenMetadataSource
                             return null;
                         }
 
+                        //MNG-2861: the artifact data has changed. If the available versions where previously retrieved,
+                        //we need to update it. TODO: shouldn't the versions be merged across relocations?
+                        List available = artifact.getAvailableVersions();
+                        if ( available != null && !available.isEmpty() )
+                        {
+                            artifact.setAvailableVersions( this.retrieveAvailableVersions( artifact, localRepository,
+                                                                                           remoteRepositories ) );
+
+                        }
+                        
                         String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
                             artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
