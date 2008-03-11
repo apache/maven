@@ -27,7 +27,6 @@
   </parent>
 
   <artifactId>maven-plugin-testing-harness</artifactId>
-  <version>1.2-SNAPSHOT</version>
   <name>Maven Plugin Testing Mechanism</name>
   <description>The Maven Plugin Testing Harness provides mechanisms to manage tests on Mojo.</description>
 
