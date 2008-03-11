@@ -183,7 +183,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
-
+        suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
+        
+        //not fixed in the code yet. Test is correct.
+        //suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
+        
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
         // ----------------------------------------------------------------------------------------------------

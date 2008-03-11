@@ -1,13 +1,12 @@
 package org.apache.maven.integrationtests;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,6 +16,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3284UsingCachedPluginsTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng3284UsingCachedPluginsTest()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.8,)" ); 
+    }
+    
     public void testitMNG3284Test()
         throws Exception
     {
@@ -65,8 +70,8 @@ public class MavenITmng3284UsingCachedPluginsTest
 
         verifier.resetStreams();
 
-        Assert.assertEquals( "Should be using plugin version 1 only once", 1,foundVersionOne );
-        Assert.assertEquals( "Should be using plugin version 2 only once", 1,foundVersionTwo );
+        Assert.assertEquals( "Should be using plugin version 1 only once.", 1,foundVersionOne );
+        Assert.assertEquals( "Should be using plugin version 2 only once.", 1,foundVersionTwo );
 
     }
 }
