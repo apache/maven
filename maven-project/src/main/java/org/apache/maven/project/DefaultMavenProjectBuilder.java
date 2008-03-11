@@ -208,10 +208,30 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        String artifactKey = artifact.getId();
 
-        return buildInternal( model, localRepository, remoteArtifactRepositories, artifact.getFile(), null,
-                              false, false, false );
+        MavenProject project = null;
+        if ( !Artifact.LATEST_VERSION.equals( artifact.getVersion() ) && !Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
+        {
+            getLogger().debug( "Checking cache for project (in buildFromRepository): " + artifactKey );
+            project = projectWorkspace.getProject( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        }
+
+        if ( project == null )
+        {
+            getLogger().debug( "Allowing buildFromRepository to proceed for: " + artifactKey );
+
+            Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+
+            project = buildInternal( model, localRepository, remoteArtifactRepositories, artifact.getFile(), null,
+                                  false, false, false );
+        }
+        else
+        {
+            getLogger().debug( "Returning cached project: " + project );
+        }
+
+        return project;
     }
 
     private Logger logger;
@@ -442,16 +462,29 @@ public class DefaultMavenProjectBuilder
                                                       ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
+        getLogger().debug( "Checking cache-hit on project (in build*): " + projectDescriptor );
 
-        MavenProject project = buildInternal( model,
-            localRepository,
-            buildArtifactRepositories( getSuperModel() ),
-            projectDescriptor,
-            profileManager,
-            STRICT_MODEL_PARSING,
-            true,
-            true );
+        MavenProject project = projectWorkspace.getProject( projectDescriptor );
+
+        if ( project == null )
+        {
+            getLogger().debug( "Allowing project-build to proceed for: " + projectDescriptor );
+
+            Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
+
+            project = buildInternal( model,
+                localRepository,
+                buildArtifactRepositories( getSuperModel() ),
+                projectDescriptor,
+                profileManager,
+                STRICT_MODEL_PARSING,
+                true,
+                true );
+        }
+        else
+        {
+            getLogger().debug( "Returning cached project: " + project );
+        }
 
         return project;
     }
@@ -778,6 +811,11 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
+
+        getLogger().debug( "Caching project: " + project.getId() + " (also keyed by file: " + project.getFile() + ")" );
+
+        projectWorkspace.storeProjectByCoordinate( project );
+        projectWorkspace.storeProjectByFile( project );
 
         project.setManagedVersionMap( createManagedVersionMap( projectId, project.getDependencyManagement(), projectDescriptor ) );
 

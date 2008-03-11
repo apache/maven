@@ -16,15 +16,16 @@ public class DefaultProjectWorkspace
 {
 
     private MavenWorkspaceStore workspaceStore;
-//    private Logger logger;
+    private Logger logger;
 
     public DefaultProjectWorkspace()
     {
     }
 
-    protected DefaultProjectWorkspace( MavenWorkspaceStore workspaceStore )
+    protected DefaultProjectWorkspace( MavenWorkspaceStore workspaceStore, Logger logger )
     {
         this.workspaceStore = workspaceStore;
+        this.logger = logger;
     }
 
     public ModelAndFile getModelAndFile( String groupId,
@@ -35,7 +36,7 @@ public class DefaultProjectWorkspace
 
         String key = createCacheKey( groupId, artifactId, version );
 
-//        getLogger().debug( "Retrieving ModelAndFile instance for: " + key + " from workspace." );
+        getLogger().debug( "Retrieving ModelAndFile instance for: " + key + " from workspace." );
         return (ModelAndFile) cache.get( key );
     }
 
@@ -45,7 +46,7 @@ public class DefaultProjectWorkspace
 
         Object pathKey = resolvePathKey( modelFile );
 
-//        getLogger().debug( "Retrieving ModelAndFile instance for: " + pathKey + " from workspace." );
+        getLogger().debug( "Retrieving ModelAndFile instance for: " + pathKey + " from workspace." );
         return (ModelAndFile) cache.get( pathKey );
     }
 
@@ -67,7 +68,7 @@ public class DefaultProjectWorkspace
 
         Object pathKey = resolvePathKey( projectFile );
 
-//        getLogger().debug( "Retrieving MavenProject instance for: " + pathKey + " from workspace." );
+        getLogger().debug( "Retrieving MavenProject instance for: " + pathKey + " from workspace." );
         return (MavenProject) cache.get( pathKey );
     }
 
@@ -79,7 +80,7 @@ public class DefaultProjectWorkspace
 
         String key = createCacheKey( groupId, artifactId, version );
 
-//        getLogger().debug( "Retrieving MavenProject instance for: " + key + " from workspace." );
+        getLogger().debug( "Retrieving MavenProject instance for: " + key + " from workspace." );
         return (MavenProject) cache.get( key );
     }
 
@@ -89,7 +90,7 @@ public class DefaultProjectWorkspace
 
         Object pathKey = resolvePathKey( modelAndFile.getFile() );
 
-//        getLogger().debug( "Storing ModelAndFile instance under: " + pathKey + " in workspace." );
+        getLogger().debug( "Storing ModelAndFile instance under: " + pathKey + " in workspace." );
         cache.put( pathKey, modelAndFile );
 
         cache = workspaceStore.getWorkspaceCache( ProjectWorkspace.MODEL_AND_FILE_BYGAV_KEY );
@@ -97,7 +98,7 @@ public class DefaultProjectWorkspace
         Model model = modelAndFile.getModel();
         String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
 
-//        getLogger().debug( "Storing ModelAndFile instance under: " + key + " in workspace." );
+        getLogger().debug( "Storing ModelAndFile instance under: " + key + " in workspace." );
         cache.put( key, modelAndFile );
     }
 
@@ -111,7 +112,7 @@ public class DefaultProjectWorkspace
 
         Object pathKey = resolvePathKey( project.getFile() );
 
-//        getLogger().debug( "Storing MavenProject instance under: " + pathKey + " in workspace." );
+        getLogger().debug( "Storing MavenProject instance under: " + pathKey + " in workspace." );
         cache.put( pathKey, project );
     }
 
@@ -121,7 +122,7 @@ public class DefaultProjectWorkspace
 
         String key = createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() );
 
-//        getLogger().debug( "Storing MavenProject instance under: " + key + " in workspace." );
+        getLogger().debug( "Storing MavenProject instance under: " + key + " in workspace." );
         cache.put( key, project );
     }
 
@@ -130,19 +131,19 @@ public class DefaultProjectWorkspace
         return groupId + ":" + artifactId + ":" + version;
     }
 
-//    protected Logger getLogger()
-//    {
+    protected Logger getLogger()
+    {
 //        if ( logger == null )
 //        {
 //            logger = new ConsoleLogger( Logger.LEVEL_INFO, "internal" );
 //        }
-//
-//        return logger;
-//    }
+
+        return logger;
+    }
 
     public void enableLogging( Logger logger )
     {
-//        this.logger = logger;
+        this.logger = logger;
     }
 
 }

@@ -37,4 +37,9 @@ public class ModelAndFile
         return validProfilesXmlLocation;
     }
 
+    public String toString()
+    {
+        return model.getId() + "@" + file;
+    }
+
 }

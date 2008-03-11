@@ -100,7 +100,12 @@ public class DefaultModelLineageBuilder
         List currentRemoteRepositories = remoteRepositories == null ? new ArrayList()
                         : new ArrayList( remoteRepositories );
 
-        ModelAndFile current = new ModelAndFile( readModel( pom ), pom, validProfilesXmlLocation );
+        ModelAndFile current = projectWorkspace.getModelAndFile( pom );
+        if ( current == null )
+        {
+            current = new ModelAndFile( readModel( pom ), pom, validProfilesXmlLocation );
+            projectWorkspace.storeModelAndFile( current );
+        }
 
         do
         {
@@ -337,6 +342,19 @@ public class DefaultModelLineageBuilder
         {
             validateParentDeclaration( modelParent, model );
 
+            String key = modelParent.getGroupId() + ":" + modelParent.getArtifactId() + ":" + modelParent.getVersion();
+            getLogger().debug( "Checking cache for parent model-and-file instance: " + key );
+
+            result = projectWorkspace.getModelAndFile( modelParent.getGroupId(), modelParent.getArtifactId(), modelParent.getVersion() );
+
+            if ( result != null )
+            {
+                getLogger().debug( "Returning cached instance." );
+                return result;
+            }
+
+            getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
+
             File parentPomFile = null;
 
             if ( ( modelPomFile != null ) )
@@ -363,10 +381,15 @@ public class DefaultModelLineageBuilder
                 {
                     if ( allowStubs )
                     {
-                        getLogger().debug( "DISREGARDING the error encountered while resolving artifact for: "
-                                                           + modelParent.getId()
-                                                           + ", building a stub model in its place.",
-                                           e );
+                        getLogger().warn( "An error was encountered while resolving artifact for: "
+                                          + modelParent.getId() + "\n\nError was: "
+                                          + e.getMessage() );
+
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug( "Stack trace: ", e );
+                        }
+
                         parentPomFile = null;
                     }
                     else
@@ -382,7 +405,7 @@ public class DefaultModelLineageBuilder
                 {
                     getLogger().warn( "Cannot find parent POM: " + modelParent.getId()
                                       + " for child: " + model.getId()
-                                      + ". Using stub model instead." );
+                                      + ".\n\nMaven is using a stub model instead for this build." );
 
                     Model parent = new Model();
 
@@ -405,6 +428,12 @@ public class DefaultModelLineageBuilder
                 Model parent = readModel( parentPomFile );
                 result = new ModelAndFile( parent, parentPomFile, !isResolved );
             }
+        }
+
+        if ( result != null )
+        {
+            getLogger().debug( "Caching parent model-and-file: " + result );
+            projectWorkspace.storeModelAndFile( result );
         }
 
         return result;

@@ -4,6 +4,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.workspace.DefaultMavenWorkspaceStore;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.io.File;
 
@@ -17,7 +19,7 @@ public class DefaultProjectWorkspaceTest
     {
         ModelAndFile maf = newModelAndFile( "group", "artifact", "1" );
 
-        DefaultProjectWorkspace ws = new DefaultProjectWorkspace( new DefaultMavenWorkspaceStore() );
+        DefaultProjectWorkspace ws = newWorkspace();
         ws.storeModelAndFile( maf );
 
         ModelAndFile r1 = ws.getModelAndFile( maf.getFile() );
@@ -29,11 +31,17 @@ public class DefaultProjectWorkspaceTest
         assertSame( maf, r2 );
     }
 
+    private DefaultProjectWorkspace newWorkspace()
+    {
+        DefaultProjectWorkspace ws = new DefaultProjectWorkspace( new DefaultMavenWorkspaceStore(), new ConsoleLogger( Logger.LEVEL_INFO, "test" ) );
+        return ws;
+    }
+
     public void testStoreAndRetrieveProjectByFile_CoordinateRetrievalReturnsNull()
     {
         MavenProject project = newProject( "group", "artifact", "1" );
 
-        DefaultProjectWorkspace ws = new DefaultProjectWorkspace( new DefaultMavenWorkspaceStore() );
+        DefaultProjectWorkspace ws = newWorkspace();
         ws.storeProjectByFile( project );
 
         assertSame( project, ws.getProject( project.getFile() ) );
@@ -44,7 +52,7 @@ public class DefaultProjectWorkspaceTest
     {
         MavenProject project = newProject( "group", "artifact", "1" );
 
-        DefaultProjectWorkspace ws = new DefaultProjectWorkspace( new DefaultMavenWorkspaceStore() );
+        DefaultProjectWorkspace ws = newWorkspace();
         ws.storeProjectByCoordinate( project );
 
         assertNull( ws.getProject( project.getFile() ) );

@@ -27,6 +27,9 @@ import java.util.List;
 public class ModelAndFileCachingTest
     extends PlexusTestCase
 {
+
+    private static final String MY_PKG = ModelAndFileCachingTest.class.getPackage().getName().replace( '.', '/' );
+
     private static final String MY_PATH = ModelAndFileCachingTest.class.getName()
                                                                        .replace( '.', '/' )
                                           + ".class";
@@ -224,11 +227,18 @@ public class ModelAndFileCachingTest
     private File getFile( String path )
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        URL myRes = cloader.getResource( MY_PATH );
+        URL res = cloader.getResource( MY_PATH );
 
-        File myFile = new File( myRes.getPath() );
+        File myFile = new File( res.getPath() );
 
-        return new File( myFile.getParentFile(), path );
+        File result = new File( myFile.getParentFile(), path );
+
+        if ( !result.exists() )
+        {
+            result = new File( "src/test/resources", MY_PKG + "/" + path );
+        }
+
+        return result;
     }
 
 }
