@@ -1,0 +1,1 @@
+There is another test under MNG-2972 that also reproduces this without external dependencies. The test contained here relies on castor.
