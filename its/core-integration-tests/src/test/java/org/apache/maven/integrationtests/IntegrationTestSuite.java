@@ -182,6 +182,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
+        suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
 
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>oldgroupId</groupId>
+  <artifactId>project</artifactId>
+  <name>project</name>
+  <version>1.0</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>id</id>
+      <url>file://localhost/${basedir}/../repository</url>
+    </repository>
+  </distributionManagement>
+</project>
