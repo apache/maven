@@ -160,6 +160,7 @@ public class MavenMetadataSource
                         }
                         if ( relocation.getVersion() != null )
                         {
+                            //note: see MNG-3454. This causes a problem, but fixing it may break more.
                             artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
                         }
 
