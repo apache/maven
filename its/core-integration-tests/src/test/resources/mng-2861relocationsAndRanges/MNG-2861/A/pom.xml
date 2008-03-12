@@ -16,7 +16,7 @@
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>test</groupId>
+      <groupId>org.apache.maven.its.mng2861</groupId>
       <artifactId>C</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>

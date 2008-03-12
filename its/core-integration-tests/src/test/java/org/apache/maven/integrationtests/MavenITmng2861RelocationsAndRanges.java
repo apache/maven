@@ -1,13 +1,10 @@
 package org.apache.maven.integrationtests;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
 
 
 public class MavenITmng2861RelocationsAndRanges
@@ -18,11 +15,11 @@ public class MavenITmng2861RelocationsAndRanges
     {
         super( "(2.0.8,)" );
     }
-    
-    public void testitMNG2123 ()
+
+    public void testitMNG2861 ()
         throws Exception
     {
-       
+
 
         // The testdir is computed from the location of this
         // file.
@@ -43,8 +40,6 @@ public class MavenITmng2861RelocationsAndRanges
         verifier.deleteArtifact( "org.apache.maven.its.mng2123", "B", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.mng2123", "C", "1.0-SNAPSHOT", "jar" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-N" );
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
