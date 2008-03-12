@@ -48,6 +48,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.identifier.PluginCoordinate;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
@@ -203,7 +204,9 @@ public class DefaultPluginManager
 
             artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-            PlexusContainer pluginContainer = container.getChildContainer( plugin.getKey() );
+            PluginCoordinate pc = new PluginCoordinate( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
+            
+            PlexusContainer pluginContainer = container.getChildContainer( pc.toString() );
 
             File pluginFile = pluginArtifact.getFile();
 
@@ -293,7 +296,9 @@ public class DefaultPluginManager
 
         try
         {
-            child = container.createChildContainer( plugin.getKey(),
+            PluginCoordinate pc = new PluginCoordinate(plugin);
+            
+            child = container.createChildContainer( pc.toString(),
                                                     Collections.singletonList( pluginArtifact.getFile() ),
                                                     Collections.EMPTY_MAP,
                                                     Collections.singletonList( pluginCollector ) );
@@ -446,7 +451,7 @@ public class DefaultPluginManager
         try
         {
             Thread.currentThread().setContextClassLoader(
-                mojoDescriptor.getPluginDescriptor().getClassRealm().getClassLoader() );
+            		mojoDescriptor.getPluginDescriptor().getClassRealm().getClassLoader() );
 
             plugin.execute();
 
@@ -580,7 +585,9 @@ public class DefaultPluginManager
     {
         String pluginKey = pluginDescriptor.getPluginLookupKey();
 
-        PlexusContainer pluginContainer = container.getChildContainer( pluginKey );
+        PluginCoordinate pc = new PluginCoordinate(pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion());
+        
+        PlexusContainer pluginContainer = container.getChildContainer( pc.toString() );
 
         if ( pluginContainer == null )
         {
