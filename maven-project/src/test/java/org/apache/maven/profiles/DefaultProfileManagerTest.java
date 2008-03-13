@@ -19,6 +19,12 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
@@ -26,8 +32,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusTestCase;
-
-import java.util.List;
+import org.codehaus.plexus.util.StringUtils;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase
@@ -246,8 +251,20 @@ public class DefaultProfileManagerTest
 
         org.apache.maven.model.ActivationFile activationFile = new org.apache.maven.model.ActivationFile();
 
-        // Assume that junit exists
-        activationFile.setExists( "${user.home}/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar" );
+        // convert the class into the path form of the classpath
+        String classPathForm = "/" + TestCase.class.getName().replace( '.', '/' ) + ".class";
+        // get the location to the class and convert to a string
+        URL url = this.getClass().getResource( classPathForm );
+        
+        //take only the left part
+        String[] parts = url.getPath().split( "!" );
+        
+        //remove file from the beginning.
+        String path = StringUtils.stripStart( parts[0],"file://" );
+        
+        path = new File(path).getAbsolutePath();
+        // Assume that junit exists in the local repo
+        activationFile.setExists( path );
 
         fileActivation.setFile( activationFile );
 
