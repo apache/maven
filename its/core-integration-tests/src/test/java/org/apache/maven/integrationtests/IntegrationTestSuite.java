@@ -39,8 +39,10 @@ public class IntegrationTestSuite
         {
             verifier = new Verifier( "" );
             String mavenVersion = verifier.getMavenVersion();
-
-            out.println( "Running integration tests for Maven " + mavenVersion );
+            
+            String executable = verifier.getExecutable();
+            
+            out.println( "Running integration tests for Maven " + mavenVersion + "using Maven executable: " + executable );
 
             System.setProperty( "maven.version", mavenVersion );
         }
