@@ -778,6 +778,8 @@ public class DefaultMavenProjectBuilder
         // merge any duplicated plugin definitions together, using the first appearance as the dominant one.
         ModelUtils.mergeDuplicatePluginDefinitions( project.getModel().getBuild() );
 
+        // TODO: [jdcasey] This line appears to be part of the problem for MNG-3391...
+        // the same line is in 2.0.x, so this is related to caching changes too...need to figure out how the two interact.
         mergeManagedDependencies(project.getModel(), localRepository, repositories);
 
         try
