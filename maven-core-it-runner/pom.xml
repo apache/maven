@@ -54,6 +54,10 @@ under the License.
               <name>maven.home</name>
               <value>${basedir}/target/maven-installation/apache-maven-${project.version}</value>
             </property>
+            <property>
+              <name>maven.test.tmpdir</name>
+              <value>${basedir}/target/it-working-folder</value>
+            </property>
           </systemProperties>
           <includes>
             <include>**/Suite.java</include>
