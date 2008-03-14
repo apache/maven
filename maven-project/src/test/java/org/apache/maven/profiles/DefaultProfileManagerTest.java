@@ -264,5 +264,14 @@ public class DefaultProfileManagerTest
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
+        
+        try
+        {
+            f.delete();
+        }
+        catch (Exception e)
+        {
+            //don't care. I tried.
+        }
     }
 }
