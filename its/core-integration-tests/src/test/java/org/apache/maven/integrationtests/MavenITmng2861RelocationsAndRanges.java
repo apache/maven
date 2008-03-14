@@ -23,7 +23,7 @@ public class MavenITmng2861RelocationsAndRanges
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861relocationsAndRanges/MNG-2861" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861relocationsAndRanges" );
 
         Verifier verifier;
 
@@ -34,7 +34,7 @@ public class MavenITmng2861RelocationsAndRanges
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = new Verifier( new File(testDir,"MNG-2861").getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.mng2123", "MNG-2861", "1.0-SNAPSHOT", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.mng2123", "A", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.mng2123", "B", "1.0-SNAPSHOT", "jar" );
