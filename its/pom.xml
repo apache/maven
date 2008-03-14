@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>6</version>
+    <version>8</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <groupId>org.apache.maven.its</groupId>
@@ -51,16 +51,6 @@
     <module>core-integration-testing-support</module>  
     <module>maven-integration-test-helper</module>  
   </modules>  
-  <distributionManagement>
-    <repository>
-      <id>apache.releases</id>
-      <url>${repositoryUrl}</url>
-    </repository>
-    <snapshotRepository>
-      <id>apache.snapshots</id>
-      <url>${repositoryUrl}</url>
-    </snapshotRepository>    
-  </distributionManagement>
   <!-- TODO this needs to be improved, right now it doesn't deploy to releases repo -->
   <properties>
     <repositoryUrl>scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</repositoryUrl> 
