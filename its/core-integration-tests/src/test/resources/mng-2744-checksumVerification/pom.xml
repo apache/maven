@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng2744</groupId>
+  <artifactId>mng2744</artifactId>
+  <packaging>jar</packaging>
+  <version>1</version>
+  <name>[MNG-2744] checksum comparison should be case-insensitive</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng2744</groupId>
+      <artifactId>a</artifactId>
+      <version>1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng2744</groupId>
+      <artifactId>b</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>mng2744</id>
+      <url>file://${basedir}/repository</url>
+      <releases>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+</project>
