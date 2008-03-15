@@ -51,7 +51,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -62,7 +61,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.text.MessageFormat;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -725,17 +723,6 @@ public class DefaultWagonManager
         if ( repository == null )
         {
             repository = (ArtifactRepository) mirrors.get( WILDCARD );
-	        if ( repository != null )
-	        {
-				String url = repository.getUrl();
-				if ( url.indexOf( "${mirrorOf}" ) >= 0 )
-				{
-				    url = StringUtils.replace( url, "${mirrorOf}", "{0}" );
-				    url = MessageFormat.format( url, new Object[] { mirrorOf } );
-				    repository = new DefaultArtifactRepository( mirrorOf, url, null );
-					mirrors.put( mirrorOf, repository );
-				}
-			}
         }
         return repository;
     }
