@@ -186,6 +186,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
+        suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         
         //not fixed in the code yet. Test is correct.
         //suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
