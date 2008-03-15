@@ -25,7 +25,7 @@ public class MavenITmng2744checksumVerificationTest
     /**
      * Tests that hex digits are compared without regard to case.
      */
-    public void testCaseInsensitiveComparison()
+    public void testitMNG2744()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2744-checksumVerification" );

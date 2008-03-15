@@ -22,7 +22,7 @@ public class MavenITmng3284UsingCachedPluginsTest
         super( "(2.0.8,)" ); 
     }
     
-    public void testitMNG3284Test()
+    public void testitMNG3284()
         throws Exception
     {
 

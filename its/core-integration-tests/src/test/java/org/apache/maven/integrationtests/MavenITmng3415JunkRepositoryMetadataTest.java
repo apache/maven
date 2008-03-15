@@ -68,7 +68,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * 3. Build the test project the second time
      *    a. See (2.a) and (2.b) above; the same criteria applies here.
      */
-    public void testShouldNotStoreMetadataOnTransferFailedException()
+    public void testitMNG3415()
         throws Exception
     {
         String methodName = getMethodName();

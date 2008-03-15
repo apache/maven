@@ -36,7 +36,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRanges
     super( "(2.0.8,)" ); // 2.0.9+
 }
     
-    public void testDependencyManagementForOverConstrainedRanges()
+    public void testitMNG3396()
         throws Exception
     {
         String baseDir = "/mng-3396-dependencyManagementForOverConstrainedRanges";

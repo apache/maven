@@ -12,7 +12,7 @@ import java.io.File;
 public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
     extends AbstractMavenIntegrationTestCase
 {
-    public void test ()
+    public void testitMNG3428 ()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3428-pluginDescriptorArtifactsIncomplete" );
@@ -42,7 +42,6 @@ public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
         // This should only succeed if commons-cli is part of ${plugin.artifacts}. The
         // commons-cli library is part of Maven's core classpath, so if this mojo succeeds
         // it means the PluginDescriptor.getArtifacts() call returns an unfiltered collection.
-        verifier.setAutoclean( false );
         verifier.executeGoal( "tests:test-cli-maven-plugin:1:test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

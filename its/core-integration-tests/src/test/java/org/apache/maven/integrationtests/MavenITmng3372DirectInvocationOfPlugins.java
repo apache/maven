@@ -27,7 +27,7 @@ public class MavenITmng3372DirectInvocationOfPlugins
     extends TestCase
 {
 
-    public void testDirectMojoInvocationWithPrefix()
+    public void testitMNG3372()
         throws Exception
     {
         // The testdir is computed from the location of this

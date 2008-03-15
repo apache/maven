@@ -28,9 +28,10 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
-    public void testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins ()
+    public void testitMNG3394a ()
         throws Exception
     {
+        //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt" );
 
         Verifier verifier;
@@ -74,9 +75,10 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         assertTrue( "No reference to maven-site-plugin, version 2.0-beta-5 found in build log.", foundSiteBeta5 );
     }
 
-    public void testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt ()
+    public void testitMNG3394b ()
         throws Exception
     {
+        //testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt" );
 
         Verifier verifier;

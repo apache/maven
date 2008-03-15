@@ -24,9 +24,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3331ModulePathNormalization
     extends AbstractMavenIntegrationTestCase
 {
-    public void testMNG3331ModuleWithSpaces ()
+    public void testitMNG3331a ()
         throws Exception
     {
+        //testMNG3331ModuleWithSpaces
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-spaces" );
 
         Verifier verifier;
@@ -53,9 +54,10 @@ public class MavenITmng3331ModulePathNormalization
         verifier.resetStreams();
     }
 
-    public void testMNG3331ModuleWithRelativeParentDirRef ()
+    public void testitMNG3331b ()
         throws Exception
     {
+        //testMNG3331ModuleWithRelativeParentDirRef
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-relative-parentDir-ref" );
 
         Verifier verifier;
