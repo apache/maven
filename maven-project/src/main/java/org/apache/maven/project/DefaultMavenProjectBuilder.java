@@ -862,14 +862,15 @@ public class DefaultMavenProjectBuilder
         }
 
         processedProjectCache.put(
-            createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+                                  createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
 
-        // jvz:note
+          // jvz:note
         // this only happens if we are building from a source file
         if ( projectDescriptor != null )
         {
             // Only translate the base directory for files in the source tree
-            pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor.getParentFile() );
+            pathTranslator.alignToBaseDirectory( project.getModel(),
+                                                 projectDir );
 
             Build build = project.getBuild();
 
@@ -883,24 +884,9 @@ public class DefaultMavenProjectBuilder
             project.setFile( projectDescriptor );
         }
 
-        MavenProject rawParent = project.getParent();
-
-        if ( rawParent != null )
-        {
-            String cacheKey =
-                createCacheKey( rawParent.getGroupId(), rawParent.getArtifactId(), rawParent.getVersion() );
-
-            MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
-
-            // yeah, this null check might be a bit paranoid, but better safe than sorry...
-            if ( processedParent != null )
-            {
-                project.setParent( processedParent );
-            }
-        }
-
-        project.setManagedVersionMap(
-            createManagedVersionMap( projectId, project.getDependencyManagement(), project.getParent() ) );
+        project.setManagedVersionMap( createManagedVersionMap( projectId,
+                                                               project.getDependencyManagement(),
+                                                               project.getParent() ) );
 
         return project;
     }
@@ -971,23 +957,26 @@ public class DefaultMavenProjectBuilder
         // We don't need all the project methods that are added over those in the model, but we do need basedir
         Map context = new HashMap();
 
+        Build build = model.getBuild();
+
         if ( projectDir != null )
         {
             context.put( "basedir", projectDir.getAbsolutePath() );
+
+            // MNG-1927, MNG-2124, MNG-3355:
+            // If the build section is present and the project directory is non-null, we should make
+            // sure interpolation of the directories below uses translated paths.
+            // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
+            // code below...
+            context.put( "build.directory", pathTranslator.alignToBaseDirectory( build.getDirectory(), projectDir ) );
+            context.put( "build.outputDirectory", pathTranslator.alignToBaseDirectory( build.getOutputDirectory(), projectDir ) );
+            context.put( "build.testOutputDirectory", pathTranslator.alignToBaseDirectory( build.getTestOutputDirectory(), projectDir ) );
+            context.put( "build.sourceDirectory", pathTranslator.alignToBaseDirectory( build.getSourceDirectory(), projectDir ) );
+            context.put( "build.testSourceDirectory", pathTranslator.alignToBaseDirectory( build.getTestSourceDirectory(), projectDir ) );
         }
 
-        // TODO: this is a hack to ensure MNG-2124 can be satisfied without triggering MNG-1927
-        //  MNG-1927 relies on the false assumption that ${project.build.*} evaluates to null, which occurs before
-        //  MNG-2124 is fixed. The null value would leave it uninterpolated, to be handled after path translation.
-        //  Until these steps are correctly sequenced, we guarantee these fields remain uninterpolated.
-        context.put( "build.directory", null );
-        context.put( "build.outputDirectory", null );
-        context.put( "build.testOutputDirectory", null );
-        context.put( "build.sourceDirectory", null );
-        context.put( "build.testSourceDirectory", null );
-
         model = modelInterpolator.interpolate( model, context, strict );
-        
+
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
         context.putAll( System.getProperties() );
         model = modelInterpolator.interpolate( model, context, strict );
@@ -1032,13 +1021,31 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        project.setParent( parentProject );
-
         if ( parentProject != null )
         {
-            Artifact parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
-                                                                            parentProject.getArtifactId(),
-                                                                            parentProject.getVersion() );
+            String cacheKey = createCacheKey( parentProject.getGroupId(),
+                                              parentProject.getArtifactId(),
+                                              parentProject.getVersion() );
+
+            MavenProject processedParent = (MavenProject) processedProjectCache.get( cacheKey );
+            Artifact parentArtifact;
+
+            // yeah, this null check might be a bit paranoid, but better safe than sorry...
+            if ( processedParent != null )
+            {
+                project.setParent( processedParent );
+
+                parentArtifact = processedParent.getArtifact();
+            }
+            else
+            {
+                project.setParent( parentProject );
+
+                parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
+                                                                                parentProject.getArtifactId(),
+                                                                                parentProject.getVersion() );
+            }
+
             project.setParentArtifact( parentArtifact );
         }
 
