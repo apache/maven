@@ -945,19 +945,29 @@ public class DefaultMavenProjectBuilder
 
         if ( pomFile != null )
         {
+            File projectDir = pomFile.getAbsoluteFile().getParentFile();
+
             context.put( "basedir", pomFile.getParentFile().getAbsolutePath() );
+            context.put( "basedir", projectDir.getAbsolutePath() );
+
+            Build build = model.getBuild();
+
+            // MNG-1927, MNG-2124, MNG-3355:
+            // If the build section is present and the project directory is non-null, we should make
+            // sure interpolation of the directories below uses translated paths.
+            // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
+            // code below...
+            context.put( "build.directory", pathTranslator.alignToBaseDirectory( build.getDirectory(), projectDir ) );
+            context.put( "build.outputDirectory", pathTranslator.alignToBaseDirectory( build.getOutputDirectory(), projectDir ) );
+            context.put( "build.testOutputDirectory", pathTranslator.alignToBaseDirectory( build.getTestOutputDirectory(), projectDir ) );
+            context.put( "build.sourceDirectory", pathTranslator.alignToBaseDirectory( build.getSourceDirectory(), projectDir ) );
+            context.put( "build.testSourceDirectory", pathTranslator.alignToBaseDirectory( build.getTestSourceDirectory(), projectDir ) );
         }
 
-        // TODO: this is a hack to ensure MNG-2124 can be satisfied without triggering MNG-1927
-        //  MNG-1927 relies on the false assumption that ${project.build.*} evaluates to null, which occurs before
-        //  MNG-2124 is fixed. The null value would leave it uninterpolated, to be handled after path translation.
-        //  Until these steps are correctly sequenced, we guarantee these fields remain uninterpolated.
-        context.put( "build.directory", null );
-        context.put( "build.outputDirectory", null );
-        context.put( "build.testOutputDirectory", null );
-        context.put( "build.sourceDirectory", null );
-        context.put( "build.testSourceDirectory", null );
+        model = modelInterpolator.interpolate( model, context, strict );
 
+        // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
+        context.putAll( System.getProperties() );
         model = modelInterpolator.interpolate( model, context, strict );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
@@ -1009,8 +1019,20 @@ public class DefaultMavenProjectBuilder
 
         try
         {
+            LinkedHashSet repoSet = new LinkedHashSet();
+            if ( ( model.getRepositories() != null ) && !model.getRepositories().isEmpty() )
+            {
+                repoSet.addAll( model.getRepositories() );
+            }
+
+            if ( ( model.getPluginRepositories() != null ) && !model.getPluginRepositories().isEmpty() )
+            {
+                getLogger().warn( "The <pluginRepositories/> section of the POM has been deprecated. Please update your POMs." );
+                repoSet.addAll( model.getPluginRepositories() );
+            }
+
             project.setRemoteArtifactRepositories(
-                                                  mavenTools.buildArtifactRepositories( model.getRepositories() ) );
+                                                  mavenTools.buildArtifactRepositories( new ArrayList( repoSet ) ) );
         }
         catch( Exception e )
         {

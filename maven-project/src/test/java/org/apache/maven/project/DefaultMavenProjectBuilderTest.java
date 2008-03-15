@@ -22,7 +22,9 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -103,6 +105,31 @@ public class DefaultMavenProjectBuilderTest
         MavenProject project = getProject( f1 );
 
         assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
+    }
+
+    public void testBuildDirectoryExpressionInterpolatedWithTranslatedValue()
+        throws Exception
+    {
+        File pom = getTestFile( "src/test/resources/projects/build-path-expression-pom.xml" );
+
+        MavenProject project = getProject( pom );
+
+        Build build = project.getBuild();
+        assertNotNull( "Project should have a build section containing the test resource.", build );
+
+        String sourceDirectory = build.getSourceDirectory();
+        assertNotNull( "Project build should contain a valid source directory.", sourceDirectory );
+
+        List resources = build.getResources();
+        assertNotNull( "Project should contain a build resource.", resources );
+        assertEquals( "Project should contain exactly one build resource.", 1, resources.size() );
+
+        Resource res = (Resource) resources.get( 0 );
+        assertEquals( "Project resource should be the same directory as the source directory.",
+                      sourceDirectory,
+                      res.getDirectory() );
+
+        System.out.println( "Interpolated, translated resource directory is: " + res.getDirectory() );
     }
 
     protected ArtifactRepository getLocalRepository()
