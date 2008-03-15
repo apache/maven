@@ -662,7 +662,7 @@ public class DefaultWagonManager
                     expectedChecksum = expectedChecksum.substring( 0, spacePos );
                 }
             }
-            if ( expectedChecksum.equals( actualChecksum ) )
+            if ( expectedChecksum.equalsIgnoreCase( actualChecksum ) )
             {
                 File checksumFile = new File( destination + checksumFileExtension );
                 if ( checksumFile.exists() )
