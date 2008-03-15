@@ -19,6 +19,17 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,15 +64,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager, Contextualizable
@@ -78,7 +80,8 @@ public class DefaultWagonManager
 
     private Map serverPermissionsMap = new HashMap();
 
-    private Map mirrors = new HashMap();
+    //used LinkedMap to preserve the order.
+    private Map mirrors = new LinkedHashMap();
 
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map serverConfigurationMap = new HashMap();
@@ -586,7 +589,7 @@ public class DefaultWagonManager
 
     public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
     {
-        ArtifactRepository mirror = getMirror( repository.getId() );
+        ArtifactRepository mirror = getMirror( repository );
         if ( mirror != null )
         {
             repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
@@ -717,16 +720,56 @@ public class DefaultWagonManager
         return (AuthenticationInfo) authenticationInfoMap.get( id );
     }
 
-    public ArtifactRepository getMirror( String mirrorOf )
+    /**
+     * This method finds a matching mirror for the selected repository. If there is an exact match,
+     * this will be used. If there is no exact match, then the list of mirrors is examined to see
+     * if a pattern applies.
+     * @param originalRepository See if there is a mirror for this repository.
+     * @return the selected mirror or null if none are found.
+     */
+    public ArtifactRepository getMirror( ArtifactRepository originalRepository )
     {
-        ArtifactRepository repository = (ArtifactRepository) mirrors.get( mirrorOf );
-        if ( repository == null )
+        ArtifactRepository selectedMirror = (ArtifactRepository) mirrors.get( originalRepository.getId() );
+        if ( null == selectedMirror )
         {
-            repository = (ArtifactRepository) mirrors.get( WILDCARD );
-        }
-        return repository;
-    }
+            // Process the patterns in order. First one that matches wins.
+            Set keySet = mirrors.keySet();
+            if ( keySet != null )
+            {
+                Iterator iter = keySet.iterator();
+                while ( iter.hasNext() )
+                {
+                    String pattern = (String) iter.next();
+                    if ( matchPattern( originalRepository, pattern ) )
+                    {
+                        selectedMirror = (ArtifactRepository) mirrors.get( pattern );
+                    }
+                }
+            }
 
+        }
+        return selectedMirror;
+    }
+    
+    /**
+     * This method checks if the pattern matches the originalRepository. Currently only wildcard
+     * matches are peformed on the repository id. Wildcard == '*'
+     * @param originalRepository to compare for a match.
+     * @param pattern used for match. Currently only '*' is supported.
+     * @return true if the repository is a match to this pattern.
+     */
+    public boolean matchPattern (ArtifactRepository originalRepository, String pattern)
+    {
+        if (WILDCARD.equals( pattern ) || pattern.equals( originalRepository.getId() ))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     /**
      * Set the proxy used for a particular protocol.
      *

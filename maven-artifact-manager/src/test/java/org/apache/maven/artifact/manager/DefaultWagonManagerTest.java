@@ -19,6 +19,9 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.repository.Repository;
@@ -43,6 +46,59 @@ public class DefaultWagonManagerTest
         wagonManager = (WagonManager) lookup( WagonManager.ROLE );
     }
 
+    /**
+     * Check that lookups with exact matches work and that no matches don't corrupt the repo.
+     */
+    public void testMirrorLookup()
+    {
+        wagonManager.addMirror( "a", "a", "http://a" );
+        wagonManager.addMirror( "b", "b", "http://b" );
+        
+        ArtifactRepository repo = null;
+        repo = wagonManager.getMirrorRepository( getRepo("a","http://a.a" ));   
+        assertEquals( "http://a", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo("b","http://a.a" ));   
+        assertEquals( "http://b", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo("c","http://c.c") ); 
+        assertEquals( "http://c.c", repo.getUrl() );
+        
+    
+    }
+    
+    /**
+     * Check that wildcards don't override exact id matches.
+     */
+    public void testMirrorWildcardLookup()
+    {
+        wagonManager.addMirror( "a", "a", "http://a" );
+        wagonManager.addMirror( "b", "b", "http://b" );
+        wagonManager.addMirror( "c", "*", "http://wildcard" );
+        
+        ArtifactRepository repo = null;
+        repo = wagonManager.getMirrorRepository( getRepo("a","http://a.a" ));   
+        assertEquals( "http://a", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo("b","http://a.a" ));   
+        assertEquals( "http://b", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo("c","http://c.c") ); 
+        assertEquals( "http://wildcard", repo.getUrl() );    
+    
+    }
+    
+    /**
+     * Build an ArtifactRepository object.
+     * @param id
+     * @param url
+     * @return
+     */
+    private ArtifactRepository getRepo (String id, String url)
+    {
+        return (ArtifactRepository) new DefaultArtifactRepository(id,url,new DefaultRepositoryLayout());
+    }
+    
     public void testDefaultWagonManager()
         throws Exception
     {
