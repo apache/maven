@@ -130,7 +130,7 @@ public class BootstrapInstaller
         
         bootstrapper.buildProject( new File( basedir ), true );
 
-        Model mavenCoreModel = bootstrapper.getCachedModel( MAVEN_GROUPID, "maven-core" );
+        Model mavenCoreModel = bootstrapper.getCachedModel( MAVEN_GROUPID, "assembly" );
 
         File installation = new File( basedir, "bootstrap/target/installation" );
         createInstallation( installation, mavenCoreModel );

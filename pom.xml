@@ -220,6 +220,7 @@ under the License.
     <module>maven-script</module>
     <module>maven-settings</module>
     <module>maven-toolchain</module>
+    <module>assembly</module>
   </modules>
 
   <dependencies>
@@ -291,6 +292,17 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-toolchain</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-parameter-documenter</artifactId>
         <version>${mavenVersion}</version>
       </dependency>
@@ -353,7 +365,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
