@@ -234,7 +234,7 @@ under the License.
 
   <properties>
     <mavenVersion>2.0.9-SNAPSHOT</mavenVersion>
-    <wagonVersion>1.0-beta-2</wagonVersion>
+    <!-- Can't use. bootstrap-mini isn't smart enough: <wagonVersion>1.0-beta-2</wagonVersion> -->
   </properties>
 
   <dependencyManagement>
@@ -345,22 +345,22 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-file</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
@@ -370,7 +370,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
