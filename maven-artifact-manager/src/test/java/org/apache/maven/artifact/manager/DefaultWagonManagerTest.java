@@ -59,6 +59,10 @@ public class DefaultWagonManagerTest
         assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://192.168.101.1" ) ));
         assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://" ) ));        
         //these are local
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://localhost:8080" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://127.0.0.1:9090" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "file://localhost/somepath" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "file://localhost/D:/somepath" ) ));
         assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://localhost" ) ));
         assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://127.0.0.1" ) ));
         assertFalse(mgr.isExternalRepo( getRepo( "foo", "file:///somepath" ) ));
