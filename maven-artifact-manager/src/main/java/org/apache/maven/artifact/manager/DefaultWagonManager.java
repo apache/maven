@@ -21,6 +21,8 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,6 +71,8 @@ public class DefaultWagonManager
     implements WagonManager, Contextualizable
 {
     private static final String WILDCARD = "*";
+    
+    private static final String EXTERNAL_WILDCARD = "external:*";
 
     private PlexusContainer container;
 
@@ -684,6 +688,7 @@ public class DefaultWagonManager
         }
     }
 
+    
     private void disconnectWagon( Wagon wagon )
     {
         try
@@ -721,9 +726,9 @@ public class DefaultWagonManager
     }
 
     /**
-     * This method finds a matching mirror for the selected repository. If there is an exact match,
-     * this will be used. If there is no exact match, then the list of mirrors is examined to see
-     * if a pattern applies.
+     * This method finds a matching mirror for the selected repository. If there is an exact match, this will be used.
+     * If there is no exact match, then the list of mirrors is examined to see if a pattern applies.
+     * 
      * @param originalRepository See if there is a mirror for this repository.
      * @return the selected mirror or null if none are found.
      */
@@ -750,36 +755,100 @@ public class DefaultWagonManager
         }
         return selectedMirror;
     }
-    
+
     /**
-     * This method checks if the pattern matches the originalRepository. Currently only wildcard
-     * matches are peformed on the repository id. Wildcard == '*'
+     * This method checks if the pattern matches the originalRepository. 
+     * Valid patterns: 
+     * * = everything
+     * external:* = everything not on the localhost and not file based.
+     * repo,repo1 = repo or repo1
+     * *,!repo1 = everything except repo1
+     * 
      * @param originalRepository to compare for a match.
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
      */
-    public boolean matchPattern (ArtifactRepository originalRepository, String pattern)
+    public boolean matchPattern( ArtifactRepository originalRepository, String pattern )
     {
-        if (WILDCARD.equals( pattern ) || pattern.equals( originalRepository.getId() ))
+        boolean result = false;
+        String originalId = originalRepository.getId();
+
+        // simple checks first to short circuit processing below.
+        if ( WILDCARD.equals( pattern ) || pattern.equals( originalId ) )
         {
-            return true;
+            result = true;
         }
         else
         {
+            // process the list
+            String[] repos = pattern.split( "," );
+            for ( int i = 0; i < repos.length; i++ )
+            {
+                String repo = repos[i];
+
+                // see if this is a negative match
+                if ( repo.length() > 1 && repo.startsWith( "!" ) )
+                {
+                    if ( originalId.equals( repo.substring( 1 ) ) )
+                    {
+                        // explicitly exclude. Set result and stop processing.
+                        result = false;
+                        break;
+                    }
+                }
+                // check for exact match
+                else if ( originalId.equals( repo ) )
+                {
+                    result = true;
+                    break;
+                }
+                // check for external:*
+                else if ( EXTERNAL_WILDCARD.equals( repo ) && isExternalRepo( originalRepository ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+                else if ( WILDCARD.equals( repo ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checks the URL to see if this repository refers to an external repository
+     * 
+     * @param originalRepository
+     * @return true if external.
+     */
+    public boolean isExternalRepo( ArtifactRepository originalRepository )
+    {
+        try
+        {
+            URL url = new URL( originalRepository.getUrl() );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals(
+                                                                                                                              "file" ) );
+        }
+        catch ( MalformedURLException e )
+        {
+            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
             return false;
         }
     }
     
     /**
      * Set the proxy used for a particular protocol.
-     *
-     * @param protocol      the protocol (required)
-     * @param host          the proxy host name (required)
-     * @param port          the proxy port (required)
-     * @param username      the username for the proxy, or null if there is none
-     * @param password      the password for the proxy, or null if there is none
-     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system
-     *                      property format: <code>*.foo.com|localhost</code>.
+     * 
+     * @param protocol the protocol (required)
+     * @param host the proxy host name (required)
+     * @param port the proxy port (required)
+     * @param username the username for the proxy, or null if there is none
+     * @param password the password for the proxy, or null if there is none
+     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system property format:
+     *            <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
     public void addProxy( String protocol,

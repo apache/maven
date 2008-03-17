@@ -46,6 +46,30 @@ public class DefaultWagonManagerTest
         wagonManager = (WagonManager) lookup( WagonManager.ROLE );
     }
 
+    
+    /**
+     * checks the handling of urls
+     */
+    public void testExternalURL()
+    {
+        DefaultWagonManager mgr = new DefaultWagonManager();
+        assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://somehost" ) ));
+        assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://somehost:9090/somepath" ) ));
+        assertTrue(mgr.isExternalRepo( getRepo( "foo", "ftp://somehost" ) ));
+        assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://192.168.101.1" ) ));
+        assertTrue(mgr.isExternalRepo( getRepo( "foo", "http://" ) ));        
+        //these are local
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://localhost" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "http://127.0.0.1" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "file:///somepath" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "file://D:/somepath" ) ));
+
+        //not a proper url so returns false;
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "192.168.101.1" ) ));
+        assertFalse(mgr.isExternalRepo( getRepo( "foo", "" ) ));
+    }
+
+    
     /**
      * Check that lookups with exact matches work and that no matches don't corrupt the repo.
      */
@@ -66,7 +90,7 @@ public class DefaultWagonManagerTest
         
     
     }
-    
+       
     /**
      * Check that wildcards don't override exact id matches.
      */
@@ -87,7 +111,73 @@ public class DefaultWagonManagerTest
         assertEquals( "http://wildcard", repo.getUrl() );    
     
     }
+
+    /**
+     * Check that patterns are processed correctly
+     * Valid patterns: 
+     * * = everything
+     * external:* = everything not on the localhost and not file based.
+     * repo,repo1 = repo or repo1
+     * *,!repo1 = everything except repo1
+     * 
+     */
+    public void testPatterns()
+    {
+        DefaultWagonManager mgr = new DefaultWagonManager();
+        
+        assertTrue(mgr.matchPattern( getRepo("a"), "*" ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "*," ));
+        assertTrue(mgr.matchPattern( getRepo("a"), ",*," ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "*," ));
+        
+        assertTrue(mgr.matchPattern( getRepo("a"), "a" ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "a," ));
+        assertTrue(mgr.matchPattern( getRepo("a"), ",a," ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "a," ));
+        
+        assertFalse(mgr.matchPattern( getRepo("b"), "a" ));
+        assertFalse(mgr.matchPattern( getRepo("b"), "a," ));
+        assertFalse(mgr.matchPattern( getRepo("b"), ",a" ));
+        assertFalse(mgr.matchPattern( getRepo("b"), ",a," ));
+        
+        assertTrue(mgr.matchPattern( getRepo("a"), "a,b" ));
+        assertTrue(mgr.matchPattern( getRepo("b"), "a,b" ));
+        
+        assertFalse(mgr.matchPattern( getRepo("c"), "a,b" ));
+        
+        assertTrue(mgr.matchPattern( getRepo("a"), "*" ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "*,b" ));
+        assertTrue(mgr.matchPattern( getRepo("a"), "*,!b" ));
+        
+        assertFalse(mgr.matchPattern( getRepo("a"), "*,!a" ));
+        assertFalse(mgr.matchPattern( getRepo("a"), "!a,*" ));
+        
+        assertTrue(mgr.matchPattern( getRepo("c"), "*,!a" ));
+        assertTrue(mgr.matchPattern( getRepo("c"), "!a,*" ));       
+        
+        assertFalse(mgr.matchPattern( getRepo("c"), "!a,!c" ));
+        assertFalse(mgr.matchPattern( getRepo("d"), "!a,!c*" ));
+    }
     
+    /**
+     * make sure the external if is fully exercised. We can assume file and ips are also handled because they
+     * have a separate test above. 
+     */
+    public void testPatternsWithExternal()
+    {
+        DefaultWagonManager mgr = new DefaultWagonManager();
+
+        assertTrue( mgr.matchPattern( getRepo( "a","http://localhost" ), "*" ) );
+        assertFalse( mgr.matchPattern( getRepo( "a","http://localhost" ), "external:*" ) );
+        
+        assertTrue( mgr.matchPattern( getRepo( "a","http://localhost" ), "external:*,a" ) );
+        assertFalse( mgr.matchPattern( getRepo( "a","http://localhost" ), "external:*,!a" ) );
+        assertTrue( mgr.matchPattern( getRepo( "a","http://localhost" ), "a,external:*" ) );
+        assertFalse( mgr.matchPattern( getRepo( "a","http://localhost" ), "!a,external:*" ) );
+        
+        assertFalse( mgr.matchPattern( getRepo( "c","http://localhost" ), "!a,external:*" ) );
+        assertTrue( mgr.matchPattern( getRepo( "c","http://somehost" ), "!a,external:*" ) );
+    }
     /**
      * Build an ArtifactRepository object.
      * @param id
@@ -97,6 +187,17 @@ public class DefaultWagonManagerTest
     private ArtifactRepository getRepo (String id, String url)
     {
         return (ArtifactRepository) new DefaultArtifactRepository(id,url,new DefaultRepositoryLayout());
+    }
+    
+    /**
+     * Build an ArtifactRepository object.
+     * @param id
+     * @param url
+     * @return
+     */
+    private ArtifactRepository getRepo (String id)
+    {
+        return getRepo(id,"http://something");
     }
     
     public void testDefaultWagonManager()
