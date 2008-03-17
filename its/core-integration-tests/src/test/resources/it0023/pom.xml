@@ -17,4 +17,17 @@
       </plugin>
     </plugins>
   </build>
+    <!--remove when the IT plugins are actually released-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache.snapshots</id>
+            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
