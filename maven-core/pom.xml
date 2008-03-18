@@ -162,6 +162,29 @@
     </dependency>
   </dependencies>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>l10n-maven-plugin</artifactId>
+        <version>1.0-alpha-1</version>
+        <configuration>
+          <locales>
+            <locale>el</locale>
+            <locale>de</locale>
+            <locale>es</locale>
+            <locale>fr</locale>
+            <locale>ja</locale>
+            <locale>nl</locale>
+            <locale>no</locale>
+            <locale>pl</locale>
+            <locale>zh_CN</locale>
+          </locales>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <profiles>
     <profile>
       <id>include-site</id>
