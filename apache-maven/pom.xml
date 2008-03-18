@@ -26,15 +26,9 @@
     <version>2.0.9-SNAPSHOT</version>
   </parent>
 
-  <artifactId>assembly</artifactId>
-  <name>Maven Core Assembly</name>
+  <artifactId>apache-maven</artifactId>
+  <name>Maven Bundle</name>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-    </pluginRepository>
-  </pluginRepositories>
   <build>
     <plugins>
       <plugin>
