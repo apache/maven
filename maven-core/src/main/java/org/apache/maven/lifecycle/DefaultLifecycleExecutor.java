@@ -75,8 +75,7 @@ import java.util.StringTokenizer;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
- *          jdcasey Exp $
+ * @version $Id$
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without much of the event handling)
  */
 public class DefaultLifecycleExecutor
