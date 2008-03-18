@@ -370,7 +370,11 @@ public final class ModelUtils
             {
                 PluginExecution parentExecution = (PluginExecution) it.next();
 
-                if ( !handleAsInheritance || parentIsInherited )
+                String inherited = parentExecution.getInherited();
+
+                boolean parentExecInherited = parentIsInherited && ( ( inherited == null ) || Boolean.valueOf( inherited ).booleanValue() );
+
+                if ( !handleAsInheritance || parentExecInherited )
                 {
                     PluginExecution assembled = parentExecution;
 

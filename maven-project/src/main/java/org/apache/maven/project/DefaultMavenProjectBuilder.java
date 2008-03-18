@@ -1161,6 +1161,8 @@ public class DefaultMavenProjectBuilder
             {
                 Dependency dep = (Dependency) iter.next();
                 depsMap.put( dep.getManagementKey(), dep );
+
+                // FIXME: Add scope-check for 'import'
                 if (dep.getType().equals("pom"))
                 {
                     doInclude = true;
@@ -1173,6 +1175,8 @@ public class DefaultMavenProjectBuilder
                 while (iter.hasNext())
                 {
                     Dependency dep = (Dependency)iter.next();
+
+                    // FIXME: Add scope-check for 'import'
                     if (dep.getType().equals("pom"))
                     {
                         Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),

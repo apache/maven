@@ -19,7 +19,6 @@ package org.apache.maven.project.inheritance;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -44,6 +43,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -800,6 +801,124 @@ public class DefaultModelInheritanceAssemblerTest
         assembler.assembleModelInheritance( child, parent );
 
         assertReports( new ArrayList(), child );
+    }
+
+    public void testPluginExecInheritanceWhereExecInheritedSetToFalse()
+    {
+        String testId = "test";
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin pChild = new Plugin();
+        pChild.setGroupId( gid );
+        pChild.setArtifactId( aid );
+        pChild.setVersion( ver );
+
+        PluginExecution eChild = new PluginExecution();
+        eChild.setId( "normal" );
+        eChild.addGoal( "run" );
+
+        pChild.addExecution( eChild );
+
+        Build bChild = new Build();
+        bChild.addPlugin( pChild );
+
+        child.setBuild( bChild );
+
+        Model parent = makeBaseModel( "parent" );
+
+        Plugin pParent = new Plugin();
+        pParent.setGroupId( gid );
+        pParent.setArtifactId( aid );
+        pParent.setVersion( ver );
+
+        pParent.setInherited( Boolean.toString( true ) );
+
+        PluginExecution eParent = new PluginExecution();
+        eParent.setId( testId );
+        eParent.addGoal( "test" );
+        eParent.setInherited( Boolean.toString( false ) );
+
+        pParent.addExecution( eParent );
+
+        Build bParent = new Build();
+        bParent.addPlugin( pParent );
+
+        parent.setBuild( bParent );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        Map pluginMap = bChild.getPluginsAsMap();
+        assertNotNull( pluginMap );
+
+        Plugin plugin = (Plugin) pluginMap.get( gid + ":" + aid );
+        assertNotNull( plugin );
+
+        Map executionMap = plugin.getExecutionsAsMap();
+        assertNotNull( executionMap );
+
+        assertNull( "test execution with inherited == false should NOT be inherited to child model.", executionMap.get( testId ) );
+    }
+
+    public void testPluginExecInheritanceWhereExecInheritedSetToFalseAndPluginInheritedNotSet()
+    {
+        String testId = "test";
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin pChild = new Plugin();
+        pChild.setGroupId( gid );
+        pChild.setArtifactId( aid );
+        pChild.setVersion( ver );
+
+        PluginExecution eChild = new PluginExecution();
+        eChild.setId( "normal" );
+        eChild.addGoal( "run" );
+
+        pChild.addExecution( eChild );
+
+        Build bChild = new Build();
+        bChild.addPlugin( pChild );
+
+        child.setBuild( bChild );
+
+        Model parent = makeBaseModel( "parent" );
+
+        Plugin pParent = new Plugin();
+        pParent.setGroupId( gid );
+        pParent.setArtifactId( aid );
+        pParent.setVersion( ver );
+
+        PluginExecution eParent = new PluginExecution();
+        eParent.setId( testId );
+        eParent.addGoal( "test" );
+        eParent.setInherited( Boolean.toString( false ) );
+
+        pParent.addExecution( eParent );
+
+        Build bParent = new Build();
+        bParent.addPlugin( pParent );
+
+        parent.setBuild( bParent );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        Map pluginMap = bChild.getPluginsAsMap();
+        assertNotNull( pluginMap );
+
+        Plugin plugin = (Plugin) pluginMap.get( gid + ":" + aid );
+        assertNotNull( plugin );
+
+        Map executionMap = plugin.getExecutionsAsMap();
+        assertNotNull( executionMap );
+
+        assertNull( "test execution with inherited == false should NOT be inherited to child model.", executionMap.get( testId ) );
     }
 
     private void assertReports( List expectedPlugins, Model child )

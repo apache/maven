@@ -355,6 +355,7 @@ public class DefaultModelInheritanceAssembler
 
             if ( ( dominantPM == null ) && ( recessivePM != null ) )
             {
+                // FIXME: Filter out the inherited == false stuff!
                 childBuild.setPluginManagement( recessivePM );
             }
             else
