@@ -64,14 +64,19 @@ public class IntegrationTestSuite
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
-        
+
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
+
+        // Pending resolution of MNG-3391
+//        suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
+
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
+        suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
@@ -201,7 +206,7 @@ public class IntegrationTestSuite
         /*
          * Add tests in reverse alpha order above.
          */
-        
+
         // not fixed in the code yet. Test is correct.
         // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
 
