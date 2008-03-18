@@ -1607,7 +1607,8 @@ public class DefaultLifecycleExecutor
                 }
                 else
                 {
-                    throw new BuildFailureException( "Required goal not found: " + task );
+                    throw new BuildFailureException( "Required goal not found: " + task + " in "
+                        + pluginDescriptor.getId() );
                 }
             }
 
