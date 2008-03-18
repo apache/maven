@@ -33,7 +33,6 @@ import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -336,13 +335,13 @@ public class DefaultModelInheritanceAssembler
             ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
 
             List resources = childBuild.getResources();
-            if ( resources == null || resources.isEmpty() )
+            if ( ( resources == null ) || resources.isEmpty() )
             {
                 childBuild.setResources( parentBuild.getResources() );
             }
 
             resources = childBuild.getTestResources();
-            if ( resources == null || resources.isEmpty() )
+            if ( ( resources == null ) || resources.isEmpty() )
             {
                 childBuild.setTestResources( parentBuild.getTestResources() );
             }
@@ -354,8 +353,9 @@ public class DefaultModelInheritanceAssembler
             PluginManagement dominantPM = childBuild.getPluginManagement();
             PluginManagement recessivePM = parentBuild.getPluginManagement();
 
-            if ( dominantPM == null && recessivePM != null )
+            if ( ( dominantPM == null ) && ( recessivePM != null ) )
             {
+                // FIXME: Filter out the inherited == false stuff!
                 childBuild.setPluginManagement( recessivePM );
             }
             else
@@ -494,10 +494,14 @@ public class DefaultModelInheritanceAssembler
         if ( appendPaths )
         {
             if ( pathAdjustment != null )
+            {
                 uncleanPath += "/" + pathAdjustment;
+            }
 
             if ( childPath != null )
+            {
                 uncleanPath += "/" + childPath;
+            }
         }
 
         String cleanedPath = "";
@@ -511,7 +515,9 @@ public class DefaultModelInheritanceAssembler
         }
 
         if ( uncleanPath.startsWith( "/" ) )
+        {
             cleanedPath += "/";
+        }
 
         return cleanedPath + resolvePath( uncleanPath );
     }
@@ -525,7 +531,7 @@ public class DefaultModelInheritanceAssembler
 
         while ( tokenizer.hasMoreTokens() )
         {
-            String token = (String) tokenizer.nextToken();
+            String token = tokenizer.nextToken();
 
             if ( token.equals( "" ) )
             {
@@ -557,7 +563,9 @@ public class DefaultModelInheritanceAssembler
         {
             cleanedPath.append( pathElements.removeFirst() );
             if ( !pathElements.isEmpty() )
+            {
                 cleanedPath.append( '/' );
+            }
         }
 
         return cleanedPath.toString();

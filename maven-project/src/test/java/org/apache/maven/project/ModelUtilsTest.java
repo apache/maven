@@ -19,13 +19,11 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Collections;
@@ -33,10 +31,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 public class ModelUtilsTest
     extends TestCase
 {
-    
+
     public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion()
     {
         Plugin mgtPlugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
@@ -67,104 +67,104 @@ public class ModelUtilsTest
     public void testShouldNotInheritPluginWithInheritanceSetToFalse()
     {
         PluginContainer parent = new PluginContainer();
-        
+
         Plugin parentPlugin = createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP );
         parentPlugin.setInherited( "false" );
-        
+
         parent.addPlugin( parentPlugin );
-        
+
         PluginContainer child = new PluginContainer();
-        
+
         child.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
-        
+
         ModelUtils.mergePluginLists( child, parent, true );
-        
+
         List results = child.getPlugins();
-        
+
         assertEquals( 1, results.size() );
-        
+
         Plugin result1 = (Plugin) results.get( 0 );
         assertEquals( "group3", result1.getGroupId() );
         assertEquals( "artifact3", result1.getArtifactId() );
     }
-    
+
     /**
      * Test that this is the resulting ordering of plugins after merging:
-     * 
+     *
      * Given:
-     * 
+     *
      *   parent: X -> A -> B -> D -> E
      *   child: Y -> A -> C -> D -> F
-     *  
-     * Result: 
-     * 
+     *
+     * Result:
+     *
      *   X -> Y -> A -> B -> C -> D -> E -> F
      */
     public void testShouldPreserveChildOrderingOfPluginsAfterParentMerge()
     {
         PluginContainer parent = new PluginContainer();
-        
+
         parent.addPlugin( createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP ) );
         parent.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key", "value" ) ) );
-        
+
         PluginContainer child = new PluginContainer();
-        
+
         child.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
         child.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key2", "value2" ) ) );
-        
+
         ModelUtils.mergePluginLists( child, parent, true );
-        
+
         List results = child.getPlugins();
-        
+
         assertEquals( 3, results.size() );
-        
+
         Plugin result1 = (Plugin) results.get( 0 );
-        
+
         assertEquals( "group", result1.getGroupId() );
         assertEquals( "artifact", result1.getArtifactId() );
-        
+
         Plugin result2 = (Plugin) results.get( 1 );
-        
+
         assertEquals( "group3", result2.getGroupId() );
         assertEquals( "artifact3", result2.getArtifactId() );
-        
+
         Plugin result3 = (Plugin) results.get( 2 );
-        
+
         assertEquals( "group2", result3.getGroupId() );
         assertEquals( "artifact2", result3.getArtifactId() );
-        
+
         Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
-        
+
         assertNotNull( result3Config );
-        
+
         assertEquals( "value", result3Config.getChild( "key" ).getValue() );
         assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
     }
-    
+
     private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
     {
         Plugin plugin = new Plugin();
         plugin.setGroupId( groupId );
         plugin.setArtifactId( artifactId );
         plugin.setVersion( version );
-        
+
         Xpp3Dom config = new Xpp3Dom( "configuration" );
-        
+
         if( configuration != null )
         {
             for ( Iterator it = configuration.entrySet().iterator(); it.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) it.next();
-                
+
                 Xpp3Dom param = new Xpp3Dom( String.valueOf( entry.getKey() ) );
                 param.setValue( String.valueOf( entry.getValue() ) );
-                
+
                 config.addChild( param );
             }
         }
-        
+
         plugin.setConfiguration( config );
-        
+
         return plugin;
     }
 
@@ -228,7 +228,7 @@ public class ModelUtilsTest
         parentExecution.setId( "testExecution" );
 
         parent.addExecution( parentExecution );
-        
+
         Build parentContainer = new Build();
         parentContainer.addPlugin( parent );
 
@@ -236,18 +236,18 @@ public class ModelUtilsTest
         child.setArtifactId( "testArtifact" );
         child.setGroupId( "testGroup" );
         child.setVersion( "1.0" );
-        
+
         Build childContainer = new Build();
         childContainer.addPlugin( child );
 
         ModelUtils.mergePluginLists( childContainer, parentContainer, true );
-        
+
         List plugins = childContainer.getPlugins();
-        
+
         assertEquals( 1, plugins.size() );
-        
+
         Plugin plugin = (Plugin) plugins.get( 0 );
-        
+
         assertEquals( 1, plugin.getExecutions().size() );
     }
 
@@ -262,7 +262,7 @@ public class ModelUtilsTest
         parentExecution.setId( "testExecution" );
 
         parent.addExecution( parentExecution );
-        
+
         Build parentContainer = new Build();
         parentContainer.addPlugin( parent );
 
@@ -276,18 +276,18 @@ public class ModelUtilsTest
 
         child.addExecution( childExecution );
 
-        
+
         Build childContainer = new Build();
         childContainer.addPlugin( child );
 
         ModelUtils.mergePluginLists( childContainer, parentContainer, true );
-        
+
         List plugins = childContainer.getPlugins();
-        
+
         assertEquals( 1, plugins.size() );
-        
+
         Plugin plugin = (Plugin) plugins.get( 0 );
-        
+
         assertEquals( 2, plugin.getExecutions().size() );
     }
 
@@ -455,4 +455,125 @@ public class ModelUtilsTest
 
         assertEquals( 2, ((Plugin)first.getPlugins().get( 0 ) ).getDependencies().size() );
     }
+
+    public void testShouldNotMergePluginExecutionWhenExecInheritedIsFalseAndTreatAsInheritanceIsTrue()
+    {
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        PluginContainer parent = new PluginContainer();
+        Plugin pParent = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+
+        pParent.setInherited( Boolean.toString( true ) );
+
+        PluginExecution eParent = new PluginExecution();
+
+        String testId = "test";
+
+        eParent.setId( testId );
+        eParent.addGoal( "run" );
+        eParent.setPhase( "initialize" );
+        eParent.setInherited( Boolean.toString( false ) );
+
+        pParent.addExecution( eParent );
+        parent.addPlugin( pParent );
+
+        PluginContainer child = new PluginContainer();
+        Plugin pChild = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+        PluginExecution eChild = new PluginExecution();
+
+        eChild.setId( "child-specified" );
+        eChild.addGoal( "child" );
+        eChild.setPhase( "compile" );
+
+        pChild.addExecution( eChild );
+        child.addPlugin( pChild );
+
+        ModelUtils.mergePluginDefinitions( pChild, pParent, true );
+
+        Map executionMap = pChild.getExecutionsAsMap();
+        assertNull( "test execution should not be inherited from parent.", executionMap.get( testId ) );
+    }
+
+    public void testShouldNotMergePluginExecutionWhenPluginInheritedIsFalseAndTreatAsInheritanceIsTrue()
+    {
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        PluginContainer parent = new PluginContainer();
+        Plugin pParent = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+
+        pParent.setInherited( Boolean.toString( false ) );
+
+        PluginExecution eParent = new PluginExecution();
+
+        String testId = "test";
+
+        eParent.setId( testId );
+        eParent.addGoal( "run" );
+        eParent.setPhase( "initialize" );
+        eParent.setInherited( Boolean.toString( true ) );
+
+        pParent.addExecution( eParent );
+        parent.addPlugin( pParent );
+
+        PluginContainer child = new PluginContainer();
+        Plugin pChild = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+        PluginExecution eChild = new PluginExecution();
+
+        eChild.setId( "child-specified" );
+        eChild.addGoal( "child" );
+        eChild.setPhase( "compile" );
+
+        pChild.addExecution( eChild );
+        child.addPlugin( pChild );
+
+        ModelUtils.mergePluginDefinitions( pChild, pParent, true );
+
+        Map executionMap = pChild.getExecutionsAsMap();
+        assertNull( "test execution should not be inherited from parent.", executionMap.get( testId ) );
+    }
+
+    public void testShouldMergePluginExecutionWhenExecInheritedIsTrueAndTreatAsInheritanceIsTrue()
+    {
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        PluginContainer parent = new PluginContainer();
+        Plugin pParent = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+
+        pParent.setInherited( Boolean.toString( true ) );
+
+        PluginExecution eParent = new PluginExecution();
+
+        String testId = "test";
+
+        eParent.setId( testId );
+        eParent.addGoal( "run" );
+        eParent.setPhase( "initialize" );
+        eParent.setInherited( Boolean.toString( true ) );
+
+        pParent.addExecution( eParent );
+        parent.addPlugin( pParent );
+
+        PluginContainer child = new PluginContainer();
+        Plugin pChild = createPlugin( gid, aid, ver, Collections.EMPTY_MAP );
+        PluginExecution eChild = new PluginExecution();
+
+        eChild.setId( "child-specified" );
+        eChild.addGoal( "child" );
+        eChild.setPhase( "compile" );
+
+        pChild.addExecution( eChild );
+        child.addPlugin( pChild );
+
+        ModelUtils.mergePluginDefinitions( pChild, pParent, true );
+
+        Map executionMap = pChild.getExecutionsAsMap();
+        assertNotNull( "test execution should be inherited from parent.", executionMap.get( testId ) );
+    }
+
 }

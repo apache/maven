@@ -19,7 +19,6 @@ package org.apache.maven.project.inheritance;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -45,6 +44,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 /**
  * @author jdcasey
  */
@@ -52,129 +53,129 @@ public class DefaultModelInheritanceAssemblerTest
     extends TestCase
 {
     private ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
-    
+
     public void testShouldAdjustChildUrlBasedOnParentAndModulePathInSiblingDir()
     {
         Model parent = makeBaseModel( "parent" );
-        
+
         parent.setUrl( "http://www.google.com/parent" );
-        
+
         Model child = makeBaseModel( "child" );
-        
+
         // TODO: this is probably what we should be appending...
 //        child.setUrl( "/child.dir" );
-        
+
         parent.addModule( "../child" );
-        
+
         assembler.assembleModelInheritance( child, parent, ".." );
-        
+
         String resultingUrl = child.getUrl();
-        
+
         System.out.println( resultingUrl );
-        
+
         assertEquals( "http://www.google.com/child", resultingUrl );
     }
-    
+
     public void testShouldAdjustPathsThreeLevelsDeepAncestryInRepoAndNonStandardModulePaths()
     {
         Model top = makeBaseModel( "top" );
-        
+
         top.setUrl( "http://www.google.com/top" );
-        
+
         Model middle = makeBaseModel( "middle" );
-        
+
         top.addModule( "../middle" );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         middle.addModule( "../bottom" );
-        
+
         assembler.assembleModelInheritance( middle, top, ".." );
         assembler.assembleModelInheritance( bottom, middle, ".." );
-        
+
         String resultingUrl = bottom.getUrl();
-        
+
         System.out.println( resultingUrl );
-        
+
         assertEquals( "http://www.google.com/bottom", resultingUrl );
     }
-    
+
     public void testShouldMergeSuccessiveDependencyManagementSectionsOverThreeLevels()
     {
         Model top = makeBaseModel( "top" );
-        
+
         DependencyManagement topMgmt = new DependencyManagement();
-        
+
         topMgmt.addDependency( makeDep( "top-dep" ) );
-        
+
         top.setDependencyManagement( topMgmt );
-        
+
         Model mid = makeBaseModel( "mid" );
-        
+
         DependencyManagement midMgmt = new DependencyManagement();
-        
+
         midMgmt.addDependency( makeDep( "mid-dep" ) );
-        
+
         mid.setDependencyManagement( midMgmt );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         DependencyManagement bottomMgmt = new DependencyManagement();
-        
+
         bottomMgmt.addDependency( makeDep( "bottom-dep" ) );
-        
+
         bottom.setDependencyManagement( bottomMgmt );
-        
+
         assembler.assembleModelInheritance( mid, top );
-        
+
         assembler.assembleModelInheritance( bottom, mid );
-        
+
         DependencyManagement result = bottom.getDependencyManagement();
-        
+
         List resultDeps = result.getDependencies();
-        
+
         assertEquals( 3, resultDeps.size() );
     }
-    
+
     public void testShouldMergeDependencyManagementSectionsFromTopTwoLevelsToBottomLevel()
     {
         Model top = makeBaseModel( "top" );
-        
+
         DependencyManagement topMgmt = new DependencyManagement();
-        
+
         topMgmt.addDependency( makeDep( "top-dep" ) );
-        
+
         top.setDependencyManagement( topMgmt );
-        
+
         Model mid = makeBaseModel( "mid" );
-        
+
         DependencyManagement midMgmt = new DependencyManagement();
-        
+
         midMgmt.addDependency( makeDep( "mid-dep" ) );
-        
+
         mid.setDependencyManagement( midMgmt );
-        
+
         Model bottom = makeBaseModel( "bottom" );
-        
+
         assembler.assembleModelInheritance( mid, top );
-        
+
         assembler.assembleModelInheritance( bottom, mid );
-        
+
         DependencyManagement result = bottom.getDependencyManagement();
-        
+
         List resultDeps = result.getDependencies();
-        
+
         assertEquals( 2, resultDeps.size() );
     }
-    
+
     private Dependency makeDep( String artifactId )
     {
         Dependency dep = new Dependency();
-        
+
         dep.setGroupId( "maven" );
         dep.setArtifactId( artifactId );
         dep.setVersion( "1.0" );
-        
+
         return dep;
     }
 
@@ -590,7 +591,7 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Build childBuild = child.getBuild();
 
-        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        if ( ( expectedPlugins != null ) && !expectedPlugins.isEmpty() )
         {
             assertNotNull( childBuild );
 
@@ -616,7 +617,7 @@ public class DefaultModelInheritanceAssemblerTest
         }
         else
         {
-            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+            assertTrue( ( childBuild == null ) || ( childBuild.getPlugins() == null ) || childBuild.getPlugins().isEmpty() );
         }
     }
 
@@ -628,9 +629,9 @@ public class DefaultModelInheritanceAssemblerTest
         List referenceExecutions = reference.getExecutions();
         Map testExecutionsMap = test.getExecutionsAsMap();
 
-        if ( referenceExecutions != null && !referenceExecutions.isEmpty() )
+        if ( ( referenceExecutions != null ) && !referenceExecutions.isEmpty() )
         {
-            assertTrue( "Missing goals specification", ( testExecutionsMap != null && !testExecutionsMap.isEmpty() ) );
+            assertTrue( "Missing goals specification", ( ( testExecutionsMap != null ) && !testExecutionsMap.isEmpty() ) );
 
             for ( Iterator it = referenceExecutions.iterator(); it.hasNext(); )
             {
@@ -648,7 +649,7 @@ public class DefaultModelInheritanceAssemblerTest
         else
         {
             assertTrue( "Unexpected goals specification",
-                        ( testExecutionsMap == null || testExecutionsMap.isEmpty() ) );
+                        ( ( testExecutionsMap == null ) || testExecutionsMap.isEmpty() ) );
         }
     }
 
@@ -746,11 +747,129 @@ public class DefaultModelInheritanceAssemblerTest
         assertReports( new ArrayList(), child );
     }
 
+    public void testPluginExecInheritanceWhereExecInheritedSetToFalse()
+    {
+        String testId = "test";
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin pChild = new Plugin();
+        pChild.setGroupId( gid );
+        pChild.setArtifactId( aid );
+        pChild.setVersion( ver );
+
+        PluginExecution eChild = new PluginExecution();
+        eChild.setId( "normal" );
+        eChild.addGoal( "run" );
+
+        pChild.addExecution( eChild );
+
+        Build bChild = new Build();
+        bChild.addPlugin( pChild );
+
+        child.setBuild( bChild );
+
+        Model parent = makeBaseModel( "parent" );
+
+        Plugin pParent = new Plugin();
+        pParent.setGroupId( gid );
+        pParent.setArtifactId( aid );
+        pParent.setVersion( ver );
+
+        pParent.setInherited( Boolean.toString( true ) );
+
+        PluginExecution eParent = new PluginExecution();
+        eParent.setId( testId );
+        eParent.addGoal( "test" );
+        eParent.setInherited( Boolean.toString( false ) );
+
+        pParent.addExecution( eParent );
+
+        Build bParent = new Build();
+        bParent.addPlugin( pParent );
+
+        parent.setBuild( bParent );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        Map pluginMap = bChild.getPluginsAsMap();
+        assertNotNull( pluginMap );
+
+        Plugin plugin = (Plugin) pluginMap.get( gid + ":" + aid );
+        assertNotNull( plugin );
+
+        Map executionMap = plugin.getExecutionsAsMap();
+        assertNotNull( executionMap );
+
+        assertNull( "test execution with inherited == false should NOT be inherited to child model.", executionMap.get( testId ) );
+    }
+
+    public void testPluginExecInheritanceWhereExecInheritedSetToFalseAndPluginInheritedNotSet()
+    {
+        String testId = "test";
+        String gid = "group";
+        String aid = "artifact";
+        String ver = "1";
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin pChild = new Plugin();
+        pChild.setGroupId( gid );
+        pChild.setArtifactId( aid );
+        pChild.setVersion( ver );
+
+        PluginExecution eChild = new PluginExecution();
+        eChild.setId( "normal" );
+        eChild.addGoal( "run" );
+
+        pChild.addExecution( eChild );
+
+        Build bChild = new Build();
+        bChild.addPlugin( pChild );
+
+        child.setBuild( bChild );
+
+        Model parent = makeBaseModel( "parent" );
+
+        Plugin pParent = new Plugin();
+        pParent.setGroupId( gid );
+        pParent.setArtifactId( aid );
+        pParent.setVersion( ver );
+
+        PluginExecution eParent = new PluginExecution();
+        eParent.setId( testId );
+        eParent.addGoal( "test" );
+        eParent.setInherited( Boolean.toString( false ) );
+
+        pParent.addExecution( eParent );
+
+        Build bParent = new Build();
+        bParent.addPlugin( pParent );
+
+        parent.setBuild( bParent );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        Map pluginMap = bChild.getPluginsAsMap();
+        assertNotNull( pluginMap );
+
+        Plugin plugin = (Plugin) pluginMap.get( gid + ":" + aid );
+        assertNotNull( plugin );
+
+        Map executionMap = plugin.getExecutionsAsMap();
+        assertNotNull( executionMap );
+
+        assertNull( "test execution with inherited == false should NOT be inherited to child model.", executionMap.get( testId ) );
+    }
+
     private void assertReports( List expectedPlugins, Model child )
     {
         Reporting childBuild = child.getReporting();
 
-        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        if ( ( expectedPlugins != null ) && !expectedPlugins.isEmpty() )
         {
             assertNotNull( childBuild );
 
@@ -776,7 +895,7 @@ public class DefaultModelInheritanceAssemblerTest
         }
         else
         {
-            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+            assertTrue( ( childBuild == null ) || ( childBuild.getPlugins() == null ) || childBuild.getPlugins().isEmpty() );
         }
     }
 
@@ -788,9 +907,9 @@ public class DefaultModelInheritanceAssemblerTest
         List referenceReportSets = reference.getReportSets();
         Map testReportSetsMap = test.getReportSetsAsMap();
 
-        if ( referenceReportSets != null && !referenceReportSets.isEmpty() )
+        if ( ( referenceReportSets != null ) && !referenceReportSets.isEmpty() )
         {
-            assertTrue( "Missing goals specification", ( testReportSetsMap != null && !testReportSetsMap.isEmpty() ) );
+            assertTrue( "Missing goals specification", ( ( testReportSetsMap != null ) && !testReportSetsMap.isEmpty() ) );
 
             for ( Iterator it = referenceReportSets.iterator(); it.hasNext(); )
             {
@@ -808,7 +927,7 @@ public class DefaultModelInheritanceAssemblerTest
         else
         {
             assertTrue( "Unexpected goals specification",
-                        ( testReportSetsMap == null || testReportSetsMap.isEmpty() ) );
+                        ( ( testReportSetsMap == null ) || testReportSetsMap.isEmpty() ) );
         }
     }
 
@@ -851,7 +970,7 @@ public class DefaultModelInheritanceAssemblerTest
     {
         Model model = makeBaseModel( artifactId );
 
-        if ( connection != null || developerConnection != null || url != null )
+        if ( ( connection != null ) || ( developerConnection != null ) || ( url != null ) )
         {
             Scm scm = new Scm();
 
