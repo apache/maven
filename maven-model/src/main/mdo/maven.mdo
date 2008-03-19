@@ -2419,6 +2419,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "FileSet {directory: " + getDirectory() + ", " + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Resource</name>
