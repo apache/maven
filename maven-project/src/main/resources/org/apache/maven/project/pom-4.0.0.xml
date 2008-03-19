@@ -95,11 +95,15 @@ under the License.
          </plugin>
          <plugin>
            <artifactId>maven-ear-plugin</artifactId>
-           <version>2.1</version>
+           <version>2.3.1</version>
          </plugin>
          <plugin>
            <artifactId>maven-ejb-plugin</artifactId>
            <version>2.1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-install-plugin</artifactId>
+           <version>2.2</version>
          </plugin>
          <plugin>
            <artifactId>maven-jar-plugin</artifactId>
@@ -108,10 +112,6 @@ under the License.
          <plugin>
            <artifactId>maven-javadoc-plugin</artifactId>
            <version>2.4</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-install-plugin</artifactId>
-           <version>2.2</version>
          </plugin>
          <plugin>
            <artifactId>maven-plugin-plugin</artifactId>
