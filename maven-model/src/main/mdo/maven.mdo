@@ -2165,6 +2165,41 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        sb.append("PatternSet [includes: {");
+        for (java.util.Iterator i = getIncludes().iterator(); i.hasNext(); )
+        {
+            String str = (String) i.next();
+            sb.append(str).append(", ");
+        }
+        if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
+        
+        sb.append("}, excludes: {");
+        for (java.util.Iterator i = getExcludes().iterator(); i.hasNext(); )
+        {
+            String str = (String) i.next();
+            sb.append(str).append(", ");
+        }
+        if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
+        
+        sb.append("}]");
+        return sb.toString();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Parent</name>
