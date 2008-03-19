@@ -20,7 +20,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>maven-${pom.version}-uber</finalName>
+              <finalName>maven-${project.version}-uber</finalName>
               <createDependencyReducedPom>
                 false
               </createDependencyReducedPom>
@@ -78,7 +78,7 @@
         <version>2.1</version>
         <configuration>
           <descriptor>src/assemble/bin.xml</descriptor>
-          <finalName>apache-maven-${version}</finalName>
+          <finalName>apache-maven-${project.version}</finalName>
         </configuration>
         <executions>
           <execution>
