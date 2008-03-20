@@ -696,8 +696,15 @@ public class DefaultPluginManager
 
             checkPlexusUtils( resolutionGroup, artifactFactory );
 
-            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+            // FIXME: We need to control the ordering of plugin dependencies,
+            // but this ordering change currently kills at least the plugin-plugin.
+            // Not sure why (yet).
+            // Set dependencies = new LinkedHashSet();
+            Set dependencies = new HashSet();
             dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
+            dependencies.addAll( resolutionGroup.getArtifacts() );
+
+            getLogger().debug( "Plugin dependencies for:\n\n" + pluginDescriptor.getId() + "\n\nare:\n\n" + StringUtils.join( dependencies.iterator(), "\n" ) + "\n\n" );
 
             List repositories = new ArrayList();
             repositories.addAll( resolutionGroup.getResolutionRepositories() );
