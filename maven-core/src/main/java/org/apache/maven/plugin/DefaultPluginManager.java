@@ -91,7 +91,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -697,10 +696,8 @@ public class DefaultPluginManager
 
             checkPlexusUtils( resolutionGroup, artifactFactory );
 
-            // [MNG-3426] resolve the plugin dependencies specified in <plugin><dependencies> first
-            // a LinkedHashSet is used to ensure predictable dependency ordering
-            Set dependencies = new LinkedHashSet( pluginDescriptor.getIntroducedDependencyArtifacts() );
-            dependencies.addAll( resolutionGroup.getArtifacts() );
+            Set dependencies = new HashSet( resolutionGroup.getArtifacts() );
+            dependencies.addAll( pluginDescriptor.getIntroducedDependencyArtifacts() );
 
             List repositories = new ArrayList();
             repositories.addAll( resolutionGroup.getResolutionRepositories() );
