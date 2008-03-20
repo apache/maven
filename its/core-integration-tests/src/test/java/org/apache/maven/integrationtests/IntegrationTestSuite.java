@@ -81,7 +81,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
-        suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
+      /*  suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
@@ -203,7 +203,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0002Test.class );
         suite.addTestSuite( MavenIT0001Test.class );
         suite.addTestSuite( MavenIT0000Test.class );
-
+*/
         /*
          * Add tests in reverse alpha order above.
          */
