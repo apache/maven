@@ -19,7 +19,11 @@ public class MavenITmng3473PluginReportCrash
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "install site" );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.executeGoal( "site" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
