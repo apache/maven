@@ -19,13 +19,7 @@ public class MavenITmng3473PluginReportCrash
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "org.apache.maven.plugin:maven-plugin-plugin:2.3" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-        
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.executeGoal( "org.apache.maven.plugin:maven-plugin-plugin:2.4" );
+        verifier.executeGoal( "site" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
