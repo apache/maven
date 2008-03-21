@@ -27,6 +27,13 @@
 			  <groupId>org.codehaus.castor</groupId>
 			  <artifactId>castor-codegen</artifactId>
               <version>1.1.1</version>	
+              <!--JTA isn't in the repo and isn't needed for this test-->
+              <exclusions>
+                <exclusion>
+                  <groupId>javax.transaction</groupId>
+                  <artifactId>jta</artifactId>
+                </exclusion>
+              </exclusions>
 			</dependency>
 		  </dependencies>
 		</plugin>		
