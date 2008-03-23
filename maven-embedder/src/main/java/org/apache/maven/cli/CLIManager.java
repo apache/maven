@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * @author Jason van Zyl
- * @version $Revision: 381114 $
+ * @version $Revision$
  */
 public class CLIManager
 {
