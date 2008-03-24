@@ -6,9 +6,8 @@ echo "Using $LOCAL_REPO ..."
 
 mv "${LOCAL_REPO}" "${LOCAL_REPO}.its"
 
-mvn -N install
-
-( 
+mvn -N install \
+&& ( 
   cd core-integration-testing-plugins
   mvn install
   ret=$?; if [ $ret != 0 ]; then echo "Failed to install IT plugins" && exit $ret; fi
