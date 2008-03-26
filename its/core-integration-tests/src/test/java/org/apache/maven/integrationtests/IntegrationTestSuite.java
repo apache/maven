@@ -183,7 +183,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0023Test.class );
         suite.addTestSuite( MavenIT0022Test.class );
         suite.addTestSuite( MavenIT0021Test.class );
-        suite.addTestSuite( MavenIT0020Test.class );
+        
         suite.addTestSuite( MavenIT0019Test.class );
 
         suite.addTestSuite( MavenIT0017Test.class );
@@ -220,6 +220,9 @@ public class IntegrationTestSuite
          *in the repo. It should be redone using fake artifacts.
          */
         //suite.addTestSuite( MavenIT0018Test.class );
+
+        //this test is flakey on windows and isn't a test of the core.
+           suite.addTestSuite( MavenIT0020Test.class );
 
         // suite.addTestSuite(MavenIT0091Test.class);
         // suite.addTestSuite(MavenIT0106Test.class);
