@@ -13,7 +13,7 @@
         <groupId>org.apache.maven.its.plugins</groupId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <pluginFile>touch-${version}.txt</pluginFile>
+          <pluginFile>touch-${project.version}.txt</pluginFile>
         </configuration>
       </plugin>
     </plugins>

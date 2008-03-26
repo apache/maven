@@ -11,7 +11,7 @@
   <packaging>war</packaging>
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>test-component-a</artifactId>
       <version>0.1</version>
     </dependency>

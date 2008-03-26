@@ -11,7 +11,7 @@
   <packaging>ear</packaging>
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>test-component-b</artifactId>
       <version>0.1</version>
       <type>war</type>

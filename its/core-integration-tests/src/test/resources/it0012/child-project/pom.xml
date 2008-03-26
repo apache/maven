@@ -12,7 +12,7 @@
         <version>2.1-SNAPSHOT</version>
         <configuration>
 		<outputDirectory>${basedir}/target/</outputDirectory>
-          <pluginFile>child-touch-${version}.txt</pluginFile>
+          <pluginFile>child-touch-${project.version}.txt</pluginFile>
         </configuration>
       </plugin>
     </plugins>
