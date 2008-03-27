@@ -19,12 +19,12 @@ package org.apache.maven.project.imports.t01;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Map;
-
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.imports.AbstractProjectImportsTestCase;
-import org.apache.maven.artifact.Artifact;
+
+import java.io.File;
+import java.util.Map;
 
 
 /**

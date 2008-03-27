@@ -289,7 +289,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( "<Super-POM>", project, null, null, true );
+            project = processProjectLogic( "<Super-POM>", project, null, null, null, null, true, true );
 
             project.setExecutionRoot( true );
 
@@ -846,11 +846,9 @@ public class DefaultMavenProjectBuilder
         // merge any duplicated plugin definitions together, using the first appearance as the dominant one.
         ModelUtils.mergeDuplicatePluginDefinitions( project.getModel().getBuild() );
 
-        mergeManagedDependencies(project.getModel(), localRepository, repositories);
-
         try
         {
-            project = processProjectLogic( pomLocation, project, externalProfileManager, projectDir, strict );
+            project = processProjectLogic( pomLocation, project, externalProfileManager, projectDir, localRepository, repositories, strict, false );
         }
         catch ( ModelInterpolationException e )
         {
@@ -938,7 +936,10 @@ public class DefaultMavenProjectBuilder
                                               MavenProject project,
                                               ProfileManager profileMgr,
                                               File projectDir,
-                                              boolean strict )
+                                              ArtifactRepository localRepository,
+                                              List remoteRepositories,
+                                              boolean strict,
+                                              boolean isSuperPom )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
         Model model = project.getModel();
@@ -980,6 +981,12 @@ public class DefaultMavenProjectBuilder
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
         context.putAll( System.getProperties() );
         model = modelInterpolator.interpolate( model, context, strict );
+
+        // MNG-3482: Make sure depMgmt is interpolated before merging.
+        if ( !isSuperPom )
+        {
+            mergeManagedDependencies( model, localRepository, remoteRepositories );
+        }
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
@@ -1366,7 +1373,7 @@ public class DefaultMavenProjectBuilder
             {
                 Dependency dep = (Dependency) iter.next();
                 depsMap.put( dep.getManagementKey(), dep );
-                if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals(dep.getScope()))
+                if ( dep.getType().equals( "pom" ) && Artifact.SCOPE_IMPORT.equals( dep.getScope() ) )
                 {
                     doInclude = true;
                 }
@@ -1378,7 +1385,8 @@ public class DefaultMavenProjectBuilder
                 while (iter.hasNext())
                 {
                     Dependency dep = (Dependency)iter.next();
-                    if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals(dep.getScope()))
+                    if ( dep.getType().equals( "pom" )
+                         && Artifact.SCOPE_IMPORT.equals( dep.getScope() ) )
                     {
                         Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
                                                                                   dep.getVersion(), dep.getScope() );
