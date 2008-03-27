@@ -28,6 +28,7 @@
      <plugin>
        <artifactId>maven-plugin-plugin</artifactId>
        <!--only fails with 2.4, not 2.3 or 2.4.1-->
+       <version>${plugin.version}</version>
      </plugin>
    </plugins>
  </reporting>
