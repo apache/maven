@@ -3,6 +3,12 @@
   <groupId>org.apache.maven.its.mng2339</groupId>
   <artifactId>bad-project-interpolation</artifactId>
   <version>1.0-SNAPSHOT</version>
+  
+  <!-- 
+    NOTE: This actually tests that the ${project.version} expression 
+    in the version of a DEPENDENCY in the project-interpolation plugin 
+    gets the correct value, despite a -Dversion=foo command-line property!
+  -->
   <build>
     <plugins>
       <plugin>
@@ -10,19 +16,16 @@
         <artifactId>maven-it-plugin-project-interpolation</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <myDirectory>${myDirectory}</myDirectory>
+          <myDirectory>${project.build.directory}/foo</myDirectory>
         </configuration>
         <executions>
           <execution>
             <goals>
-              <goal>check</goal>
+              <goal>check-plugin</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <myDirectory>${project.build.directory}/foo</myDirectory>
-  </properties>
 </project>

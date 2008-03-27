@@ -22,13 +22,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @goal check
+ * @goal check-property
  * 
  * @phase validate
- *
- * @description Goal which cleans the build
  */
-public class CoreItMojo
+public class PropertyInterpolationMojo
     extends AbstractMojo
 {
     /** @parameter */
@@ -40,15 +38,10 @@ public class CoreItMojo
     public void execute()
         throws MojoExecutionException
     {
-        if ( !myDirectory.equals( project.getBasedir() + "/target/foo" ) )
-        {
-            throw new MojoExecutionException( "wrong directory: " + myDirectory );
-        }
-
         String value = project.getProperties().getProperty( "myDirectory" );
-        if ( !value.equals( "${project.build.directory}/foo" ) )
+        if ( !value.equals( project.getBuild().getDirectory() + "/foo" ) )
         {
-            throw new MojoExecutionException( "wrong directory: " + value );
+            throw new MojoExecutionException( "Property value of 'myDirectory': " + value + " should equal project build directory: " + project.getBuild().getDirectory() + " + '/foo'" );
         }
     }
 }

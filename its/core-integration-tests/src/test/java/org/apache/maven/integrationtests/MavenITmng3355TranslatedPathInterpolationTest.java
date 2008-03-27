@@ -26,20 +26,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenITmng2339BadProjectInterpolationTest
+public class MavenITmng3355TranslatedPathInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng2339BadProjectInterpolationTest()
+    public MavenITmng3355TranslatedPathInterpolationTest()
         throws org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }
 
-    public void testitMNG2339a()
+    public void testitMNG3355()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339-badProjectInterpolation/a" );
+                                                                 "/mng-3355" );
 
         Verifier verifier;
 
@@ -49,39 +49,6 @@ public class MavenITmng2339BadProjectInterpolationTest
         cliOptions.add( "-Dversion=foo" );
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-    }
-
-    // test that -Dversion=1.0 is still available for interpolation.
-    public void testitMNG2339b()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339-badProjectInterpolation/b" );
-
-        Verifier verifier;
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.executeGoal( "initialize" );
-
-        assertTrue( "Touchfile using ${project.version} for ${version} does not exist.",
-                    new File( testDir, "target/touch-1.txt" ).exists() );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dversion=2" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "initialize" );
-
-        assertTrue( "Touchfile using CLI-specified ${version} does not exist.",
-                    new File( testDir, "target/touch-2.txt" ).exists() );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
