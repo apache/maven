@@ -222,7 +222,7 @@ public class IntegrationTestSuite
         //suite.addTestSuite( MavenIT0018Test.class );
 
         //this test is flakey on windows and isn't a test of the core.
-           suite.addTestSuite( MavenIT0020Test.class );
+        //   suite.addTestSuite( MavenIT0020Test.class );
 
         // suite.addTestSuite(MavenIT0091Test.class);
         // suite.addTestSuite(MavenIT0106Test.class);
