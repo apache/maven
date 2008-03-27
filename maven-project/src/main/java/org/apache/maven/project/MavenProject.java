@@ -1351,15 +1351,7 @@ public class MavenProject
     }
 
     public void addAttachedArtifact( Artifact artifact )
-        throws DuplicateArtifactAttachmentException
     {
-        List attachedArtifacts = getAttachedArtifacts();
-
-        if ( attachedArtifacts.contains( artifact ) )
-        {
-            throw new DuplicateArtifactAttachmentException( this, artifact );
-        }
-
         getAttachedArtifacts().add( artifact );
     }
 
@@ -1771,25 +1763,25 @@ public class MavenProject
     {
         StringBuffer sb = new StringBuffer(30);
         sb.append( "MavenProject: " );
-        sb.append( getGroupId() );
+        sb.append( this.getGroupId() );
         sb.append( ":" );
-        sb.append( getArtifactId() );
+        sb.append( this.getArtifactId() );
         sb.append( ":" );
-        sb.append( getVersion() );
+        sb.append( this.getVersion() );
         sb.append( " @ " );
-
-        try
+        
+        try 
         {
-            sb.append( getFile().getPath() );
+            sb.append( this.getFile().getPath() );
         }
         catch (NullPointerException e)
         {
             //don't log it.
         }
-
-        return sb.toString();
+        
+        return sb.toString();        
     }
-
+    
     /**
      * @throws CloneNotSupportedException
      * @since 2.0.9
