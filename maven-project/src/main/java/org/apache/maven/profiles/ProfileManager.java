@@ -25,6 +25,7 @@ import org.apache.maven.settings.Settings;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public interface ProfileManager
 {
@@ -55,5 +56,7 @@ public interface ProfileManager
     List getIdsActivatedByDefault();
 
     void loadSettingsProfiles( Settings settings );
-    
+
+    Properties getRequestProperties();
+
 }

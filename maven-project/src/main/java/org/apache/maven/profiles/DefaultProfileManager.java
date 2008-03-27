@@ -19,7 +19,6 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
-import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -32,9 +31,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 public class DefaultProfileManager
@@ -49,9 +49,8 @@ public class DefaultProfileManager
     private List defaultIds = new ArrayList();
 
     private Map profilesById = new LinkedHashMap();
-    
-    // default fallback..
-    private Properties systemProperties = System.getProperties();
+
+    private Properties requestProperties;
 
     /**
      * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work correctly
@@ -61,7 +60,7 @@ public class DefaultProfileManager
     {
         this( container, (Settings)null);
     }
-    
+
     /**
      * the properties passed to the profile manager are the props that
      * are passed to maven, possibly containing profile activator properties
@@ -70,7 +69,7 @@ public class DefaultProfileManager
     public DefaultProfileManager( PlexusContainer container, Properties props )
     {
         this( container, (Settings)null, props );
-        
+
     }
 
     /**
@@ -83,7 +82,7 @@ public class DefaultProfileManager
 
         loadSettingsProfiles( settings );
     }
-    
+
     /**
      * the properties passed to the profile manager are the props that
      * are passed to maven, possibly containing profile activator properties
@@ -94,15 +93,15 @@ public class DefaultProfileManager
         this.container = container;
 
         loadSettingsProfiles( settings );
-        
+
         if ( props != null )
         {
-            systemProperties = props;
+            requestProperties = props;
         }
     }
-    
-    public Properties getSystemProperties() {
-        return systemProperties;
+
+    public Properties getRequestProperties() {
+        return requestProperties;
     }
 
     public Map getProfilesById()
@@ -211,7 +210,7 @@ public class DefaultProfileManager
             {
                 shouldAdd = true;
             }
-            
+
             if ( shouldAdd )
             {
                 if ( "pom".equals( profile.getSource() ) )
@@ -236,9 +235,9 @@ public class DefaultProfileManager
                 activeFromPom.add( profile );
             }
         }
-        
+
         List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
-        
+
         allActive.addAll( activeExternal );
         allActive.addAll( activeFromPom );
 
@@ -249,6 +248,12 @@ public class DefaultProfileManager
         throws ProfileActivationException
     {
         List activators = null;
+        Properties systemProperties = new Properties( System.getProperties() );
+        if ( requestProperties != null )
+        {
+            systemProperties.putAll( requestProperties );
+        }
+
         container.addContextValue("SystemProperties", systemProperties);
         try
         {

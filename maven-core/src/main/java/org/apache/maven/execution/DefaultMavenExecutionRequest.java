@@ -63,6 +63,8 @@ public class DefaultMavenExecutionRequest
 
     private final Properties executionProperties;
 
+    private final Properties userProperties;
+
     private final Date startTime;
 
     private final boolean showErrors;
@@ -70,6 +72,7 @@ public class DefaultMavenExecutionRequest
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
                                          EventDispatcher eventDispatcher, List goals, String baseDirectory,
                                          ProfileManager globalProfileManager, Properties executionProperties,
+                                         Properties userProperties,
                                          boolean showErrors )
     {
         this.localRepository = localRepository;
@@ -86,7 +89,9 @@ public class DefaultMavenExecutionRequest
 
         this.executionProperties = executionProperties;
 
-        this.startTime = new Date();
+        this.userProperties = userProperties;
+
+        startTime = new Date();
 
         this.showErrors = showErrors;
     }
@@ -193,5 +198,10 @@ public class DefaultMavenExecutionRequest
     public boolean isShowErrors()
     {
         return showErrors;
+    }
+
+    public Properties getUserProperties()
+    {
+        return userProperties;
     }
 }

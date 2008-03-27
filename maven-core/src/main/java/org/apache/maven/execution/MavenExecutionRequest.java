@@ -71,6 +71,8 @@ public interface MavenExecutionRequest
 
     Properties getExecutionProperties();
 
+    Properties getUserProperties();
+
     Date getStartTime();
 
     boolean isShowErrors();

@@ -25,19 +25,23 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Mirror;
@@ -70,6 +74,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.TimeZone;
 
 /**
@@ -284,7 +289,7 @@ public class DefaultMaven
         getLogger().info( "Scanning for projects..." );
 
         boolean foundProjects = true;
-        List projects = getProjects( request, globalProfileManager );
+        List projects = getProjects( request );
         if ( projects.isEmpty() )
         {
             projects.add( getSuperProject( request ) );
@@ -349,7 +354,7 @@ public class DefaultMaven
         return superProject;
     }
 
-    private List getProjects( MavenExecutionRequest request, ProfileManager globalProfileManager )
+    private List getProjects( MavenExecutionRequest request )
         throws MavenExecutionException, BuildFailureException
     {
         List projects;
@@ -357,8 +362,7 @@ public class DefaultMaven
         {
             List files = getProjectFiles( request );
 
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings(), globalProfileManager, !request.isReactorActive() );
+            projects = collectProjects( files, request, !request.isReactorActive() );
 
         }
         catch ( IOException e )
@@ -434,11 +438,12 @@ public class DefaultMaven
         return fmt.format( new Date( time ) );
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
-                                  ProfileManager globalProfileManager, boolean isRoot )
+    private List collectProjects( List files, MavenExecutionRequest request, boolean isRoot )
         throws ArtifactResolutionException, ProjectBuildingException, ProfileActivationException,
         MavenExecutionException, BuildFailureException
     {
+//        .getLocalRepository(), request.isRecursive(),
+//        request.getSettings(), request.getUserProperties(), requ, !request.isReactorActive()
         List projects = new ArrayList( files.size() );
 
         for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
@@ -453,7 +458,7 @@ public class DefaultMaven
                 usingReleasePom = true;
             }
 
-            MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
+            MavenProject project = getProject( file, request );
 
             if ( isRoot )
             {
@@ -470,7 +475,7 @@ public class DefaultMaven
                 }
             }
 
-            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
+            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
             {
                 // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                 project.setPackaging( "pom" );
@@ -527,7 +532,7 @@ public class DefaultMaven
                 }
 
                 List collectedProjects =
-                    collectProjects( moduleFiles, localRepository, recursive, settings, globalProfileManager, false );
+                    collectProjects( moduleFiles, request, false );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -537,8 +542,28 @@ public class DefaultMaven
         return projects;
     }
 
+    /**
+     * @deprecated Use {@link DefaultMaven#getProject(File, MavenExecutionRequest)} instead.
+     */
     public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
-                                    ProfileManager globalProfileManager )
+                                    Properties userProperties, ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest(
+                                                                      localRepository,
+                                                                      settings,
+                                                                      new DefaultEventDispatcher(),
+                                                                      Collections.EMPTY_LIST,
+                                                                      pom.getParentFile()
+                                                                         .getAbsolutePath(),
+                                                                      globalProfileManager,
+                                                                      globalProfileManager.getRequestProperties(),
+                                                                      new Properties(), false );
+
+        return getProject( pom, request );
+    }
+
+    public MavenProject getProject( File pom, MavenExecutionRequest request )
         throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
         if ( pom.exists() )
@@ -550,7 +575,12 @@ public class DefaultMaven
             }
         }
 
-        return projectBuilder.build( pom, localRepository, globalProfileManager );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        config.setLocalRepository( request.getLocalRepository() )
+              .setGlobalProfileManager( request.getGlobalProfileManager() )
+              .setUserProperties( request.getUserProperties() );
+
+        return projectBuilder.build( pom, config );
     }
 
     // ----------------------------------------------------------------------

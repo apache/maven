@@ -91,10 +91,19 @@ public interface MavenProjectBuilder
 
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
-    
+
     /**
      * need to pass a profilemanager with correct context (eg. with execution properties)
      */
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
+        throws ProjectBuildingException;
+
+    MavenProject build( File pom,
+                        ProjectBuilderConfiguration config )
+        throws ProjectBuildingException;
+
+    MavenProject build( File pom,
+                        ProjectBuilderConfiguration config,
+                        boolean checkDistributionManagementStatus )
         throws ProjectBuildingException;
 }

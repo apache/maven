@@ -19,16 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Map.Entry;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -67,6 +57,16 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -180,7 +180,9 @@ public class MavenCli
         // are constructed.
         // ----------------------------------------------------------------------
 
-        Properties executionProperties = getExecutionProperties( commandLine );
+        Properties executionProperties = new Properties();
+        Properties userProperties = new Properties();
+        populateProperties( commandLine, executionProperties, userProperties );
 
         Settings settings;
 
@@ -253,7 +255,7 @@ public class MavenCli
             }
 
             request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager,
-                                     executionProperties, showErrors );
+                                     executionProperties, userProperties, showErrors );
 
             setProjectFileOptions( commandLine, request );
 
@@ -404,7 +406,7 @@ public class MavenCli
     private static MavenExecutionRequest createRequest( CommandLine commandLine, Settings settings,
                                                         EventDispatcher eventDispatcher, LoggerManager loggerManager,
                                                         ProfileManager profileManager, Properties executionProperties,
-                                                        boolean showErrors )
+                                                        Properties userProperties, boolean showErrors )
         throws ComponentLookupException
     {
         MavenExecutionRequest request;
@@ -415,7 +417,7 @@ public class MavenCli
 
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                     commandLine.getArgList(), userDir.getPath(), profileManager,
-                                                    executionProperties, showErrors );
+                                                    executionProperties, userProperties, showErrors );
 
         // TODO [BP]: do we set one per mojo? where to do it?
         Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
@@ -572,10 +574,8 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static Properties getExecutionProperties( CommandLine commandLine )
+    static void populateProperties( CommandLine commandLine, Properties executionProperties, Properties userProperties )
     {
-        Properties executionProperties = new Properties();
-
         // add the env vars to the property set, with the "env." prefix
         // XXX support for env vars should probably be removed from the ModelInterpolator
         try
@@ -607,17 +607,17 @@ public class MavenCli
             {
                 for ( int i = 0; i < defStrs.length; ++i )
                 {
-                    setCliProperty( defStrs[i], executionProperties );
+                    setCliProperty( defStrs[i], userProperties );
                 }
             }
+
+            executionProperties.putAll( userProperties );
         }
 
         executionProperties.putAll( System.getProperties() );
-
-        return executionProperties;
     }
 
-    private static void setCliProperty( String property, Properties executionProperties )
+    private static void setCliProperty( String property, Properties requestProperties )
     {
         String name;
 
@@ -638,7 +638,7 @@ public class MavenCli
             value = property.substring( i + 1 ).trim();
         }
 
-        executionProperties.setProperty( name, value );
+        requestProperties.setProperty( name, value );
 
         // ----------------------------------------------------------------------
         // I'm leaving the setting of system properties here as not to break
