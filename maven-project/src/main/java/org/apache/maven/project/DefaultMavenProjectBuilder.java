@@ -286,7 +286,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            processProjectLogic( project, null, true );
+            processProjectLogic( project, null, null, null, true, false );
 
             project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
             project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
@@ -778,13 +778,9 @@ public class DefaultMavenProjectBuilder
         // merge any duplicated plugin definitions together, using the first appearance as the dominant one.
         ModelUtils.mergeDuplicatePluginDefinitions( project.getModel().getBuild() );
 
-        // TODO: [jdcasey] This line appears to be part of the problem for MNG-3391...
-        // the same line is in 2.0.x, so this is related to caching changes too...need to figure out how the two interact.
-        mergeManagedDependencies(project.getModel(), localRepository, repositories);
-
         try
         {
-            project = processProjectLogic( project, projectDescriptor, strict );
+            project = processProjectLogic( project, projectDescriptor, localRepository, repositories, strict, false );
         }
         catch ( ModelInterpolationException e )
         {
@@ -930,7 +926,10 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject processProjectLogic( MavenProject project,
                                               File pomFile,
-                                              boolean strict )
+                                              ArtifactRepository localRepository,
+                                              List remoteRepositories,
+                                              boolean strict,
+                                              boolean superPom )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
         Model model = project.getModel();
@@ -969,6 +968,14 @@ public class DefaultMavenProjectBuilder
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
         context.putAll( System.getProperties() );
         model = modelInterpolator.interpolate( model, context, strict );
+
+        // We must inject any imported dependencyManagement information ahead of the defaults injection.
+        if ( !superPom )
+        {
+            // TODO: [jdcasey] This line appears to be part of the problem for MNG-3391...
+            // the same line is in 2.0.x, so this is related to caching changes too...need to figure out how the two interact.
+            mergeManagedDependencies( model, localRepository, remoteRepositories );
+        }
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
@@ -1162,8 +1169,8 @@ public class DefaultMavenProjectBuilder
                 Dependency dep = (Dependency) iter.next();
                 depsMap.put( dep.getManagementKey(), dep );
 
-                // FIXME: Add scope-check for 'import'
-                if (dep.getType().equals("pom"))
+                // MNG-3391: SEE BELOW.
+                if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals( dep.getScope() ) )
                 {
                     doInclude = true;
                 }
@@ -1176,8 +1183,15 @@ public class DefaultMavenProjectBuilder
                 {
                     Dependency dep = (Dependency)iter.next();
 
-                    // FIXME: Add scope-check for 'import'
-                    if (dep.getType().equals("pom"))
+                    // MNG-3391: The check for scope == 'import' to limit the StackOverflowExceptions caused
+                    // when importing from the parent and the import-target is a module that declares the
+                    // current pom as a parent.
+                    //
+                    // Also, dependencies with type == 'pom' are the best way we currently have to
+                    // aggregate multiple other dependencies without messing with the issues caused by using
+                    // an assembly (ClassCastException if a second-level dep is also part of the maven core,
+                    // for instance)
+                    if (dep.getType().equals("pom") && Artifact.SCOPE_IMPORT.equals( dep.getScope() ) )
                     {
                         Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
                                                                                   dep.getVersion(), dep.getScope() );
