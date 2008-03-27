@@ -75,6 +75,7 @@ public class IntegrationTestSuite
 //        suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
 
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
+        suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
@@ -183,7 +184,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0023Test.class );
         suite.addTestSuite( MavenIT0022Test.class );
         suite.addTestSuite( MavenIT0021Test.class );
-        
+
         suite.addTestSuite( MavenIT0019Test.class );
 
         suite.addTestSuite( MavenIT0017Test.class );
@@ -215,8 +216,8 @@ public class IntegrationTestSuite
         // Tests that need to be fixed.
         // ----------------------------------------------------------------------------------------------------
         /*
-         *Test 18 always fails because it is trying to delete a 
-         *commonly used artifact (commons-logging-1.0.3) that is in use 
+         *Test 18 always fails because it is trying to delete a
+         *commonly used artifact (commons-logging-1.0.3) that is in use
          *in the repo. It should be redone using fake artifacts.
          */
         //suite.addTestSuite( MavenIT0018Test.class );
