@@ -492,29 +492,54 @@ public class DefaultLifecycleExecutor
                                            Map lifecycleMappings, MavenProject project, Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
-        List goals = processGoalChain( task, lifecycleMappings, lifecycle );
+        // 'task' is meant to be a lifecycle phase here. So, we need to resolve...
 
-        if ( task != null )
-        {
-            forkEntryPoints.push( task );
-        }
+        // only execute up to the given phase
+        int index = lifecycle.getPhases().indexOf( task );
 
-        try
+        for ( int i = 0; i <= index; i++ )
         {
-            if ( !goals.isEmpty() )
+            String p = (String) lifecycle.getPhases().get( i );
+
+            // don't add the goals for this phase if we're already executing inside of it.
+            if ( forkEntryPoints.contains( p ) )
             {
-                executeGoals( goals, forkEntryPoints, session, project );
+                getLogger().info( "NOT processing phase: " + p + " in forked execution. We're already executing in that phase." );
+                continue;
             }
-            else
+
+            // the goals that make up this phase. We're making a defensive copy here so we can modify it later if needed.
+            List goals = new ArrayList();
+
+            List phaseGoals = (List) lifecycleMappings.get( p );
+
+            if ( phaseGoals != null )
             {
-                getLogger().info( "No goals needed for project - skipping" );
+                goals.addAll( phaseGoals );
             }
-        }
-        finally
-        {
-            if ( task != null )
+
+            // add this phase to the forkEntryPoints to keep from forking into one of these repeatedly...
+            forkEntryPoints.push( p );
+
+            try
             {
-                forkEntryPoints.pop();
+                if ( !goals.isEmpty() )
+                {
+                    // now we're ready to execute the goals of this phase.
+                    executeGoals( goals, forkEntryPoints, session, project );
+                }
+                else
+                {
+                    getLogger().debug( "No goals needed for project in phase: " + p + ". - skipping" );
+                }
+            }
+            finally
+            {
+                if ( task != null )
+                {
+                    // finally, since we're done with the phase we logged above, we remove it from the stack of forked-entry points.
+                    forkEntryPoints.pop();
+                }
             }
         }
     }
@@ -540,11 +565,7 @@ public class DefaultLifecycleExecutor
             if ( ( mojoDescriptor.getExecutePhase() != null )
                  || ( mojoDescriptor.getExecuteGoal() != null ) )
             {
-                forkEntryPoints.push( mojoDescriptor );
-
                 forkLifecycle( mojoDescriptor, forkEntryPoints, session, project );
-
-                forkEntryPoints.pop();
             }
 
             if ( mojoDescriptor.isRequiresReports() )
@@ -560,11 +581,7 @@ public class DefaultLifecycleExecutor
 
                     if ( ( descriptor.getExecutePhase() != null ) || ( descriptor.getExecuteGoal() != null ) )
                     {
-                        forkEntryPoints.push( descriptor );
-
                         forkLifecycle( descriptor, forkEntryPoints, session, project );
-
-                        forkEntryPoints.pop();
                     }
                 }
             }
@@ -752,7 +769,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+        getLogger().debug( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
 
         if ( mojoDescriptor.isAggregator() )
         {
@@ -789,14 +806,12 @@ public class DefaultLifecycleExecutor
             Map lifecycleMappings = null;
             if ( targetPhase != null )
             {
-                for ( Iterator it = forkEntryPoints.iterator(); it.hasNext(); )
+                getLogger().debug( "Preparing forked lifecycle for phase: " + targetPhase );
+
+                if ( forkEntryPoints.contains( targetPhase ) )
                 {
-                    Object forkOrigin = it.next();
-                    if ( ( forkOrigin instanceof String ) && targetPhase.equals( forkOrigin ) )
-                    {
-                        getLogger().debug( "Blocking forked execution of lifecycle phase: " + targetPhase + " from: " + mojoDescriptor.getGoal() + "; We're already executing that phase now." );
-                        return;
-                    }
+                    getLogger().debug( "Blocking forked execution of lifecycle phase: " + targetPhase + " from: " + mojoDescriptor.getGoal() + "; We're already executing that phase now." );
+                    return;
                 }
 
                 Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
@@ -934,17 +949,26 @@ public class DefaultLifecycleExecutor
                 removeFromLifecycle( forkEntryPoints, lifecycleMappings );
             }
 
+            // TODO Is this deferred until now because it's expensive to construct?
+            // Otherwise, we could unite the above and below if(..) statements to
+            // make the logic simpler...
             MavenProject executionProject = new MavenProject( project );
             if ( targetPhase != null )
             {
                 Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
 
+                getLogger().debug( "Executing forked lifecycle to phase: " + targetPhase );
+
                 executeGoalWithLifecycle( targetPhase, forkEntryPoints, session, lifecycleMappings, executionProject,
                                           lifecycle );
+
+                getLogger().debug( "Cleaning up after forked lifecycle execution." );
             }
             else
             {
                 String goal = mojoDescriptor.getExecuteGoal();
+                getLogger().debug( "Preparing forked mojo execution of: " + goal );
+
                 for ( Iterator it = forkEntryPoints.iterator(); it.hasNext(); )
                 {
                     Object forkOrigin = it.next();
@@ -957,9 +981,15 @@ public class DefaultLifecycleExecutor
                 }
 
                 MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
+
+                getLogger().debug( "Executing forked mojo: " + goal );
+
                 executeGoals( Collections.singletonList( new MojoExecution( desc ) ), forkEntryPoints, session,
                               executionProject );
+
+                getLogger().debug( "Cleaning up after forked mojo execution." );
             }
+
             project.setExecutionProject( executionProject );
         }
         finally
@@ -1033,7 +1063,7 @@ public class DefaultLifecycleExecutor
 
                 if ( removed )
                 {
-                    getLogger().warn( "Removing: " + mojoDescriptor.getGoal() +
+                    getLogger().warn( "Removing: " + mojoDescriptor.getFullGoalName() +
                         " from forked lifecycle, to prevent recursive invocation." );
                 }
             }
@@ -1459,27 +1489,6 @@ public class DefaultLifecycleExecutor
         {
             goals.add( mojoExecution );
         }
-    }
-
-    private List processGoalChain( String task, Map phaseMap, Lifecycle lifecycle )
-    {
-        List goals = new ArrayList();
-
-        // only execute up to the given phase
-        int index = lifecycle.getPhases().indexOf( task );
-
-        for ( int i = 0; i <= index; i++ )
-        {
-            String p = (String) lifecycle.getPhases().get( i );
-
-            List phaseGoals = (List) phaseMap.get( p );
-
-            if ( phaseGoals != null )
-            {
-                goals.addAll( phaseGoals );
-            }
-        }
-        return goals;
     }
 
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
