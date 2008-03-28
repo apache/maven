@@ -63,11 +63,14 @@ public class MavenArtifactFilterManager
         artifacts.add( "maven-toolchain" );
         //artifacts.add( "plexus-utils" );
         artifacts.add( "wagon-provider-api" );
-        artifacts.add( "wagon-file" );
-        artifacts.add( "wagon-http-lightweight" );
-        artifacts.add( "wagon-webdav" );
-        artifacts.add( "wagon-ssh" );
-        artifacts.add( "wagon-ssh-external" );
+
+        // It should be safe to include implementations, and since this is used by the extension manager they would
+        // get filtered out otherwise
+        //artifacts.add( "wagon-file" );
+        //artifacts.add( "wagon-http-lightweight" );
+        //artifacts.add( "wagon-webdav" );
+        //artifacts.add( "wagon-ssh" );
+        //artifacts.add( "wagon-ssh-external" );
 
         return new ExclusionSetFilter( artifacts );
     }

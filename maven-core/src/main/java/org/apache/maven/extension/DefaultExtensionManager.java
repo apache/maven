@@ -19,6 +19,16 @@ package org.apache.maven.extension;
  * under the License.
  */
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.jar.JarFile;
+
 import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -37,6 +47,11 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.Wagon;
+import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.classworlds.DuplicateRealmException;
+import org.codehaus.classworlds.NoSuchRealmException;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -47,12 +62,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.jar.JarFile;
 
 /**
  * Used to locate extensions.
@@ -71,12 +80,13 @@ public class DefaultExtensionManager
 
     private ArtifactMetadataSource artifactMetadataSource;
 
-
-    private PlexusContainer container;
+    private DefaultPlexusContainer container;
 
     private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createStandardFilter();
 
     private WagonManager wagonManager;
+
+    private PlexusContainer extensionContainer;
 
     private static final String CONTAINER_NAME = "extensions";
 
@@ -124,16 +134,6 @@ public class DefaultExtensionManager
                                                                                     localRepository,
                                                                                     project.getRemoteArtifactRepositories(),
                                                                                     artifactMetadataSource, filter );
-            // create a child container for the extension
-            // TODO: this could surely be simpler/different on trunk with the new classworlds
-
-            PlexusContainer extensionContainer = getExtensionContainer();
-
-            if ( extensionContainer == null )
-            {
-                extensionContainer =
-                    container.createChildContainer( CONTAINER_NAME, Collections.EMPTY_LIST, Collections.EMPTY_MAP );
-            }
 
             // gross hack for some backwards compat (MNG-2749)
             // if it is a lone artifact, then we assume it to be a resource package, and put it in the main container
@@ -178,6 +178,14 @@ public class DefaultExtensionManager
             }
             else
             {
+                // create a child container for the extension
+                // TODO: this could surely be simpler/different on trunk with the new classworlds
+
+                if ( extensionContainer == null )
+                {
+                    extensionContainer = createContainer();
+                }
+
                 for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
                 {
                     Artifact a = (Artifact) i.next();
@@ -188,18 +196,71 @@ public class DefaultExtensionManager
 
                     extensionContainer.addJarResource( a.getFile() );
                 }
-            }
 
-            if ( getLogger().isDebugEnabled() )
-            {
-                extensionContainer.getContainerRealm().display();
+                if ( getLogger().isDebugEnabled() )
+                {
+                    extensionContainer.getContainerRealm().display();
+                }
             }
         }
     }
 
+    private PlexusContainer createContainer()
+        throws PlexusContainerException
+    {
+        DefaultPlexusContainer child = new DefaultPlexusContainer();
+
+        ClassWorld classWorld = container.getClassWorld();
+        child.setClassWorld( classWorld );
+
+        ClassRealm childRealm = null;
+
+        // note: ideally extensions would live in their own realm, but this would mean that things like wagon-scm would
+        // have no way to obtain SCM extensions
+        String childRealmId = "plexus.core.child-container[" + CONTAINER_NAME + "]";
+        try
+        {
+            childRealm = classWorld.getRealm( childRealmId );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            try
+            {
+                childRealm = classWorld.newRealm( childRealmId );
+            }
+            catch ( DuplicateRealmException impossibleError )
+            {
+                getLogger().error( "An impossible error has occurred. After getRealm() failed, newRealm() " +
+                    "produced duplication error on same id!", impossibleError );
+            }
+        }
+
+        childRealm.setParent( container.getContainerRealm() );
+
+        child.setCoreRealm( childRealm );
+
+        child.setName( CONTAINER_NAME );
+
+        // This is what we are skipping - we use the parent realm, but not the parent container since otherwise
+        // we won't reload component descriptors that already exist in there
+//        child.setParentPlexusContainer( this );
+
+        // ----------------------------------------------------------------------
+        // Set all the child elements from the parent that were set
+        // programmatically.
+        // ----------------------------------------------------------------------
+
+        child.setLoggerManager( container.getLoggerManager() );
+
+        child.initialize();
+
+        child.start();
+
+        return child;
+    }
+
     public void registerWagons()
     {
-        PlexusContainer extensionContainer = getExtensionContainer();
         if ( extensionContainer != null )
         {
             try
@@ -214,17 +275,10 @@ public class DefaultExtensionManager
         }
     }
 
-    private PlexusContainer getExtensionContainer()
-    {
-        // note: ideally extensions would live in their own realm, but this would mean that things like wagon-scm would
-        // have no way to obtain SCM extensions
-        return container.getChildContainer( CONTAINER_NAME );
-    }
-
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        this.container = (DefaultPlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private static final class ProjectArtifactExceptionFilter
