@@ -1034,7 +1034,6 @@ public class DefaultMavenProjectBuilder
 
             if ( ( model.getPluginRepositories() != null ) && !model.getPluginRepositories().isEmpty() )
             {
-                getLogger().warn( "The <pluginRepositories/> section of the POM has been deprecated. Please update your POMs." );
                 repoSet.addAll( model.getPluginRepositories() );
             }
 

@@ -30,6 +30,9 @@ import java.util.List;
 
 public class ProfilesConversionUtils
 {
+
+    public static final String PROFILES_XML_SOURCE = "profiles.xml";
+
     private ProfilesConversionUtils()
     {
     }
@@ -40,7 +43,7 @@ public class ProfilesConversionUtils
 
         profile.setId( profileXmlProfile.getId() );
 
-        profile.setSource( "profiles.xml" );
+        profile.setSource( PROFILES_XML_SOURCE );
 
         org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
 
@@ -64,9 +67,9 @@ public class ProfilesConversionUtils
                 activation.setProperty( prop );
             }
 
-            
+
             ActivationOS profileOs = profileActivation.getOs();
-            
+
             if ( profileOs != null )
             {
                 org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
@@ -76,7 +79,7 @@ public class ProfilesConversionUtils
                 os.setName( profileOs.getName() );
                 os.setVersion( profileOs.getVersion() );
             }
-            
+
             org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
 
             if ( profileFile != null )
