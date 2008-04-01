@@ -266,7 +266,10 @@ public class DefaultModelInheritanceAssembler
             for ( Iterator it = deps.iterator(); it.hasNext(); )
             {
                 Dependency dependency = (Dependency) it.next();
-                depsMap.put( dependency.getManagementKey(), dependency );
+                if ( !depsMap.containsKey( dependency.getManagementKey() ) )
+                {
+                    depsMap.put( dependency.getManagementKey(), dependency );
+                }
             }
         }
 

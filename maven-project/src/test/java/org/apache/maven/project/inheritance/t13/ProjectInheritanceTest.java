@@ -80,6 +80,7 @@ public class ProjectInheritanceTest
 
         Dependency dep1 = (Dependency) dependencies.get( 0 );
         assertEquals( "Child dependency should be listed first.", "test-from-child", dep1.getArtifactId() );
+        assertEquals( "Child dependency should have version '1'.", "1", dep1.getVersion() );
 
         Dependency dep2 = (Dependency) dependencies.get( 1 );
         assertEquals( "Parent dependency should be listed last.", "test-from-parent", dep2.getArtifactId() );

@@ -11,11 +11,6 @@
       <artifactId>test-from-parent</artifactId>
       <version>1</version>
     </dependency>
-    <dependency>
-      <groupId>tests</groupId>
-      <artifactId>test-from-child</artifactId>
-      <version>0.5</version>
-    </dependency>
   </dependencies>
 
 </project>
