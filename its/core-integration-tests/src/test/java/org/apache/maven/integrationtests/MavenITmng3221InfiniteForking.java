@@ -5,6 +5,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MavenITmng3221InfiniteForking
     extends AbstractMavenIntegrationTestCase
@@ -19,6 +21,7 @@ public class MavenITmng3221InfiniteForking
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3221" );
+        File logBackupDir = testDir.getAbsoluteFile().getParentFile();
 
         File reportDir = new File( testDir, "report" );
         File projectDir = new File( testDir, "user" );
@@ -36,6 +39,11 @@ public class MavenITmng3221InfiniteForking
             verifier.resetStreams();
 
             verifier = new Verifier( projectDir.getAbsolutePath() );
+
+            List cliOptions = new ArrayList();
+            cliOptions.add( "-Psite" );
+            verifier.setCliOptions( cliOptions );
+
             verifier.executeGoal( "site" );
             verifier.verifyErrorFreeLog();
         }
@@ -47,7 +55,7 @@ public class MavenITmng3221InfiniteForking
             }
 
             File logFile = new File( projectDir, "log.txt" );
-            File logFileBackup = new File( projectDir, "mng-3221-a-log.txt" );
+            File logFileBackup = new File( logBackupDir, "mng-3221-a-log.txt" );
 
             logFile.renameTo( logFileBackup );
         }
@@ -57,6 +65,7 @@ public class MavenITmng3221InfiniteForking
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3221" );
+        File logBackupDir = testDir.getAbsoluteFile().getParentFile();
 
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "user" );
@@ -74,6 +83,11 @@ public class MavenITmng3221InfiniteForking
             verifier.resetStreams();
 
             verifier = new Verifier( projectDir.getAbsolutePath() );
+
+            List cliOptions = new ArrayList();
+            cliOptions.add( "-Pplugin" );
+            verifier.setCliOptions( cliOptions );
+
             verifier.executeGoal( "package" );
             verifier.verifyErrorFreeLog();
         }
@@ -85,7 +99,7 @@ public class MavenITmng3221InfiniteForking
             }
 
             File logFile = new File( projectDir, "log.txt" );
-            File logFileBackup = new File( projectDir, "mng-3221-b-log.txt" );
+            File logFileBackup = new File( logBackupDir, "mng-3221-b-log.txt" );
 
             logFile.renameTo( logFileBackup );
         }

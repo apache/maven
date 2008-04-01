@@ -34,33 +34,44 @@ under the License.
     </dependency>
   </dependencies>
   
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>tests</groupId>
-        <artifactId>maven-forking-report-plugin</artifactId>
-        <version>1</version>
-      </plugin>
-    </plugins>
-  </reporting>
+  <profiles>
+    <profile>
+      <id>site</id>
+      
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>tests</groupId>
+            <artifactId>maven-forking-report-plugin</artifactId>
+            <version>1</version>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+    
+    <profile>
+      <id>plugin</id>
+      
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>tests</groupId>
+            <artifactId>maven-forking-test-plugin</artifactId>
+            <version>1</version>
+            <executions>
+              <execution>
+                <id>test</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>test</goal>
+                  <goal>test2</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>tests</groupId>
-        <artifactId>maven-forking-test-plugin</artifactId>
-        <version>1</version>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>test</goal>
-              <goal>test2</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
