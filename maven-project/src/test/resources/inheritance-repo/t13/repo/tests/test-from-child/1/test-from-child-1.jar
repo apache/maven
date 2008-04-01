@@ -1,0 +1,16 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>p0</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>tests</groupId>
+      <artifactId>test-from-parent</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+
+</project>

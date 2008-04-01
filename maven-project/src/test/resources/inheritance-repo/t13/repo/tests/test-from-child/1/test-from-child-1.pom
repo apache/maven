@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tests</groupId>
+  <artifactId>test-from-child</artifactId>
+  <version>1</version>
+  
+</project>
