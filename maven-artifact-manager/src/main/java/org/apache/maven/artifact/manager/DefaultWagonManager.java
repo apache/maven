@@ -596,7 +596,14 @@ public class DefaultWagonManager
         ArtifactRepository mirror = getMirror( repository );
         if ( mirror != null )
         {
-            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
+            String id = mirror.getId();
+            if ( id == null )
+            {
+                // TODO: this should be illegal in settings.xml
+                id = repository.getId();
+            }
+
+            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
                                                                      repository.getReleases() );
         }
