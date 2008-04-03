@@ -65,6 +65,7 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
 
+        suite.addTestSuite( MNG3498Test.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3473PluginReportCrash.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
