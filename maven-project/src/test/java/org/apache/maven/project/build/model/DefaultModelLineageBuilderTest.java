@@ -32,6 +32,7 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.error.ProjectErrorReporter;
 import org.apache.maven.project.error.ProjectReporterManager;
@@ -117,8 +118,7 @@ public class DefaultModelLineageBuilderTest
         }
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( pomFile,
-                                                                      null,
-                                                                      null,
+                                                                      new DefaultProjectBuilderConfiguration(),
                                                                       null,
                                                                       false,
                                                                       true );
@@ -183,9 +183,8 @@ public class DefaultModelLineageBuilderTest
                                                                             defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
-                                                                      localRepository,
+                                                                      new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                                       Collections.EMPTY_LIST,
-                                                                      null,
                                                                       false,
                                                                       true );
 
@@ -234,9 +233,8 @@ public class DefaultModelLineageBuilderTest
                                                                             defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
-                                                                      localRepository,
+                                                                      new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                                       Collections.EMPTY_LIST,
-                                                                      null,
                                                                       true,
                                                                       true );
 
@@ -321,9 +319,8 @@ public class DefaultModelLineageBuilderTest
                                                                              defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
-                                                                      localRepository,
+                                                                      new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                                       Collections.singletonList( remoteRepository ),
-                                                                      null,
                                                                       false,
                                                                       true );
 
@@ -384,9 +381,8 @@ public class DefaultModelLineageBuilderTest
                                                                             defaultLayout );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
-                                                                      localRepository,
+                                                                      new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                                       Collections.EMPTY_LIST,
-                                                                      null,
                                                                       false,
                                                                       true );
 
@@ -457,9 +453,9 @@ public class DefaultModelLineageBuilderTest
         profileManager.explicitlyActivate( profile.getId() );
 
         ModelLineage lineage = modelLineageBuilder.buildModelLineage( currentPOM,
-                                                                      localRepository,
+                                                                      new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
+                                                                                                              .setGlobalProfileManager( profileManager ),
                                                                       Collections.EMPTY_LIST,
-                                                                      profileManager,
                                                                       false,
                                                                       true );
 
@@ -615,9 +611,8 @@ public class DefaultModelLineageBuilderTest
         try
         {
             modelLineageBuilder.buildModelLineage( currentPOM,
-                                                   localRepository,
+                                                   new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                    Collections.EMPTY_LIST,
-                                                   null,
                                                    false,
                                                    true );
 
@@ -650,9 +645,8 @@ public class DefaultModelLineageBuilderTest
         try
         {
             modelLineageBuilder.buildModelLineage( currentPOM,
-                                                   localRepository,
+                                                   new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ),
                                                    Collections.EMPTY_LIST,
-                                                   null,
                                                    false,
                                                    true );
 

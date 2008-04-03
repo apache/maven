@@ -23,9 +23,9 @@ public aspect MavenExecErrorReporterAspect
         execution( List DefaultMaven.getProjects( MavenExecutionRequest ) )
         && args( request );
 
-    private pointcut dm_collectProjects( ArtifactRepository localRepository, ProfileManager globalProfileManager ):
-        execution( List DefaultMaven.collectProjects( List, ArtifactRepository, boolean, ProfileManager, boolean ) )
-        && args( *, localRepository, *, globalProfileManager, * );
+    private pointcut dm_collectProjects( MavenExecutionRequest request ):
+        execution( List DefaultMaven.collectProjects( List, MavenExecutionRequest, boolean ) )
+        && args( *, request, * );
 
     private MavenProject currentProject;
     private ArtifactVersion mavenVersion;
@@ -40,7 +40,7 @@ public aspect MavenExecErrorReporterAspect
 
     MavenProject around()
         throws ProjectBuildingException:
-        cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )
+        cflow( dm_collectProjects( MavenExecutionRequest ) )
         && within( DefaultMaven )
         && call( MavenProject MavenProjectBuilder+.build( .. ) )
     {
@@ -50,7 +50,7 @@ public aspect MavenExecErrorReporterAspect
 
     MavenExecutionException around():
         cflow( dm_getProjects( MavenExecutionRequest ) )
-        && cflow( dm_collectProjects( ArtifactRepository, ProfileManager ) )
+        && cflow( dm_collectProjects( MavenExecutionRequest ) )
         && call( MavenExecutionException.new( String, File ) )
     {
         MavenExecutionException err = proceed();
@@ -67,7 +67,7 @@ public aspect MavenExecErrorReporterAspect
         getReporter().reportMissingModulePom( err );
     }
 
-    after(): dm_collectProjects( ArtifactRepository, ProfileManager )
+    after(): dm_collectProjects( MavenExecutionRequest )
     {
         currentProject = null;
     }

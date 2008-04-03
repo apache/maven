@@ -7,6 +7,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.build.model.ModelLineage;
@@ -113,9 +114,8 @@ public class ModelAndFileCachingTest
         projectWorkspace.storeModelAndFile( maf );
 
         ModelLineage lineage = lineageBuilder.buildModelLineage( childPomFile,
-                                                                 localRepo,
+                                                                 new DefaultProjectBuilderConfiguration().setLocalRepository( localRepo ).setGlobalProfileManager( profileManager ),
                                                                  Collections.EMPTY_LIST,
-                                                                 profileManager,
                                                                  false,
                                                                  false );
 
@@ -133,9 +133,8 @@ public class ModelAndFileCachingTest
         String ver = "1";
 
         ModelLineage lineage = lineageBuilder.buildModelLineage( childPomFile,
-                                                                 localRepo,
+                                                                 new DefaultProjectBuilderConfiguration().setLocalRepository( localRepo ).setGlobalProfileManager( profileManager ),
                                                                  Collections.EMPTY_LIST,
-                                                                 profileManager,
                                                                  false,
                                                                  false );
 
@@ -164,9 +163,8 @@ public class ModelAndFileCachingTest
         projectWorkspace.storeModelAndFile( maf );
 
         ModelLineage lineage = lineageBuilder.buildModelLineage( pomFile,
-                                                                 localRepo,
+                                                                 new DefaultProjectBuilderConfiguration().setLocalRepository( localRepo ).setGlobalProfileManager( profileManager ),
                                                                  Collections.EMPTY_LIST,
-                                                                 profileManager,
                                                                  false,
                                                                  false );
 
@@ -183,9 +181,8 @@ public class ModelAndFileCachingTest
         String ver = "1";
 
         ModelLineage lineage = lineageBuilder.buildModelLineage( pomFile,
-                                                                 localRepo,
+                                                                 new DefaultProjectBuilderConfiguration().setLocalRepository( localRepo ).setGlobalProfileManager( profileManager ),
                                                                  Collections.EMPTY_LIST,
-                                                                 profileManager,
                                                                  false,
                                                                  false );
 

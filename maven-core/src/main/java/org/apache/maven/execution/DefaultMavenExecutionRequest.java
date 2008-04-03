@@ -25,6 +25,8 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
@@ -91,6 +93,8 @@ public class DefaultMavenExecutionRequest
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
     private Properties properties;
+
+    private Properties userProperties;
 
     private Date startTime;
 
@@ -361,6 +365,13 @@ public class DefaultMavenExecutionRequest
 
         properties.setProperty( key, value );
 
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
+        userProperties.setProperty( key, value );
+
         return this;
     }
 
@@ -579,6 +590,9 @@ public class DefaultMavenExecutionRequest
 
     private ProfileActivationContext profileActivationContext;
 
+    // calculated from request attributes.
+    private ProjectBuilderConfiguration projectBuildingConfiguration;
+
     public MavenExecutionRequest setSettings( Settings settings )
     {
         this.settings = settings;
@@ -707,5 +721,30 @@ public class DefaultMavenExecutionRequest
     {
         this.workspaceMonitor = workspaceMonitor;
         return this;
+    }
+
+    public Properties getUserProperties()
+    {
+        return userProperties;
+    }
+
+    public MavenExecutionRequest setUserProperties( Properties userProperties )
+    {
+        this.userProperties = userProperties;
+        return this;
+    }
+
+    public ProjectBuilderConfiguration getProjectBuildingConfiguration()
+    {
+        if ( projectBuildingConfiguration == null )
+        {
+            projectBuildingConfiguration = new DefaultProjectBuilderConfiguration();
+            projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
+            projectBuildingConfiguration.setExecutionProperties( getProperties() );
+            projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
+            projectBuildingConfiguration.setUserProperties( getUserProperties() );
+        }
+
+        return projectBuildingConfiguration;
     }
 }

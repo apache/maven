@@ -2,7 +2,6 @@ package org.apache.maven.project.error;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.DeploymentRepository;
@@ -17,6 +16,7 @@ import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -352,7 +352,7 @@ public interface ProjectErrorReporter
      * </pre>
      */
     void reportParentPomArtifactNotFound( Parent parentRef,
-                                          ArtifactRepository localRepo,
+                                          ProjectBuilderConfiguration config,
                                           List remoteRepos,
                                           String childId,
                                           File childPomFile,
@@ -371,7 +371,7 @@ public interface ProjectErrorReporter
      * </pre>
      */
     void reportParentPomArtifactUnresolvable( Parent parentRef,
-                                              ArtifactRepository localRepo,
+                                              ProjectBuilderConfiguration config,
                                               List remoteRepos,
                                               String childId,
                                               File childPomFile,

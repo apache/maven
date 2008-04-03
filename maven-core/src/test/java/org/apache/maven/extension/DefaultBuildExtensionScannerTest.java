@@ -7,6 +7,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -112,11 +113,11 @@ public class DefaultBuildExtensionScannerTest
         ModelLineage ml = new DefaultModelLineage();
         ml.setOrigin( model, pomFile, Collections.EMPTY_LIST, true );
 
-        modelLineageBuilder.buildModelLineage( pomFile, null, null, null, false, true );
+        modelLineageBuilder.buildModelLineage( pomFile, new DefaultProjectBuilderConfiguration(), null, false, true );
         modelLineageBuilderCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         modelLineageBuilderCtl.setReturnValue( ml, MockControl.ZERO_OR_MORE );
 
-        modelInterpolator.interpolate( model, null, false );
+        modelInterpolator.interpolate( model, null, null, false );
         modelInterpolatorCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         modelInterpolatorCtl.setReturnValue( model, MockControl.ZERO_OR_MORE );
 
@@ -126,7 +127,8 @@ public class DefaultBuildExtensionScannerTest
         MavenProject superProject = new MavenProject( new Model() );
         superProject.setRemoteArtifactRepositories( Collections.EMPTY_LIST );
 
-        projectBuilder.buildStandaloneSuperProject();
+        projectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
+        projectBuilderCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         projectBuilderCtl.setReturnValue( superProject, MockControl.ZERO_OR_MORE );
 
         mockManager.replayAll();
@@ -189,15 +191,15 @@ public class DefaultBuildExtensionScannerTest
         ml.setOrigin( model, pomFile, Collections.EMPTY_LIST, true );
         ml.addParent( parentModel, pomFile, Collections.EMPTY_LIST, false );
 
-        modelLineageBuilder.buildModelLineage( pomFile, null, null, null, false, true );
+        modelLineageBuilder.buildModelLineage( pomFile, new DefaultProjectBuilderConfiguration(), null, false, true );
         modelLineageBuilderCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         modelLineageBuilderCtl.setReturnValue( ml, MockControl.ZERO_OR_MORE );
 
-        modelInterpolator.interpolate( model, null, false );
+        modelInterpolator.interpolate( model, null, null, false );
         modelInterpolatorCtl.setMatcher( new FirstArgFileMatcher() );
         modelInterpolatorCtl.setReturnValue( model, MockControl.ZERO_OR_MORE);
 
-        modelInterpolator.interpolate( parentModel, null, false );
+        modelInterpolator.interpolate( parentModel, null, null, false );
         modelInterpolatorCtl.setReturnValue( parentModel, MockControl.ZERO_OR_MORE );
 
         extensionManager.addPluginAsExtension( plugin, model, Collections.EMPTY_LIST, request );
@@ -206,7 +208,8 @@ public class DefaultBuildExtensionScannerTest
         MavenProject superProject = new MavenProject( new Model() );
         superProject.setRemoteArtifactRepositories( Collections.EMPTY_LIST );
 
-        projectBuilder.buildStandaloneSuperProject();
+        projectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
+        projectBuilderCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         projectBuilderCtl.setReturnValue( superProject, MockControl.ZERO_OR_MORE );
 
         mockManager.replayAll();
@@ -295,21 +298,21 @@ public class DefaultBuildExtensionScannerTest
         moduleMl.addParent( model, pomFile, Collections.EMPTY_LIST, true );
         moduleMl.addParent( parentModel, pomFile, Collections.EMPTY_LIST, false );
 
-        modelLineageBuilder.buildModelLineage( pomFile, null, null, null, false, true );
+        modelLineageBuilder.buildModelLineage( pomFile, new DefaultProjectBuilderConfiguration(), null, false, true );
         modelLineageBuilderCtl.setMatcher( new FirstArgFileMatcher() );
         modelLineageBuilderCtl.setReturnValue( ml, MockControl.ZERO_OR_MORE );
 
-        modelLineageBuilder.buildModelLineage( modulePomFile, null, null, null, false, true );
+        modelLineageBuilder.buildModelLineage( modulePomFile, new DefaultProjectBuilderConfiguration(), null, false, true );
         modelLineageBuilderCtl.setReturnValue( moduleMl, MockControl.ZERO_OR_MORE );
 
-        modelInterpolator.interpolate( model, null, false );
+        modelInterpolator.interpolate( model, null, null, false );
         modelInterpolatorCtl.setMatcher( new FirstArgModelIdMatcher() );
         modelInterpolatorCtl.setReturnValue( model, MockControl.ZERO_OR_MORE );
 
-        modelInterpolator.interpolate( parentModel, null, false );
+        modelInterpolator.interpolate( parentModel, null, null, false );
         modelInterpolatorCtl.setReturnValue( parentModel, MockControl.ZERO_OR_MORE );
 
-        modelInterpolator.interpolate( module, null, false );
+        modelInterpolator.interpolate( module, null, null, false );
         modelInterpolatorCtl.setReturnValue( module, MockControl.ZERO_OR_MORE );
 
         extensionManager.addPluginAsExtension( plugin, module, Collections.EMPTY_LIST, request );
@@ -318,7 +321,8 @@ public class DefaultBuildExtensionScannerTest
         MavenProject superProject = new MavenProject( new Model() );
         superProject.setRemoteArtifactRepositories( Collections.EMPTY_LIST );
 
-        projectBuilder.buildStandaloneSuperProject();
+        projectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
+        projectBuilderCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         projectBuilderCtl.setReturnValue( superProject, MockControl.ZERO_OR_MORE );
 
         mockManager.replayAll();

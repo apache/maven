@@ -188,7 +188,17 @@ public class DefaultMavenProjectBuilder
                                ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        return buildFromSourceFileInternal( projectDescriptor, localRepository, profileManager );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
+                                                                                     .setGlobalProfileManager( profileManager );
+
+        return buildFromSourceFileInternal( projectDescriptor, config );
+    }
+
+    public MavenProject build( File projectDescriptor,
+                               ProjectBuilderConfiguration config )
+        throws ProjectBuildingException
+    {
+        return buildFromSourceFileInternal( projectDescriptor, config );
     }
 
     /** @deprecated  */
@@ -223,7 +233,9 @@ public class DefaultMavenProjectBuilder
 
             Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-            project = buildInternal( model, localRepository, remoteArtifactRepositories, artifact.getFile(), null,
+            ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+
+            project = buildInternal( model, config, remoteArtifactRepositories, artifact.getFile(),
                                   false, false, false );
         }
         else
@@ -241,10 +253,17 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
-        return buildStandaloneSuperProject( null );
+        return buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
     }
 
     public MavenProject buildStandaloneSuperProject( ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
+        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
+        return buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration().setGlobalProfileManager( profileManager ) );
+    }
+
+    public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -256,6 +275,8 @@ public class DefaultMavenProjectBuilder
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
         superModel = ModelUtils.cloneModel( superModel );
+
+        ProfileManager profileManager = config.getGlobalProfileManager();
 
         List activeProfiles = new ArrayList();
         if ( profileManager != null )
@@ -286,7 +307,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            processProjectLogic( project, null, null, null, true, false );
+            processProjectLogic( project, null, config, null, true, true );
 
             project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
             project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
@@ -458,8 +479,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject buildFromSourceFileInternal( File projectDescriptor,
-                                                      ArtifactRepository localRepository,
-                                                      ProfileManager profileManager )
+                                                      ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         getLogger().debug( "Checking cache-hit on project (in build*): " + projectDescriptor );
@@ -473,10 +493,9 @@ public class DefaultMavenProjectBuilder
             Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
             project = buildInternal( model,
-                localRepository,
+                config,
                 buildArtifactRepositories( getSuperModel() ),
                 projectDescriptor,
-                profileManager,
                 STRICT_MODEL_PARSING,
                 true,
                 true );
@@ -655,10 +674,9 @@ public class DefaultMavenProjectBuilder
     // We've got a mixture of things going in the USD and from the repository, sometimes the descriptor
     // is a real file and sometimes null which makes things confusing.
     private MavenProject buildInternal( Model model,
-                                        ArtifactRepository localRepository,
+                                        ProjectBuilderConfiguration config,
                                         List parentSearchRepositories,
                                         File projectDescriptor,
-                                        ProfileManager externalProfileManager,
                                         boolean strict, boolean validProfilesXmlLocation,
                                         boolean fromSourceTree )
         throws ProjectBuildingException
@@ -672,6 +690,7 @@ public class DefaultMavenProjectBuilder
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext profileActivationContext;
 
+        ProfileManager externalProfileManager = config.getGlobalProfileManager();
         if ( externalProfileManager != null )
         {
             // used to trigger the caching of SystemProperties in the container context...
@@ -688,7 +707,7 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
+            profileActivationContext = new DefaultProfileActivationContext( config.getExecutionProperties(), false );
         }
 
         LinkedHashSet activeInSuperPom = new LinkedHashSet();
@@ -721,7 +740,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = assembleLineage( model, lineage, localRepository, projectDescriptor, aggregatedRemoteWagonRepositories, externalProfileManager, strict, validProfilesXmlLocation );
+            project = assembleLineage( model, lineage, config, projectDescriptor, aggregatedRemoteWagonRepositories, strict, validProfilesXmlLocation );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -780,7 +799,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( project, projectDescriptor, localRepository, repositories, strict, false );
+            project = processProjectLogic( project, projectDescriptor, config, repositories, strict, false );
         }
         catch ( ModelInterpolationException e )
         {
@@ -926,10 +945,10 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject processProjectLogic( MavenProject project,
                                               File pomFile,
-                                              ArtifactRepository localRepository,
+                                              ProjectBuilderConfiguration config,
                                               List remoteRepositories,
                                               boolean strict,
-                                              boolean superPom )
+                                              boolean isSuperPom )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
         Model model = project.getModel();
@@ -940,41 +959,37 @@ public class DefaultMavenProjectBuilder
         //  [BP] - Can this above comment be explained?
         // We don't need all the project methods that are added over those in the model, but we do need basedir
         // mkleint - using System.getProperties() is almost definitely bad for embedding.
-        Map context = new HashMap( System.getProperties() );
+        Map context = new HashMap();
+
+        // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
+        if ( config.getExecutionProperties() != null && !config.getExecutionProperties().isEmpty() )
+        {
+            context.putAll( config.getExecutionProperties() );
+        }
+
+        File projectDir = null;
 
         if ( pomFile != null )
         {
-            File projectDir = pomFile.getAbsoluteFile().getParentFile();
+            projectDir = pomFile.getAbsoluteFile().getParentFile();
 
-            context.put( "basedir", pomFile.getParentFile().getAbsolutePath() );
             context.put( "basedir", projectDir.getAbsolutePath() );
-
-            Build build = model.getBuild();
-
-            // MNG-1927, MNG-2124, MNG-3355:
-            // If the build section is present and the project directory is non-null, we should make
-            // sure interpolation of the directories below uses translated paths.
-            // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
-            // code below...
-            context.put( "build.directory", pathTranslator.alignToBaseDirectory( build.getDirectory(), projectDir ) );
-            context.put( "build.outputDirectory", pathTranslator.alignToBaseDirectory( build.getOutputDirectory(), projectDir ) );
-            context.put( "build.testOutputDirectory", pathTranslator.alignToBaseDirectory( build.getTestOutputDirectory(), projectDir ) );
-            context.put( "build.sourceDirectory", pathTranslator.alignToBaseDirectory( build.getSourceDirectory(), projectDir ) );
-            context.put( "build.testSourceDirectory", pathTranslator.alignToBaseDirectory( build.getTestSourceDirectory(), projectDir ) );
         }
 
-        model = modelInterpolator.interpolate( model, context, strict );
+        Map overrideContext = new HashMap();
+        if ( !isSuperPom && config.getUserProperties() != null && !config.getUserProperties().isEmpty() )
+        {
+            overrideContext.putAll( config.getUserProperties() );
+        }
 
-        // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
-        context.putAll( System.getProperties() );
-        model = modelInterpolator.interpolate( model, context, strict );
+        model = modelInterpolator.interpolate( model, context, overrideContext, projectDir, true );
 
         // We must inject any imported dependencyManagement information ahead of the defaults injection.
-        if ( !superPom )
+        if ( !isSuperPom )
         {
             // TODO: [jdcasey] This line appears to be part of the problem for MNG-3391...
             // the same line is in 2.0.x, so this is related to caching changes too...need to figure out how the two interact.
-            mergeManagedDependencies( model, localRepository, remoteRepositories );
+            mergeManagedDependencies( model, config.getLocalRepository(), remoteRepositories );
         }
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
@@ -1081,10 +1096,9 @@ public class DefaultMavenProjectBuilder
      */
     private MavenProject assembleLineage( Model model,
                                           LinkedList lineage,
-                                          ArtifactRepository localRepository,
+                                          ProjectBuilderConfiguration config,
                                           File pomFile,
                                           Set aggregatedRemoteWagonRepositories,
-                                          ProfileManager externalProfileManager,
                                           boolean strict, boolean validProfilesXmlLocation )
         throws ProjectBuildingException, InvalidRepositoryException
     {
@@ -1092,10 +1106,11 @@ public class DefaultMavenProjectBuilder
 
         modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ), validProfilesXmlLocation );
 
-        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, localRepository, externalProfileManager, !strict );
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, config, !strict );
 
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext profileActivationContext;
+        ProfileManager externalProfileManager = config.getGlobalProfileManager();
 
         if ( externalProfileManager != null )
         {
@@ -1103,7 +1118,7 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            profileActivationContext = new DefaultProfileActivationContext( System.getProperties(), false );
+            profileActivationContext = new DefaultProfileActivationContext( config.getExecutionProperties(), false );
         }
 
         MavenProject lastProject = null;

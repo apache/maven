@@ -20,7 +20,6 @@ package org.apache.maven;
  */
 
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -36,7 +35,6 @@ import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -106,7 +104,7 @@ public class DefaultMaven
 
             if ( projects.isEmpty() )
             {
-                projects.add( projectBuilder.buildStandaloneSuperProject( request.getProfileManager() ) );
+                projects.add( projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingConfiguration() ) );
 
                 request.setProjectPresent( false );
             }
@@ -281,15 +279,13 @@ public class DefaultMaven
             throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
 
-        projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(), request.getProfileManager(), !request.useReactor() );
+        projects = collectProjects( files, request, !request.useReactor() );
 
         return projects;
     }
 
     private List collectProjects( List files,
-                                  ArtifactRepository localRepository,
-                                  boolean recursive,
-                                  ProfileManager globalProfileManager,
+                                  MavenExecutionRequest request,
                                   boolean isRoot )
         throws MavenExecutionException
     {
@@ -313,7 +309,7 @@ public class DefaultMaven
                 MavenProject project;
                 try
                 {
-                    project = projectBuilder.build( file, localRepository, globalProfileManager );
+                    project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -337,7 +333,7 @@ public class DefaultMaven
                     }
                 }
 
-                if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && recursive )
+                if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
                 {
                     // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                     project.setPackaging( "pom" );
@@ -396,8 +392,7 @@ public class DefaultMaven
                         moduleFiles.add( moduleFile );
                     }
 
-                    List collectedProjects = collectProjects( moduleFiles, localRepository, recursive,
-                                                              globalProfileManager, false );
+                    List collectedProjects = collectProjects( moduleFiles, request, false );
 
                     projects.addAll( collectedProjects );
                     project.setCollectedProjects( collectedProjects );

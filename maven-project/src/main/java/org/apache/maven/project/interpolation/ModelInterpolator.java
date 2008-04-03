@@ -21,6 +21,7 @@ package org.apache.maven.project.interpolation;
 
 import org.apache.maven.model.Model;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -32,9 +33,25 @@ public interface ModelInterpolator
 {
     String ROLE = ModelInterpolator.class.getName();
 
-    Model interpolate( Model project, Map context )
+    Model interpolate( Model project,
+                       Map context )
         throws ModelInterpolationException;
 
-    Model interpolate( Model model, Map context, boolean strict )
+    Model interpolate( Model model,
+                       Map context,
+                       boolean strict )
+        throws ModelInterpolationException;
+
+    Model interpolate( Model model,
+                       Map context,
+                       Map overrideContext,
+                       boolean outputDebugMessages )
+        throws ModelInterpolationException;
+
+    Model interpolate( Model model,
+                       Map context,
+                       Map overrideContext,
+                       File projectDir,
+                       boolean outputDebugMessages )
         throws ModelInterpolationException;
 }

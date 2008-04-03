@@ -214,12 +214,15 @@ public final class CLIRequestUtils
             loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
         }
 
-        Properties executionProperties = getExecutionProperties( commandLine );
+        Properties executionProperties = new Properties();
+        Properties userProperties = new Properties();
+        populateProperties( commandLine, executionProperties, userProperties );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
             .setProperties( executionProperties ) // optional
+            .setUserProperties( userProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setUseReactor( useReactor ) // default: false
@@ -248,10 +251,8 @@ public final class CLIRequestUtils
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static Properties getExecutionProperties( CommandLine commandLine )
+    static void populateProperties( CommandLine commandLine, Properties executionProperties, Properties userProperties )
     {
-        Properties executionProperties = new Properties();
-
         // add the env vars to the property set, with the "env." prefix
         // XXX support for env vars should probably be removed from the ModelInterpolator
         try
@@ -283,14 +284,14 @@ public final class CLIRequestUtils
             {
                 for ( int i = 0; i < defStrs.length; ++i )
                 {
-                    setCliProperty( defStrs[i], executionProperties );
+                    setCliProperty( defStrs[i], userProperties );
                 }
             }
+
+            executionProperties.putAll( userProperties );
         }
 
         executionProperties.putAll( System.getProperties() );
-
-        return executionProperties;
     }
 
     private static void setCliProperty( String property,

@@ -19,6 +19,7 @@ import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -679,27 +680,27 @@ public class DefaultProjectErrorReporter
     }
 
     public void reportParentPomArtifactNotFound( Parent parentRef,
-                                                 ArtifactRepository localRepo,
+                                                 ProjectBuilderConfiguration config,
                                                  List remoteRepos,
                                                  String childId,
                                                  File childPomFile,
                                                  ArtifactNotFoundException cause )
     {
-        reportArtifactError( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
+        reportArtifactError( parentRef, config, remoteRepos, childId, childPomFile, cause );
     }
 
     public void reportParentPomArtifactUnresolvable( Parent parentRef,
-                                                     ArtifactRepository localRepo,
+                                                     ProjectBuilderConfiguration config,
                                                      List remoteRepos,
                                                      String childId,
                                                      File childPomFile,
                                                      ArtifactResolutionException cause )
     {
-        reportArtifactError( parentRef, localRepo, remoteRepos, childId, childPomFile, cause );
+        reportArtifactError( parentRef, config, remoteRepos, childId, childPomFile, cause );
     }
 
     private void reportArtifactError( Parent parentRef,
-                                      ArtifactRepository localRepo,
+                                      ProjectBuilderConfiguration config,
                                       List remoteRepos,
                                       String childId,
                                       File childPomFile,
@@ -727,7 +728,7 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Local Repository: " );
-        writer.write( localRepo.getBasedir() );
+        writer.write( config.getLocalRepository().getBasedir() );
 
         if ( ( remoteRepos != null ) && !remoteRepos.isEmpty() )
         {

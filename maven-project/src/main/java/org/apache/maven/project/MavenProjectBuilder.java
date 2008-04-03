@@ -38,9 +38,15 @@ public interface MavenProjectBuilder
 
     boolean STRICT_MODEL_PARSING = true;
 
+    /**
+     * @deprecated Use {@link MavenProjectBuilder#build(File, ProjectBuilderConfiguration)} instead.
+     */
     MavenProject build( File project,
                         ArtifactRepository localRepository,
                         ProfileManager globalProfileManager )
+        throws ProjectBuildingException;
+
+    MavenProject build( File project, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
     MavenProject buildWithDependencies( File project,
@@ -67,12 +73,17 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     /**
-     * @return
-     * @throws ProjectBuildingException
+     * @deprecated Use {@link MavenProjectBuilder#buildStandaloneSuperProject(ProjectBuilderConfiguration)} instead.
      */
     MavenProject buildStandaloneSuperProject()
         throws ProjectBuildingException;
 
+    /**
+     * @deprecated Use {@link MavenProjectBuilder#buildStandaloneSuperProject(ProjectBuilderConfiguration)} instead.
+     */
     MavenProject buildStandaloneSuperProject( ProfileManager profileManager )
+        throws ProjectBuildingException;
+
+    MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException;
 }

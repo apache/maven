@@ -19,8 +19,7 @@ package org.apache.maven.project.build.model;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;
@@ -50,8 +49,8 @@ public interface ModelLineageBuilder
      * @param allowStubs Whether stubbed-out Model instances should be constructed in the event that
      *   a parent-POM cannot be resolved.
      */
-    ModelLineage buildModelLineage( File pom, ArtifactRepository localRepository, List remoteRepositories,
-                                    ProfileManager profileManager, boolean allowStubs, boolean validProfilesXmlLocation )
+    ModelLineage buildModelLineage( File pom, ProjectBuilderConfiguration config, List remoteRepositories,
+                                    boolean allowStubs, boolean validProfilesXmlLocation )
         throws ProjectBuildingException;
 
     /**
@@ -65,8 +64,7 @@ public interface ModelLineageBuilder
      * @param allowStubs Whether stubbed-out Model instances should be constructed in the event that
      *   a parent-POM cannot be resolved.
      */
-    void resumeBuildingModelLineage( ModelLineage lineage, ArtifactRepository localRepository,
-                                     ProfileManager profileManager, boolean allowStubs )
+    void resumeBuildingModelLineage( ModelLineage lineage, ProjectBuilderConfiguration config, boolean allowStubs )
         throws ProjectBuildingException;
 
 }

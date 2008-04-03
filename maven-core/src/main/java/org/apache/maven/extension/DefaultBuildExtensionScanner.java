@@ -32,6 +32,7 @@ import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.build.model.ModelLineage;
 import org.apache.maven.project.build.model.ModelLineageBuilder;
@@ -129,11 +130,11 @@ public class DefaultBuildExtensionScanner
 
         try
         {
-            List originalRemoteRepositories = getInitialRemoteRepositories();
+            List originalRemoteRepositories = getInitialRemoteRepositories( request.getProjectBuildingConfiguration() );
 
             getLogger().debug( "Pre-scanning POM lineage of: " + pom + " for build extensions." );
 
-            ModelLineage lineage = buildModelLineage( pom, request, originalRemoteRepositories );
+            ModelLineage lineage = buildModelLineage( pom, request.getProjectBuildingConfiguration(), originalRemoteRepositories );
 
             Map inheritedInterpolationValues = new HashMap();
 
@@ -161,7 +162,7 @@ public class DefaultBuildExtensionScanner
                     inheritedInterpolationValues = new HashMap();
                 }
 
-                model = modelInterpolator.interpolate( model, inheritedInterpolationValues, false );
+                model = modelInterpolator.interpolate( model, inheritedInterpolationValues, request.getUserProperties(), false );
 
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
 
@@ -398,14 +399,14 @@ public class DefaultBuildExtensionScanner
         }
     }
 
-    private ModelLineage buildModelLineage( File pom, MavenExecutionRequest request,
+    private ModelLineage buildModelLineage( File pom, ProjectBuilderConfiguration config,
                                             List originalRemoteRepositories )
         throws ExtensionScanningException
     {
-        ProfileManager profileManager = request.getProfileManager();
+        ProfileManager profileManager = config.getGlobalProfileManager();
 
         ProfileActivationContext profileActivationContext = profileManager == null
-                        ? new DefaultProfileActivationContext( System.getProperties(), false )
+                        ? new DefaultProfileActivationContext( config.getExecutionProperties(), false )
                         : profileManager.getProfileActivationContext();
 
         boolean suppressActivatorFailure = profileActivationContext.isCustomActivatorFailureSuppressed();
@@ -420,8 +421,8 @@ public class DefaultBuildExtensionScanner
             // the last parameter here and determine whether it's appropriate for the POM to have
             // an accompanying profiles.xml file.
             profileActivationContext.setCustomActivatorFailureSuppressed( true );
-            lineage = modelLineageBuilder.buildModelLineage( pom, request.getLocalRepository(), originalRemoteRepositories,
-                                                             request.getProfileManager(), false, true );
+
+            lineage = modelLineageBuilder.buildModelLineage( pom, config, originalRemoteRepositories, false, true );
         }
         catch ( ProjectBuildingException e )
         {
@@ -436,14 +437,14 @@ public class DefaultBuildExtensionScanner
         return lineage;
     }
 
-    private List getInitialRemoteRepositories()
+    private List getInitialRemoteRepositories( ProjectBuilderConfiguration config )
         throws ExtensionScanningException
     {
         if ( basicSuperProject == null )
         {
             try
             {
-                basicSuperProject = projectBuilder.buildStandaloneSuperProject();
+                basicSuperProject = projectBuilder.buildStandaloneSuperProject( config );
             }
             catch ( ProjectBuildingException e )
             {

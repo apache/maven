@@ -26,6 +26,7 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
@@ -96,6 +97,9 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setProperties( Properties properties );
     MavenExecutionRequest setProperty( String key, String value );
     Properties getProperties();
+
+    MavenExecutionRequest setUserProperties( Properties userProperties );
+    Properties getUserProperties();
 
     // Reactor
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
@@ -220,4 +224,6 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setWorkspaceMonitor( MavenWorkspaceMonitor workspaceMonitor );
     MavenWorkspaceMonitor getWorkspaceMonitor();
+
+    ProjectBuilderConfiguration getProjectBuildingConfiguration();
 }

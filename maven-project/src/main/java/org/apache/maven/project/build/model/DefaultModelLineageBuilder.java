@@ -23,17 +23,16 @@ import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.build.ProfileAdvisor;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.workspace.ProjectWorkspace;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -88,9 +87,8 @@ public class DefaultModelLineageBuilder
      * @see org.apache.maven.project.build.model.ModelLineageBuilder#buildModelLineage(java.io.File, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List)
      */
     public ModelLineage buildModelLineage( File pom,
-                                           ArtifactRepository localRepository,
+                                           ProjectBuilderConfiguration config,
                                            List remoteRepositories,
-                                           ProfileManager profileManager,
                                            boolean allowStubs,
                                            boolean validProfilesXmlLocation )
         throws ProjectBuildingException
@@ -127,12 +125,12 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = updateRepositorySet( current.getModel(),
                                                              currentRemoteRepositories,
                                                              current.getFile(),
-                                                             profileManager,
+                                                             config,
                                                              current.isValidProfilesXmlLocation() );
 
             current = resolveParentPom( current,
                                         currentRemoteRepositories,
-                                        localRepository,
+                                        config,
                                         allowStubs );
         }
         while ( current != null );
@@ -141,8 +139,7 @@ public class DefaultModelLineageBuilder
     }
 
     public void resumeBuildingModelLineage( ModelLineage lineage,
-                                            ArtifactRepository localRepository,
-                                            ProfileManager profileManager,
+                                            ProjectBuilderConfiguration config,
                                             boolean allowStubs )
         throws ProjectBuildingException
     {
@@ -166,7 +163,7 @@ public class DefaultModelLineageBuilder
         // use the above information to re-bootstrap the resolution chain...
         current = resolveParentPom( current,
                                     currentRemoteRepositories,
-                                    localRepository,
+                                    config,
                                     allowStubs );
 
         while ( current != null )
@@ -179,12 +176,12 @@ public class DefaultModelLineageBuilder
             currentRemoteRepositories = updateRepositorySet( current.getModel(),
                                                              currentRemoteRepositories,
                                                              current.getFile(),
-                                                             profileManager,
+                                                             config,
                                                              current.isValidProfilesXmlLocation() );
 
             current = resolveParentPom( current,
                                         currentRemoteRepositories,
-                                        localRepository,
+                                        config,
                                         allowStubs );
         }
     }
@@ -237,7 +234,7 @@ public class DefaultModelLineageBuilder
     private List updateRepositorySet( Model model,
                                       List oldArtifactRepositories,
                                       File pomFile,
-                                      ProfileManager externalProfileManager,
+                                      ProjectBuilderConfiguration config,
                                       boolean useProfilesXml )
         throws ProjectBuildingException
     {
@@ -256,7 +253,7 @@ public class DefaultModelLineageBuilder
 
                 loadActiveProfileRepositories( remoteRepos,
                                                model,
-                                               externalProfileManager,
+                                               config,
                                                projectDir,
                                                useProfilesXml );
 
@@ -279,7 +276,7 @@ public class DefaultModelLineageBuilder
 
     private void loadActiveProfileRepositories( List repositories,
                                                 Model model,
-                                                ProfileManager profileManager,
+                                                ProjectBuilderConfiguration config,
                                                 File pomFile,
                                                 boolean useProfilesXml )
         throws ProjectBuildingException
@@ -289,18 +286,18 @@ public class DefaultModelLineageBuilder
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext context;
 
-        if ( profileManager != null )
+        if ( config.getGlobalProfileManager() != null )
         {
-            context = profileManager.getProfileActivationContext();
+            context = config.getGlobalProfileManager().getProfileActivationContext();
         }
         else
         {
-            context = new DefaultProfileActivationContext( System.getProperties(), false );
+            context = new DefaultProfileActivationContext( config.getExecutionProperties(), false );
         }
 
         LinkedHashSet profileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
                                                                                                pomFile,
-                                                                                               profileManager );
+                                                                                               config.getGlobalProfileManager() );
 
         getLogger().debug( "Got external-profile repositories: " + profileRepos );
 
@@ -327,7 +324,7 @@ public class DefaultModelLineageBuilder
      */
     private ModelAndFile resolveParentPom( ModelAndFile child,
                                            List remoteRepositories,
-                                           ArtifactRepository localRepository,
+                                           ProjectBuilderConfiguration config,
                                            boolean allowStubs )
         throws ProjectBuildingException
     {
@@ -371,7 +368,7 @@ public class DefaultModelLineageBuilder
                     getLogger().debug( "Attempting to resolve parent POM: " + modelParent.getId() + " using repositories:\n" + StringUtils.join( remoteRepositories.iterator(), "\n" ) );
 
                     parentPomFile = resolveParentFromRepositories( modelParent,
-                                                                   localRepository,
+                                                                   config,
                                                                    remoteRepositories,
                                                                    model.getId(),
                                                                    modelPomFile );
@@ -467,7 +464,7 @@ public class DefaultModelLineageBuilder
     }
 
     private File resolveParentFromRepositories( Parent modelParent,
-                                                ArtifactRepository localRepository,
+                                                ProjectBuilderConfiguration config,
                                                 List remoteRepositories,
                                                 String childId,
                                                 File childPomFile )
@@ -480,7 +477,7 @@ public class DefaultModelLineageBuilder
 
         try
         {
-            artifactResolver.resolve( parentPomArtifact, remoteRepositories, localRepository );
+            artifactResolver.resolve( parentPomArtifact, remoteRepositories, config.getLocalRepository() );
         }
         catch ( ArtifactResolutionException e )
         {

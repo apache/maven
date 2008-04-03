@@ -22,18 +22,31 @@ package org.apache.maven.project.interpolation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.path.PathTranslator;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
+import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
+import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
+import org.codehaus.plexus.interpolation.RecursionInterceptor;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,20 +61,55 @@ public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.|env\\.)?([^}]+)\\}" );
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{([^}]+)\\}" );
 
-    private Properties envars;
+    private static final List PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
+    private static final List TRANSLATED_PATH_EXPRESSIONS;
+
+    static
+    {
+        List translatedPrefixes = new ArrayList();
+
+        // MNG-1927, MNG-2124, MNG-3355:
+        // If the build section is present and the project directory is non-null, we should make
+        // sure interpolation of the directories below uses translated paths.
+        // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
+        // code below...
+        translatedPrefixes.add( "build.directory" );
+        translatedPrefixes.add( "build.outputDirectory" );
+        translatedPrefixes.add( "build.testOutputDirectory" );
+        translatedPrefixes.add( "build.sourceDirectory" );
+        translatedPrefixes.add( "build.testSourceDirectory" );
+
+        TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
+    }
+
+    private PathTranslator pathTranslator;
 
     public RegexBasedModelInterpolator()
         throws IOException
     {
-        envars = CommandLineUtils.getSystemEnvVars();
     }
 
     public Model interpolate( Model model, Map context )
         throws ModelInterpolationException
     {
-        return interpolate( model, context, true );
+        return interpolate( model, context, Collections.EMPTY_MAP, null, true );
+    }
+
+    public Model interpolate( Model model, Map context, boolean strict )
+        throws ModelInterpolationException
+    {
+        return interpolate( model, context, Collections.EMPTY_MAP, null, true );
+    }
+
+    public Model interpolate( Model model,
+                              Map context,
+                              Map overrideContext,
+                              boolean strict )
+        throws ModelInterpolationException
+    {
+        return interpolate( model, context, Collections.EMPTY_MAP, null, true );
     }
 
     /**
@@ -72,10 +120,15 @@ public class RegexBasedModelInterpolator
      *
      * @param model   The inbound Model instance, to serialize and reference for expression resolution
      * @param context The other context map to be used during resolution
+     * @param overrideContext The context map which should be used to OVERRIDE
+     *                        values from everything else. This will come from the CLI
+     *                        or userProperties in the execution request.
+     * @param projectDir The directory from which the current model's pom was read.
      * @param strict  This parameter is ignored!
+     * @param outputDebugMessages If true, print any feedback from the interpolator out to the DEBUG log-level.
      * @return The resolved instance of the inbound Model. This is a different instance!
      */
-    public Model interpolate( Model model, Map context, boolean strict )
+    public Model interpolate( Model model, Map context, Map overrideContext, File projectDir, boolean outputDebugMessages )
         throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter();
@@ -91,7 +144,7 @@ public class RegexBasedModelInterpolator
         }
 
         String serializedModel = sWriter.toString();
-        serializedModel = interpolateInternal( serializedModel, model, context );
+        serializedModel = interpolateInternal( serializedModel, model, context, overrideContext, projectDir, outputDebugMessages );
 
         StringReader sReader = new StringReader( serializedModel );
 
@@ -125,85 +178,57 @@ public class RegexBasedModelInterpolator
      *       with the value, and continue to find other expressions.</li>
      *   <li>If the value is null, get it from the model properties.</li>
      *   <li>
-     *
-     *
+     * @param overrideContext
+     * @param outputDebugMessages
      */
-    private String interpolateInternal( String src, Model model, Map context )
+    private String interpolateInternal( String src, Model model, Map context, Map overrideContext, File projectDir, boolean outputDebugMessages )
         throws ModelInterpolationException
     {
         Logger logger = getLogger();
 
-        boolean isSnapshotModel = ( model.getVersion() == null
-            ? model.getParent() == null ? "" : model.getParent().getVersion()
-            : model.getVersion() ).indexOf( "SNAPSHOT" ) >= 0;
+        ValueSource baseModelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource modelValueSource1 = new PathTranslatingValueSource( baseModelValueSource1,
+                                                                       TRANSLATED_PATH_EXPRESSIONS,
+                                                                       projectDir, pathTranslator );
+
+        ValueSource baseModelValueSource2 = new ObjectBasedValueSource( model );
+        ValueSource modelValueSource2 = new PathTranslatingValueSource( baseModelValueSource2,
+                                                                       TRANSLATED_PATH_EXPRESSIONS,
+                                                                       projectDir, pathTranslator );
+
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        // NOTE: Order counts here!
+        interpolator.addValueSource( new MapBasedValueSource( overrideContext ) );
+        interpolator.addValueSource( modelValueSource1 );
+        interpolator.addValueSource( new PrefixedValueSourceWrapper( new MapBasedValueSource( model.getProperties() ), PROJECT_PREFIXES, true ) );
+        interpolator.addValueSource( modelValueSource2 );
+        interpolator.addValueSource( new MapBasedValueSource( context ) );
+
+        RecursionInterceptor recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
 
         String result = src;
         Matcher matcher = EXPRESSION_PATTERN.matcher( result );
         while ( matcher.find() )
         {
             String wholeExpr = matcher.group( 0 );
-            String prefix = matcher.group( 1 );
-            String realExpr = matcher.group( 2 );
 
-            prefix = prefix == null ? "" : prefix;
+            Object value;
+            try
+            {
+                value = interpolator.interpolate( wholeExpr, "", recursionInterceptor );
+            }
+            catch( InterpolationException e )
+            {
+                throw new ModelInterpolationException( e.getMessage(), e );
+            }
 
-            Object value = null;
-
-            boolean isPomExpression = "pom.".equals( prefix ) || "project.".equals( prefix );
-
-            // Check for special expressions that should NOT be interpolated.
-            // See DefaultProjectBuilder and MNG-2124/MNG-1927.
-            if ( ( context.get( realExpr ) == null ) && context.containsKey( realExpr ) )
+            if ( value == null || value.equals(  wholeExpr ) )
             {
                 continue;
             }
 
-// TODO
-// I don't think we should deprecate this as it's used in plugin params aswell,
-// and project.build.outputDirectory etc. are documented.
-// For now I'll allow both pom. and project.
-// Perhaps pom. should be deprecated instead?
-//            if ( isSnapshotModel && logger != null && "project.".equals( prefix ) )
-//            {
-//                logger.warn( "Deprecated expression: " + wholeExpr + " - 'project.' prefix is deprecated."
-//                    + " Use 'pom.': ${pom." + realExpr + "} (model: " + model.getId() + ")" );
-//            }
-
-            if ( isPomExpression )
-            {
-                value = getValueFromModel( realExpr, model, wholeExpr, logger );
-            }
-
-            if ( value == null )
-            {
-                value = context.get( realExpr );
-            }
-
-            if ( value == null )
-            {
-                value = model.getProperties().getProperty( realExpr );
-            }
-
-            if ( value == null )
-            {
-                value = envars.getProperty( realExpr );
-            }
-
-            // Any expression, not just artifactId, version etc., but also scm.repository
-            // were evaluated against the model, even if there is no prefix.
-            // If the 2.1 strategy fails, try the legacy approach. If it yields a result, warn for it.
-            if ( ( value == null ) && ( prefix.length() == 0 ) )
-            {
-                value = getValueFromModel( realExpr, model, wholeExpr, logger );
-
-                if ( isSnapshotModel && ( value != null ) && ( logger != null ) )
-                {
-                    // TODO: Bring this back into the open once we're ready to deal with it.
-                    logger.debug( "Expression: " + wholeExpr + " is missing its prefix. Instead, use ${pom."
-                        + realExpr + "} (model: " + model.getId() + ")" );
-                }
-            }
-
+            // FIXME: Does this account for the case where ${project.build.directory} -> ${build.directory}??
             if ( value != null )
             {
                 // if the expression refers to itself, skip it.
@@ -223,7 +248,6 @@ public class RegexBasedModelInterpolator
                 matcher.reset( result );
             }
 
-
 /*
         // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
         // timing of executing the interpolation
@@ -236,26 +260,50 @@ public class RegexBasedModelInterpolator
 */
         }
 
+        if ( outputDebugMessages )
+        {
+            List feedback = interpolator.getFeedback();
+            if ( feedback != null && !feedback.isEmpty() )
+            {
+                logger.debug( "Maven encountered the following problems during initial POM interpolation:" );
+
+                Object last = null;
+                for ( Iterator it = feedback.iterator(); it.hasNext(); )
+                {
+                    Object next = it.next();
+
+                    if ( next instanceof Throwable )
+                    {
+                        if ( last == null )
+                        {
+                            logger.debug( "", ( (Throwable) next ) );
+                        }
+                        else
+                        {
+                            logger.debug( String.valueOf( last ), ( (Throwable) next ) );
+                        }
+                    }
+                    else
+                    {
+                        if ( last != null )
+                        {
+                            logger.debug( String.valueOf( last ) );
+                        }
+
+                        last = next;
+                    }
+                }
+
+                if ( last != null )
+                {
+                    logger.debug( String.valueOf( last ) );
+                }
+            }
+        }
+
+        interpolator.clearFeedback();
+
         return result;
     }
 
-    private static Object getValueFromModel( String realExpr, Model model, String wholeExpr, Logger logger )
-    {
-        try
-        {
-            // NOTE: We've already trimmed off any leading expression parts like 'project.'
-            // or 'pom.', and now we have to ensure that the ReflectionValueExtractor
-            // doesn't try to do it again.
-            return ReflectionValueExtractor.evaluate( realExpr, model, false );
-        }
-        catch ( Exception e )
-        {
-            if ( logger != null )
-            {
-                logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...", e );
-            }
-
-            return null;
-        }
-    }
 }

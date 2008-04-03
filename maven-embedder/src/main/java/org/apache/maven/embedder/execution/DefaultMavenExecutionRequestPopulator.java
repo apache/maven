@@ -193,15 +193,30 @@ public class DefaultMavenExecutionRequestPopulator
     private void executionProperties( MavenExecutionRequest request,
                                       Configuration configuration )
     {
-        if ( request.getProperties() == null )
+        Properties requestProperties = request.getProperties();
+
+        if ( requestProperties == null )
         {
-            Properties props = configuration.getSystemProperties();
-            if ( props == null )
+            requestProperties = configuration.getSystemProperties();
+            if ( requestProperties == null )
             {
-                props = System.getProperties();
+                requestProperties = System.getProperties();
             }
 
-            request.setProperties( props );
+            request.setProperties( requestProperties );
+        }
+
+        Properties userProperties = request.getUserProperties();
+        if ( userProperties != null )
+        {
+            for ( Iterator it = userProperties.keySet().iterator(); it.hasNext(); )
+            {
+                String key = (String) it.next();
+                if ( !requestProperties.containsKey( key ) )
+                {
+                    requestProperties.setProperty( key, userProperties.getProperty( key ) );
+                }
+            }
         }
     }
 
