@@ -268,11 +268,20 @@ public class DefaultMavenProjectBuilder
     {
         //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
         ProfileManager profileManager = new DefaultProfileManager( container );
-        return buildStandaloneSuperProject( localRepository, profileManager );
+
+        return buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
+                                                                                    .setGlobalProfileManager( profileManager ) );
     }
 
     public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository,
                                                      ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
+        return buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
+                                                                                    .setGlobalProfileManager( profileManager ) );
+    }
+
+    public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -285,6 +294,8 @@ public class DefaultMavenProjectBuilder
 
 
         List activeProfiles;
+
+        ProfileManager profileManager = config.getGlobalProfileManager();
 
         if ( profileManager == null )
         {
@@ -308,7 +319,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( "<Super-POM>", project, null, null, null, true, true );
+            project = processProjectLogic( "<Super-POM>", project, config, null, null, true, true );
 
             project.setExecutionRoot( true );
 
@@ -1006,7 +1017,11 @@ public class DefaultMavenProjectBuilder
 
         // second pass allows ${user.home} to work, if it needs to.
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
-        context.putAll( config.getExecutionProperties() );
+        if ( config.getExecutionProperties() != null && !config.getExecutionProperties().isEmpty() )
+        {
+            context.putAll( config.getExecutionProperties() );
+        }
+
         model = modelInterpolator.interpolate( model, context, strict );
 
         // MNG-3482: Make sure depMgmt is interpolated before merging.

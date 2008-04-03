@@ -40,6 +40,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -113,7 +114,7 @@ public class MavenMetadataSource
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "Reason: " + e.getMessage() );
-                        
+
                         ModelValidationResult validationResult = e.getValidationResult();
 
                         if ( validationResult != null )
@@ -143,7 +144,7 @@ public class MavenMetadataSource
                     if ( distMgmt != null )
                     {
                         relocation = distMgmt.getRelocation();
-                        
+
                         artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                         pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                     }
@@ -175,11 +176,11 @@ public class MavenMetadataSource
                         List available = artifact.getAvailableVersions();
                         if ( available != null && !available.isEmpty() )
                         {
-                            artifact.setAvailableVersions( this.retrieveAvailableVersions( artifact, localRepository,
+                            artifact.setAvailableVersions( retrieveAvailableVersions( artifact, localRepository,
                                                                                            remoteRepositories ) );
 
                         }
-                        
+
                         String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
                             artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
@@ -217,8 +218,8 @@ public class MavenMetadataSource
         {
             // TODO: this could come straight from the project, negating the need to set it in the project itself?
             artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-        }        
-        
+        }
+
         ResolutionGroup result;
 
         if ( project == null )
@@ -262,7 +263,7 @@ public class MavenMetadataSource
         {
             try
             {
-                superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
+                superProject = mavenProjectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
             }
             catch ( ProjectBuildingException e )
             {
@@ -284,7 +285,7 @@ public class MavenMetadataSource
             {
                 ArtifactRepository repo = (ArtifactRepository) aggregatedIterator.next();
 
-                // if the repository exists in the list and was introduced by another POM's super-pom, 
+                // if the repository exists in the list and was introduced by another POM's super-pom,
                 // remove it...the repository definitions from the super-POM should only be at the end of
                 // the list.
                 // if the repository has been redefined, leave it.
@@ -352,7 +353,7 @@ public class MavenMetadataSource
             }
 
             ArtifactFilter artifactFilter = dependencyFilter;
-            
+
             if ( artifact != null && ( artifactFilter == null || artifactFilter.include( artifact ) ) )
             {
                 if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )

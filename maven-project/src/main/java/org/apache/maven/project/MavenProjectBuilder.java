@@ -89,13 +89,20 @@ public interface MavenProjectBuilder
                                       ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException;
 
+    /**
+     * @deprecated Use {@link MavenProjectBuilder#buildStandaloneSuperProject(ProjectBuilderConfiguration)} instead.
+     */
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
     /**
      * need to pass a profilemanager with correct context (eg. with execution properties)
+     * @deprecated Use {@link MavenProjectBuilder#buildStandaloneSuperProject(ProjectBuilderConfiguration)} instead.
      */
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
+        throws ProjectBuildingException;
+
+    MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException;
 
     MavenProject build( File pom,
