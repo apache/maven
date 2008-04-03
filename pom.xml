@@ -44,6 +44,14 @@ under the License.
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
   
+  <!-- TODO: TAKE THIS OUT BEFORE WE RELEASE! -->
+  <repositories>
+    <repository>
+      <id>codehaus.snapshots</id>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </repository>
+  </repositories>
+  
   <mailingLists>
     <mailingList>
       <name>Maven Developer List</name>
