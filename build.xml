@@ -120,6 +120,7 @@ under the License.
     <pull orgpath="backport-util-concurrent/backport-util-concurrent" version="${backport.version}" name="backport-util-concurrent"/>        
     <pull orgpath="commons-cli/commons-cli" version="${commons-cli.version}" name="commons-cli"/>
     <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
+    <pull orgpath="org/codehaus/plexus/plexus-interpolation" version="${plexus-interpolation.version}" name="plexus-interpolation" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
     <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
     <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
@@ -149,6 +150,7 @@ under the License.
       <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
       <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
+      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interpolation/${plexus-interpolation.version}/plexus-interpolation-${plexus-interpolation.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/${plexus.version}/plexus-container-default-${plexus.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/${classworlds.version}/plexus-classworlds-${classworlds.version}.jar"/>
       <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/${plexus-interactivity-api.version}/plexus-interactivity-api-${plexus-interactivity-api.version}.jar"/>
