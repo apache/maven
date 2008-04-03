@@ -242,7 +242,7 @@ under the License.
   </dependencies>
 
   <properties>
-    <mavenVersion>2.0.9-RC8</mavenVersion>
+    <mavenVersion>2.0.9-RC9-SNAPSHOT</mavenVersion>
     <!-- Can't use. bootstrap-mini isn't smart enough: <wagonVersion>1.0-beta-2</wagonVersion> -->
   </properties>
 
