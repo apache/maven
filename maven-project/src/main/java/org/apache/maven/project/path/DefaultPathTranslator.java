@@ -83,7 +83,7 @@ public class DefaultPathTranslator
 
         if ( requiresBaseDirectoryAlignment( s ) )
         {
-            s = new File( basedir, s ).getAbsolutePath();
+            s = new File( new File( basedir, s ).toURI().normalize() ).getAbsolutePath();
         }
 
         return s;
@@ -91,14 +91,23 @@ public class DefaultPathTranslator
 
     private String stripBasedirToken( String s )
     {
+        String basedirExpr = "${basedir}";
+
         if ( s != null )
         {
             s = s.trim();
 
-            if ( s.startsWith( "${basedir}" ) )
+            if ( s.startsWith( basedirExpr ) )
             {
-                // Take out ${basedir} and the leading slash
-                s = s.substring( 11 );
+                if ( s.length() > basedirExpr.length() )
+                {
+                    // Take out ${basedir} and the leading slash
+                    s = s.substring( basedirExpr.length() + 1 );
+                }
+                else
+                {
+                    s = ".";
+                }
             }
         }
 
