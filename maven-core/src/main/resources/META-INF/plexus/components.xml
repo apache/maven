@@ -20,11 +20,11 @@ under the License.
 <component-set>
   <components>
 
-    <!-- 
+    <!--
      | These are the artifacts handlers that were previously in maven-artifact and they don't belong there as these
     | are Maven specific artifact handlers. We need to put these into their respective plugins and make this fully dynamic. jvz.
     -->
-    
+
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>
@@ -153,8 +153,9 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>rar</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -164,8 +165,9 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>par</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -175,11 +177,12 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>ejb3</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
-    </component>    
-        
+    </component>
+
     <component>
       <role>org.apache.maven.extension.BuildExtensionScanner</role>
       <role-hint>default</role-hint>
@@ -864,7 +867,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.plugin.PluginManagerSupport</role>
       <role-hint>default</role-hint>
