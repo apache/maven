@@ -51,10 +51,13 @@ import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Very simple stub of <code>MavenProject<code> object, going to take a lot of work to make it
@@ -171,6 +174,33 @@ public class MavenProjectStub
     {
         super( (Model) null );
         this.model = model;
+    }
+
+    /**
+     * Loads the model for this stub from the specified POM. For convenience, any checked exception caused by I/O or
+     * parser errors will be wrapped into an unchecked exception.
+     * 
+     * @param pomFile The path to the POM file to load, must not be <code>null</code>. If this path is relative, it
+     *            is resolved against the return value of {@link #getBasedir()}.
+     */
+    protected void readModel( File pomFile )
+    {
+        if ( !pomFile.isAbsolute() )
+        {
+            pomFile = new File( getBasedir(), pomFile.getPath() );
+        }
+        try
+        {
+            setModel( new MavenXpp3Reader().read( ReaderFactory.newXmlReader( pomFile ) ) );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( "Failed to read POM file: " + pomFile, e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new RuntimeException( "Failed to parse POM file: " + pomFile, e );
+        }
     }
 
     /**
