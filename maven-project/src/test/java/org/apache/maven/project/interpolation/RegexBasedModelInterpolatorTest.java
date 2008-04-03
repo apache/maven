@@ -296,4 +296,39 @@ public class RegexBasedModelInterpolatorTest
         assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
     }
 
+//    public void testPOMExpressionDoesNotUseSystemProperty()
+//        throws Exception
+//    {
+//        Model model = new Model();
+//        model.setVersion( "1.0" );
+//
+//        Properties modelProperties = new Properties();
+//        modelProperties.setProperty( "version", "prop version" );
+//        modelProperties.setProperty( "foo.version", "prop foo.version" );
+//        modelProperties.setProperty( "pom.version", "prop pom.version" );
+//        modelProperties.setProperty( "project.version", "prop project.version" );
+//
+//        model.setProperties( modelProperties );
+//
+//        Dependency dep = new Dependency();
+//        model.addDependency( dep );
+//
+//        checkDep( "prop version", "${version}", model );
+//        checkDep( "1.0", "${pom.version}", model );
+//        checkDep( "1.0", "${project.version}", model );
+//        checkDep( "prop foo.version", "${foo.version}", model );
+//    }
+//
+//    private void checkDep( String expectedVersion,
+//                           String depVersionExpr,
+//                           Model model )
+//        throws Exception
+//    {
+//        ( (Dependency) model.getDependencies().get( 0 ) ).setVersion( depVersionExpr );
+//        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+//        String result = ( (Dependency) out.getDependencies().get( 0 ) ).getVersion();
+//        assertEquals( "Expected '" + expectedVersion + "' for version expression '"
+//                      + depVersionExpr + "', but was '" + result + "'", expectedVersion, result );
+//    }
+
 }

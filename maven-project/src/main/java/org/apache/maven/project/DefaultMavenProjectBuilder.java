@@ -1006,7 +1006,7 @@ public class DefaultMavenProjectBuilder
 
         // second pass allows ${user.home} to work, if it needs to.
         // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
-        context.putAll( System.getProperties() );
+        context.putAll( config.getExecutionProperties() );
         model = modelInterpolator.interpolate( model, context, strict );
 
         // MNG-3482: Make sure depMgmt is interpolated before merging.

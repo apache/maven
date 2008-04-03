@@ -14,10 +14,14 @@ public interface ProjectBuilderConfiguration
 
     Properties getUserProperties();
 
+    Properties getExecutionProperties();
+
     ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager );
 
     ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
 
     ProjectBuilderConfiguration setUserProperties( Properties userProperties );
+
+    ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
 
 }

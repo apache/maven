@@ -15,6 +15,8 @@ public class DefaultProjectBuilderConfiguration
 
     private Properties userProperties;
 
+    private Properties executionProperties = System.getProperties();
+
     public DefaultProjectBuilderConfiguration()
     {
     }
@@ -49,7 +51,23 @@ public class DefaultProjectBuilderConfiguration
 
     public Properties getUserProperties()
     {
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
         return userProperties;
+    }
+
+    public Properties getExecutionProperties()
+    {
+        return executionProperties;
+    }
+
+    public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
+    {
+        this.executionProperties = executionProperties;
+        return this;
     }
 
 }
