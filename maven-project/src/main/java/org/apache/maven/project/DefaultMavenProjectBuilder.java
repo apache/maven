@@ -677,7 +677,8 @@ public class DefaultMavenProjectBuilder
                                         ProjectBuilderConfiguration config,
                                         List parentSearchRepositories,
                                         File projectDescriptor,
-                                        boolean strict, boolean validProfilesXmlLocation,
+                                        boolean strict,
+                                        boolean isReactorProject,
                                         boolean fromSourceTree )
         throws ProjectBuildingException
     {
@@ -711,7 +712,7 @@ public class DefaultMavenProjectBuilder
         }
 
         LinkedHashSet activeInSuperPom = new LinkedHashSet();
-        List activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, validProfilesXmlLocation, profileActivationContext );
+        List activated = profileAdvisor.applyActivatedProfiles( superModel, projectDescriptor, isReactorProject, profileActivationContext );
         if ( !activated.isEmpty() )
         {
             activeInSuperPom.addAll( activated );
@@ -731,7 +732,7 @@ public class DefaultMavenProjectBuilder
         LinkedHashSet aggregatedRemoteWagonRepositories = collectInitialRepositories( model, superModel,
             parentSearchRepositories,
             projectDescriptor,
-            validProfilesXmlLocation,
+            isReactorProject,
             profileActivationContext );
 
         Model originalModel = ModelUtils.cloneModel( model );
@@ -740,7 +741,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = assembleLineage( model, lineage, config, projectDescriptor, aggregatedRemoteWagonRepositories, strict, validProfilesXmlLocation );
+            project = assembleLineage( model, lineage, config, projectDescriptor, aggregatedRemoteWagonRepositories, strict, isReactorProject );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -1089,7 +1090,7 @@ public class DefaultMavenProjectBuilder
     }
 
     /**
-     * @param validProfilesXmlLocation
+     * @param isReactorProject
      * @noinspection CollectionDeclaredAsConcreteClass
      * @todo We need to find an effective way to unit test parts of this method!
      * @todo Refactor this into smaller methods with discrete purposes.
@@ -1099,14 +1100,15 @@ public class DefaultMavenProjectBuilder
                                           ProjectBuilderConfiguration config,
                                           File pomFile,
                                           Set aggregatedRemoteWagonRepositories,
-                                          boolean strict, boolean validProfilesXmlLocation )
+                                          boolean strict,
+                                          boolean isReactorProject )
         throws ProjectBuildingException, InvalidRepositoryException
     {
         ModelLineage modelLineage = new DefaultModelLineage();
 
-        modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ), validProfilesXmlLocation );
+        modelLineage.setOrigin( model, pomFile, new ArrayList( aggregatedRemoteWagonRepositories ), isReactorProject );
 
-        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, config, !strict );
+        modelLineageBuilder.resumeBuildingModelLineage( modelLineage, config, !strict, isReactorProject );
 
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext profileActivationContext;
@@ -1143,7 +1145,7 @@ public class DefaultMavenProjectBuilder
 
             // NOTE: the caching aspect may replace the parent project instance, so we apply profiles here.
             // TODO: Review this...is that a good idea, to allow application of profiles when other profiles could have been applied already?
-            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), validProfilesXmlLocation, profileActivationContext ) );
+            project.setActiveProfiles( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), isReactorProject, profileActivationContext ) );
 
             lineage.addFirst( project );
 

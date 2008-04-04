@@ -41,16 +41,24 @@ public interface ModelLineageBuilder
      * Construct a lineage of the current POM plus all of its ancestors.
      *
      * @param pom The current POM, whose Model will terminate the constructed lineage
-     * @param localRepository The local repository against which parent POMs should be resolved
+     *
+     * @param config The project-building configuration to use, which contains the global profile manager,
+     *   local repository, and execution- and user-level properties.
+     *
      * @param remoteRepositories List of ArtifactRepository instances against which parent POMs
      *   should be resolved
-     * @param profileManager The profile manager containing information about global profiles to be
-     *   applied (from settings.xml, for instance)
+     *
      * @param allowStubs Whether stubbed-out Model instances should be constructed in the event that
      *   a parent-POM cannot be resolved.
+     *
+     * @param isReactorProject Whether the model being built is part of the build we're trying to execute,
+     *   or if it's actually being read from the repository.
      */
-    ModelLineage buildModelLineage( File pom, ProjectBuilderConfiguration config, List remoteRepositories,
-                                    boolean allowStubs, boolean validProfilesXmlLocation )
+    ModelLineage buildModelLineage( File pom,
+                                    ProjectBuilderConfiguration config,
+                                    List remoteRepositories,
+                                    boolean allowStubs,
+                                    boolean isReactorProject )
         throws ProjectBuildingException;
 
     /**
@@ -58,13 +66,20 @@ public interface ModelLineageBuilder
      * parent already in the lineage.
      *
      * @param lineage The ModelLineage instance in progress, which should be completed.
-     * @param localRepository The local repository against which parent POMs should be resolved
-     * @param profileManager The profile manager containing information about global profiles to be
-     *   applied (from settings.xml, for instance)
+     *
+     * @param config The project-building configuration to use, which contains the global profile manager,
+     *   local repository, and execution- and user-level properties.
+     *
      * @param allowStubs Whether stubbed-out Model instances should be constructed in the event that
      *   a parent-POM cannot be resolved.
+     *
+     * @param isReactorProject Whether the model being built is part of the build we're trying to execute,
+     *   or if it's actually being read from the repository.
      */
-    void resumeBuildingModelLineage( ModelLineage lineage, ProjectBuilderConfiguration config, boolean allowStubs )
+    void resumeBuildingModelLineage( ModelLineage lineage,
+                                     ProjectBuilderConfiguration config,
+                                     boolean allowStubs,
+                                     boolean isReactorProject )
         throws ProjectBuildingException;
 
 }

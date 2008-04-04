@@ -1,6 +1,7 @@
 package org.apache.maven.project.workspace;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.build.model.ModelAndFile;
 import org.apache.maven.workspace.MavenWorkspaceStore;
@@ -8,7 +9,6 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Map;
 
 public class DefaultProjectWorkspace
@@ -57,9 +57,7 @@ public class DefaultProjectWorkspace
             return null;
         }
 
-        URI path = file.toURI().normalize();
-
-        return path;
+        return file.toURI().normalize().toString();
     }
 
     public MavenProject getProject( File projectFile )
@@ -97,9 +95,38 @@ public class DefaultProjectWorkspace
 
         Model model = modelAndFile.getModel();
         String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        String keyWithParent = createCacheKeyUsingParent( model );
 
         getLogger().debug( "Storing ModelAndFile instance under: " + key + " in workspace." );
         cache.put( key, modelAndFile );
+
+        if ( !key.equals( keyWithParent ) )
+        {
+            getLogger().debug( "Also Storing ModelAndFile instance using groupId/version information from parent, under: " + keyWithParent + " in workspace." );
+            cache.put( keyWithParent, modelAndFile );
+        }
+    }
+
+    private String createCacheKeyUsingParent( Model model )
+    {
+        String groupId = model.getGroupId();
+        String version = model.getVersion();
+
+        Parent parent = model.getParent();
+        if ( parent != null )
+        {
+            if ( groupId == null )
+            {
+                groupId = parent.getGroupId();
+            }
+
+            if ( version == null )
+            {
+                version = parent.getVersion();
+            }
+        }
+
+        return createCacheKey( groupId, model.getArtifactId(), version );
     }
 
     public void storeProjectByFile( MavenProject project )

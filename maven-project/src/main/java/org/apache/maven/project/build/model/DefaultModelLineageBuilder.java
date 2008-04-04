@@ -90,7 +90,7 @@ public class DefaultModelLineageBuilder
                                            ProjectBuilderConfiguration config,
                                            List remoteRepositories,
                                            boolean allowStubs,
-                                           boolean validProfilesXmlLocation )
+                                           boolean isReactorProject )
         throws ProjectBuildingException
     {
         ModelLineage lineage = new DefaultModelLineage();
@@ -101,7 +101,7 @@ public class DefaultModelLineageBuilder
         ModelAndFile current = projectWorkspace.getModelAndFile( pom );
         if ( current == null )
         {
-            current = new ModelAndFile( readModel( pom ), pom, validProfilesXmlLocation );
+            current = new ModelAndFile( readModel( pom ), pom, isReactorProject );
             projectWorkspace.storeModelAndFile( current );
         }
 
@@ -131,7 +131,8 @@ public class DefaultModelLineageBuilder
             current = resolveParentPom( current,
                                         currentRemoteRepositories,
                                         config,
-                                        allowStubs );
+                                        allowStubs,
+                                        isReactorProject );
         }
         while ( current != null );
 
@@ -140,7 +141,8 @@ public class DefaultModelLineageBuilder
 
     public void resumeBuildingModelLineage( ModelLineage lineage,
                                             ProjectBuilderConfiguration config,
-                                            boolean allowStubs )
+                                            boolean allowStubs,
+                                            boolean isReactorProject )
         throws ProjectBuildingException
     {
         if ( lineage.size() == 0 )
@@ -164,7 +166,8 @@ public class DefaultModelLineageBuilder
         current = resolveParentPom( current,
                                     currentRemoteRepositories,
                                     config,
-                                    allowStubs );
+                                    allowStubs,
+                                    isReactorProject);
 
         while ( current != null )
         {
@@ -182,7 +185,8 @@ public class DefaultModelLineageBuilder
             current = resolveParentPom( current,
                                         currentRemoteRepositories,
                                         config,
-                                        allowStubs );
+                                        allowStubs,
+                                        isReactorProject );
         }
     }
 
@@ -240,8 +244,6 @@ public class DefaultModelLineageBuilder
     {
         List repositories = model.getRepositories();
 
-        File projectDir = pomFile == null ? null : pomFile.getParentFile();
-
         Set artifactRepositories = null;
 
         if ( repositories != null )
@@ -254,7 +256,7 @@ public class DefaultModelLineageBuilder
                 loadActiveProfileRepositories( remoteRepos,
                                                model,
                                                config,
-                                               projectDir,
+                                               pomFile,
                                                useProfilesXml );
 
                 artifactRepositories = new LinkedHashSet( remoteRepos.size()
@@ -321,11 +323,13 @@ public class DefaultModelLineageBuilder
      * resolve that artifact...then, return the resolved POM file for the parent.
      * @param projectBuildCache
      * @param allowStubs
+     * @param childIsReactorProject
      */
     private ModelAndFile resolveParentPom( ModelAndFile child,
                                            List remoteRepositories,
                                            ProjectBuilderConfiguration config,
-                                           boolean allowStubs )
+                                           boolean allowStubs,
+                                           boolean childIsReactorProject )
         throws ProjectBuildingException
     {
         Model model = child.getModel();
@@ -340,9 +344,39 @@ public class DefaultModelLineageBuilder
             validateParentDeclaration( modelParent, model );
 
             String key = modelParent.getGroupId() + ":" + modelParent.getArtifactId() + ":" + modelParent.getVersion();
-            getLogger().debug( "Checking cache for parent model-and-file instance: " + key );
 
-            result = projectWorkspace.getModelAndFile( modelParent.getGroupId(), modelParent.getArtifactId(), modelParent.getVersion() );
+            File parentPomFile = null;
+
+            if ( childIsReactorProject && modelPomFile != null )
+            {
+                getLogger().debug( "Attempting to locate parent model using relativePath and local filesystem; child is a reactor project." );
+
+                // if the child isn't a reactor project, don't resolve the parent from the local filesystem...use the repository.
+                String relativePath = modelParent.getRelativePath();
+                File modelDir = modelPomFile.getParentFile();
+
+                parentPomFile = new File( modelDir, relativePath );
+
+                if ( parentPomFile.isDirectory() )
+                {
+                    parentPomFile = new File( parentPomFile, "pom.xml" );
+                }
+
+                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using file: " + parentPomFile );
+
+                result = projectWorkspace.getModelAndFile( parentPomFile );
+                if ( result != null && !parentModelMatches( modelParent, result.getModel() ) )
+                {
+                    result = null;
+                }
+            }
+
+            if ( result == null )
+            {
+                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using project groupId:artifactId:version." );
+
+                result = projectWorkspace.getModelAndFile( modelParent.getGroupId(), modelParent.getArtifactId(), modelParent.getVersion() );
+            }
 
             if ( result != null )
             {
@@ -352,11 +386,13 @@ public class DefaultModelLineageBuilder
 
             getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
 
-            File parentPomFile = null;
-
-            if ( ( modelPomFile != null ) )
+            if ( parentPomFile != null && parentPomFile.exists() )
             {
-                parentPomFile = resolveParentWithRelativePath( modelParent, modelPomFile );
+                Model parentModel = readModel( parentPomFile );
+                if ( !parentModelMatches( modelParent, parentModel ) )
+                {
+                    parentPomFile = null;
+                }
             }
 
             boolean isResolved = false;
@@ -436,6 +472,23 @@ public class DefaultModelLineageBuilder
         return result;
     }
 
+    private boolean parentModelMatches( Parent modelParent, Model parentModel )
+    {
+
+        boolean groupsMatch = ( parentModel.getGroupId() == null )
+                              || parentModel.getGroupId().equals( modelParent.getGroupId() );
+        boolean versionsMatch = ( parentModel.getVersion() == null )
+                                || parentModel.getVersion().equals( modelParent.getVersion() );
+
+        if ( groupsMatch && !versionsMatch
+             && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private void validateParentDeclaration( Parent modelParent,
                                             Model model )
         throws ProjectBuildingException
@@ -498,42 +551,6 @@ public class DefaultModelLineageBuilder
         {
             return null;
         }
-    }
-
-    private File resolveParentWithRelativePath( Parent modelParent,
-                                                File modelPomFile )
-        throws ProjectBuildingException
-    {
-        String relativePath = modelParent.getRelativePath();
-        File modelDir = modelPomFile.getParentFile();
-
-        File parentPomFile = new File( modelDir, relativePath );
-
-        if ( parentPomFile.isDirectory() )
-        {
-//            getLogger().debug( "Parent relative-path is a directory; assuming \'pom.xml\' file exists within." );
-            parentPomFile = new File( parentPomFile, "pom.xml" );
-        }
-
-//        getLogger().debug( "Looking for parent: " + modelParent.getId() + " in: " + parentPomFile );
-
-        if ( parentPomFile.exists() )
-        {
-            Model parentModel = readModel( parentPomFile );
-
-            boolean groupsMatch = ( parentModel.getGroupId() == null )
-                                  || parentModel.getGroupId().equals( modelParent.getGroupId() );
-            boolean versionsMatch = ( parentModel.getVersion() == null )
-                                    || parentModel.getVersion().equals( modelParent.getVersion() );
-
-            if ( groupsMatch && versionsMatch
-                 && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
-            {
-                return parentPomFile;
-            }
-        }
-
-        return null;
     }
 
     private Logger getLogger()
