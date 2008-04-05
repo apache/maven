@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -72,8 +73,7 @@ public class DefaultLifecycleBindingManager
     private PlexusContainer container;
 
     /**
-     * Retrieve the LifecycleBindings given by the lifecycle mapping component/file for the project's packaging. Any
-     * applicable mojo configuration will be injected into the LifecycleBindings from the POM.
+     * {@inheritDoc}
      */
     public LifecycleBindings getBindingsForPackaging( final MavenProject project, final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException
@@ -123,8 +123,7 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Construct the LifecycleBindings for the default lifecycle mappings, including injection of configuration from the
-     * project into each MojoBinding, where appropriate.
+     * {@inheritDoc}
      */
     public LifecycleBindings getDefaultBindings( final MavenProject project ) throws LifecycleSpecificationException
     {
@@ -141,10 +140,9 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within the POM itself.
-     * @param session
+     * {@inheritDoc}
      */
-    public LifecycleBindings getProjectCustomBindings( final MavenProject project, final MavenSession session )
+    public LifecycleBindings getProjectCustomBindings( final MavenProject project, final MavenSession session, Set unbindableMojos )
         throws LifecycleLoaderException, LifecycleSpecificationException
     {
         LifecycleBindings bindings = new LifecycleBindings();
@@ -210,7 +208,7 @@ public class DefaultLifecycleBindingManager
                                         }
                                         catch ( PluginLoaderException e )
                                         {
-                                            mojoBinding.setLateBound( true );
+                                            unbindableMojos.add( mojoBinding );
 
                                             String message = "Failed to load plugin descriptor for: "
                                                              + plugin
@@ -236,6 +234,8 @@ public class DefaultLifecycleBindingManager
                                         {
                                             logger.error( "Somehow, the PluginDescriptor for plugin: " + plugin.getKey()
                                                             + " contains no mojos. This is highly irregular. Ignoring..." );
+
+                                            unbindableMojos.add( mojoBinding );
                                             continue;
                                         }
 
@@ -267,14 +267,15 @@ public class DefaultLifecycleBindingManager
                                         }
                                         else
                                         {
-                                            logger.debug( "Skipping addition to build-plan for goal: "
+                                            logger.warn( "\n\nSkipping addition to build-plan for goal: "
                                                           + goal
                                                           + " in execution: "
                                                           + execution.getId()
                                                           + " of plugin: "
                                                           + plugin.getKey()
-                                                          + " because no phase information was available (either through the mojo descriptor, which is currently missing, or in the POM itself)." );
+                                                          + " because no phase information was available (either through the mojo descriptor, which is currently missing, or in the POM itself).\n\n" );
 
+                                            unbindableMojos.add( mojoBinding );
                                             continue;
                                         }
                                     }
@@ -294,8 +295,7 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Construct the LifecycleBindings that constitute the mojos mapped to the lifecycles by an overlay specified in a
-     * plugin. Inject mojo configuration from the POM into all appropriate MojoBinding instances.
+     * {@inheritDoc}
      */
     public LifecycleBindings getPluginLifecycleOverlay( final PluginDescriptor pluginDescriptor,
                                                         final String lifecycleId, final MavenProject project )
@@ -417,15 +417,7 @@ public class DefaultLifecycleBindingManager
     }
 
     /**
-     * Retrieve the list of MojoBinding instances that correspond to the reports configured for the specified project.
-     * Inject all appropriate configuration from the POM for each MojoBinding, using the following precedence rules:
-     * <br/>
-     * <ol>
-     * <li>report-set-level configuration</li>
-     * <li>reporting-level configuration</li>
-     * <li>execution-level configuration</li>
-     * <li>plugin-level configuration</li>
-     * </ol>
+     * {@inheritDoc}
      */
     public List getReportBindings( final MavenProject project, final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException
@@ -599,6 +591,51 @@ public class DefaultLifecycleBindingManager
         throws ContextException
     {
         container = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void resolveUnbindableMojos( final Set unbindableMojos,
+                                        final MavenProject project,
+                                        final MavenSession session,
+                                        final LifecycleBindings lifecycleBindings )
+        throws LifecycleSpecificationException
+    {
+        for ( Iterator it = unbindableMojos.iterator(); it.hasNext(); )
+        {
+            MojoBinding binding = (MojoBinding) it.next();
+            PluginDescriptor pluginDescriptor;
+            try
+            {
+                pluginDescriptor = pluginLoader.loadPlugin( binding, project, session );
+            }
+            catch ( PluginLoaderException e )
+            {
+                String message = "Failed to load plugin descriptor for: "
+                                 + MojoBindingUtils.toString( binding )
+                                 + ". Cannot discover it's default phase, specified in its plugin descriptor.";
+
+                throw new LifecycleSpecificationException( message, e );
+            }
+
+            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( binding.getGoal() );
+            if ( mojoDescriptor == null )
+            {
+                throw new LifecycleSpecificationException( "Cannot find mojo descriptor for goal: " + binding.getGoal() + " in plugin: " + pluginDescriptor.getPluginLookupKey() );
+            }
+
+            String phase = mojoDescriptor.getPhase();
+            if ( phase == null )
+            {
+                throw new LifecycleSpecificationException(
+                                                           "Mojo descriptor: "
+                                                                           + mojoDescriptor.getFullGoalName()
+                                                                           + " doesn't have a default lifecycle phase. Please specify a <phase/> for this goal in your POM." );
+            }
+
+            LifecycleUtils.addMojoBinding( phase, binding, lifecycleBindings );
+        }
     }
 
 }

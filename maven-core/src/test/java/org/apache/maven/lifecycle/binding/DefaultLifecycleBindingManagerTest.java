@@ -28,6 +28,7 @@ import org.easymock.MockControl;
 import java.io.File;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -203,7 +204,7 @@ public class DefaultLifecycleBindingManagerTest
 
         MavenProject project = new MavenProject( model );
 
-        LifecycleBindings lifecycleBindings = mgr.getProjectCustomBindings( project, null );
+        LifecycleBindings lifecycleBindings = mgr.getProjectCustomBindings( project, null, new HashSet() );
 
         List bindings = lifecycleBindings.getBuildBinding().getValidate().getBindings();
 

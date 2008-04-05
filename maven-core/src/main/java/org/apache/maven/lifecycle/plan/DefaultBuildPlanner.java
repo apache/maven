@@ -18,9 +18,11 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -62,7 +64,7 @@ public class DefaultBuildPlanner
         BuildPlan plan = session.getBuildPlan( project );
         if ( plan == null )
         {
-            plan = constructBuildPlan( Collections.EMPTY_LIST, project, session );
+            plan = constructBuildPlan( Collections.EMPTY_LIST, project, session, true );
 
             session.setBuildPlan( project, plan );
         }
@@ -73,13 +75,15 @@ public class DefaultBuildPlanner
     /**
      * Orchestrates construction of the build plan which will be used by the user of LifecycleExecutor.
      */
-    public BuildPlan constructBuildPlan( final List tasks,
-                                         final MavenProject project,
-                                         final MavenSession session )
+    public BuildPlan constructBuildPlan( List tasks,
+                                         MavenProject project,
+                                         MavenSession session,
+                                         boolean allowUnbindableMojos )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException
     {
         BuildPlan plan = session.getBuildPlan( project );
 
+        boolean pluginResolutionAttempted = false;
         if ( plan != null )
         {
             plan = plan.copy( tasks );
@@ -87,20 +91,31 @@ public class DefaultBuildPlanner
         else
         {
             LifecycleBindings defaultBindings = lifecycleBindingManager.getDefaultBindings( project );
+
             LifecycleBindings packagingBindings = lifecycleBindingManager.getBindingsForPackaging( project,
                                                                                                    session );
-            LifecycleBindings projectBindings = lifecycleBindingManager.getProjectCustomBindings( project,
-                                                                                                  session );
 
-            plan = new BuildPlan( packagingBindings, projectBindings, defaultBindings, tasks );
+            Set unbindableMojos = new HashSet();
+            LifecycleBindings projectBindings = lifecycleBindingManager.getProjectCustomBindings( project,
+                                                                                                  session,
+                                                                                                  unbindableMojos );
+
+            plan = new BuildPlan( packagingBindings, projectBindings, defaultBindings, unbindableMojos, tasks );
+            pluginResolutionAttempted = true;
+        }
+
+        if ( ( !pluginResolutionAttempted || !allowUnbindableMojos ) && plan.hasUnbindableMojos() )
+        {
+            lifecycleBindingManager.resolveUnbindableMojos( plan.getUnbindableMojos(), project, session, plan.getLifecycleBindings() );
+            plan.clearUnbindableMojos();
         }
 
         // initialize/resolve any direct-invocation tasks, if possible.
         initializeDirectInvocations( plan, project, session );
 
         // Inject forked lifecycles as plan modifiers for each mojo that has @execute in it.
-        addForkedLifecycleModifiers( plan, project, session, new LinkedList() );
-        addReportingLifecycleModifiers( plan, project, session, new LinkedList() );
+        addForkedLifecycleModifiers( plan, project, session, new LinkedList(), allowUnbindableMojos );
+        addReportingLifecycleModifiers( plan, project, session, new LinkedList(), allowUnbindableMojos );
 
         plan.markFullyResolved();
 
@@ -147,8 +162,9 @@ public class DefaultBuildPlanner
      */
     private void addForkedLifecycleModifiers( final BuildPlan plan,
                                               final MavenProject project,
-                                              MavenSession session,
-                                              LinkedList callStack )
+                                              final MavenSession session,
+                                              LinkedList callStack,
+                                              final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         List planBindings = plan.renderExecutionPlan( new Stack() );
@@ -160,7 +176,7 @@ public class DefaultBuildPlanner
 
             if ( !plan.isFullyResolved( mojoBinding ) )
             {
-                findForkModifiers( mojoBinding, plan, project, session, callStack );
+                findForkModifiers( mojoBinding, plan, project, session, callStack, allowUnbindableMojos );
             }
         }
     }
@@ -169,13 +185,15 @@ public class DefaultBuildPlanner
                                     final BuildPlan plan,
                                     final MavenProject project,
                                     MavenSession session,
-                                    LinkedList callStack )
+                                    LinkedList callStack,
+                                    final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding,
                                                                   plan,
                                                                   project,
-                                                                  session );
+                                                                  session,
+                                                                  allowUnbindableMojos );
 
         if ( pluginDescriptor == null )
         {
@@ -190,20 +208,19 @@ public class DefaultBuildPlanner
                                                  + pluginDescriptor.getId() + "." );
         }
 
-        findForkModifiers( mojoBinding, pluginDescriptor, plan, project, session, false, callStack );
+        findForkModifiers( mojoBinding, pluginDescriptor, plan, project, session, callStack, false, allowUnbindableMojos );
     }
 
     /**
      * Traverses all MojoBinding instances discovered from the POM and its packaging-mappings, and orchestrates the
      * process of injecting any modifiers that are necessary to accommodate mojos that require access to the project's
      * configured reports.
-     * @param callStack
-     * @param session
      */
     private void addReportingLifecycleModifiers( final BuildPlan plan,
                                                  final MavenProject project,
-                                                 MavenSession session,
-                                                 LinkedList callStack )
+                                                 final MavenSession session,
+                                                 LinkedList callStack,
+                                                 final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         if ( plan.isIncludingReports() )
@@ -228,7 +245,8 @@ public class DefaultBuildPlanner
             PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding,
                                                                       plan,
                                                                       project,
-                                                                      session );
+                                                                      session,
+                                                                      allowUnbindableMojos );
 
             if ( pluginDescriptor == null )
             {
@@ -265,7 +283,8 @@ public class DefaultBuildPlanner
                         PluginDescriptor pd = loadPluginDescriptor( reportBinding,
                                                                     plan,
                                                                     project,
-                                                                    session );
+                                                                    session,
+                                                                    allowUnbindableMojos );
 
                         if ( pd != null )
                         {
@@ -274,8 +293,9 @@ public class DefaultBuildPlanner
                                                plan,
                                                project,
                                                session,
+                                               callStack,
                                                true,
-                                               callStack );
+                                               allowUnbindableMojos );
                         }
                     }
                 }
@@ -292,7 +312,9 @@ public class DefaultBuildPlanner
     private PluginDescriptor loadPluginDescriptor( final MojoBinding mojoBinding,
                                                    final BuildPlan plan,
                                                    final MavenProject project,
-                                                   final MavenSession session )
+                                                   final MavenSession session,
+                                                   final boolean allowUnbindableMojos )
+        throws LifecyclePlannerException
     {
         PluginDescriptor pluginDescriptor = null;
         try
@@ -301,20 +323,27 @@ public class DefaultBuildPlanner
         }
         catch ( PluginLoaderException e )
         {
-            String message = "Failed to load plugin: "
-                             + MojoBindingUtils.createPluginKey( mojoBinding )
-                             + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
-
-            if ( logger.isDebugEnabled() )
+            if ( allowUnbindableMojos )
             {
-                logger.debug( message, e );
+                String message = "Failed to load plugin: "
+                + MojoBindingUtils.createPluginKey( mojoBinding )
+                + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( message, e );
+                }
+                else
+                {
+                    logger.warn( message );
+                }
+
+                plan.addUnbindableMojo( mojoBinding );
             }
             else
             {
-                logger.warn( message );
+                throw new LifecyclePlannerException( "Failed to resolve plugin for mojo binding: " + MojoBindingUtils.toString( mojoBinding ), e );
             }
-
-            mojoBinding.setLateBound( true );
         }
 
         return pluginDescriptor;
@@ -330,8 +359,9 @@ public class DefaultBuildPlanner
                                     final BuildPlan plan,
                                     final MavenProject project,
                                     final MavenSession session,
+                                    LinkedList callStack,
                                     final boolean includeReportConfig,
-                                    LinkedList callStack )
+                                    final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         String referencingGoal = mojoBinding.getGoal();
@@ -360,8 +390,9 @@ public class DefaultBuildPlanner
                                   plan,
                                   project,
                                   session,
+                                  callStack,
                                   includeReportConfig,
-                                  callStack );
+                                  allowUnbindableMojos );
         }
     }
 
@@ -380,8 +411,9 @@ public class DefaultBuildPlanner
                                        final BuildPlan plan,
                                        final MavenProject project,
                                        final MavenSession session,
+                                       LinkedList callStack,
                                        final boolean includeReportConfig,
-                                       LinkedList callStack )
+                                       final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
         callStack.addFirst( mojoBinding );
@@ -429,7 +461,7 @@ public class DefaultBuildPlanner
 
             plan.addForkedExecution( mojoBinding, clonedPlan );
 
-            addForkedLifecycleModifiers( clonedPlan, project, session, callStack );
+            addForkedLifecycleModifiers( clonedPlan, project, session, callStack, allowUnbindableMojos );
         }
         finally
         {

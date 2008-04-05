@@ -200,6 +200,7 @@ public class LifecycleUtils
 
         Phase phase = (Phase) phases.get( idx );
         phase.addBinding( mojoBinding );
+        mojoBinding.setLifecycleInfo( phase );
     }
 
     public static void addMojoBinding( final String phaseName, final MojoBinding mojo, final LifecycleBindings bindings )

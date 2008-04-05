@@ -4,10 +4,13 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
+import org.apache.maven.lifecycle.model.MojoBinding;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances to different parts
@@ -39,7 +42,7 @@ public interface LifecycleBindingManager
     /**
      * Construct the LifecycleBindings that constitute the extra mojos bound to the lifecycle within the POM itself.
      */
-    LifecycleBindings getProjectCustomBindings( MavenProject project, MavenSession session )
+    LifecycleBindings getProjectCustomBindings( MavenProject project, MavenSession session, Set unresolvableBindings )
         throws LifecycleLoaderException, LifecycleSpecificationException;
 
     /**
@@ -62,5 +65,21 @@ public interface LifecycleBindingManager
      * </ol>
      */
     List getReportBindings( MavenProject project, MavenSession session ) throws LifecycleLoaderException, LifecycleSpecificationException;
+
+    /**
+     * Go through the set of unbindable mojos provided (these are {@link MojoBinding} instancess coming
+     * from the project as custom bindings for which we failed to determine a phase
+     * to bind them during {@link LifecycleBindingManager#getProjectCustomBindings(MavenProject, MavenSession, Set)}).
+     * For each {@link MojoBinding}, attempt to resolve it again, and if successful,
+     * extract the default phase name from the {@link MojoDescriptor}.
+     *
+     * @throws LifecycleSpecificationException In case the plugin cannot be resolved, the plugin doesn't contain the specified mojo,
+     *   or the mojo doesn't have a default phase.
+     */
+    void resolveUnbindableMojos( final Set unbindableMojos,
+                                        final MavenProject project,
+                                        final MavenSession session,
+                                        final LifecycleBindings lifecycleBindings )
+        throws LifecycleSpecificationException;
 
 }

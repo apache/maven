@@ -136,7 +136,7 @@ public class ModelAndFileCachingTest
                                                                  new DefaultProjectBuilderConfiguration().setLocalRepository( localRepo ).setGlobalProfileManager( profileManager ),
                                                                  Collections.EMPTY_LIST,
                                                                  false,
-                                                                 false );
+                                                                 true );
 
         assertEquals( parentPomFile.getCanonicalPath(), lineage.getDeepestAncestorFile()
                                                                .getCanonicalPath() );

@@ -367,6 +367,7 @@ public class DefaultModelLineageBuilder
                 result = projectWorkspace.getModelAndFile( parentPomFile );
                 if ( result != null && !parentModelMatches( modelParent, result.getModel() ) )
                 {
+                    parentPomFile = null;
                     result = null;
                 }
             }
@@ -386,10 +387,17 @@ public class DefaultModelLineageBuilder
 
             getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
 
-            if ( parentPomFile != null && parentPomFile.exists() )
+            if ( parentPomFile != null )
             {
-                Model parentModel = readModel( parentPomFile );
-                if ( !parentModelMatches( modelParent, parentModel ) )
+                if ( parentPomFile.exists() )
+                {
+                    Model parentModel = readModel( parentPomFile );
+                    if ( !parentModelMatches( modelParent, parentModel ) )
+                    {
+                        parentPomFile = null;
+                    }
+                }
+                else
                 {
                     parentPomFile = null;
                 }
@@ -480,7 +488,7 @@ public class DefaultModelLineageBuilder
         boolean versionsMatch = ( parentModel.getVersion() == null )
                                 || parentModel.getVersion().equals( modelParent.getVersion() );
 
-        if ( groupsMatch && !versionsMatch
+        if ( groupsMatch && versionsMatch
              && parentModel.getArtifactId().equals( modelParent.getArtifactId() ) )
         {
             return true;

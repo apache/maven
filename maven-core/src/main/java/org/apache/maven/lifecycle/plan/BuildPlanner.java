@@ -24,7 +24,8 @@ public interface BuildPlanner
      */
     BuildPlan constructBuildPlan( List tasks,
                                   MavenProject project,
-                                  MavenSession session )
+                                  MavenSession session,
+                                  boolean allowUnbindableMojos )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException;
 
     void constructInitialProjectBuildPlans( MavenSession session )

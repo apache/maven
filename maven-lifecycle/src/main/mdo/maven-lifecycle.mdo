@@ -678,25 +678,6 @@
         this.originDescription = originDescription;
     }
           
-    private boolean lateBound = false;
-          
-    /**
-     * Mark this mojo binding as late-bound, meaning the plugin for this mojo
-     * could not be resolved when it was included in a build plan (the class
-     * responsible for calculating the ordered list of mojos to execute for a build).
-     * This flag should result in Maven injecting an internal step into the build
-     * just ahead of this mojo's execution, to resolve the plugin it refers to.
-     */
-    public boolean isLateBound()
-    {
-        return lateBound;
-    }
-          
-    public void setLateBound( boolean lateBound )
-    {
-        this.lateBound = lateBound;
-    }
-    
     private Phase phase;
     
     /**

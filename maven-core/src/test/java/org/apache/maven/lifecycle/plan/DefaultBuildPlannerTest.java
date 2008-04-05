@@ -88,7 +88,8 @@ public class DefaultBuildPlannerTest
 
         BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "package" ),
                                                           project,
-                                                          session );
+                                                          session,
+                                                          false );
 
         List rendered = plan.renderExecutionPlan( new Stack() );
 
@@ -154,7 +155,8 @@ public class DefaultBuildPlannerTest
 
         BuildPlan plan = buildPlanner.constructBuildPlan( Collections.singletonList( "deploy" ),
                                                           project,
-                                                          session );
+                                                          session,
+                                                          false );
 
         List rendered = plan.renderExecutionPlan( new Stack() );
 

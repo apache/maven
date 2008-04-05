@@ -10,6 +10,7 @@ import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -64,11 +65,12 @@ public class BuildPlanTest
 
         check.add( StateManagementUtils.createClearForkedExecutionMojoBinding() );
 
-        BuildPlan plan = new BuildPlan( new LifecycleBindings(), tasks );
+        BuildPlan plan = new BuildPlan( new LifecycleBindings(), new HashSet(), tasks );
 
         plan.addDirectInvocationBinding( "eclipse:eclipse", eclipseBinding );
 
         plan.addForkedExecution( eclipseBinding, new BuildPlan( bindings,
+                                                                new HashSet(),
                                                                 Collections.singletonList( "generate-sources" ) ) );
 
         List executionPlan = plan.renderExecutionPlan( new Stack() );
@@ -120,7 +122,7 @@ public class BuildPlanTest
 
         List tasks = Collections.singletonList( "package" );
 
-        BuildPlan plan = new BuildPlan( bindings, tasks );
+        BuildPlan plan = new BuildPlan( bindings, new HashSet(), tasks );
 
         plan.addForkedExecution( assemblyBinding, plan.copy( "package" ) );
 

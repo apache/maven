@@ -295,8 +295,8 @@ public privileged aspect LifecycleErrorReporterAspect
                       MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException:
             cflow( execution( * DefaultLifecycleExecutor.*( .. ) ) )
-            && execution( BuildPlan BuildPlanner+.constructBuildPlan( List, MavenProject, MavenSession ) )
-            && args( tasks, project, session )
+            && execution( BuildPlan BuildPlanner+.constructBuildPlan( List, MavenProject, MavenSession, * ) )
+            && args( tasks, project, session, * )
     {
         try
         {

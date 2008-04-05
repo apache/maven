@@ -177,7 +177,7 @@ public class DefaultLifecycleExecutor
 
             if ( segment.aggregate() )
             {
-                executeTaskSegmentsForProject( segment, rootProject, reactorManager, dispatcher, session );
+                executeTaskSegmentForProject( segment, rootProject, reactorManager, dispatcher, session );
             }
             else
             {
@@ -188,13 +188,13 @@ public class DefaultLifecycleExecutor
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
 
-                    executeTaskSegmentsForProject( segment, currentProject, reactorManager, dispatcher, session );
+                    executeTaskSegmentForProject( segment, currentProject, reactorManager, dispatcher, session );
                 }
             }
         }
     }
 
-    private void executeTaskSegmentsForProject( TaskSegment segment,
+    private void executeTaskSegmentForProject( TaskSegment segment,
                                     MavenProject project,
                                     ReactorManager reactorManager,
                                     EventDispatcher dispatcher,
@@ -397,10 +397,7 @@ public class DefaultLifecycleExecutor
         List mojoBindings;
         try
         {
-            BuildPlan plan = buildPlanner.constructBuildPlan(
-                tasks,
-                project,
-                session );
+            BuildPlan plan = buildPlanner.constructBuildPlan( tasks, project, session, false );
 
             if ( getLogger().isDebugEnabled() )
             {

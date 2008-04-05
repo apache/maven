@@ -38,17 +38,20 @@ public class BuildPlan
 
     private boolean includingReports = false;
 
+    private Set unbindableMojos;
+
     public BuildPlan( final LifecycleBindings packaging, final LifecycleBindings projectBindings,
-                      final LifecycleBindings defaults, final List tasks )
+                      final LifecycleBindings defaults, final Set unbindableMojos, final List tasks )
         throws LifecycleSpecificationException, LifecycleLoaderException
     {
-        this( LifecycleUtils.mergeBindings( packaging, projectBindings, defaults, true, false ), tasks );
+        this( LifecycleUtils.mergeBindings( packaging, projectBindings, defaults, true, false ), unbindableMojos, tasks );
     }
 
-    public BuildPlan( final LifecycleBindings bindings, final List tasks )
+    public BuildPlan( final LifecycleBindings bindings, final Set unbindableMojos, final List tasks )
         throws LifecycleSpecificationException, LifecycleLoaderException
     {
         this.bindings = bindings;
+        this.unbindableMojos = unbindableMojos == null ? null : new HashSet( unbindableMojos );
         this.tasks = tasks;
         forkedDirectInvocations = new HashMap();
         forkedPhases = new HashMap();
@@ -56,9 +59,10 @@ public class BuildPlan
     }
 
     private BuildPlan( final LifecycleBindings bindings, final Map forkedDirectInvocations, final Map forkedPhases,
-                       final Map directInvocationBindings, final Set fullyResolvedMojoBindings, final List tasks,
-                       boolean includingReports )
+                       final Map directInvocationBindings, final Set fullyResolvedMojoBindings, final Set unbindableMojos,
+                       final List tasks, boolean includingReports )
     {
+        this.unbindableMojos = unbindableMojos == null ? null : new HashSet( unbindableMojos );
         this.bindings = LifecycleUtils.cloneBindings( bindings );
         this.forkedDirectInvocations = new HashMap( forkedDirectInvocations );
         this.forkedPhases = new HashMap( forkedPhases );
@@ -76,6 +80,26 @@ public class BuildPlan
     public boolean isIncludingReports()
     {
         return includingReports;
+    }
+
+    public boolean hasUnbindableMojos()
+    {
+        return unbindableMojos != null && !unbindableMojos.isEmpty();
+    }
+
+    public Set getUnbindableMojos()
+    {
+        return unbindableMojos;
+    }
+
+    public void clearUnbindableMojos()
+    {
+        unbindableMojos = null;
+    }
+
+    public void addUnbindableMojo( MojoBinding binding )
+    {
+        unbindableMojos.add( binding );
     }
 
     public boolean isFullyResolved( final MojoBinding mojoBinding )
@@ -176,7 +200,7 @@ public class BuildPlan
 
     public BuildPlan copy( final List newTasks )
     {
-        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, directInvocationBindings, fullyResolvedBindings, newTasks, includingReports );
+        return new BuildPlan( bindings, forkedDirectInvocations, forkedPhases, directInvocationBindings, fullyResolvedBindings, unbindableMojos, newTasks, includingReports );
     }
 
     public void resetExecutionProgress()
@@ -227,7 +251,6 @@ public class BuildPlan
                     String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
                     if ( !executionStack.contains( key ) )
                     {
-                        addResolverIfLateBound( mojoBinding, plan );
                         plan.addAll( findForkedBindings( mojoBinding, executionStack ) );
                     }
                 }
@@ -238,22 +261,12 @@ public class BuildPlan
                 String key = MojoBindingUtils.createMojoBindingKey( mojoBinding, false );
                 if ( !executionStack.contains( key ) )
                 {
-                    addResolverIfLateBound( mojoBinding, plan );
                     plan.addAll( findForkedBindings( mojoBinding, executionStack ) );
                 }
             }
         }
 
         return plan;
-    }
-
-    private void addResolverIfLateBound( final MojoBinding mojoBinding, final List plan )
-    {
-        if ( mojoBinding.isLateBound() )
-        {
-            MojoBinding resolveBinding = StateManagementUtils.createResolveLateBoundMojoBinding( mojoBinding );
-            plan.add( resolveBinding );
-        }
     }
 
     private List findForkedBindings( final MojoBinding mojoBinding, final Stack executionStack )
@@ -294,7 +307,6 @@ public class BuildPlan
                         continue;
                     }
 
-                    addResolverIfLateBound( invocation, forkedBindings );
                     forkedBindings.addAll( findForkedBindings( invocation, executionStack ) );
                 }
             }

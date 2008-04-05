@@ -533,6 +533,14 @@ public class MavenEmbedder
                                    MavenProject project )
         throws MavenEmbedderException
     {
+        return getBuildPlan( goals, project, false );
+    }
+
+    public BuildPlan getBuildPlan( List goals,
+                                   MavenProject project,
+                                   boolean allowUnbindableMojos )
+        throws MavenEmbedderException
+    {
         MavenExecutionRequest req = new DefaultMavenExecutionRequest( request );
         req.setGoals( goals );
 
@@ -559,7 +567,7 @@ public class MavenEmbedder
 
         try
         {
-            return buildPlanner.constructBuildPlan( goals, project, session );
+            return buildPlanner.constructBuildPlan( goals, project, session, allowUnbindableMojos );
         }
         catch ( LifecycleException e )
         {
