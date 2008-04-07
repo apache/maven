@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>2.0.9-RC9-SNAPSHOT</version>
+  <version>2.0.9</version>
   <packaging>pom</packaging>
 
   <name>Maven</name>
@@ -117,9 +117,9 @@ under the License.
   </mailingLists>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</developerConnection>
-    <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.9</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.9</developerConnection>
+    <url>https://svn.apache.org/repos/asf/maven/components/tags/maven-2.0.9</url>
   </scm>
 
   <build>
@@ -242,7 +242,7 @@ under the License.
   </dependencies>
 
   <properties>
-    <mavenVersion>2.0.9-RC9-SNAPSHOT</mavenVersion>
+    <mavenVersion>2.0.9</mavenVersion>
     <!-- Can't use. bootstrap-mini isn't smart enough: <wagonVersion>1.0-beta-2</wagonVersion> -->
   </properties>
 
