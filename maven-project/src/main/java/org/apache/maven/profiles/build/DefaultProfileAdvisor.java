@@ -73,8 +73,8 @@ public class DefaultProfileAdvisor
                                         ProfileActivationContext activationContext )
         throws ProjectBuildingException
     {
-        logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: "
-                      + pomFile );
+//        logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: "
+//                      + pomFile );
         ProfileManager profileManager = buildProfileManager( model,
                                                              pomFile,
                                                              useProfilesXml,
@@ -93,9 +93,9 @@ public class DefaultProfileAdvisor
             return Collections.EMPTY_LIST;
         }
 
-        logger.debug( "Building profile manager for model: " + model.getId()
-                      + " with external profile manager including profiles: "
-                      + externalProfileManager.getProfilesById() );
+//        logger.debug( "Building profile manager for model: " + model.getId()
+//                      + " with external profile manager including profiles: "
+//                      + externalProfileManager.getProfilesById() );
         return applyActivatedProfiles( model, projectDir, externalProfileManager );
     }
 

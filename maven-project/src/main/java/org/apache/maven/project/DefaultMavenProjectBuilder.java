@@ -223,13 +223,13 @@ public class DefaultMavenProjectBuilder
         MavenProject project = null;
         if ( !Artifact.LATEST_VERSION.equals( artifact.getVersion() ) && !Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
-            getLogger().debug( "Checking cache for project (in buildFromRepository): " + artifactKey );
+//            getLogger().debug( "Checking cache for project (in buildFromRepository): " + artifactKey );
             project = projectWorkspace.getProject( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         }
 
         if ( project == null )
         {
-            getLogger().debug( "Allowing buildFromRepository to proceed for: " + artifactKey );
+//            getLogger().debug( "Allowing buildFromRepository to proceed for: " + artifactKey );
 
             Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
@@ -238,10 +238,10 @@ public class DefaultMavenProjectBuilder
             project = buildInternal( model, config, remoteArtifactRepositories, artifact.getFile(),
                                   false, false, false );
         }
-        else
-        {
-            getLogger().debug( "Returning cached project: " + project );
-        }
+//        else
+//        {
+//            getLogger().debug( "Returning cached project: " + project );
+//        }
 
         return project;
     }
@@ -482,13 +482,13 @@ public class DefaultMavenProjectBuilder
                                                       ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        getLogger().debug( "Checking cache-hit on project (in build*): " + projectDescriptor );
+//        getLogger().debug( "Checking cache-hit on project (in build*): " + projectDescriptor );
 
         MavenProject project = projectWorkspace.getProject( projectDescriptor );
 
         if ( project == null )
         {
-            getLogger().debug( "Allowing project-build to proceed for: " + projectDescriptor );
+//            getLogger().debug( "Allowing project-build to proceed for: " + projectDescriptor );
 
             Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
 
@@ -500,10 +500,10 @@ public class DefaultMavenProjectBuilder
                 true,
                 true );
         }
-        else
-        {
-            getLogger().debug( "Returning cached project: " + project );
-        }
+//        else
+//        {
+//            getLogger().debug( "Returning cached project: " + project );
+//        }
 
         return project;
     }
@@ -830,7 +830,7 @@ public class DefaultMavenProjectBuilder
             project.setFile( projectDescriptor );
         }
 
-        getLogger().debug( "Caching project: " + project.getId() + " (also keyed by file: " + project.getFile() + ")" );
+//        getLogger().debug( "Caching project: " + project.getId() + " (also keyed by file: " + project.getFile() + ")" );
 
         projectWorkspace.storeProjectByCoordinate( project );
         projectWorkspace.storeProjectByFile( project );

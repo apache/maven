@@ -283,7 +283,7 @@ public class DefaultModelLineageBuilder
                                                 boolean useProfilesXml )
         throws ProjectBuildingException
     {
-        getLogger().debug( "Grabbing profile-injected repositories for: " + model.getId() );
+//        getLogger().debug( "Grabbing profile-injected repositories for: " + model.getId() );
 
         // FIXME: Find a way to pass in this context, so it's never null!
         ProfileActivationContext context;
@@ -301,14 +301,14 @@ public class DefaultModelLineageBuilder
                                                                                                pomFile,
                                                                                                config.getGlobalProfileManager() );
 
-        getLogger().debug( "Got external-profile repositories: " + profileRepos );
+//        getLogger().debug( "Got external-profile repositories: " + profileRepos );
 
         LinkedHashSet pomProfileRepos = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model,
                                                                                        pomFile,
                                                                                        useProfilesXml,
                                                                                        context );
 
-        getLogger().debug( "Got pom-profile repositories: " + pomProfileRepos );
+//        getLogger().debug( "Got pom-profile repositories: " + pomProfileRepos );
 
         profileRepos.addAll( pomProfileRepos );
 
@@ -349,7 +349,7 @@ public class DefaultModelLineageBuilder
 
             if ( childIsReactorProject && modelPomFile != null )
             {
-                getLogger().debug( "Attempting to locate parent model using relativePath and local filesystem; child is a reactor project." );
+//                getLogger().debug( "Attempting to locate parent model using relativePath and local filesystem; child is a reactor project." );
 
                 // if the child isn't a reactor project, don't resolve the parent from the local filesystem...use the repository.
                 String relativePath = modelParent.getRelativePath();
@@ -362,7 +362,7 @@ public class DefaultModelLineageBuilder
                     parentPomFile = new File( parentPomFile, "pom.xml" );
                 }
 
-                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using file: " + parentPomFile );
+//                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using file: " + parentPomFile );
 
                 result = projectWorkspace.getModelAndFile( parentPomFile );
                 if ( result != null && !parentModelMatches( modelParent, result.getModel() ) )
@@ -374,18 +374,18 @@ public class DefaultModelLineageBuilder
 
             if ( result == null )
             {
-                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using project groupId:artifactId:version." );
+//                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using project groupId:artifactId:version." );
 
                 result = projectWorkspace.getModelAndFile( modelParent.getGroupId(), modelParent.getArtifactId(), modelParent.getVersion() );
             }
 
             if ( result != null )
             {
-                getLogger().debug( "Returning cached instance." );
+//                getLogger().debug( "Returning cached instance." );
                 return result;
             }
 
-            getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
+//            getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
 
             if ( parentPomFile != null )
             {
@@ -409,7 +409,7 @@ public class DefaultModelLineageBuilder
             {
                 try
                 {
-                    getLogger().debug( "Attempting to resolve parent POM: " + modelParent.getId() + " using repositories:\n" + StringUtils.join( remoteRepositories.iterator(), "\n" ) );
+//                    getLogger().debug( "Attempting to resolve parent POM: " + modelParent.getId() + " using repositories:\n" + StringUtils.join( remoteRepositories.iterator(), "\n" ) );
 
                     parentPomFile = resolveParentFromRepositories( modelParent,
                                                                    config,
@@ -473,7 +473,7 @@ public class DefaultModelLineageBuilder
 
         if ( result != null )
         {
-            getLogger().debug( "Caching parent model-and-file: " + result );
+//            getLogger().debug( "Caching parent model-and-file: " + result );
             projectWorkspace.storeModelAndFile( result );
         }
 
