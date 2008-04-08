@@ -251,6 +251,7 @@ final class BindingUtils
     static void injectProjectConfiguration( LifecycleBindings bindings, MavenProject project )
     {
         Map pluginsByVersionlessKey = buildPluginMap( project );
+        Map reportPluginsByVersionlessKey = buildReportPluginMap( project );
 
         for ( Iterator lifecycleIt = bindings.getBindingList().iterator(); lifecycleIt.hasNext(); )
         {
@@ -265,13 +266,20 @@ final class BindingUtils
                     MojoBinding mojo = (MojoBinding) mojoIt.next();
 
                     String pluginKey = createPluginKey( mojo.getGroupId(), mojo.getArtifactId() );
+
                     Plugin plugin = (Plugin) pluginsByVersionlessKey.get( pluginKey );
+                    ReportPlugin reportPlugin = (ReportPlugin) reportPluginsByVersionlessKey.get( pluginKey );
 
                     if ( plugin == null )
                     {
                         plugin = new Plugin();
                         plugin.setGroupId( mojo.getGroupId() );
                         plugin.setArtifactId( mojo.getArtifactId() );
+
+                        if ( reportPlugin != null )
+                        {
+                            plugin.setVersion( reportPlugin.getVersion() );
+                        }
                     }
 
                     injectPluginManagementInfo( plugin, project );
@@ -279,9 +287,9 @@ final class BindingUtils
                     PluginExecution exec = (PluginExecution) plugin.getExecutionsAsMap().get( mojo.getExecutionId() );
 
                     mojo.setConfiguration( mergeConfigurations( plugin, exec ) );
-                    
+
                     mojo.setVersion( plugin.getVersion() );
-                    
+
                 }
             }
         }
