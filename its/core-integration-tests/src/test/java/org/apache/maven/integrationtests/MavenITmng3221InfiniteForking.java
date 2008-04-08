@@ -5,8 +5,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MavenITmng3221InfiniteForking
     extends AbstractMavenIntegrationTestCase
@@ -14,7 +14,7 @@ public class MavenITmng3221InfiniteForking
     public MavenITmng3221InfiniteForking()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+        super( "(2.0.8,2.1-SNAPSHOT)" ); // only test in 2.0.9+
     }
 
     public void testitMNG3221a()

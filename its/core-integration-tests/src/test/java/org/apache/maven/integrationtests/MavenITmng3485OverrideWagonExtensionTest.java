@@ -1,13 +1,12 @@
 package org.apache.maven.integrationtests;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.ResourceExtractor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
 
 public class MavenITmng3485OverrideWagonExtensionTest
     extends AbstractMavenIntegrationTestCase
@@ -15,7 +14,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
     public MavenITmng3485OverrideWagonExtensionTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+        super( "(2.0.8, 2.1-SNAPSHOT)" ); // only test in 2.0.9+
     }
 
     public void testitMNG3485 ()
