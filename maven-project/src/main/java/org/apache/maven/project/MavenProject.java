@@ -161,12 +161,12 @@ public class MavenProject
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
 
-        this.setModel( model );
+        setModel( model );
     }
 
     public MavenProject( Model model )
     {
-        this.setModel( model );
+        setModel( model );
     }
 
     /**
@@ -1682,6 +1682,7 @@ public class MavenProject
                     // if the project artifact doesn't exist, don't use it. We haven't built that far.
                     if ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() )
                     {
+                        // FIXME: Why aren't we using project.getArtifact() for the second parameter here??
                         pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
                         return pluginArtifact;
                     }

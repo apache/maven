@@ -30,6 +30,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -516,9 +517,12 @@ public class DefaultPluginManager
             {
                 MavenProject p = (MavenProject) i.next();
 
-                resolveTransitiveDependencies( session, artifactResolver,
+                resolveTransitiveDependencies( session,
+                                               artifactResolver,
                                                mojoDescriptor.isDependencyResolutionRequired(),
-                                               artifactFactory, p );
+                                               artifactFactory,
+                                               p,
+                                               mojoDescriptor.isAggregator() );
             }
 
             downloadDependencies( project, session, artifactResolver );
@@ -1421,7 +1425,8 @@ public class DefaultPluginManager
                                                 ArtifactResolver artifactResolver,
                                                 String scope,
                                                 ArtifactFactory artifactFactory,
-                                                MavenProject project )
+                                                MavenProject project,
+                                                boolean isAggregator )
         throws ArtifactResolutionException, ArtifactNotFoundException,
         InvalidDependencyVersionException
     {
@@ -1441,16 +1446,87 @@ public class DefaultPluginManager
             // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively(
-                                                                                project.getDependencyArtifacts(),
-                                                                                artifact,
-                                                                                project.getManagedVersionMap(),
-                                                                                context.getLocalRepository(),
-                                                                                project.getRemoteArtifactRepositories(),
-                                                                                artifactMetadataSource,
-                                                                                filter );
 
-        project.setArtifacts( result.getArtifacts() );
+        Set resolvedArtifacts;
+        try
+        {
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+                                                                                   project.getDependencyArtifacts(),
+                                                                                   artifact,
+                                                                                   project.getManagedVersionMap(),
+                                                                                   context.getLocalRepository(),
+                                                                                   project.getRemoteArtifactRepositories(),
+                                                                                   artifactMetadataSource,
+                                                                                   filter );
+
+            resolvedArtifacts = result.getArtifacts();
+        }
+        catch( MultipleArtifactsNotFoundException e )
+        {
+            /*only do this if we are an aggregating plugin: MNG-2277
+            if the dependency doesn't yet exist but is in the reactor, then
+            all we can do is warn and skip it. A better fix can be inserted into 2.1*/
+            if ( isAggregator
+                 && checkMissingArtifactsInReactor( context.getSortedProjects(),
+                                                    e.getMissingArtifacts() ) )
+            {
+                resolvedArtifacts = new HashSet( e.getResolvedArtifacts() );
+            }
+            else
+            {
+                //we can't find all the artifacts in the reactor so bubble the exception up.
+                throw e;
+            }
+        }
+
+        project.setArtifacts( resolvedArtifacts );
+    }
+
+    /**
+     * This method is checking to see if the artifacts that can't be resolved are all
+     * part of this reactor. This is done to prevent a chicken or egg scenario with
+     * fresh projects that have a plugin that is an aggregator and requires dependencies. See
+     * MNG-2277 for more info.
+     *
+     * NOTE: If this happens, it most likely means the project-artifact for an
+     * interproject dependency doesn't have a file yet (it hasn't been built yet).
+     *
+     * @param projects the sibling projects in the reactor
+     * @param missing the artifacts that can't be found
+     * @return true if ALL missing artifacts are found in the reactor.
+     */
+    private boolean checkMissingArtifactsInReactor( Collection projects,
+                                                    Collection missing )
+    {
+        Collection foundInReactor = new HashSet();
+        Iterator iter = missing.iterator();
+        while ( iter.hasNext() )
+        {
+            Artifact mArtifact = (Artifact) iter.next();
+            Iterator pIter = projects.iterator();
+            while ( pIter.hasNext() )
+            {
+                MavenProject p = (MavenProject) pIter.next();
+                if ( p.getArtifactId().equals( mArtifact.getArtifactId() )
+                     && p.getGroupId().equals( mArtifact.getGroupId() )
+                     && p.getVersion().equals( mArtifact.getVersion() ) )
+                {
+                    //TODO: the packaging could be different, but the exception doesn't contain that info
+                    //most likely it would be produced by the project we just found in the reactor since all
+                    //the other info matches. Assume it's ok.
+                    getLogger().warn( "The dependency: "
+                                      + p.getId()
+                                      + " can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
+
+                    //found it, move on.
+                    foundInReactor.add( p );
+                    break;
+                }
+            }
+        }
+
+        //if all of them have been found, we can continue.
+        return foundInReactor.size() == missing.size();
     }
 
     // ----------------------------------------------------------------------
