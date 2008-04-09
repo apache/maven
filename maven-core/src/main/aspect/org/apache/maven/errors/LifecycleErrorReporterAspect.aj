@@ -258,8 +258,8 @@ public privileged aspect LifecycleErrorReporterAspect
 
     private pointcut pm_resolveTransitiveDependencies( MavenProject project,
                                                        String scope ):
-        execution( void DefaultPluginManager.resolveTransitiveDependencies( *, *, String, *, MavenProject ) )
-        && args( *, *, scope, *, project );
+        execution( void DefaultPluginManager.resolveTransitiveDependencies( *, *, String, *, MavenProject, * ) )
+        && args( *, *, scope, *, project, * );
 
     after( MavenProject project,
            String scope) throwing( ArtifactNotFoundException cause ):
