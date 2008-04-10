@@ -175,8 +175,9 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>rar</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -186,8 +187,9 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>par</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
@@ -197,8 +199,9 @@ under the License.
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
         <type>ejb3</type>
+        <includesDependencies>true</includesDependencies>
         <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
 
