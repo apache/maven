@@ -973,8 +973,6 @@ public class DefaultMavenProjectBuilder
         if ( pomFile != null )
         {
             projectDir = pomFile.getAbsoluteFile().getParentFile();
-
-            context.put( "basedir", projectDir.getAbsolutePath() );
         }
 
         Map overrideContext = new HashMap();

@@ -19,17 +19,22 @@ package org.apache.maven.project.interpolation;
  * under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -46,6 +51,34 @@ public class RegexBasedModelInterpolatorTest
         super.setUp();
 
         context = Collections.singletonMap( "basedir", "myBasedir" );
+    }
+
+    public void testShouldInterpolateProjectDotBasedirInDistributionManagement()
+        throws ModelInterpolationException, IOException
+    {
+        Model model = new Model();
+        DistributionManagement dm = new DistributionManagement();
+        DeploymentRepository repo = new DeploymentRepository();
+
+        // from IT0062...
+        repo.setUrl( "http://localhost/${project.basedir}/target/test-repo" );
+
+        dm.setRepository( repo );
+        model.setDistributionManagement( dm );
+
+        Map context = new HashMap();
+        String path = "path/to/project";
+
+        File basedir = new File( path ).getAbsoluteFile();
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model,
+                                                                   context,
+                                                                   Collections.EMPTY_MAP,
+                                                                   basedir,
+                                                                   false );
+
+        assertEquals( "http://localhost/" + basedir.getAbsolutePath() + "/target/test-repo",
+                      out.getDistributionManagement().getRepository().getUrl() );
     }
 
     public void testShouldNotThrowExceptionOnReferenceToNonExistentValue()

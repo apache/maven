@@ -181,7 +181,12 @@ public class RegexBasedModelInterpolator
      * @param overrideContext
      * @param outputDebugMessages
      */
-    private String interpolateInternal( String src, Model model, Map context, Map overrideContext, File projectDir, boolean outputDebugMessages )
+    private String interpolateInternal( String src,
+                                        Model model,
+                                        Map context,
+                                        Map overrideContext,
+                                        final File projectDir,
+                                        boolean outputDebugMessages )
         throws ModelInterpolationException
     {
         Logger logger = getLogger();
@@ -196,9 +201,23 @@ public class RegexBasedModelInterpolator
                                                                        TRANSLATED_PATH_EXPRESSIONS,
                                                                        projectDir, pathTranslator );
 
+        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new ValueSource(){
+            public Object getValue( String expression )
+            {
+                if ( projectDir != null && "basedir".equals( expression ) )
+                {
+                    return projectDir.getAbsolutePath();
+                }
+
+                return null;
+            }
+        },
+        PROJECT_PREFIXES, true );
+
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
         // NOTE: Order counts here!
+        interpolator.addValueSource( basedirValueSource );
         interpolator.addValueSource( new MapBasedValueSource( overrideContext ) );
         interpolator.addValueSource( modelValueSource1 );
         interpolator.addValueSource( new PrefixedValueSourceWrapper( new MapBasedValueSource( model.getProperties() ), PROJECT_PREFIXES, true ) );
