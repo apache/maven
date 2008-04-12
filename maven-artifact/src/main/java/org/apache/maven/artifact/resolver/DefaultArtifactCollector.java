@@ -33,8 +33,6 @@ import org.apache.maven.artifact.versioning.ManagedVersionMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -73,7 +71,7 @@ public class DefaultArtifactCollector
 
         ManagedVersionMap versionMap = getManagedVersionsMap( originatingArtifact, managedVersions );
 
-        recurse( root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
+        recurse( originatingArtifact, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
                  listeners );
 
         Set set = new LinkedHashSet();
@@ -142,7 +140,7 @@ public class DefaultArtifactCollector
         return versionMap;
     }
 
-    private void recurse( ResolutionNode node, Map resolvedArtifacts, ManagedVersionMap managedVersions,
+    private void recurse( Artifact originatingArtifact, ResolutionNode node, Map resolvedArtifacts, ManagedVersionMap managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
                           ArtifactFilter filter, List listeners )
         throws CyclicDependencyException, ArtifactResolutionException, OverConstrainedVersionException
@@ -150,7 +148,7 @@ public class DefaultArtifactCollector
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
 
         Object key = node.getKey();
-        
+
         // TODO: Does this check need to happen here?  Had to add the same call
         // below when we iterate on child nodes -- will that suffice?
         if ( managedVersions.containsKey( key ))
@@ -192,7 +190,7 @@ public class DefaultArtifactCollector
                         for ( int j = 0; j < 2; j++ )
                         {
                             Artifact resetArtifact = resetNodes[j].getArtifact();
-                            
+
                             //MNG-2123: if the previous node was not a range, then it wouldn't have any available
                             //versions. We just clobbered the selected version above. (why? i have no idea.)
                             //So since we are here and this is ranges we must go figure out the version (for a third time...)
@@ -220,7 +218,7 @@ public class DefaultArtifactCollector
                                     }
                                 }
                                 //end hack
-                               
+
                                 //MNG-2861: match version can return null
                                 ArtifactVersion selectedVersion = resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() );
                                 if (selectedVersion != null)
@@ -231,7 +229,7 @@ public class DefaultArtifactCollector
                                 {
                                   throw new OverConstrainedVersionException(" Unable to find a version in "+ resetArtifact.getAvailableVersions()+" to match the range "+ resetArtifact.getVersionRange(), resetArtifact);
                                 }
-                                
+
                                 fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
                             }
                         }
@@ -305,7 +303,7 @@ public class DefaultArtifactCollector
                             // managed version's POM, *not* any other version's POM.
                             // We retrieve the POM below in the retrieval step.
                             manageArtifact( child, managedVersions, listeners );
-                            
+
                             // Also, we need to ensure that any exclusions it presents are
                             // added to the artifact before we retrieve the metadata
                             // for the artifact; otherwise we may end up with unwanted
@@ -354,18 +352,32 @@ public class DefaultArtifactCollector
 
                                 if ( version == null )
                                 {
+                                    // Getting the dependency trail so it can be logged in the exception
+                                    List dependencyTrail = new ArrayList();
+                                    dependencyTrail.add( originatingArtifact );
+                                    for ( Iterator it = previousNodes.iterator(); it.hasNext(); )
+                                    {
+                                        ResolutionNode resolutionNode = (ResolutionNode) it.next();
+
+                                        if ( originatingArtifact.equals( resolutionNode.getArtifact() ) )
+                                        {
+                                            continue;
+                                        }
+                                        dependencyTrail.add( resolutionNode.getArtifact() );
+                                    }
+                                    dependencyTrail.add( artifact );
+                                    artifact.setDependencyTrail( dependencyTrail );
+
                                     if ( versions.isEmpty() )
                                     {
                                         throw new OverConstrainedVersionException(
                                             "No versions are present in the repository for the artifact with a range " +
                                                 versionRange, artifact, remoteRepositories );
                                     }
-                                    else
-                                    {
-                                        throw new OverConstrainedVersionException( "Couldn't find a version in " +
-                                            versions + " to match range " + versionRange, artifact,
-                                                                                          remoteRepositories );
-                                    }
+
+                                    throw new OverConstrainedVersionException( "Couldn't find a version in " +
+                                        versions + " to match range " + versionRange, artifact,
+                                                                                      remoteRepositories );
                                 }
                             }
 
@@ -405,7 +417,7 @@ public class DefaultArtifactCollector
                             e );
                     }
 
-                    recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
+                    recurse( originatingArtifact, child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
                              filter, listeners );
                 }
             }

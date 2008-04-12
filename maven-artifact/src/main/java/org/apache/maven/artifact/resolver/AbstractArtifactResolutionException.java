@@ -45,7 +45,7 @@ public class AbstractArtifactResolutionException
 
     private String classifier;
 
-    private Artifact artifact; 
+    private Artifact artifact;
 
     private List remoteRepositories;
 
@@ -200,6 +200,7 @@ public class AbstractArtifactResolutionException
             }
         }
 
+        sb.append( LS );
         sb.append( constructArtifactPath( path, "" ) );
         sb.append( LS );
         return sb.toString();
