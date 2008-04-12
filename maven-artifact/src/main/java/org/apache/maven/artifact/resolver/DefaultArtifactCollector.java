@@ -288,6 +288,7 @@ public class DefaultArtifactCollector
             for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
             {
                 ResolutionNode child = (ResolutionNode) i.next();
+
                 // We leave in optional ones, but don't pick up its dependencies
                 if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
                 {
@@ -353,20 +354,7 @@ public class DefaultArtifactCollector
                                 if ( version == null )
                                 {
                                     // Getting the dependency trail so it can be logged in the exception
-                                    List dependencyTrail = new ArrayList();
-                                    dependencyTrail.add( originatingArtifact );
-                                    for ( Iterator it = previousNodes.iterator(); it.hasNext(); )
-                                    {
-                                        ResolutionNode resolutionNode = (ResolutionNode) it.next();
-
-                                        if ( originatingArtifact.equals( resolutionNode.getArtifact() ) )
-                                        {
-                                            continue;
-                                        }
-                                        dependencyTrail.add( resolutionNode.getArtifact() );
-                                    }
-                                    dependencyTrail.add( artifact );
-                                    artifact.setDependencyTrail( dependencyTrail );
+                                    artifact.setDependencyTrail( node.getDependencyTrail() );
 
                                     if ( versions.isEmpty() )
                                     {
