@@ -347,6 +347,8 @@ public class DefaultArtifactCollector
                                     artifact.setAvailableVersions( versions );
                                 }
 
+                                Collections.sort( versions );
+
                                 VersionRange versionRange = artifact.getVersionRange();
 
                                 version = versionRange.matchVersion( versions );
