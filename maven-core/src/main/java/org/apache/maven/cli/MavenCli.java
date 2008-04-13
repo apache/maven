@@ -560,8 +560,11 @@ public class MavenCli
 
             System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
 
+            System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+                                + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+
             System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
-                                "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
+                                "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
 
         }
         catch ( IOException e )
