@@ -78,9 +78,8 @@ public final class CLIReportingUtils
             System.out.println( "Java version: "
                                 + System.getProperty( "java.version", "<unknown java version>" ) );
 
-            //TODO: when plexus can return the family type, add that here because it will make it easier to know what profile activation settings to use.
-            System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION
-                                + "\" arch: \"" + Os.OS_ARCH + "\"" );
+            System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
+                                "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
         }
         catch ( IOException e )
         {
