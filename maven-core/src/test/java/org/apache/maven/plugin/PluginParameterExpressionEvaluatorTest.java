@@ -21,10 +21,12 @@ package org.apache.maven.plugin;
 
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -36,16 +38,23 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.easymock.MockControl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -58,6 +67,121 @@ public class PluginParameterExpressionEvaluatorTest
     extends PlexusTestCase
 {
     private static final String FS = System.getProperty( "file.separator" );
+
+    private ArtifactFactory factory;
+
+    private PathTranslator pathTranslator;
+
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+        factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        pathTranslator = (PathTranslator) lookup( PathTranslator.ROLE );
+    }
+
+    public void testPluginDescriptorExpressionReference()
+        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+    {
+        MojoExecution exec = newMojoExecution();
+
+        MavenSession session = newMavenSession();
+
+        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
+
+        Object result = new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
+                                                                logger, new Properties() ).evaluate( "${plugin}" );
+
+        System.out.println( "Result: " + result );
+
+        assertSame( "${plugin} expression does not return plugin descriptor.",
+                    exec.getMojoDescriptor().getPluginDescriptor(),
+                    result );
+    }
+
+    public void testPluginArtifactsExpressionReference()
+        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+    {
+        MojoExecution exec = newMojoExecution();
+
+        Artifact depArtifact = factory.createDependencyArtifact( "group",
+                                                                 "artifact",
+                                                                 VersionRange.createFromVersion( "1" ),
+                                                                 "jar",
+                                                                 null,
+                                                                 Artifact.SCOPE_COMPILE );
+
+        List deps = new ArrayList();
+        deps.add( depArtifact );
+
+        exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );
+
+        MavenSession session = newMavenSession();
+
+        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
+
+        List depResults = (List) new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
+                                                                logger, new Properties() ).evaluate( "${plugin.artifacts}" );
+
+        System.out.println( "Result: " + depResults );
+
+        assertNotNull( depResults );
+        assertEquals( 1, depResults.size() );
+        assertSame( "dependency artifact is wrong.", depArtifact, depResults.get( 0 ) );
+    }
+
+    public void testPluginArtifactMapExpressionReference()
+        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+    {
+        MojoExecution exec = newMojoExecution();
+
+        Artifact depArtifact = factory.createDependencyArtifact( "group",
+                                                                 "artifact",
+                                                                 VersionRange.createFromVersion( "1" ),
+                                                                 "jar",
+                                                                 null,
+                                                                 Artifact.SCOPE_COMPILE );
+
+        List deps = new ArrayList();
+        deps.add( depArtifact );
+
+        exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );
+
+        MavenSession session = newMavenSession();
+
+        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
+
+        Map depResults = (Map) new PluginParameterExpressionEvaluator( session, exec,
+                                                                         pathTranslator, logger,
+                                                                         new Properties() ).evaluate( "${plugin.artifactMap}" );
+
+        System.out.println( "Result: " + depResults );
+
+        assertNotNull( depResults );
+        assertEquals( 1, depResults.size() );
+        assertSame( "dependency artifact is wrong.",
+                    depArtifact,
+                    depResults.get( ArtifactUtils.versionlessKey( depArtifact ) ) );
+    }
+
+    public void testPluginArtifactIdExpressionReference()
+        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+    {
+        MojoExecution exec = newMojoExecution();
+
+        MavenSession session = newMavenSession();
+
+        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
+
+        Object result = new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
+                                                                logger, new Properties() ).evaluate( "${plugin.artifactId}" );
+
+        System.out.println( "Result: " + result );
+
+        assertSame( "${plugin.artifactId} expression does not return plugin descriptor's artifactId.",
+                    exec.getMojoDescriptor().getPluginDescriptor().getArtifactId(),
+                    result );
+    }
 
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
@@ -325,6 +449,43 @@ public class PluginParameterExpressionEvaluatorTest
 
         // TODO: used to be SCOPE_COMPILE, check
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, "jar" );
+    }
+
+    private MojoExecution newMojoExecution()
+    {
+        PluginDescriptor pd = new PluginDescriptor();
+        pd.setArtifactId( "my-plugin" );
+        pd.setGroupId( "org.myco.plugins" );
+        pd.setVersion( "1" );
+
+        MojoDescriptor md = new MojoDescriptor();
+        md.setPluginDescriptor( pd );
+
+        pd.addComponentDescriptor( md );
+
+        return new MojoExecution( md );
+    }
+
+    private MavenSession newMavenSession()
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        Model model = new Model();
+        model.setGroupId( "group" );
+        model.setArtifactId( "artifact" );
+        model.setVersion( "1" );
+
+        MavenProject project = new MavenProject( model );
+
+        ReactorManager rm = new ReactorManager( Collections.singletonList( project ),
+                                                ReactorManager.FAIL_FAST );
+
+        MockControl reqCtl = MockControl.createControl( MavenExecutionRequest.class );
+        MavenExecutionRequest req = (MavenExecutionRequest) reqCtl.getMock();
+
+        MavenSession session = new MavenSession( getContainer(), req, new DefaultEventDispatcher(),
+                                                 rm );
+
+        return session;
     }
 
 }

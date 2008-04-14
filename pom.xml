@@ -222,7 +222,7 @@ under the License.
   </modules>
 
   <properties>
-    <plexusVersion>1.0-alpha-44</plexusVersion>
+    <plexusVersion>1.0-alpha-45-SNAPSHOT</plexusVersion>
     <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
 

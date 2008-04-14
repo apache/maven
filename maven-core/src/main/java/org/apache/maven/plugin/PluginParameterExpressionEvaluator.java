@@ -274,6 +274,38 @@ public class PluginParameterExpressionEvaluator
                                                          e );
             }
         }
+        else if ( expression.equals( "mojo" ) )
+        {
+            value = mojoExecution;
+        }
+        else if ( expression.startsWith( "mojo" ) )
+        {
+            try
+            {
+                int pathSeparator = expression.indexOf( "/" );
+
+                if ( pathSeparator > 0 )
+                {
+                    String pathExpression = expression.substring( 1, pathSeparator );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, mojoExecution );
+                    value = value + expression.substring( pathSeparator );
+                }
+                else
+                {
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), mojoExecution );
+                }
+            }
+            catch ( Exception e )
+            {
+                // TODO: don't catch exception
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
+            }
+        }
+        else if ( expression.equals( "plugin" ) )
+        {
+            value = mojoDescriptor.getPluginDescriptor();
+        }
         else if ( expression.startsWith( "plugin" ) )
         {
             try
