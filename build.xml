@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project default="all" basedir=".">
+<project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <description>
     The first time you build Maven from source, you have to build Maven without Maven.
@@ -33,21 +33,18 @@ under the License.
     local repository for the bootstrap process.
   </description>
 
-  <property file="build.properties"/>
+  <target name="initTaskDefs">
+  	<xmlproperty file="pom.xml" prefix="pom.xml" />
+    <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.0.8.jar"/>
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
+  </target>
 
-  <taskdef resource="net/sf/antcontrib/antlib.xml">
-    <classpath>
-      <pathelement path="ant-contrib-1.0b2.jar"/>
-    </classpath>
-  </taskdef>
-
-  <target name="isMavenHomeSet">
+  <target name="isMavenHomeSet" depends="initTaskDefs">
     <property environment="env"/>
     <condition property="maven.home" value="${env.M2_HOME}">
       <isset property="env.M2_HOME"/>
     </condition>
-    <fail unless="maven.home"
-          message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
+    <fail unless="maven.home" message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
   </target>
 
   <target name="checkMavenHome" depends="isMavenHomeSet">
@@ -70,121 +67,35 @@ under the License.
   </target>
 
   <target name="init" depends="checkMavenHome">
-    <xmlproperty file="${user.home}/.m2/settings.xml"/>
-
-    <condition property="maven.repo.local" value="${settings.localRepository}">
-      <isset property="settings.localRepository"/>
-    </condition>
-
-    <condition property="maven.repo.local" value="${user.home}/.m2/repository">
-      <not>
-        <isset property="maven.repo.local"/>
-      </not>
-    </condition>
-
-    <echo>Using Local Repository: ${maven.repo.local}</echo>
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
     <delete dir="bootstrap"/>
   </target>
 
-  <!-- DGF TODO Make a simple Java Ant task that pulls dependencies and adds them to a path reference, so we don't have to copy-and-paste -->
-  <!-- Then again, this *is* a very simple Ant script, so maybe there's no need to get fancy...? -->
-  <target name="pull" depends="init"
-          description="copies all required dependencies from the Maven remote repository into your local repository.  Set the 'skip.pull' property to skip this step, but only if you're sure you already have all of the dependencies downloaded to your local repository"
-          unless="skip.pull">
-    <macrodef name="pull">
-      <attribute name="orgpath"/>
-      <attribute name="name"/>
-      <attribute name="version"/>
-      <attribute name="repository" default="maven"/>
-      <attribute name="type" default="jar"/>
-      <sequential>
-        <!-- call an ant task to download the artifact. The script cannot be
-          defined in here, because you cannot re-initialize properties.
-          Calling the script like this will scope the properties so they can
-          be re-initialized.
-        -->
-        <antcall target="download-artifact" inheritAll="true">
-          <param name="orgpath" value="@{orgpath}"/>
-          <param name="name" value="@{name}"/>
-          <param name="version" value="@{version}"/>
-          <param name="repository" value="@{repository}"/>
-          <param name="type" value="@{type}"/>
-        </antcall>
-      </sequential>
-    </macrodef>
-    <pull orgpath="aspectj/aspectjrt" version="${aspectj.version}" name="aspectjrt"/>
-    <pull orgpath="net/sf/retrotranslator/retrotranslator-runtime" version="${retrotranslator.version}" name="retrotranslator-runtime"/>
-    <pull orgpath="backport-util-concurrent/backport-util-concurrent" version="${backport.version}" name="backport-util-concurrent"/>        
-    <pull orgpath="commons-cli/commons-cli" version="${commons-cli.version}" name="commons-cli"/>
-    <pull orgpath="org/codehaus/plexus/plexus-utils" version="${plexus-utils.version}" name="plexus-utils" repository="codehaus"/>
-    <pull orgpath="org/codehaus/plexus/plexus-interpolation" version="${plexus-interpolation.version}" name="plexus-interpolation" repository="codehaus"/>
-    <pull orgpath="org/codehaus/plexus/plexus-container-default" version="${plexus.version}" name="plexus-container-default" repository="codehaus"/>
-    <pull orgpath="org/codehaus/plexus/plexus-classworlds" version="${classworlds.version}" name="plexus-classworlds" repository="codehaus"/>
-    <pull orgpath="org/apache/maven/maven-parent" version="4" name="maven-parent" type="pom"/>
-    <pull orgpath="org/apache/maven/plugins/maven-plugins" version="4" name="maven-plugins" type="pom"/>
-    <pull orgpath="org/apache/apache" version="3" name="apache" type="pom"/>
-    <!-- Wagon Deps (Start) -->
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-file" version="${wagon.version}" name="wagon-file"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-http-shared" version="${wagon.version}" name="wagon-http-shared"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-http-lightweight" version="${wagon.version}" name="wagon-http-lightweight"/>
-    <pull orgpath="org/apache/maven/wagon/wagon-provider-api" version="${wagon.version}" name="wagon-provider-api"/>
-    <!-- Wagon Deps (End) -->
-    <pull orgpath="org/apache/maven/doxia/doxia-sink-api" version="${doxia.version}" name="doxia-sink-api"/>
-    <pull orgpath="org/codehaus/modello/modello-core" version="${modello.version}" name="modello-core" repository="codehaus"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xml" version="${modello.version}" name="modello-plugin-xml" repository="codehaus"/>
-    <pull orgpath="org/codehaus/modello/modello-plugin-xpp3" version="${modello.version}" name="modello-plugin-xpp3" repository="codehaus"/>
-    <pull orgpath="junit/junit" version="${junit.version}" name="junit"/>
-    <pull orgpath="org/apache/maven/artifact/maven-artifact" version="${maven-artifact.version}" name="maven-artifact"/>    
-  </target>
-
-  <target name="classpath-pre" depends="init,pull"
-          description="constructs a classpath reference containing our dependencies, and verifies that all files are present">
-    <path id="pre.classpath">
-      <pathelement location="${maven.repo.local}/aspectj/aspectjrt/${aspectj.version}/aspectjrt-${aspectj.version}.jar"/>
-      <pathelement location="${maven.repo.local}/net/sf/retrotranslator/retrotranslator-runtime/${retrotranslator.version}/retrotranslator-runtime-${retrotranslator.version}.jar"/>
-      <pathelement location="${maven.repo.local}/backport-util-concurrent/backport-util-concurrent/${backport.version}/backport-util-concurrent-${backport.version}.jar"/>
-      <pathelement location="${maven.repo.local}/commons-cli/commons-cli/${commons-cli.version}/commons-cli-${commons-cli.version}.jar"/>
-      <pathelement location="${maven.repo.local}/commons-lang/commons-lang/${commons-lang.version}/commons-lang-${commons-lang.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-utils/${plexus-utils.version}/plexus-utils-${plexus-utils.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interpolation/${plexus-interpolation.version}/plexus-interpolation-${plexus-interpolation.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-container-default/${plexus.version}/plexus-container-default-${plexus.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-classworlds/${classworlds.version}/plexus-classworlds-${classworlds.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/plexus/plexus-interactivity-api/${plexus-interactivity-api.version}/plexus-interactivity-api-${plexus-interactivity-api.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-manager/${wagon.version}/wagon-manager-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-file/${wagon.version}/wagon-file-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-shared/${wagon.version}/wagon-http-shared-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-http-lightweight/${wagon.version}/wagon-http-lightweight-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-provider-api/${wagon.version}/wagon-provider-api-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-external/${wagon.version}/wagon-ssh-external-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh-common/${wagon.version}/wagon-ssh-common-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/wagon/wagon-ssh/${wagon.version}/wagon-ssh-${wagon.version}.jar"/>
-      <pathelement location="${maven.repo.local}/com/jcraft/jsch/${jsch.version}/jsch-${jsch.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/doxia/doxia-sink-api/${doxia.version}/doxia-sink-api-${doxia.version}.jar"/>
-      <pathelement location="${maven.repo.local}/junit/junit/${junit.version}/junit-${junit.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/apache/maven/artifact/maven-artifact/${maven-artifact.version}/maven-artifact-${maven-artifact.version}.jar"/>
-    </path>
+  <target name="pull" depends="init" unless="skip.pull">    
+    <property name="verbose" value="false"/>
+    <property name="bootstrap.repository" value="${basedir}/bootstrap/repository"/>
+    <!-- Pull the dependencies that Maven needs to build -->
+    <copy file="pom.xml" tofile="dependencies.xml"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
+    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}">      
+       <localRepository path="${bootstrap.repository}"/>
+       <pom refid="pom"/>                                                                                                                                       
+    </artifact:dependencies>      
+    <delete file="${basedir}/dependencies.xml"/>
     
-    <!-- DGF Need to keep these modello classes out of the system classpath at runtime, because different parts of the build
-         need different versions of modello.  -->
-    <path id="modello.classpath">
-      <path refid="pre.classpath"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-core/${modello.version}/modello-core-${modello.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xml/${modello.version}/modello-plugin-xml-${modello.version}.jar"/>
-      <pathelement location="${maven.repo.local}/org/codehaus/modello/modello-plugin-xpp3/${modello.version}/modello-plugin-xpp3-${modello.version}.jar"/>
-    </path>
-    <!-- DGF pathconvert immediately so we can validate the classpath -->
-    <pathconvert property="pre.classpath.str" refid="pre.classpath" pathsep="&#xa;"/>
-    <pathconvert property="modello.classpath.str" refid="modello.classpath" pathsep="&#xa;"/>
+    <!-- Pull the dependencies for Modello -->
+    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">      
+       <localRepository path="${bootstrap.repository}"/>
+       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-17"/>                                                                                                                                      
+    </artifact:dependencies>          
   </target>
 
-  <target name="generate-sources" depends="classpath-pre"
-          description="generates Java sources from Modello mdo model files"
-      >
+  <target name="generate-sources" depends="pull"
+          description="generates Java sources from Modello mdo model files">
     <mkdir dir="bootstrap/target"/>
     <mkdir dir="bootstrap/lib"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
@@ -195,7 +106,7 @@ under the License.
       <attribute name="version"/>
       <sequential>
         <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
-          <classpath refid="modello.classpath"/>
+          <classpath refid="modello.pathid"/>
           <arg file="@{file}"/>
           <arg value="@{mode}"/>
           <arg file="bootstrap/target/generated-sources"/>
@@ -245,9 +156,9 @@ under the License.
     </path>
 
     <mkdir dir="bootstrap/target/classes"/>
-    <javac destdir="bootstrap/target/classes" debug="on">
+    <javac destdir="bootstrap/target/classes" debug="${debug}">
       <src refid="sources"/>
-      <classpath refid="pre.classpath"/>
+      <classpath refid="pom.pathid"/>
     </javac>
 
     <!-- DGF generating a fake pom.properties so Maven thinks it has a version number -->
@@ -258,7 +169,7 @@ under the License.
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
       <path refid="sources"/>
-      <path refid="pre.classpath"/>
+      <path refid="pom.pathid"/>
     </path>
   </target>
 
@@ -327,82 +238,4 @@ under the License.
       <arg line="${maven.goals}"/>
     </java>
   </target>
-
-  <!--
-    Downloads an artifact, detecting wheter it's a snapshot, and uses the maven-metadata.xml to retrieve
-    the correct version.
-  -->
-  <target name="download-artifact">
-
-    <!-- choose the proper repository -->
-    <condition property="repo" value="http://snapshots.repository.codehaus.org">
-      <and>
-        <equals arg1="${repository}" arg2="codehaus"/>
-        <contains string="${version}" substring="SNAPSHOT"/>
-      </and>
-    </condition>
-
-    <condition property="repo" value="http://people.apache.org/repo/m2-snapshot-repository"
-               else="http://repo1.maven.org/maven2">
-      <and>
-        <not>
-          <isset property="repo"/>
-        </not>
-        <contains string="${version}" substring="SNAPSHOT"/>
-      </and>
-    </condition>
-
-    <mkdir dir="${maven.repo.local}/${orgpath}/${version}"/>
-
-    <!-- get the metadata file -->
-    <get src="${repo}/${orgpath}/${version}/maven-metadata.xml"
-         dest="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml" usetimestamp="true"
-         ignoreerrors="true"
-        />
-
-    <!-- Replace 'SNAPSHOT' with 'timestamp-buildnumber'. This is ugly but
-      ant doesn't allow updating of properties.
-    -->
-
-    <condition property="localSnapshot" value="false">
-      <not>
-        <available file="${maven.repo.local}/${orgpath}/${version}/maven-metadata-local.xml"/>
-      </not>
-    </condition>
-
-    <if>
-      <equals arg1="${localSnapshot}" arg2="false"/>
-      <then>
-        <xmlproperty file="${maven.repo.local}/${orgpath}/${version}/bootstrap-maven-metadata.xml"/>
-        <echo file="deleteme.version.properties" message="${version}"/>
-        <replaceregexp file="deleteme.version.properties"
-                       match="SNAPSHOT"
-                       replace="${metadata.versioning.snapshot.timestamp}-${metadata.versioning.snapshot.buildNumber}"
-                       byline="true"/>
-        <loadfile srcFile="deleteme.version.properties" property="fileversion"/>
-
-        <!-- download the final artifact -->
-        <get src="${repo}/${orgpath}/${version}/${name}-${fileversion}.${type}"
-             dest="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" usetimestamp="true"
-             ignoreerrors="false"
-            />
-
-      </then>
-      <else>
-        <property name="fileversion" value="SNAPSHOT"/>
-      </else>
-    </if>
-
-    <copy file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}" todir="bootstrap/lib"/>
-
-    <echo>Resolved version ${fileversion} (given=${version})</echo>
-
-    <condition property="build.failed">
-      <not>
-        <available file="${maven.repo.local}/${orgpath}/${version}/${name}-${version}.${type}"/>
-      </not>
-    </condition>
-    <fail if="build.failed" message="Couldn't pull dependency ${orgpath}/${name}/${version}"/>
-  </target>
-
 </project>
