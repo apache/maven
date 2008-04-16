@@ -229,7 +229,7 @@ under the License.
     <module>maven-script</module>
     <module>maven-settings</module>
     <module>maven-toolchain</module>
-    <module>apache-maven</module>
+    <module>maven-distribution</module>
   </modules>
 
   <dependencies>
