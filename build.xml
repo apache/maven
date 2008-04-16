@@ -165,6 +165,7 @@ under the License.
   <target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
     <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
     <!-- Deleting the contents inside maven.home allow one to use symlinks for maven.home and still have this work. -->          
+    <mkdir dir="${maven.home}"/>
     <delete>
       <fileset dir="${maven.home}">
         <include name="bin"/>
