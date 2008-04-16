@@ -52,15 +52,19 @@ under the License.
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
     <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
-    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}">      
+    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}">
+       <!--
        <localRepository path="${bootstrap.repository}"/>
+       -->
        <pom refid="pom"/>                                                                                                                                       
     </artifact:dependencies>      
     <delete file="${basedir}/dependencies.xml"/>
     
     <!-- Pull the dependencies for Modello -->
-    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">      
+    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
+       <!--
        <localRepository path="${bootstrap.repository}"/>
+       -->
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-17"/>                                                                                                                                      
     </artifact:dependencies>          
   </target>
