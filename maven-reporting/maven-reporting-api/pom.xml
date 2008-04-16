@@ -43,7 +43,6 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
-      <version>1.0-alpha-10</version>
     </dependency>
   </dependencies>
 </project>
