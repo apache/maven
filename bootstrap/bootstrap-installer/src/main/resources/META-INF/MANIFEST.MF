@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: org.apache.maven.bootstrap.installer.BootstrapInstaller
-Class-Path: bootstrap-mini-2.0.9-SNAPSHOT.jar plexus-utils-1.0.4.jar
