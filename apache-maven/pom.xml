@@ -26,8 +26,8 @@
     <version>2.0.10-SNAPSHOT</version>
   </parent>
 
-  <artifactId>apache-maven</artifactId>
-  <name>Maven Bundle</name>
+  <artifactId>maven-distribution</artifactId>
+  <name>Maven Distribution</name>
 
   <build>
     <plugins>
