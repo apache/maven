@@ -210,6 +210,7 @@ under the License.
 
   <modules>
     <module>maven-core</module>
+    <module>maven-distribution</module>
     <module>maven-lifecycle</module>
     <module>maven-model</module>
     <module>maven-plugin-api</module>

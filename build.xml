@@ -150,7 +150,7 @@ under the License.
     The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
     </echo>
-    <property name="maven.assembly" location="maven-embedder/target/${maven.home.basename.expected}-bin.zip"/>
+    <property name="maven.assembly" location="maven-distribution/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
         <available file="${maven.assembly}"/>
