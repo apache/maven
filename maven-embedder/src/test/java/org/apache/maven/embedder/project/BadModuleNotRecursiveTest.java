@@ -32,7 +32,7 @@ public class BadModuleNotRecursiveTest
         request.setOffline( false );
         request.setUseReactor( false );
         request.setRecursive( false );
-        request.setLoggingLevel( Logger.LEVEL_DEBUG );
+        //request.setLoggingLevel( Logger.LEVEL_DEBUG );
         request.setPom( pom );
         request.setBaseDirectory( pom.getParentFile() );
         MavenExecutionResult result = embedder.readProjectWithDependencies( request );

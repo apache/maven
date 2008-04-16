@@ -86,7 +86,7 @@ public abstract class AbstractEmbedderExecutionTestCase
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setShowErrors( true )
-            .setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG )
+            //.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG )
             .setBaseDirectory( targetDirectory )
             .setGoals( goals );
 
