@@ -67,6 +67,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
+        suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
         suite.addTestSuite( MavenITmng3473PluginReportCrash.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );

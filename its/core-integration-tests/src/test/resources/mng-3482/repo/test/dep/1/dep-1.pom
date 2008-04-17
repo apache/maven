@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>dep</artifactId>
+  <version>1</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>test</groupId>
+      <artifactId>dep2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+</project>

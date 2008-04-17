@@ -1,0 +1,22 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>remote-repository</id>
+      <repositories>
+        <repository>
+          <id>testing-repo</id>
+          <url>file://@TESTDIR@/repo</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>testing-repo</id>
+          <url>file://@TESTDIR@/repo</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>remote-repository</activeProfile>
+  </activeProfiles>
+</settings>
