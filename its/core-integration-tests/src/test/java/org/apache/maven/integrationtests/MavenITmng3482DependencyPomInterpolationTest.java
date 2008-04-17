@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -46,12 +45,6 @@ import java.util.List;
 public class MavenITmng3482DependencyPomInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3482DependencyPomInterpolationTest()
-        throws InvalidVersionSpecificationException
-    {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
-    }
-
     public void testitMNG3482()
         throws Exception
     {
