@@ -30,7 +30,7 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-embedder</artifactId>
+      <artifactId>maven-distribution</artifactId>
       <version>2.1-SNAPSHOT</version>
       <classifier>bin</classifier>
       <type>tar.gz</type>
@@ -52,7 +52,7 @@ under the License.
           <systemProperties>
             <property>
               <name>maven.home</name>
-              <value>${basedir}/target/maven-installation/apache-maven-${project.version}</value>
+              <value>${basedir}/target/maven-installation/apache-maven-2.1-SNAPSHOT</value>
             </property>
             <property>
               <name>maven.test.tmpdir</name>
@@ -76,8 +76,8 @@ under the License.
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.maven</groupId>
-                  <artifactId>maven-embedder</artifactId>
-                  <version>${project.version}</version>
+                  <artifactId>maven-distribution</artifactId>
+                  <version>2.1-SNAPSHOT</version>
                   <classifier>bin</classifier>
                   <type>tar.gz</type>
                 </artifactItem>
@@ -96,7 +96,7 @@ under the License.
           <execution>
             <configuration>
               <tasks>
-                <chmod file="${basedir}/target/maven-installation/apache-maven-${project.version}/bin/mvn" perm="755"/>
+                <chmod file="${basedir}/target/maven-installation/apache-maven-2.1-SNAPSHOT/bin/mvn" perm="755"/>
               </tasks>
             </configuration>
             <phase>process-sources</phase>
