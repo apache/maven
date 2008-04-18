@@ -11,6 +11,7 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
         <executions>
           <execution>
             <goals>
@@ -21,6 +22,7 @@
             <configuration>
               <version>1.0.0</version>
               <model>test.mdo</model>
+              <packageWithVersion>false</packageWithVersion>
             </configuration>
           </execution>
         </executions>
