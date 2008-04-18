@@ -376,7 +376,7 @@ public class MavenEmbedder
 
         getLogger().debug( "Building MavenProject instance: " + mavenProject );
 
-        return mavenProjectBuilder.build( mavenProject, request.getLocalRepository(), request.getProfileManager() );
+        return mavenProjectBuilder.build( mavenProject, request.getProjectBuildingConfiguration() );
     }
 
     /**
@@ -450,8 +450,7 @@ public class MavenEmbedder
         {
             projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies(
                 request.getPom(),
-                request.getLocalRepository(),
-                request.getProfileManager() );
+                request.getProjectBuildingConfiguration() );
         }
         catch ( ProjectBuildingException e )
         {

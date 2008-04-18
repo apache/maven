@@ -353,7 +353,17 @@ public class DefaultMavenProjectBuilder
                                                              ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        MavenProject project = build( projectDescriptor, localRepository, profileManager );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
+                                                                                     .setGlobalProfileManager( profileManager );
+
+        return buildProjectWithDependencies( projectDescriptor, config );
+    }
+
+    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor,
+                                                                    ProjectBuilderConfiguration config )
+               throws ProjectBuildingException
+   {
+        MavenProject project = build( projectDescriptor, config );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -387,7 +397,7 @@ public class DefaultMavenProjectBuilder
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( projectArtifact )
             .setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( localRepository )
+            .setLocalRepository( config.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( managedVersions )
             .setMetadataSource( artifactMetadataSource );

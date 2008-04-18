@@ -55,6 +55,14 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     MavenProjectBuildingResult buildProjectWithDependencies( File project,
+                                                             ProjectBuilderConfiguration config )
+        throws ProjectBuildingException;
+
+
+    /**
+     * @deprecated Use {@link MavenProjectBuilder#buildProjectWithDependencies(File, ProjectBuilderConfiguration)} instead.
+     */
+    MavenProjectBuildingResult buildProjectWithDependencies( File project,
                                                              ArtifactRepository localRepository,
                                                              ProfileManager globalProfileManager )
         throws ProjectBuildingException;
